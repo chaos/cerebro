@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.7 2005-02-02 01:27:51 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.8 2005-02-02 18:08:38 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -222,7 +222,7 @@ cerebrod_listener(void *arg)
       if (rv < 0)
 	continue;
 
-      if ((hblen = cerebrod_heartbeat_ummarshall(&hb, hbbuf, rv)) < 0)
+      if ((hblen = cerebrod_heartbeat_unmarshall(&hb, hbbuf, rv)) < 0)
 	continue;
 
       _cerebrod_listener_dump_heartbeat(&hb);
