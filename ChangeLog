@@ -30,6 +30,9 @@
 	* src/libcerebro/cerebro_updown_protocol.h: Define default server port.
 
 	* src/cerebrod/cerebrod_config.h: Use defined default server port.
+
+	* src/cerebrod/cerebrod_speaker.c (_cerebrod_speaker_initialize):
+	Improve initialization routine.
 	
 2005-03-28  Albert Chu  <chu11@llnl.gov>
 
