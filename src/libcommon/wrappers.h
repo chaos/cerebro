@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.h,v 1.6 2005-01-18 18:43:35 achu Exp $
+ *  $Id: wrappers.h,v 1.7 2005-01-18 23:03:41 achu Exp $
 \*****************************************************************************/
 
 #ifndef _WRAPPERS_H
@@ -145,6 +145,4 @@ int wrap_pthread_mutex_unlock(const char *file, int line, pthread_mutex_t *mutex
 pid_t wrap_fork(const char *file, int line);
 Sighandler_t wrap_signal(const char *file, int line, int signum, Sighandler_t handler);
 
-#if WITH_PTHREADS
-#endif /* WITH_PTHREADS */
 #endif /* _WRAPPERS_H */
