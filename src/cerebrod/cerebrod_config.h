@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.h,v 1.30 2005-03-22 01:34:54 achu Exp $
+ *  $Id: cerebrod_config.h,v 1.31 2005-03-22 05:37:46 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_CONFIG_H
@@ -16,7 +16,6 @@
  */
 
 #define CEREBROD_DEBUG_DEFAULT                        0
-#define CEREBROD_CONFIG_TYPE_DEFAULT                  NULL
 #define CEREBROD_CONFIG_MODULE_DEFAULT                NULL
 #define CEREBROD_HEARTBEAT_FREQUENCY_MIN_DEFAULT      10
 #define CEREBROD_HEARTBEAT_FREQUENCY_MAX_DEFAULT      20
@@ -30,8 +29,6 @@
 #define CEREBROD_LISTEN_THREADS_DEFAULT               2
 #define CEREBROD_UPDOWN_SERVER_DEFAULT                1
 #define CEREBROD_UPDOWN_SERVER_PORT_DEFAULT           8852
-#define CEREBROD_CLUSTERLIST_TYPE_DEFAULT             NULL
-#define CEREBROD_CLUSTERLIST_TYPE_OPTIONS_DEFAULT     NULL
 #define CEREBROD_CLUSTERLIST_MODULE_DEFAULT           NULL
 #define CEREBROD_CLUSTERLIST_MODULE_OPTIONS_DEFAULT   NULL
 #define CEREBROD_SPEAK_DEBUG_DEFAULT                  0
@@ -50,11 +47,7 @@ struct cerebrod_config
   int debug;
 #endif /* NDEBUG */
   char *config_file;
-#if WITH_STATIC_MODULES
-  char *config_type;
-#else  /* !WITH_STATIC_MODULES */
   char *config_module;
-#endif /* !WITH_STATIC_MODULES */
 
   /* Set by the user in the configuration file */
   unsigned int heartbeat_frequency_min;
@@ -73,13 +66,8 @@ struct cerebrod_config
   int updown_server;
   int updown_server_port;
 
-#if WITH_STATIC_MODULES
-  char *clusterlist_type;
-  char **clusterlist_type_options;
-#else  /* !WITH_STATIC_MODULES */
   char *clusterlist_module;
   char **clusterlist_module_options;
-#endif /* !WITH_STATIC_MODULES */
 
 #ifndef NDEBUG
   int speak_debug;

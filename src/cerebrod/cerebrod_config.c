@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.50 2005-03-22 01:34:54 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.51 2005-03-22 05:37:46 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -93,11 +93,7 @@ _cerebrod_config_default(void)
   conf.debug = CEREBROD_DEBUG_DEFAULT;
 #endif /* NDEBUG */
   conf.config_file = CEREBROD_CONFIG_FILE_DEFAULT;
-#if WITH_STATIC_MODULES
-  conf.config_type = CEREBROD_CONFIG_TYPE_DEFAULT;
-#else  /* !WITH_STATIC_MODULES */
   conf.config_module = CEREBROD_CONFIG_MODULE_DEFAULT;
-#endif /* !WITH_STATIC_MODULES */
   conf.heartbeat_frequency_min = CEREBROD_HEARTBEAT_FREQUENCY_MIN_DEFAULT;
   conf.heartbeat_frequency_max = CEREBROD_HEARTBEAT_FREQUENCY_MAX_DEFAULT;
   conf.heartbeat_source_port = CEREBROD_HEARTBEAT_SOURCE_PORT_DEFAULT;
@@ -110,13 +106,8 @@ _cerebrod_config_default(void)
   conf.listen_threads = CEREBROD_LISTEN_THREADS_DEFAULT;
   conf.updown_server = CEREBROD_UPDOWN_SERVER_DEFAULT;
   conf.updown_server_port = CEREBROD_UPDOWN_SERVER_PORT_DEFAULT;
-#if WITH_STATIC_MODULES
-  conf.clusterlist_type = CEREBROD_CLUSTERLIST_TYPE_DEFAULT;
-  conf.clusterlist_type_options = CEREBROD_CLUSTERLIST_TYPE_OPTIONS_DEFAULT;
-#else  /* !WITH_STATIC_MODULES */
   conf.clusterlist_module = CEREBROD_CLUSTERLIST_MODULE_DEFAULT;
   conf.clusterlist_module_options = CEREBROD_CLUSTERLIST_MODULE_OPTIONS_DEFAULT;
-#endif /* !WITH_STATIC_MODULES */
 #ifndef NDEBUG
   conf.speak_debug = CEREBROD_SPEAK_DEBUG_DEFAULT;
   conf.listen_debug = CEREBROD_LISTEN_DEBUG_DEFAULT;
@@ -135,14 +126,8 @@ _usage(void)
   fprintf(stderr, "Usage: cerebrod [OPTIONS]\n"
           "-h    --help          Output Help\n"
           "-v    --version       Output Version\n"
-          "-c    --config_file   Specify alternate config file\n");
-#if WITH_STATIC_MODULES
-  fprintf(stderr, 
-          "-m    --config_type   Specify configuration type\n");
-#else  /* !WITH_STATIC_MODULES */
-  fprintf(stderr, 
+          "-c    --config_file   Specify alternate config file\n"
           "-m    --config_module Specify configuration module\n");
-#endif /* !WITH_STATIC_MODULES */
 #ifndef NDEBUG
   fprintf(stderr, 
           "-d    --debug         Turn on debugging and run daemon in foreground\n");
@@ -178,12 +163,8 @@ _cerebrod_cmdline_parse(int argc, char **argv)
     {
       {"help",                0, NULL, 'h'},
       {"version",             0, NULL, 'v'},
-      {"config_file",         1, NULL, 'c'},
-#if WITH_STATIC_MODULES
-      {"config_type",         1, NULL, 't'},
-#else  /* !WITH_STATIC_MODULES */
-      {"config_module",       1, NULL, 'm'},
-#endif /* !WITH_STATIC_MODULES */
+      {"config-file",         1, NULL, 'c'},
+      {"config-module",       1, NULL, 'm'},
 #ifndef NDEBUG
       {"debug",               0, NULL, 'd'},
 #endif /* NDEBUG */
@@ -193,11 +174,7 @@ _cerebrod_cmdline_parse(int argc, char **argv)
   assert(argv);
 
   memset(options, '\0', sizeof(options));
-#if WITH_STATIC_MODULES
-  strcat(options, "hvc:t:");
-#else  /* !WITH_STATIC_MODULES */
   strcat(options, "hvc:m:");
-#endif /* !WITH_STATIC_MODULES */
 #ifndef NDEBUG
   strcat(options, "d");
 #endif /* NDEBUG */
@@ -219,18 +196,12 @@ _cerebrod_cmdline_parse(int argc, char **argv)
         case 'v':       /* --version */
           _version();
           break;
-        case 'c':       /* --config_file */
+        case 'c':       /* --config-file */
           conf.config_file = Strdup(optarg);
           break;
-#if WITH_STATIC_MODULES
-        case 't':       /* --config_type */
-          conf.config_type = Strdup(optarg);
-          break;
-#else  /* !WITH_STATIC_MODULES */
-        case 'm':       /* --config_module */
+        case 'm':       /* --config-module */
           conf.config_module = Strdup(optarg);
           break;
-#endif /* !WITH_STATIC_MODULES */
 #ifndef NDEBUG
         case 'd':       /* --debug */
           conf.debug++;
@@ -268,7 +239,7 @@ _cerebrod_cmdline_parse_check(void)
 
 #if WITH_STATIC_MODULES
   /* Check if the configuration type exists */
-  if (conf.config_type)
+  if (conf.config_module)
     {
       struct cerebrod_config_module_info **ptr = &static_config_modules[0];
       int i = 0;
@@ -280,12 +251,12 @@ _cerebrod_cmdline_parse_check(void)
               err_debug("static config module index '%d' does not contain name");
               continue;
             }
-          if (!strcmp(ptr[i]->config_module_name, conf.config_type))
+          if (!strcmp(ptr[i]->config_module_name, conf.config_module))
             goto done;
           i++;
         }
 
-      err_exit("config type '%s' not found", conf.config_type);
+      err_exit("config type '%s' not found", conf.config_module);
     }
 #else  /* !WITH_STATIC_MODULES */
   /* Check if the configuration module exists */
@@ -489,11 +460,11 @@ static void
 _cerebrod_config_module_setup(void)
 {
 #if WITH_STATIC_MODULES
-  if (conf.config_type)
+  if (conf.config_module)
     {
-      if (_config_load_static_module(conf.config_type) != 1)
+      if (_config_load_static_module(conf.config_module) != 1)
 	err_exit("config type '%s' could not be loaded",
-		 conf.config_type);
+		 conf.config_module);
     }
   else
     {
@@ -601,7 +572,7 @@ _cb_stringptr(conffile_t cf, struct conffile_data *data,
 }
 
 /*
- * _cb_options
+ * _cb_module_options
  *
  * conffile callback function that parses and stores an array of
  * options.
@@ -609,9 +580,9 @@ _cb_stringptr(conffile_t cf, struct conffile_data *data,
  * Returns 0 on success, -1 on error
  */
 static int
-_cb_options(conffile_t cf, struct conffile_data *data,
-            char *optionname, int option_type, void *option_ptr,
-            int option_data, void *app_ptr, int app_data)
+_cb_module_options(conffile_t cf, struct conffile_data *data,
+		   char *optionname, int option_type, void *option_ptr,
+		   int option_data, void *app_ptr, int app_data)
 {
   if (option_ptr == NULL)
     {
@@ -647,12 +618,8 @@ _cerebrod_config_parse(void)
     heartbeat_destination_port_flag, heartbeat_destination_ip_flag, 
     heartbeat_network_interface_flag, heartbeat_ttl_flag, speak_flag, 
     listen_flag, listen_threads_flag, updown_server_flag, 
-    updown_server_port_flag, 
-#if WITH_STATIC_MODULES
-    clusterlist_type_flag, clusterlist_type_options_flag;
-#else  /* !WITH_STATIC_MODULES */
-    clusterlist_module_flag, clusterlist_module_options_flag;
-#endif /* !WITH_STATIC_MODULES */
+    updown_server_port_flag, clusterlist_module_flag, 
+    clusterlist_module_options_flag;
 #ifndef NDEBUG    
   int speak_debug_flag, listen_debug_flag, updown_server_debug_flag;
 #endif /* NDEBUG */
@@ -682,19 +649,11 @@ _cerebrod_config_parse(void)
        1, 0, &updown_server_flag, &conf.updown_server, 0},
       {"updown_server_port", CONFFILE_OPTION_INT, -1, conffile_int,
        1, 0, &updown_server_port_flag, &(conf.updown_server_port), 0},
-#if WITH_STATIC_MODULES
-      {"clusterlist_type", CONFFILE_OPTION_STRING, -1, _cb_stringptr,
-       1, 0, &clusterlist_type_flag, &(conf.clusterlist_type), 0},
-      {"clusterlist_type_options", CONFFILE_OPTION_LIST_STRING, -1, 
-       _cb_options, 1, 0, &clusterlist_type_options_flag, 
-       &(conf.clusterlist_type_options), 0},
-#else  /* !WITH_STATIC_MODULES */
       {"clusterlist_module", CONFFILE_OPTION_STRING, -1, _cb_stringptr,
        1, 0, &clusterlist_module_flag, &(conf.clusterlist_module), 0},
       {"clusterlist_module_options", CONFFILE_OPTION_LIST_STRING, -1, 
-       _cb_options, 1, 0, &clusterlist_module_options_flag, 
+       _cb_module_options, 1, 0, &clusterlist_module_options_flag, 
        &(conf.clusterlist_module_options), 0},
-#endif /* !WITH_STATIC_MODULES */
 #ifndef NDEBUG    
       {"speak_debug", CONFFILE_OPTION_BOOL, -1, conffile_bool,
        1, 0, &speak_debug_flag, &conf.speak_debug, 0},
@@ -1211,7 +1170,7 @@ static void
 _cerebrod_calculate_clusterlist_module(void)
 {
 #if WITH_STATIC_MODULES
-  if (conf.clusterlist_type)
+  if (conf.clusterlist_module)
     {
       struct cerebrod_clusterlist_module_info **ptr = &static_clusterlist_modules[0];
       int i = 0;
@@ -1223,12 +1182,12 @@ _cerebrod_calculate_clusterlist_module(void)
               err_debug("static clusterlist module index '%d' does not contain name");
               continue;
             }
-          if (!strcmp(ptr[i]->clusterlist_module_name, conf.clusterlist_type))
+          if (!strcmp(ptr[i]->clusterlist_module_name, conf.clusterlist_module))
             goto done;
           i++;
         }
 
-      err_exit("clusterlist type '%s' not found", conf.clusterlist_type);
+      err_exit("clusterlist type '%s' not found", conf.clusterlist_module);
     }
 #else  /* !WITH_STATIC_MODULES */
   if (conf.clusterlist_module)
@@ -1410,11 +1369,7 @@ _cerebrod_config_dump(void)
       fprintf(stderr, "* -------------------------------\n");
       fprintf(stderr, "* debug: %d\n", conf.debug);
       fprintf(stderr, "* config_file: \"%s\"\n", conf.config_file);
-#if WITH_STATIC_MODULES
-      fprintf(stderr, "* config_type: \"%s\"\n", conf.config_type);
-#else  /* !WITH_STATIC_MODULES */
       fprintf(stderr, "* config_module: \"%s\"\n", conf.config_module);
-#endif /* !WITH_STATIC_MODULES */
       fprintf(stderr, "* -------------------------------\n");
       fprintf(stderr, "* Configuration File Options\n");
       fprintf(stderr, "* -------------------------------\n");
@@ -1430,22 +1385,6 @@ _cerebrod_config_dump(void)
       fprintf(stderr, "* listen_threads: %d\n", conf.listen_threads);
       fprintf(stderr, "* updown_server: %d\n", conf.updown_server);
       fprintf(stderr, "* updown_server_port: %d\n", conf.updown_server_port);
-#if WITH_STATIC_MODULES
-      fprintf(stderr, "* clusterlist_type: %s\n", conf.clusterlist_type);
-      fprintf(stderr, "* clusterlist_type_options: ");
-      if (!conf.clusterlist_type_options)
-        fprintf(stderr, "%s\n", (char *)conf.clusterlist_type_options);
-      else
-        {
-          int i = 0;
-          while (conf.clusterlist_type_options[i] != NULL) 
-            {
-              fprintf(stderr, "%s ", conf.clusterlist_type_options[i]);
-              i++;
-            }
-          fprintf(stderr, "\n");
-        }
-#else  /* !WITH_STATIC_MODULES */
       fprintf(stderr, "* clusterlist_module: %s\n", conf.clusterlist_module);
       fprintf(stderr, "* clusterlist_module_options: ");
       if (!conf.clusterlist_module_options)
@@ -1460,7 +1399,6 @@ _cerebrod_config_dump(void)
             }
           fprintf(stderr, "\n");
         }
-#endif /* !WITH_STATIC_MODULES */
       fprintf(stderr, "* speak_debug: %d\n", conf.speak_debug);
       fprintf(stderr, "* listen_debug: %d\n", conf.listen_debug);
       fprintf(stderr, "* updown_server_debug: %d\n", conf.updown_server_debug);

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist.c,v 1.15 2005-03-22 01:34:54 achu Exp $
+ *  $Id: cerebrod_clusterlist.c,v 1.16 2005-03-22 05:37:46 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -209,11 +209,11 @@ cerebrod_clusterlist_setup(void)
   assert(!clusterlist_module_info);
 
 #if WITH_STATIC_MODULES
-  if (conf.clusterlist_type)
+  if (conf.clusterlist_module)
     {
-      if (_clusterlist_load_static_module(conf.clusterlist_type) != 1)
+      if (_clusterlist_load_static_module(conf.clusterlist_module) != 1)
         err_exit("clusterlist type '%s' could not be loaded",
-                 conf.clusterlist_type);
+                 conf.clusterlist_module);
     }
   else
     {
@@ -295,11 +295,7 @@ cerebrod_clusterlist_parse_options(void)
 {
   assert(clusterlist_module_info);
 
-#if WITH_STATIC_MODULES
-  return ((*clusterlist_module_info->parse_options)(conf.clusterlist_type_options));
-#else /* !WITH_STATIC_MODULES */
   return ((*clusterlist_module_info->parse_options)(conf.clusterlist_module_options));
-#endif
 }
 
 int 

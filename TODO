@@ -22,3 +22,6 @@
   - on manpage ORIGINS
 
 - signals to daemon to log/unlog debug info?
+
+- lib for writing modules
+  - and doc

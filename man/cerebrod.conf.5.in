@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebrod.conf.5.in,v 1.6 2005-03-21 16:41:39 achu Exp $
+\."$Id: cerebrod.conf.5.in,v 1.7 2005-03-22 05:37:46 achu Exp $
 \."#############################################################################
 .TH cerebrod.conf 5 "May 2005" "cerebrod.conf @VERSION@" "cerebrod.conf"
 .SH "NAME"
@@ -114,6 +114,12 @@ option is turned on.
 .I updown_server_port num
 Specify the updown server port.  The default server port is 8852.
 .TP
+.ie @MANPAGE_STATIC_MODULES@ \{
+.I clusterlist_module name
+Specify the clusterlist module name to be loaded for parsing a
+list/database of cluster nodes.
+\}
+.el \{
 .I clusterlist_module ( name | filename | path )
 Specify the clusterlist module to be loaded for parsing a
 list/database of cluster nodes.  The name, filename, or full filename path
@@ -122,11 +128,12 @@ first searched for in the
 .B Cerebro
 package library, @CEREBROD_MODULE_DIR@.  They are then searched for in
 the current directory.
+\}
 
-When this option is not configured, the following clusterlist modules
-are currently searched for by
+The following clusterlist modules
+are available to
 .B cerebrod
-in the following order:
+by default:
  
 .if @MANPAGE_GENDERSLLNL@ \{
 gendersllnl
@@ -141,6 +148,11 @@ genders
 hostsfile
  
 none
+
+When this option is not configured, the above clusterlist modules are
+searched for by
+.B cerebrod
+in the above order.
 
 .TP
 .I clusterlist_module_options str

@@ -1,4 +1,18 @@
 2005-03-21  Albert Chu  <chu11@llnl.gov>
+	
+	Static module compilation code cleanup
+
+	* Globally remove config_type and clusterlist_type.  Everything
+	will be referred to as modules, despite being compiled statically
+	or not.
+
+	* config/ac_static_modules.m4: Turn --with-static-modules to
+	--enable-static-modules.
+
+	* man/cerebrod.8.in, man/cerebrod.conf.5.in: Updated with static
+	modules wording.
+
+2005-03-21  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerebrod/cerebrod_clusterlist.h: Modified
 	Cerebrod_clusterlist_get_nodename prototype to take a unsigned int

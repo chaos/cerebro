@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebrod.8.in,v 1.8 2005-03-22 01:34:54 achu Exp $
+\."$Id: cerebrod.8.in,v 1.9 2005-03-22 05:37:46 achu Exp $
 \."#############################################################################
 .TH cerebrod 8 "May 2005" "cerebrod @VERSION@" cerebrod
 .SH "NAME"
@@ -22,10 +22,10 @@ Output help
 .B  -v, --version
 Output version
 .TP
-.B  -c, --config_file
+.B  -c, --config-file
 Specify alternate configuration file
 .TP
-.B  -m, --config_module
+.B  -m, --config-module
 Specify configuration module
 .if @MANPAGE_DEBUG@ \{
 .TP
@@ -62,23 +62,23 @@ manpage.
 A configuration module format has been developed into 
 .B cerebrod
 to alleviate the potential difficulty of configuring many different
-cluster nodes with different configuration files.  
-For example, if the cluster contains a cluster configuration database,
-a configuration module could be written to read from the cluster
+cluster nodes with different configuration files.  The configuration
+module loads an alternate set of default configuration options.  For
+example, if the cluster contains a cluster configuration database, a
+configuration module could be written to read from the cluster
 configuration database, and configure each
 .B cerebrod
 daemon in the cluster based on the parameters stored in the database.
 Therefore, a different configuration file does not have to be written
-for each cluster node.
+and distributed for each cluster node.
 
-The configuration module is dynamically loaded by the
-.B cerebrod
-daemon to load the alternate set of default configuration options
-specified by the module.  The alternate default configuration options
+The alternate default configuration options
 can be overrided by the options specified in the configuration file.
-The following configuration modules are currently searched for by
+
+The following config modules
+are available to
 .B cerebrod
-in the following order:
+by default:
 
 .ie @MANPAGE_GENDERSLLNL@ \{
 gendersllnl - Configures the
@@ -91,23 +91,36 @@ No configuration modules are searched in this build.
 
 \}
 
+.ie @MANPAGE_STATIC_MODULES@ \{
+A configuration module can be specified on the command line with
+the
+.I -c 
+option.
+
+When a config module is not specified, the above config modules are
+searched for by
+.B cerebrod
+in the above order.
+\}
+.el \{
 Configuration modules are first searched for in the 
 .B Cerebro
 package library directory, @CEREBROD_MODULE_DIR@.  They are then
 searched for in the current directory.  A configuration module can
-also be specified on the command line with the 
+also be specified on the command line with the
 .I -c 
 option.
 
 For more information on writing 
 .B cerebrod
 configuration modules see XXX.
+\}
 
 .SH "CLUSTERLIST MODULE"
 In order for 
 .B Cerebro
 to be utilized at its full potential, a list of cluster nodes should be
-loaded to the
+loaded into the
 .B cerebrod
 daemon.  Although
 .B Cerebro
@@ -116,26 +129,33 @@ without one.  For example, there will be no way to determine the down
 nodes of the cluster, if there is no knowledge of what all of the
 nodes in the cluster actually are.
 
-The list of cluster nodes can be specified in several formats.  The 
-.B cerebrod
-daemon dynamically loads a clusterlist module capable of parsing
-and interpreting different database formats.  
-Clusterlist modules are first searched for in the 
-.B Cerebro
-package library, @CEREBROD_MODULE_DIR@.  They are then searched for in
-the current directory.  Specific clusterlist modules can be selected
-using the
+The list of cluster nodes can be specified in several formats,
+depending on the clusterlist module selected.  Clusterlist modules can
+be selected using the
 .I clusterlist_module
 configuration option in the
 .B cerebrod
 configuration file.
 Configurable options can be passed to the clusterlist modules through the
 .I clusterlist_module_options
-configuration file option.  The options are listed as key=value pairs.
+configuration file option.  The options are typically listed as
+key=value pairs.
 
-The following clusterlist modules are currently searched for by
+.if !@MANPAGE_STATIC_MODULES@ \{
+The 
 .B cerebrod
-in the following order:
+daemon dynamically loads the clusterlist module selected by the user
+or searches for one when one is not specified.  Clusterlist modules
+are first searched for in the
+.B Cerebro
+package library, @CEREBROD_MODULE_DIR@.  They are then searched for in
+the current directory.  
+\}
+
+The following config modules
+are available to
+.B cerebrod
+by default:
 
 .if @MANPAGE_GENDERSLLNL@ \{
 gendersllnl - Reads and parses a genders database with LLNL specific
@@ -158,10 +178,17 @@ located at @CEREBROD_CLUSTERLIST_HOSTSFILE_DEFAULT@.
 
 none - Do not use a cluster list.
 
+When a clusterlist module is not specified, the above clusterlist
+modules are searched for by
+.B cerebrod
+in the above order.
+
+.if !@MANPAGE_STATIC_MODULES@ \{
 Other cluster list formats can be parsed by writing a new clusterlist 
 module.  For more information on writing 
 .B cerebrod
 clusterlist modules see XXX.
+\}
 
 .SH "FILES"
 @CEREBROD_CONFIG_FILE_DEFAULT@
