@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_daemon.c,v 1.3 2005-01-18 18:43:35 achu Exp $
+ *  $Id: cerebrod_daemon.c,v 1.4 2005-03-20 20:21:18 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -17,6 +17,11 @@
 #include "error.h"
 #include "wrappers.h"
 
+/* 
+ * cerebrod_daemon_init
+ *
+ * daemonize the cerebrod process
+ */
 void
 cerebrod_daemon_init(void)
 {

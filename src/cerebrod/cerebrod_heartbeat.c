@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_heartbeat.c,v 1.10 2005-03-20 20:10:14 achu Exp $
+ *  $Id: cerebrod_heartbeat.c,v 1.11 2005-03-20 20:21:18 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -24,9 +24,14 @@
 
 extern struct cerebrod_config conf;
 #ifndef NDEBUG
-pthread_mutex_t debug_output_mutex;
+extern pthread_mutex_t debug_output_mutex;
 #endif /* NDEBUG */
 
+/*
+ * cerebrod_heartbeat_construct
+ *
+ * construct a heartbeat packet
+ */
 void
 cerebrod_heartbeat_construct(struct cerebrod_heartbeat *hb)
 {
@@ -38,6 +43,11 @@ cerebrod_heartbeat_construct(struct cerebrod_heartbeat *hb)
   hb->boottime = cerebrod_get_boottime();
 }
 
+/*
+ * cerebrod_heartbeat_dump
+ *
+ * dump contents of a heartbeat packet
+ */
 void
 cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb)
 {
@@ -64,6 +74,13 @@ cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb)
 #endif /* NDEBUG */
 }
 
+/* 
+ * _marshall_int32
+ *
+ * marshall contents of a 32 bit integer
+ *
+ * Returns length of data copied into buffer
+ */
 static int
 _marshall_int32(int32_t val, char *buffer)
 {
@@ -74,6 +91,13 @@ _marshall_int32(int32_t val, char *buffer)
   return sizeof(temp);
 }
 
+/* 
+ * _marshall_uint32
+ *
+ * marshall contents of an unsigned 32 bit integer
+ *
+ * Returns length of data copied into buffer
+ */
 static int
 _marshall_uint32(u_int32_t val, char *buffer)
 {
@@ -84,6 +108,13 @@ _marshall_uint32(u_int32_t val, char *buffer)
   return sizeof(temp);
 }
 
+/* 
+ * _marshall_buffer
+ *
+ * marshall contents of a buffer
+ *
+ * Returns length of data copied into buffer
+ */
 static int
 _marshall_buffer(char *buf, int buflen, char *buffer)
 {
@@ -92,34 +123,13 @@ _marshall_buffer(char *buf, int buflen, char *buffer)
   return buflen;
 }
 
-static int
-_unmarshall_int32(int32_t *val, char *buffer)
-{
-  int32_t temp;
-  assert(val && buffer);
-  memcpy((void *)&temp, buffer, sizeof(temp));
-  *val = ntohl(temp);
-  return sizeof(temp);
-}
-
-static int
-_unmarshall_uint32(u_int32_t *val, char *buffer)
-{
-  u_int32_t temp;
-  assert(val && buffer);
-  memcpy((void *)&temp, buffer, sizeof(temp));
-  *val = ntohl(temp);
-  return sizeof(temp);
-}
-
-static int
-_unmarshall_buffer(char *buf, int buflen, char *buffer)
-{
-  assert(buf && buflen > 0 && buffer);
-  memcpy(buf, buffer, buflen);
-  return buflen;
-}
-
+/*
+ * cerebrod_heartbeat_marshall
+ *
+ * marshall contents of a heartbeat packet.
+ *
+ * Returns length of data copied into buffer, -1 on error
+ */
 int 
 cerebrod_heartbeat_marshall(struct cerebrod_heartbeat *hb, 
 			    char *buffer, int len) 
@@ -138,6 +148,62 @@ cerebrod_heartbeat_marshall(struct cerebrod_heartbeat *hb,
   return c;
 }
 
+/* 
+ * _unmarshall_int32
+ *
+ * unmarshall contents of a 32 bit integer
+ *
+ * Returns length of data read from buffer
+ */
+static int
+_unmarshall_int32(int32_t *val, char *buffer)
+{
+  int32_t temp;
+  assert(val && buffer);
+  memcpy((void *)&temp, buffer, sizeof(temp));
+  *val = ntohl(temp);
+  return sizeof(temp);
+}
+
+/* 
+ * _unmarshall_uint32
+ *
+ * unmarshall contents of an unsigned 32 bit integer
+ *
+ * Returns length of data read from buffer
+ */
+static int
+_unmarshall_uint32(u_int32_t *val, char *buffer)
+{
+  u_int32_t temp;
+  assert(val && buffer);
+  memcpy((void *)&temp, buffer, sizeof(temp));
+  *val = ntohl(temp);
+  return sizeof(temp);
+}
+
+/* 
+ * _unmarshall_buffer
+ *
+ * unmarshall contents of a buffer
+ *
+ * Returns length of data read from buffer
+ */
+static int
+_unmarshall_buffer(char *buf, int buflen, char *buffer)
+{
+  assert(buf && buflen > 0 && buffer);
+  memcpy(buf, buffer, buflen);
+  return buflen;
+}
+
+/* 
+ * cerebrod_heartbeat_unmarshall
+ *
+ * unmarshall contents of a packet buffer
+ *
+ * Returns 0 on success, -1 on error 
+ */
 int 
 cerebrod_heartbeat_unmarshall(struct cerebrod_heartbeat *hb, 
 			      char *buffer, int len)

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.45 2005-03-20 19:35:49 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.46 2005-03-20 20:21:18 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -123,9 +123,6 @@ _version(void)
  * _cerebrod_cmdline_parse
  *
  * parse command line options
- *
- * - argc - number of command line arguments
- * - argv - command line arguments array
  */
 static void
 _cerebrod_cmdline_parse(int argc, char **argv)

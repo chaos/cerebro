@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.h,v 1.25 2005-03-20 19:35:49 achu Exp $
+ *  $Id: cerebrod_config.h,v 1.26 2005-03-20 20:21:18 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_CONFIG_H
@@ -31,7 +31,9 @@
 #define CEREBROD_UPDOWN_SERVER_DEBUG_DEFAULT          0
 
 /*
- * cerebrod_config - configuration structure used by all of cerebrod.
+ * struct cerebrod_config 
+ *
+ * configuration structure and data used by all of cerebrod.
  */
 struct cerebrod_config
 {
@@ -84,8 +86,10 @@ struct cerebrod_config
 typedef int (*Cerebrod_config_load_default)(struct cerebrod_config *conf);
 
 /*
- * cerebrod_config_module_info - contains config module information.  Required
- * to be defined in each config module.
+ * struct cerebrod_config_module_info 
+ * 
+ * contains config module information.  Required to be defined in each
+ * config module.
  */
 struct cerebrod_config_module_info
 {
@@ -93,8 +97,10 @@ struct cerebrod_config_module_info
 };
  
 /*
- * cerebrod_config_module_ops - contains config module functions.  Required
- * to be defined in each config module.
+ * struct cerebrod_config_module_ops 
+ *
+ * config module functions.  Required to be defined in each config
+ * module.
  */
 struct cerebrod_config_module_ops
 {
