@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.23 2005-03-22 05:37:46 achu Exp $
+ *  $Id: cerebrod.c,v 1.24 2005-03-25 18:34:11 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -73,7 +73,7 @@ main(int argc, char **argv)
 
   _cerebrod_pre_config_initialization();
 
-  cerebrod_config(argc, argv);
+  cerebrod_config_setup(argc, argv);
 
   _cerebrod_post_config_initialization();
 

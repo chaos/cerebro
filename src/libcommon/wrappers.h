@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.h,v 1.21 2005-03-22 01:34:54 achu Exp $
+ *  $Id: wrappers.h,v 1.22 2005-03-25 18:34:11 achu Exp $
 \*****************************************************************************/
 
 #ifndef _WRAPPERS_H
@@ -25,6 +25,8 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
+#include <netdb.h>
+
 #if TIME_WITH_SYS_TIME
 # include <sys/time.h>
 # include <time.h>
@@ -113,6 +115,10 @@ int wrap_closedir(const char *file, int line, DIR *dir);
         wrap_getsockopt(__FILE__, __LINE__, s, level, optname, optval, optlen)
 #define Setsockopt(s, level, optname, optval, optlen) \
         wrap_setsockopt(__FILE__, __LINE__, s, level, optname, optval, optlen)
+#define Gethostbyname(name) \
+        wrap_gethostbyname(__FILE__, __LINE__, name)
+#define Inet_ntop(af, src, dst, cnt) \
+        wrap_inet_ntop(__FILE__, __LINE__, af, src, dst, cnt)
 #define Inet_pton(af, src, dst) \
         wrap_inet_pton(__FILE__, __LINE__, af, src, dst)
 
@@ -121,6 +127,8 @@ int wrap_bind(const char *file, int line, int sockfd, struct sockaddr *my_addr, 
 int wrap_connect(const char *file, int line, int sockfd, struct sockaddr *serv_addr, socklen_t addrlen);
 int wrap_getsockopt(const char *file, int line, int s, int level, int optname, void *optval, socklen_t *optlen);
 int wrap_setsockopt(const char *file, int line, int s, int level, int optname, const void *optval, socklen_t optlen);
+struct hostent *wrap_gethostbyname(const char *file, int line, const char *name);
+const char *wrap_inet_ntop(const char *file, int line, int af, const void *src, char *dst, socklen_t cnt);
 int wrap_inet_pton(const char *file, int line, int af, const char *src, void *dst);
 
 /* 

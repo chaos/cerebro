@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.h,v 1.32 2005-03-24 01:29:21 achu Exp $
+ *  $Id: cerebrod_config.h,v 1.33 2005-03-25 18:34:11 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_CONFIG_H
@@ -90,11 +90,18 @@ struct cerebrod_config
 };
 
 /*
- * cerebrod_config
+ * cerebrod_config_setup
  * 
  * perform all cerebrod configuration.  Includes command line parsing,
  * config module loading, and configuration file parsing
  */
-void cerebrod_config(int argc, char **argv);
+void cerebrod_config_setup(int argc, char **argv);
+
+/*
+ * cerebrod_config_cleanup
+ * 
+ * congifuration cleanup
+ */
+void cerebrod_config_cleanup(void);
 
 #endif /* _CEREBROD_CONFIG_H */

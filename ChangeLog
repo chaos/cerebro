@@ -1,3 +1,24 @@
+2005-03-25  Albert Chu  <chu11@llnl.gov>
+
+	* src/libcommon/wrappers.h, src/libcommon/wrappers.c
+	(Gethostbyname, Inet_ntop, wrap_gethostbyname, wrap_inet_ntop):
+	New macros and functions.
+
+	* src/cerebrod/cerebrod_config_gendersllnl.c
+	(gendersllnl_config_load_default): Add altname support.
+
+	* src/cerebrod/cerebrod_config.h, src/cerebrod/cerebrod_config.c
+	(cerebrod_config_cleanup): New function.
+
+	* src/cerebrod/cerebrod_config.h, src/cerebrod/cerebrod_config.c
+	(cerebrod_config): Rename to cerebrod_config_setup.
+
+	* src/cerebrod/cerebrod.c (main): Update for function name change.
+
+	* src/cerebrod/cerebrod_config.c (_config_load_dynamic_module,
+	_cerebrod_config_module_setup): Remove calls to Lt_dlclose and
+	Lt_dlexit, so config module is kept upon on exit.
+	
 2005-03-23  Albert Chu  <chu11@llnl.gov>
 
 	Begin work on libcerebro

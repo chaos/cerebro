@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config_gendersllnl.c,v 1.5 2005-03-24 01:29:21 achu Exp $
+ *  $Id: cerebrod_config_gendersllnl.c,v 1.6 2005-03-25 18:34:11 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -13,6 +13,10 @@
 #endif /* STDC_HEADERS */
 #include <assert.h>
 #include <errno.h>
+#include <netdb.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 #include <gendersllnl.h>
 
@@ -22,6 +26,15 @@
 #include "cerebrod_config.h"
 #include "error.h"
 #include "wrappers.h"
+
+extern int h_errno;
+
+/* 
+ * gendersllnl_heartbeat_network_interface
+ *
+ * Store private management network ip address
+ */
+char gendersllnl_heartbeat_network_interface[INET_ADDRSTRLEN+1];
 
 /* 
  * gendersllnl_config_load_default
@@ -35,6 +48,7 @@ int
 gendersllnl_config_load_default(struct cerebrod_module_config *conf)
 {
   genders_t handle = NULL;
+  char altnamebuf[CEREBROD_MAXHOSTNAMELEN+1];
   int ret;
 
   assert(conf);
@@ -61,6 +75,33 @@ gendersllnl_config_load_default(struct cerebrod_module_config *conf)
       conf->speak = 1;
       conf->listen = 0;
       conf->updown_server = 0;
+    }
+
+  memset(altnamebuf, '\0', CEREBROD_MAXHOSTNAMELEN+1);
+  if ((ret = genders_testattr(handle, 
+                              NULL, 
+                              GENDERS_ALTNAME_ATTRIBUTE,
+                              altnamebuf,
+                              CEREBROD_MAXHOSTNAMELEN)) < 0)
+    err_exit("genders_config_load_default: genders_testattr: %s",
+             genders_errormsg(handle));
+
+  if (ret)
+    {
+      struct hostent *h = NULL;
+      struct in_addr in;
+
+      h = Gethostbyname(altnamebuf);
+
+      in = *((struct in_addr *)h->h_addr);
+
+      memset(gendersllnl_heartbeat_network_interface, '\0', INET_ADDRSTRLEN+1);
+      Inet_ntop(AF_INET, 
+                &in, 
+                gendersllnl_heartbeat_network_interface,
+                INET_ADDRSTRLEN+1);
+
+      conf->heartbeat_network_interface = gendersllnl_heartbeat_network_interface;
     }
 
   if (genders_handle_destroy(handle) < 0)

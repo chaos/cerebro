@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.c,v 1.25 2005-03-22 01:34:54 achu Exp $
+ *  $Id: wrappers.c,v 1.26 2005-03-25 18:34:11 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -13,6 +13,8 @@
 #include "error.h"
 #include "fd.h"
 #include "wrappers.h"
+
+extern int h_errno;
 
 #define MALLOC_MAGIC      0xf0e0d0c0
 #define MALLOC_PAD_DATA   0xab
@@ -319,7 +321,7 @@ wrap_getsockopt(const char *file, int line, int s, int level, int optname, void 
     err_exit("getsockopt(%s:%d): invalid *optlen: %d", file, line, *optlen);
 
   if ((ret = getsockopt(s, level, optname, optval, optlen)) < 0)
-    err_exit("socket(%s:%d): optname=%x: %s", 
+    err_exit("getsockopt(%s:%d): optname=%x: %s", 
              file, line, optname, strerror(errno));
 
   return ret;
@@ -339,8 +341,43 @@ wrap_setsockopt(const char *file, int line, int s, int level, int optname, const
     err_exit("setsockopt(%s:%d): invalid optlen: %d", file, line, optlen);
 
   if ((ret = setsockopt(s, level, optname, optval, optlen)) < 0)
-    err_exit("socket(%s:%d): %s", file, line, strerror(errno));
+    err_exit("setsockopt(%s:%d): %s", file, line, strerror(errno));
 
+  return ret;
+}
+
+struct hostent *
+wrap_gethostbyname(const char *file, int line, const char *name)
+{
+  struct hostent *ret;
+
+  assert(file != NULL);
+
+  if (!name)
+    err_exit("gethostbyname(%s:%d): null name pointer", file, line);
+
+  if (!(ret = gethostbyname(name)))
+    err_exit("gethostbyname(%s:%d): name=%s: %s", file, line, name, hstrerror(h_errno));
+
+  return ret;
+}
+
+const char *
+wrap_inet_ntop(const char *file, int line, int af, const void *src, char *dst, socklen_t cnt)
+{
+  const char *ret;
+
+  assert(file != NULL);
+
+  if (!src)
+    err_exit("inet_ntop(%s:%d): null src pointer", file, line);
+
+  if (!dst)
+    err_exit("inet_ntop(%s:%d): null dst pointer", file, line);
+
+  if ((ret = inet_ntop(af, src, dst, cnt)) < 0)
+    err_exit("inet_ntop(%s:%d): af=%x: %s", file, line, af, strerror(errno));
+  
   return ret;
 }
 

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.55 2005-03-24 01:29:21 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.56 2005-03-25 18:34:11 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -51,6 +51,15 @@
  * cerebrod configuration used by all of cerebrod
  */
 struct cerebrod_config conf;
+
+#if !WITH_STATIC_MODULES
+/*
+ * config_module_dl_handle
+ *
+ * config module dynamically loaded module handle
+ */
+lt_dlhandle config_module_dl_handle = NULL;
+#endif /* !WITH_STATIC_MODULES */
 
 /* 
  * _cerebrod_config_default 
@@ -403,7 +412,6 @@ _config_load_static_module(char *name)
 static int
 _config_load_dynamic_module(char *module_path)
 {
-  lt_dlhandle config_module_dl_handle = NULL;
   struct cerebrod_config_module_info *config_module_info = NULL;
   int rv;
 
@@ -417,8 +425,6 @@ _config_load_dynamic_module(char *module_path)
              module_path);
 
   rv = _cerebrod_load_alternate_configuration(config_module_info);
-
-  Lt_dlclose(config_module_dl_handle);
 
   return rv;
 }
@@ -486,7 +492,6 @@ _cerebrod_config_module_setup(void)
     }
 
  done:
-  Lt_dlexit();
 #endif /* !WITH_STATIC_MODULES */
 }
 
@@ -1386,7 +1391,7 @@ _cerebrod_config_dump(void)
 }
 
 void
-cerebrod_config(int argc, char **argv)
+cerebrod_config_setup(int argc, char **argv)
 {
   assert(argv);
 
@@ -1399,4 +1404,11 @@ cerebrod_config(int argc, char **argv)
   _cerebrod_calculate_configuration();
   _cerebrod_post_calculate_configuration_config_check();
   _cerebrod_config_dump();
+}
+
+void
+cerebrod_config_cleanup(void)
+{
+  Lt_dlclose(config_module_dl_handle);
+  Lt_dlexit();
 }
