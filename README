@@ -9,10 +9,6 @@ internally developed monitoring tool was needed instead of this
 heavily modified Ganglia.  To pay homage to Ganglia, another member of
 the central nervous system was chosen for this project's name.
 
-It is only coincidence that another famous monitoring tool/machine is
-also named Cerebro.  Cerebro was the best name I could find.  I
-refused to name this project dendrite or axon :-)
-
 Albert Chu
 chu11@llnl.gov
 Lawrence Livermore National Laboratories    
