@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.12 2005-02-10 00:58:40 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.13 2005-02-15 01:22:31 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -63,10 +63,10 @@ _cerebrod_listener_create_and_setup_socket(void)
       struct ip_mreqn imr;
 
       memcpy(&imr.imr_multiaddr,
-             &conf.heartbeat_destination_in_addr,
+             &conf.heartbeat_destination_ip_in_addr,
              sizeof(struct in_addr));
       memcpy(&imr.imr_address,
-             &conf.heartbeat_in_addr,
+             &conf.heartbeat_network_interface_in_addr,
              sizeof(struct in_addr));
       imr.imr_ifindex = conf.heartbeat_interface_index;
 
@@ -83,10 +83,10 @@ _cerebrod_listener_create_and_setup_socket(void)
 	}
 
       memcpy(&imr.imr_multiaddr,
-             &conf.heartbeat_destination_in_addr,
+             &conf.heartbeat_destination_ip_in_addr,
              sizeof(struct in_addr));
       memcpy(&imr.imr_address,
-             &conf.heartbeat_in_addr,
+             &conf.heartbeat_network_interface_in_addr,
              sizeof(struct in_addr));
       imr.imr_ifindex = conf.heartbeat_interface_index;
 
@@ -107,7 +107,7 @@ _cerebrod_listener_create_and_setup_socket(void)
   heartbeat_addr.sin_family = AF_INET;
   heartbeat_addr.sin_port = htons(conf.heartbeat_destination_port);
   memcpy(&heartbeat_addr.sin_addr,
-         &conf.heartbeat_in_addr,
+         &conf.heartbeat_network_interface_in_addr,
          sizeof(struct in_addr));
   if (bind(temp_fd, (struct sockaddr *)&heartbeat_addr, sizeof(struct sockaddr_in)) < 0)
     {

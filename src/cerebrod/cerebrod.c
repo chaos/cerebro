@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.9 2005-01-24 16:57:01 achu Exp $
+ *  $Id: cerebrod.c,v 1.10 2005-02-15 01:22:31 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -14,6 +14,7 @@
 #include "cerebrod_cache.h"
 #include "cerebrod_config.h"
 #include "cerebrod_daemon.h"
+#include "cerebrod_listener.h"
 #include "cerebrod_speaker.h"
 #include "error.h"
 #include "wrappers.h"
@@ -60,6 +61,22 @@ main(int argc, char **argv)
       Pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
       Pthread_create(&thread, &attr, cerebrod_speaker, NULL);
       Pthread_attr_destroy(&attr);
+    }
+
+  if (conf.listen)
+    {
+      int i;
+
+      for (i = 0; i < conf.listen_threads; i++)
+        {
+          pthread_t thread;
+          pthread_attr_t attr;
+
+          Pthread_attr_init(&attr);
+          Pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+          Pthread_create(&thread, &attr, cerebrod_listener, NULL);
+          Pthread_attr_destroy(&attr);
+        }
     }
 
   for (;;) {}

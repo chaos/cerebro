@@ -1,3 +1,21 @@
+2005-02-14  Albert Chu  <chu11@llnl.gov>
+
+	* src/cerebrod/cerebrod_config.c
+	(_cerebrod_pre_calculate_configuration_config_check): Add
+	listen_threads check.
+
+	* src/cerebrod/cerebrod.c (main): Launch listen threads
+	appropriately.
+
+	* src/cerebrod/cerebrod_config.c
+	(_cerebrod_calculate_configuration): Calculate destination ip
+	inaddr in both listener and speaker mode.
+
+	* src/cerebrod/cerebrod_config.h, src/cerebrod/cerebrod_config.c,
+	src/cerebrod/cerebrod_speaker.c, src/cerebrod_listener.c: Globally
+	rename heartbeat_in_addr to heartbeat_network_interface_in_addr.
+	Globally rename destination_in_addr to destination_ip_in_addr.
+	
 2005-02-09  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerebrod/cerebrod_listener.h,

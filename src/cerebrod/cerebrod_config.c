@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.24 2005-02-10 00:22:11 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.25 2005-02-15 01:22:31 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -262,6 +262,9 @@ _cerebrod_pre_calculate_configuration_config_check(void)
 
   if (conf.heartbeat_ttl <= 0)
     err_exit("heartbeat ttl '%d' invalid", conf.heartbeat_ttl);
+
+  if (conf.listen_threads <= 0)
+    err_exit("listen threads '%d' invalid", conf.listen_threads);
 }
 
 static void
@@ -298,9 +301,9 @@ _cerebrod_calculate_heartbeat_frequency_ranged(void)
 }
 
 static void
-_cerebrod_calculate_heartbeat_destination_in_addr(void)
+_cerebrod_calculate_heartbeat_destination_ip_in_addr(void)
 {
-  if (!Inet_pton(AF_INET, conf.heartbeat_destination_ip, &conf.heartbeat_destination_in_addr))
+  if (!Inet_pton(AF_INET, conf.heartbeat_destination_ip, &conf.heartbeat_destination_ip_in_addr))
     err_exit("heartbeat destination IP address '%s' improperly format",
 	     conf.heartbeat_destination_ip);
 }
@@ -625,10 +628,10 @@ _cerebrod_calculate_in_addr_and_index(char *network_interface,
 }
 
 static void
-_cerebrod_calculate_heartbeat_in_addr_and_index()
+_cerebrod_calculate_heartbeat_network_interface_in_addr_and_index()
 {
   _cerebrod_calculate_in_addr_and_index(conf.heartbeat_network_interface,
-					&conf.heartbeat_in_addr,
+					&conf.heartbeat_network_interface_in_addr,
 					&conf.heartbeat_interface_index);
 }
 
@@ -638,22 +641,16 @@ _cerebrod_calculate_configuration(void)
   /* Determine if the heartbeat is single or multi casted */
   _cerebrod_calculate_multicast();
 
-  if (conf.speak)
-    {
-      /* Determine if the heartbeat frequencey is ranged or fixed */
-      _cerebrod_calculate_heartbeat_frequency_ranged();
+  /* Determine if the heartbeat frequencey is ranged or fixed */
+  _cerebrod_calculate_heartbeat_frequency_ranged();
 
-      /* Calculate the destination ip */
-      _cerebrod_calculate_heartbeat_destination_in_addr();
-    }
+  /* Calculate the destination ip */
+  _cerebrod_calculate_heartbeat_destination_ip_in_addr();
 
-  if (conf.speak || conf.listen)
-    {
-      /* Determine the appropriate network interface to use based on
-       * the user's heartbeat_network_interface input.
-       */
-      _cerebrod_calculate_heartbeat_in_addr_and_index();
-    }
+  /* Determine the appropriate network interface to use based on
+   * the user's heartbeat_network_interface input.
+   */
+  _cerebrod_calculate_heartbeat_network_interface_in_addr_and_index();
 }
 
 static void
@@ -728,8 +725,8 @@ _cerebrod_config_dump(void)
       fprintf(stderr, "* listen: %d\n", conf.listen);
       fprintf(stderr, "* listen_threads: %d\n", conf.listen_threads);
       fprintf(stderr, "* multicast: %d\n", conf.multicast);
-      fprintf(stderr, "* heartbeat_destination_in_addr: %s\n", inet_ntoa(conf.heartbeat_destination_in_addr));
-      fprintf(stderr, "* heartbeat_in_addr: %s\n", inet_ntoa(conf.heartbeat_in_addr));
+      fprintf(stderr, "* heartbeat_destination_ip_in_addr: %s\n", inet_ntoa(conf.heartbeat_destination_ip_in_addr));
+      fprintf(stderr, "* heartbeat_network_interface_in_addr: %s\n", inet_ntoa(conf.heartbeat_network_interface_in_addr));
       fprintf(stderr, "* heartbeat_interface_index: %d\n", conf.heartbeat_interface_index);
       fprintf(stderr, "**************************************\n");
     }

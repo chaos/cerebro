@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.h,v 1.15 2005-02-04 00:09:01 achu Exp $
+ *  $Id: cerebrod_config.h,v 1.16 2005-02-15 01:22:31 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_CONFIG_H
@@ -55,15 +55,6 @@
  * - on/off
  * listen_threads
  * - num
- *
- * Calculated by cerebrod:
- * multicast
- * - on/off
- * speak_to_in_addr
- * speak_from_in_addr
- * - both in network byte order
- * speak_from_interface_index;
- *
  */
 
 struct cerebrod_config
@@ -89,8 +80,8 @@ struct cerebrod_config
 
   int multicast;
   int heartbeat_frequency_ranged;
-  struct in_addr heartbeat_destination_in_addr;
-  struct in_addr heartbeat_in_addr;
+  struct in_addr heartbeat_destination_ip_in_addr;
+  struct in_addr heartbeat_network_interface_in_addr;
   int heartbeat_interface_index;
 };
 
