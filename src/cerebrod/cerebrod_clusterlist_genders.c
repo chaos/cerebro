@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_genders.c,v 1.6 2005-03-17 05:05:52 achu Exp $
+ *  $Id: cerebrod_clusterlist_genders.c,v 1.7 2005-03-17 17:21:06 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -38,16 +38,16 @@ _parse_options(char **options)
 	  char *p = strchr(options[i], '=');
 
 	  if (!p)
-	    err_exit("hostsfile clusterlist module: filename unspecified");
+	    err_exit("genders clusterlist module: filename unspecified");
 
 	  p++;
 	  if (p == '\0')
-	    err_exit("hostsfile clusterlist module: filename unspecified");
+	    err_exit("genders clusterlist module: filename unspecified");
 
-	  hostsfile_file = Strdup(p);
+	  genders_file = Strdup(p);
 	}
       else
-	err_exit("hostsfile clusterlist module: option '%s' unrecognized", options[i]);
+	err_exit("genders clusterlist module: option '%s' unrecognized", options[i]);
 
       i++;
     }

@@ -1,3 +1,10 @@
+2005-03-17  Albert Chu  <chu11@llnl.gov>
+
+	* src/cerebrod/cerebrod_clusterlist_genders.c
+	(_parse_options),
+	src/cerebrod/cerebrod_clusterlist_gendersllnl.c
+	(_parse_options): Fix cut and paste typos.
+	
 2005-03-16  Albert Chu  <chu11@llnl.gov>
 
 	* src/libcommon/argv.h, src/libcommon/argv.c: Removed files.
