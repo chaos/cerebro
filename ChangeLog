@@ -11,6 +11,15 @@
 	(_cerebrod_calculate_configuration): Calculate destination ip
 	inaddr in both listener and speaker mode.
 
+	* src/cerebrod/cerebrod_speaker.c
+	(_cerebrod_speaker_create_and_setup_socket),
+	src/cerebrod/cerebrod_listener.c
+	(_cerebrod_listener_create_and_setup_socket): Add memsets to
+	ensure correct settings.
+
+	* src/cerebrod/cerebrod_listener.c (cerebrod_listener): Fix buffer
+	input error.
+	
 	* src/cerebrod/cerebrod_config.h, src/cerebrod/cerebrod_config.c,
 	src/cerebrod/cerebrod_speaker.c, src/cerebrod_listener.c: Globally
 	rename heartbeat_in_addr to heartbeat_network_interface_in_addr.

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.14 2005-02-15 01:47:57 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.15 2005-02-15 01:55:00 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -284,7 +284,7 @@ cerebrod_listener(void *arg)
       int rv, hblen;
 
       Pthread_mutex_lock(&listener_fd_lock);
-      if ((rv = fd_read_n(listener_fd, hbbuf, hblen)) < 0)
+      if ((rv = fd_read_n(listener_fd, hbbuf, CEREBROD_PACKET_BUFLEN)) < 0)
 	{
           /* For errnos EINVAL, EBADF, ENODEV, assume the device has
            * been temporarily brought down then back up.  For example,
