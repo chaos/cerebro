@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_heartbeat.c,v 1.11 2005-03-20 20:21:18 achu Exp $
+ *  $Id: cerebrod_heartbeat.c,v 1.12 2005-03-20 20:34:48 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -27,11 +27,6 @@ extern struct cerebrod_config conf;
 extern pthread_mutex_t debug_output_mutex;
 #endif /* NDEBUG */
 
-/*
- * cerebrod_heartbeat_construct
- *
- * construct a heartbeat packet
- */
 void
 cerebrod_heartbeat_construct(struct cerebrod_heartbeat *hb)
 {
@@ -43,11 +38,6 @@ cerebrod_heartbeat_construct(struct cerebrod_heartbeat *hb)
   hb->boottime = cerebrod_get_boottime();
 }
 
-/*
- * cerebrod_heartbeat_dump
- *
- * dump contents of a heartbeat packet
- */
 void
 cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb)
 {
@@ -123,13 +113,6 @@ _marshall_buffer(char *buf, int buflen, char *buffer)
   return buflen;
 }
 
-/*
- * cerebrod_heartbeat_marshall
- *
- * marshall contents of a heartbeat packet.
- *
- * Returns length of data copied into buffer, -1 on error
- */
 int 
 cerebrod_heartbeat_marshall(struct cerebrod_heartbeat *hb, 
 			    char *buffer, int len) 
@@ -197,13 +180,6 @@ _unmarshall_buffer(char *buf, int buflen, char *buffer)
   return buflen;
 }
 
-/* 
- * cerebrod_heartbeat_unmarshall
- *
- * unmarshall contents of a packet buffer
- *
- * Returns 0 on success, -1 on error 
- */
 int 
 cerebrod_heartbeat_unmarshall(struct cerebrod_heartbeat *hb, 
 			      char *buffer, int len)

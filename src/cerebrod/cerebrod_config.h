@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.h,v 1.26 2005-03-20 20:21:18 achu Exp $
+ *  $Id: cerebrod_config.h,v 1.27 2005-03-20 20:34:48 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_CONFIG_H
@@ -82,6 +82,8 @@ struct cerebrod_config
  * Cerebrod_config_load_default
  *
  * function prototype for config module configuration loading.
+ *
+ * Returns 0 on success, -1 on error
  */
 typedef int (*Cerebrod_config_load_default)(struct cerebrod_config *conf);
 

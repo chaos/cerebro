@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_data.c,v 1.1 2005-03-20 20:10:14 achu Exp $
+ *  $Id: cerebrod_data.c,v 1.2 2005-03-20 20:34:48 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -127,12 +127,6 @@ _cerebrod_cache_hostname(void)
   cerebrod_hostname_len = strlen(cerebrod_hostname);
 }
 
-/* 
- * cerebrod_load_data
- *
- * Load and cache cerebrod starttme, machine boottime, and machine
- * hostname
- */
 void
 cerebrod_load_data(void)
 {
@@ -141,11 +135,6 @@ cerebrod_load_data(void)
   _cerebrod_cache_hostname();
 }
 
-/* 
- * cerebrod_get_starttime
- *
- * Return the cached cerebrod starttime
- */
 u_int32_t
 cerebrod_get_starttime(void)
 {
@@ -154,11 +143,6 @@ cerebrod_get_starttime(void)
   return cerebrod_starttime;
 }
 
-/* 
- * cerebrod_get_boottime
- *
- * Return the cached system boottime
- */
 u_int32_t
 cerebrod_get_boottime(void)
 {
@@ -167,11 +151,6 @@ cerebrod_get_boottime(void)
   return cerebrod_boottime;
 }
 
-/* 
- * cerebrod_get_hostname
- *
- * Return the cached system hostname
- */
 void
 cerebrod_get_hostname(char *buf, unsigned int len)
 {

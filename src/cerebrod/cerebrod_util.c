@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_util.c,v 1.3 2005-03-19 19:06:24 achu Exp $
+ *  $Id: cerebrod_util.c,v 1.4 2005-03-20 20:34:48 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -22,8 +22,15 @@
 #include "error.h"
 #include "wrappers.h"
 
+/* 
+ * _hash_removeall
+ *
+ * callback for hash_for_each that inserts entries into the new hash.
+ *
+ * Returns 1 for success, 0 on failure, -1 on fatal error
+ */
 static int
-_reinsert(void *data, const void *key, void *arg)
+_hash_reinsert(void *data, const void *key, void *arg)
 {
   hash_t newhash;
 
@@ -34,8 +41,14 @@ _reinsert(void *data, const void *key, void *arg)
   return 1;
 }
 
+/* 
+ * _hash_removeall
+ *
+ * callback for hash_delete_if that returns 1, signifying the removal
+ * of all hashed entries
+ */
 static int
-_removeall(void *data, const void *key, void *arg)
+_hash_removeall(void *data, const void *key, void *arg)
 {
   return 1;
 }
@@ -73,12 +86,12 @@ cerebrod_rehash(hash_t *old_hash,
 			 (hash_cmp_f)strcmp,
 			 (hash_del_f)_Free);
   
-  rv = Hash_for_each(*old_hash, _reinsert, &new_hash);
+  rv = Hash_for_each(*old_hash, _hash_reinsert, &new_hash);
   if (rv != hash_numnodes)
     err_exit("_rehash: invalid reinsert count: rv=%d numnodes=%d",
              rv, hash_numnodes);
 
-  rv = Hash_delete_if(*old_hash, _removeall, NULL);
+  rv = Hash_delete_if(*old_hash, _hash_removeall, NULL);
   if (rv != hash_numnodes)
     err_exit("_rehash: invalid removeall count: rv=%d numnodes=%d",
              rv, hash_numnodes);

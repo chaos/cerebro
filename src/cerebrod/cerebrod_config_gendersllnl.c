@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config_gendersllnl.c,v 1.1 2005-03-18 19:04:25 achu Exp $
+ *  $Id: cerebrod_config_gendersllnl.c,v 1.2 2005-03-20 20:34:48 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -21,6 +21,14 @@
 #include "error.h"
 #include "wrappers.h"
 
+/* 
+ * gendersllnl_config_load_default
+ *
+ * alter default module specifically for use on LLNL clusters 'mgmt'
+ * nodes listen and speak, while compute nodes only speak.
+ *
+ * Returns 0 on success, -1 on error
+ */
 int
 gendersllnl_config_load_default(struct cerebrod_config *conf)
 {
@@ -56,6 +64,8 @@ gendersllnl_config_load_default(struct cerebrod_config *conf)
   if (genders_handle_destroy(handle) < 0)
     err_exit("genders_config_load_default: genders_handle_destroy: %s",
              genders_errormsg(handle));
+
+  return 0;
 }
 
 struct cerebrod_config_module_info config_module_info =

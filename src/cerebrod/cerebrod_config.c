@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.46 2005-03-20 20:21:18 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.47 2005-03-20 20:34:48 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -1243,12 +1243,6 @@ _cerebrod_config_dump(void)
 #endif /* NDEBUG */
 }
 
-/*
- * cerebrod_config
- * 
- * perform all cerebrod configuration.  Includes command line parsing,
- * config module loading, and configuration file parsing
- */
 void
 cerebrod_config(int argc, char **argv)
 {
