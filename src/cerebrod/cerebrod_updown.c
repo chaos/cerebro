@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.c,v 1.13 2005-03-20 21:24:58 achu Exp $
+ *  $Id: cerebrod_updown.c,v 1.14 2005-03-20 21:28:25 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -231,7 +231,6 @@ _cerebrod_updown_initialize(void)
  * Passed int * pointer to client TCP socket file descriptor
  *
  * Executed in detached state, no return value.
- */
  */
 static void *
 cerebrod_updown_service_connection(void *arg)
