@@ -11,6 +11,11 @@
 	* configure.ac: Add ac_cerebrod_configfile config option.
 
 	* config/ac_hostsfile.m4: AC_SUBST the hostsfile.
+
+	* config/ac_cerebrod_module_dir.m4: New file.
+
+	* configure.ac, src/cerebrod/Makefile.am: CEREBROD_MODULE_DIR now
+	defined by AC_CEREBROD_MODULE_DIR.
 	
 2005-03-18  Albert Chu  <chu11@llnl.gov>
 

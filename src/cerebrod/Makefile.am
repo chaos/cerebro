@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.15 2005-03-18 19:04:25 achu Exp $
+## $Id: Makefile.am,v 1.16 2005-03-19 17:59:55 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -28,8 +28,7 @@ cerebrod_SOURCES = cerebrod.c \
 		   cerebrod_speaker.c \
 		   cerebrod_updown.c \
 		   cerebrod_util.c
-cerebrod_CFLAGS = -I$(srcdir)/../libcommon \
-		  -DCEREBROD_MODULE_DIR=\"$(pkglibdir)\"
+cerebrod_CFLAGS = -I$(srcdir)/../libcommon
 cerebrod_LDFLAGS = -export-dynamic
 cerebrod_LDADD = ../libcommon/libcommon.la
 
