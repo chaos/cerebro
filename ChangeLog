@@ -23,6 +23,8 @@
 	* src/cerebrod/cerebrod_config.c (_cerebrod_config_module_setup),
 	src/cerebrod/cerebrod_clusterlist.c (cerebrod_clusterlist_setup):
 	Support new cerebrod_search_dir_for_module interface.
+
+	* man/cerebrod.8.in: First draft.
 	
 2005-03-18  Albert Chu  <chu11@llnl.gov>
 

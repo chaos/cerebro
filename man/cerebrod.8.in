@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebrod.8.in,v 1.4 2005-03-19 08:40:14 achu Exp $
+\."$Id: cerebrod.8.in,v 1.5 2005-03-20 02:22:18 achu Exp $
 \."#############################################################################
 .TH cerebrod 8 "May 2005" "cerebrod @VERSION@" cerebrod
 .SH "NAME"
@@ -32,10 +32,144 @@ Specify configuration module
 .B  -d, --debug
 Turn on debugging and run daemon in foreground
 \}
+.SH "CONFIGURATION FILE"
+The configuration file configures the features and behavior of the
+.B cerebrod 
+daemon.  The configuration will ultimately affect the utility of
+the 
+.B Cerebro
+suite of tools and libraries.
+
+The user is highly encouraged to learn about the various
+configuration options, since proper configuration can help
+improve the performance of
+.B Cerebro
+as a whole.
+
+The default configuration file loaded by 
+.B cerebrod
+is @CEREBROD_CONFIGFILE_DEFAULT@, however an alternate configuration
+file can be specified on the command line with the 
+.I -c 
+option.
+
+Specific details of the configurable features and
+configurable options can be found in the
+.B cerebrod.conf(5)
+manpage.  
+
+.SH "CONFIGURATION MODULE"
+A configuration module format has been developed into 
+.B cerebrod
+to alleviate the potential difficulty of configuring many different
+cluster nodes with different configuration files.  
+For example, if the cluster contains a cluster configuration database,
+a configuration module could be written to read from the cluster
+configuration database, and configure each
+.B cerebrod
+daemon in the cluster based on the parameters stored in the database.
+Therefore, a different configuration file does not have to be written
+for each cluster node.
+
+The configuration module is dynamically loaded by the
+.B cerebrod
+daemon to load the alternate set of default configuration options
+specified by the module.  The alternate default configuration options
+can be overrided by the options specified in the configuration file.
+The following configuration modules are currently searched for by
+.B cerebrod
+in the following order:
+
+.ie @MANPAGE_GENDERSLLNL@ \{
+gendersllnl - Configures the
+.B cerebrod
+daemon specifically for use on LLNL clusters.
+
+\}
+.el \{
+No configuration modules are searched in this build.
+
+\}
+
+Configuration modules are first searched for in the 
+.B Cerebro
+package library directory, @CEREBROD_MODULE_DIR@.  They are then
+searched for in the current directory.  A configuration module can
+also be specified on the command line with the 
+.I -c 
+option.
+
+For more information on writing 
+.B cerebrod
+configuration modules see XXX.
+
+.SH "CLUSTERLIST MODULE"
+In order for 
+.B Cerebro
+to be utilized at its full potential, a list of cluster nodes should be
+loaded to the
+.B cerebrod
+daemon.  Although
+.B Cerebro
+can be used without a clusterlist, some features will be diminished
+without one.  For example, there will be no way to determine the down
+nodes of the cluster, if there is no knowledge of what all of the
+nodes in the cluster actually are.
+
+The list of cluster nodes can be specified in several formats.  The 
+.B cerebrod
+daemon dynamically loads a clusterlist module capable of parsing
+and interpreting different database formats.  
+Clusterlist modules are first searched for in the 
+.B Cerebro
+package library, @CEREBROD_MODULE_DIR@.  They are then searched for in
+the current directory.  Specific clusterlist modules can be selected
+using the
+.I clusterlist_module
+configuration option in the
+.B cerebrod
+configuration file.
+Configurable options can be passed to the clusterlist modules through the
+.I clusterlist_module_options
+configuration file option.  The options are listed as key=value pairs.
+
+The following clusterlist modules are currently searched for by
+.B cerebrod
+in the following order:
+
+.if @MANPAGE_GENDERSLLNL@ \{
+gendersllnl - Reads and parses a genders database with LLNL specific
+attributes and values.  Can be passed a filename=value option to
+specify an non-default genders database location.
+
+\}
+
+.if @MANPAGE_GENDERS@ \{
+genders - Reads and parses a generic genders database.  Can be passed
+a filename=value option to specify an non-default genders database
+location.
+
+\}
+
+hostsfile - Reads and parses a file listing each cluster node on a
+separate line.  Can be passed a filename=value option to specify an
+non-default hostsfile database location.  The default hostsfile is
+located at @CEREBROD_CLUSTERLIST_HOSTSFILE_DEFAULT@.
+
+none - Do not use a cluster list.
+
+Other cluster list formats can be parsed by writing a new clusterlist 
+module.  For more information on writing 
+.B cerebrod
+clusterlist modules see XXX.
+
 .SH "FILES"
 @CEREBROD_CONFIGFILE_DEFAULT@
+
+@CEREBROD_CLUSTERLIST_HOSTSFILE_DEFAULT@
+
+@CEREBROD_MODULE_DIR@
 .SH "ORIGIN"
-Developed by Albert Chu <chu11@llnl.gov> on LLNL's GNU/Linux clusters.
+Developed by Albert Chu <chu11@llnl.gov> on LLNL's Linux clusters.
 .SH "SEE ALSO"
 cerebrod(1), cerebrod.conf(5)
-
