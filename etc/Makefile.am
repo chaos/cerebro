@@ -1,11 +1,14 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.3 2005-03-15 23:14:39 achu Exp $
+## $Id: Makefile.am,v 1.1 2005-03-15 23:14:39 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
-
-include config/Make-rpm.mk
-
-SUBDIRS = etc man src
-
-EXTRA_DIST = autogen.sh META 
+ 
+CEREBRODINIT = cerebrod
+CEREBRODINITdir = $(sysconfdir)/init.d
+CEREBRODINIT_DATA = $(CEREBRODINIT)
+ 
+EXTRA_DIST = $(CEREBRODINIT)
+ 
+install-data-hook:
+	chmod 755 $(DESTDIR)/$(CEREBRODINITdir)/$(CEREBRODINIT)

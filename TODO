@@ -11,3 +11,7 @@
 - static modules support
 - more debugging in wrappers
 - timeout option?? - for mem-leak debuggin
+
+- test
+   - fd leaking
+   - mem-leaking

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.h,v 1.13 2005-03-14 22:05:55 achu Exp $
+ *  $Id: wrappers.h,v 1.14 2005-03-15 23:14:39 achu Exp $
 \*****************************************************************************/
 
 #ifndef _WRAPPERS_H
@@ -62,6 +62,9 @@ void * wrap_malloc(const char *file, int line, size_t size);
 void wrap_free(const char *file, int line, void *ptr);
 char * wrap_strdup(const char *file, int line, const char *s);
 char * wrap_strncpy(const char *file, int line, char *dest, const char *src, size_t n);
+
+/* Special wrapper for List/Hash libraries */
+void _Free(void *ptr);
 
 /* 
  * File System Wrappers 

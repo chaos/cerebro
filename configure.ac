@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.7 2005-03-14 22:05:55 achu Exp $
+## $Id: configure.ac,v 1.8 2005-03-15 23:14:39 achu Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -97,6 +97,7 @@ AC_DEFINE(WITH_LSD_FATAL_ERROR_FUNC, 1, [Define lsd_fatal_error])
 AC_CONFIG_FILES( \
   cerebro.spec \
   Makefile \
+  etc/Makefile \
   man/Makefile \
   src/Makefile \
   src/libcommon/Makefile \

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.12 2005-02-15 17:04:01 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.13 2005-03-15 23:14:39 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -211,10 +211,6 @@ cerebrod_speaker(void *arg)
                   if (!(fd < 0))
                     close(fd);	/* no-wrapper, make best effort */
                   
-                  /* XXX: Should we re-calc in-addrs? Its even more unlikely
-                   * that a system administrator will change IPs, subnets, etc.
-                   * on us.
-                   */
                   if ((fd = _cerebrod_speaker_create_and_setup_socket()) < 0)
                     err_debug("cerebrod_speaker: error re-initializing socket");
                   else

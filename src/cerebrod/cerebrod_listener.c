@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.22 2005-03-14 23:46:02 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.23 2005-03-15 23:14:39 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -40,7 +40,7 @@ pthread_mutex_t cerebrod_listener_initialization_complete_lock = PTHREAD_MUTEX_I
 
 int listener_fd;
 pthread_mutex_t listener_fd_lock = PTHREAD_MUTEX_INITIALIZER;
-hash_t cluster_data_hash;
+hash_t cluster_data_hash = NULL;
 int cluster_data_hash_size;
 int cluster_data_hash_numnodes;
 pthread_mutex_t cluster_data_hash_lock = PTHREAD_MUTEX_INITIALIZER;
@@ -116,12 +116,19 @@ _cerebrod_listener_initialize(void)
     err_exit("_cerebrod_listener_initialize: listener_fd setup failed");
   Pthread_mutex_unlock(&listener_fd_lock);
 
-  cluster_data_hash_size = CEREBROD_LISTENER_HASH_SIZE_DEFAULT;
+  /* If a clusterlist is found/used, use the numnodes count as the 
+   * initializing hash size. 
+   */
+
+  cluster_data_hash_size = cerebrod_clusterlist_numnodes();
+  if (!cluster_data_hash_size)
+    cluster_data_hash_size = CEREBROD_LISTENER_HASH_SIZE_DEFAULT;
+
   cluster_data_hash_numnodes = 0;
   cluster_data_hash = Hash_create(cluster_data_hash_size,
 				  (hash_key_f)hash_key_string,
 				  (hash_cmp_f)strcmp,
-				  (hash_del_f)free);
+				  (hash_del_f)_Free);
   cerebrod_listener_initialization_complete++;
  done:
   Pthread_mutex_unlock(&cerebrod_listener_initialization_complete_lock);
@@ -302,16 +309,12 @@ cerebrod_listener(void *arg)
               if (!(listener_fd < 0))
 		close(listener_fd);	/* no-wrapper, make best effort */
 
-              /* XXX: Should we re-calc in-addrs? Its even more unlikely
-               * that a system administrator will change IPs, subnets, etc.
-               * on us.
-               */
               if ((listener_fd = _cerebrod_listener_create_and_setup_socket()) < 0)
 		{
 		  err_debug("cerebrod_listener: error re-initializing socket");
 
 		  /* Wait a bit, so we don't spin */
-		  sleep(CEREBROD_REINITIALIZE_WAIT);
+		  sleep(CEREBROD_LISTENER_REINITIALIZE_WAIT);
 		}
               else
                 err_debug("cerebrod_listener: success re-initializing socket");
@@ -374,9 +377,12 @@ cerebrod_listener(void *arg)
 
       Pthread_mutex_lock(&(nd->node_data_lock));
       Gettimeofday(&tv, NULL);
-      nd->starttime = hb.starttime;
-      nd->boottime = hb.boottime;
-      nd->last_received = tv.tv_sec;
+      if (tv.tv_sec >= nd->last_received)
+        {
+          nd->starttime = hb.starttime;
+          nd->boottime = hb.boottime;
+          nd->last_received = tv.tv_sec;
+        }
       Pthread_mutex_unlock(&(nd->node_data_lock));
 
       _cerebrod_listener_dump_cluster_node_data_hash();

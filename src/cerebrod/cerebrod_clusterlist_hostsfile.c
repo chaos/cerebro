@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_hostsfile.c,v 1.2 2005-03-14 22:05:55 achu Exp $
+ *  $Id: cerebrod_clusterlist_hostsfile.c,v 1.3 2005-03-15 23:14:39 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -166,7 +166,7 @@ hostsfile_clusterlist_init(char *cmdline)
       argv_destroy(argv);
     }
 
-  hosts = List_create(NULL);
+  hosts = List_create((ListDelF)_Free);
 
   hostsfile_file = CEREBROD_CLUSTERLIST_HOSTSFILE_DEFAULT;
   if ((fd = open(hostsfile_file, O_RDONLY)) < 0)
@@ -204,21 +204,10 @@ hostsfile_clusterlist_init(char *cmdline)
   return 0;
 }
 
-static int
-_all(void *x, void *y)
-{
-  return 1;
-}
-
 int
 hostsfile_clusterlist_finish(void)
 {
   assert(hosts);
-
-  /* Can't pass 'Free' to List_create(), so free manually.
-   * - Can't pass NULL for the key, so pass a dummy string.
-   */
-  List_delete_all(hosts, _all, "dummy");
 
   List_destroy(hosts);
   hosts = NULL;

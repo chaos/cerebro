@@ -1,3 +1,41 @@
+2005-03-15  Albert Chu  <chu11@llnl.gov>
+
+	Begin support of updown server.
+
+	* src/cerebrod/cerebrod_config.h, src/cerebrod/cerebrod_config.c
+	(_cerebrod_config_parse,
+	_cerebrod_pre_calculate_configuration_config_check): Add updown
+	configuration support.
+
+	* src/cerebrod/cerebrod_updown.h, src/cerebrod/cerebrod_updown.c: New files.
+
+	Misc
+	
+	* src/libcommon/wrappers.c: Added mountains of additional error
+	checks and debug info output.
+
+	* src/cerebrod/cerebrod_listener.c
+	(_cerebrod_listener_initialize): Initialize hash base on
+	clusterlist numnodes count.
+
+	* etc/Makefile.am, etc/cerebrod: New files.
+
+	* configure.ac: Generate etc/Makefile.
+
+	* Makefile.am: Add etc subdir.
+
+	* src/libcommon/wrappers.h, src/libcommon/wrappers.c (_Free): New
+	function.
+
+	* src/cerebrod/cerebrod_clusterlist_hostsfile.c
+	(hostsfile_clusterlist_init, hostsfile_clusterlist_finish): Rework
+	using _Free.
+
+	* src/cerebrod/cerebrod_clusterlist_hostsfile.c (_all): Removed function.
+
+	* src/cerebrod/cerebrod_listener.c
+	(_cerebrod_listener_initialize): Rework using _Free.
+
 2005-03-14  Albert Chu  <chu11@llnl.gov>
 
 	* src/libcommon/wrappers.h, src/libcommon/wrappers.c (Lt_dlinit,

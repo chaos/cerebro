@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.h,v 1.5 2005-02-10 00:58:40 achu Exp $
+ *  $Id: cerebrod_listener.h,v 1.6 2005-03-15 23:14:39 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_LISTENER_H
@@ -16,11 +16,7 @@ struct cerebrod_node_data
     pthread_mutex_t node_data_lock;
   };
 
-#define CEREBROD_NODE_DATA_LEN  (sizeof(u_int32_t) \
-                                 + sizeof(u_int32_t) \
-                                 + sizeof(u_int32_t))
-
-#define CEREBROD_REINITIALIZE_WAIT 2
+#define CEREBROD_LISTENER_REINITIALIZE_WAIT 2
 
 void *cerebrod_listener(void *);
 

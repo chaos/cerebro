@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.26 2005-03-14 17:05:14 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.27 2005-03-15 23:14:39 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -56,6 +56,8 @@ _cerebrod_config_default(void)
   conf.speak = CEREBROD_SPEAK_DEFAULT;
   conf.listen = CEREBROD_LISTEN_DEFAULT;
   conf.listen_threads = CEREBROD_LISTEN_THREADS_DEFAULT;
+  conf.updown_server = CEREBROD_UPDOWN_SERVER;
+  conf.updown_server_port = CEREBROD_UPDOWN_SERVER_PORT;
   conf.clusterlist_module = CEREBROD_CLUSTERLIST_MODULE_DEFAULT;
   conf.clusterlist_module_cmdline = CEREBROD_CLUSTERLIST_MODULE_CMDLINE_DEFAULT;
 }
@@ -184,10 +186,13 @@ _cb_stringptr(conffile_t cf, struct conffile_data *data,
 static void
 _cerebrod_config_parse(void)
 {
-  int heartbeat_frequency_flag, heartbeat_source_port_flag, heartbeat_destination_port_flag, 
-    heartbeat_destination_ip_flag, heartbeat_network_interface_flag, heartbeat_ttl_flag, 
-    speak_flag, listen_flag, listen_threads_flag, clusterlist_module_flag, clusterlist_module_cmdline_flag;
-
+  int heartbeat_frequency_flag, heartbeat_source_port_flag, 
+    heartbeat_destination_port_flag, heartbeat_destination_ip_flag, 
+    heartbeat_network_interface_flag, heartbeat_ttl_flag, speak_flag, 
+    listen_flag, listen_threads_flag, updown_server_flag, 
+    updown_server_port_flag, clusterlist_module_flag, 
+    clusterlist_module_cmdline_flag;
+  
   struct conffile_option options[] =
     {
       {"heartbeat_frequency", CONFFILE_OPTION_LIST_INT, -1, _cb_heartbeat_freq,
@@ -209,6 +214,10 @@ _cerebrod_config_parse(void)
        1, 0, &listen_flag, &conf.listen, 0},
       {"listen_threads", CONFFILE_OPTION_INT, -1, conffile_int,
        1, 0, &listen_threads_flag, &(conf.listen_threads), 0},
+      {"updown_server", CONFFILE_OPTION_BOOL, -1, conffile_bool,
+       1, 0, &updown_server_flag, &conf.updown_server, 0},
+      {"updown_server_port", CONFFILE_OPTION_INT, -1, conffile_int,
+       1, 0, &updown_server_port_flag, &(conf.updown_server_port), 0},
       {"clusterlist_module", CONFFILE_OPTION_STRING, -1, _cb_stringptr,
        1, 0, &clusterlist_module_flag, &(conf.clusterlist_module), 0},
       {"clusterlist_module_cmdline", CONFFILE_OPTION_STRING, -1, _cb_stringptr,
@@ -297,6 +306,12 @@ _cerebrod_pre_calculate_configuration_config_check(void)
 	    err_exit("clusterlist_module '%s' not found", filebuf);
 	}
     }
+
+  /* If the listening server is turned off, none of the other
+   * servers can be on.  So we turn them off.
+   */
+  if (!conf.listen)
+    conf.updown_server = 0;
 }
 
 static void
