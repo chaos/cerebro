@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.c,v 1.1.1.1 2004-07-02 22:31:29 achu Exp $
+ *  $Id: wrappers.c,v 1.2 2004-07-03 00:34:15 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -77,7 +77,6 @@ wrap_open(char *file, int line, const char *pathname, int flags, int mode)
   int fd;
 
   assert(file != NULL);
-  assert(pathname != NULL);
 
   if ((fd = open(pathname, flags, mode)) < 0)
     err_exit("open(%s:%d): %s", file, line, strerror(errno));
@@ -102,9 +101,6 @@ wrap_read(char *file, int line, int fd, void *buf, size_t count)
   ssize_t ret;
 
   assert(file != NULL);
-  assert(fd >= 0);
-  assert(buf != NULL);
-  assert(count >= 0);
 
   if ((ret = fd_read_n(fd, buf, count)) < 0)
     err_exit("read(%s:%d): %s", file, line, strerror(errno));
@@ -118,9 +114,6 @@ wrap_write(char *file, int line, int fd, const void *buf, size_t count)
   ssize_t ret;
 
   assert(file != NULL);
-  assert(fd >= 0);
-  assert(buf != NULL);
-  assert(count >= 0);
 
   if ((ret = fd_write_n(fd, buf, count)) < 0)
     err_exit("write(%s:%d): %s", file, line, strerror(errno));
@@ -128,3 +121,41 @@ wrap_write(char *file, int line, int fd, const void *buf, size_t count)
   return ret;
 }
 
+int
+wrap_socket(char *file, int line, int domain, int type, int protocol)
+{
+  int fd;
+
+  assert(file != NULL);
+
+  if ((fd = socket(domain, type, protocol)) < 0)
+    err_exit("socket(%s:%d): %s", file, line, strerror(errno));
+
+  return fd;
+}
+
+int
+wrap_getsockopt(char *file, int line, int s, int level, int optname, void *optval, socklen_t *optlen)
+{
+  int ret;
+
+  assert(file != NULL);
+
+  if ((ret = getsockopt(s, level, optname, optval, optlen)) < 0)
+    err_exit("socket(%s:%d): %s", file, line, strerror(errno));
+
+  return ret;
+}
+
+int
+wrap_setsockopt(char *file, int line, int s, int level, int optname, const void *optval, socklen_t optlen)
+{
+  int ret;
+
+  assert(file != NULL);
+
+  if ((ret = setsockopt(s, level, optname, optval, optlen)) < 0)
+    err_exit("socket(%s:%d): %s", file, line, strerror(errno));
+
+  return ret;
+}

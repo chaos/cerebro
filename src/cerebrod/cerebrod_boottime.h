@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_boottime.h,v 1.1.1.1 2004-07-02 22:31:29 achu Exp $
+ *  $Id: cerebrod_boottime.h,v 1.2 2004-07-03 00:34:15 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_BOOTTIME_H
@@ -20,6 +20,6 @@
 # endif
 #endif
 
-time_t cerebrod_boottime(void);
+time_t cerebrod_get_boottime(void);
 
 #endif /* _CEREBROD_CONFIG_H */

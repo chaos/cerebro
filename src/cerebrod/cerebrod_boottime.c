@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_boottime.c,v 1.1.1.1 2004-07-02 22:31:29 achu Exp $
+ *  $Id: cerebrod_boottime.c,v 1.2 2004-07-03 00:34:15 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -24,12 +24,13 @@
 #define CEREBROD_BOOTTIME_FILE     "/proc/stat"
 #define CEREBROD_BOOTTIME_KEYWORD  "btime"
 
-/* achu: Its important to call this function only one time at the
+/* achu: Its important to call this function only once time at the
  * beginning of the program.  Some systems have a bug in which system
- * boottime in /proc/stat will change +/- 1 second.
+ * boottime in /proc/stat will change +/- 1 second as the system is
+ * running.
  */
 time_t
-cerebrod_boottime(void)
+cerebrod_get_boottime(void)
 {
   int fd, len;
   char *bootvalptr, *endptr, *tempptr;
@@ -48,7 +49,7 @@ cerebrod_boottime(void)
 
       tempptr = bootvalptr;
 
-      while(!isspace(*tempptr))
+      while(!isspace(*tempptr) && *tempptr != '\0')
         tempptr++;
       *tempptr = '\0';
     }

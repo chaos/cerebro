@@ -2,11 +2,11 @@ Cerebro is a collection of tools for dynamically monitoring a cluster
 of nodes.
 
 The name of this project comes from its origins in the Ganglia project
-(http://ganglia.sourceforge.net).  A modified version of Ganglia was
-originally used at Lawrence Livermore National Laboratory to
-dynamically monitor a system.  Over time, it became necessary to write
-our own dynamic monitoring tool.  To pay homage to Ganglia, another
-member of the central nervous system was chosen for the name.
+(http://ganglia.sourceforge.net).  A heavily modified version of
+Ganglia was originally used at Lawrence Livermore National Laboratory
+to dynamically monitor our clusters.  Over time, it became necessary
+to write our own dynamic monitoring tool.  To pay homage to Ganglia,
+another member of the central nervous system was chosen for the name.
 
 Albert Chu
 chu11@llnl.gov
