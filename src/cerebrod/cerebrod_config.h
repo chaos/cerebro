@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.h,v 1.10 2005-02-01 00:44:05 achu Exp $
+ *  $Id: cerebrod_config.h,v 1.11 2005-02-01 01:00:13 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_CONFIG_H
@@ -32,7 +32,7 @@
  * - 1 val for fixed frequency
  * - 2 vals for range (val1 must be < val2)
  * heartbeat_destination_port
- - - the port to send heartbeats to
+ * - the port to send heartbeats to
  * heartbeat_destination_ip
  * - to ip to send heartbeats to, may be remote IP or multicast
  * listen

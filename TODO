@@ -8,7 +8,3 @@
 - remove hash/list buffering in list.c hash.c?
 - if speak_to_ip is non-multicast check if listener has 
   the speak_to_ip.
-- need to modify config names so its valid for both speaker and listener
-  - heartbeat_ip
-  - heartbeat_port
-  
