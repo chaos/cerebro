@@ -1,8 +1,12 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.20 2005-03-22 05:37:46 achu Exp $
+## $Id: Makefile.am,v 1.21 2005-03-22 07:33:01 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
+
+if WITH_STATIC_MODULES
+STATIC_MODULES_HEADERS = cerebrod_static_modules.h
+endif
 
 noinst_HEADERS = cerebrod.h \
 		 cerebrod_clusterlist.h \
@@ -14,9 +18,9 @@ noinst_HEADERS = cerebrod.h \
 		 cerebrod_heartbeat.h \
 		 cerebrod_listener.h \
 		 cerebrod_speaker.h \
-		 cerebrod_static_modules.h \
 		 cerebrod_updown.h \
-		 cerebrod_util.h
+		 cerebrod_util.h \
+		 $(STATIC_MODULES_HEADERS)
 
 #
 # cerebrod daemon
