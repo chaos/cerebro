@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.17 2005-02-15 21:14:39 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.18 2005-02-16 19:54:03 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -105,12 +105,14 @@ _cerebrod_listener_create_and_setup_socket(void)
 	}
     }
 
-  /* Even if we're multicasting, the port still needs to be bound */
+  /* Configuration checks ensure destination ip is on this machine if
+   * it is a non-multicast address.
+   */
   memset(&heartbeat_addr, '\0', sizeof(struct sockaddr_in));
   heartbeat_addr.sin_family = AF_INET;
   heartbeat_addr.sin_port = htons(conf.heartbeat_destination_port);
   memcpy(&heartbeat_addr.sin_addr,
-         &conf.heartbeat_network_interface_in_addr,
+         &conf.heartbeat_destination_ip_in_addr,
          sizeof(struct in_addr));
   if (bind(temp_fd, (struct sockaddr *)&heartbeat_addr, sizeof(struct sockaddr_in)) < 0)
     {
