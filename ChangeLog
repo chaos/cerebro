@@ -5,6 +5,15 @@
 
 	* src/cerebrod/cerebrod_config.c (cerebrod_config): Call
 	_cerebrod_config_module_setup.
+
+	* src/cerebrod/cerebrod_config_gendersllnl.c: New file.
+
+	* src/cerebrod/Makefile.am: Adjusted for new module.
+
+	* src/cerebrod/cerebrod_clusterlist_genders.c
+	(genders_clusterlist_init),
+	src/cerebrod/cerebrod_clusterlist_gendersllnl.c
+	(gendersllnl_clusterlist_init): Fix argument param bug.
 	
 2005-03-17  Albert Chu  <chu11@llnl.gov>
 

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.36 2005-03-18 06:10:43 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.37 2005-03-18 19:04:25 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -179,6 +179,12 @@ _load_module(char *module_path)
       fprintf(stderr, "**************************************\n");
     }
 #endif /* NDEBUG */
+
+  if ((*config_module_ops->load_default)(&conf) < 0)
+    err_exit("%s config module: load_default failed: %s",
+             config_module_info->config_module_name, strerror(errno));
+
+  Lt_dlclose(config_module_dl_handle);
 }
 
 static int

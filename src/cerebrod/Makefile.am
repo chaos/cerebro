@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.14 2005-03-17 22:32:03 achu Exp $
+## $Id: Makefile.am,v 1.15 2005-03-18 19:04:25 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -34,6 +34,7 @@ cerebrod_LDFLAGS = -export-dynamic
 cerebrod_LDADD = ../libcommon/libcommon.la
 
 if WITH_GENDERSLLNL
+GENDERSLLNL_CONFIG_MODULE = cerebrod_config_gendersllnl.la
 GENDERSLLNL_CLUSTERLIST_MODULE = cerebrod_clusterlist_gendersllnl.la
 endif
 
@@ -42,12 +43,17 @@ GENDERS_CLUSTERLIST_MODULE = cerebrod_clusterlist_genders.la
 endif
 
 pkglib_LTLIBRARIES = \
+	$(GENDERSLLNL_CONFIG_MODULE) \
 	$(GENDERSLLNL_CLUSTERLIST_MODULE) \
 	$(GENDERS_CLUSTERLIST_MODULE) \
 	cerebrod_clusterlist_hostsfile.la \
 	cerebrod_clusterlist_none.la
 
 MODULE_FLAGS = -module -avoid-version
+
+cerebrod_config_gendersllnl_la_SOURCES = cerebrod_config_gendersllnl.c
+cerebrod_config_gendersllnl_la_LDFLAGS = $(MODULE_FLAGS) $(GENDERSLLNL_LIBS)
+cerebrod_config_gendersllnl_la_CFLAGS = -I$(srcdir)/../libcommon
 
 cerebrod_clusterlist_gendersllnl_la_SOURCES = cerebrod_clusterlist_gendersllnl.c cerebrod_clusterlist_util.c cerebrod_clusterlist_genders_util.c
 cerebrod_clusterlist_gendersllnl_la_LDFLAGS = $(MODULE_FLAGS) $(GENDERSLLNL_LIBS)

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_gendersllnl.c,v 1.9 2005-03-17 22:32:03 achu Exp $
+ *  $Id: cerebrod_clusterlist_gendersllnl.c,v 1.10 2005-03-18 19:04:25 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -39,7 +39,7 @@ gendersllnl_clusterlist_init(void)
 {
   assert(!handle);
                                                                                      
-  return cerebrod_clusterlist_genders_init(&handle, &gendersllnl_file);
+  return cerebrod_clusterlist_genders_init(&handle, gendersllnl_file);
 }
                                                                                      
 int
