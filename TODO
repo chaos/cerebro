@@ -1,2 +1,3 @@
 - README description
 - cerebro.spec.in, descriptions
+- not multicast, single-cast option
