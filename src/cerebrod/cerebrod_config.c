@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.8 2004-08-18 21:11:01 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.9 2004-08-20 00:14:54 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -314,11 +314,10 @@ cerebrod_calculate_configuration(void)
       struct ifconf ifc;
       struct ifreq *ifr;
       void *buf = NULL, *ptr = NULL;
-      int fd;
+      int fd, mask;
       struct in_addr net_s;
       u_int32_t current_ip, net;
       char *tok;
-      int mask = 0;
       char *network_interface_cpy;
       
       if (strchr(conf.network_interface, ':'))
@@ -327,15 +326,16 @@ cerebrod_calculate_configuration(void)
 
       /* From Unix Network Programming, by R. Stevens, Chapter 16 */
 
-      _get_if_conf(&buf, &ifc, fd);
-      
       fd = Socket(AF_INET, SOCK_DGRAM, 0);
-      
+
+      _get_if_conf(&buf, &ifc, fd);
+     
       network_interface_cpy = Strdup(conf.network_interface);
 
       /* If no '/', then just an IP address, mask is 0 bits */
-      if ((tok = strtok(network_interface_cpy, "/")))
+      if (strchr(network_interface_cpy, '/'))
         {
+          tok = strtok(network_interface_cpy, "/");
           if (inet_pton(AF_INET, tok, &net_s) < 0)
             err_exit("network interface '%s' IP address resolution "
                      "failed", conf.network_interface);
@@ -350,6 +350,7 @@ cerebrod_calculate_configuration(void)
           if (inet_pton(AF_INET, network_interface_cpy, &net_s) < 0)
             err_exit("network interface '%s' IP address resolution "
                      "failed", conf.network_interface);
+          mask = 32;
         }
 
       net = htonl(net_s.s_addr) >> (32 - mask);
@@ -382,11 +383,11 @@ cerebrod_calculate_configuration(void)
 	      || !(ifr_tmp.ifr_flags & IFF_MULTICAST))
 	    continue;
           
-          if (net != current_ip)
-            continue;
-
-          conf.multicast_interface = Strdup(ifr->ifr_name);
-          break;
+          if (net == current_ip)
+            {
+              conf.multicast_interface = Strdup(ifr->ifr_name);
+              break;
+            }
 	}
       
       if (conf.multicast_interface == NULL)
