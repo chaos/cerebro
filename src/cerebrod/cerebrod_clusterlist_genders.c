@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_genders.c,v 1.11 2005-03-19 03:28:29 achu Exp $
+ *  $Id: cerebrod_clusterlist_genders.c,v 1.12 2005-03-20 22:17:17 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -22,9 +22,25 @@
 #include "error.h"
 #include "wrappers.h"
 
+/* 
+ * handle
+ *
+ * genders handle
+ */
 genders_t handle = NULL;
+
+/*  
+ * genders_file
+ *
+ * genders database
+ */
 char *genders_file = NULL;
 
+/* 
+ * genders_clusterlist_parse_options
+ *
+ * parse options for the genders clusterlist module
+ */
 int
 genders_clusterlist_parse_options(char **options)
 {
@@ -36,6 +52,11 @@ genders_clusterlist_parse_options(char **options)
   return 0;
 }
 
+/* 
+ * genders_clusterlist_init
+ *
+ * genders clusterlist module init function
+ */
 int 
 genders_clusterlist_init(void)
 {
@@ -44,6 +65,11 @@ genders_clusterlist_init(void)
   return cerebrod_clusterlist_genders_init(&handle, genders_file);
 }
 
+/* 
+ * genders_clusterlist_finish
+ *
+ * genders clusterlist module finish function
+ */
 int
 genders_clusterlist_finish(void)
 {
@@ -52,6 +78,11 @@ genders_clusterlist_finish(void)
   return cerebrod_clusterlist_genders_finish(&handle, &genders_file);
 }
 
+/*
+ * genders_clusterlist_get_all_nodes
+ *
+ * genders clusterlist module get all nodes function
+ */
 int
 genders_clusterlist_get_all_nodes(char **nodes, unsigned int nodeslen)
 {
@@ -61,6 +92,11 @@ genders_clusterlist_get_all_nodes(char **nodes, unsigned int nodeslen)
   return cerebrod_clusterlist_genders_get_all_nodes(handle, nodes, nodeslen);
 }
 
+/*
+ * genders_clusterlist_numnodes
+ *
+ * genders clusterlist module numnodes function
+ */
 int 
 genders_clusterlist_numnodes(void)
 {
@@ -69,6 +105,11 @@ genders_clusterlist_numnodes(void)
   return cerebrod_clusterlist_genders_numnodes(handle);
 }
 
+/*
+ * genders_clusterlist_node_in_cluster
+ *
+ * genders clusterlist module node in cluster function
+ */
 int
 genders_clusterlist_node_in_cluster(char *node)
 {
@@ -100,6 +141,11 @@ genders_clusterlist_node_in_cluster(char *node)
   return ret;
 }
 
+/*
+ * genders_clusterlist_get_nodename
+ *
+ * genders clusterlist module get nodename function
+ */
 int
 genders_clusterlist_get_nodename(char *node, char *buf, int buflen)
 {

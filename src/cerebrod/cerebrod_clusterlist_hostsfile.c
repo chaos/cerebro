@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_hostsfile.c,v 1.9 2005-03-19 03:28:29 achu Exp $
+ *  $Id: cerebrod_clusterlist_hostsfile.c,v 1.10 2005-03-20 22:17:17 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -22,9 +22,25 @@
 #include "fd.h"
 #include "wrappers.h"
 
+/* 
+ * hosts
+ *
+ * list of all hosts
+ */
 List hosts = NULL;
+
+/*  
+ * hostsfile_file
+ *
+ * hostsfile database
+ */
 char *hostsfile_file = NULL;
 
+/* 
+ * hostsfile_clusterlist_parse_options
+ *
+ * parse options for the hostsfile clusterlist module
+ */
 int
 hostsfile_clusterlist_parse_options(char **options)
 {
@@ -36,6 +52,13 @@ hostsfile_clusterlist_parse_options(char **options)
   return 0;
 }
 
+/* 
+ * _readline
+ * 
+ * read a line from the hostsfile
+ *
+ * Return amount of data read into the buffer
+ */
 static int
 _readline(int fd, char *buf, int buflen)
 {
@@ -53,6 +76,13 @@ _readline(int fd, char *buf, int buflen)
   return ret;
 }
 
+/* 
+ * _remove_comments
+ *
+ * remove comments from the buffer
+ *
+ * Return length of buffer left after comments were removed
+ */
 static int
 _remove_comments(char *buf, int buflen)
 {
@@ -85,6 +115,13 @@ _remove_comments(char *buf, int buflen)
   return retlen;
 }
 
+/* 
+ * _remove_trailing_whitespace
+ *
+ * remove trailing whitespace from the buffer
+ *
+ * Return length of buffer left after trailing whitespace was removed
+ */
 static int
 _remove_trailing_whitespace(char *buf, int buflen)
 {
@@ -105,6 +142,13 @@ _remove_trailing_whitespace(char *buf, int buflen)
   return buflen;
 }
 
+/* 
+ * _move_past_whitespace
+ *
+ * move past whitespace at the beginning of the buffer
+ *
+ * Return pointer to beginning of first non-whitespace char
+ */
 static char *
 _move_past_whitespace(char *buf)
 {
@@ -119,6 +163,12 @@ _move_past_whitespace(char *buf)
   return buf;
 }
 
+/* 
+ * hostsfile_clusterlist_init
+ *
+ * hostsfile clusterlist module init function.  Open hostsfile, read
+ * each line of the hostsfile, and save hosts into hosts list.
+ */
 int 
 hostsfile_clusterlist_init(void)
 {
@@ -170,6 +220,11 @@ hostsfile_clusterlist_init(void)
   return 0;
 }
 
+/* 
+ * hostsfile_clusterlist_finish
+ *
+ * hostsfile clusterlist module finish function
+ */
 int
 hostsfile_clusterlist_finish(void)
 {
@@ -183,6 +238,11 @@ hostsfile_clusterlist_finish(void)
   return 0;
 }
 
+/*
+ * hostsfile_clusterlist_get_all_nodes
+ *
+ * hostsfile clusterlist module get all nodes function
+ */
 int
 hostsfile_clusterlist_get_all_nodes(char **nodes, unsigned int nodeslen)
 {
@@ -211,6 +271,11 @@ hostsfile_clusterlist_get_all_nodes(char **nodes, unsigned int nodeslen)
   return numnodes;
 }
 
+/*
+ * hostsfile_clusterlist_numnodes
+ *
+ * hostsfile clusterlist module numnodes function
+ */
 int 
 hostsfile_clusterlist_numnodes(void)
 {
@@ -219,6 +284,11 @@ hostsfile_clusterlist_numnodes(void)
   return list_count(hosts);
 }
 
+/*
+ * hostsfile_clusterlist_node_in_cluster
+ *
+ * hostsfile clusterlist module node in cluster function
+ */
 int
 hostsfile_clusterlist_node_in_cluster(char *node)
 {
@@ -232,6 +302,11 @@ hostsfile_clusterlist_node_in_cluster(char *node)
   return ((ret) ? 1: 0);
 }
 
+/*
+ * hostsfile_clusterlist_get_nodename
+ *
+ * hostsfile clusterlist module get nodename function
+ */
 int
 hostsfile_clusterlist_get_nodename(char *node, char *buf, int buflen)
 {

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.47 2005-03-20 20:34:48 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.48 2005-03-20 22:17:17 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -46,7 +46,9 @@
  */
 struct cerebrod_config conf;
 
-/* config_modules
+/* 
+ * config_modules
+ * config_modules_len
  * 
  * configuration modules to search for by default
  */
