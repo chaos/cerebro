@@ -5,6 +5,12 @@
 
 	* src/cerebrod/cerebrod_clusterlist.c (cerebrod_clusterlist_setup,
 	cerebrod_clusterlist_cleanup): Use new wrappers.h
+
+	* src/cerebrod/cerebrod_clusterlist_hostsfile.c: Completed work.
+
+	* config/ac_hostsfile.m4: New file.
+
+	* configure.ac: Updated to configure hostsfile default path.
 	
 2005-03-13  Albert Chu  <chu11@llnl.gov>
 

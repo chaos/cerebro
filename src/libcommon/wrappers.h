@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.h,v 1.12 2005-03-14 17:15:21 achu Exp $
+ *  $Id: wrappers.h,v 1.13 2005-03-14 22:05:55 achu Exp $
 \*****************************************************************************/
 
 #ifndef _WRAPPERS_H
@@ -206,16 +206,24 @@ int wrap_lt_dlclose(const char *file, int line, void *handle);
  */
 #define List_create(f) \
         wrap_list_create(__FILE__, __LINE__, f)
+#define List_destroy(l) \
+        wrap_list_destroy(__FILE__, __LINE__, l)
 #define List_append(l, x) \
-        wrap_list_append(__FILE__, __LINE__, l, x);
+        wrap_list_append(__FILE__, __LINE__, l, x)
+#define List_delete_all(l, f, key) \
+        wrap_list_delete_all(__FILE__, __LINE__, l, f, key)
+#define List_for_each(l, f, arg) \
+        wrap_list_for_each(__FILE__, __LINE__, l, f, arg)
 #define List_iterator_create(l) \
         wrap_list_iterator_create(__FILE__, __LINE__, l)
 #define List_iterator_destroy(i) \
         wrap_list_iterator_destroy(__FILE__, __LINE__, i)
 
 List wrap_list_create(const char *file, int line, ListDelF f);
-void *wrap_list_append (const char *file, int line, List l, void *x);
 void wrap_list_destroy(const char *file, int line, List l);
+void *wrap_list_append (const char *file, int line, List l, void *x);
+int wrap_list_delete_all(const char *file, int line, List l, ListFindF f, void *key);
+int wrap_list_for_each(const char *file, int line, List l, ListForF f, void *arg);
 ListIterator wrap_list_iterator_create(const char *file, int line, List l);
 void wrap_list_iterator_destroy(const char *file, int line, ListIterator i);
 /* 

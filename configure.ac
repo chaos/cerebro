@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.6 2005-03-14 17:05:14 achu Exp $
+## $Id: configure.ac,v 1.7 2005-03-14 22:05:55 achu Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -40,6 +40,11 @@ AC_CHECK_HEADERS( \
   unistd.h \
   getopt.h \
 )
+
+#
+# Check for new default hostsfile
+#
+AC_HOSTSFILE
 
 #
 # Check for genders

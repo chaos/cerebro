@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_genders.c,v 1.1 2005-03-14 17:05:14 achu Exp $
+ *  $Id: cerebrod_clusterlist_genders.c,v 1.2 2005-03-14 22:05:55 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -88,9 +88,9 @@ genders_clusterlist_init(char *cmdline)
       if (genders_errnum(handle) == GENDERS_ERR_OPEN)
 	{
 	  if (genders_file)
-	    err_exit("genders clusterlist file '%s' not found", genders_file);
+	    err_exit("genders clusterlist file '%s' cannot be opened", genders_file);
 	  else
-	    err_exit("genders clusterlist file '%s' not found", GENDERS_DEFAULT_FILE);
+	    err_exit("genders clusterlist file '%s' cannot be opened", GENDERS_DEFAULT_FILE);
 	}
       else
 	err_exit("genders_clusterlist_init: genders_load_data: %s",
@@ -121,7 +121,8 @@ genders_clusterlist_get_all_nodes(char **nodes, unsigned int nodeslen)
   char **nodelist;
   int i, nodelistlen, numnodes;
   
-  assert(handle && nodes);
+  assert(handle);
+  assert(nodes);
 
   if ((nodelistlen = genders_nodelist_create(handle, &nodelist)) < 0)
     err_exit("genders_clusterlist_get_all_nodes: genders_nodelist_create: %s",
@@ -163,7 +164,8 @@ genders_clusterlist_node_in_cluster(char *node)
 {
   int ret;
 
-  assert(handle && node);
+  assert(handle);
+  assert(node);
 
   if ((ret = genders_isnode(handle, node)) < 0)
     err_exit("genders_clusterlist_node_in_cluster: genders_isnode: %s",
@@ -177,7 +179,10 @@ genders_clusterlist_get_nodename(char *node, char *buf, int buflen)
 {
   int len;
 
-  assert(handle && node && buf && buflen > 0);
+  assert(handle);
+  assert(node);
+  assert(buf);
+  assert(buflen > 0);
 
   len = strlen(node);
 

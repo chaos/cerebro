@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_hostsfile.c,v 1.1 2005-03-14 17:05:14 achu Exp $
+ *  $Id: cerebrod_clusterlist_hostsfile.c,v 1.2 2005-03-14 22:05:55 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #if STDC_HEADERS
 #include <string.h>
+#include <ctype.h>
 #endif /* STDC_HEADERS */
 #if HAVE_GETOPT_H
 #include <getopt.h>
@@ -20,10 +21,11 @@
 #include "cerebrod.h"
 #include "cerebrod_clusterlist.h"
 #include "error.h"
+#include "fd.h"
 #include "wrappers.h"
 
 List hosts = NULL;
-char *hostsfile_file = CEREBROD_HOSTSFILE_DEFAULT;
+char *hostsfile_file = NULL;
 
 static void
 _cmdline_parse(int argc, char **argv)
@@ -61,12 +63,96 @@ _cmdline_parse(int argc, char **argv)
     }
 }
 
+static int
+_readline(int fd, char *buf, int buflen)
+{
+  int ret;
+
+  assert(buf);
+
+  if ((ret = fd_read_line(fd, buf, buflen)) < 0)
+    err_exit("_readline: fd_read_line: %s", strerror(errno));
+
+  /* buflen - 1 b/c fd_read_line guarantees null termination */
+  if (ret >= (buflen-1))
+    err_exit("_readline: fd_read_line: line truncation");
+
+  return ret;
+}
+
+static int
+_remove_comments(char *buf, int buflen)
+{
+  int i, comment_flag, retlen;
+
+  assert(buf);
+
+  if (strchr(buf, '#') == NULL)
+    return buflen;
+
+  i = 0;
+  comment_flag = 0;
+  retlen = buflen;
+  while (i < buflen)
+    {
+      if (comment_flag)
+        {
+          buf[i] = '\0';
+          retlen--;
+        }
+
+      if (buf[i] == '#')
+        {
+          buf[i] = '\0';
+          comment_flag++;
+          retlen--;
+        }
+    }
+
+  return retlen;
+}
+
+static int
+_remove_trailing_whitespace(char *buf, int buflen)
+{
+  char *temp;
+  
+  assert(buf);
+
+  temp = buf + buflen;
+  for (--temp; temp >= buf; temp--) 
+    {
+      if (isspace(*temp))
+        *temp = '\0';
+      else
+        break;
+      buflen--;
+    }
+
+  return buflen;
+}
+
+static char *
+_move_past_whitespace(char *buf)
+{
+  assert(buf);
+
+  while (*buf != '\0' && isspace(*buf))
+    buf++;
+
+  if (*buf == '\0')
+    return NULL;
+
+  return buf;
+}
+
 int 
 hostsfile_clusterlist_init(char *cmdline)
 {
-  int fd;
+  int fd, len;
+  char buf[CEREBROD_PARSE_BUFLEN];
 
-  assert(!handle);
+  assert(!hosts);
 
   if (cmdline)
     {
@@ -80,34 +166,59 @@ hostsfile_clusterlist_init(char *cmdline)
       argv_destroy(argv);
     }
 
-  hosts = List_create((ListDelF)Free);
+  hosts = List_create(NULL);
 
-  if ((fd = open(
+  hostsfile_file = CEREBROD_CLUSTERLIST_HOSTSFILE_DEFAULT;
+  if ((fd = open(hostsfile_file, O_RDONLY)) < 0)
+    err_exit("hostsfile clusterlist file '%s' cannot be opened", hostsfile_file);
 
-  if (!(handle = hostsfile_handle_create()))
-    err_exit("hostsfile_clusterlist_init: hostsfile_handle_create");
-
-  if (hostsfile_load_data(handle, hostsfile_file) < 0)
+  while ((len = _readline(fd, buf, CEREBROD_PARSE_BUFLEN)) > 0)
     {
-      if (hostsfile_errnum(handle) == HOSTSFILE_ERR_OPEN)
-	{
-	  if (hostsfile_file)
-	    err_exit("hostsfile clusterlist file '%s' not found", hostsfile_file);
-	  else
-	    err_exit("hostsfile clusterlist file '%s' not found", HOSTSFILE_DEFAULT_FILE);
-	}
-      else
-	err_exit("hostsfile_clusterlist_init: hostsfile_load_data: %s",
-		 hostsfile_errormsg(handle));
-    }
+      char *hostPtr;
+      char *str;
 
+      if ((len = _remove_comments(buf, len)) == 0)
+        continue;
+
+      if ((len = _remove_trailing_whitespace(buf, len)) == 0)
+        continue;
+
+      if ((hostPtr = _move_past_whitespace(buf)) == NULL)
+        continue;
+
+      if (hostPtr[0] == '\0')
+        continue;
+
+      if (strchr(hostPtr, ' ') || strchr(hostPtr, '\t'))
+        err_exit("hostsfile clusterlist parse error: host contains whitespace");
+
+      if (strlen(hostPtr) > MAXHOSTNAMELEN)
+        err_exit("hostsfile clusterlist parse error: hostname '%s' exceeds "
+                 "maximum length", hostPtr);
+      
+      str = Strdup(hostPtr);
+      List_append(hosts, str);
+    }
+  
+  close(fd);
   return 0;
+}
+
+static int
+_all(void *x, void *y)
+{
+  return 1;
 }
 
 int
 hostsfile_clusterlist_finish(void)
 {
-  assert(handle);
+  assert(hosts);
+
+  /* Can't pass 'Free' to List_create(), so free manually.
+   * - Can't pass NULL for the key, so pass a dummy string.
+   */
+  List_delete_all(hosts, _all, "dummy");
 
   List_destroy(hosts);
   hosts = NULL;
@@ -123,7 +234,8 @@ hostsfile_clusterlist_get_all_nodes(char **nodes, unsigned int nodeslen)
   ListIterator itr;
   int numnodes, i = 0;
 
-  assert(handle && nodes);
+  assert(hosts);
+  assert(nodes);
 
   numnodes = list_count(hosts);
 
@@ -146,7 +258,7 @@ hostsfile_clusterlist_get_all_nodes(char **nodes, unsigned int nodeslen)
 int 
 hostsfile_clusterlist_numnodes(void)
 {
-  assert(handle);
+  assert(hosts);
 
   return list_count(hosts);
 }
@@ -156,9 +268,10 @@ hostsfile_clusterlist_node_in_cluster(char *node)
 {
   void *ret;
 
-  assert(handle && node);
+  assert(hosts);
+  assert(node);
 
-  ret = list_find_first(l, (ListFindF)strcmp, node);
+  ret = list_find_first(hosts, (ListFindF)strcmp, node);
 
   return ((ret) ? 1: 0);
 }
@@ -168,7 +281,10 @@ hostsfile_clusterlist_get_nodename(char *node, char *buf, int buflen)
 {
   int len;
 
-  assert(handle && node && buf && buflen > 0);
+  assert(hosts);
+  assert(node);
+  assert(buf);
+  assert(buflen > 0);
 
   len = strlen(node);
 

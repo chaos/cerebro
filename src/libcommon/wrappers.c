@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.c,v 1.13 2005-03-14 17:15:21 achu Exp $
+ *  $Id: wrappers.c,v 1.14 2005-03-14 22:05:55 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -64,7 +64,6 @@ wrap_strdup(const char *file, int line, const char *s)
   char *ptr;
 
   assert(file != NULL);
-  assert(s != NULL);
 
   ptr = wrap_malloc(file, line, strlen(s) + 1);
   strcpy(ptr, s);
@@ -122,7 +121,7 @@ wrap_read(const char *file, int line, int fd, void *buf, size_t count)
 
   if ((ret = fd_read_n(fd, buf, count)) < 0)
     err_exit("read(%s:%d): %s", file, line, strerror(errno));
-    
+  
   return ret;
 }
 
@@ -580,6 +579,19 @@ wrap_list_create(const char *file, int line, ListDelF f)
   return ret;
 }
 
+void
+wrap_list_destroy(const char *file, int line, List l)
+{
+  assert(file != NULL);
+
+  if (!l)
+    err_exit("list_destroy(%s:%d): NULL list pointer", file, line);
+
+  list_destroy(l);
+
+  return;
+}
+
 void *
 wrap_list_append (const char *file, int line, List l, void *x)
 {
@@ -593,17 +605,30 @@ wrap_list_append (const char *file, int line, List l, void *x)
   return ret;
 }
 
-void
-wrap_list_destroy(const char *file, int line, List l)
+int 
+wrap_list_delete_all(const char *file, int line, List l, ListFindF f, void *key)
 {
+  int ret;
+
   assert(file != NULL);
 
-  if (!l)
-    err_exit("list_destroy(%s:%d): NULL list pointer", file, line);
+  if ((ret = list_delete_all(l, f, key)) < 0)
+    err_exit("list_delete_all(%s:%d): %s", file, line, strerror(errno));
+  
+  return ret;
+}
 
-  list_destroy(l);
+int
+wrap_list_for_each(const char *file, int line, List l, ListForF f, void *arg)
+{
+  int ret;
 
-  return;
+  assert(file != NULL);
+
+  if ((ret = list_for_each(l, f, arg)) < 0)
+    err_exit("list_for_each(%s:%d): %s", file, line, strerror(errno));
+  
+  return ret;
 }
 
 ListIterator
@@ -638,7 +663,7 @@ wrap_hash_create(const char *file, int line, int size, hash_key_f key_f, hash_cm
   hash_t ret;
 
   assert(file != NULL);
-
+  
   if (!(ret = hash_create(size, key_f, cmp_f, del_f)))
     err_exit("hash_create(%s:%d): %s", file, line, strerror(errno));
 
