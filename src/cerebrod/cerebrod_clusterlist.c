@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist.c,v 1.4 2005-03-17 05:46:57 achu Exp $
+ *  $Id: cerebrod_clusterlist.c,v 1.5 2005-03-17 06:16:06 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -55,15 +55,16 @@ _load_module(char *module_path)
   clusterlist_ops = (struct cerebrod_clusterlist_ops *)Lt_dlsym(clusterlist_dl_handle, "clusterlist_ops");
 }
 
-static void
-_find_clusterlist_module(void)
+static int
+_search_dir(char *search_dir)
 {
   DIR *dir;
   int i = 0;
 
   assert(!clusterlist_ops && !clusterlist_dl_handle);
+  assert(search_dir);
 
-  dir = Opendir(CEREBROD_MODULE_DIR);
+  dir = Opendir(search_dir);
   while (clusterlist_modules[i] != NULL)
     {
       struct dirent *dirent;
@@ -73,35 +74,29 @@ _find_clusterlist_module(void)
 	  if (!strcmp(dirent->d_name, clusterlist_modules[i]))
 	    {
 	      _load_module(clusterlist_modules[i]);
-	      Closedir(dir);
-	      return;
+	      goto found_dir;
 	    }
 	}
       
       rewinddir(dir);
       i++;
     }
+ found_dir:
   Closedir(dir);
+  
+  return (clusterlist_dl_handle) ? 1 : 0;
+}
 
-  dir = Opendir(".");
-  while (clusterlist_modules[i] != NULL)
-    {
-      struct dirent *dirent;
+static void
+_find_clusterlist_module(void)
+{
+  assert(!clusterlist_ops && !clusterlist_dl_handle);
 
-      while ((dirent = readdir(dir)))
-	{
-	  if (!strcmp(dirent->d_name, clusterlist_modules[i]))
-	    {
-	      _load_module(clusterlist_modules[i]);
-	      Closedir(dir);
-	      return;
-	    }
-	}
-      
-      rewinddir(dir);
-      i++;
-    }
-  Closedir(dir);
+  if (_search_dir(CEREBROD_MODULE_DIR))
+    return;
+
+  if (_search_dir("."))
+    return;
 
   if (!clusterlist_dl_handle)
     err_exit("no valid cluster list modules found");

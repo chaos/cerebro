@@ -56,6 +56,11 @@
 	* src/cerebrod/cerebrod_clusterlist.c (_find_clusterlist_module):
 	Fix logic bugs and also search current directory for modules.
 
+	* src/cerebrod/cerebrod_clusterlist.c (_search_dir): New function
+
+	* src/cerebrod/cerebrod_clusterlist.c (_find_clusterlist_module):
+	Code cleanup.
+
 2005-03-16  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerbrod/cerebrod_util.h, src/cerbrod/cerebrod_util.c: New

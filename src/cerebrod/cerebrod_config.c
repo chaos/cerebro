@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.32 2005-03-17 05:46:57 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.33 2005-03-17 06:16:06 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -723,7 +723,7 @@ _cerebrod_calculate_clusterlist_module(void)
 	  if (!stat(filebuf, &buf))
 	    {
 	      conf.clusterlist_module_file = Strdup(filebuf);
-	      goto clusterlist_module_found;
+	      return;
 	    }
 
 	  memset(filebuf, '\0', MAXPATHLEN+1);
@@ -732,7 +732,7 @@ _cerebrod_calculate_clusterlist_module(void)
 	  if (!stat(filebuf, &buf))
 	    {
 	      conf.clusterlist_module_file = Strdup(filebuf);
-	      goto clusterlist_module_found;
+	      return;
 	    }
 
 	  memset(filebuf, '\0', MAXPATHLEN+1);
@@ -742,7 +742,7 @@ _cerebrod_calculate_clusterlist_module(void)
 	  if (!stat(filebuf, &buf))
 	    {
 	      conf.clusterlist_module_file = Strdup(filebuf);
-	      goto clusterlist_module_found;
+	      return;
 	    }
 
 	  memset(filebuf, '\0', MAXPATHLEN+1);
@@ -751,12 +751,11 @@ _cerebrod_calculate_clusterlist_module(void)
 	  if (!stat(filebuf, &buf))
 	    {
 	      conf.clusterlist_module_file = Strdup(filebuf);
-	      goto clusterlist_module_found;
+	      return;
 	    }
 
 	  if (!conf.clusterlist_module_file)
 	    err_exit("clusterlist_module '%s' not found", conf.clusterlist_module);
-	clusterlist_module_found:
 	}
     }
 }
