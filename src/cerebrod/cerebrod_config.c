@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.54 2005-03-22 21:12:57 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.55 2005-03-24 01:29:21 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -27,8 +27,9 @@
 
 #include <sys/param.h>
 
+#include "cerebrod_config_module.h"
+
 #include "cerebrod_config.h"
-#include "cerebrod_clusterlist.h"
 #if WITH_STATIC_MODULES
 #include "cerebrod_static_modules.h"
 #else /* !WITH_STATIC_MODULES */
@@ -308,6 +309,8 @@ _cerebrod_cmdline_parse_check(void)
 static int
 _cerebrod_load_alternate_configuration(struct cerebrod_config_module_info *config_module_info)
 {
+  struct cerebrod_module_config module_conf;
+
   assert(config_module_info);
 
   if (!config_module_info->load_default)
@@ -325,12 +328,44 @@ _cerebrod_load_alternate_configuration(struct cerebrod_config_module_info *confi
     }
 #endif /* NDEBUG */
 
+  /* Initialize module_conf with current defaults */
+  module_conf.heartbeat_frequency_min = conf.heartbeat_frequency_min;
+  module_conf.heartbeat_frequency_max = conf.heartbeat_frequency_max;
+  module_conf.heartbeat_source_port = conf.heartbeat_source_port;
+  module_conf.heartbeat_destination_port = conf.heartbeat_destination_port;
+  module_conf.heartbeat_destination_ip = conf.heartbeat_destination_ip;
+  module_conf.heartbeat_network_interface = conf.heartbeat_network_interface;
+  module_conf.heartbeat_ttl = conf.heartbeat_ttl;
+  module_conf.speak = conf.speak;
+  module_conf.listen = conf.listen;
+  module_conf.listen_threads = conf.listen_threads;
+  module_conf.updown_server = conf.updown_server;
+  module_conf.updown_server_port = conf.updown_server_port;
+  module_conf.clusterlist_module = conf.clusterlist_module;
+  module_conf.clusterlist_module_options = conf.clusterlist_module_options;
+
   /* Load the alternate default configuration from the configuration module */
-  if ((*config_module_info->load_default)(&conf) < 0)
+  if ((*config_module_info->load_default)(&module_conf) < 0)
     err_exit("%s config module: load_default failed: %s", 
 	     config_module_info->config_module_name, strerror(errno));
 
-  return 1;
+  /* Load new defaults */
+  conf.heartbeat_frequency_min = module_conf.heartbeat_frequency_min;
+  conf.heartbeat_frequency_max = module_conf.heartbeat_frequency_max;
+  conf.heartbeat_source_port = module_conf.heartbeat_source_port;
+  conf.heartbeat_destination_port = module_conf.heartbeat_destination_port;
+  conf.heartbeat_destination_ip = module_conf.heartbeat_destination_ip;
+  conf.heartbeat_network_interface = module_conf.heartbeat_network_interface;
+  conf.heartbeat_ttl = module_conf.heartbeat_ttl;
+  conf.speak = module_conf.speak;
+  conf.listen = module_conf.listen;
+  conf.listen_threads = module_conf.listen_threads;
+  conf.updown_server = module_conf.updown_server;
+  conf.updown_server_port = module_conf.updown_server_port;
+  conf.clusterlist_module = module_conf.clusterlist_module;
+  conf.clusterlist_module_options = module_conf.clusterlist_module_options;
+
+  return 0;
 }
 
 #if WITH_STATIC_MODULES

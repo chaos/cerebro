@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.h,v 1.31 2005-03-22 05:37:46 achu Exp $
+ *  $Id: cerebrod_config.h,v 1.32 2005-03-24 01:29:21 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_CONFIG_H
@@ -87,28 +87,6 @@ struct cerebrod_config
   char *config_module_file;
   char *clusterlist_module_file;
 #endif /* !WITH_STATIC_MODULES */
-};
-
-/*
- * Cerebrod_config_load_default
- *
- * function prototype for config module function to alter default
- * configuration values
- *
- * Returns 0 on success, -1 on error
- */
-typedef int (*Cerebrod_config_load_default)(struct cerebrod_config *conf);
-
-/*
- * struct cerebrod_config_module_info 
- * 
- * contains config module information and operations.  Required to be
- * defined in each config module.
- */
-struct cerebrod_config_module_info
-{
-  char *config_module_name;
-  Cerebrod_config_load_default load_default;
 };
 
 /*

@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.23 2005-03-23 17:37:33 achu Exp $
+## $Id: Makefile.am,v 1.24 2005-03-24 01:29:21 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -69,7 +69,8 @@ cerebrod_SOURCES = cerebrod.c \
 		   cerebrod_util.c \
 		   $(STATIC_MODULES_SOURCES) \
 		   $(DYNAMIC_MODULES_SOURCES)
-cerebrod_CFLAGS  = -I$(srcdir)/../libcommon
+cerebrod_CFLAGS  = -I$(srcdir)/../libcerebro \
+		   -I$(srcdir)/../libcommon
 cerebrod_LDFLAGS = $(MODULE_EXPORT_FLAGS) $(STATIC_MODULES_LIBS)
 cerebrod_LDADD   = ../libcommon/libcommon.la
 
@@ -98,29 +99,34 @@ MODULE_FLAGS = -module -avoid-version
 
 cerebrod_config_gendersllnl_la_SOURCES = cerebrod_config_gendersllnl.c
 cerebrod_config_gendersllnl_la_LDFLAGS = $(MODULE_FLAGS) $(GENDERSLLNL_LIBS)
-cerebrod_config_gendersllnl_la_CFLAGS  = -I$(srcdir)/../libcommon
+cerebrod_config_gendersllnl_la_CFLAGS  = -I$(srcdir)/../libcerebro \
+					 -I$(srcdir)/../libcommon
 
 cerebrod_clusterlist_gendersllnl_la_SOURCES = cerebrod_clusterlist_gendersllnl.c \
 					      cerebrod_clusterlist_genders_util.c \
 					      cerebrod_clusterlist_util.c 
 cerebrod_clusterlist_gendersllnl_la_LDFLAGS = $(MODULE_FLAGS) $(GENDERSLLNL_LIBS)
-cerebrod_clusterlist_gendersllnl_la_CFLAGS  = -I$(srcdir)/../libcommon
+cerebrod_clusterlist_gendersllnl_la_CFLAGS  = -I$(srcdir)/../libcerebro \
+					      -I$(srcdir)/../libcommon
 
 cerebrod_clusterlist_genders_la_SOURCES = cerebrod_clusterlist_genders.c \
 					  cerebrod_clusterlist_genders_util.c \
 					  cerebrod_clusterlist_util.c
 cerebrod_clusterlist_genders_la_LDFLAGS = $(MODULE_FLAGS) $(GENDERS_LIBS)
-cerebrod_clusterlist_genders_la_CFLAGS  = -I$(srcdir)/../libcommon
+cerebrod_clusterlist_genders_la_CFLAGS  = -I$(srcdir)/../libcerebro \
+					  -I$(srcdir)/../libcommon
 
 cerebrod_clusterlist_hostsfile_la_SOURCES = cerebrod_clusterlist_hostsfile.c \
 					    cerebrod_clusterlist_util.c
 cerebrod_clusterlist_hostsfile_la_LDFLAGS = $(MODULE_FLAGS)
-cerebrod_clusterlist_hostsfile_la_CFLAGS  = -I$(srcdir)/../libcommon
+cerebrod_clusterlist_hostsfile_la_CFLAGS  = -I$(srcdir)/../libcerebro \
+					    -I$(srcdir)/../libcommon
 
 cerebrod_clusterlist_none_la_SOURCES = cerebrod_clusterlist_none.c \
 				       cerebrod_clusterlist_util.c
 cerebrod_clusterlist_none_la_LDFLAGS = $(MODULE_FLAGS)
-cerebrod_clusterlist_none_la_CFLAGS  = -I$(srcdir)/../libcommon
+cerebrod_clusterlist_none_la_CFLAGS  = -I$(srcdir)/../libcerebro \
+				       -I$(srcdir)/../libcommon
 
 ../libcommon/libcommon.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`

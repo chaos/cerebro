@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebrod.8.in,v 1.9 2005-03-22 05:37:46 achu Exp $
+\."$Id: cerebrod.8.in,v 1.10 2005-03-24 01:29:21 achu Exp $
 \."#############################################################################
 .TH cerebrod 8 "May 2005" "cerebrod @VERSION@" cerebrod
 .SH "NAME"
@@ -72,8 +72,8 @@ daemon in the cluster based on the parameters stored in the database.
 Therefore, a different configuration file does not have to be written
 and distributed for each cluster node.
 
-The alternate default configuration options
-can be overrided by the options specified in the configuration file.
+The alternate default configuration options can be overrided by the
+options specified in the configuration file.
 
 The following config modules
 are available to

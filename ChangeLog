@@ -3,8 +3,8 @@
 	Begin work on libcerebro
 
 	* src/libcerebro/Makefile.am,
-	src/libcerebro/cerebro_config_module.h,
-	src/libcerebro/cerebro_clusterlist.h: New files.
+	src/libcerebro/cerebrod_config_module.h,
+	src/libcerebro/cerebrod_clusterlist.h: New files.
 
 	* configure.ac, src/Makefile.am: Updated for new files and directories.
 
@@ -13,6 +13,25 @@
 	* src/cerebrod/cerebrod_clusterlist.h: Remove useless headers.
 
 	* src/cerebrod/cerebrod_clusterlist_utils.c: Fix header problems.
+
+	* src/cerebrod/cerebrod_config.h,
+	src/cerebrod/cerebrod_clusterlist.h: Removed definitions and
+	declarations due to new ones in
+	src/libcerebro/cerebrod_config_module.h and
+	src/libcerebro/cerebrod_clusterlist.h.
+
+	* src/cerebrod/cerebrod_config.c,
+	src/cerebrod_config_gendersllnl.c
+	src/cerebrod/cerebrod_clusterlist.c,
+	src/cerebrod/cerebrod_clusterlist_none.c,
+	src/cerebrod_clusterlist_hostsfile.c,
+	src/cerebrod_clusterlist_genders.c,
+	src/cerebrod_clusterlist_gendersllnl.c: Include new headers as
+	needed.
+
+	* src/cerebrod/cerebrod_config.c
+	(_cerebrod_load_alternate_configuration): Reworked as needed for
+	by new headers.
 
 2005-03-22  Albert Chu  <chu11@llnl.gov>
 

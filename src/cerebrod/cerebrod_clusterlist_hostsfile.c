@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_hostsfile.c,v 1.14 2005-03-22 01:34:54 achu Exp $
+ *  $Id: cerebrod_clusterlist_hostsfile.c,v 1.15 2005-03-24 01:29:21 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -14,6 +14,8 @@
 #endif /* STDC_HEADERS */
 #include <assert.h>
 #include <errno.h>
+
+#include "cerebrod_clusterlist_module.h"
 
 #include "cerebrod.h"
 #include "cerebrod_clusterlist.h"

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config_gendersllnl.c,v 1.4 2005-03-22 01:34:54 achu Exp $
+ *  $Id: cerebrod_config_gendersllnl.c,v 1.5 2005-03-24 01:29:21 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -16,6 +16,8 @@
 
 #include <gendersllnl.h>
 
+#include "cerebrod_config_module.h"
+
 #include "cerebrod.h"
 #include "cerebrod_config.h"
 #include "error.h"
@@ -30,7 +32,7 @@
  * Returns 0 on success, -1 on error
  */
 int
-gendersllnl_config_load_default(struct cerebrod_config *conf)
+gendersllnl_config_load_default(struct cerebrod_module_config *conf)
 {
   genders_t handle = NULL;
   int ret;

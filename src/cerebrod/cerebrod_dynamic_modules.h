@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_dynamic_modules.h,v 1.1 2005-03-22 20:56:40 achu Exp $
+ *  $Id: cerebrod_dynamic_modules.h,v 1.2 2005-03-24 01:29:21 achu Exp $
 \*****************************************************************************/
  
 #ifndef _CEREBROD_STATIC_MODULES_H
@@ -10,9 +10,6 @@
 #endif /* HAVE_CONFIG_H */
 
 #if !WITH_STATIC_MODULES
-
-#include "cerebrod_config.h"
-#include "cerebrod_clusterlist.h"
 
 extern char *dynamic_config_modules[];
 extern int dynamic_config_modules_len;
