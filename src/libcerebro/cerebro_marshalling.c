@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_marshalling.c,v 1.1 2005-03-27 08:10:24 achu Exp $
+ *  $Id: cerebro_marshalling.c,v 1.2 2005-03-28 17:40:10 achu Exp $
 \*****************************************************************************/
  
 #if HAVE_CONFIG_H
@@ -16,6 +16,19 @@
 #include <errno.h>
 
 int
+cerebro_marshall_int8(int8_t val, char *buffer, int bufferlen)
+{
+  if (!buffer || bufferlen < sizeof(int8_t))
+    {
+      errno = EINVAL;
+      return -1;
+    }
+
+  memcpy(buffer, (void *)&val, sizeof(int8_t));
+  return sizeof(int8_t);
+}
+
+int
 cerebro_marshall_int32(int32_t val, char *buffer, int bufferlen)
 {
   int32_t temp;
@@ -29,6 +42,19 @@ cerebro_marshall_int32(int32_t val, char *buffer, int bufferlen)
   temp = htonl(val);
   memcpy(buffer, (void *)&temp, sizeof(temp));
   return sizeof(temp);
+}
+
+int
+cerebro_marshall_uint8(u_int8_t val, char *buffer, int bufferlen)
+{
+  if (!buffer || bufferlen < sizeof(u_int8_t))
+    {
+      errno = EINVAL;
+      return -1;
+    }
+
+  memcpy(buffer, (void *)&val, sizeof(u_int8_t));
+  return sizeof(u_int8_t);
 }
 
 int
@@ -61,6 +87,19 @@ cerebro_marshall_buffer(char *buf, int buflen, char *buffer, int bufferlen)
 }
 
 int
+cerebro_unmarshall_int8(int8_t *val, char *buffer, int bufferlen)
+{
+  if (!val || !buffer || bufferlen < sizeof(int8_t))
+    {
+      errno = EINVAL;
+      return -1;
+    }
+
+  memcpy((void *)val, buffer, sizeof(int8_t));
+  return sizeof(int8_t);
+}
+
+int
 cerebro_unmarshall_int32(int32_t *val, char *buffer, int bufferlen)
 {
   int32_t temp;
@@ -74,6 +113,19 @@ cerebro_unmarshall_int32(int32_t *val, char *buffer, int bufferlen)
   memcpy((void *)&temp, buffer, sizeof(temp));
   *val = ntohl(temp);
   return sizeof(temp);
+}
+
+int
+cerebro_unmarshall_u_int8(u_int8_t *val, char *buffer, int bufferlen)
+{
+  if (!val || !buffer || bufferlen < sizeof(u_int8_t))
+    {
+      errno = EINVAL;
+      return -1;
+    }
+
+  memcpy((void *)val, buffer, sizeof(u_int8_t));
+  return sizeof(u_int8_t);
 }
 
 int

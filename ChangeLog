@@ -1,3 +1,21 @@
+2005-03-28  Albert Chu  <chu11@llnl.gov>
+
+	* src/cerebrod/cerebrod_updown.c
+	(_cerebrod_updown_evaluate_updown_state): Completed work.
+	
+2005-03-27  Albert Chu  <chu11@llnl.gov>
+
+	* src/libcerebro/cerebro_marshalling.h,
+	src/libcerebro/cerebro_marshalling.c (cerebro_marshall_int8,
+	cerebro_marshall_uint8, cerebro_unmarshall_int8,
+	cerebro_unmarshall_uint8): New functions.
+
+	* src/cerebrod/cerebrod_updown.c
+	(_cerebrod_updown_evaluate_updown_state,
+	_cerebrod_updown_respond_with_node,
+	_cerebrod_updown_respond_with_updown_nodes,
+	_cerebrod_updown_send_response): New functions.
+	
 2005-03-26  Albert Chu  <chu11@llnl.gov>
 
 	* src/libcommon/wrappers.h, src/libcommon/wrappers.c (Listen,

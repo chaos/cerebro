@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.h,v 1.4 2005-03-25 19:44:05 achu Exp $
+ *  $Id: cerebrod_updown.h,v 1.5 2005-03-28 17:40:10 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_UPDOWN_H
@@ -20,6 +20,21 @@ struct cerebrod_updown_node_data
   int discovered;
   u_int32_t last_received;
   pthread_mutex_t updown_node_data_lock;
+};
+
+/* 
+ * struct cerebrod_updown_evaluation_data
+ *
+ * Holds data for callback function when evaluating updown state.
+ */
+struct cerebrod_updown_evaluation_data
+{
+  int client_fd;
+  u_int32_t updown_request;
+  u_int32_t timeout_len;
+  u_int32_t time_now;
+  u_int32_t numnodes;
+  u_int32_t count;
 };
 
 /*
