@@ -3,17 +3,15 @@ monitoring a cluster of nodes.
 
 This project as been named Cerebro to pay homage to the the Ganglia
 project (http://ganglia.sourceforge.net).  A heavily modified version
-of Ganglia was once used at Lawrence Livermore National Laboratory on
-our Linux clusters.  Originally, a Ganglia gmond daemon with all
-metrics removed except for the heartbeat message was used as an aid
-for a cluster node up/down detection utility.
+of Ganglia was once used at Lawrence Livermore National Laboratory to
+support our Linux clusters. 
 
-Over time, the gmond daemon was "hacked" to support a number of other
-features.  However, a number of features desired by users, system
-administrators, and other developers could not be added to Ganglia
-without significant architectural changes.
+Over time, the gmond daemon was "hacked" to support a number of local
+performance enhancements and features.  A number of features desired
+by users, system administrators, and other developers could not be
+added to Ganglia without significant architectural changes.
 
-Since so much of the Ganglia package was already removed from our
+Since a large part of the Ganglia package was already removed from our
 local package, it was apparent that an internally developed monitoring
 tool was needed.  To pay homage to Ganglia, another member of the
 central nervous system was chosen for this project's name.
