@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.57 2005-03-25 19:44:05 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.58 2005-03-27 08:23:50 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -1410,6 +1410,8 @@ cerebrod_config_setup(int argc, char **argv)
 void
 cerebrod_config_cleanup(void)
 {
+#if !WITH_STATIC_MODULES
   Lt_dlclose(config_module_dl_handle);
+#endif /* !WITH_STATIC_MODULES */
   Lt_dlexit();
 }

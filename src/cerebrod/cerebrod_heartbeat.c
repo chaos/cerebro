@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_heartbeat.c,v 1.14 2005-03-25 23:52:54 achu Exp $
+ *  $Id: cerebrod_heartbeat.c,v 1.15 2005-03-27 08:23:50 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -69,15 +69,15 @@ cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb)
 
 int 
 cerebrod_heartbeat_marshall(struct cerebrod_heartbeat *hb, 
-			    char *buffer, int len) 
+			    char *buffer, int bufferlen) 
 {
   int ret, c = 0;
 
-  assert(hb && buffer && len > 0);
-  assert(len >= CEREBROD_HEARTBEAT_LEN);
+  assert(hb && buffer && bufferlen > 0);
+  assert(bufferlen >= CEREBROD_HEARTBEAT_LEN);
 
-  memset(buffer, '\0', len);
-  if ((ret = cerebro_marshall_int32(hb->version, buffer + c, len - c)) < 0)
+  memset(buffer, '\0', bufferlen);
+  if ((ret = cerebro_marshall_int32(hb->version, buffer + c, bufferlen - c)) < 0)
     err_exit("cerebrod_heartbeat_marshall: cerebro_marshall_int32: %s",
              strerror(errno));
   c += ret;
@@ -85,17 +85,17 @@ cerebrod_heartbeat_marshall(struct cerebrod_heartbeat *hb,
   if ((ret = cerebro_marshall_buffer(hb->hostname, 
                                      sizeof(hb->hostname), 
                                      buffer + c, 
-                                     len - c)) < 0)
+                                     bufferlen - c)) < 0)
     err_exit("cerebrod_heartbeat_marshall: cerebro_marshall_buffer: %s",
              strerror(errno));
   c += ret;
 
-  if ((ret = cerebro_marshall_uint32(hb->starttime, buffer + c, len - c)) < 0)
+  if ((ret = cerebro_marshall_uint32(hb->starttime, buffer + c, bufferlen - c)) < 0)
     err_exit("cerebrod_heartbeat_marshall: cerebro_marshall_uint32: %s",
              strerror(errno));
   c += ret;
 
-  if ((ret = cerebro_marshall_uint32(hb->boottime, buffer + c, len - c)) < 0)
+  if ((ret = cerebro_marshall_uint32(hb->boottime, buffer + c, bufferlen - c)) < 0)
     err_exit("cerebrod_heartbeat_marshall: cerebro_marshall_uint32: %s",
              strerror(errno));
   c += ret;
@@ -105,29 +105,29 @@ cerebrod_heartbeat_marshall(struct cerebrod_heartbeat *hb,
 
 int 
 cerebrod_heartbeat_unmarshall(struct cerebrod_heartbeat *hb, 
-			      char *buffer, int len)
+			      char *buffer, int bufferlen)
 {
   int ret, c = 0;
 
-  assert(hb && buffer && len > 0);
+  assert(hb && buffer && bufferlen >= 0);
 
-  if (CEREBROD_HEARTBEAT_LEN > len)
+  if (CEREBROD_HEARTBEAT_LEN > bufferlen)
     {
       err_debug("cerebrod_heartbeat_ummarshall: received buffer length "
-		"too small: need %d, len %d", CEREBROD_HEARTBEAT_LEN, 
-		len);
+		"too small: need %d, bufferlen %d", CEREBROD_HEARTBEAT_LEN, 
+		bufferlen);
       return -1;
     }
   
-  if (CEREBROD_HEARTBEAT_LEN != len)
+  if (CEREBROD_HEARTBEAT_LEN != bufferlen)
     {
       err_debug("cerebrod_heartbeat_marshall: received buffer length "
-		"unexpected size: expect %d, len %d", CEREBROD_HEARTBEAT_LEN,
-		len);
+		"unexpected size: expect %d, bufferlen %d", CEREBROD_HEARTBEAT_LEN,
+		bufferlen);
       return -1;
     }
   
-  if ((ret = cerebro_unmarshall_int32(&(hb->version), buffer + c, len - c)) < 0)
+  if ((ret = cerebro_unmarshall_int32(&(hb->version), buffer + c, bufferlen - c)) < 0)
       err_exit("cerebrod_heartbeat_unmarshall: cerebro_unmarshall_int32: %s",
                strerror(errno));
   c += ret;
@@ -135,17 +135,17 @@ cerebrod_heartbeat_unmarshall(struct cerebrod_heartbeat *hb,
   if ((ret = cerebro_unmarshall_buffer(hb->hostname, 
                                        sizeof(hb->hostname), 
                                        buffer + c, 
-                                       len - c)) < 0)
+                                       bufferlen - c)) < 0)
     err_exit("cerebrod_heartbeat_unmarshall: cerebro_unmarshall_buffer: %s",
              strerror(errno));
   c += ret;
 
-  if ((ret = cerebro_unmarshall_uint32(&(hb->starttime), buffer + c, len - c)) < 0)
+  if ((ret = cerebro_unmarshall_uint32(&(hb->starttime), buffer + c, bufferlen - c)) < 0)
     err_exit("cerebrod_heartbeat_unmarshall: cerebro_unmarshall_uint32: %s",
              strerror(errno));
   c += ret;
 
-  if ((ret = cerebro_unmarshall_uint32(&(hb->boottime), buffer + c, len - c)) < 0)
+  if ((ret = cerebro_unmarshall_uint32(&(hb->boottime), buffer + c, bufferlen - c)) < 0)
     err_exit("cerebrod_heartbeat_unmarshall: cerebro_unmarshall_uint32: %s",
              strerror(errno));
   c += ret;

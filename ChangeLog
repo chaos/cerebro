@@ -3,6 +3,20 @@
 	* src/libcommon/wrappers.h, src/libcommon/wrappers.c (Listen,
 	Accept, Select, Poll, wrap_listen, wrap_accept, wrap_select,
 	wrap_poll): New macros and functions.
+
+	* src/cerebrod/cerebrod_updown.c
+	(_cerebrod_updown_respond_with_error,
+	_cerebrod_updown_request_dump, _cerebrod_updown_receive_request,
+	_cerebrod_updown_request_unmarshall,
+	_cerebrod_updown_response_marshall): New functions.
+
+	* src/cerebrod/cerebrod_updown.c
+	(_cerebrod_updown_service_connection): Use new functions.
+	
+	* src/libcerebro/cerebrod_updown_protocol.h: Minor cleanup.
+
+	* src/cerebrod/cerebrod_config.c (cerebrod_config_cleanup): Fix
+	dl_handle bug.
 	
 2005-03-25  Albert Chu  <chu11@llnl.gov>
 

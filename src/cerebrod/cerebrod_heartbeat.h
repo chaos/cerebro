@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_heartbeat.h,v 1.6 2005-03-25 19:44:05 achu Exp $
+ *  $Id: cerebrod_heartbeat.h,v 1.7 2005-03-27 08:23:50 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_HEARTBEAT_H
@@ -33,7 +33,7 @@ int cerebrod_heartbeat_marshall(struct cerebrod_heartbeat *hb, char *buffer, int
 /* 
  * cerebrod_heartbeat_unmarshall
  *
- * unmarshall contents of a packet buffer
+ * unmarshall contents of a heartbeat packet buffer
  *
  * Returns 0 on success, -1 on error 
  */
