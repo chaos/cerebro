@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.h,v 1.11 2005-03-14 17:05:14 achu Exp $
+ *  $Id: wrappers.h,v 1.12 2005-03-14 17:15:21 achu Exp $
 \*****************************************************************************/
 
 #ifndef _WRAPPERS_H
@@ -184,6 +184,10 @@ int wrap_gethostname(const char *file, int line, char *name, size_t len);
  * ltdl wrappers
  */
 
+#define Lt_dlinit() \
+        wrap_lt_dlinit(__FILE__, __LINE__)
+#define Lt_dlexit() \
+        wrap_lt_dlexit(__FILE__, __LINE__)
 #define Lt_dlopen(filename) \
         wrap_lt_dlopen(__FILE__, __LINE__, filename)
 #define Lt_dlsym(handle, symbol) \
@@ -191,6 +195,8 @@ int wrap_gethostname(const char *file, int line, char *name, size_t len);
 #define Lt_dlclose(handle) \
         wrap_lt_dlclose(__FILE__, __LINE__, handle)
 
+int wrap_lt_dlinit(const char *file, int line);
+int wrap_lt_dlexit(const char *file, int line);
 lt_dlhandle wrap_lt_dlopen(const char *file, int line, const char *filename);
 lt_ptr wrap_lt_dlsym(const char *file, int line, void *handle, char *symbol);
 int wrap_lt_dlclose(const char *file, int line, void *handle);

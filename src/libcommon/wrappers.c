@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.c,v 1.12 2005-03-14 17:05:14 achu Exp $
+ *  $Id: wrappers.c,v 1.13 2005-03-14 17:15:21 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -480,6 +480,32 @@ wrap_gethostname(const char *file, int line, char *name, size_t len)
 
   if ((ret = gethostname(name, len)) < 0)
     err_exit("gethostname(%s:%d): %s", file, line, strerror(errno));
+
+  return ret;
+}
+
+int
+wrap_lt_dlinit(const char *file, int line)
+{
+  int ret;
+
+  assert(file != NULL);
+
+  if ((ret = lt_dlinit()) != 0)
+    err_exit("lt_dlinit(%s:%d): %s", file, line, lt_dlerror());
+
+  return ret;
+}
+
+int
+wrap_lt_dlexit(const char *file, int line)
+{
+  int ret;
+
+  assert(file != NULL);
+
+  if ((ret = lt_dlexit()) != 0)
+    err_exit("lt_dlexit(%s:%d): %s", file, line, lt_dlerror());
 
   return ret;
 }

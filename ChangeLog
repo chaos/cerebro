@@ -1,3 +1,11 @@
+2005-03-14  Albert Chu  <chu11@llnl.gov>
+
+	* src/libcommon/wrappers.h, src/libcommon/wrappers.c (Lt_dlinit,
+	Lt_dlexit, wrap_lt_dlinit, wrap_lt_dlexit): New wrappers.
+
+	* src/cerebrod/cerebrod_clusterlist.c (cerebrod_clusterlist_setup,
+	cerebrod_clusterlist_cleanup): Use new wrappers.h
+	
 2005-03-13  Albert Chu  <chu11@llnl.gov>
 
 	Add initial support for masterlist mechanisms.

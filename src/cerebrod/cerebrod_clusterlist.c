@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist.c,v 1.1 2005-03-14 17:05:14 achu Exp $
+ *  $Id: cerebrod_clusterlist.c,v 1.2 2005-03-14 17:15:21 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -93,8 +93,7 @@ cerebrod_clusterlist_setup(void)
 {
   assert(!clusterlist_ops && !clusterlist_dl_handle);
 
-  if (lt_dlinit() != 0)
-    err_exit("cerebrod_clusterlist_setup: lt_dlinit: %s", lt_dlerror());
+  Lt_dlinit();
 
   if (conf.clusterlist_module)
     _load_module(conf.clusterlist_module);
@@ -111,8 +110,7 @@ cerebrod_clusterlist_cleanup(void)
   clusterlist_dl_handle = NULL;
   clusterlist_ops = NULL;
 
-  if (lt_dlexit() != 0)
-    err_exit("cerebrod_clusterlist_setup: lt_dlexit: %s", lt_dlerror());
+  Lt_dlexit();
 }
 
 int 
