@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.51 2005-03-22 05:37:46 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.52 2005-03-22 07:27:30 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -77,7 +77,6 @@ char *config_modules[] = {
 };
 int config_modules_len = 1;
 #endif /* WITH_STATIC_MODULES */
-
 
 /* 
  * _cerebrod_config_default 
@@ -214,6 +213,38 @@ _cerebrod_cmdline_parse(int argc, char **argv)
     }
 }
 
+#if WITH_STATIC_MODULES
+/*
+ * _cerebrod_find_static_config_module
+ *
+ * Returns pointer to cerebrod_config_module_info structure with the
+ * name, NULL if one is not found
+ */
+static struct cerebrod_config_module_info *
+_cerebrod_find_static_config_module(char *name)
+{
+  struct cerebrod_config_module_info **ptr = &static_config_modules[0];
+  int i = 0;
+
+  assert(name);
+  
+  while (ptr[i] != NULL)
+    {
+      if (!ptr[i]->config_module_name)
+	{
+	  err_debug("static config module index '%d' does not contain name", i);
+	  continue;
+	}
+      if (!strcmp(ptr[i]->config_module_name, name))
+	return ptr[i];
+      i++;
+    }
+
+  return NULL;
+}
+#endif /* WITH_STATIC_MODULES */
+
+
 /* 
  * _cerebrod_cmdline_parse_check:
  *
@@ -241,22 +272,8 @@ _cerebrod_cmdline_parse_check(void)
   /* Check if the configuration type exists */
   if (conf.config_module)
     {
-      struct cerebrod_config_module_info **ptr = &static_config_modules[0];
-      int i = 0;
-
-      while (ptr[i] != NULL)
-        {
-          if (!ptr[i]->config_module_name)
-            {
-              err_debug("static config module index '%d' does not contain name");
-              continue;
-            }
-          if (!strcmp(ptr[i]->config_module_name, conf.config_module))
-            goto done;
-          i++;
-        }
-
-      err_exit("config type '%s' not found", conf.config_module);
+      if (!_cerebrod_find_static_config_module(conf.config_module) < 0)
+	err_exit("config module '%s' not found", conf.config_module);
     }
 #else  /* !WITH_STATIC_MODULES */
   /* Check if the configuration module exists */
@@ -333,11 +350,46 @@ _cerebrod_cmdline_parse_check(void)
 	  if (!conf.config_module_file)
 	    err_exit("config module '%s' not found", conf.config_module);
 	}
+    done:
+      ;
     }
 #endif /* !WITH_STATIC_MODULES */
-
- done:
   return;
+}
+
+/* 
+ * _cerebrod_load_alternate_configuration
+ *
+ * Check parameters and load the actual alternate configuration
+ *
+ * Returns 1 on loading success, 0 on loading failure, -1 on fatal error
+ */
+static int
+_cerebrod_load_alternate_configuration(struct cerebrod_config_module_info *config_module_info)
+{
+  assert(config_module_info);
+
+  if (!config_module_info->load_default)
+    err_exit("config module '%s' does not contain valid load_default function", 
+	     config_module_info->config_module_name);
+
+#ifndef NDEBUG
+  if (conf.debug)
+    {
+      fprintf(stderr, "**************************************\n");
+      fprintf(stderr, "* Cerebrod Config Configuration:\n");
+      fprintf(stderr, "* -----------------------\n");
+      fprintf(stderr, "* Loaded config module: %s\n", config_module_info->config_module_name);
+      fprintf(stderr, "**************************************\n");
+    }
+#endif /* NDEBUG */
+
+  /* Load the alternate default configuration from the configuration module */
+  if ((*config_module_info->load_default)(&conf) < 0)
+    err_exit("%s config module: load_default failed: %s", 
+	     config_module_info->config_module_name, strerror(errno));
+
+  return 1;
 }
 
 #if WITH_STATIC_MODULES
@@ -351,53 +403,16 @@ _cerebrod_cmdline_parse_check(void)
  * Returns 1 on loading success, 0 on loading failure, -1 on fatal error
  */
 static int
-_config_load_static_module(char *type)
+_config_load_static_module(char *name)
 {
-  struct cerebrod_config_module_info **ptr = &static_config_modules[0];
-  int i = 0, found = 0;
+  struct cerebrod_config_module_info *config_module_info;
 
-  assert(type);
+  assert(name);
 
-  while (ptr[i] != NULL)
-    {
-      if (!ptr[i]->config_module_name)
-        {
-          err_debug("static config module index '%d' does not contain name");
-          continue;
-        }
-
-      if (!strcmp(ptr[i]->config_module_name, type))
-        {
-          if (!ptr[i]->load_default)
-            err_exit("config module '%s' does not contain valid load_default function", 
-                     type);
-
-#ifndef NDEBUG
-          if (conf.debug)
-            {
-              fprintf(stderr, "**************************************\n");
-              fprintf(stderr, "* Cerebrod Config Configuration:\n");
-              fprintf(stderr, "* -----------------------\n");
-              fprintf(stderr, "* Loaded config type: %s\n", type);
-              fprintf(stderr, "**************************************\n");
-            }
-#endif /* NDEBUG */
-
-          /* Load the alternate default configuration from the configuration module */
-          if ((*ptr[i]->load_default)(&conf) < 0)
-            err_exit("%s config type: load_default failed: %s",
-                     ptr[i]->config_module_name, strerror(errno));
-
-          found++;
-          break;
-        }
-      i++;
-    }
-
-  if (!found)
-    err_exit("_config_load_static_module: config type '%s' not found", type);
-
-  return 1;
+  if (!(config_module_info = _cerebrod_find_static_config_module(name)))
+    err_exit("_config_load_static_module: config module '%s' name not found", name);
+  
+  return _cerebrod_load_alternate_configuration(config_module_info);
 }
 #else /* !WITH_STATIC_MODULES */
 /* 
@@ -414,6 +429,7 @@ _config_load_module(char *module_path)
 {
   lt_dlhandle config_module_dl_handle = NULL;
   struct cerebrod_config_module_info *config_module_info = NULL;
+  int rv;
 
   assert(module_path);
 
@@ -424,29 +440,11 @@ _config_load_module(char *module_path)
     err_exit("config module '%s' does not contain a valid name", 
              module_path);
 
-  if (!config_module_info->load_default)
-    err_exit("config module '%s' does not contain valid load_default function", 
-             module_path);
-  
-#ifndef NDEBUG
-  if (conf.debug)
-    {
-      fprintf(stderr, "**************************************\n");
-      fprintf(stderr, "* Cerebrod Config Configuration:\n");
-      fprintf(stderr, "* -----------------------\n");
-      fprintf(stderr, "* Loaded config module: %s\n", module_path); 
-      fprintf(stderr, "**************************************\n");
-    }
-#endif /* NDEBUG */
-
-  /* Load the alternate default configuration from the configuration module */
-  if ((*config_module_info->load_default)(&conf) < 0)
-    err_exit("%s config module: load_default failed: %s",
-             config_module_info->config_module_name, strerror(errno));
+  rv = _cerebrod_load_alternate_configuration(config_module_info);
 
   Lt_dlclose(config_module_dl_handle);
 
-  return 1;
+  return rv;
 }
 #endif /* !WITH_STATIC_MODULES */
 
@@ -463,7 +461,7 @@ _cerebrod_config_module_setup(void)
   if (conf.config_module)
     {
       if (_config_load_static_module(conf.config_module) != 1)
-	err_exit("config type '%s' could not be loaded",
+	err_exit("config module '%s' could not be loaded",
 		 conf.config_module);
     }
   else
@@ -475,8 +473,13 @@ _cerebrod_config_module_setup(void)
         {
           int rv;
           
+	  if (!(ptr[i]->config_module_name))
+	    {
+	      err_debug("static config module index '%d' does not contain name", i);
+	      continue;
+	    }
           if ((rv = _config_load_static_module(ptr[i]->config_module_name)) < 0)
-            err_exit("config type '%s' could not be loaded",
+            err_exit("config module '%s' could not be loaded",
                      ptr[i]->config_module_name);
           if (rv)
             break;
@@ -686,6 +689,37 @@ _cerebrod_config_parse(void)
   conffile_handle_destroy(cf);
 }
 
+#if WITH_STATIC_MODULES
+/*
+ * cerebrod_find_static_clusterlist_module
+ *
+ * Returns pointer to cerebrod_clusterlist_module_info structure with
+ * the name, NULL if one is not found
+ */
+static struct cerebrod_clusterlist_module_info *
+_cerebrod_find_static_clusterlist_module(char *name)
+{
+  struct cerebrod_clusterlist_module_info **ptr = &static_clusterlist_modules[0];
+  int i = 0;
+
+  assert(name);
+
+  while (ptr[i] != NULL)
+    {
+      if (!ptr[i]->clusterlist_module_name)
+        {
+          err_debug("static clusterlist module index '%d' does not contain name", i);
+          continue;
+        }
+      if (!strcmp(ptr[i]->clusterlist_module_name, name))
+        return ptr[i];
+      i++;
+    }
+
+  return NULL;
+}
+#endif /* WITH_STATIC_MODULES */
+
 /*
  * _cerebrod_pre_calculate_configuration_config_check
  * 
@@ -747,6 +781,14 @@ _cerebrod_pre_calculate_configuration_config_check(void)
       if (conf.updown_server_port == conf.heartbeat_source_port)
 	err_exit("updown server port '%d' cannot be identical to heartbeat source port");
     }
+
+#if WITH_STATIC_MODULES
+  if (conf.clusterlist_module)
+    {
+      if (!_cerebrod_find_static_clusterlist_module(conf.clusterlist_module))
+	err_exit("clusterlist module '%s' not found", conf.clusterlist_module);
+    }
+#endif /* WITH_STATIC_MODULES */
 }
 
 /*
@@ -1169,27 +1211,7 @@ _cerebrod_calculate_heartbeat_network_interface_in_addr_and_index(void)
 static void
 _cerebrod_calculate_clusterlist_module(void)
 {
-#if WITH_STATIC_MODULES
-  if (conf.clusterlist_module)
-    {
-      struct cerebrod_clusterlist_module_info **ptr = &static_clusterlist_modules[0];
-      int i = 0;
-
-      while (ptr[i] != NULL)
-        {
-          if (!ptr[i]->clusterlist_module_name)
-            {
-              err_debug("static clusterlist module index '%d' does not contain name");
-              continue;
-            }
-          if (!strcmp(ptr[i]->clusterlist_module_name, conf.clusterlist_module))
-            goto done;
-          i++;
-        }
-
-      err_exit("clusterlist type '%s' not found", conf.clusterlist_module);
-    }
-#else  /* !WITH_STATIC_MODULES */
+#if  !WITH_STATIC_MODULES
   if (conf.clusterlist_module)
     {
       struct stat buf;
@@ -1263,9 +1285,10 @@ _cerebrod_calculate_clusterlist_module(void)
 	  if (!conf.clusterlist_module_file)
 	    err_exit("clusterlist module '%s' not found", conf.clusterlist_module);
 	}
+    done:
+      ;
     }
 #endif /* !WITH_STATIC_MODULES */
- done:
   return;
 }
 

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: conffile.c,v 1.2 2004-11-17 00:49:31 achu Exp $
+ *  $Id: conffile.c,v 1.3 2005-03-22 07:27:30 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2003 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -676,7 +676,7 @@ conffile_parse(conffile_t cf,
                int app_data,
                int flags)
 {
-    int i, j, len, retval = -1;
+    int i, j, len = 0, retval = -1;
     char linebuf[CONFFILE_MAX_LINELEN];
 
     if (cf == NULL || cf->magic != CONFFILE_MAGIC)

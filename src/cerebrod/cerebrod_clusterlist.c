@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist.c,v 1.16 2005-03-22 05:37:46 achu Exp $
+ *  $Id: cerebrod_clusterlist.c,v 1.17 2005-03-22 07:27:30 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -79,6 +79,60 @@ static struct cerebrod_clusterlist_module_info *clusterlist_module_info = NULL;
 static lt_dlhandle clusterlist_module_dl_handle = NULL;
 #endif /* !WITH_STATIC_MODULES */
 
+/*
+ * _clusterlist_check_module_data
+ *
+ * Check parameters and load the actual module data
+ *
+ * Returns 1 on loading success, 0 on loading failure, -1 on fatal error
+ */
+static int
+_clusterlist_check_module_data(struct cerebrod_clusterlist_module_info *clusterlist_module_info_l)
+{
+  assert(clusterlist_module_info);
+
+  if (!clusterlist_module_info_l->parse_options)
+    err_exit("clusterlist module '%s' does not contain valid parse_options function",
+	     clusterlist_module_info->clusterlist_module_name);
+
+  if (!clusterlist_module_info_l->init)
+    err_exit("clusterlist module '%s' does not contain valid init function",
+	     clusterlist_module_info->clusterlist_module_name);
+
+  if (!clusterlist_module_info_l->finish)
+    err_exit("clusterlist module '%s' does not contain valid finish function",
+	     clusterlist_module_info->clusterlist_module_name);
+
+  if (!clusterlist_module_info_l->get_all_nodes)
+    err_exit("clusterlist module '%s' does not contain valid get_all_nodes function",
+	     clusterlist_module_info->clusterlist_module_name);
+
+  if (!clusterlist_module_info_l->numnodes)
+    err_exit("clusterlist module '%s' does not contain valid numnodes function",
+	     clusterlist_module_info->clusterlist_module_name);
+
+  if (!clusterlist_module_info_l->node_in_cluster)
+    err_exit("clusterlist module '%s' does not contain valid node_in_cluster function",
+	     clusterlist_module_info->clusterlist_module_name);
+
+  if (!clusterlist_module_info_l->get_nodename)
+    err_exit("clusterlist module '%s' does not contain valid get_nodename function",
+    	     clusterlist_module_info->clusterlist_module_name);
+                                                                                         
+#ifndef NDEBUG
+  if (conf.debug)
+    {
+      fprintf(stderr, "**************************************\n");
+      fprintf(stderr, "* Cerebrod Clusterlist Configuration:\n");
+      fprintf(stderr, "* -----------------------\n");
+      fprintf(stderr, "* Loaded clusterlist module: %s\n", name);
+      fprintf(stderr, "**************************************\n");
+    }
+#endif /* NDEBUG */
+
+  return 1;
+}
+
 #if WITH_STATIC_MODULES
 /*
  * _clusterlist_load_static_module
@@ -90,21 +144,21 @@ static lt_dlhandle clusterlist_module_dl_handle = NULL;
  * Returns 1 on loading success, 0 on loading failure, -1 on fatal error
  */
 static int
-_clusterlist_load_static_module(char *type)
+_clusterlist_load_static_module(char *name)
 {
   struct cerebrod_clusterlist_module_info **ptr = &static_clusterlist_modules[0];
   int i = 0;
 
-  assert(type);
+  assert(name);
 
   while (ptr[i] != NULL)
     {
       if (!ptr[i]->clusterlist_module_name)
         {
-          err_debug("static clusterlist module index '%d' does not contain name");
+          err_debug("static clusterlist module index '%d' does not contain name", i);
           continue;
         }
-      if (!strcmp(ptr[i]->clusterlist_module_name, type))
+      if (!strcmp(ptr[i]->clusterlist_module_name, name))
         {
           clusterlist_module_info = ptr[i];
           break;
@@ -112,39 +166,7 @@ _clusterlist_load_static_module(char *type)
       i++;
     }
   
-  if (!clusterlist_module_info->parse_options)
-    err_exit("clusterlist type '%s' does not contain valid parse_options function");
-
-  if (!clusterlist_module_info->init)
-    err_exit("clusterlist type '%s' does not contain valid init function");
-
-  if (!clusterlist_module_info->finish)
-    err_exit("clusterlist type '%s' does not contain valid finish function");
-
-  if (!clusterlist_module_info->get_all_nodes)
-    err_exit("clusterlist type '%s' does not contain valid get_all_nodes function");
-
-  if (!clusterlist_module_info->numnodes)
-    err_exit("clusterlist type '%s' does not contain valid numnodes function");
-
-  if (!clusterlist_module_info->node_in_cluster)
-    err_exit("clusterlist type '%s' does not contain valid node_in_cluster function");
-
-  if (!clusterlist_module_info->get_nodename)
-    err_exit("clusterlist type '%s' does not contain valid get_nodename function");
-  
-#ifndef NDEBUG
-  if (conf.debug)
-    {
-      fprintf(stderr, "**************************************\n");
-      fprintf(stderr, "* Cerebrod Clusterlist Configuration:\n");
-      fprintf(stderr, "* -----------------------\n");
-      fprintf(stderr, "* Loaded clusterlist type: %s\n", type); 
-      fprintf(stderr, "**************************************\n");
-    }
-#endif /* NDEBUG */
-
-  return 1;
+  return _clusterlist_check_module_data(ptr[i]);
 }
 #else  /* !WITH_STATIC_MODULES */
 /*
@@ -167,39 +189,7 @@ _clusterlist_load_module(char *module_path)
   if (!clusterlist_module_info->clusterlist_module_name)
     err_exit("clusterlist module '%s' does not contain a valid name");
 
-  if (!clusterlist_module_info->parse_options)
-    err_exit("clusterlist module '%s' does not contain valid parse_options function");
-
-  if (!clusterlist_module_info->init)
-    err_exit("clusterlist module '%s' does not contain valid init function");
-
-  if (!clusterlist_module_info->finish)
-    err_exit("clusterlist module '%s' does not contain valid finish function");
-
-  if (!clusterlist_module_info->get_all_nodes)
-    err_exit("clusterlist module '%s' does not contain valid get_all_nodes function");
-
-  if (!clusterlist_module_info->numnodes)
-    err_exit("clusterlist module '%s' does not contain valid numnodes function");
-
-  if (!clusterlist_module_info->node_in_cluster)
-    err_exit("clusterlist module '%s' does not contain valid node_in_cluster function");
-
-  if (!clusterlist_module_info->get_nodename)
-    err_exit("clusterlist module '%s' does not contain valid get_nodename function");
-  
-#ifndef NDEBUG
-  if (conf.debug)
-    {
-      fprintf(stderr, "**************************************\n");
-      fprintf(stderr, "* Cerebrod Clusterlist Configuration:\n");
-      fprintf(stderr, "* -----------------------\n");
-      fprintf(stderr, "* Loaded clusterlist module: %s\n", module_path); 
-      fprintf(stderr, "**************************************\n");
-    }
-#endif /* NDEBUG */
-
-  return 1;
+  return _clusterlist_check_module_data(clusterlist_module_info);
 }
 #endif /* !WITH_STATIC_MODULES */
 
@@ -212,7 +202,7 @@ cerebrod_clusterlist_setup(void)
   if (conf.clusterlist_module)
     {
       if (_clusterlist_load_static_module(conf.clusterlist_module) != 1)
-        err_exit("clusterlist type '%s' could not be loaded",
+        err_exit("clusterlist module '%s' could not be loaded",
                  conf.clusterlist_module);
     }
   else
@@ -225,7 +215,7 @@ cerebrod_clusterlist_setup(void)
           int rv;
                                                                                          
           if ((rv = _clusterlist_load_static_module(ptr[i]->clusterlist_module_name)) < 0)
-            err_exit("clusterlist type '%s' could not be loaded",
+            err_exit("clusterlist module '%s' could not be loaded",
                      ptr[i]->clusterlist_module_name);
           if (rv)
             break;

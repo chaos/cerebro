@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_util.c,v 1.5 2005-03-20 21:24:58 achu Exp $
+ *  $Id: cerebrod_util.c,v 1.6 2005-03-22 07:27:30 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -101,6 +101,7 @@ cerebrod_rehash(hash_t *old_hash,
   *old_hash = new_hash;
 }
 
+#if !WITH_STATIC_MODULES
 int
 cerebrod_search_dir_for_module(char *search_dir,
                                char **modules_list,
@@ -153,3 +154,4 @@ cerebrod_search_dir_for_module(char *search_dir,
 
   return (found) ? 1 : 0;
 }
+#endif /* !WITH_STATIC_MODULES */

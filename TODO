@@ -5,10 +5,6 @@
 - Non-pthreads support?
 - remove hash/list buffering in list.c hash.c?
 
-- static modules support
-
-- build clusterlist none in cerebrod binary?
-
 - split libcommon to common and binary only libs?
   - i.e. wrappers and error stuff in separate lib
 

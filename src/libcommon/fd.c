@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: fd.c,v 1.2 2004-11-17 00:49:31 achu Exp $
+ *  $Id: fd.c,v 1.3 2005-03-22 07:27:30 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2001-2002 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -83,7 +83,7 @@ fd_read_n (int fd, void *buf, size_t n)
 
 
 ssize_t
-fd_write_n (int fd, void *buf, size_t n)
+fd_write_n (int fd, const void *buf, size_t n)
 {
     size_t nleft;
     ssize_t nwritten;

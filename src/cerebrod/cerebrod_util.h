@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_util.h,v 1.4 2005-03-20 20:34:48 achu Exp $
+ *  $Id: cerebrod_util.h,v 1.5 2005-03-22 07:27:30 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_UTIL_H
@@ -40,6 +40,7 @@ void cerebrod_rehash(hash_t *old_hash,
 		     int hash_num, 
 		     pthread_mutex_t *hash_mutex);
 
+#if !WITH_STATIC_MODULES
 /*
  * cerebrod_search_dir_for_module
  *
@@ -56,6 +57,6 @@ int cerebrod_search_dir_for_module(char *search_dir,
 				   char **modules_list,
 				   int modules_list_len,
                                    Cerebrod_load_module load_module);
-                                   
+#endif /* !WITH_STATIC_MODULES */                                   
 
 #endif /* _CEREBROD_UTIL_H */

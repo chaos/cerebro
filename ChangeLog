@@ -12,6 +12,25 @@
 	* man/cerebrod.8.in, man/cerebrod.conf.5.in: Updated with static
 	modules wording.
 
+	* src/cerebrod/cerebrod_config.c (_cerebrod_find_static_module,
+	_cerebrod_load_alternate_configuration,
+	_cerebrod_find_static_clusterlist_module) New functions.
+
+	* src/cerebrod/cerebrod_config.c (_config_load_static_modulem,
+	_config_load_module, _cerebrod_cmdline_parse_check,
+	_cerebrod_pre_calculate_configuration_config_check): Use new
+	common functions.
+
+	* src/cerebrod/cerebrod_config.c (_cerebrod_config_module_setup):
+	Add null pointer check.
+
+	* src/cerebrod/cerebrod_clusterlist.c
+	(_clusterlist_check_module_data): New function.
+
+	* src/cerebrod/cerebrod_clusterlist.c
+	(_clusterlist_load_static_module, _clusterlist_load_module): Use
+	new common functions.
+
 2005-03-21  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerebrod/cerebrod_clusterlist.h: Modified
