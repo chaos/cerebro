@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebrod.8.in,v 1.6 2005-03-20 07:11:27 achu Exp $
+\."$Id: cerebrod.8.in,v 1.7 2005-03-21 16:41:39 achu Exp $
 \."#############################################################################
 .TH cerebrod 8 "May 2005" "cerebrod @VERSION@" cerebrod
 .SH "NAME"
@@ -48,7 +48,7 @@ as a whole.
 
 The default configuration file loaded by 
 .B cerebrod
-is @CEREBROD_CONFIGFILE_DEFAULT@, however an alternate configuration
+is @CEREBROD_CONFIG_FILE_DEFAULT@, however an alternate configuration
 file can be specified on the command line with the 
 .I -c 
 option.
@@ -164,7 +164,7 @@ module.  For more information on writing
 clusterlist modules see XXX.
 
 .SH "FILES"
-@CEREBROD_CONFIGFILE_DEFAULT@
+@CEREBROD_CONFIG_FILE_DEFAULT@
 
 @CEREBROD_CLUSTERLIST_HOSTSFILE_DEFAULT@
 

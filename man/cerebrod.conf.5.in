@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebrod.conf.5.in,v 1.5 2005-03-20 18:20:39 achu Exp $
+\."$Id: cerebrod.conf.5.in,v 1.6 2005-03-21 16:41:39 achu Exp $
 \."#############################################################################
 .TH cerebrod.conf 5 "May 2005" "cerebrod.conf @VERSION@" "cerebrod.conf"
 .SH "NAME"
@@ -16,7 +16,7 @@ suite of tools and libraries.
 
 The default configuration file loaded by
 .B cerebrod
-is @CEREBROD_CONFIGFILE_DEFAULT@, however an alternate configuration
+is @CEREBROD_CONFIG_FILE_DEFAULT@, however an alternate configuration
 file can be specified on the command line with the
 .I -c
 option.
@@ -186,6 +186,6 @@ from the command line with the
 option.  This option is turned off by default.
 \}
 .SH "FILES"
-@CEREBROD_CONFIGFILE_DEFAULT@
+@CEREBROD_CONFIG_FILE_DEFAULT@
 .SH "SEE ALSO"
 cerebrod(1), cerebrod(8)
