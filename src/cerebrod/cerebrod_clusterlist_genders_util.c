@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_genders_util.c,v 1.1 2005-03-17 22:32:03 achu Exp $
+ *  $Id: cerebrod_clusterlist_genders_util.c,v 1.2 2005-03-22 01:34:54 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -59,7 +59,7 @@ cerebrod_clusterlist_genders_finish(genders_t *handle, char **file)
 
   if (genders_handle_destroy(*handle) < 0)
     err_exit("%s clusterlist module: cerebrod_clusterlist_genders_finish: genders_handle_destroy: %s",
-	     genders_errormsg(*handle));
+	     clusterlist_module_name, genders_errormsg(*handle));
 
   Free(*file);
   *handle = NULL;

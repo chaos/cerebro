@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.h,v 1.20 2005-03-17 05:05:53 achu Exp $
+ *  $Id: wrappers.h,v 1.21 2005-03-22 01:34:54 achu Exp $
 \*****************************************************************************/
 
 #ifndef _WRAPPERS_H
@@ -42,7 +42,9 @@
 #include <signal.h>
 #include <dirent.h>
 
+#if !WITH_STATIC_MODULES
 #include "ltdl.h"
+#endif
 #include "list.h"
 #include "hash.h"
 
@@ -189,6 +191,7 @@ pid_t wrap_fork(const char *file, int line);
 Sighandler_t wrap_signal(const char *file, int line, int signum, Sighandler_t handler);
 int wrap_gethostname(const char *file, int line, char *name, size_t len);
 
+#if !WITH_STATIC_MODULES
 /*
  * ltdl wrappers
  */
@@ -209,6 +212,7 @@ int wrap_lt_dlexit(const char *file, int line);
 lt_dlhandle wrap_lt_dlopen(const char *file, int line, const char *filename);
 lt_ptr wrap_lt_dlsym(const char *file, int line, void *handle, char *symbol);
 int wrap_lt_dlclose(const char *file, int line, void *handle);
+#endif /* !WITH_STATIC_MODULES */
 
 /* 
  * List lib wrappers 

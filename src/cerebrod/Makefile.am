@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.18 2005-03-21 16:58:17 achu Exp $
+## $Id: Makefile.am,v 1.19 2005-03-22 01:34:54 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -14,12 +14,38 @@ noinst_HEADERS = cerebrod.h \
 		 cerebrod_heartbeat.h \
 		 cerebrod_listener.h \
 		 cerebrod_speaker.h \
+		 cerebrod_static_modules.h \
 		 cerebrod_updown.h \
 		 cerebrod_util.h
 
 #
 # cerebrod daemon
 #
+
+if WITH_GENDERSLLNL
+GENDERSLLNL_STATIC_SOURCES = cerebrod_config_gendersllnl.c \
+		             cerebrod_clusterlist_gendersllnl.c
+GENDERS_UTIL_STATIC_SOURCES = cerebrod_clusterlist_genders_util.c
+GENDERSLLNL_STATIC_LIBS = $(GENDERSLLNL_LIBS)
+endif
+
+if WITH_GENDERS
+GENDERS_STATIC_SOURCES = cerebrod_clusterlist_genders.c
+GENDERS_UTIL_STATIC_SOURCES = cerebrod_clusterlist_genders_util.c
+GENDERS_STATIC_LIBS = $(GENDERS_LIBS)
+endif
+
+if WITH_STATIC_MODULES
+STATIC_MODULE_SOURCES = $(GENDERSLLNL_STATIC_SOURCES) \
+		        $(GENDERS_STATIC_SOURCES) \
+                        $(GENDERS_UTIL_STATIC_SOURCES) \
+			cerebrod_clusterlist_util.c \
+		        cerebrod_clusterlist_hostsfile.c \
+		        cerebrod_clusterlist_none.c
+STATIC_MODULE_LIBS    = $(GENDERSLLNL_STATIC_LIBS) $(GENDERS_STATIC_LIBS)
+else
+EXPORT_DYNAMIC_FLAGS = -export-dynamic
+endif
 
 sbin_PROGRAMS = cerebrod
 cerebrod_SOURCES = cerebrod.c \
@@ -31,9 +57,10 @@ cerebrod_SOURCES = cerebrod.c \
 		   cerebrod_listener.c \
 		   cerebrod_speaker.c \
 		   cerebrod_updown.c \
-		   cerebrod_util.c
+		   cerebrod_util.c \
+		   $(STATIC_MODULE_SOURCES)
 cerebrod_CFLAGS = -I$(srcdir)/../libcommon
-cerebrod_LDFLAGS = -export-dynamic
+cerebrod_LDFLAGS = $(EXPORT_DYNAMIC_FLAGS) $(STATIC_MODULE_LIBS)
 cerebrod_LDADD = ../libcommon/libcommon.la
 
 #
@@ -49,12 +76,14 @@ if WITH_GENDERS
 GENDERS_CLUSTERLIST_MODULE = cerebrod_clusterlist_genders.la
 endif
 
+if !WITH_STATIC_MODULES
 pkglib_LTLIBRARIES = \
 	$(GENDERSLLNL_CONFIG_MODULE) \
 	$(GENDERSLLNL_CLUSTERLIST_MODULE) \
 	$(GENDERS_CLUSTERLIST_MODULE) \
 	cerebrod_clusterlist_hostsfile.la \
 	cerebrod_clusterlist_none.la
+endif
 
 MODULE_FLAGS = -module -avoid-version
 

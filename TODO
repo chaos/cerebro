@@ -21,3 +21,4 @@
   - on all headers
   - on manpage ORIGINS
 
+- signals to daemon to log/unlog debug info?

@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebrod.8.in,v 1.7 2005-03-21 16:41:39 achu Exp $
+\."$Id: cerebrod.8.in,v 1.8 2005-03-22 01:34:54 achu Exp $
 \."#############################################################################
 .TH cerebrod 8 "May 2005" "cerebrod @VERSION@" cerebrod
 .SH "NAME"
@@ -22,10 +22,10 @@ Output help
 .B  -v, --version
 Output version
 .TP
-.B  -c, --configfile
+.B  -c, --config_file
 Specify alternate configuration file
 .TP
-.B  -m, --configmodule
+.B  -m, --config_module
 Specify configuration module
 .if @MANPAGE_DEBUG@ \{
 .TP

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist.c,v 1.14 2005-03-21 18:28:38 achu Exp $
+ *  $Id: cerebrod_clusterlist.c,v 1.15 2005-03-22 01:34:54 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -19,15 +19,37 @@
 #include "cerebrod.h"
 #include "cerebrod_clusterlist.h"
 #include "cerebrod_config.h"
+#if WITH_STATIC_MODULES
+#include "cerebrod_static_modules.h"
+#endif /* WITH_STATIC_MODULES */
 #include "cerebrod_util.h"
 #include "error.h"
 #include "wrappers.h"
 
 extern struct cerebrod_config conf;
 
+#if WITH_STATIC_MODULES
+/* 
+ * static_clusterlist_modules
+ *
+ * clusterlist modules statically compiled in
+ */
+struct cerebrod_clusterlist_module_info *static_clusterlist_modules[] =
+  {
+#if WITH_GENDERSLLNL
+    &gendersllnl_clusterlist_module_info,
+#endif
+#if WITH_GENDERS
+    &genders_clusterlist_module_info,
+#endif
+    &hostsfile_clusterlist_module_info,
+    &none_clusterlist_module_info,
+    NULL
+  }; 
+#else /* !WITH_STATIC_MODULES */
 /*
- * cluster_modules
- * cluster_modules_len
+ * clusterlist_modules
+ * clusterlist_modules_len
  *
  * clusterlist modules to search for by default
  */
@@ -39,6 +61,7 @@ char *clusterlist_modules[] = {
   NULL
 };
 int clusterlist_modules_len = 4;
+#endif /* !WITH_STATIC_MODULES */
 
 /* 
  * clusterlist_module_info
@@ -47,14 +70,83 @@ int clusterlist_modules_len = 4;
  */
 static struct cerebrod_clusterlist_module_info *clusterlist_module_info = NULL;
 
+#if !WITH_STATIC_MODULES
 /* 
  * clusterlist_module_dl_handle
  *
  * clusterlist module dynamically loaded module handle
  */
 static lt_dlhandle clusterlist_module_dl_handle = NULL;
+#endif /* !WITH_STATIC_MODULES */
 
+#if WITH_STATIC_MODULES
+/*
+ * _clusterlist_load_static_module
+ *
+ * load a clusterlist module
+ *
+ * - type - module type
+ *
+ * Returns 1 on loading success, 0 on loading failure, -1 on fatal error
+ */
+static int
+_clusterlist_load_static_module(char *type)
+{
+  struct cerebrod_clusterlist_module_info **ptr = &static_clusterlist_modules[0];
+  int i = 0;
 
+  assert(type);
+
+  while (ptr[i] != NULL)
+    {
+      if (!ptr[i]->clusterlist_module_name)
+        {
+          err_debug("static clusterlist module index '%d' does not contain name");
+          continue;
+        }
+      if (!strcmp(ptr[i]->clusterlist_module_name, type))
+        {
+          clusterlist_module_info = ptr[i];
+          break;
+        }
+      i++;
+    }
+  
+  if (!clusterlist_module_info->parse_options)
+    err_exit("clusterlist type '%s' does not contain valid parse_options function");
+
+  if (!clusterlist_module_info->init)
+    err_exit("clusterlist type '%s' does not contain valid init function");
+
+  if (!clusterlist_module_info->finish)
+    err_exit("clusterlist type '%s' does not contain valid finish function");
+
+  if (!clusterlist_module_info->get_all_nodes)
+    err_exit("clusterlist type '%s' does not contain valid get_all_nodes function");
+
+  if (!clusterlist_module_info->numnodes)
+    err_exit("clusterlist type '%s' does not contain valid numnodes function");
+
+  if (!clusterlist_module_info->node_in_cluster)
+    err_exit("clusterlist type '%s' does not contain valid node_in_cluster function");
+
+  if (!clusterlist_module_info->get_nodename)
+    err_exit("clusterlist type '%s' does not contain valid get_nodename function");
+  
+#ifndef NDEBUG
+  if (conf.debug)
+    {
+      fprintf(stderr, "**************************************\n");
+      fprintf(stderr, "* Cerebrod Clusterlist Configuration:\n");
+      fprintf(stderr, "* -----------------------\n");
+      fprintf(stderr, "* Loaded clusterlist type: %s\n", type); 
+      fprintf(stderr, "**************************************\n");
+    }
+#endif /* NDEBUG */
+
+  return 1;
+}
+#else  /* !WITH_STATIC_MODULES */
 /*
  * _clusterlist_load_module
  *
@@ -109,12 +201,38 @@ _clusterlist_load_module(char *module_path)
 
   return 1;
 }
+#endif /* !WITH_STATIC_MODULES */
 
 int
 cerebrod_clusterlist_setup(void)
 {
-  assert(!clusterlist_module_dl_handle);
+  assert(!clusterlist_module_info);
 
+#if WITH_STATIC_MODULES
+  if (conf.clusterlist_type)
+    {
+      if (_clusterlist_load_static_module(conf.clusterlist_type) != 1)
+        err_exit("clusterlist type '%s' could not be loaded",
+                 conf.clusterlist_type);
+    }
+  else
+    {
+      struct cerebrod_clusterlist_module_info **ptr = &static_clusterlist_modules[0];
+      int i = 0;
+                                                                                         
+      while (ptr[i] != NULL)
+        {
+          int rv;
+                                                                                         
+          if ((rv = _clusterlist_load_static_module(ptr[i]->clusterlist_module_name)) < 0)
+            err_exit("clusterlist type '%s' could not be loaded",
+                     ptr[i]->clusterlist_module_name);
+          if (rv)
+            break;
+          i++;
+        }
+    }
+#else /* !WITH_STATIC_MODULES */
   Lt_dlinit();
 
   if (conf.clusterlist_module_file)
@@ -142,19 +260,24 @@ cerebrod_clusterlist_setup(void)
     }
 
  done:
+#endif /* !WITH_STATIC_MODULES */
   return 0;
 }
 
 int 
 cerebrod_clusterlist_cleanup(void)
 {
-  assert(!clusterlist_module_dl_handle);
+  assert(clusterlist_module_info);
 
+#if !WITH_STATIC_MODULES
   Lt_dlclose(clusterlist_module_dl_handle);
   clusterlist_module_dl_handle = NULL;
+#endif /* !WITH_STATIC_MODULES */
   clusterlist_module_info = NULL;
 
+#if !WITH_STATIC_MODULES
   Lt_dlexit();
+#endif /* !WITH_STATIC_MODULES */
 
   return 0;
 }
@@ -162,7 +285,7 @@ cerebrod_clusterlist_cleanup(void)
 char *
 cerebrod_clusterlist_module_name(void)
 {
-  assert(clusterlist_module_dl_handle);
+  assert(clusterlist_module_info);
 
   return clusterlist_module_info->clusterlist_module_name;
 }
@@ -170,15 +293,19 @@ cerebrod_clusterlist_module_name(void)
 int 
 cerebrod_clusterlist_parse_options(void)
 {
-  assert(clusterlist_module_dl_handle);
+  assert(clusterlist_module_info);
 
+#if WITH_STATIC_MODULES
+  return ((*clusterlist_module_info->parse_options)(conf.clusterlist_type_options));
+#else /* !WITH_STATIC_MODULES */
   return ((*clusterlist_module_info->parse_options)(conf.clusterlist_module_options));
+#endif
 }
 
 int 
 cerebrod_clusterlist_init(void)
 {
-  assert(clusterlist_module_dl_handle);
+  assert(clusterlist_module_info);
 
   return ((*clusterlist_module_info->init)());
 }
@@ -186,7 +313,7 @@ cerebrod_clusterlist_init(void)
 int 
 cerebrod_clusterlist_finish(void)
 {
-  assert(clusterlist_module_dl_handle);
+  assert(clusterlist_module_info);
 
   return ((*clusterlist_module_info->finish)());
 }
@@ -194,7 +321,7 @@ cerebrod_clusterlist_finish(void)
 int 
 cerebrod_clusterlist_get_all_nodes(char **nodes, unsigned int nodeslen)
 {
-  assert(clusterlist_module_dl_handle && nodes);
+  assert(clusterlist_module_info && nodes);
 
   return ((*clusterlist_module_info->get_all_nodes)(nodes, nodeslen));
 }
@@ -202,7 +329,7 @@ cerebrod_clusterlist_get_all_nodes(char **nodes, unsigned int nodeslen)
 int 
 cerebrod_clusterlist_numnodes(void)
 {
-  assert(clusterlist_module_dl_handle);
+  assert(clusterlist_module_info);
 
   return ((*clusterlist_module_info->numnodes)());
 }
@@ -210,7 +337,7 @@ cerebrod_clusterlist_numnodes(void)
 int 
 cerebrod_clusterlist_node_in_cluster(char *node)
 {
-  assert(clusterlist_module_dl_handle);
+  assert(clusterlist_module_info);
 
   return ((*clusterlist_module_info->node_in_cluster)(node));
 }
@@ -218,7 +345,7 @@ cerebrod_clusterlist_node_in_cluster(char *node)
 int 
 cerebrod_clusterlist_get_nodename(char *node, char *buf, unsigned int buflen)
 {
-  assert(clusterlist_module_dl_handle);
+  assert(clusterlist_module_info);
 
   return ((*clusterlist_module_info->get_nodename)(node, buf, buflen));
 }

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_genders.c,v 1.14 2005-03-21 18:28:38 achu Exp $
+ *  $Id: cerebrod_clusterlist_genders.c,v 1.15 2005-03-22 01:34:54 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -24,11 +24,11 @@
 #include "wrappers.h"
 
 /* 
- * handle
+ * genders_handle
  *
  * genders handle
  */
-genders_t handle = NULL;
+genders_t genders_handle = NULL;
 
 /*  
  * genders_file
@@ -45,7 +45,7 @@ char *genders_file = NULL;
 int
 genders_clusterlist_parse_options(char **options)
 {
-  assert(!handle);
+  assert(!genders_handle);
 
   if (options)
     cerebrod_clusterlist_parse_filename(options, &genders_file);
@@ -61,9 +61,9 @@ genders_clusterlist_parse_options(char **options)
 int 
 genders_clusterlist_init(void)
 {
-  assert(!handle);
+  assert(!genders_handle);
 
-  return cerebrod_clusterlist_genders_init(&handle, genders_file);
+  return cerebrod_clusterlist_genders_init(&genders_handle, genders_file);
 }
 
 /* 
@@ -74,9 +74,9 @@ genders_clusterlist_init(void)
 int
 genders_clusterlist_finish(void)
 {
-  assert(handle);
+  assert(genders_handle);
 
-  return cerebrod_clusterlist_genders_finish(&handle, &genders_file);
+  return cerebrod_clusterlist_genders_finish(&genders_handle, &genders_file);
 }
 
 /*
@@ -87,10 +87,10 @@ genders_clusterlist_finish(void)
 int
 genders_clusterlist_get_all_nodes(char **nodes, unsigned int nodeslen)
 {
-  assert(handle);
+  assert(genders_handle);
   assert(nodes);
   
-  return cerebrod_clusterlist_genders_get_all_nodes(handle, nodes, nodeslen);
+  return cerebrod_clusterlist_genders_get_all_nodes(genders_handle, nodes, nodeslen);
 }
 
 /*
@@ -101,9 +101,9 @@ genders_clusterlist_get_all_nodes(char **nodes, unsigned int nodeslen)
 int 
 genders_clusterlist_numnodes(void)
 {
-  assert(handle);
+  assert(genders_handle);
 
-  return cerebrod_clusterlist_genders_numnodes(handle);
+  return cerebrod_clusterlist_genders_numnodes(genders_handle);
 }
 
 /*
@@ -117,7 +117,7 @@ genders_clusterlist_node_in_cluster(char *node)
   int ret, free_flag = 0;
   char *nodePtr = NULL;
 
-  assert(handle);
+  assert(genders_handle);
   assert(node);
 
   /* Shorten hostname if necessary */
@@ -132,9 +132,9 @@ genders_clusterlist_node_in_cluster(char *node)
   else
     nodePtr = node;
 
-  if ((ret = genders_isnode(handle, nodePtr)) < 0)
+  if ((ret = genders_isnode(genders_handle, nodePtr)) < 0)
     err_exit("genders_clusterlist_node_in_cluster: genders_isnode: %s",
-	     genders_errormsg(handle));
+	     genders_errormsg(genders_handle));
 
   if (free_flag)
     Free(nodePtr);
@@ -150,14 +150,18 @@ genders_clusterlist_node_in_cluster(char *node)
 int
 genders_clusterlist_get_nodename(char *node, char *buf, unsigned int buflen)
 {
-  assert(handle);
+  assert(genders_handle);
   assert(node);
   assert(buf);
 
   return cerebrod_clusterlist_copy_nodename(node, buf, buflen);
 }
 
+#if WITH_STATIC_MODULES
+struct cerebrod_clusterlist_module_info genders_clusterlist_module_info =
+#else
 struct cerebrod_clusterlist_module_info clusterlist_module_info =
+#endif /* !WITH_STATIC_MODULES */
   {
     "genders",
     &genders_clusterlist_parse_options,

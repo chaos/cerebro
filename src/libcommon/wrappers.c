@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.c,v 1.24 2005-03-17 23:10:51 achu Exp $
+ *  $Id: wrappers.c,v 1.25 2005-03-22 01:34:54 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -652,6 +652,7 @@ wrap_gethostname(const char *file, int line, char *name, size_t len)
   return ret;
 }
 
+#if !WITH_STATIC_MODULES
 int
 wrap_lt_dlinit(const char *file, int line)
 {
@@ -736,6 +737,7 @@ wrap_lt_dlclose(const char *file, int line, void *handle)
 
   return ret;
 }
+#endif /* !WITH_STATIC_MODULES */
 
 List 
 wrap_list_create(const char *file, int line, ListDelF f)

@@ -47,6 +47,48 @@
 	src/cerebrod_clusterlist_gendersllnl.c,
 	src/cerebrod_clusterlist_util.h: Updated for structure changes.
 
+	* src/cerebrod/cerebrod_config.h: Add config_type and
+	clusterlist_type and clusterlist_type_options to struct
+	cerebrod_config.
+
+	* src/cerebrod/cerebrod_config.c (_cerebrod_config_default):
+	Initialize new variables appropriately.
+
+	* src/cerebrod/cerebrod_config.c (_usage, _cerebrod_cmdline_parse,
+	_cerebrod_cmdline_parse_check): Appropriately output, parse, and
+	check new config_type option.
+
+	* src/cerebrod/cerebrod_config.c (_config_load_static_module): New
+	function.
+
+	* src/cerebrod/cerebro_config.c (_cerebrod_config_module_setup):
+	Call static or dynamic module loader appropriately.
+
+	* src/cerebrod/cerebrod_config.c (_cb_module_options): Renamed
+	_cb_options.
+
+	* src/cerebrod/cerebrod_config.c (_cerebrod_config_parse): Parse
+	clusterlist_type and clusterlist_type_options configuration
+	options.
+
+	* src/cerebrod/cerebrod_config.c
+	(_cerebrod_calculate_clusterlist_module): Check static modules
+	list appropriately.
+
+	* src/cerebrod/cerebrod_clusterlist.c
+	(_clusterlist_load_static_module): New function.
+
+	* src/cerebrod/cerebrod_clusterlist.c
+	(cerebrod_clusterlist_setup): Support static modules.
+
+	* src/libcommon/Makefile.am, src/libcommon/wrappers.h,
+	src/libcommon/wrappers.c: Don't compile ltdl when compiling
+	statically.
+
+	* src/cerebrod/cerebrod_clusterlist_genders.c,
+	src/cerebrod/cerebrod_clusterlist_gendersllnl.c: Rename some
+	globals to stop name clobbering on static builds.
+	
 2005-03-20  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerebrod/cerebrod_config.c

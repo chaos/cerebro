@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.21 2005-03-21 14:41:00 achu Exp $
+ *  $Id: cerebrod.c,v 1.22 2005-03-22 01:34:54 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -56,8 +56,13 @@ _cerebrod_post_config_initialization(void)
 {
   cerebrod_clusterlist_setup();
 
+#if WITH_STATIC_MODULES
+  if (conf.clusterlist_type_options)
+    cerebrod_clusterlist_parse_options();
+#else  /* !WITH_STATIC_MODULES */
   if (conf.clusterlist_module_options)
     cerebrod_clusterlist_parse_options();
+#endif /* !WITH_STATIC_MODULES */
 
   cerebrod_clusterlist_init();
 
@@ -77,6 +82,10 @@ main(int argc, char **argv)
 
   _cerebrod_post_config_initialization();
 
+#ifdef NDEBUG
+  cerebrod_daemon_init();
+  err_set_flags(ERROR_SYSLOG);
+#else  /* !NDEBUG */
   if (!conf.debug)
     {
       cerebrod_daemon_init();
@@ -84,6 +93,7 @@ main(int argc, char **argv)
     }
   else
     err_set_flags(ERROR_STDERR);
+#endif /* !NDEBUG */
 
   /* Call after daemonization, since daemonization closes currently open fds */
   openlog(argv[0], LOG_ODELAY | LOG_PID, LOG_DAEMON);
