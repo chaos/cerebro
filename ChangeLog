@@ -19,7 +19,9 @@
 	(_remove_comments): Fix loop bug.
 
 	* config/ac_genders.m4, config/ac_gendersllnl.m4: Make genders and
-	gendersllnl auto-configurable on or off.
+	gendersllnl auto-configurable on or off.  Various cleanup.
+
+	* configure.ac: Support cleanup.
 	
 2005-03-20  Albert Chu  <chu11@llnl.gov>
 

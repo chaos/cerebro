@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.14 2005-03-20 19:35:49 achu Exp $
+## $Id: configure.ac,v 1.15 2005-03-21 17:55:48 achu Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -57,13 +57,13 @@ AC_HOSTSFILE
 # Check for genders
 #
 AC_GENDERS
-AM_CONDITIONAL(WITH_GENDERS, [test "$ac_have_libgenders"    = "yes"])
+AM_CONDITIONAL(WITH_GENDERS, [test "$ac_with_genders" = "yes"])
 
 #
 # Check for gendersllnl
 #
 AC_GENDERSLLNL
-AM_CONDITIONAL(WITH_GENDERSLLNL, [test "$ac_have_gendersllnl"    = "yes"])
+AM_CONDITIONAL(WITH_GENDERSLLNL, [test "$ac_with_gendersllnl" = "yes"])
 
 ##
 # Checks for typedefs, structures, and compiler characteristics.
