@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.1 2005-01-03 17:48:38 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.2 2005-01-10 16:41:14 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -32,7 +32,7 @@ _cerebrod_speaker_initialize(void)
 static int
 _cerebrod_speaker_create_and_setup_socket(void)
 {
-  struct sockaddr_in speak_from_addr;
+  struct sockaddr_in speak_to_addr, speak_from_addr;
   int temp_fd;
 
   temp_fd = Socket(AF_INET, SOCK_DGRAM, 0);
@@ -66,13 +66,21 @@ _cerebrod_speaker_create_and_setup_socket(void)
 		 sizeof(optval));
     }
 
-  /* We still need to bind the port, even if we're multicasting */
+  /* Even if we're multicasting, the port still needs to be bound */
   speak_from_addr.sin_family = AF_INET;
   speak_from_addr.sin_port = htons(conf.speak_from_port);
   memcpy(&speak_from_addr.sin_addr,
 	 &conf.speak_from_in_addr,
 	 sizeof(struct in_addr));
   Bind(temp_fd, (struct sockaddr *)&speak_from_addr, sizeof(struct sockaddr_in));
+
+  /* Connect to the speak to address */
+  speak_to_addr.sin_family = AF_INET;
+  speak_from_addr.sin_port = htons(conf.listen_port);
+  memcpy(&speak_to_addr.sin_addr,
+	 &conf.speak_to_in_addr,
+	 sizeof(struct in_addr));
+  Connect(temp_fd, (struct sockaddr *)&speak_to_addr, sizeof(struct sockaddr_in));
 
   return temp_fd;
 }
@@ -94,7 +102,7 @@ _cerebrod_speaker_dump_heartbeat(struct cerebrod_heartbeat *hb)
       strftime(strbuf, CEREBROD_STRING_BUFLEN, "%H:%M:%S", &tm);
 
       fprintf(stderr, "**************************************\n");
-      fprintf(stderr, "* Sending Heartbeat: %s:\n", strbuf);     
+      fprintf(stderr, "* Sending Heartbeat: %s\n", strbuf);     
       fprintf(stderr, "* -----------------------\n");
       cerebrod_heartbeat_dump(hb);
       fprintf(stderr, "**************************************\n");
@@ -125,4 +133,16 @@ cerebrod_speaker(void *arg)
 
   _cerebrod_speaker_initialize();
   fd = _cerebrod_speaker_create_and_setup_socket();
+
+  while (1)
+    {
+      int sleep_time;
+
+      /* Algorithm from srand(3) manpage */
+      sleep_time = conf.heartbeat_frequency_min + ((((double)(conf.heartbeat_frequency_max - conf.heartbeat_frequency_min))*rand())/(RAND_MAX+1.0));
+
+      _cerebrod_speaker_send_heartbeat(fd);
+      sleep(sleep_time);
+
+    }
 }

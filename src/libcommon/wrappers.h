@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.h,v 1.4 2005-01-03 17:48:38 achu Exp $
+ *  $Id: wrappers.h,v 1.5 2005-01-10 16:41:15 achu Exp $
 \*****************************************************************************/
 
 #ifndef _WRAPPERS_H
@@ -59,6 +59,8 @@
         wrap_socket(__FILE__, __LINE__, domain, type, protocol)
 #define Bind(sockfd, my_addr, addrlen) \
         wrap_bind(__FILE__, __LINE__, sockfd, my_addr, addrlen)
+#define Connect(sockfd, serv_addr, addrlen) \
+        wrap_connect(__FILE__, __LINE__, sockfd, serv_addr, addrlen)
 #define Getsockopt(s, level, optname, optval, optlen) \
         wrap_getsockopt(__FILE__, __LINE__, s, level, optname, optval, optlen)
 #define Setsockopt(s, level, optname, optval, optlen) \
@@ -96,6 +98,7 @@ ssize_t wrap_read(const char *file, int line, int fd, void *buf, size_t count);
 ssize_t wrap_write(const char *file, int line, int fd, const void *buf, size_t count);
 int wrap_socket(const char *file, int line, int domain, int type, int protocol);
 int wrap_bind(const char *file, int line, int sockfd, struct sockaddr *my_addr, socklen_t addrlen);
+int wrap_connect(const char *file, int line, int sockfd, struct sockaddr *serv_addr, socklen_t addrlen);
 int wrap_getsockopt(const char *file, int line, int s, int level, int optname, void *optval, socklen_t *optlen);
 int wrap_setsockopt(const char *file, int line, int s, int level, int optname, const void *optval, socklen_t optlen);
 pid_t wrap_fork(const char *file, int line);

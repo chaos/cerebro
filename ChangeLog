@@ -1,3 +1,22 @@
+2005-01-09  Albert Chu  <chu11@llnl.gov>
+
+	* src/libcommon/wrappers.h, src/libcommon/wrappers.c (Connect,
+	wrap_connect): New macro and function.
+
+	* src/cerebrod/cerebrod_config.h, src/cerebrod/cerebrod_config.c
+	(_cerebrod_config_default, _cerebrod_config_parse): Add support
+	for listen_port configuration option.
+
+	* src/cerebrod/cerebrod_heartbeat.c (cerebrod_heartbeat_marshall):
+	Fixed parameter check error.
+
+	* src/cerebrod/cerebrod.c (main): Call cerebrod_speaker.  Fix some
+	error output logic errors on debugging.
+
+	* src/cerebrod/cerebrod_speaker.c
+	(_cerebrod_speaker_create_and_setup_socket, cerebrod_speaker):
+	Complete initial speaker code.
+	
 2005-01-05  Albert Chu  <chu11@llnl.gov>
 
 	* cerebro.spec.in, Makefile.am: Fix to get initial rpm build to work.

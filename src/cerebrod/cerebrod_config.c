@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.15 2005-01-03 17:48:38 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.16 2005-01-10 16:41:14 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -51,6 +51,7 @@ _cerebrod_config_default(void)
   conf.speak_to_ip = CEREBROD_SPEAK_TO_IP_DEFAULT;
   conf.speak_from_port = CEREBROD_SPEAK_FROM_PORT_DEFAULT;
   conf.speak_from_network_interface = NULL;
+  conf.listen_port = CEREBROD_LISTEN_PORT_DEFAULT;
   conf.listen_threads = CEREBROD_LISTEN_THREADS_DEFAULT;
 }
 
@@ -180,7 +181,7 @@ _cerebrod_config_parse(void)
 {
   int heartbeat_frequency_flag, listen_flag, speak_flag, speak_to_ip_flag, 
     speak_from_port_flag, speak_from_network_interface_flag, 
-    listen_threads_flag;
+    listen_port_flag, listen_threads_flag;
 
   struct conffile_option options[] =
     {
@@ -197,6 +198,8 @@ _cerebrod_config_parse(void)
       {"speak_from_network_interface", CONFFILE_OPTION_STRING, -1, _cb_stringptr,
        1, 0, &speak_from_network_interface_flag, 
        &(conf.speak_from_network_interface), 0},
+      {"listen_port", CONFFILE_OPTION_INT, -1, conffile_int,
+       1, 0, &listen_port_flag, &(conf.listen_port), 0},
       {"listen_threads", CONFFILE_OPTION_INT, -1, conffile_int,
        1, 0, &listen_threads_flag, &(conf.listen_threads), 0},
     };
@@ -615,8 +618,7 @@ _cerebrod_calculate_configuration(void)
   /* Step 1: Determine if the heartbeat frequencey is ranged or fixed */
   _cerebrod_calculate_heartbeat_frequency_ranged();
 
-  /* Step 2: Calculate the destination ip
-   */
+  /* Step 2: Calculate the destination ip */
   _cerebrod_calculate_speak_to_in_addr();
 
   /* Step 3: Determine the appropriate network interface to use based

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.h,v 1.6 2005-01-04 23:45:53 achu Exp $
+ *  $Id: cerebrod_config.h,v 1.7 2005-01-10 16:41:14 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_CONFIG_H
@@ -23,6 +23,7 @@
 #define CEREBROD_SPEAK_DEFAULT                       1
 #define CEREBROD_SPEAK_TO_IP_DEFAULT                 "239.2.11.72"
 #define CEREBROD_SPEAK_FROM_PORT_DEFAULT             8650
+#define CEREBROD_LISTEN_PORT_DEFAULT                 8651
 #define CEREBROD_LISTEN_THREADS_DEFAULT              2
 
 /* Configuration
@@ -45,6 +46,8 @@
  * - network interface - will be checked.
  * - ip address - will be checked
  * - ip address/subnet - will be found/checked
+ * listen_port
+ * - num
  * listen_threads
  * - num
  *
@@ -72,6 +75,7 @@ struct cerebrod_config
   char *speak_to_ip;
   int speak_from_port;
   char *speak_from_network_interface;
+  int listen_port;
   unsigned int listen_threads;
 
   /* Determined by cerebrod based on configuration */

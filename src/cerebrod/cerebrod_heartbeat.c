@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_heartbeat.c,v 1.4 2005-01-03 17:48:38 achu Exp $
+ *  $Id: cerebrod_heartbeat.c,v 1.5 2005-01-10 16:41:14 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -118,7 +118,7 @@ cerebrod_heartbeat_marshall(struct cerebrod_heartbeat *hb,
 
   assert(hb && buffer && len > 0);
 
-  if (CEREBROD_HEARTBEAT_LEN < len)
+  if (CEREBROD_HEARTBEAT_LEN > len)
     err_exit("cerebrod_heartbeat_marshall: internal buffer length "
 	     "too small: expect %d, len %d", CEREBROD_HEARTBEAT_LEN, 
 	     len);
