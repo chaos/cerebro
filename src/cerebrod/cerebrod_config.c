@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.6 2004-08-10 21:17:21 geller2 Exp $
+ *  $Id: cerebrod_config.c,v 1.7 2004-08-10 22:12:03 geller2 Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -244,13 +244,13 @@ void _get_if_conf(void **buf, struct ifconf *ifc, int fd)
       *buf = Malloc(len);
       ifc->ifc_len = len;
       ifc->ifc_buf = *buf;
+
       if(ioctl(fd, SIOCGIFCONF, ifc) == -1)
-	{
-	  printf("Ioctl failed");
-	  exit(1);
-	}
+	err_exit("IOCTL Failed");
+
       if(ifc->ifc_len == lastlen)
 	break;
+
       lastlen = ifc->ifc_len;
       len += 10 * sizeof(struct ifreq);
       Free(*buf);
@@ -286,7 +286,8 @@ cerebrod_calculate_configuration(void)
                                                                                     
 	  ptr += sizeof(ifr->ifr_name) + len;
 	  
-	  ioctl(fd, SIOCGIFFLAGS, ifr);
+	  if(ioctl(fd, SIOCGIFFLAGS, ifr) == -1)
+	    err_exit("IOCTL Failed");
 
 	  if (!(ifr->ifr_flags & IFF_UP)
 	      || !(ifr->ifr_flags & IFF_MULTICAST))
@@ -304,15 +305,14 @@ cerebrod_calculate_configuration(void)
 	struct ifreq *ifr;                                     /* The config struct */
 	struct sockaddr_in *sinptr;                            /* Used to hold the ip address */
 	void *buf = NULL, *ptr = NULL;
-	int fd = Socket(AF_INET, SOCK_DGRAM, 0);            /* Counter and file descriptor */
-       
-	_get_if_conf(&buf, &ifc, fd);
-	  
+	int fd = Socket(AF_INET, SOCK_DGRAM, 0);               /* Counter and file descriptor */  
 	struct in_addr net_s;
 	u_int32_t current_ip, net;
 	int mask;
 	char *tok;
 
+	_get_if_conf(&buf, &ifc, fd);
+	  
 	if(tok = strtok(conf.network_interface, "/") == NULL)
 	  err_exit(CIDR_PARSE_ERROR);
 
@@ -320,6 +320,10 @@ cerebrod_calculate_configuration(void)
 	  err_exit(CIDR_PARSE_ERROR);
 
 	mask = atoi(strtok(NULL, ""));
+
+	if(mask < 1 || mask > 32)
+	  err_exit(CIDR_PARSE_ERROR);
+
 	net = htonl(net_s.s_addr)>>(32-mask);
 
 	if(net == NULL)
