@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.18 2005-02-16 19:54:03 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.19 2005-02-17 00:24:09 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -61,27 +61,6 @@ _cerebrod_listener_create_and_setup_socket(void)
      {
       /* XXX: Probably lots of portability problems here */
       struct ip_mreqn imr;
-
-      memset(&imr, '\0', sizeof(struct ip_mreqn));
-      memcpy(&imr.imr_multiaddr,
-             &conf.heartbeat_destination_ip_in_addr,
-             sizeof(struct in_addr));
-      memcpy(&imr.imr_address,
-             &conf.heartbeat_network_interface_in_addr,
-             sizeof(struct in_addr));
-      imr.imr_ifindex = conf.heartbeat_interface_index;
-
-      /* Sort of like a multicast-bind */
-      if (setsockopt(temp_fd,
-		     SOL_IP,
-		     IP_MULTICAST_IF,
-		     &imr,
-		     sizeof(struct ip_mreqn)) < 0)
-	{
-	  err_debug("_cerebrod_listener_create_and_setup_socket: setsockopt: %s",
-		    strerror(errno));
-	  return -1;
-	}
 
       memset(&imr, '\0', sizeof(struct ip_mreqn));
       memcpy(&imr.imr_multiaddr,

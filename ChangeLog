@@ -1,7 +1,8 @@
 2005-02-16  Albert Chu  <chu11@llnl.gov>
 	 
 	* src/cerebrod/cerebrod_listener.c
-	(_cerebrod_listener_create_and_setup_socket): Fix bind error.
+	(_cerebrod_listener_create_and_setup_socket): Fix bind error,
+	remove unnecessary setsockopt call.
 	
 2005-02-15  Albert Chu  <chu11@llnl.gov>
 
