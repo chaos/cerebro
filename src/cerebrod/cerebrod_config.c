@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.31 2005-03-17 05:05:52 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.32 2005-03-17 05:46:57 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -250,11 +250,9 @@ _cerebrod_config_parse(void)
        1, 0, &updown_server_port_flag, &(conf.updown_server_port), 0},
       {"clusterlist_module", CONFFILE_OPTION_STRING, -1, _cb_stringptr,
        1, 0, &clusterlist_module_flag, &(conf.clusterlist_module), 0},
-
       {"clusterlist_module_options", CONFFILE_OPTION_LIST_STRING, -1, 
        _cb_module_options, 1, 0, &clusterlist_module_options_flag, 
        &(conf.clusterlist_module_options), 0},
-
       {"speak_debug", CONFFILE_OPTION_BOOL, -1, conffile_bool,
        1, 0, &speak_debug_flag, &conf.speak_debug, 0},
       {"listen_debug", CONFFILE_OPTION_BOOL, -1, conffile_bool,
@@ -321,29 +319,6 @@ _cerebrod_pre_calculate_configuration_config_check(void)
 
   if (conf.listen_threads <= 0)
     err_exit("listen threads '%d' invalid", conf.listen_threads);
-  
-  if (conf.clusterlist_module)
-    {
-      struct stat buf;
-
-      /* No wrappers, want to receive error */
-      if (conf.clusterlist_module[0] == '/')
-	{
-	  if (stat(conf.clusterlist_module, &buf) < 0)
-	    err_exit("clusterlist_module '%s' not found", 
-		     conf.clusterlist_module);
-	}
-      else
-	{
-	  char filebuf[MAXPATHLEN+1];
-	  
-	  memset(filebuf, '\0', MAXPATHLEN+1);
-	  snprintf(filebuf, MAXPATHLEN, "%s/%s", 
-		   CEREBROD_MODULE_DIR, conf.clusterlist_module);
-	  if (stat(conf.clusterlist_module, &buf) < 0)
-	    err_exit("clusterlist_module '%s' not found", filebuf);
-	}
-    }
 
   /* If the listening server is turned off, none of the other
    * servers can be on.  So we turn them off.
@@ -721,6 +696,72 @@ _cerebrod_calculate_heartbeat_network_interface_in_addr_and_index()
 }
 
 static void
+_cerebrod_calculate_clusterlist_module(void)
+{
+  if (conf.clusterlist_module)
+    {
+      struct stat buf;
+
+      /* No wrappers, want to receive error */
+      if (conf.clusterlist_module[0] == '/')
+	{
+	  if (stat(conf.clusterlist_module, &buf) < 0)
+	    err_exit("clusterlist_module '%s' not found", 
+		     conf.clusterlist_module);
+	  
+	  conf.clusterlist_module_file = Strdup(conf.clusterlist_module);
+	}
+      else
+	{
+	  char filebuf[MAXPATHLEN+1];
+	  int found = 0;
+
+	  memset(filebuf, '\0', MAXPATHLEN+1);
+	  snprintf(filebuf, MAXPATHLEN, "%s/%s", 
+		   CEREBROD_MODULE_DIR, conf.clusterlist_module);
+
+	  if (!stat(filebuf, &buf))
+	    {
+	      conf.clusterlist_module_file = Strdup(filebuf);
+	      goto clusterlist_module_found;
+	    }
+
+	  memset(filebuf, '\0', MAXPATHLEN+1);
+	  snprintf(filebuf, MAXPATHLEN, "./%s", conf.clusterlist_module);
+
+	  if (!stat(filebuf, &buf))
+	    {
+	      conf.clusterlist_module_file = Strdup(filebuf);
+	      goto clusterlist_module_found;
+	    }
+
+	  memset(filebuf, '\0', MAXPATHLEN+1);
+	  snprintf(filebuf, MAXPATHLEN, "%s/cerebrod_clusterlist_%s.la", 
+		   CEREBROD_MODULE_DIR, conf.clusterlist_module);
+
+	  if (!stat(filebuf, &buf))
+	    {
+	      conf.clusterlist_module_file = Strdup(filebuf);
+	      goto clusterlist_module_found;
+	    }
+
+	  memset(filebuf, '\0', MAXPATHLEN+1);
+	  snprintf(filebuf, MAXPATHLEN, "./cerebrod_clusterlist_%s.la", conf.clusterlist_module);
+
+	  if (!stat(filebuf, &buf))
+	    {
+	      conf.clusterlist_module_file = Strdup(filebuf);
+	      goto clusterlist_module_found;
+	    }
+
+	  if (!conf.clusterlist_module_file)
+	    err_exit("clusterlist_module '%s' not found", conf.clusterlist_module);
+	clusterlist_module_found:
+	}
+    }
+}
+
+static void
 _cerebrod_calculate_configuration(void)
 {
   /* Determine if the heartbeat is single or multi casted */
@@ -736,6 +777,10 @@ _cerebrod_calculate_configuration(void)
    * the user's heartbeat_network_interface input.
    */
   _cerebrod_calculate_heartbeat_network_interface_in_addr_and_index();
+
+  /* Determine the clusterlist module to use
+   */
+  _cerebrod_calculate_clusterlist_module();
 }
 
 static void
@@ -821,6 +866,7 @@ _cerebrod_config_dump(void)
       fprintf(stderr, "* heartbeat_destination_ip_in_addr: %s\n", inet_ntoa(conf.heartbeat_destination_ip_in_addr));
       fprintf(stderr, "* heartbeat_network_interface_in_addr: %s\n", inet_ntoa(conf.heartbeat_network_interface_in_addr));
       fprintf(stderr, "* heartbeat_interface_index: %d\n", conf.heartbeat_interface_index);
+      fprintf(stderr, "* clusterlist_module_file: %s\n", conf.clusterlist_module_file);
       fprintf(stderr, "**************************************\n");
     }
 #endif /* NDEBUG */

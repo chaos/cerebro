@@ -34,6 +34,28 @@
 	src/cerebrod/cerebrod_clusterlist_gendersllnl.c
 	(gendersllnl_clusterlist_init): Re-worked using new options format.
 
+	* src/cerebrod/cerebrod_config.h: Add new clusterlist_module_file
+	config calculation.
+
+	* src/cerebrod/cerebrod_clusterlist.c
+	(cerebrod_clusterlist_setup): Base on clusterlist_module_file
+	config calculation.
+	
+	* src/cerebrod/cerebrod_config.c (_cerebrod_config_dump): Add
+	debug for new clusterlist_module_file config calculation.
+
+	* src/cerebrod/cerebrod_config.c (_cerebrod_calculate_clusterlist_module): new function.
+
+	* src/cerebrod/cerebrod_config.c
+	(_cerebrod_pre_calculate_configuration_config_check,
+	_cerebrod_calculate_configuration): Move clusterlist module checks
+	and calculation from
+	_cerebrod_pre_calculate_configuration_config_check to
+	_cerebrod_calculate_configuration.
+
+	* src/cerebrod/cerebrod_clusterlist.c (_find_clusterlist_module):
+	Fix logic bugs and also search current directory for modules.
+
 2005-03-16  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerbrod/cerebrod_util.h, src/cerbrod/cerebrod_util.c: New

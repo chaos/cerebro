@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist.c,v 1.3 2005-03-17 05:05:52 achu Exp $
+ *  $Id: cerebrod_clusterlist.c,v 1.4 2005-03-17 05:46:57 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -64,7 +64,6 @@ _find_clusterlist_module(void)
   assert(!clusterlist_ops && !clusterlist_dl_handle);
 
   dir = Opendir(CEREBROD_MODULE_DIR);
-
   while (clusterlist_modules[i] != NULL)
     {
       struct dirent *dirent;
@@ -74,14 +73,34 @@ _find_clusterlist_module(void)
 	  if (!strcmp(dirent->d_name, clusterlist_modules[i]))
 	    {
 	      _load_module(clusterlist_modules[i]);
-	      goto found_module;
+	      Closedir(dir);
+	      return;
 	    }
 	}
       
       rewinddir(dir);
+      i++;
     }
+  Closedir(dir);
 
- found_module:
+  dir = Opendir(".");
+  while (clusterlist_modules[i] != NULL)
+    {
+      struct dirent *dirent;
+
+      while ((dirent = readdir(dir)))
+	{
+	  if (!strcmp(dirent->d_name, clusterlist_modules[i]))
+	    {
+	      _load_module(clusterlist_modules[i]);
+	      Closedir(dir);
+	      return;
+	    }
+	}
+      
+      rewinddir(dir);
+      i++;
+    }
   Closedir(dir);
 
   if (!clusterlist_dl_handle)
@@ -95,7 +114,7 @@ cerebrod_clusterlist_setup(void)
 
   Lt_dlinit();
 
-  if (conf.clusterlist_module)
+  if (conf.clusterlist_module_file)
     _load_module(conf.clusterlist_module);
   else
     _find_clusterlist_module();

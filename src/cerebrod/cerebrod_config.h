@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.h,v 1.20 2005-03-17 05:05:52 achu Exp $
+ *  $Id: cerebrod_config.h,v 1.21 2005-03-17 05:46:57 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_CONFIG_H
@@ -112,6 +112,8 @@ struct cerebrod_config
   struct in_addr heartbeat_destination_ip_in_addr;
   struct in_addr heartbeat_network_interface_in_addr;
   int heartbeat_interface_index;
+
+  char *clusterlist_module_file;
 };
 
 void cerebrod_config(int argc, char **argv);
