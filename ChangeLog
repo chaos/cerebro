@@ -16,6 +16,13 @@
 
 	* configure.ac, src/cerebrod/Makefile.am: CEREBROD_MODULE_DIR now
 	defined by AC_CEREBROD_MODULE_DIR.
+
+	* src/cerebrod/cerebrod_util.h, src/cerebrod/cerebrod_util.c
+	(cerebrod_search_dir_for_module): Include modules list length.
+
+	* src/cerebrod/cerebrod_config.c (_cerebrod_config_module_setup),
+	src/cerebrod/cerebrod_clusterlist.c (cerebrod_clusterlist_setup):
+	Support new cerebrod_search_dir_for_module interface.
 	
 2005-03-18  Albert Chu  <chu11@llnl.gov>
 

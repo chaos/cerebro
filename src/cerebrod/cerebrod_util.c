@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_util.c,v 1.2 2005-03-18 23:27:05 achu Exp $
+ *  $Id: cerebrod_util.c,v 1.3 2005-03-19 19:06:24 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -91,6 +91,7 @@ cerebrod_rehash(hash_t *old_hash,
 int
 cerebrod_search_dir_for_module(char *search_dir,
                                char **modules_list,
+			       int modules_list_len,
                                Cerebrod_load_module load_module)
 {
   DIR *dir;
@@ -98,12 +99,13 @@ cerebrod_search_dir_for_module(char *search_dir,
 
   assert(search_dir);
   assert(modules_list);
+  assert(modules_list_len > 0);
   assert(load_module);
 
   if (!(dir = opendir(search_dir)))
     return 0;
 
-  while (modules_list[i] != NULL)
+  for (i = 0; i < modules_list_len; i++)
     {
       struct dirent *dirent;
 
@@ -131,7 +133,6 @@ cerebrod_search_dir_for_module(char *search_dir,
         }
 
       rewinddir(dir);
-      i++;
     }
 
  done:

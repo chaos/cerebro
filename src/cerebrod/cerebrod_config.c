@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.41 2005-03-19 08:40:14 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.42 2005-03-19 19:06:24 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -45,6 +45,7 @@ char *config_modules[] = {
   "cerebrod_config_gendersllnl.la",
   NULL
 };
+int config_modules_len = 1;
 
 static void
 _cerebrod_config_default(void)
@@ -221,21 +222,37 @@ _cerebrod_config_module_setup(void)
 {
   Lt_dlinit();
 
-  if (conf.configmodule) 
+  if (conf.configmodule && conf.configmodule[0] == '/')
     {
       if (_config_load_module(conf.configmodule) != 1)
-        err_exit("config module '%s' could not be loaded",
-                 conf.configmodule);
+	err_exit("config module '%s' could not be loaded",
+		 conf.configmodule);
     }
-  else
+  else 
     {
+      char **modules_list;
+      int modules_list_len;
+
+      if (conf.configmodule)
+	{
+	  modules_list = &conf.configmodule;
+	  modules_list_len = 1;
+	}
+      else
+	{
+	  modules_list = config_modules;
+	  modules_list_len = config_modules_len;
+	}
+      
       if (cerebrod_search_dir_for_module(CEREBROD_MODULE_DIR,
-                                         config_modules,
+                                         modules_list,
+					 modules_list_len,
                                          _config_load_module))
         goto done;
-
+      
       if (cerebrod_search_dir_for_module(".",
-                                         config_modules,
+                                         modules_list,
+					 modules_list_len,
                                          _config_load_module))
         goto done;
     }

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist.c,v 1.9 2005-03-18 23:27:05 achu Exp $
+ *  $Id: cerebrod_clusterlist.c,v 1.10 2005-03-19 19:06:24 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -30,6 +30,7 @@ char *clusterlist_modules[] = {
   "cerebrod_clusterlist_hostfile.la",
   NULL
 };
+int clusterlist_modules_len = 4;
 
 extern struct cerebrod_config conf;
 static struct cerebrod_clusterlist_module_info *clusterlist_module_info = NULL;
@@ -79,11 +80,13 @@ cerebrod_clusterlist_setup(void)
     {
       if (cerebrod_search_dir_for_module(CEREBROD_MODULE_DIR,
                                          clusterlist_modules,
+					 clusterlist_modules_len,
                                          _clusterlist_load_module))
         goto done;
 
       if (cerebrod_search_dir_for_module(".",
                                          clusterlist_modules,
+					 clusterlist_modules_len,
                                          _clusterlist_load_module))
         goto done;
 
