@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.12 2004-11-03 01:26:30 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.13 2004-11-08 19:07:51 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -31,6 +31,9 @@
 #include "wrappers.h"
 
 extern struct cerebrod_config conf;
+
+#define IPADDR_BITS     32   
+#define IPADDR6_BITS    128
 
 void
 cerebrod_config_default(void)
@@ -316,50 +319,60 @@ cerebrod_calculate_configuration(void)
       void *buf = NULL, *ptr = NULL;
       int fd, mask;
       struct in_addr net_s;
-      u_int32_t current_ip, net;
+      u_int32_t conf_masked_ip;
       char *tok;
       
       if (strchr(conf.network_interface, ':'))
         err_exit("IPv6 IP addresses currently not supported, please specify"
                  "an IPv4 IP address");
 
-      /* From Unix Network Programming, by R. Stevens, Chapter 16 */
-
       fd = Socket(AF_INET, SOCK_DGRAM, 0);
 
       _get_if_conf(&buf, &ifc, fd);
      
-      /* If no '/', then just an IP address, mask is 0 bits */
       if (strchr(conf.network_interface, '/'))
         {
           char *network_interface_cpy = Strdup(conf.network_interface);
+	  char *snm, *ptr;
+
           tok = strtok(network_interface_cpy, "/");
           if (inet_pton(AF_INET, tok, &net_s) < 0)
             err_exit("network interface '%s' IP address resolution "
                      "failed", conf.network_interface);
           
-          mask = atoi(strtok(NULL, ""));
-          if (mask < 1 || mask > 32)
-            err_exit("network interface '%s' subnet mask improper",
+	  if (!(snm = strtok(NULL, "")))
+            err_exit("network interface '%s' subnet mask not specified",
                      conf.network_interface);
+	  else
+	    {
+	      mask = strtol(snm, &ptr, 10);
+	      if (ptr != (snm + strlen(snm)))
+		err_exit("network interface '%s' subnet mask improper",
+			 conf.network_interface);
+	      else if (mask < 1 || mask > IPADDR_BITS)
+		err_exit("network interface '%s' subnet mask size invalid",
+			 conf.network_interface);
+	    }
 
           Free(network_interface_cpy);
         }
       else
         {
+	  /* If no '/', then just an IP address, mask is all bits */
           if (inet_pton(AF_INET, conf.network_interface, &net_s) < 0)
             err_exit("network interface '%s' IP address resolution "
                      "failed", conf.network_interface);
-          mask = 32;
+          mask = IPADDR_BITS;
         }
 
-      net = htonl(net_s.s_addr) >> (32 - mask);
+      conf_masked_ip = htonl(net_s.s_addr) >> (IPADDR_BITS - mask);
 
       /* Check all interfaces */
       for(ptr = buf; ptr < buf + ifc.ifc_len;)
         { 
           struct ifreq ifr_tmp;
           struct sockaddr_in *sinptr;
+	  u_int32_t intf_masked_ip;
           int len;
 
           ifr = (struct ifreq *)ptr;
@@ -370,7 +383,7 @@ cerebrod_calculate_configuration(void)
           
           sinptr = (struct sockaddr_in *)&ifr->ifr_addr;
           
-          current_ip = htonl((sinptr->sin_addr).s_addr) >> (32 - mask);
+          intf_masked_ip = htonl((sinptr->sin_addr).s_addr) >> (32 - mask);
           
           /* Null termination not required, don't use wrapper */
           strncpy(ifr_tmp.ifr_name, ifr->ifr_name, IFNAMSIZ);
@@ -383,7 +396,7 @@ cerebrod_calculate_configuration(void)
               || !(ifr_tmp.ifr_flags & IFF_MULTICAST))
             continue;
           
-          if (net == current_ip)
+          if (conf_masked_ip == intf_masked_ip)
             {
               conf.multicast_interface = Strdup(ifr->ifr_name);
               break;

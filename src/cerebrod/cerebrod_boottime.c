@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_boottime.c,v 1.3 2004-07-06 17:06:26 achu Exp $
+ *  $Id: cerebrod_boottime.c,v 1.4 2004-11-08 19:07:51 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -23,15 +23,15 @@
 #define CEREBROD_BOOTTIME_FILE     "/proc/stat"
 #define CEREBROD_BOOTTIME_KEYWORD  "btime"
 
-time_t cerebrod_boottime = 0;
+u_int32_t cerebrod_boottime = 0;
 
-time_t
+u_int32_t
 cerebrod_get_boottime(void)
 {
   int fd, len;
   char *bootvalptr, *endptr, *tempptr;
   char buf[CEREBROD_BOOTTIME_BUFLEN];
-  time_t ret;
+  u_int32_t ret;
   
   if (cerebrod_boottime)
     return cerebrod_boottime;
@@ -56,7 +56,7 @@ cerebrod_get_boottime(void)
     err_exit("cerebrod_boottime: boottime file parse error");
 
   errno = 0;
-  ret = (time_t)strtol(bootvalptr, &endptr, 10);
+  ret = (u_int32_t)strtol(bootvalptr, &endptr, 10);
   if ((ret == LONG_MIN || ret == LONG_MAX) && errno == ERANGE)
     err_exit("cerebrod_boottime: boottime out of range");
   if ((bootvalptr + strlen(bootvalptr)) != endptr)
