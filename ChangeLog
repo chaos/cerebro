@@ -1,3 +1,16 @@
+2005-03-21  Albert Chu  <chu11@llnl.gov>
+
+	* src/cerebrod/cerebrod_clusterlist.h: Modified Cerebrod_clusterlist_get_nodename prototype to take a unsigned int buflen instead of an int buflen.
+
+	* src/cerebrod/cerebrod_clusterlist.c,
+	src/cerebrod/cerebrod_clusterlist_none.c,
+	src/cerebrod_clusterlist_hostsfile.c,
+	src/cerebrod_clusterlist_genders.c,
+	src/cerebrod_clusterlist_gendersllnl.c,
+	src/cerebrod_clusterlist_util.h,
+	src/cerebrod/cerebrod_clusterlist_util.c: Modified for changed
+	parameter type.
+	
 2005-03-20  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerebrod/cerebrod_config.c

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist.h,v 1.5 2005-03-20 21:50:40 achu Exp $
+ *  $Id: cerebrod_clusterlist.h,v 1.6 2005-03-21 14:36:47 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_CLUSTERLIST_H
@@ -12,6 +12,8 @@
  * Cerebrod_clusterlist_parse_options
  *
  * function prototype for clusterlist module function to parse options
+ *
+ * - options - string of arrays.  The strings are usually key=value pairs
  *
  * Returns 0 on success, -1 on error
  */
@@ -43,9 +45,13 @@ typedef int (*Cerebrod_clusterlist_finish)(void);
  * cluster nodes.  Caller is responsible for allocating a char * array
  * of appropriate length and freeing returned Strdup()'ed entries.
  *
+ * - nodes - array of char * pointers
+ * - nodeslen - array length, usually retrieved by numnodes
+ *   clusterlist module function
+ *
  * Returns number of cluster nodes copied in the buffer  on success, -1 on error
  */
-typedef int (*Cerebrod_clusterlist_get_all_nodes)(char **, unsigned int);
+typedef int (*Cerebrod_clusterlist_get_all_nodes)(char **nodes, unsigned int nodeslen);
 
 /*
  * Cerebrod_clusterlist_numnodes
@@ -63,9 +69,11 @@ typedef int (*Cerebrod_clusterlist_numnodes)(void);
  * function prototype for clusterlist module function to determine if
  * a node is in the cluser.
  *
+ * - node - node string
+ *
  * Returns 1 if node is in cluster, 0 if not, -1 on error
  */
-typedef int (*Cerebrod_clusterlist_node_in_cluster)(char *);
+typedef int (*Cerebrod_clusterlist_node_in_cluster)(char *node);
 
 /*
  * Cerebrod_clusterlist_get_nodename
@@ -76,9 +84,13 @@ typedef int (*Cerebrod_clusterlist_node_in_cluster)(char *);
  * some circumstances, nodes with duplicate names (perhaps aliased)
  * need to be identified with a single nodename key.
  *
+ * - node - node string
+ * - buf - buffer pointer
+ * - buflen - buffer length
+ *
  * Returns nodename in buffer, 0 on success, -1 on error
  */
-typedef int (*Cerebrod_clusterlist_get_nodename)(char *, char *, int);
+typedef int (*Cerebrod_clusterlist_get_nodename)(char *node, char *buf, unsigned int buflen);
 	     
 /*  
  * struct cerebrod_clusterlist_module_info
@@ -174,7 +186,7 @@ int cerebrod_clusterlist_node_in_cluster(char *node);
  * 
  * call clusterlist module get nodename function
  */
-int cerebrod_clusterlist_get_nodename(char *node, char *buf, int buflen);
+int cerebrod_clusterlist_get_nodename(char *node, char *buf, unsigned int buflen);
 
 /* 
  * cerebrod_clusterlist_module_name

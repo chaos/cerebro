@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_gendersllnl.c,v 1.13 2005-03-20 22:17:17 achu Exp $
+ *  $Id: cerebrod_clusterlist_gendersllnl.c,v 1.14 2005-03-21 14:36:47 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -18,6 +18,7 @@
 
 #include "cerebrod.h"
 #include "cerebrod_clusterlist.h"
+#include "cerebrod_clusterlist_genders_util.h"
 #include "cerebrod_clusterlist_util.h"
 #include "error.h"
 #include "wrappers.h"
@@ -147,7 +148,7 @@ gendersllnl_clusterlist_node_in_cluster(char *node)
  * gendersllnl clusterlist module get nodename function
  */
 int
-gendersllnl_clusterlist_get_nodename(char *node, char *buf, int buflen)
+gendersllnl_clusterlist_get_nodename(char *node, char *buf, unsigned int buflen)
 {
   int len, free_flag = 0;
   char *nodePtr = NULL;
@@ -155,7 +156,6 @@ gendersllnl_clusterlist_get_nodename(char *node, char *buf, int buflen)
   assert(handle);
   assert(node);
   assert(buf);
-  assert(buflen > 0);
 
   /* Shorten hostname if necessary */
   if (strchr(node, '.'))

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist.c,v 1.12 2005-03-20 21:50:40 achu Exp $
+ *  $Id: cerebrod_clusterlist.c,v 1.13 2005-03-21 14:36:47 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -211,7 +211,7 @@ cerebrod_clusterlist_node_in_cluster(char *node)
 }
 
 int 
-cerebrod_clusterlist_get_nodename(char *node, char *buf, int buflen)
+cerebrod_clusterlist_get_nodename(char *node, char *buf, unsigned int buflen)
 {
   assert(clusterlist_module_dl_handle);
 

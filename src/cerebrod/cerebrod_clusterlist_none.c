@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_none.c,v 1.6 2005-03-20 22:17:17 achu Exp $
+ *  $Id: cerebrod_clusterlist_none.c,v 1.7 2005-03-21 14:36:47 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -105,11 +105,10 @@ none_clusterlist_node_in_cluster(char *node)
  * none clusterlist module get nodename function
  */
 int
-none_clusterlist_get_nodename(char *node, char *buf, int buflen)
+none_clusterlist_get_nodename(char *node, char *buf, unsigned int buflen)
 {
   assert(node);
   assert(buf);
-  assert(buflen > 0);
 
   return cerebrod_clusterlist_copy_nodename(node, buf, buflen);
 }

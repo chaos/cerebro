@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_hostsfile.c,v 1.10 2005-03-20 22:17:17 achu Exp $
+ *  $Id: cerebrod_clusterlist_hostsfile.c,v 1.11 2005-03-21 14:36:47 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -55,7 +55,11 @@ hostsfile_clusterlist_parse_options(char **options)
 /* 
  * _readline
  * 
- * read a line from the hostsfile
+ * read a line from the hostsfile.  Buffer guaranteed to be null terminated.
+ *
+ * - fd - file descriptor to read from
+ * - buf - buffer pointer
+ * - buflen - buffer length
  *
  * Return amount of data read into the buffer
  */
@@ -80,6 +84,9 @@ _readline(int fd, char *buf, int buflen)
  * _remove_comments
  *
  * remove comments from the buffer
+ *
+ * - buf - buffer pointer
+ * - buflen - buffer length
  *
  * Return length of buffer left after comments were removed
  */
@@ -120,6 +127,9 @@ _remove_comments(char *buf, int buflen)
  *
  * remove trailing whitespace from the buffer
  *
+ * - buf - buffer pointer
+ * - buflen - buffer length
+ *
  * Return length of buffer left after trailing whitespace was removed
  */
 static int
@@ -146,6 +156,8 @@ _remove_trailing_whitespace(char *buf, int buflen)
  * _move_past_whitespace
  *
  * move past whitespace at the beginning of the buffer
+ *
+ * - buf - buffer pointer
  *
  * Return pointer to beginning of first non-whitespace char
  */
@@ -308,12 +320,11 @@ hostsfile_clusterlist_node_in_cluster(char *node)
  * hostsfile clusterlist module get nodename function
  */
 int
-hostsfile_clusterlist_get_nodename(char *node, char *buf, int buflen)
+hostsfile_clusterlist_get_nodename(char *node, char *buf, unsigned int buflen)
 {
   assert(hosts);
   assert(node);
   assert(buf);
-  assert(buflen > 0);
 
   return cerebrod_clusterlist_copy_nodename(node, buf, buflen);
 }
