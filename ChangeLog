@@ -1,3 +1,7 @@
+2005-02-02  Albert Chu  <chu11@llnl.gov>
+
+	* cerebro.spec.in: Fix rpm build problem.
+	
 2005-02-01  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerebrod/cerebrod_config.h, src/cerebrod/cerebrod_config.c:
