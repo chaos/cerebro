@@ -1,3 +1,10 @@
+2005-01-31  Albert Chu  <chu11@llnl.gov>
+
+	* src/cerebrod/cerebrod_config.h, src/cerebrod/cerebrod_config.c,
+	src/cerebrod/cerebrod_speaker.c: Globally renamed speak_to_ip and
+	speak_to_port to heartbeat_destination_ip and
+	heartbeat_destination_port.  Removed listen_port configuration.
+	
 2005-01-23  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerebrod/cerebrod_listener.c: Begin work on cerebrod_listener

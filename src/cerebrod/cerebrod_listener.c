@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.1 2005-01-24 16:57:01 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.2 2005-02-01 00:44:05 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -45,11 +45,89 @@ pthread_mutex_t heartbeat_hash_lock = PTHREAD_MUTEX_INITIALIZER;
 static void
 _cerebrod_listener_create_and_setup_socket(void)
 {
+#if 0
   listener_fd = Socket(AF_INET, SOCK_DGRAM, 0);
 
   if (conf.multicast)
     {
+      /* XXX: Probably lots of portability problems here */
+      struct ip_mreqn imr;
+      int optval;
+
+      memcpy(&imr.imr_multiaddr,
+             &conf.speak_to_in_addr,
+             sizeof(struct in_addr));
+      memcpy(&imr.imr_address,
+             &conf.speak_from_in_addr,
+             sizeof(struct in_addr));
+      imr.imr_ifindex = conf.speak_from_interface_index;
+
+      /* Sort of like a multicast-bind */
+      if (setsockopt(temp_fd,
+                     SOL_IP,
+                     IP_MULTICAST_IF,
+                     &imr,
+                     sizeof(struct ip_mreqn)) < 0)
+        {
+          err_debug("_cerebrod_speaker_create_and_setup_socket: setsockopt:
+%s",
+                    strerror(errno));
+          return -1;
+        }
+
+      optval = 1;
+      if (setsockopt(temp_fd,
+                     SOL_IP,
+                     IP_MULTICAST_LOOP,
+                     &optval,
+                     sizeof(optval)) < 0)
+        {
+          err_debug("_cerebrod_speaker_create_and_setup_socket: setsockopt:
+%s",
+                    strerror(errno));
+          return -1;
+        }
+
+      optval = conf.speak_ttl;
+      if (setsockopt(temp_fd,
+                     SOL_IP,
+                     IP_MULTICAST_TTL,
+                     &optval,
+                     sizeof(optval)) < 0)
+        {
+          err_debug("_cerebrod_speaker_create_and_setup_socket: setsockopt:
+%s",
+                    strerror(errno));
+          return -1;
+        }
     }
+
+  /* Even if we're multicasting, the port still needs to be bound */
+  speak_from_addr.sin_family = AF_INET;
+  speak_from_addr.sin_port = htons(conf.speak_from_port);
+  memcpy(&speak_from_addr.sin_addr,
+         &conf.speak_from_in_addr,
+         sizeof(struct in_addr));
+  if (bind(temp_fd, (struct sockaddr *)&speak_from_addr, sizeof(struct sockaddr_in)))
+    {
+      err_debug("_cerebrod_speaker_create_and_setup_socket: bind: %s",
+                strerror(errno));
+      return -1;
+    }
+
+  /* Connect to the speak to address */
+  speak_to_addr.sin_family = AF_INET;
+  speak_from_addr.sin_port = htons(conf.speak_to_port);
+  memcpy(&speak_to_addr.sin_addr,
+         &conf.speak_to_in_addr,
+         sizeof(struct in_addr));
+  if (connect(temp_fd, (struct sockaddr *)&speak_to_addr, sizeof(struct sockaddr_in)) < 0)
+    {
+      err_debug("_cerebrod_speaker_create_and_setup_socket: connect: %s",
+                strerror(errno));
+      return -1;
+    }
+#endif
 }
 
 static void
