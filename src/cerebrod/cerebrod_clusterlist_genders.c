@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_genders.c,v 1.7 2005-03-17 17:21:06 achu Exp $
+ *  $Id: cerebrod_clusterlist_genders.c,v 1.8 2005-03-17 18:51:52 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -18,48 +18,26 @@
 
 #include "cerebrod.h"
 #include "cerebrod_clusterlist.h"
+#include "cerebrod_clusterlist_util.h"
 #include "error.h"
 #include "wrappers.h"
 
 genders_t handle = NULL;
 char *genders_file = NULL;
 
-static void
-_parse_options(char **options)
-{
-  int i = 0;
-
-  assert(options);
-
-  while (options[i] != NULL)
-    {
-      if (strstr(options[i], "filename"))
-	{
-	  char *p = strchr(options[i], '=');
-
-	  if (!p)
-	    err_exit("genders clusterlist module: filename unspecified");
-
-	  p++;
-	  if (p == '\0')
-	    err_exit("genders clusterlist module: filename unspecified");
-
-	  genders_file = Strdup(p);
-	}
-      else
-	err_exit("genders clusterlist module: option '%s' unrecognized", options[i]);
-
-      i++;
-    }
-}
-
-int 
-genders_clusterlist_init(char **options)
+int
+genders_clusterlist_parse_options(char **options)
 {
   assert(!handle);
 
   if (options)
-    _parse_options(options);
+    cerebrod_clusterlist_parse_filename(options, &genders_file);
+}
+
+int 
+genders_clusterlist_init(void)
+{
+  assert(!handle);
 
   if (!(handle = genders_handle_create()))
     err_exit("genders_clusterlist_init: genders_handle_create");
@@ -193,8 +171,14 @@ genders_clusterlist_get_nodename(char *node, char *buf, int buflen)
   return 0;
 }
 
-struct cerebrod_clusterlist_ops clusterlist_ops =
+struct cerebrod_clusterlist_module_info clusterlist_module_info =
   {
+    "genders",
+  };
+
+struct cerebrod_clusterlist_module_ops clusterlist_module_ops =
+  {
+    &genders_clusterlist_parse_options,
     &genders_clusterlist_init,
     &genders_clusterlist_finish,
     &genders_clusterlist_get_all_nodes,

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_hostsfile.c,v 1.5 2005-03-17 05:05:52 achu Exp $
+ *  $Id: cerebrod_clusterlist_hostsfile.c,v 1.6 2005-03-17 18:51:52 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -17,6 +17,7 @@
 
 #include "cerebrod.h"
 #include "cerebrod_clusterlist.h"
+#include "cerebrod_clusterlist_util.h"
 #include "error.h"
 #include "fd.h"
 #include "wrappers.h"
@@ -24,33 +25,13 @@
 List hosts = NULL;
 char *hostsfile_file = NULL;
 
-static void
-_parse_options(char **options)
+int
+hostsfile_clusterlist_parse_options(char **options)
 {
-  int i = 0;
+  assert(!hosts);
 
-  assert(options);
-
-  while (options[i] != NULL)
-    {
-      if (strstr(options[i], "filename"))
-	{
-	  char *p = strchr(options[i], '=');
-
-	  if (!p)
-	    err_exit("hostsfile clusterlist module: filename unspecified");
-
-	  p++;
-	  if (p == '\0')
-	    err_exit("hostsfile clusterlist module: filename unspecified");
-
-	  hostsfile_file = Strdup(p);
-	}
-      else
-	err_exit("hostsfile clusterlist module: option '%s' unrecognized", options[i]);
-
-      i++;
-    }
+  if (options)
+    cerebrod_clusterlist_parse_filename(options, &hostsfile_file);
 }
 
 static int
@@ -137,16 +118,13 @@ _move_past_whitespace(char *buf)
 }
 
 int 
-hostsfile_clusterlist_init(char **options)
+hostsfile_clusterlist_init(void)
 {
   int fd, len;
   char buf[CEREBROD_PARSE_BUFLEN];
   char *file;
 
   assert(!hosts);
-
-  if (options)
-    _parse_options(options);
 
   hosts = List_create((ListDelF)_Free);
 
@@ -273,8 +251,14 @@ hostsfile_clusterlist_get_nodename(char *node, char *buf, int buflen)
   return 0;
 }
 
-struct cerebrod_clusterlist_ops clusterlist_ops =
+struct cerebrod_clusterlist_module_info clusterlist_module_info =
   {
+    "hostsfile",
+  };
+
+struct cerebrod_clusterlist_module_ops clusterlist_module_ops =
+  {
+    &hostsfile_clusterlist_parse_options,
     &hostsfile_clusterlist_init,
     &hostsfile_clusterlist_finish,
     &hostsfile_clusterlist_get_all_nodes,

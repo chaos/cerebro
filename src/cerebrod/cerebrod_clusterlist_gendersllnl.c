@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_gendersllnl.c,v 1.7 2005-03-17 17:21:06 achu Exp $
+ *  $Id: cerebrod_clusterlist_gendersllnl.c,v 1.8 2005-03-17 18:51:52 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -18,48 +18,26 @@
 
 #include "cerebrod.h"
 #include "cerebrod_clusterlist.h"
+#include "cerebrod_clusterlist_util.h"
 #include "error.h"
 #include "wrappers.h"
 
 genders_t handle = NULL;
 char *gendersllnl_file = NULL;
 
-static void
-_parse_options(char **options)
-{
-  int i = 0;
-
-  assert(options);
-
-  while (options[i] != NULL)
-    {
-      if (strstr(options[i], "filename"))
-	{
-	  char *p = strchr(options[i], '=');
-
-	  if (!p)
-	    err_exit("gendersllnl clusterlist module: filename unspecified");
-
-	  p++;
-	  if (p == '\0')
-	    err_exit("gendersllnl clusterlist module: filename unspecified");
-
-	  gendersllnl_file = Strdup(p);
-	}
-      else
-	err_exit("gendersllnl clusterlist module: option '%s' unrecognized", options[i]);
-
-      i++;
-    }
-}
-
-int 
-gendersllnl_clusterlist_init(char **options)
+int
+gendersllnl_clusterlist_parse_options(char **options)
 {
   assert(!handle);
 
   if (options)
-    _parse_options(options);
+    cerebrod_clusterlist_parse_filename(options, &gendersllnl_file);
+}
+
+int 
+gendersllnl_clusterlist_init(void)
+{
+  assert(!handle);
 
   if (!(handle = genders_handle_create()))
     err_exit("gendersllnl_clusterlist_init: genders_handle_create");
@@ -207,8 +185,14 @@ gendersllnl_clusterlist_get_nodename(char *node, char *buf, int buflen)
   return 0;
 }
 
-struct cerebrod_clusterlist_ops clusterlist_ops =
+struct cerebrod_clusterlist_module_info clusterlist_module_info =
   {
+    "gendersllnl",
+  };
+
+struct cerebrod_clusterlist_module_ops clusterlist_module_ops =
+  {
+    &gendersllnl_clusterlist_parse_options,
     &gendersllnl_clusterlist_init,
     &gendersllnl_clusterlist_finish,
     &gendersllnl_clusterlist_get_all_nodes,

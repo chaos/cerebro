@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.33 2005-03-17 06:16:06 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.34 2005-03-17 18:51:52 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -28,6 +28,7 @@
 #include <sys/param.h>
 
 #include "cerebrod_config.h"
+#include "cerebrod_clusterlist.h"
 #include "conffile.h"
 #include "error.h"
 #include "wrappers.h"
@@ -830,6 +831,9 @@ _cerebrod_post_calculate_configuration_config_check(void)
       if (!found_interface)
         err_exit("heartbeat destination address not found");
     }
+
+  if (conf.clusterlist_module_options)
+    cerebrod_clusterlist_parse_options();
 }
 
 static void 

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_none.c,v 1.2 2005-03-17 05:05:52 achu Exp $
+ *  $Id: cerebrod_clusterlist_none.c,v 1.3 2005-03-17 18:51:52 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -19,8 +19,26 @@
 #include "error.h"
 #include "wrappers.h"
 
+int
+none_clusterlist_parse_options(char **options)
+{
+  int i = 0;
+
+  if (!options)
+    return 0;
+
+  /* None module takes no options */
+  while (options[i] != NULL)
+    {
+      err_exit("none clusterlist module: option '%s' unrecognized", options[i]);
+      i++;
+    }
+
+  return 0;
+}
+
 int 
-none_clusterlist_init(char **options)
+none_clusterlist_init(void)
 {
   return 0;
 }
@@ -70,8 +88,14 @@ none_clusterlist_get_nodename(char *node, char *buf, int buflen)
   return 0;
 }
 
-struct cerebrod_clusterlist_ops clusterlist_ops =
+struct cerebrod_clusterlist_module_info clusterlist_module_info =
   {
+    "none",
+  };
+
+struct cerebrod_clusterlist_module_ops clusterlist_module_ops =
+  {
+    &none_clusterlist_parse_options,
     &none_clusterlist_init,
     &none_clusterlist_finish,
     &none_clusterlist_get_all_nodes,

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist.c,v 1.5 2005-03-17 06:16:06 achu Exp $
+ *  $Id: cerebrod_clusterlist.c,v 1.6 2005-03-17 18:51:52 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -31,28 +31,29 @@ char *clusterlist_modules[] = {
 };
 
 extern struct cerebrod_config conf;
-static struct cerebrod_clusterlist_ops *clusterlist_ops = NULL;
-lt_dlhandle clusterlist_dl_handle = NULL;
+static struct cerebrod_clusterlist_module_info *clusterlist_module_info = NULL;
+static struct cerebrod_clusterlist_module_ops *clusterlist_module_ops = NULL;
+lt_dlhandle clusterlist_module_dl_handle = NULL;
 
 static void
 _load_module(char *module_path)
 {
-  char module_path_buf[MAXPATHLEN+1];
-  
   assert(module_path);
 
-  if (module_path[0] != '/')
+  clusterlist_module_dl_handle = Lt_dlopen(module_path);
+  clusterlist_module_info = (struct cerebrod_clusterlist_module_info *)Lt_dlsym(clusterlist_module_dl_handle, "clusterlist_module_info");
+  clusterlist_module_ops = (struct cerebrod_clusterlist_module_ops *)Lt_dlsym(clusterlist_module_dl_handle, "clusterlist_module_ops");
+  
+#ifndef NDEBUG
+  if (conf.debug)
     {
-      memset(module_path_buf, '\0', MAXPATHLEN+1);
-      snprintf(module_path_buf, MAXPATHLEN, 
-	       "%s/%s", 
-	       CEREBROD_MODULE_DIR,
-	       module_path);
-      module_path = &module_path_buf[0];
+      fprintf(stderr, "**************************************\n");
+      fprintf(stderr, "* Cerebrod Clusterlist Configuration:\n");
+      fprintf(stderr, "* -----------------------\n");
+      fprintf(stderr, "* Loaded clusterlist module: %s\n", module_path); 
+      fprintf(stderr, "**************************************\n");
     }
-
-  clusterlist_dl_handle = Lt_dlopen(module_path);
-  clusterlist_ops = (struct cerebrod_clusterlist_ops *)Lt_dlsym(clusterlist_dl_handle, "clusterlist_ops");
+#endif /* NDEBUG */
 }
 
 static int
@@ -61,10 +62,12 @@ _search_dir(char *search_dir)
   DIR *dir;
   int i = 0;
 
-  assert(!clusterlist_ops && !clusterlist_dl_handle);
+  assert(!clusterlist_module_dl_handle);
   assert(search_dir);
 
-  dir = Opendir(search_dir);
+  if (!(dir = opendir(search_dir)))
+    return 0;
+
   while (clusterlist_modules[i] != NULL)
     {
       struct dirent *dirent;
@@ -73,7 +76,13 @@ _search_dir(char *search_dir)
 	{
 	  if (!strcmp(dirent->d_name, clusterlist_modules[i]))
 	    {
-	      _load_module(clusterlist_modules[i]);
+              char filebuf[MAXPATHLEN+1];
+
+              memset(filebuf, '\0', MAXPATHLEN+1);
+              snprintf(filebuf, MAXPATHLEN, "%s/%s",
+                       search_dir, clusterlist_modules[i]);
+
+	      _load_module(filebuf);
 	      goto found_dir;
 	    }
 	}
@@ -84,13 +93,13 @@ _search_dir(char *search_dir)
  found_dir:
   Closedir(dir);
   
-  return (clusterlist_dl_handle) ? 1 : 0;
+  return (clusterlist_module_dl_handle) ? 1 : 0;
 }
 
 static void
 _find_clusterlist_module(void)
 {
-  assert(!clusterlist_ops && !clusterlist_dl_handle);
+  assert(!clusterlist_module_dl_handle);
 
   if (_search_dir(CEREBROD_MODULE_DIR))
     return;
@@ -98,14 +107,14 @@ _find_clusterlist_module(void)
   if (_search_dir("."))
     return;
 
-  if (!clusterlist_dl_handle)
+  if (!clusterlist_module_dl_handle)
     err_exit("no valid cluster list modules found");
 }
 
 int 
 cerebrod_clusterlist_setup(void)
 {
-  assert(!clusterlist_ops && !clusterlist_dl_handle);
+  assert(!clusterlist_module_dl_handle);
 
   Lt_dlinit();
 
@@ -118,59 +127,75 @@ cerebrod_clusterlist_setup(void)
 int 
 cerebrod_clusterlist_cleanup(void)
 {
-  assert(!clusterlist_ops && !clusterlist_dl_handle);
+  assert(!clusterlist_module_dl_handle);
 
-  Lt_dlclose(clusterlist_dl_handle);
-  clusterlist_dl_handle = NULL;
-  clusterlist_ops = NULL;
+  Lt_dlclose(clusterlist_module_dl_handle);
+  clusterlist_module_dl_handle = NULL;
+  clusterlist_module_ops = NULL;
 
   Lt_dlexit();
 }
 
 int 
+cerebrod_clusterlist_parse_options(void)
+{
+  assert(clusterlist_module_dl_handle);
+
+  return ((*clusterlist_module_ops->parse_options)(conf.clusterlist_module_options));
+}
+
+int 
 cerebrod_clusterlist_init(void)
 {
-  assert(clusterlist_ops && clusterlist_dl_handle);
+  assert(clusterlist_module_dl_handle);
 
-  return ((*clusterlist_ops->init)(conf.clusterlist_module_options));
+  return ((*clusterlist_module_ops->init)());
 }
 
 int 
 cerebrod_clusterlist_finish(void)
 {
-  assert(clusterlist_ops && clusterlist_dl_handle);
+  assert(clusterlist_module_dl_handle);
 
-  return ((*clusterlist_ops->finish)());
+  return ((*clusterlist_module_ops->finish)());
 }
 
 int 
 cerebrod_clusterlist_get_all_nodes(char **nodes, unsigned int nodeslen)
 {
-  assert(clusterlist_ops && clusterlist_dl_handle && nodes);
+  assert(clusterlist_module_dl_handle && nodes);
 
-  return ((*clusterlist_ops->get_all_nodes)(nodes, nodeslen));
+  return ((*clusterlist_module_ops->get_all_nodes)(nodes, nodeslen));
 }
 
 int 
 cerebrod_clusterlist_numnodes(void)
 {
-  assert(clusterlist_ops && clusterlist_dl_handle);
+  assert(clusterlist_module_dl_handle);
 
-  return ((*clusterlist_ops->numnodes)());
+  return ((*clusterlist_module_ops->numnodes)());
 }
 
 int 
 cerebrod_clusterlist_node_in_cluster(char *node)
 {
-  assert(clusterlist_ops && clusterlist_dl_handle);
+  assert(clusterlist_module_dl_handle);
 
-  return ((*clusterlist_ops->node_in_cluster)(node));
+  return ((*clusterlist_module_ops->node_in_cluster)(node));
 }
 
 int 
 cerebrod_clusterlist_get_nodename(char *node, char *buf, int buflen)
 {
-  assert(clusterlist_ops && clusterlist_dl_handle);
+  assert(clusterlist_module_dl_handle);
 
-  return ((*clusterlist_ops->get_nodename)(node, buf, buflen));
+  return ((*clusterlist_module_ops->get_nodename)(node, buf, buflen));
+}
+
+char *
+cerebrod_clusterlist_module_name(void)
+{
+  assert(clusterlist_module_dl_handle);
+
+  return clusterlist_module_info->clusterlist_module_name;
 }

@@ -4,6 +4,54 @@
 	(_parse_options),
 	src/cerebrod/cerebrod_clusterlist_gendersllnl.c
 	(_parse_options): Fix cut and paste typos.
+
+	* src/cerebrod/cerebrod_clusterlist.c (_load_module, _search_dir):
+	Fix logic errs in search paths.
+
+	Re-architect option parsing logic.
+
+	* src/cerebrod/cerebrod_clusterlist_util.h,
+	src/cerebrod/cerebrod_clusterlist_util.c: New files.
+	
+	* src/cerebrod/cerebrod_clusterlist_hostsfile.c (_parse_options),
+	src/cerebrod/cerebrod_clusterlist_genders.c
+	(_parse_options), src/cerebrod/cerebrod_clusterlist_gendersllnl.c
+	(_parse_options): Removed functions.
+
+	* src/cerebrod/cerebrod_clusterlist.h,
+	src/cerebrod/cerebrod_clusterlist.c,
+	src/cerebrod/cerebrod_clusterlist_none.c,
+	src/cerebrod/cerebrod_clusterlist_hostsfile.c,
+	src/cerebrod/cerebrod_clusterlist_genders.c,
+	src/cerebrod/cerebrod_clusterlist_gendersllnl.c: Change
+	cerebrod_clusterlist_ops to cerebrod_clusterlist_module_ops
+	globally.
+
+	* src/cerebrod/cerebrod_clusterlist.h: New
+	Cerebrod_clusterlist_parse_options typedef.  Added
+	Cerebrod_clusterlist_parse_options into
+	cerebrod_clusterlist_module_ops.  New
+	cerebrod_clusterlist_module_info definition.  
+
+	* src/cerebrod/cerebrod_clusterlist.c (_load_module): Search and
+	load clusterlist_module_info symbol.
+
+	* src/cerebrod/cerebrod_clusterlist.h,
+	src/cerebrod/cerebrod_clusterlist.c
+	(cerebrod_clusterlist_parse_options): New function.
+
+	* src/cerebrod/cerebrod_clusterlist_none.c
+	(none_clusterlist_parse_options),
+	src/cerebrod/cerebrod_clusterlist_hostsfile.c
+	(hostsfile_clusterlist_parse_options),
+	src/cerebrod/cerebrod_clusterlist_genders.c
+	(genders_clusterlist_parse_options),
+	src/cerebrod/cerebrod_clusterlist_gendersllnl.c
+	(gendersllnl_clusterlist_parse_options): New functions.
+
+	* src/cerebrod/cerebrod_config.c
+	(_cerebrod_post_calculate_configuration_config_check): Call
+	cerebrod_clusterlist_parse_options.
 	
 2005-03-16  Albert Chu  <chu11@llnl.gov>
 
