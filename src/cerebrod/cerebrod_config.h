@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.h,v 1.28 2005-03-20 21:50:40 achu Exp $
+ *  $Id: cerebrod_config.h,v 1.29 2005-03-21 18:28:38 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_CONFIG_H
@@ -91,22 +91,12 @@ typedef int (*Cerebrod_config_load_default)(struct cerebrod_config *conf);
 /*
  * struct cerebrod_config_module_info 
  * 
- * contains config module information.  Required to be defined in each
- * config module.
+ * contains config module information and operations.  Required to be
+ * defined in each config module.
  */
 struct cerebrod_config_module_info
 {
   char *config_module_name;
-};
- 
-/*
- * struct cerebrod_config_module_ops 
- *
- * config module functions.  Required to be defined in each config
- * module.
- */
-struct cerebrod_config_module_ops
-{
   Cerebrod_config_load_default load_default;
 };
 

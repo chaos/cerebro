@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist.h,v 1.6 2005-03-21 14:36:47 achu Exp $
+ *  $Id: cerebrod_clusterlist.h,v 1.7 2005-03-21 18:28:38 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_CLUSTERLIST_H
@@ -95,22 +95,12 @@ typedef int (*Cerebrod_clusterlist_get_nodename)(char *node, char *buf, unsigned
 /*  
  * struct cerebrod_clusterlist_module_info
  *
- * contains clusterlist module information.  Required to be defined in
- * each clusterlist module.
+ * contains clusterlist module information and operations.  Required
+ * to be defined in each clusterlist module.
  */
 struct cerebrod_clusterlist_module_info
 {
   char *clusterlist_module_name;
-};
-
-/*  
- * struct cerebrod_clusterlist_module_ops
- *
- * clusterlist module functions.  Required to be defined in each
- * clusterlist module.
- */
-struct cerebrod_clusterlist_module_ops 
-{
   Cerebrod_clusterlist_parse_options parse_options;
   Cerebrod_clusterlist_init init;
   Cerebrod_clusterlist_finish finish;
@@ -138,6 +128,13 @@ int cerebrod_clusterlist_setup(void);
  * Return 0 on success, -1 on error
  */
 int cerebrod_clusterlist_cleanup(void);
+
+/* 
+ * cerebrod_clusterlist_module_name
+ *
+ * Return clusterlist module name
+ */
+char *cerebrod_clusterlist_module_name(void);
 
 /* 
  * cerebrod_clusterlist_parse_options
@@ -187,12 +184,5 @@ int cerebrod_clusterlist_node_in_cluster(char *node);
  * call clusterlist module get nodename function
  */
 int cerebrod_clusterlist_get_nodename(char *node, char *buf, unsigned int buflen);
-
-/* 
- * cerebrod_clusterlist_module_name
- *
- * Return clusterlist module name
- */
-char *cerebrod_clusterlist_module_name(void);
 
 #endif /* _CEREBROD_CLUSTERLIST_H */

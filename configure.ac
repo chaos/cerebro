@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.15 2005-03-21 17:55:48 achu Exp $
+## $Id: configure.ac,v 1.16 2005-03-21 18:28:38 achu Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -47,6 +47,12 @@ AC_CHECK_HEADERS( \
 #
 AC_CEREBROD_MODULE_DIR
 AC_CEREBROD_CONFIG_FILE
+
+#
+# Check for static module compilation
+#
+AC_STATIC_MODULES
+AM_CONDITIONAL(WITH_STATIC_MODULES, [test "$ac_with_static_modules" = "yes"])
 
 #
 # Check for new default hostsfile

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.48 2005-03-20 22:17:17 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.49 2005-03-21 18:28:38 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -300,18 +300,16 @@ _config_load_module(char *module_path)
 {
   lt_dlhandle config_module_dl_handle = NULL;
   struct cerebrod_config_module_info *config_module_info = NULL;
-  struct cerebrod_config_module_ops *config_module_ops = NULL;
 
   assert(module_path);
 
   config_module_dl_handle = Lt_dlopen(module_path);
   config_module_info = (struct cerebrod_config_module_info *)Lt_dlsym(config_module_dl_handle, "config_module_info");
-  config_module_ops = (struct cerebrod_config_module_ops *)Lt_dlsym(config_module_dl_handle, "config_module_ops");
 
   if (!config_module_info->config_module_name)
     err_exit("config module '%s' does not contain a valid name");
 
-  if (!config_module_ops->load_default)
+  if (!config_module_info->load_default)
     err_exit("config module '%s' does not contain valid load_default function");
   
 #ifndef NDEBUG
@@ -326,7 +324,7 @@ _config_load_module(char *module_path)
 #endif /* NDEBUG */
 
   /* Load the alternate default configuration from the configuration module */
-  if ((*config_module_ops->load_default)(&conf) < 0)
+  if ((*config_module_info->load_default)(&conf) < 0)
     err_exit("%s config module: load_default failed: %s",
              config_module_info->config_module_name, strerror(errno));
 

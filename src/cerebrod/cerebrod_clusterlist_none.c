@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_none.c,v 1.7 2005-03-21 14:36:47 achu Exp $
+ *  $Id: cerebrod_clusterlist_none.c,v 1.8 2005-03-21 18:28:38 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -116,10 +116,6 @@ none_clusterlist_get_nodename(char *node, char *buf, unsigned int buflen)
 struct cerebrod_clusterlist_module_info clusterlist_module_info =
   {
     "none",
-  };
-
-struct cerebrod_clusterlist_module_ops clusterlist_module_ops =
-  {
     &none_clusterlist_parse_options,
     &none_clusterlist_init,
     &none_clusterlist_finish,
@@ -128,5 +124,3 @@ struct cerebrod_clusterlist_module_ops clusterlist_module_ops =
     &none_clusterlist_node_in_cluster,
     &none_clusterlist_get_nodename,
   };
-
-

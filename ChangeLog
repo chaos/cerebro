@@ -22,12 +22,36 @@
 	gendersllnl auto-configurable on or off.  Various cleanup.
 
 	* configure.ac: Support cleanup.
+
+	Support static module compilation
+
+	* config/ac_static_modules.m4: New file.
+
+	* configure.ac: Add static modules option.
+
+	* src/cerebrod/cerebrod_config.h: Collapse struct
+	cerebrod_config_module_ops into struct
+	cerebrod_config_module_info.
+
+	* src/cerebrod/cerebrod_config.c (_config_load_module),
+	src/cerebrod/cerebrod_config_gendersllnl.c: Updated for structure
+	changes.
 	
+	* src/cerebrod/cerebrod_clusterlist.h: Collapse struct
+	cerebrod_clusterlist_module_ops into struct
+	cerebrod_clusterlist_module_info.
+
+	* src/cerebrod/cerebrod_clusterlist.c (_clusterlist_load_module),
+	src/cerebrod_clusterlist_hostsfile.c,
+	src/cerebrod_clusterlist_genders.c,
+	src/cerebrod_clusterlist_gendersllnl.c,
+	src/cerebrod_clusterlist_util.h: Updated for structure changes.
+
 2005-03-20  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerebrod/cerebrod_config.c
-	(_cerebrod_pre_calculate_configuration_config_check): Add
-	port checks.
+	(_cerebrod_pre_calculate_configuration_config_check): Add port
+	checks.
 
 	* src/cerebrod/cerebrod_config.h: New default ports.
 

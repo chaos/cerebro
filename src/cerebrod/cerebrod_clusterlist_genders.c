@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_genders.c,v 1.13 2005-03-21 14:36:47 achu Exp $
+ *  $Id: cerebrod_clusterlist_genders.c,v 1.14 2005-03-21 18:28:38 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -160,10 +160,6 @@ genders_clusterlist_get_nodename(char *node, char *buf, unsigned int buflen)
 struct cerebrod_clusterlist_module_info clusterlist_module_info =
   {
     "genders",
-  };
-
-struct cerebrod_clusterlist_module_ops clusterlist_module_ops =
-  {
     &genders_clusterlist_parse_options,
     &genders_clusterlist_init,
     &genders_clusterlist_finish,

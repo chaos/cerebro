@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_hostsfile.c,v 1.12 2005-03-21 16:58:17 achu Exp $
+ *  $Id: cerebrod_clusterlist_hostsfile.c,v 1.13 2005-03-21 18:28:38 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -333,10 +333,6 @@ hostsfile_clusterlist_get_nodename(char *node, char *buf, unsigned int buflen)
 struct cerebrod_clusterlist_module_info clusterlist_module_info =
   {
     "hostsfile",
-  };
-
-struct cerebrod_clusterlist_module_ops clusterlist_module_ops =
-  {
     &hostsfile_clusterlist_parse_options,
     &hostsfile_clusterlist_init,
     &hostsfile_clusterlist_finish,
@@ -345,5 +341,3 @@ struct cerebrod_clusterlist_module_ops clusterlist_module_ops =
     &hostsfile_clusterlist_node_in_cluster,
     &hostsfile_clusterlist_get_nodename,
   };
-
-
