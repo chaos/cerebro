@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.42 2005-03-19 19:06:24 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.43 2005-03-19 19:23:49 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -228,31 +228,60 @@ _cerebrod_config_module_setup(void)
 	err_exit("config module '%s' could not be loaded",
 		 conf.configmodule);
     }
-  else 
+  else if (conf.configmodule)
     {
-      char **modules_list;
-      int modules_list_len;
+      char filebuf[MAXPATHLEN+1];
+      int ret;
 
-      if (conf.configmodule)
-	{
-	  modules_list = &conf.configmodule;
-	  modules_list_len = 1;
-	}
-      else
-	{
-	  modules_list = config_modules;
-	  modules_list_len = config_modules_len;
-	}
-      
+      memset(filebuf, '\0', MAXPATHLEN+1);
+      snprintf(filebuf, MAXPATHLEN, "%s/%s", 
+	       CEREBROD_MODULE_DIR, conf.configmodule);
+
+      if ((ret = _config_load_module(filebuf)) < 0)
+	err_exit("error loading config module '%s'",
+		 conf.configmodule);
+      if (ret == 1)
+	goto done;
+
+      memset(filebuf, '\0', MAXPATHLEN+1);
+      snprintf(filebuf, MAXPATHLEN, "./%s", conf.configmodule);
+
+      if ((ret = _config_load_module(filebuf)) < 0)
+	err_exit("error loading config module '%s'",
+		 conf.configmodule);
+      if (ret == 1)
+	goto done;
+
+      memset(filebuf, '\0', MAXPATHLEN+1);
+      snprintf(filebuf, MAXPATHLEN, "%s/cerebrod_clusterlist_%s.la", 
+	       CEREBROD_MODULE_DIR, conf.configmodule);
+
+      if ((ret = _config_load_module(filebuf)) < 0)
+	err_exit("error loading config module '%s'",
+		 conf.configmodule);
+      if (ret == 1)
+	goto done;
+
+      memset(filebuf, '\0', MAXPATHLEN+1);
+      snprintf(filebuf, MAXPATHLEN, "./cerebrod_clusterlist_%s.la", conf.configmodule);
+
+      if ((ret = _config_load_module(filebuf)) < 0)
+	err_exit("error loading config module '%s'",
+		 conf.configmodule);
+      if (ret == 1)
+	goto done;
+    }
+  else
+    {
       if (cerebrod_search_dir_for_module(CEREBROD_MODULE_DIR,
-                                         modules_list,
-					 modules_list_len,
+                                         config_modules,
+					 config_modules_len,
                                          _config_load_module))
         goto done;
       
       if (cerebrod_search_dir_for_module(".",
-                                         modules_list,
-					 modules_list_len,
+                                         config_modules,
+					 config_modules_len,
                                          _config_load_module))
         goto done;
     }
