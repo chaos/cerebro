@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.13 2005-03-16 17:08:26 achu Exp $
+ *  $Id: cerebrod.c,v 1.14 2005-03-16 19:37:59 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -39,6 +39,7 @@ static void
 _cerebrod_post_config_initialization(void)
 {
   cerebrod_clusterlist_setup();
+  cerebrod_clusterlist_init();
 }
 
 int 
