@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_updown_protocol.h,v 1.2 2005-03-26 00:24:17 achu Exp $
+ *  $Id: cerebro_updown_protocol.h,v 1.3 2005-03-26 01:40:54 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_UPDOWN_PROTOCOL_H
@@ -8,14 +8,19 @@
 #include <sys/types.h>
 #include "cerebro_defs.h"
 
-#define CEREBRO_UPDOWN_PROTOCOL_VERSION           1
+#define CEREBRO_UPDOWN_PROTOCOL_VERSION                1
  
-#define CEREBRO_UPDOWN_REQUEST_UP_NODES           0
-#define CEREBRO_UPDOWN_REQUEST_DOWN_NODES         1
-#define CEREBRO_UPDOWN_REQUEST_UP_AND_DOWN_NODES  2
+#define CEREBRO_UPDOWN_REQUEST_UP_NODES                0
+#define CEREBRO_UPDOWN_REQUEST_DOWN_NODES              1
+#define CEREBRO_UPDOWN_REQUEST_UP_AND_DOWN_NODES       2
 
-#define CEREBRO_UPDOWN_RESPONSE_NODE_UP           0
-#define CEREBRO_UPDOWN_RESPONSE_NODE_DOWN         1
+#define CEREBRO_UPDOWN_RESPONSE_CODE_SUCCESS                0
+#define CEREBRO_UPDOWN_RESPONSE_CODE_VERSION_INVALID        1
+#define CEREBRO_UPDOWN_RESPONSE_CODE_UPDOWN_REQUEST_INVALID 2
+#define CEREBRO_UPDOWN_RESPONSE_CODE_TIMEOUT_INVALID        3
+
+#define CEREBRO_UPDOWN_RESPONSE_NODE_UP                     0
+#define CEREBRO_UPDOWN_RESPONSE_NODE_DOWN                   1
 /*
  * struct cerebrod_updown_request
  *
@@ -40,6 +45,7 @@ struct cerebro_updown_request
 struct cerebro_updown_response
 {
   int32_t version;
+  u_int32_t updown_response_code;
   char hostname[CEREBRO_MAXHOSTNAMELEN];
   u_int32_t updown_state;
 };
