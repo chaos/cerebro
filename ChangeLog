@@ -24,6 +24,8 @@
 
 	* src/libcommon/Makefile.am, src/cerebrod/Makefile.am: Split off
 	libcommon libraries into libcommon and libwrappers.
+
+	* src/cerebrod/cerebrod.c (main): Fix spinning loop issue.
 	
 2005-03-28  Albert Chu  <chu11@llnl.gov>
 
