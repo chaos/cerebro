@@ -1,3 +1,11 @@
+2005-03-18  Albert Chu  <chu11@llnl.gov>
+
+	* src/cerebrod/cerebrod_config.c (_cerebrod_config_module_setup,
+	_find_config_module, _search_dir, _load_module): New functions.
+
+	* src/cerebrod/cerebrod_config.c (cerebrod_config): Call
+	_cerebrod_config_module_setup.
+	
 2005-03-17  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerebrod/cerebrod_clusterlist_genders.c

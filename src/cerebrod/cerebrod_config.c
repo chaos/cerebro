@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.35 2005-03-18 01:36:30 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.36 2005-03-18 06:10:43 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -153,16 +153,16 @@ _cerebrod_cmdline_parse(int argc, char **argv)
     }
 }
 
-static struct cerebrod_config_module_info *config_module_info = NULL;
-static struct cerebrod_config_module_ops *config_module_ops = NULL;
-static lt_dlhandle module_config_dl_handle = NULL;
-
-static void
+static int
 _load_module(char *module_path)
 {
+  lt_dlhandle config_module_dl_handle = NULL;
+  struct cerebrod_config_module_info *config_module_info = NULL;
+  struct cerebrod_config_module_ops *config_module_ops = NULL;
+
   assert(module_path);
 
-  module_config_dl_handle = Lt_dlopen(module_path);
+  config_module_dl_handle = Lt_dlopen(module_path);
   config_module_info = (struct cerebrod_config_module_info *)Lt_dlsym(config_module_dl_handle, "config_module_info");
   config_module_ops = (struct cerebrod_config_module_ops *)Lt_dlsym(config_module_dl_handle, "config_module_ops");
 
@@ -185,7 +185,7 @@ static int
 _search_dir(char *search_dir)
 {
   DIR *dir;
-  int i = 0;
+  int i = 0, found = 0;
 
   assert(search_dir);
 
@@ -206,8 +206,11 @@ _search_dir(char *search_dir)
               snprintf(filebuf, MAXPATHLEN, "%s/%s",
                        search_dir, config_modules[i]);
 
-	      _load_module(filebuf);
-	      goto found_dir;
+	      if (_load_module(filebuf))
+		{
+		  found++;
+		  goto found_dir;
+		}
 	    }
 	}
       
@@ -217,14 +220,12 @@ _search_dir(char *search_dir)
  found_dir:
   Closedir(dir);
   
-  return (config_module_dl_handle) ? 1 : 0;
+  return (found) ? 1 : 0;
 }
 
 static void
 _find_config_module(void)
 {
-  assert(!config_module_dl_handle);
-
   if (_search_dir(CEREBROD_MODULE_DIR))
     return;
 
@@ -233,10 +234,8 @@ _find_config_module(void)
 }
 
 static void
-_cerebrod_config_setup(void)
+_cerebrod_config_module_setup(void)
 {
-  assert(!config_module_dl_handle);
-
   Lt_dlinit();
 
   if (conf.configmodule) 
@@ -246,12 +245,12 @@ _cerebrod_config_setup(void)
       if (stat(conf.configmodule, &buf) < 0)
         err_exit("config module '%s' not found", conf.configmodule);
 
-      _load_module(conf.config_module);
+      _load_module(conf.configmodule);
     }
   else
     _find_config_module();
 
-  Lt_dlfinish();
+  Lt_dlexit();
 }
 
 static int
@@ -993,7 +992,7 @@ cerebrod_config(int argc, char **argv)
 
   _cerebrod_config_default();
   _cerebrod_cmdline_parse(argc, argv);
-  _cerebrod_config_module();
+  _cerebrod_config_module_setup();
   _cerebrod_config_parse();
   _cerebrod_pre_calculate_configuration_config_check();
   _cerebrod_calculate_configuration();
