@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.6 2005-02-02 01:02:24 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.7 2005-02-02 01:27:51 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -124,9 +124,10 @@ _cerebrod_listener_initialize(void)
   if (initialization_complete)
     goto done;
 
+  Pthread_mutex_lock(&listener_fd_lock);
   if ((listener_fd = _cerebrod_listener_create_and_setup_socket()) < 0)
     err_exit("_cerebrod_listener_initialize: listener_fd setup failed");
-  listener_fd_complete = 1;
+  Pthread_mutex_unlock(&listener_fd_lock);
 
   cluster_data_hash_size = CEREBROD_LISTENER_HASH_SIZE_DEFAULT;
   cluster_data_hash_numnodes = 0;

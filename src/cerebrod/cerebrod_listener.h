@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.h,v 1.2 2005-02-02 01:02:24 achu Exp $
+ *  $Id: cerebrod_listener.h,v 1.3 2005-02-02 01:27:51 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_LISTENER_H
@@ -18,7 +18,7 @@ struct cerebrod_node_data
                                  + sizeof(u_int32_t) \
                                  + sizeof(u_int32_t))
 
-#define CEREBROD_REINITIALIZE_WAIT 5
+#define CEREBROD_REINITIALIZE_WAIT 2
 
 void *cerebrod_listener(void *);
 
