@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_heartbeat.c,v 1.17 2005-03-30 05:41:45 achu Exp $
+ *  $Id: cerebrod_heartbeat.c,v 1.18 2005-03-30 18:46:58 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -36,7 +36,7 @@ cerebrod_heartbeat_construct(struct cerebrod_heartbeat *hb)
   assert(hb);
 
   hb->version = CEREBROD_HEARTBEAT_PROTOCOL_VERSION;
-  cerebrod_get_hostname(hb->hostname, CEREBRO_MAXHOSTNAMELEN);
+  cerebrod_get_nodename(hb->nodename, CEREBRO_MAXNODENAMELEN);
   hb->starttime = cerebrod_get_starttime();
   hb->boottime = cerebrod_get_boottime();
 }
@@ -63,7 +63,7 @@ cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb)
       fprintf(stderr, "* Cerebrod Heartbeat:\n");     
       fprintf(stderr, "* -------------------\n");
       fprintf(stderr, "* version: %d\n", hb->version);
-      fprintf(stderr, "* hostname: \"%s\"\n", hb->hostname);
+      fprintf(stderr, "* nodename: \"%s\"\n", hb->nodename);
       fprintf(stderr, "* starttime: %u\n", hb->starttime);
       fprintf(stderr, "* boottime: %u\n", hb->boottime);
       fprintf(stderr, "**************************************\n");
@@ -89,8 +89,8 @@ cerebrod_heartbeat_marshall(struct cerebrod_heartbeat *hb,
 		      strerror(errno));
   c += ret;
 
-  if ((ret = cerebro_marshall_buffer(hb->hostname, 
-                                     sizeof(hb->hostname), 
+  if ((ret = cerebro_marshall_buffer(hb->nodename, 
+                                     sizeof(hb->nodename), 
                                      buffer + c, 
                                      bufferlen - c)) < 0)
     cerebrod_err_exit("%s(%s:%d): cerebro_marshall_buffer: %s",
@@ -152,8 +152,8 @@ cerebrod_heartbeat_unmarshall(struct cerebrod_heartbeat *hb,
 			strerror(errno));
   c += ret;
 
-  if ((ret = cerebro_unmarshall_buffer(hb->hostname, 
-                                       sizeof(hb->hostname), 
+  if ((ret = cerebro_unmarshall_buffer(hb->nodename, 
+                                       sizeof(hb->nodename), 
                                        buffer + c, 
                                        bufferlen - c)) < 0)
     cerebrod_err_exit("%s(%s:%d): cerebro_unmarshall_buffer: %s",

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_data.h,v 1.1 2005-03-20 20:10:14 achu Exp $
+ *  $Id: cerebrod_data.h,v 1.2 2005-03-30 18:46:58 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_CACHE_H
@@ -9,7 +9,7 @@
  * cerebrod_load_data
  *
  * Load and cache cerebrod starttme, machine boottime, and machine
- * hostname
+ * nodename
  */
 void cerebrod_load_data(void);
 
@@ -29,10 +29,10 @@ u_int32_t cerebrod_get_boottime(void);
 
 
 /* 
- * cerebrod_get_hostname
+ * cerebrod_get_nodename
  *
- * Return the cached system hostname
+ * Return the cached system nodename
  */
-void cerebrod_get_hostname(char *buf, unsigned int len);
+void cerebrod_get_nodename(char *buf, unsigned int len);
 
 #endif /* _CEREBROD_CACHE_H */

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_updown_protocol.h,v 1.8 2005-03-29 23:28:45 achu Exp $
+ *  $Id: cerebro_updown_protocol.h,v 1.9 2005-03-30 18:46:58 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_UPDOWN_PROTOCOL_H
@@ -72,14 +72,14 @@ struct cerebro_updown_response
   int32_t version;
   u_int32_t updown_err_code;
   u_int8_t end_of_responses;
-  char hostname[CEREBRO_MAXHOSTNAMELEN];
+  char nodename[CEREBRO_MAXNODENAMELEN];
   u_int8_t updown_state;
 };
   
 #define CEREBRO_UPDOWN_RESPONSE_LEN  (sizeof(int32_t) \
                                       + sizeof(u_int32_t) \
                                       + sizeof(u_int8_t) \
-                                      + CEREBRO_MAXHOSTNAMELEN \
+                                      + CEREBRO_MAXNODENAMELEN \
                                       + sizeof(u_int8_t))
 
 #endif /* _CEREBRO_UPDOWN_PROTOCOL_H */

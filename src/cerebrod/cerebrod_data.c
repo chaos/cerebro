@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_data.c,v 1.4 2005-03-30 05:41:45 achu Exp $
+ *  $Id: cerebrod_data.c,v 1.5 2005-03-30 18:46:58 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -45,13 +45,13 @@ static u_int32_t cerebrod_starttime = 0;
 static u_int32_t cerebrod_boottime = 0;
 
 /*
- * cerebrod_hostname
- * cerebrod_hostname_len
+ * cerebrod_nodename
+ * cerebrod_nodename_len
  *
- * cached system hostname and hostname length
+ * cached system nodename and nodename length
  */
-static char cerebrod_hostname[CEREBRO_MAXHOSTNAMELEN+1];
-static int cerebrod_hostname_len = 0;
+static char cerebrod_nodename[CEREBRO_MAXNODENAMELEN+1];
+static int cerebrod_nodename_len = 0;
 
 /*
  * _cerebrod_cache_starttime
@@ -118,17 +118,17 @@ _cerebrod_cache_boottime(void)
 }
 
 /*
- * _cerebrod_cache_hostname
+ * _cerebrod_cache_nodename
  *
- * cache the system hostname and length
+ * cache the system nodename and length
  */
 static void
-_cerebrod_cache_hostname(void)
+_cerebrod_cache_nodename(void)
 {
-  assert(!cerebrod_hostname_len);
-  memset(cerebrod_hostname, '\0', CEREBRO_MAXHOSTNAMELEN+1);
-  Gethostname(cerebrod_hostname, CEREBRO_MAXHOSTNAMELEN);
-  cerebrod_hostname_len = strlen(cerebrod_hostname);
+  assert(!cerebrod_nodename_len);
+  memset(cerebrod_nodename, '\0', CEREBRO_MAXNODENAMELEN+1);
+  Gethostname(cerebrod_nodename, CEREBRO_MAXNODENAMELEN);
+  cerebrod_nodename_len = strlen(cerebrod_nodename);
 }
 
 void
@@ -136,7 +136,7 @@ cerebrod_load_data(void)
 {
   _cerebrod_cache_starttime();
   _cerebrod_cache_boottime();
-  _cerebrod_cache_hostname();
+  _cerebrod_cache_nodename();
 }
 
 u_int32_t
@@ -156,10 +156,10 @@ cerebrod_get_boottime(void)
 }
 
 void
-cerebrod_get_hostname(char *buf, unsigned int len)
+cerebrod_get_nodename(char *buf, unsigned int len)
 {
   assert(buf && len > 0);
-  assert(len > cerebrod_hostname_len);
+  assert(len > cerebrod_nodename_len);
   
-  memcpy(buf, cerebrod_hostname, cerebrod_hostname_len);
+  memcpy(buf, cerebrod_nodename, cerebrod_nodename_len);
 }

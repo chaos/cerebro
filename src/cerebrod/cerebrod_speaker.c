@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.19 2005-03-30 05:41:45 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.20 2005-03-30 18:46:58 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -138,7 +138,7 @@ _cerebrod_speaker_create_and_setup_socket(void)
 static void
 _cerebrod_speaker_initialize(void)
 {
-  char hostname[CEREBRO_MAXHOSTNAMELEN+1];
+  char nodename[CEREBRO_MAXNODENAMELEN+1];
   unsigned int seed;;
   int i, len;
 
@@ -146,15 +146,15 @@ _cerebrod_speaker_initialize(void)
 
   /* If an entire cluster is re-booted at the same time, each cluster
    * node could potentially be seeded with the same time.  In order to
-   * avoid this, we'll add the cluster hostname to the seed to give
+   * avoid this, we'll add the cluster nodename to the seed to give
    * every cluster node a constant different offset.
    */
-  memset(hostname, '\0', CEREBRO_MAXHOSTNAMELEN+1);
-  cerebrod_get_hostname(hostname, CEREBRO_MAXHOSTNAMELEN+1);
+  memset(nodename, '\0', CEREBRO_MAXNODENAMELEN+1);
+  cerebrod_get_nodename(nodename, CEREBRO_MAXNODENAMELEN+1);
   
-  len = strlen(hostname);
+  len = strlen(nodename);
   for (i = 0; i < len; i++)
-    seed += (int)hostname[i];
+    seed += (int)nodename[i];
 
   srand(seed);
 }

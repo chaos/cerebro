@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.36 2005-03-30 18:26:02 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.37 2005-03-30 18:46:58 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -297,8 +297,8 @@ cerebrod_listener(void *arg)
       struct cerebrod_heartbeat hb;
       struct cerebrod_node_data *nd;
       char hbbuf[CEREBROD_PACKET_BUFLEN];
-      char hostname_buf[CEREBRO_MAXHOSTNAMELEN+1];
-      char hostname_key[CEREBRO_MAXHOSTNAMELEN+1];
+      char nodename_buf[CEREBRO_MAXNODENAMELEN+1];
+      char nodename_key[CEREBRO_MAXNODENAMELEN+1];
       int rv, hblen, cluster_data_updated_flag = 0;
 
       Pthread_mutex_lock(&listener_fd_lock);
@@ -366,37 +366,37 @@ cerebrod_listener(void *arg)
 	  continue;
 	}
       
-      if (!cerebrod_clusterlist_node_in_cluster(hb.hostname))
+      if (!cerebrod_clusterlist_node_in_cluster(hb.nodename))
         {
           cerebrod_err_debug("%s(%s:%d): received non-cluster packet from: %s",
 			     __FILE__, __FUNCTION__, __LINE__,
-                             hb.hostname);
+                             hb.nodename);
           continue;
         }
       
       /* Guarantee truncation */
-      memset(hostname_buf, '\0', CEREBRO_MAXHOSTNAMELEN+1);
-      memcpy(hostname_buf, hb.hostname, CEREBRO_MAXHOSTNAMELEN);
+      memset(nodename_buf, '\0', CEREBRO_MAXNODENAMELEN+1);
+      memcpy(nodename_buf, hb.nodename, CEREBRO_MAXNODENAMELEN);
 
-      memset(hostname_key, '\0', CEREBRO_MAXHOSTNAMELEN+1);
-      if (cerebrod_clusterlist_get_nodename(hostname_buf,
-                                            hostname_key, 
-                                            CEREBRO_MAXHOSTNAMELEN+1) < 0)
+      memset(nodename_key, '\0', CEREBRO_MAXNODENAMELEN+1);
+      if (cerebrod_clusterlist_get_nodename(nodename_buf,
+                                            nodename_key, 
+                                            CEREBRO_MAXNODENAMELEN+1) < 0)
         {
           cerebrod_err_output("%s(%s:%d): cerebrod_clusterlist_get_nodename "
 			      "error: %s", 
 			      __FILE__, __FUNCTION__, __LINE__,
-                              hb.hostname);
+                              hb.nodename);
           continue;
         }
 
       Pthread_mutex_lock(&cluster_data_hash_lock);
-      nd = Hash_find(cluster_data_hash, hostname_key);
+      nd = Hash_find(cluster_data_hash, nodename_key);
       if (!nd)
         {
           char *key;
 
-          key = Strdup(hostname_key);
+          key = Strdup(nodename_key);
           nd = (struct cerebrod_node_data *)Malloc(sizeof(struct cerebrod_node_data));
           Pthread_mutex_init(&(nd->node_data_lock), NULL);
 
@@ -425,7 +425,7 @@ cerebrod_listener(void *arg)
       Pthread_mutex_unlock(&(nd->node_data_lock));
 
       if (conf.updown_server && cluster_data_updated_flag)
-	cerebrod_updown_update_data(hostname_key, nd->last_received);
+	cerebrod_updown_update_data(nodename_key, nd->last_received);
 
       _cerebrod_listener_dump_cluster_node_data_hash();
     }

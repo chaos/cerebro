@@ -19,5 +19,3 @@
 
 - libcerebro - local vs. installed header inclusion???
   - basically concerns use of "cerebro_defs.h" in protocol header files
-
-- hostname -> nodename

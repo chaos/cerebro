@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_hostsfile.c,v 1.17 2005-03-30 05:41:45 achu Exp $
+ *  $Id: cerebrod_clusterlist_hostsfile.c,v 1.18 2005-03-30 18:46:58 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -233,9 +233,9 @@ hostsfile_clusterlist_init(void)
         cerebrod_err_exit("hostsfile clusterlist parse error: "
 			  "host contains whitespace");
 
-      if (strlen(hostPtr) > CEREBRO_MAXHOSTNAMELEN)
+      if (strlen(hostPtr) > CEREBRO_MAXNODENAMELEN)
         cerebrod_err_exit("hostsfile clusterlist parse error: "
-			  "hostname '%s' exceeds maximum length", 
+			  "nodename '%s' exceeds maximum length", 
 			  hostPtr);
       
       str = Strdup(hostPtr);

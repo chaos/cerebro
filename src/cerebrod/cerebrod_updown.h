@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.h,v 1.6 2005-03-29 21:30:29 achu Exp $
+ *  $Id: cerebrod_updown.h,v 1.7 2005-03-30 18:46:58 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_UPDOWN_H
@@ -17,7 +17,7 @@
  */
 struct cerebrod_updown_node_data
 {
-  char *node;
+  char *nodename;
   int discovered;
   u_int32_t last_received;
   pthread_mutex_t updown_node_data_lock;

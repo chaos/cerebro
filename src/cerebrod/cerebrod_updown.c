@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.c,v 1.23 2005-03-30 18:40:12 achu Exp $
+ *  $Id: cerebrod_updown.c,v 1.24 2005-03-30 18:46:58 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -150,8 +150,8 @@ _updown_node_data_strcmp(void *x, void *y)
 {
   assert(x && y);
 
-  return strcmp(((struct cerebrod_updown_node_data *)x)->node,
-                ((struct cerebrod_updown_node_data *)y)->node);
+  return strcmp(((struct cerebrod_updown_node_data *)x)->nodename,
+                ((struct cerebrod_updown_node_data *)y)->nodename);
 }
 
 /*
@@ -216,7 +216,7 @@ _cerebrod_updown_initialize(void)
 
           ud = Malloc(sizeof(struct cerebrod_updown_node_data));
 
-          ud->node = Strdup(nodes[i]);
+          ud->nodename = Strdup(nodes[i]);
           ud->discovered = 0;
           ud->last_received = 0;
           Pthread_mutex_init(&(ud->updown_node_data_lock), NULL);
@@ -287,8 +287,8 @@ _cerebrod_updown_response_marshall(struct cerebro_updown_response *res,
     }
   c += ret;
 
-  if ((ret = cerebro_marshall_buffer(res->hostname,
-                                     sizeof(res->hostname),
+  if ((ret = cerebro_marshall_buffer(res->nodename,
+                                     sizeof(res->nodename),
                                      buffer + c,
                                      bufferlen - c)) < 0)
     cerebrod_err_exit("%s(%s:%d): cerebro_marshall_buffer: %s",
@@ -625,13 +625,13 @@ _cerebrod_updown_evaluate_updown_state(void *x, void *arg)
   res->updown_err_code = CEREBRO_UPDOWN_ERR_CODE_SUCCESS;
   res->end_of_responses = CEREBRO_UPDOWN_IS_NOT_LAST_RESPONSE;
 #ifndef NDEBUG
-  if (ud->node && strlen(ud->node) > CEREBRO_MAXHOSTNAMELEN)
+  if (ud->nodename && strlen(ud->nodename) > CEREBRO_MAXNODENAMELEN)
     cerebrod_err_debug("%s(%s:%d): invalid node name length: %s", 
 		       __FILE__, __FUNCTION__, __LINE__,
-		       ud->node);
+		       ud->nodename);
 #endif /* NDEBUG */
   /* strncpy, b/c terminating character not required */
-  strncpy(res->hostname, ud->node, CEREBRO_MAXHOSTNAMELEN);
+  strncpy(res->nodename, ud->nodename, CEREBRO_MAXNODENAMELEN);
   res->updown_state = updown_state;
 
   if (!list_append(ed->node_responses, res))
@@ -916,7 +916,7 @@ _cerebrod_updown_output_insert(struct cerebrod_updown_node_data *ud)
     {
       Pthread_mutex_lock(&debug_output_mutex);
       fprintf(stderr, "**************************************\n");
-      fprintf(stderr, "* Updown Server Insertion: Node=%s\n", ud->node);
+      fprintf(stderr, "* Updown Server Insertion: Node=%s\n", ud->nodename);
       fprintf(stderr, "**************************************\n");
       Pthread_mutex_unlock(&debug_output_mutex);
     }
@@ -944,7 +944,7 @@ _cerebrod_updown_output_update(struct cerebrod_updown_node_data *ud)
  
       Pthread_mutex_lock(&debug_output_mutex);
       fprintf(stderr, "**************************************\n");
-      fprintf(stderr, "* Updown Server Update: Node=%s Last_Received=%s\n", ud->node, strbuf);
+      fprintf(stderr, "* Updown Server Update: Node=%s Last_Received=%s\n", ud->nodename, strbuf);
       fprintf(stderr, "**************************************\n");
       Pthread_mutex_unlock(&debug_output_mutex);
     }
@@ -968,7 +968,7 @@ _cerebrod_updown_dump_updown_node_data_item(void *x, void *arg)
  
   Pthread_mutex_lock(&(ud->updown_node_data_lock));
   fprintf(stderr, "* %s: discovered=%d last_received=%u\n",
-          ud->node, ud->discovered, ud->last_received);
+          ud->nodename, ud->discovered, ud->last_received);
   Pthread_mutex_unlock(&(ud->updown_node_data_lock));
  
   return 1;
@@ -1037,7 +1037,7 @@ cerebrod_updown_update_data(char *node, u_int32_t last_received)
 
       key = Strdup(node);
 
-      ud->node = Strdup(node);
+      ud->nodename = Strdup(node);
       Pthread_mutex_init(&(ud->updown_node_data_lock), NULL);
 
       /* Re-hash if our hash is getting too small */

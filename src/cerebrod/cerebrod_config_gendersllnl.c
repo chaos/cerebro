@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config_gendersllnl.c,v 1.8 2005-03-30 05:41:45 achu Exp $
+ *  $Id: cerebrod_config_gendersllnl.c,v 1.9 2005-03-30 18:46:58 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -49,7 +49,7 @@ int
 gendersllnl_config_load_default(struct cerebrod_module_config *conf)
 {
   genders_t handle = NULL;
-  char altnamebuf[CEREBRO_MAXHOSTNAMELEN+1];
+  char altnamebuf[CEREBRO_MAXNODENAMELEN+1];
   int ret;
 
   assert(conf);
@@ -81,12 +81,12 @@ gendersllnl_config_load_default(struct cerebrod_module_config *conf)
       conf->updown_server = 0;
     }
 
-  memset(altnamebuf, '\0', CEREBRO_MAXHOSTNAMELEN+1);
+  memset(altnamebuf, '\0', CEREBRO_MAXNODENAMELEN+1);
   if ((ret = genders_testattr(handle, 
                               NULL, 
                               GENDERS_ALTNAME_ATTRIBUTE,
                               altnamebuf,
-                              CEREBRO_MAXHOSTNAMELEN)) < 0)
+                              CEREBRO_MAXNODENAMELEN)) < 0)
     cerebrod_err_exit("%s(%s:%d): genders_testattr: %s",
 		      __FILE__, __FUNCTION__, __LINE__,
 		      genders_errormsg(handle));
