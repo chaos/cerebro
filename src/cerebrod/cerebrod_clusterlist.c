@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist.c,v 1.11 2005-03-20 19:35:49 achu Exp $
+ *  $Id: cerebrod_clusterlist.c,v 1.12 2005-03-20 21:50:40 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -23,6 +23,14 @@
 #include "error.h"
 #include "wrappers.h"
 
+extern struct cerebrod_config conf;
+
+/*
+ * cluster_modules
+ * cluster_modules_len
+ *
+ * clusterlist modules to search for by default
+ */
 char *clusterlist_modules[] = {
   "cerebrod_clusterlist_gendersllnl.la",
   "cerebrod_clusterlist_genders.la",
@@ -32,11 +40,32 @@ char *clusterlist_modules[] = {
 };
 int clusterlist_modules_len = 4;
 
-extern struct cerebrod_config conf;
+/* 
+ * clusterlist_module_info
+ * clusterlist_module_ops
+ *
+ * clusterlist module info and operations pointers
+ */
 static struct cerebrod_clusterlist_module_info *clusterlist_module_info = NULL;
 static struct cerebrod_clusterlist_module_ops *clusterlist_module_ops = NULL;
+
+/* 
+ * clusterlist_module_dl_handle
+ *
+ * clusterlist module dynamically loaded module handle
+ */
 static lt_dlhandle clusterlist_module_dl_handle = NULL;
 
+
+/*
+ * _clusterlist_load_module
+ *
+ * load a clusterlist module and all appropriate symbols
+ *
+ * - module_path - full path to clusterlist module to load
+ *
+ * Returns 1 on loading success, 0 on loading failure, -1 on fatal error
+ */
 static int
 _clusterlist_load_module(char *module_path)
 {

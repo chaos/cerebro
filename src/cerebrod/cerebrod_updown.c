@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.c,v 1.14 2005-03-20 21:28:25 achu Exp $
+ *  $Id: cerebrod_updown.c,v 1.15 2005-03-20 21:50:40 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -298,6 +298,7 @@ cerebrod_updown(void *arg)
       if (client_fd < 0)
 	continue;
 
+      /* Pass off connection to thread */
       Pthread_attr_init(&attr);
       Pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
       arg = Malloc(sizeof(int));
