@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_util.c,v 1.1 2005-03-16 15:55:28 achu Exp $
+ *  $Id: cerebrod_util.c,v 1.2 2005-03-18 23:27:05 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -14,6 +14,8 @@
 #include <netinet/in.h>
 #include <assert.h>
 #include <errno.h>
+
+#include <sys/param.h>
 
 #include "cerebrod_util.h"
 #include "cerebrod.h"
@@ -84,4 +86,56 @@ cerebrod_rehash(hash_t *old_hash,
   Hash_destroy(*old_hash);
 
   *old_hash = new_hash;
+}
+
+int
+cerebrod_search_dir_for_module(char *search_dir,
+                               char **modules_list,
+                               Cerebrod_load_module load_module)
+{
+  DIR *dir;
+  int i = 0, found = 0;
+
+  assert(search_dir);
+  assert(modules_list);
+  assert(load_module);
+
+  if (!(dir = opendir(search_dir)))
+    return 0;
+
+  while (modules_list[i] != NULL)
+    {
+      struct dirent *dirent;
+
+      while ((dirent = readdir(dir)))
+        {
+          if (!strcmp(dirent->d_name, modules_list[i]))
+            {
+              char filebuf[MAXPATHLEN+1];
+              int ret;
+
+              memset(filebuf, '\0', MAXPATHLEN+1);
+              snprintf(filebuf, MAXPATHLEN, "%s/%s",
+                       search_dir, modules_list[i]);
+
+              if ((ret = load_module(filebuf)) < 0)
+                err_exit("cerebrod_search_dir_for_module: load_module: %s",
+                         strerror(errno));
+
+              if (ret)
+                {
+                  found++;
+                  goto done;
+                }
+            }
+        }
+
+      rewinddir(dir);
+      i++;
+    }
+
+ done:
+  Closedir(dir);
+
+  return (found) ? 1 : 0;
 }

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.38 2005-03-18 21:35:51 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.39 2005-03-18 23:27:05 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -29,6 +29,7 @@
 
 #include "cerebrod_config.h"
 #include "cerebrod_clusterlist.h"
+#include "cerebrod_util.h"
 #include "conffile.h"
 #include "error.h"
 #include "wrappers.h"
@@ -153,8 +154,34 @@ _cerebrod_cmdline_parse(int argc, char **argv)
     }
 }
 
+static void
+_cerebrod_cmdline_parse_check(void)
+{
+  if (conf.configfile)
+    {
+      /* The default configfile is allowed to be missing, so don't
+       * bother checking for it 
+       */
+      if (strcmp(conf.configfile, CEREBROD_CONFIGFILE_DEFAULT) != 0)
+        {
+          struct stat buf;
+  
+          if (stat(conf.configfile, &buf) < 0)
+            err_exit("config file '%s' not found", conf.configfile);
+        }
+    }
+
+  if (conf.configmodule)
+    {
+      struct stat buf;
+  
+      if (stat(conf.configmodule, &buf) < 0)
+        err_exit("config module '%s' not found", conf.configmodule);
+    }
+}
+
 static int
-_load_module(char *module_path)
+_config_load_module(char *module_path)
 {
   lt_dlhandle config_module_dl_handle = NULL;
   struct cerebrod_config_module_info *config_module_info = NULL;
@@ -185,58 +212,8 @@ _load_module(char *module_path)
              config_module_info->config_module_name, strerror(errno));
 
   Lt_dlclose(config_module_dl_handle);
-}
 
-static int
-_search_dir(char *search_dir)
-{
-  DIR *dir;
-  int i = 0, found = 0;
-
-  assert(search_dir);
-
-  if (!(dir = opendir(search_dir)))
-    return 0;
-
-  while (config_modules[i] != NULL)
-    {
-      struct dirent *dirent;
-
-      while ((dirent = readdir(dir)))
-	{
-	  if (!strcmp(dirent->d_name, config_modules[i]))
-	    {
-              char filebuf[MAXPATHLEN+1];
-
-              memset(filebuf, '\0', MAXPATHLEN+1);
-              snprintf(filebuf, MAXPATHLEN, "%s/%s",
-                       search_dir, config_modules[i]);
-
-	      if (_load_module(filebuf))
-		{
-		  found++;
-		  goto found_dir;
-		}
-	    }
-	}
-      
-      rewinddir(dir);
-      i++;
-    }
- found_dir:
-  Closedir(dir);
-  
-  return (found) ? 1 : 0;
-}
-
-static void
-_find_config_module(void)
-{
-  if (_search_dir(CEREBROD_MODULE_DIR))
-    return;
-
-  if (_search_dir("."))
-    return;
+  return 1;
 }
 
 static void
@@ -246,16 +223,24 @@ _cerebrod_config_module_setup(void)
 
   if (conf.configmodule) 
     {
-      struct stat buf;
-
-      if (stat(conf.configmodule, &buf) < 0)
-        err_exit("config module '%s' not found", conf.configmodule);
-
-      _load_module(conf.configmodule);
+      if (_config_load_module(conf.configmodule) != 1)
+        err_exit("config module '%s' could not be loaded",
+                 conf.configmodule);
     }
   else
-    _find_config_module();
+    {
+      if (cerebrod_search_dir_for_module(CEREBROD_MODULE_DIR,
+                                         config_modules,
+                                         _config_load_module))
+        goto done;
 
+      if (cerebrod_search_dir_for_module(".",
+                                         config_modules,
+                                         _config_load_module))
+        goto done;
+    }
+
+ done:
   Lt_dlexit();
 }
 
@@ -1007,6 +992,7 @@ cerebrod_config(int argc, char **argv)
 
   _cerebrod_config_default();
   _cerebrod_cmdline_parse(argc, argv);
+  _cerebrod_cmdline_parse_check();
   _cerebrod_config_module_setup();
   _cerebrod_config_parse();
   _cerebrod_pre_calculate_configuration_config_check();

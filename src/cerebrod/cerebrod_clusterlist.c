@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist.c,v 1.8 2005-03-18 01:36:30 achu Exp $
+ *  $Id: cerebrod_clusterlist.c,v 1.9 2005-03-18 23:27:05 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -19,14 +19,15 @@
 #include "cerebrod.h"
 #include "cerebrod_clusterlist.h"
 #include "cerebrod_config.h"
+#include "cerebrod_util.h"
 #include "error.h"
 #include "wrappers.h"
 
 char *clusterlist_modules[] = {
   "cerebrod_clusterlist_gendersllnl.la",
   "cerebrod_clusterlist_genders.la",
-  "cerebrod_clusterlist_hostfile.la",
   "cerebrod_clusterlist_none.la",
+  "cerebrod_clusterlist_hostfile.la",
   NULL
 };
 
@@ -35,8 +36,8 @@ static struct cerebrod_clusterlist_module_info *clusterlist_module_info = NULL;
 static struct cerebrod_clusterlist_module_ops *clusterlist_module_ops = NULL;
 static lt_dlhandle clusterlist_module_dl_handle = NULL;
 
-static void
-_load_module(char *module_path)
+static int
+_clusterlist_load_module(char *module_path)
 {
   assert(module_path);
 
@@ -57,64 +58,11 @@ _load_module(char *module_path)
       fprintf(stderr, "**************************************\n");
     }
 #endif /* NDEBUG */
+
+  return 1;
 }
 
-static int
-_search_dir(char *search_dir)
-{
-  DIR *dir;
-  int i = 0;
-
-  assert(!clusterlist_module_dl_handle);
-  assert(search_dir);
-
-  if (!(dir = opendir(search_dir)))
-    return 0;
-
-  while (clusterlist_modules[i] != NULL)
-    {
-      struct dirent *dirent;
-
-      while ((dirent = readdir(dir)))
-	{
-	  if (!strcmp(dirent->d_name, clusterlist_modules[i]))
-	    {
-              char filebuf[MAXPATHLEN+1];
-
-              memset(filebuf, '\0', MAXPATHLEN+1);
-              snprintf(filebuf, MAXPATHLEN, "%s/%s",
-                       search_dir, clusterlist_modules[i]);
-
-	      _load_module(filebuf);
-	      goto found_dir;
-	    }
-	}
-      
-      rewinddir(dir);
-      i++;
-    }
- found_dir:
-  Closedir(dir);
-  
-  return (clusterlist_module_dl_handle) ? 1 : 0;
-}
-
-static void
-_find_clusterlist_module(void)
-{
-  assert(!clusterlist_module_dl_handle);
-
-  if (_search_dir(CEREBROD_MODULE_DIR))
-    return;
-
-  if (_search_dir("."))
-    return;
-
-  if (!clusterlist_module_dl_handle)
-    err_exit("no valid cluster list modules found");
-}
-
-int 
+int
 cerebrod_clusterlist_setup(void)
 {
   assert(!clusterlist_module_dl_handle);
@@ -122,9 +70,29 @@ cerebrod_clusterlist_setup(void)
   Lt_dlinit();
 
   if (conf.clusterlist_module_file)
-    _load_module(conf.clusterlist_module);
+    {
+      if (_clusterlist_load_module(conf.clusterlist_module) != 1)
+        err_exit("clusterlist module '%s' could not be loaded", 
+                 conf.clusterlist_module_file);
+    }
   else
-    _find_clusterlist_module();
+    {
+      if (cerebrod_search_dir_for_module(CEREBROD_MODULE_DIR,
+                                         clusterlist_modules,
+                                         _clusterlist_load_module))
+        goto done;
+
+      if (cerebrod_search_dir_for_module(".",
+                                         clusterlist_modules,
+                                         _clusterlist_load_module))
+        goto done;
+
+      if (!clusterlist_module_dl_handle)
+        err_exit("no valid cluster list modules found");
+    }
+
+ done:
+  return 0;
 }
 
 int 
@@ -137,6 +105,8 @@ cerebrod_clusterlist_cleanup(void)
   clusterlist_module_ops = NULL;
 
   Lt_dlexit();
+
+  return 0;
 }
 
 int 

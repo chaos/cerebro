@@ -24,7 +24,37 @@
 	Move option parsing from
 	_cerebrod_post_calculate_configuration_config_ to
 	_cerebrod_post_config_initialization.
-	
+
+	* src/cerebrod/cerebrod_config.c (_cerebrod_config_dump): Fix
+	clusterlist_module_options output.
+
+	* src/cerebrod/cerebrod_config.c (_cerebrod_cmdline_parse_check):
+	New function.
+
+	* src/cerebrod/cerebrod_config.c (cerebrod_config): Call
+	_cerebrod_cmdline_parse_check.
+
+	* src/cerebrod/cerebrod_util.h, src/cerebrod/cerebrod_util.c
+	(cerebrod_search_dir_for_module): New function.
+
+	* src/cerebrod/cerebrod_config.c (_find_config_module),
+	src/cerebrod/cerebrod_clusterlist.c (_find_clusterlist_module):
+	Removed functions.
+
+	* src/cerebrod/cerebrod_config.c (_load_module),
+	src/cerebrod/cerebrod_clusterlist.c (_load_module): Return 1 on
+	sucess.
+
+	* src/cerebrod/cerebrod_config.c (_cerebrod_config_module_setup),
+	src/cerebrod/cerebrod_clusterlist.c (cerebrod_clusterlist_setup):
+	Use new cerebrod_search_dir_for_module.
+
+	* src/cerebrod/cerebrod_config.c (_load_module): Globally rename
+	to _config_load_module.
+
+	* src/cerebrod/cerebrod_clusterlist.c (_load_module): Globally
+	rename to _clusterlist_load_module.
+
 2005-03-17  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerebrod/cerebrod_clusterlist_genders.c

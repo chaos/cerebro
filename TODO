@@ -12,9 +12,9 @@
 - more debugging in wrappers
 - timeout option?? - for mem-leak debuggin
 
+- build clusterlist none in cerebrod binary?
+
 - test
    - fd leaking
    - mem-leaking
 
-- auto configuration with genders, so dist files
-and configuration files can be skipped.
