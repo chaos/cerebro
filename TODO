@@ -8,5 +8,3 @@
 - remove hash/list buffering in list.c hash.c?
 - if speak_to_ip is non-multicast check if listener has 
   the speak_to_ip.
-- single heartbeat_network_interface configuration option?
-  - makes sense, probably should
