@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.2 2004-07-06 17:06:25 achu Exp $
+## $Id: configure.ac,v 1.3 2004-07-12 15:15:02 achu Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -45,6 +45,8 @@ AC_CHECK_HEADERS( \
 AC_C_BIGENDIAN
 AC_C_CONST
 AC_TYPE_UID_T
+AC_STRUCT_SA_LEN
+AC_IPV6
 
 ##
 # Checks for library functions.

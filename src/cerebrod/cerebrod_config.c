@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.2 2004-07-06 17:06:26 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.3 2004-07-12 15:15:02 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -30,7 +30,7 @@ cerebrod_config_default(void)
   conf.heartbeat_freq_min = CEREBROD_HEARTBEAT_FREQ_MIN_DEFAULT;
   conf.heartbeat_freq_max = CEREBROD_HEARTBEAT_FREQ_MAX_DEFAULT;
   conf.listen = CEREBROD_LISTEN_DEFAULT;
-  conf.listen = CEREBROD_SPEAK_DEFAULT;
+  conf.speak = CEREBROD_SPEAK_DEFAULT;
   conf.network_interface = NULL;
   conf.mcast_ip = CEREBROD_MCAST_IP_DEFAULT;
   conf.mcast_port = CEREBROD_MCAST_PORT_DEFAULT;
@@ -189,6 +189,56 @@ cerebrod_config_parse(void)
   conffile_handle_destroy(cf);
 }
 
+static int
+_interface_valid(int fd, char *interface_name)
+{
+  struct ifreq ifr;
+
+  assert(fd >= 0 && interface_name != NULL);
+
+  Strncpy(ifr.ifr_name, interface_name, IFNAMSIZ);
+  if (ioctl(fd, SIOCGIFFLAGS, &ifr) < 0) 
+      err_exit("ioctl: %s", strerror(errno));
+
+  if ((ifr.ifr_flags & IFF_UP)
+      && (ifr.ifr_flags & IFF_MULTICAST))
+    return 1;
+  else
+    return 0;
+}
+
+/* _get_ifr_len: From Unix Network Programming by R. Stevens */
+static int
+_get_ifr_len(struct ifreq *ifr)
+{
+  int len;
+
+#if HAVE_SA_LEN
+  if (sizeof(struct sockaddr) > ifr->ifr_addr.sa_len)
+    len = sizeof(struct sockaddr);
+  else
+    len = ifr->ifr_addr.sa_len;
+#else /* !HAVE_SA_LEN */
+  /* For now we only assume AF_INET and AF_INET6 */
+  switch(ifr->ifr_addr.sa_family) {
+#ifdef HAVE_IPV6
+  case AF_INET6:
+    len = sizeof(struct sockaddr_in6);
+    break;
+#endif /* HAVE_IPV6 */
+  case AF_INET:
+  default:
+    len = sizeof(struct sockaddr_in);
+    break;
+  }
+
+  if (len < (sizeof(struct ifreq) - IFNAMSIZ))
+    len = sizeof(struct ifreq) - IFNAMSIZ;
+#endif /* HAVE_SA_LEN */
+
+  return len;
+}
+
 void
 cerebrod_calculate_configuration(void)
 {
@@ -198,7 +248,7 @@ cerebrod_calculate_configuration(void)
 
   if (!conf.network_interface)
     {
-      /* Case A: No interface specified */
+      /* Case A: No interface specified, find any multicast interface */
     }
   else if (strchr(conf.network_interface, '.'))
     {
@@ -207,6 +257,31 @@ cerebrod_calculate_configuration(void)
   else
     {
       /* Case C: Interface name specified */
+      struct ifreq ifr;
+      int fd;
+
+      fd = Socket(AF_INET, SOCK_DGRAM, 0);
+      Strncpy(ifr.ifr_name, conf.network_interface, IFNAMSIZ);
+
+      if (ioctl(fd, SIOCGIFFLAGS, &ifr) < 0) 
+	{
+	  if (errno == ENODEV)
+	    err_exit("network interface '%s' not found",
+		     conf.network_interface);
+	  else
+	    err_exit("ioctl: %s", strerror(errno));
+	}
+
+      if (!(ifr.ifr_flags & IFF_UP))
+	  err_exit("network interface '%s' not up",
+		   conf.network_interface);
+      
+      if (!(ifr.ifr_flags & IFF_MULTICAST))
+	  err_exit("network interface '%s' not a multicast interface",
+		   conf.network_interface);
+
+      conf.multicast_interface = Strdup(conf.network_interface);
+
+      Close(fd);
     }
-  
 }
