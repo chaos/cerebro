@@ -24,6 +24,13 @@
 	src/libcerebro/cerebro_updown_protocol.h: New files.
 	
 	* src/cerebrod/: Re-work for new header files and variable renaming.
+
+	* src/libcerebro/cerebro_marshalling.h,
+	src/libcerebro/cerebro_marshalling.c: New files.
+
+	* src/cerebrod/cerebrod_heartbeat.c: Re-worked for use of new library functions.
+
+	* src/cerebrod/Makefile.am: Updated for new library.
 	
 2005-03-23  Albert Chu  <chu11@llnl.gov>
 
