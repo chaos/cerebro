@@ -15,3 +15,6 @@
 - test
    - fd leaking
    - mem-leaking
+
+- auto configuration with genders, so dist files
+and configuration files can be skipped.
