@@ -1,7 +1,7 @@
 2005-01-05  Albert Chu  <chu11@llnl.gov>
 
-	* cerebro.spec.in: Fix to get initial rpm build to work.
-	
+	* cerebro.spec.in, Makefile.am: Fix to get initial rpm build to work.
+
 2005-01-02  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerebrod/cerebrod.h, src/cerebrod/cerebrod_speaker.h,

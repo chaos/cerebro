@@ -2,15 +2,16 @@ Name:    @PROJECT@
 Version: @VERSION@
 Release: @RELEASE@
 Summary: Cerebro is a collection of tools for dynamically monitoring a cluster of nodes.
-Copyright: none
 Group: System Environment/Base
-BuildRoot: %{_tmppath}/%{name}-%{version}
+License: GPL
+Source: %{name}-%{version}-%{release}.tgz
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}
 
 %description
 Cerebro is a collection of tools for dynamically monitoring a cluster of nodes.
 
 %prep
-%setup  -q -n %{name}-%{version}
+%setup  -q -n %{name}-%{version}-%{release}
 
 %build
 ./autogen.sh
