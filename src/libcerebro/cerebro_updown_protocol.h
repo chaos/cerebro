@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_updown_protocol.h,v 1.7 2005-03-29 21:30:29 achu Exp $
+ *  $Id: cerebro_updown_protocol.h,v 1.8 2005-03-29 23:28:45 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_UPDOWN_PROTOCOL_H
@@ -39,12 +39,13 @@
 #define CEREBRO_UPDOWN_ERR_CODE_NO_NODES_FOUND         4
 #define CEREBRO_UPDOWN_ERR_CODE_INTERNAL_SYSTEM_ERROR  5
 
-#define CEREBRO_UPDOWN_STATE_NODE_UP                   0
-#define CEREBRO_UPDOWN_STATE_NODE_DOWN                 1
+#define CEREBRO_UPDOWN_STATE_NODE_UP                   1
+#define CEREBRO_UPDOWN_STATE_NODE_DOWN                 0
 
 #define CEREBRO_UPDOWN_IS_LAST_RESPONSE                1
 #define CEREBRO_UPDOWN_IS_NOT_LAST_RESPONSE            0
 
+#define CEREBRO_UPDOWN_SERVER_PORT                     8852
 /*
  * struct cerebro_updown_request
  *

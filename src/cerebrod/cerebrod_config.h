@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.h,v 1.33 2005-03-25 18:34:11 achu Exp $
+ *  $Id: cerebrod_config.h,v 1.34 2005-03-29 23:28:45 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_CONFIG_H
@@ -10,6 +10,8 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <netinet/in.h>
+
+#include "cerebro_updown_protocol.h"
 
 /*
  * Cerebrod default configuration values
@@ -28,7 +30,7 @@
 #define CEREBROD_LISTEN_DEFAULT                       1
 #define CEREBROD_LISTEN_THREADS_DEFAULT               2
 #define CEREBROD_UPDOWN_SERVER_DEFAULT                1
-#define CEREBROD_UPDOWN_SERVER_PORT_DEFAULT           8852
+#define CEREBROD_UPDOWN_SERVER_PORT_DEFAULT           CEREBRO_UPDOWN_SERVER_PORT
 #define CEREBROD_CLUSTERLIST_MODULE_DEFAULT           NULL
 #define CEREBROD_CLUSTERLIST_MODULE_OPTIONS_DEFAULT   NULL
 #define CEREBROD_SPEAK_DEBUG_DEFAULT                  0
