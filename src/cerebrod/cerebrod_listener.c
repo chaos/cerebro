@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.29 2005-03-17 22:59:27 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.30 2005-03-17 23:10:51 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -230,7 +230,8 @@ cerebrod_listener(void *arg)
       struct cerebrod_heartbeat hb;
       struct cerebrod_node_data *nd;
       char hbbuf[CEREBROD_PACKET_BUFLEN];
-      char hostname_key[CEREBROD_MAXHOSTNAMELEN];
+      char hostname_buf[CEREBROD_MAXHOSTNAMELEN+1];
+      char hostname_key[CEREBROD_MAXHOSTNAMELEN+1];
       int rv, hblen, cluster_data_updated_flag = 0;
 
       Pthread_mutex_lock(&listener_fd_lock);
@@ -297,9 +298,14 @@ cerebrod_listener(void *arg)
           continue;
         }
       
-      if (cerebrod_clusterlist_get_nodename(hb.hostname, 
+      /* Guarantee truncation */
+      memset(hostname_buf, '\0', CEREBROD_MAXHOSTNAMELEN+1);
+      memcpy(hostname_buf, hb.hostname, CEREBROD_MAXHOSTNAMELEN);
+
+      memset(hostname_key, '\0', CEREBROD_MAXHOSTNAMELEN+1);
+      if (cerebrod_clusterlist_get_nodename(hostname_buf,, 
                                             hostname_key, 
-                                            CEREBROD_MAXHOSTNAMELEN) < 0)
+                                            CEREBROD_MAXHOSTNAMELEN+1) < 0)
         {
           err_output("cerebrod_listener: cerebrod_clusterlist_get_nodename "
                      "error: %s", hb.hostname);

@@ -76,14 +76,17 @@
 	common functions in
 	src/cerebrod/cerebrod_clusterlist_genders_util.c.
 
-	* src/libcommon/wrappers.c (wrap_gethostname): Guarantee
-	truncation.
-
 	* src/cerebrod/cerebrod_cache.c (_cerebrod_cache_hostname): No
 	truncation needed anymore.
 
 	* src/cerebrod: Globally change MAXHOSTNAMELEN to
 	CEREBROD_MAXHOSTNAMELEN.  Don't depend on sys/param.h.
+
+	* src/cerebrod/cerebrod_cache.c (_cerebrod_cache_hostname,
+	cerebrod_get_hostname), src/cerebrod/cerebrod_listener.c
+	(cerebrod_listener): Re-work so hostname could be
+	CEREBROD_MAXHOSTNAMELEN in length exactly.  Null termination not
+	required in the packet itself.
 		
 2005-03-16  Albert Chu  <chu11@llnl.gov>
 
