@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.10 2004-10-07 18:49:10 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.11 2004-11-03 01:13:36 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -217,7 +217,7 @@ _get_if_conf(void **buf, struct ifconf *ifc, int fd)
         err_exit("_get_if_conf: ioctl: %s", strerror(errno));
 
       if (ifc->ifc_len == lastlen)
-	break;
+        break;
 
       lastlen = ifc->ifc_len;
       len += 10 * sizeof(struct ifreq);
@@ -280,30 +280,30 @@ cerebrod_calculate_configuration(void)
 
       /* Check all interfaces */
       for (ptr = buf; ptr < buf + ifc.ifc_len; ) 
-	{
+        {
           struct ifreq ifr_tmp;
           int len;
 
-	  ifr = (struct ifreq *)ptr;
+          ifr = (struct ifreq *)ptr;
 
-	  len = _get_ifr_len(ifr);
+          len = _get_ifr_len(ifr);
 
-	  ptr += sizeof(ifr->ifr_name) + len;
-	  
+          ptr += sizeof(ifr->ifr_name) + len;
+          
           /* Null termination not required, don't use wrapper */
           strncpy(ifr_tmp.ifr_name, ifr->ifr_name, IFNAMSIZ);
 
-	  if(ioctl(fd, SIOCGIFFLAGS, &ifr_tmp) < 0)
-	    err_exit("cerebrod_calculate_configuration: ioctl: %s",
+          if(ioctl(fd, SIOCGIFFLAGS, &ifr_tmp) < 0)
+            err_exit("cerebrod_calculate_configuration: ioctl: %s",
                      strerror(errno));
 
-	  if (!(ifr_tmp.ifr_flags & IFF_UP)
-	      || !(ifr_tmp.ifr_flags & IFF_MULTICAST))
-	    continue;
+          if (!(ifr_tmp.ifr_flags & IFF_UP)
+              || !(ifr_tmp.ifr_flags & IFF_MULTICAST))
+            continue;
 
-	  conf.multicast_interface = Strdup(ifr->ifr_name);
-	  break;
-	}
+          conf.multicast_interface = Strdup(ifr->ifr_name);
+          break;
+        }
 
       Free(buf);
       Close(fd);
@@ -362,12 +362,12 @@ cerebrod_calculate_configuration(void)
           struct sockaddr_in *sinptr;
           int len;
 
-	  ifr = (struct ifreq *)ptr;
+          ifr = (struct ifreq *)ptr;
 
-	  len = _get_ifr_len(ifr);
+          len = _get_ifr_len(ifr);
 
-	  ptr += sizeof(ifr->ifr_name) + len;
-	  
+          ptr += sizeof(ifr->ifr_name) + len;
+          
           sinptr = (struct sockaddr_in *)&ifr->ifr_addr;
           
           current_ip = htonl((sinptr->sin_addr).s_addr) >> (32 - mask);
@@ -379,16 +379,16 @@ cerebrod_calculate_configuration(void)
             err_exit("cerebrod_calculate_configuration: ioctl: %s",
                      strerror(errno));
           
-	  if (!(ifr_tmp.ifr_flags & IFF_UP)
-	      || !(ifr_tmp.ifr_flags & IFF_MULTICAST))
-	    continue;
+          if (!(ifr_tmp.ifr_flags & IFF_UP)
+              || !(ifr_tmp.ifr_flags & IFF_MULTICAST))
+            continue;
           
           if (net == current_ip)
             {
               conf.multicast_interface = Strdup(ifr->ifr_name);
               break;
             }
-	}
+        }
       
       if (conf.multicast_interface == NULL)
         err_exit("network interface '%s' up and with multicast "
@@ -409,22 +409,22 @@ cerebrod_calculate_configuration(void)
       Strncpy(ifr.ifr_name, conf.network_interface, IFNAMSIZ);
 
       if (ioctl(fd, SIOCGIFFLAGS, &ifr) < 0) 
-	{
-	  if (errno == ENODEV)
-	    err_exit("network interface '%s' not found",
-		     conf.network_interface);
-	  else
-	    err_exit("cerebrod_calculate_configuration: ioctl: %s",
+        {
+          if (errno == ENODEV)
+            err_exit("network interface '%s' not found",
+                     conf.network_interface);
+          else
+            err_exit("cerebrod_calculate_configuration: ioctl: %s",
                      strerror(errno));
-	}
+        }
 
       if (!(ifr.ifr_flags & IFF_UP))
-	  err_exit("network interface '%s' not up",
-		   conf.network_interface);
+          err_exit("network interface '%s' not up",
+                   conf.network_interface);
       
       if (!(ifr.ifr_flags & IFF_MULTICAST))
-	  err_exit("network interface '%s' not a multicast interface",
-		   conf.network_interface);
+          err_exit("network interface '%s' not a multicast interface",
+                   conf.network_interface);
       
       conf.multicast_interface = Strdup(conf.network_interface);
 
