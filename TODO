@@ -7,4 +7,5 @@
 - Non-pthreads support?
 - remove hash/list buffering in list.c hash.c?
 - daemon init.d script
-- test rehashing through hack tests
+
+- static modules support

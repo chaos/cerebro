@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.25 2005-02-15 01:22:31 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.26 2005-03-14 17:05:14 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -24,6 +24,8 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+
+#include <sys/param.h>
 
 #include "cerebrod_config.h"
 #include "conffile.h"
@@ -54,6 +56,8 @@ _cerebrod_config_default(void)
   conf.speak = CEREBROD_SPEAK_DEFAULT;
   conf.listen = CEREBROD_LISTEN_DEFAULT;
   conf.listen_threads = CEREBROD_LISTEN_THREADS_DEFAULT;
+  conf.clusterlist_module = CEREBROD_CLUSTERLIST_MODULE_DEFAULT;
+  conf.clusterlist_module_cmdline = CEREBROD_CLUSTERLIST_MODULE_CMDLINE_DEFAULT;
 }
 
 static void
@@ -182,7 +186,7 @@ _cerebrod_config_parse(void)
 {
   int heartbeat_frequency_flag, heartbeat_source_port_flag, heartbeat_destination_port_flag, 
     heartbeat_destination_ip_flag, heartbeat_network_interface_flag, heartbeat_ttl_flag, 
-    speak_flag, listen_flag, listen_threads_flag;
+    speak_flag, listen_flag, listen_threads_flag, clusterlist_module_flag, clusterlist_module_cmdline_flag;
 
   struct conffile_option options[] =
     {
@@ -205,6 +209,11 @@ _cerebrod_config_parse(void)
        1, 0, &listen_flag, &conf.listen, 0},
       {"listen_threads", CONFFILE_OPTION_INT, -1, conffile_int,
        1, 0, &listen_threads_flag, &(conf.listen_threads), 0},
+      {"clusterlist_module", CONFFILE_OPTION_STRING, -1, _cb_stringptr,
+       1, 0, &clusterlist_module_flag, &(conf.clusterlist_module), 0},
+      {"clusterlist_module_cmdline", CONFFILE_OPTION_STRING, -1, _cb_stringptr,
+       1, 0, &clusterlist_module_cmdline_flag, 
+       &(conf.clusterlist_module_cmdline), 0},
     };
   conffile_t cf = NULL;
   int num;
@@ -265,6 +274,29 @@ _cerebrod_pre_calculate_configuration_config_check(void)
 
   if (conf.listen_threads <= 0)
     err_exit("listen threads '%d' invalid", conf.listen_threads);
+  
+  if (conf.clusterlist_module)
+    {
+      struct stat buf;
+
+      /* No wrappers, want to receive error */
+      if (conf.clusterlist_module[0] == '/')
+	{
+	  if (stat(conf.clusterlist_module, &buf) < 0)
+	    err_exit("clusterlist_module '%s' not found", 
+		     conf.clusterlist_module);
+	}
+      else
+	{
+	  char filebuf[MAXPATHLEN+1];
+	  
+	  memset(filebuf, '\0', MAXPATHLEN+1);
+	  snprintf(filebuf, MAXPATHLEN, "%s/%s", 
+		   CEREBROD_MODULE_DIR, conf.clusterlist_module);
+	  if (stat(conf.clusterlist_module, &buf) < 0)
+	    err_exit("clusterlist_module '%s' not found", filebuf);
+	}
+    }
 }
 
 static void

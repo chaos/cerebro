@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.h,v 1.10 2005-02-15 21:14:39 achu Exp $
+ *  $Id: wrappers.h,v 1.11 2005-03-14 17:05:14 achu Exp $
 \*****************************************************************************/
 
 #ifndef _WRAPPERS_H
@@ -40,9 +40,11 @@
 #endif /* _GNU_SOURCE */
 #include <pthread.h>
 #include <signal.h>
+#include <dirent.h>
 
 #include "hash.h"
 #include "list.h"
+#include "ltdl.h"
 
 /* 
  * Memory/String Wrappers 
@@ -74,15 +76,24 @@ char * wrap_strncpy(const char *file, int line, char *dest, const char *src, siz
         wrap_write(__FILE__, __LINE__, fd, buf, count) 
 #define Chdir(path) \
         wrap_chdir(__FILE__, __LINE__, path)
+#define Stat(path, buf) \
+        wrap_stat(__FILE__, __LINE__, path, buf)
 #define Umask(mask) \
         wrap_umask(__FILE__, __LINE__, mask)
+#define Opendir(name) \
+        wrap_opendir(__FILE__, __LINE__, name)
+#define Closedir(dir) \
+        wrap_closedir(__FILE__, __LINE__, dir)
 
 int wrap_open(const char *file, int line, const char *pathname, int flags, int mode);
 int wrap_close(const char *file, int line, int fd);
 ssize_t wrap_read(const char *file, int line, int fd, void *buf, size_t count);
 ssize_t wrap_write(const char *file, int line, int fd, const void *buf, size_t count);
 int wrap_chdir(const char *file, int line, const char *path);
+int wrap_stat(const char *file, int line, const char *path, struct stat *buf);
 mode_t wrap_umask(const char *file, int line, mode_t mask);
+DIR *wrap_opendir(const char *file, int line, const char *name);
+int wrap_closedir(const char *file, int line, DIR *dir);
 
 /* 
  * Networking Wrappers 
@@ -169,14 +180,38 @@ pid_t wrap_fork(const char *file, int line);
 Sighandler_t wrap_signal(const char *file, int line, int signum, Sighandler_t handler);
 int wrap_gethostname(const char *file, int line, char *name, size_t len);
 
+/*
+ * ltdl wrappers
+ */
+
+#define Lt_dlopen(filename) \
+        wrap_lt_dlopen(__FILE__, __LINE__, filename)
+#define Lt_dlsym(handle, symbol) \
+        wrap_lt_dlsym(__FILE__, __LINE__, handle, symbol)
+#define Lt_dlclose(handle) \
+        wrap_lt_dlclose(__FILE__, __LINE__, handle)
+
+lt_dlhandle wrap_lt_dlopen(const char *file, int line, const char *filename);
+lt_ptr wrap_lt_dlsym(const char *file, int line, void *handle, char *symbol);
+int wrap_lt_dlclose(const char *file, int line, void *handle);
+
 /* 
  * List lib wrappers 
  */
 #define List_create(f) \
         wrap_list_create(__FILE__, __LINE__, f)
+#define List_append(l, x) \
+        wrap_list_append(__FILE__, __LINE__, l, x);
+#define List_iterator_create(l) \
+        wrap_list_iterator_create(__FILE__, __LINE__, l)
+#define List_iterator_destroy(i) \
+        wrap_list_iterator_destroy(__FILE__, __LINE__, i)
 
 List wrap_list_create(const char *file, int line, ListDelF f);
-
+void *wrap_list_append (const char *file, int line, List l, void *x);
+void wrap_list_destroy(const char *file, int line, List l);
+ListIterator wrap_list_iterator_create(const char *file, int line, List l);
+void wrap_list_iterator_destroy(const char *file, int line, ListIterator i);
 /* 
  * Hash lib wrappers 
  */
@@ -188,6 +223,8 @@ List wrap_list_create(const char *file, int line, ListDelF f);
         wrap_hash_find(__FILE__, __LINE__, h, key)
 #define Hash_insert(h, key, data) \
         wrap_hash_insert(__FILE__, __LINE__, h, key, data)
+#define Hash_remove(h, key) \
+        wrap_hash_remove(__FILE__, __LINE__, h, key)
 #define Hash_delete_if(h, argf, arg) \
         wrap_hash_delete_if(__FILE__, __LINE__, h, argf, arg)
 #define Hash_for_each(h, argf, arg) \
@@ -199,6 +236,7 @@ hash_t wrap_hash_create (const char *file, int line, int size, hash_key_f key_f,
 int wrap_hash_count(const char *file, int line, hash_t h);
 void *wrap_hash_find(const char *file, int line, hash_t h, const void *key);
 void *wrap_hash_insert(const char *file, int line, hash_t h, const void *key, void *data);
+void *wrap_hash_remove (const char *file, int line, hash_t h, const void *key);
 int wrap_hash_delete_if(const char *file, int line, hash_t h, hash_arg_f argf, void *arg);
 int wrap_hash_for_each(const char *file, int line, hash_t h, hash_arg_f argf, void *arg);
 void wrap_hash_destroy(const char *file, int line, hash_t h)

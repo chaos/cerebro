@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.c,v 1.11 2005-02-15 21:14:39 achu Exp $
+ *  $Id: wrappers.c,v 1.12 2005-03-14 17:05:14 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -92,7 +92,12 @@ wrap_open(const char *file, int line, const char *pathname, int flags, int mode)
   assert(file != NULL);
 
   if ((fd = open(pathname, flags, mode)) < 0)
-    err_exit("open(%s:%d): %s", file, line, strerror(errno));
+    {
+      if (pathname)
+	err_exit("open(%s:%d): pathname=%s: %s", file, line, pathname, strerror(errno));
+      else
+	err_exit("open(%s:%d): %s", file, line, strerror(errno));
+    }
   return fd;
 }
 
@@ -142,7 +147,25 @@ wrap_chdir(const char *file, int line, const char *path)
   assert(file != NULL);
 
   if ((ret = chdir(path)) < 0)
-    err_exit("chdir(%s:%d): %s", file, line, strerror(errno));
+    {
+      if (path)
+	err_exit("chdir(%s:%d): path=%s: %s", file, line, path, strerror(errno));
+      else
+	err_exit("chdir(%s:%d): %s", file, line, strerror(errno));
+    }
+
+  return ret;
+}
+
+int 
+wrap_stat(const char *file, int line, const char *path, struct stat *buf)
+{
+  int ret;
+
+  assert(file != NULL);
+
+  if ((ret = stat(path, buf)) < 0)
+    err_exit("stat(%s:%d): %s", file, line, strerror(errno));
 
   return ret;
 }
@@ -154,6 +177,37 @@ wrap_umask(const char *file, int line, mode_t mask)
 
   /* achu: never supposed to fail.  Go fig. */
   return umask(mask);
+}
+
+DIR *
+wrap_opendir(const char *file, int line, const char *name)
+{
+  DIR *ret;
+  
+  assert(file != NULL);
+
+  if (!(ret = opendir(name)))
+    {
+      if (name)
+	err_exit("opendir(%s:%d): name=%s: %s", file, line, name, strerror(errno));
+      else
+	err_exit("opendir(%s:%d): %s", file, line, strerror(errno));
+    }
+
+  return ret;
+}
+
+int
+wrap_closedir(const char *file, int line, DIR *dir)
+{
+  int ret;
+
+  assert(file != NULL);
+
+  if ((ret = closedir(dir)) < 0)
+    err_exit("closedir(%s:%d): %s", file, line, strerror(errno));
+
+  return ret;
 }
 
 int
@@ -430,6 +484,63 @@ wrap_gethostname(const char *file, int line, char *name, size_t len)
   return ret;
 }
 
+lt_dlhandle
+wrap_lt_dlopen(const char *file, int line, const char *filename)
+{
+  lt_dlhandle ret;
+
+  assert(file != NULL);
+
+  if (!(ret = lt_dlopen(filename)))
+    {
+      if (filename)
+	err_exit("lt_dlopen(%s:%d): filename=%s: %s", file, line, filename, lt_dlerror());
+      else
+	err_exit("lt_dlopen(%s:%d): %s", file, line, lt_dlerror());
+    }
+
+  return ret;
+}
+
+lt_ptr
+wrap_lt_dlsym(const char *file, int line, void *handle, char *symbol)
+{
+  lt_ptr *ret;
+  const char *err;
+
+  assert(file != NULL);
+
+  /* "clear" lt_dlerror() */
+  lt_dlerror();
+
+  if (!(ret = lt_dlsym(handle, symbol)))
+    {
+      err = lt_dlerror();
+      if (err != NULL)
+	{
+	  if (symbol)
+	    err_exit("lt_dlsym(%s:%d): symbol=%s: %s", file, line, symbol, err);
+	  else
+	    err_exit("lt_dlsym(%s:%d): %s", file, line, err);
+	}
+    }
+
+  return ret;
+}
+
+int 
+wrap_lt_dlclose(const char *file, int line, void *handle)
+{
+  int ret;
+
+  assert(file != NULL);
+
+  if ((ret = lt_dlclose(handle)) != 0)
+    err_exit("lt_dlclose(%s:%d): %s", lt_dlerror());
+
+  return ret;
+}
+
 List 
 wrap_list_create(const char *file, int line, ListDelF f)
 {
@@ -438,9 +549,61 @@ wrap_list_create(const char *file, int line, ListDelF f)
   assert(file != NULL);
 
   if (!(ret = list_create(f)))
-    err_exit("hash_create(%s:%d): %s", file, line, strerror(errno));
+    err_exit("list_create(%s:%d): %s", file, line, strerror(errno));
 
   return ret;
+}
+
+void *
+wrap_list_append (const char *file, int line, List l, void *x)
+{
+  void *ret;
+
+  assert(file != NULL);
+
+  if (!(ret = list_append(l, x)))
+    err_exit("list_append(%s:%d): %s", file, line, strerror(errno));
+  
+  return ret;
+}
+
+void
+wrap_list_destroy(const char *file, int line, List l)
+{
+  assert(file != NULL);
+
+  if (!l)
+    err_exit("list_destroy(%s:%d): NULL list pointer", file, line);
+
+  list_destroy(l);
+
+  return;
+}
+
+ListIterator
+wrap_list_iterator_create(const char *file, int line, List l)
+{
+  ListIterator ret;
+
+  assert(file != NULL);
+
+  if (!(ret = list_iterator_create(l)))
+    err_exit("list_iterator_create(%s:%d): %s", file, line, strerror(errno));
+
+  return ret;
+}
+
+void
+wrap_list_iterator_destroy(const char *file, int line, ListIterator i)
+{
+  assert(file != NULL);
+
+  if (!i)
+    err_exit("list_iterator_destroy(%s:%d): NULL list iterator pointer", file, line);
+
+  list_iterator_destroy(i);
+
+  return;
 }
 
 hash_t 
@@ -497,6 +660,19 @@ wrap_hash_insert(const char *file, int line, hash_t h, const void *key, void *da
     err_exit("hash_insert(%s:%d): %s", file, line, strerror(errno));
   if (ret != data)
     err_exit("hash_insert(%s:%d): invalid insert", file, line);
+
+  return ret;
+}
+
+void *
+wrap_hash_remove (const char *file, int line, hash_t h, const void *key)
+{
+  void *ret;
+
+  assert(file != NULL);
+
+  if (!(ret = hash_remove(h, key)))
+    err_exit("hash_remove(%s:%d): %s", file, line, strerror(errno));
 
   return ret;
 }

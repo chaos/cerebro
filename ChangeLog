@@ -1,3 +1,41 @@
+2005-03-13  Albert Chu  <chu11@llnl.gov>
+
+	Add initial support for masterlist mechanisms.
+	
+	* config/libtool.m4, config/ac_genders.m4,
+	config/ac_gendersllnl.m4, src/libcommon/ltdl.h,
+	src/libcommon/ltdl.c,src/cerebrod/cerebrod_clusterlist.h,
+	src/cerebrod/cerebrod_clusterlist.c,
+	src/cerebrod/cerebrod_clusterlist_genders.c,
+	src/cerebrod/cerebrod_clusterlist_gendersllnl.c,
+	src/cerebrod/cerebrod_clusterlist_hostsfile.c: New files.
+
+	* src/libcommon/Makefile.am, src/cerebrod/Makefile.am: Updated
+	appropriately.
+
+	* src/cerebrod/cerebrod.c (_cerebrod_initialization): Renamed to
+	_cerebrod_pre_config_initialization.
+
+	* src/cerebrod/cerebrod.c (_cerebrod_post_config_initialization):
+	New function.
+
+	* src/cerebrod/cerebrod.c (main): Added calls to new functions.
+
+	* src/cerebrod/cerebrod_config.h, src/cerebrod/cerebrod_config.c
+	(_cerebrod_config_parse): Added support for clusterlist module
+	configuration.
+
+	* src/libcommon/wrappers.c (wrap_open, wrap_chdir): Added
+	additional debugging info.
+
+	* src/libcommon/wrappers.h, src/libcommon/wrappers.c (List_append,
+	List_destroy, List_iterator_create, List_iterator_destroy,
+	Hash_remove, Stat, Opendir, Closedir, Lt_dlopen, Lt_dlsym,
+	Lt_dlclose, wrap_list_append, wrap_list_destroy,
+	wrap_list_iterator_create, wrap_list_iterator_destroy,
+	wrap_hash_remove, wrap_stat, wrap_opendir, wrap_closedir,
+	wrap_lt_dlopen, wrap_lt_dlsym, wrap_lt_dlclose): New wrappers.
+	
 2005-02-16  Albert Chu  <chu11@llnl.gov>
 	 
 	* src/cerebrod/cerebrod_listener.c

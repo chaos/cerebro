@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.11 2005-02-17 00:36:50 achu Exp $
+ *  $Id: cerebrod.c,v 1.12 2005-03-14 17:05:14 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -12,6 +12,7 @@
 
 #include "cerebrod.h"
 #include "cerebrod_cache.h"
+#include "cerebrod_clusterlist.h"
 #include "cerebrod_config.h"
 #include "cerebrod_daemon.h"
 #include "cerebrod_listener.h"
@@ -27,9 +28,15 @@ extern struct cerebrod_config conf;
 extern int cerebrod_listener_initialization_complete;
 
 static void
-_cerebrod_initialization(void)
+_cerebrod_pre_config_initialization(void)
 {
   cerebrod_cache();
+}
+
+static void
+_cerebrod_post_config_initialization(void)
+{
+  cerebrod_clusterlist_setup();
 }
 
 int 
@@ -38,9 +45,11 @@ main(int argc, char **argv)
   err_init(argv[0]);
   err_set_flags(ERROR_STDERR | ERROR_SYSLOG);
 
-  _cerebrod_initialization();
+  _cerebrod_pre_config_initialization();
 
   cerebrod_config(argc, argv);
+
+  _cerebrod_post_config_initialization();
 
   if (!conf.debug)
     {

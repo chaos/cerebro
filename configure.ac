@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.5 2005-01-18 18:43:34 achu Exp $
+## $Id: configure.ac,v 1.6 2005-03-14 17:05:14 achu Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -24,9 +24,10 @@ AM_MAINTAINER_MODE
 # Checks for programs.
 ##
 AC_PROG_CC
-AC_PROG_LIBTOOL
 AC_PROG_MAKE_SET
-AC_DEBUG
+AC_LIBTOOL_DLOPEN
+AC_PROG_LIBTOOL
+AC_LIB_LTDL
 
 ##
 # Checks for header files.
@@ -39,6 +40,18 @@ AC_CHECK_HEADERS( \
   unistd.h \
   getopt.h \
 )
+
+#
+# Check for genders
+#
+AC_GENDERS
+AM_CONDITIONAL(WITH_GENDERS, [test "$ac_have_libgenders"    = "yes"])
+
+#
+# Check for gendersllnl
+#
+AC_GENDERSLLNL
+AM_CONDITIONAL(WITH_GENDERSLLNL, [test "$ac_have_gendersllnl"    = "yes"])
 
 ##
 # Checks for typedefs, structures, and compiler characteristics.
