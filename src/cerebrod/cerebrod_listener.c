@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.8 2005-02-02 18:08:38 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.9 2005-02-04 00:09:01 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -22,6 +22,7 @@
 #include "cerebrod_config.h"
 #include "cerebrod_heartbeat.h"
 #include "error.h"
+#include "fd.h"
 #include "wrappers.h"
 
 #define CEREBROD_LISTENER_HASH_SIZE_DEFAULT   1024
@@ -45,7 +46,7 @@ pthread_mutex_t cluster_data_hash_lock = PTHREAD_MUTEX_INITIALIZER;
 static int
 _cerebrod_listener_create_and_setup_socket(void)
 {
-  struct sockaddr_in listen_on_addr;
+  struct sockaddr_in heartbeat_addr;
   int temp_fd;
 
   if ((temp_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
@@ -64,9 +65,9 @@ _cerebrod_listener_create_and_setup_socket(void)
              &conf.heartbeat_destination_in_addr,
              sizeof(struct in_addr));
       memcpy(&imr.imr_address,
-             &conf.listen_on_in_addr,
+             &conf.heartbeat_in_addr,
              sizeof(struct in_addr));
-      imr.imr_ifindex = conf.listen_on_interface_index;
+      imr.imr_ifindex = conf.heartbeat_interface_index;
 
       /* Sort of like a multicast-bind */
       if (setsockopt(temp_fd,
@@ -84,9 +85,9 @@ _cerebrod_listener_create_and_setup_socket(void)
              &conf.heartbeat_destination_in_addr,
              sizeof(struct in_addr));
       memcpy(&imr.imr_address,
-             &conf.listen_on_in_addr,
+             &conf.heartbeat_in_addr,
              sizeof(struct in_addr));
-      imr.imr_ifindex = conf.listen_on_interface_index;
+      imr.imr_ifindex = conf.heartbeat_interface_index;
 
       /* Join the multicast group */
       if (setsockopt(temp_fd,
@@ -102,12 +103,12 @@ _cerebrod_listener_create_and_setup_socket(void)
     }
 
   /* Even if we're multicasting, the port still needs to be bound */
-  listen_on_addr.sin_family = AF_INET;
-  listen_on_addr.sin_port = htons(conf.heartbeat_destination_port);
-  memcpy(&listen_on_addr.sin_addr,
-         &conf.listen_on_in_addr,
+  heartbeat_addr.sin_family = AF_INET;
+  heartbeat_addr.sin_port = htons(conf.heartbeat_destination_port);
+  memcpy(&heartbeat_addr.sin_addr,
+         &conf.heartbeat_in_addr,
          sizeof(struct in_addr));
-  if (bind(temp_fd, (struct sockaddr *)&listen_on_addr, sizeof(struct sockaddr_in)) < 0)
+  if (bind(temp_fd, (struct sockaddr *)&heartbeat_addr, sizeof(struct sockaddr_in)) < 0)
     {
       err_debug("_cerebrod_listener_create_and_setup_socket: bind: %s",
 		strerror(errno));

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.22 2005-02-01 16:19:01 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.23 2005-02-04 00:09:01 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -49,11 +49,10 @@ _cerebrod_config_default(void)
   conf.heartbeat_source_port = CEREBROD_HEARTBEAT_SOURCE_PORT_DEFAULT;
   conf.heartbeat_destination_port = CEREBROD_HEARTBEAT_DESTINATION_PORT_DEFAULT;
   conf.heartbeat_destination_ip = CEREBROD_HEARTBEAT_DESTINATION_IP_DEFAULT;
-  conf.listen = CEREBROD_LISTEN_DEFAULT;
+  conf.heartbeat_network_interface = CEREBROD_HEARTBEAT_NETWORK_INTERFACE_DEFAULT;
+  conf.heartbeat_ttl = CEREBROD_HEARTBEAT_TTL_DEFAULT;
   conf.speak = CEREBROD_SPEAK_DEFAULT;
-  conf.speak_from_network_interface = CEREBROD_SPEAK_FROM_NETWORK_INTERFACE_DEFAULT;
-  conf.speak_ttl = CEREBROD_SPEAK_TTL_DEFAULT;
-  conf.listen_on_network_interface = CEREBROD_LISTEN_ON_NETWORK_INTERFACE_DEFAULT;
+  conf.listen = CEREBROD_LISTEN_DEFAULT;
   conf.listen_threads = CEREBROD_LISTEN_THREADS_DEFAULT;
 }
 
@@ -182,9 +181,8 @@ static void
 _cerebrod_config_parse(void)
 {
   int heartbeat_frequency_flag, heartbeat_source_port_flag, heartbeat_destination_port_flag, 
-    heartbeat_destination_ip_flag, listen_flag, speak_flag, 
-    speak_from_network_interface_flag, speak_ttl_flag, 
-    listen_on_network_interface_flag, listen_threads_flag;
+    heartbeat_destination_ip_flag, heartbeat_network_interface_flag, heartbeat_ttl_flag, 
+    speak_flag, listen_flag, listen_threads_flag;
 
   struct conffile_option options[] =
     {
@@ -196,18 +194,15 @@ _cerebrod_config_parse(void)
        1, 0, &heartbeat_destination_ip_flag, &(conf.heartbeat_destination_ip), 0},
       {"heartbeat_source_port", CONFFILE_OPTION_INT, -1, conffile_int,
        1, 0, &heartbeat_source_port_flag, &(conf.heartbeat_source_port), 0},
-      {"listen", CONFFILE_OPTION_BOOL, -1, conffile_bool,
-       1, 0, &listen_flag, &conf.listen, 0},
+      {"heartbeat_network_interface", CONFFILE_OPTION_STRING, -1, _cb_stringptr,
+       1, 0, &heartbeat_network_interface_flag, 
+       &(conf.heartbeat_network_interface), 0},
+      {"heartbeat_ttl", CONFFILE_OPTION_INT, -1, conffile_int,
+       1, 0, &heartbeat_ttl_flag, &(conf.heartbeat_ttl), 0},
       {"speak", CONFFILE_OPTION_BOOL, -1, conffile_bool,
        1, 0, &speak_flag, &conf.speak, 0},
-      {"speak_from_network_interface", CONFFILE_OPTION_STRING, -1, _cb_stringptr,
-       1, 0, &speak_from_network_interface_flag, 
-       &(conf.speak_from_network_interface), 0},
-      {"speak_ttl", CONFFILE_OPTION_INT, -1, conffile_int,
-       1, 0, &speak_ttl_flag, &(conf.speak_ttl), 0},
-      {"listen_on_network_interface", CONFFILE_OPTION_STRING, -1, _cb_stringptr,
-       1, 0, &listen_on_network_interface_flag, 
-       &(conf.listen_on_network_interface), 0},
+      {"listen", CONFFILE_OPTION_BOOL, -1, conffile_bool,
+       1, 0, &listen_flag, &conf.listen, 0},
       {"listen_threads", CONFFILE_OPTION_INT, -1, conffile_int,
        1, 0, &listen_threads_flag, &(conf.listen_threads), 0},
     };
@@ -242,54 +237,31 @@ _cerebrod_config_check(void)
     err_exit("heartbeat destination IP address '%s' improperly format",
 	     conf.heartbeat_destination_ip);
 
-  if (conf.speak_from_network_interface
-      && strchr(conf.speak_from_network_interface, '.'))
+  if (conf.heartbeat_network_interface
+      && strchr(conf.heartbeat_network_interface, '.'))
     {
-      if (strchr(conf.speak_from_network_interface, '/'))
+      if (strchr(conf.heartbeat_network_interface, '/'))
 	{
-	  char *speak_from_network_interface_cpy = Strdup(conf.speak_from_network_interface);
+	  char *heartbeat_network_interface_cpy = Strdup(conf.heartbeat_network_interface);
 	  char *tok;
 	  
-	  tok = strtok(speak_from_network_interface_cpy, "/");
+	  tok = strtok(heartbeat_network_interface_cpy, "/");
 	  if (!Inet_pton(AF_INET, tok, &addr_temp))
-	    err_exit("speak from network interface IP address '%s' "
-		     "improperly format", conf.speak_from_network_interface);
+	    err_exit("network interface IP address '%s' "
+		     "improperly format", conf.heartbeat_network_interface);
 	  
-	  Free(speak_from_network_interface_cpy);
+	  Free(heartbeat_network_interface_cpy);
 	}
       else
 	{
-	  if (!Inet_pton(AF_INET, conf.speak_from_network_interface, &addr_temp))
-	    err_exit("speak from network interface IP address '%s' "
-		     "improperly format", conf.speak_from_network_interface);
+	  if (!Inet_pton(AF_INET, conf.heartbeat_network_interface, &addr_temp))
+	    err_exit("network interface IP address '%s' "
+		     "improperly format", conf.heartbeat_network_interface);
 	}
     }
 
-  if (conf.speak_ttl <= 0)
-    err_exit("speak ttl '%d' invalid", conf.speak_ttl);
-
-  if (conf.listen_on_network_interface
-      && strchr(conf.listen_on_network_interface, '.'))
-    {
-      if (strchr(conf.listen_on_network_interface, '/'))
-	{
-	  char *listen_on_network_interface_cpy = Strdup(conf.listen_on_network_interface);
-	  char *tok;
-	  
-	  tok = strtok(listen_on_network_interface_cpy, "/");
-	  if (!Inet_pton(AF_INET, tok, &addr_temp))
-	    err_exit("listen on network interface IP address '%s' "
-		     "improperly format", conf.listen_on_network_interface);
-	  
-	  Free(listen_on_network_interface_cpy);
-	}
-      else
-	{
-	  if (!Inet_pton(AF_INET, conf.listen_on_network_interface, &addr_temp))
-	    err_exit("listen on network interface IP address '%s' "
-		     "improperly format", conf.listen_on_network_interface);
-	}
-    }
+  if (conf.heartbeat_ttl <= 0)
+    err_exit("heartbeat ttl '%d' invalid", conf.heartbeat_ttl);
 }
 
 static void
@@ -653,19 +625,11 @@ _cerebrod_calculate_in_addr_and_index(char *network_interface,
 }
 
 static void
-_cerebrod_calculate_speak_from_in_addr_and_index()
+_cerebrod_calculate_heartbeat_in_addr_and_index()
 {
-  _cerebrod_calculate_in_addr_and_index(conf.speak_from_network_interface,
-					&conf.speak_from_in_addr,
-					&conf.speak_from_interface_index);
-}
-
-static void
-_cerebrod_calculate_listen_on_in_addr_and_index()
-{
-  _cerebrod_calculate_in_addr_and_index(conf.listen_on_network_interface,
-					&conf.listen_on_in_addr,
-					&conf.listen_on_interface_index);
+  _cerebrod_calculate_in_addr_and_index(conf.heartbeat_network_interface,
+					&conf.heartbeat_in_addr,
+					&conf.heartbeat_interface_index);
 }
 
 static void
@@ -681,19 +645,14 @@ _cerebrod_calculate_configuration(void)
 
       /* Calculate the destination ip */
       _cerebrod_calculate_heartbeat_destination_in_addr();
-
-      /* Determine the appropriate network interface to use based on
-       * the user's speak_from_network_interface input.
-       */
-      _cerebrod_calculate_speak_from_in_addr_and_index();
     }
 
-  if (conf.listen)
+  if (conf.speak || conf.listen)
     {
       /* Determine the appropriate network interface to use based on
-       * the user's listen_on_network_interface input.
+       * the user's heartbeat_network_interface input.
        */
-      _cerebrod_calculate_listen_on_in_addr_and_index();
+      _cerebrod_calculate_heartbeat_in_addr_and_index();
     }
 }
 
@@ -713,17 +672,15 @@ _cerebrod_config_dump(void)
       fprintf(stderr, "* heartbeat_source_port: %d\n", conf.heartbeat_source_port);
       fprintf(stderr, "* heartbeat_destination_port: %d\n", conf.heartbeat_destination_port);
       fprintf(stderr, "* heartbeat_destination_ip: \"%s\"\n", conf.heartbeat_destination_ip);
-      fprintf(stderr, "* listen: %d\n", conf.listen);
+      fprintf(stderr, "* heartbeat_network_interface: \"%s\"\n", conf.heartbeat_network_interface);
+      fprintf(stderr, "* heartbeat_ttl: %d\n", conf.heartbeat_ttl);
       fprintf(stderr, "* speak: %d\n", conf.speak);
-      fprintf(stderr, "* speak_from_network_interface: \"%s\"\n", conf.speak_from_network_interface);
-      fprintf(stderr, "* listen_on_network_interface: \"%s\"\n", conf.listen_on_network_interface);
+      fprintf(stderr, "* listen: %d\n", conf.listen);
       fprintf(stderr, "* listen_threads: %d\n", conf.listen_threads);
       fprintf(stderr, "* multicast: %d\n", conf.multicast);
       fprintf(stderr, "* heartbeat_destination_in_addr: %s\n", inet_ntoa(conf.heartbeat_destination_in_addr));
-      fprintf(stderr, "* speak_from_in_addr: %s\n", inet_ntoa(conf.speak_from_in_addr));
-      fprintf(stderr, "* speak_from_interface_index: %d\n", conf.speak_from_interface_index);
-      fprintf(stderr, "* listen_on_in_addr: %s\n", inet_ntoa(conf.listen_on_in_addr));
-      fprintf(stderr, "* listen_on_interface_index: %d\n", conf.listen_on_interface_index);
+      fprintf(stderr, "* heartbeat_in_addr: %s\n", inet_ntoa(conf.heartbeat_in_addr));
+      fprintf(stderr, "* heartbeat_interface_index: %d\n", conf.heartbeat_interface_index);
       fprintf(stderr, "**************************************\n");
     }
 #endif /* NDEBUG */

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.8 2005-02-02 01:02:24 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.9 2005-02-04 00:09:01 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -42,7 +42,7 @@ _cerebrod_speaker_initialize(void)
 static int
 _cerebrod_speaker_create_and_setup_socket(void)
 {
-  struct sockaddr_in heartbeat_destination_addr, speak_from_addr;
+  struct sockaddr_in heartbeat_destination_addr, heartbeat_addr;
   int temp_fd;
 
   if ((temp_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
@@ -62,9 +62,9 @@ _cerebrod_speaker_create_and_setup_socket(void)
 	     &conf.heartbeat_destination_in_addr,
 	     sizeof(struct in_addr));
       memcpy(&imr.imr_address, 
-	     &conf.speak_from_in_addr,
+	     &conf.heartbeat_in_addr,
 	     sizeof(struct in_addr));
-      imr.imr_ifindex = conf.speak_from_interface_index;
+      imr.imr_ifindex = conf.heartbeat_interface_index;
       
       /* Sort of like a multicast-bind */
       if (setsockopt(temp_fd,
@@ -90,7 +90,7 @@ _cerebrod_speaker_create_and_setup_socket(void)
 	  return -1;
 	}
 
-      optval = conf.speak_ttl;
+      optval = conf.heartbeat_ttl;
       if (setsockopt(temp_fd,
 		     SOL_IP,
 		     IP_MULTICAST_TTL,
@@ -104,12 +104,12 @@ _cerebrod_speaker_create_and_setup_socket(void)
     }
 
   /* Even if we're multicasting, the port still needs to be bound */
-  speak_from_addr.sin_family = AF_INET;
-  speak_from_addr.sin_port = htons(conf.heartbeat_source_port);
-  memcpy(&speak_from_addr.sin_addr,
-	 &conf.speak_from_in_addr,
+  heartbeat_addr.sin_family = AF_INET;
+  heartbeat_addr.sin_port = htons(conf.heartbeat_source_port);
+  memcpy(&heartbeat_addr.sin_addr,
+	 &conf.heartbeat_in_addr,
 	 sizeof(struct in_addr));
-  if (bind(temp_fd, (struct sockaddr *)&speak_from_addr, sizeof(struct sockaddr_in))) 
+  if (bind(temp_fd, (struct sockaddr *)&heartbeat_addr, sizeof(struct sockaddr_in))) 
     {
       err_debug("_cerebrod_speaker_create_and_setup_socket: bind: %s", 
 		strerror(errno));

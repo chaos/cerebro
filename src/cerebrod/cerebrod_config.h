@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.h,v 1.14 2005-02-01 16:19:01 achu Exp $
+ *  $Id: cerebrod_config.h,v 1.15 2005-02-04 00:09:01 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_CONFIG_H
@@ -20,14 +20,13 @@
 #define CEREBROD_CONFIGFILE_DEFAULT                   "/etc/cerebrod.conf"
 #define CEREBROD_HEARTBEAT_FREQUENCY_MIN_DEFAULT      10
 #define CEREBROD_HEARTBEAT_FREQUENCY_MAX_DEFAULT      20
-#define CEREBROD_HEARTBEAT_SOURCE_PORT_DEFAULT        8651
-#define CEREBROD_HEARTBEAT_DESTINATION_PORT_DEFAULT   8650
+#define CEREBROD_HEARTBEAT_SOURCE_PORT_DEFAULT        8650
+#define CEREBROD_HEARTBEAT_DESTINATION_PORT_DEFAULT   8651
 #define CEREBROD_HEARTBEAT_DESTINATION_IP_DEFAULT     "239.2.11.72"
-#define CEREBROD_LISTEN_DEFAULT                       1
+#define CEREBROD_HEARTBEAT_NETWORK_INTERFACE_DEFAULT  NULL
+#define CEREBROD_HEARTBEAT_TTL_DEFAULT                1
 #define CEREBROD_SPEAK_DEFAULT                        1
-#define CEREBROD_SPEAK_FROM_NETWORK_INTERFACE_DEFAULT NULL
-#define CEREBROD_SPEAK_TTL_DEFAULT                    1
-#define CEREBROD_LISTEN_ON_NETWORK_INTERFACE_DEFAULT  NULL
+#define CEREBROD_LISTEN_DEFAULT                       1
 #define CEREBROD_LISTEN_THREADS_DEFAULT               2
 
 /* Configuration
@@ -43,22 +42,17 @@
  * - the port to send heartbeats to
  * heartbeat_destination_ip
  * - to ip to send heartbeats to, may be remote IP or multicast
- * listen
- * - on/off
+ * heartbeat_network_interface
+ * - not specified - we pick an interface
+ * - network interface - will be checked.
+ * - ip address - will be checked
+ * - ip address/subnet - will be found/checked
+ * heartbeat_ttl
+ * - num
  * speak
  * - on/off
- * speak_from_network_interface
- * - not specified - we pick an interface
- * - network interface - will be checked.
- * - ip address - will be checked
- * - ip address/subnet - will be found/checked
- * speak_ttl
- * - num
- * listen_on_network_interface
- * - not specified - we pick an interface
- * - network interface - will be checked.
- * - ip address - will be checked
- * - ip address/subnet - will be found/checked
+ * listen
+ * - on/off
  * listen_threads
  * - num
  *
@@ -84,26 +78,20 @@ struct cerebrod_config
   int heartbeat_source_port;
   int heartbeat_destination_port;
   char *heartbeat_destination_ip;
+  char *heartbeat_network_interface;
+  int heartbeat_ttl;
 
-  int listen;
   int speak;
-  char *speak_from_network_interface;
-  int speak_ttl;
-  char *listen_on_network_interface;
+  int listen;
   int listen_threads;
 
   /* Determined by cerebrod based on configuration */
 
-  /* speaker configuration */
   int multicast;
   int heartbeat_frequency_ranged;
   struct in_addr heartbeat_destination_in_addr;
-  struct in_addr speak_from_in_addr;
-  int speak_from_interface_index;
-
-  /* listener configuration */
-  struct in_addr listen_on_in_addr;
-  int listen_on_interface_index;
+  struct in_addr heartbeat_in_addr;
+  int heartbeat_interface_index;
 };
 
 void cerebrod_config(int argc, char **argv);
