@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.53 2005-03-22 20:56:40 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.54 2005-03-22 21:12:57 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -213,7 +213,7 @@ _cerebrod_cmdline_parse_check(void)
   /* Check if the configuration type exists */
   if (conf.config_module)
     {
-      if (!cerebrod_find_static_config_module(conf.config_module) < 0)
+      if (!cerebrod_find_static_config_module(conf.config_module))
 	err_exit("config module '%s' not found", conf.config_module);
     }
 #else  /* !WITH_STATIC_MODULES */

@@ -32,6 +32,9 @@
 	src/cerebrod/cerebrod_clusterlist.c: Use common functions for
 	effectively overall.  Fix for new variable and function names.
 
+	* src/cerebrod/cerebrod_config.c (_cerebrod_cmdline_parse_check):
+	Fix bug.
+
 2005-03-21  Albert Chu  <chu11@llnl.gov>
 	
 	Static module compilation code cleanup
