@@ -1,4 +1,5 @@
 - README description
+  - cerebro.1 manpage
 - IPv6
 - cerebro.spec.in, descriptions
 - remove hostname from heartbeat, useless?
