@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.7 2005-02-01 22:04:53 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.8 2005-02-02 01:02:24 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -205,7 +205,7 @@ cerebrod_speaker(void *arg)
 	      || fd < 0)
 	    {
 	      if (!(fd < 0))
-		Close(fd);	
+		close(fd);	/* no-wrapper, make best effort */
 
 	      /* XXX: Should we re-calc in-addrs? Its even more unlikely
 	       * that a system administrator will change IPs, subnets, etc.

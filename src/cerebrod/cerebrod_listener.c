@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.5 2005-02-01 22:37:28 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.6 2005-02-02 01:02:24 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -42,12 +42,18 @@ int cluster_data_hash_size;
 int cluster_data_hash_numnodes;
 pthread_mutex_t cluster_data_hash_lock = PTHREAD_MUTEX_INITIALIZER;
 
-static void
+static int
 _cerebrod_listener_create_and_setup_socket(void)
 {
   struct sockaddr_in listen_on_addr;
+  int temp_fd;
 
-  listener_fd = Socket(AF_INET, SOCK_DGRAM, 0);
+  if ((temp_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
+    {
+      err_debug("_cerebrod_listener_create_and_setup_socket: socket: %s",
+		strerror(errno));
+      return -1;
+    }
 
   if (conf.multicast)
     {
@@ -63,11 +69,16 @@ _cerebrod_listener_create_and_setup_socket(void)
       imr.imr_ifindex = conf.listen_on_interface_index;
 
       /* Sort of like a multicast-bind */
-      Setsockopt(listener_fd,
-		 SOL_IP,
-		 IP_MULTICAST_IF,
-		 &imr,
-		 sizeof(struct ip_mreqn));
+      if (setsockopt(temp_fd,
+		     SOL_IP,
+		     IP_MULTICAST_IF,
+		     &imr,
+		     sizeof(struct ip_mreqn)) < 0)
+	{
+	  err_debug("_cerebrod_listener_create_and_setup_socket: setsockopt: %s",
+		    strerror(errno));
+	  return -1;
+	}
 
       memcpy(&imr.imr_multiaddr,
              &conf.heartbeat_destination_in_addr,
@@ -78,11 +89,16 @@ _cerebrod_listener_create_and_setup_socket(void)
       imr.imr_ifindex = conf.listen_on_interface_index;
 
       /* Join the multicast group */
-      Setsockopt(listener_fd,
-		 SOL_IP,
-		 IP_ADD_MEMBERSHIP,
-		 &imr,
-		 sizeof(struct ip_mreqn));
+      if (setsockopt(temp_fd,
+		     SOL_IP,
+		     IP_ADD_MEMBERSHIP,
+		     &imr,
+		     sizeof(struct ip_mreqn)) < 0)
+	{
+	  err_debug("_cerebrod_listener_create_and_setup_socket: setsockopt: %s",
+		    strerror(errno));
+	  return -1;
+	}
     }
 
   /* Even if we're multicasting, the port still needs to be bound */
@@ -91,7 +107,14 @@ _cerebrod_listener_create_and_setup_socket(void)
   memcpy(&listen_on_addr.sin_addr,
          &conf.listen_on_in_addr,
          sizeof(struct in_addr));
-  Bind(listener_fd, (struct sockaddr *)&listen_on_addr, sizeof(struct sockaddr_in));
+  if (bind(temp_fd, (struct sockaddr *)&listen_on_addr, sizeof(struct sockaddr_in)) < 0)
+    {
+      err_debug("_cerebrod_listener_create_and_setup_socket: bind: %s",
+		strerror(errno));
+      return -1;
+    }
+
+  return temp_fd;
 }
 
 static void
@@ -101,7 +124,9 @@ _cerebrod_listener_initialize(void)
   if (initialization_complete)
     goto done;
 
-  _cerebrod_listener_create_and_setup_socket();
+  if ((listener_fd = _cerebrod_listener_create_and_setup_socket()) < 0)
+    err_exit("_cerebrod_listener_initialize: listener_fd setup failed");
+  listener_fd_complete = 1;
 
   cluster_data_hash_size = CEREBROD_LISTENER_HASH_SIZE_DEFAULT;
   cluster_data_hash_numnodes = 0;
@@ -145,6 +170,67 @@ void *
 cerebrod_listener(void *arg)
 {
   _cerebrod_listener_initialize();
+
+  for (;;)
+    {
+      struct cerebrod_heartbeat hb;
+      char hbbuf[CEREBROD_PACKET_BUFLEN];
+      int rv, hblen;
+
+      Pthread_mutex_lock(&listener_fd_lock);
+      if ((rv = fd_read_n(listener_fd, hbbuf, hblen)) < 0)
+	{
+          /* For errnos EINVAL, EBADF, ENODEV, assume the device has
+           * been temporarily brought down then back up.  For example,
+           * this can occur if the administrator runs
+           * '/etc/init.d/network restart'.  We just need to re-setup
+           * the socket.
+           *
+           * If fd < 0, the network device just isn't back up yet from
+           * the previous time we got an errno EINVAL, EBADF, or
+           * ENODEV.
+           */
+          if (errno == EINVAL
+	      || errno == EBADF
+	      || errno == ENODEV
+	      || listener_fd < 0)
+            {
+              if (!(listener_fd < 0))
+		close(listener_fd);	/* no-wrapper, make best effort */
+
+              /* XXX: Should we re-calc in-addrs? Its even more unlikely
+               * that a system administrator will change IPs, subnets, etc.
+               * on us.
+               */
+              if ((listener_fd = _cerebrod_listener_create_and_setup_socket()) < 0)
+		{
+		  err_debug("cerebrod_listener: error re-initializing socket");
+
+		  /* Wait a bit, so we don't spin */
+		  sleep(CEREBROD_REINITIALIZE_WAIT);
+		}
+              else
+                err_debug("cerebrod_listener: success re-initializing socket");
+            }
+          else
+            err_exit("cerebrod_listener: fd_read_n: %s", strerror(errno));
+	}
+      Pthread_mutex_unlock(&listener_fd_lock);
+     
+      /* No packet read */
+      if (rv < 0)
+	continue;
+
+      if ((hblen = cerebrod_heartbeat_ummarshall(&hb, hbbuf, rv)) < 0)
+	continue;
+
+      _cerebrod_listener_dump_heartbeat(&hb);
+      if (hb.version != CEREBROD_PROTOCOL_VERSION)
+	{
+	  err_debug("cerebrod_listener: invalid cerebrod packet version read");
+	  continue;
+	}
+    }
 
   return NULL;			/* NOT REACHED */
 }
