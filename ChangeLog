@@ -1,3 +1,12 @@
+2005-04-01  Albert Chu  <chu11@llnl.gov>
+
+	* src/cerebrod/cerebrod_clusterlist_genders.c
+	(genders_clusterlist_node_in_cluster),
+	src/cerebrod/cerebrod_clusterlist_gendersllnl.c
+	(gendersllnl_clusterlist_get_nodename,
+	gendersllnl_clusterlist_node_in_cluster): Use buffer instead of
+	strdup for shortening the nodename.
+	
 2005-03-31  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerebrod/Makefile.am: modulelib dir based on module dir

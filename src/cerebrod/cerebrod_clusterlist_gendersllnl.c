@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_gendersllnl.c,v 1.19 2005-03-30 05:41:45 achu Exp $
+ *  $Id: cerebrod_clusterlist_gendersllnl.c,v 1.20 2005-04-02 00:36:52 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -16,6 +16,7 @@
 
 #include <gendersllnl.h>
 
+#include "cerebro_defs.h"
 #include "cerebrod_clusterlist_module.h"
 
 #include "cerebrod_clusterlist.h"
@@ -119,8 +120,9 @@ gendersllnl_clusterlist_numnodes(void)
 int
 gendersllnl_clusterlist_node_in_cluster(char *node)
 {
-  int ret, free_flag = 0;
+  int ret;
   char *nodePtr = NULL;
+  char nodebuf[CEREBRO_MAXNODENAMELEN+1];
   char *clusterlist_module_name = cerebrod_clusterlist_module_name();
 
   assert(gendersllnl_handle);
@@ -131,10 +133,11 @@ gendersllnl_clusterlist_node_in_cluster(char *node)
     {
       char *p;
 
-      nodePtr = Strdup(node);
-      p = strchr(nodePtr, '.');
+      memset(nodebuf, '\0', CEREBRO_MAXNODENAMELEN+1);
+      strncpy(nodebuf, node, CEREBRO_MAXNODENAMELEN);
+      p = strchr(nodebuf, '.');
       *p = '\0';
-      free_flag++;
+      nodePtr = nodebuf;
     }
   else
     nodePtr = node;
@@ -144,9 +147,6 @@ gendersllnl_clusterlist_node_in_cluster(char *node)
 		      __FILE__, __FUNCTION__, __LINE__, 
 		      clusterlist_module_name,
 		      genders_errormsg(gendersllnl_handle));
-
-  if (free_flag)
-    Free(nodePtr);
 
   return ret;
 }
@@ -159,8 +159,8 @@ gendersllnl_clusterlist_node_in_cluster(char *node)
 int
 gendersllnl_clusterlist_get_nodename(char *node, char *buf, unsigned int buflen)
 {
-  int free_flag = 0;
   char *nodePtr = NULL;
+  char nodebuf[CEREBRO_MAXNODENAMELEN+1];
   char *clusterlist_module_name = cerebrod_clusterlist_module_name();
 
   assert(gendersllnl_handle);
@@ -172,10 +172,11 @@ gendersllnl_clusterlist_get_nodename(char *node, char *buf, unsigned int buflen)
     {
       char *p;
 
-      nodePtr = Strdup(node);
-      p = strchr(nodePtr, '.');
+      memset(nodebuf, '\0', CEREBRO_MAXNODENAMELEN+1);
+      strncpy(nodebuf, node, CEREBRO_MAXNODENAMELEN);
+      p = strchr(nodebuf, '.');
       *p = '\0';
-      free_flag++;
+      nodePtr = nodebuf;
     }
   else
     nodePtr = node;
@@ -186,10 +187,6 @@ gendersllnl_clusterlist_get_nodename(char *node, char *buf, unsigned int buflen)
 		      __FILE__, __FUNCTION__, __LINE__,
 		      clusterlist_module_name, 
 		      genders_errormsg(gendersllnl_handle));
-
-  if (free_flag)
-    Free(nodePtr);
-
   return 0;
 }
 
