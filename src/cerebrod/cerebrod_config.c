@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.11 2004-11-03 01:13:36 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.12 2004-11-03 01:26:30 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -318,7 +318,6 @@ cerebrod_calculate_configuration(void)
       struct in_addr net_s;
       u_int32_t current_ip, net;
       char *tok;
-      char *network_interface_cpy;
       
       if (strchr(conf.network_interface, ':'))
         err_exit("IPv6 IP addresses currently not supported, please specify"
@@ -330,11 +329,10 @@ cerebrod_calculate_configuration(void)
 
       _get_if_conf(&buf, &ifc, fd);
      
-      network_interface_cpy = Strdup(conf.network_interface);
-
       /* If no '/', then just an IP address, mask is 0 bits */
-      if (strchr(network_interface_cpy, '/'))
+      if (strchr(conf.network_interface, '/'))
         {
+          char *network_interface_cpy = Strdup(conf.network_interface);
           tok = strtok(network_interface_cpy, "/");
           if (inet_pton(AF_INET, tok, &net_s) < 0)
             err_exit("network interface '%s' IP address resolution "
@@ -344,10 +342,12 @@ cerebrod_calculate_configuration(void)
           if (mask < 1 || mask > 32)
             err_exit("network interface '%s' subnet mask improper",
                      conf.network_interface);
+
+          Free(network_interface_cpy);
         }
       else
         {
-          if (inet_pton(AF_INET, network_interface_cpy, &net_s) < 0)
+          if (inet_pton(AF_INET, conf.network_interface, &net_s) < 0)
             err_exit("network interface '%s' IP address resolution "
                      "failed", conf.network_interface);
           mask = 32;
@@ -391,11 +391,10 @@ cerebrod_calculate_configuration(void)
         }
       
       if (conf.multicast_interface == NULL)
-        err_exit("network interface '%s' up and with multicast "
+        err_exit("network interface '%s' with multicast "
                  "not found", conf.network_interface);
       
       Free(buf);
-      Free(network_interface_cpy);
       Close(fd);
     }
   else
