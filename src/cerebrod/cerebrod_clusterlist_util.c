@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_util.c,v 1.3 2005-03-21 14:36:47 achu Exp $
+ *  $Id: cerebrod_clusterlist_util.c,v 1.4 2005-03-23 17:37:33 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -18,6 +18,7 @@
 #include "cerebrod_clusterlist.h"
 #include "cerebrod_clusterlist_util.h"
 #include "error.h"
+#include "wrappers.h"
 
 int 
 cerebrod_clusterlist_parse_filename(char **options, char **filename)

@@ -1,3 +1,19 @@
+2005-03-23  Albert Chu  <chu11@llnl.gov>
+
+	Begin work on libcerebro
+
+	* src/libcerebro/Makefile.am,
+	src/libcerebro/cerebro_config_module.h,
+	src/libcerebro/cerebro_clusterlist.h: New files.
+
+	* configure.ac, src/Makefile.am: Updated for new files and directories.
+
+	* src/libcommon/fd.c (fd_write_n): Remove warnings.
+
+	* src/cerebrod/cerebrod_clusterlist.h: Remove useless headers.
+
+	* src/cerebrod/cerebrod_clusterlist_utils.c: Fix header problems.
+
 2005-03-22  Albert Chu  <chu11@llnl.gov>
 
 	More code cleanup

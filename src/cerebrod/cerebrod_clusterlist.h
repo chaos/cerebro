@@ -1,12 +1,9 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist.h,v 1.7 2005-03-21 18:28:38 achu Exp $
+ *  $Id: cerebrod_clusterlist.h,v 1.8 2005-03-23 17:37:33 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_CLUSTERLIST_H
 #define _CEREBROD_CLUSTERLIST_H
-
-#include "list.h"
-#include "wrappers.h"
 
 /*
  * Cerebrod_clusterlist_parse_options

@@ -1,13 +1,13 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.22 2005-03-22 20:56:40 achu Exp $
+## $Id: Makefile.am,v 1.23 2005-03-23 17:37:33 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
 
 if WITH_STATIC_MODULES
-STATIC_MODULES_HEADERS = cerebrod_static_modules.h
+STATIC_MODULES_HEADERFILES = cerebrod_static_modules.h
 else
-DYNAMIC_MODULE_HEADERS = cerebrod_dynamic_modules.h
+DYNAMIC_MODULES_HEADERFILES = cerebrod_dynamic_modules.h
 endif
 
 noinst_HEADERS = cerebrod.h \
@@ -22,8 +22,8 @@ noinst_HEADERS = cerebrod.h \
 		 cerebrod_speaker.h \
 		 cerebrod_updown.h \
 		 cerebrod_util.h \
-		 $(STATIC_MODULES_HEADERS) \
-		 $(DYNAMIC_MODULES_HEADERS)
+		 $(STATIC_MODULES_HEADERFILES) \
+		 $(DYNAMIC_MODULES_HEADERFILES)
 
 #
 # cerebrod daemon
