@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.9 2005-03-19 00:19:56 achu Exp $
+## $Id: configure.ac,v 1.10 2005-03-19 00:24:11 achu Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -99,8 +99,8 @@ AC_CONFIG_FILES( \
   Makefile \
   etc/Makefile \
   man/Makefile \
-  man/cerebrod.8.in \
-  man/cerebrod.conf.5.in \
+  man/cerebrod.8 \
+  man/cerebrod.conf.5 \
   src/Makefile \
   src/libcommon/Makefile \
   src/cerebrod/Makefile \
