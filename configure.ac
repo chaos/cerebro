@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.11 2005-03-19 03:28:29 achu Exp $
+## $Id: configure.ac,v 1.12 2005-03-19 08:40:14 achu Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -41,6 +41,11 @@ AC_CHECK_HEADERS( \
   unistd.h \
   getopt.h \
 )
+
+#
+# Check for new default cerebrod configfile
+#
+AC_CEREBROD_CONFIGFILE
 
 #
 # Check for new default hostsfile
@@ -100,6 +105,7 @@ AC_CONFIG_FILES( \
   Makefile \
   etc/Makefile \
   man/Makefile \
+  man/cerebro.1 \
   man/cerebrod.8 \
   man/cerebrod.conf.5 \
   src/Makefile \

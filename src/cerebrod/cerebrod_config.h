@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.h,v 1.22 2005-03-18 01:36:30 achu Exp $
+ *  $Id: cerebrod_config.h,v 1.23 2005-03-19 08:40:14 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_CONFIG_H
@@ -12,7 +12,6 @@
  */
 
 #define CEREBROD_DEBUG_DEFAULT                        0
-#define CEREBROD_CONFIGFILE_DEFAULT                   "/etc/cerebrod.conf"
 #define CEREBROD_HEARTBEAT_FREQUENCY_MIN_DEFAULT      10
 #define CEREBROD_HEARTBEAT_FREQUENCY_MAX_DEFAULT      20
 #define CEREBROD_HEARTBEAT_SOURCE_PORT_DEFAULT        8650

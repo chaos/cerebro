@@ -1,6 +1,16 @@
-2005-03-18  Albert Chu  <chu11@llnl.gov>
+2005-03-19  Albert Chu  <chu11@llnl.gov>
 
 	* Fixed variety of compiler warnings.
+
+	* man/cerebro.1.in: New file.
+	
+	* configure.ac, man/Makefile.am: Updated for new manpages.
+
+	* config/ac_cerebrod_configfile.m4: New file.
+
+	* configure.ac: Add ac_cerebrod_configfile config option.
+
+	* config/ac_hostsfile.m4: AC_SUBST the hostsfile.
 	
 2005-03-18  Albert Chu  <chu11@llnl.gov>
 

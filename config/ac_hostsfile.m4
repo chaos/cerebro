@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: ac_hostsfile.m4,v 1.1 2005-03-14 22:05:55 achu Exp $
+## $Id: ac_hostsfile.m4,v 1.2 2005-03-19 08:40:14 achu Exp $
 ##*****************************************************************************
 
 AC_DEFUN([AC_HOSTSFILE],
@@ -19,4 +19,5 @@ AC_DEFUN([AC_HOSTSFILE],
   AC_DEFINE_UNQUOTED([CEREBROD_CLUSTERLIST_HOSTSFILE_DEFAULT], 
                      ["$CEREBROD_CLUSTERLIST_HOSTSFILE_DEFAULT"], 
                      [Define default hostsfile clusterlist.])
+  AC_SUBST(CEREBROD_CLUSTERLIST_HOSTSFILE_DEFAULT)
 ])

@@ -18,3 +18,8 @@
    - fd leaking
    - mem-leaking
 
+
+- to GPL
+  - on all headers
+  - on manpage ORIGINS
+

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.40 2005-03-19 03:28:29 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.41 2005-03-19 08:40:14 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -82,7 +82,7 @@ _usage(void)
           "-m    --configmodule Specify configuration module\n");
 #ifndef NDEBUG
   fprintf(stderr, 
-          "-d    --debug       Turn on debugging (can be used multiple times)\n");
+          "-d    --debug       Turn on debugging and run daemon in foreground\n");
 #endif /* NDEBUG */
   exit(0);
 }
