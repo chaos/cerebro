@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.c,v 1.10 2005-03-16 20:52:04 achu Exp $
+ *  $Id: cerebrod_updown.c,v 1.11 2005-03-16 21:06:45 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -37,6 +37,7 @@ extern pthread_mutex_t debug_output_mutex;
 #endif /* NDEBUG */
 
 int cerebrod_updown_initialization_complete = 0;
+pthread_cond_t cerebrod_updown_initialization_cond = PTHREAD_COND_INITIALIZER;
 pthread_mutex_t cerebrod_updown_initialization_complete_lock = PTHREAD_MUTEX_INITIALIZER;
 
 int updown_fd;
@@ -160,6 +161,7 @@ _cerebrod_updown_initialize(void)
 
   Pthread_mutex_lock(&cerebrod_updown_initialization_complete_lock);
   cerebrod_updown_initialization_complete++;
+  Pthread_cond_signal(&cerebrod_updown_initialization_cond);
   Pthread_mutex_unlock(&cerebrod_updown_initialization_complete_lock);
 }
 

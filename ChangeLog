@@ -23,6 +23,12 @@
 
 	* src/cerebrod/Makefile.am: Fix dynamic module symbol problems.
 
+	* src/cerebrod/cerebrod_listener.c
+	(_cerebrod_listener_initialization),
+	src/cerebrod/cerebrod_updown.c (_cerebrod_updown_initialization),
+	src/cerebrod/cerebrod.c (main): Fix pthread logic problem with
+	condition variables.
+
 2005-03-15  Albert Chu  <chu11@llnl.gov>
 
 	Begin support of updown server.

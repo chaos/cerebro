@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.27 2005-03-16 17:08:26 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.28 2005-03-16 21:06:45 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -38,6 +38,7 @@ extern pthread_mutex_t debug_output_mutex;
 #endif /* NDEBUG */
 
 int cerebrod_listener_initialization_complete = 0;
+pthread_cond_t cerebrod_listener_initialization_cond = PTHREAD_COND_INITIALIZER;
 pthread_mutex_t cerebrod_listener_initialization_complete_lock = PTHREAD_MUTEX_INITIALIZER;
 
 int listener_fd;
@@ -132,6 +133,7 @@ _cerebrod_listener_initialize(void)
 				  (hash_cmp_f)strcmp,
 				  (hash_del_f)_Free);
   cerebrod_listener_initialization_complete++;
+  Pthread_cond_signal(&cerebrod_listener_initialization_cond);
  done:
   Pthread_mutex_unlock(&cerebrod_listener_initialization_complete_lock);
 }

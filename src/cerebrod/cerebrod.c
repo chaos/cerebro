@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.15 2005-03-16 20:52:04 achu Exp $
+ *  $Id: cerebrod.c,v 1.16 2005-03-16 21:06:45 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -26,8 +26,14 @@ pthread_mutex_t debug_output_mutex = PTHREAD_MUTEX_INITIALIZER;
 #endif /* NDEBUG */
 
 extern struct cerebrod_config conf;
+
 extern int cerebrod_listener_initialization_complete;
+extern pthread_cond_t cerebrod_listener_initialization_cond;
+extern pthread_mutex_t cerebrod_listener_initialization_complete_lock;
+
 extern int cerebrod_updown_initialization_complete;
+extern pthread_cond_t cerebrod_updown_initialization_cond;
+extern pthread_mutex_t cerebrod_updown_initialization_complete_lock;
 
 static void
 _cerebrod_pre_config_initialization(void)
@@ -78,8 +84,12 @@ main(int argc, char **argv)
       Pthread_create(&thread, &attr, cerebrod_updown, NULL);
       Pthread_attr_destroy(&attr);
 
-      /* No need for locking */
-      while (cerebrod_updown_initialization_complete == 0) {}
+      /* Wait for initialization to complete */
+      Pthread_mutex_lock(&cerebrod_updown_initialization_complete_lock);
+      while (cerebrod_updown_initialization_complete == 0)
+        Pthread_cond_wait(&cerebrod_updown_initialization_cond,
+                          &cerebrod_updown_initialization_complete_lock);
+      Pthread_mutex_unlock(&cerebrod_updown_initialization_complete_lock);
     }
 
   /* Start listener before speaker, since the listener may need to
@@ -100,8 +110,12 @@ main(int argc, char **argv)
           Pthread_attr_destroy(&attr);
         }
 
-      /* No need for locking */
-      while (cerebrod_listener_initialization_complete == 0) {}
+      /* Wait for initialization to complete */
+      Pthread_mutex_lock(&cerebrod_listener_initialization_complete_lock);
+      while (cerebrod_listener_initialization_complete == 0)
+        Pthread_cond_wait(&cerebrod_listener_initialization_cond,
+                          &cerebrod_listener_initialization_complete_lock);
+      Pthread_mutex_unlock(&cerebrod_listener_initialization_complete_lock);
     }
 
   if (conf.speak)
