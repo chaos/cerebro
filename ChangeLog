@@ -11,7 +11,8 @@
 	Add initial support for masterlist mechanisms.
 	
 	* config/libtool.m4, config/ac_genders.m4,
-	config/ac_gendersllnl.m4, src/libcommon/ltdl.h,
+	config/ac_gendersllnl.m4, src/libcommon/argv.h,
+	src/libcommon/argv.c, src/libcommon/ltdl.h,
 	src/libcommon/ltdl.c,src/cerebrod/cerebrod_clusterlist.h,
 	src/cerebrod/cerebrod_clusterlist.c,
 	src/cerebrod/cerebrod_clusterlist_genders.c,
