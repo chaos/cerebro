@@ -5,9 +5,6 @@
 - Non-pthreads support?
 - remove hash/list buffering in list.c hash.c?
 
-- split libcommon to common and binary only libs?
-  - i.e. wrappers and error stuff in separate lib
-
 - test
    - fd leaking
    - mem-leaking
@@ -18,8 +15,7 @@
 
 - signals to daemon to log/unlog debug info?
 
-- lib for writing modules
-  - and doc
+- doc for writing modules
 
 - libcerebro versioning
 - libcerebro symbol map
@@ -28,8 +24,3 @@
   - basically concerns use of "cerebro_defs.h" in protocol header files
 
 - hostname -> nodename
-
-- cerebrod_err_exit
-  - and err_output??
-
-

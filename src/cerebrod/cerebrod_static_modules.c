@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_static_modules.c,v 1.3 2005-03-30 05:41:45 achu Exp $
+ *  $Id: cerebrod_static_modules.c,v 1.4 2005-03-30 18:26:02 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -56,11 +56,12 @@ struct cerebrod_clusterlist_module_info *static_clusterlist_modules[] =
 struct cerebrod_config_module_info *
 cerebrod_find_static_config_module(char *name)
 {
-  struct cerebrod_config_module_info **ptr = &static_config_modules[0];
+  struct cerebrod_config_module_info **ptr;
   int i = 0;
 
   assert(name);
 
+  ptr = &static_config_modules[0];
   while (ptr[i] != NULL)
     {
       if (!ptr[i]->config_module_name)
@@ -80,11 +81,12 @@ cerebrod_find_static_config_module(char *name)
 struct cerebrod_clusterlist_module_info *
 cerebrod_find_static_clusterlist_module(char *name)
 {
-  struct cerebrod_clusterlist_module_info **ptr = &static_clusterlist_modules[0];
+  struct cerebrod_clusterlist_module_info **ptr;
   int i = 0;
   
   assert(name);
   
+  ptr = &static_clusterlist_modules[0]; 
   while (ptr[i] != NULL)
     {
       if (!ptr[i]->clusterlist_module_name)

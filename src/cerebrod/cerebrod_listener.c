@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.35 2005-03-30 05:41:45 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.36 2005-03-30 18:26:02 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -358,6 +358,7 @@ cerebrod_listener(void *arg)
 	continue;
 
       _cerebrod_listener_dump_heartbeat(&hb);
+
       if (hb.version != CEREBROD_HEARTBEAT_PROTOCOL_VERSION)
 	{
 	  cerebrod_err_debug("%s(%s:%d): invalid cerebrod packet version read",
@@ -385,7 +386,7 @@ cerebrod_listener(void *arg)
           cerebrod_err_output("%s(%s:%d): cerebrod_clusterlist_get_nodename "
 			      "error: %s", 
 			      __FILE__, __FUNCTION__, __LINE__,
-			      hb.hostname);
+                              hb.hostname);
           continue;
         }
 

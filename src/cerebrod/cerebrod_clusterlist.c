@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist.c,v 1.21 2005-03-30 05:41:45 achu Exp $
+ *  $Id: cerebrod_clusterlist.c,v 1.22 2005-03-30 18:26:02 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -171,7 +171,6 @@ cerebrod_clusterlist_setup(void)
     }
   else
     {
-
       struct cerebrod_clusterlist_module_info **ptr;
       int i = 0;
 
@@ -237,13 +236,11 @@ cerebrod_clusterlist_cleanup(void)
 
 #if !WITH_STATIC_MODULES
   Lt_dlclose(clusterlist_module_dl_handle);
+  Lt_dlexit();
   clusterlist_module_dl_handle = NULL;
 #endif /* !WITH_STATIC_MODULES */
-  clusterlist_module_info = NULL;
 
-#if !WITH_STATIC_MODULES
-  Lt_dlexit();
-#endif /* !WITH_STATIC_MODULES */
+  clusterlist_module_info = NULL;
 
   return 0;
 }

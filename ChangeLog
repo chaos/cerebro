@@ -1,3 +1,17 @@
+2005-03-30  Albert Chu  <chu11@llnl.gov>
+
+	* Minor code cleanup throughout
+
+	* src/cerebrod/cerebrod_updown.c (cerebrod_updown_update_data):
+	Fix race condition.
+
+	* configure.ac, src/libcerebro/Makefile.am: Add library
+	versioning.
+
+	* src/libcerebro/cerebro.map: New file.
+
+	* src/libcerebro/Makefile.am: Add symbol export map.
+	
 2005-03-29  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerebrod/cerebrod_error.h, src/cerebrod/cerebrod_error.c

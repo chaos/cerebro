@@ -1,6 +1,11 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.4 2005-03-25 23:52:54 achu Exp $
+## $Id: Makefile.am,v 1.5 2005-03-30 18:26:02 achu Exp $
 ##*****************************************************************************
+
+if WITH_GNU_LD
+VERSION_SCRIPT = $(srcdir)/cerebro.map
+OTHER_FLAGS = -Wl,--version-script=$(VERSION_SCRIPT)
+endif
 
 noinst_HEADERS = cerebro_updown_protocol.h \
 		 cerebrod_heartbeat_protocol.h
@@ -15,3 +20,4 @@ cerebroheaders_HEADERS = cerebro_defs.h \
 lib_LTLIBRARIES       = libcerebro.la
 libcerebro_la_CFLAGS  = -D_REENTRANT
 libcerebro_la_SOURCES = cerebro_marshalling.c
+libcerebro_la_LDFLAGS = -version-info @LIBCEREBRO_VERSION_INFO@ $(OTHER_FLAGS)

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.61 2005-03-30 05:41:45 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.62 2005-03-30 18:26:02 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -328,7 +328,7 @@ _cerebrod_load_alternate_configuration(struct cerebrod_config_module_info *confi
   if (!config_module_info->load_default)
     cerebrod_err_exit("config module '%s' does not contain "
 		      "valid load_default function", 
-	     config_module_info->config_module_name);
+                      config_module_info->config_module_name);
 
 #ifndef NDEBUG
   if (conf.debug)
@@ -454,9 +454,10 @@ _cerebrod_config_module_setup(void)
     }
   else
     {
-      struct cerebrod_config_module_info **ptr = &static_config_modules[0];
+      struct cerebrod_config_module_info **ptr;
       int i = 0;
 
+      ptr = &static_config_modules[0];
       while (ptr[i] != NULL)
         {
           int rv;

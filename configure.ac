@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.17 2005-03-23 17:37:33 achu Exp $
+## $Id: configure.ac,v 1.18 2005-03-30 18:26:02 achu Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -20,6 +20,26 @@ AM_INIT_AUTOMAKE($PROJECT, $VERSION)
 AM_CONFIG_HEADER([config/config.h])
 AM_MAINTAINER_MODE
 
+# Update this information before a public release only!
+ 
+# libcerebro versioning
+#
+# If library source code has changed at all increment rev
+# (current:rev:age) = (current:rev+1:age)
+#
+# If any interfaces have been added,removed, or changed increment current
+#  and set rev = 0;
+#
+# If any interfaces have been added increment age
+#
+# If any interfaces have been removed, set age = 0
+#
+LIBCEREBRO_CURRENT=0
+LIBCEREBRO_REVISION=0
+LIBCEREBRO_AGE=0
+LIBCEREBRO_VERSION_INFO=$LIBCEREBRO_CURRENT:$LIBCEREBRO_REVISION:$LIBCEREBRO_AGE
+AC_SUBST([LIBCEREBRO_VERSION_INFO])
+
 ##
 # Checks for programs.
 ##
@@ -28,6 +48,7 @@ AC_PROG_MAKE_SET
 AC_LIBTOOL_DLOPEN
 AC_PROG_LIBTOOL
 AC_LIB_LTDL
+AM_CONDITIONAL(WITH_GNU_LD, test "$with_gnu_ld" = "yes")
 AC_DEBUG
 
 ##

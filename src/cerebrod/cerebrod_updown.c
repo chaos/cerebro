@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.c,v 1.21 2005-03-30 05:41:45 achu Exp $
+ *  $Id: cerebrod_updown.c,v 1.22 2005-03-30 18:26:02 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -584,7 +584,9 @@ _cerebrod_updown_evaluate_updown_state(void *x, void *arg)
   struct cerebrod_updown_evaluation_data *ed;
   struct cerebro_updown_response *res = NULL;
   u_int8_t updown_state;
+#ifndef NDEBUG
   int rv;
+#endif /* NDEBUG */
 
   assert(x);
   assert(arg);
@@ -682,7 +684,7 @@ _cerebrod_updown_respond_with_updown_nodes(int client_fd,
   struct cerebrod_updown_evaluation_data ed;
   struct cerebro_updown_response end_res;
   struct timeval tv;
-  List node_responses;
+  List node_responses = NULL;
 
   assert(client_fd >= 0);
   assert(updown_request == CEREBRO_UPDOWN_REQUEST_UP_NODES
@@ -738,7 +740,7 @@ _cerebrod_updown_respond_with_updown_nodes(int client_fd,
 
   if (List_count(node_responses))
     {
-      if (list_for_each(node_responses, 
+      if (list_for_each(node_responses,
 			_cerebrod_updown_send_node_responses, 
 			&client_fd) < 0)
         {
@@ -1008,7 +1010,8 @@ _cerebrod_updown_dump_updown_node_data_list(void)
 	    }
         }
       else
-        fprintf(stderr, "_cerebrod_updown_dump_node_data: called with empty list\n");
+        fprintf(stderr, "_cerebrod_updown_dump_node_data: "
+                "called with empty list\n");
       fprintf(stderr, "**************************************\n");
       Pthread_mutex_unlock(&debug_output_mutex);
       Pthread_mutex_unlock(&updown_node_data_lock);
@@ -1020,6 +1023,7 @@ void
 cerebrod_updown_update_data(char *node, u_int32_t last_received)
 {
   struct cerebrod_updown_node_data *ud;
+  int update_output_flag = 0;
 
   if (!cerebrod_updown_initialization_complete)
     cerebrod_err_exit("%s(%s:%d): initialization not complete",
@@ -1049,6 +1053,9 @@ cerebrod_updown_update_data(char *node, u_int32_t last_received)
       Hash_insert(updown_node_data_index, key, ud);
       updown_node_data_index_numnodes++;
 
+      /* Ok to call debug output function, since updown_node_data_lock
+       * is locked.
+       */
       _cerebrod_updown_output_insert(ud);
     }
   Pthread_mutex_unlock(&updown_node_data_lock);
@@ -1058,10 +1065,17 @@ cerebrod_updown_update_data(char *node, u_int32_t last_received)
     {
       ud->discovered = 1;
       ud->last_received = last_received;
+      update_output_flag++;
 
-      _cerebrod_updown_output_update(ud);
+      /* Can't call a debug output function in here, it
+       * can cause a deadlock b/c the updown_noe_data_lock 
+       * is not locked.
+       */
     }
   Pthread_mutex_unlock(&(ud->updown_node_data_lock));
+
+  if (update_output_flag)
+    _cerebrod_updown_output_update(ud);
 
   _cerebrod_updown_dump_updown_node_data_list();
 }
