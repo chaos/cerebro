@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.c,v 1.5 2004-08-20 00:14:54 achu Exp $
+ *  $Id: wrappers.c,v 1.6 2005-01-03 17:48:38 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -76,6 +76,8 @@ wrap_strncpy(const char *file, int line, char *dest, const char *src, size_t n)
 {
   char *ret;
 
+  assert(file != NULL);
+
   ret = strncpy(dest, src, n);
   dest[n-1] = '\0';
   
@@ -145,6 +147,19 @@ wrap_socket(const char *file, int line, int domain, int type, int protocol)
   return fd;
 }
 
+int 
+wrap_bind(const char *file, int line, int sockfd, struct sockaddr *my_addr, socklen_t addrlen)
+{
+  int ret;
+  
+  assert(file != NULL);
+
+  if ((ret = bind(sockfd, my_addr, addrlen)) < 0)
+    err_exit("bind(%s:%d): %s", file, line, strerror(errno));
+
+  return ret;
+}
+
 int
 wrap_getsockopt(const char *file, int line, int s, int level, int optname, void *optval, socklen_t *optlen)
 {
@@ -176,6 +191,8 @@ wrap_fork(const char *file, int line)
 {
   pid_t pid;
 
+  assert(file != NULL);
+
   if ((pid = fork()) < 0)
     err_exit("fork(%s:%d): %s", file, line, strerror(errno));
 
@@ -186,6 +203,8 @@ Sighandler_t
 wrap_signal(const char *file, int line, int signum, Sighandler_t handler)
 {
   Sighandler_t ret;
+
+  assert(file != NULL);
 
   if ((ret = signal(signum, handler)) == SIG_ERR)
     err_exit("signal(%s:%d): %s", file, line, strerror(errno));
@@ -198,8 +217,10 @@ wrap_chdir(const char *file, int line, const char *path)
 {
   int ret;
 
+  assert(file != NULL);
+
   if ((ret = chdir(path)) < 0)
-    err_exit("Chdir((%s:%d): %s", file, line, strerror(errno));
+    err_exit("Chdir(%s:%d): %s", file, line, strerror(errno));
 
   return ret;
 }
@@ -207,6 +228,86 @@ wrap_chdir(const char *file, int line, const char *path)
 mode_t
 wrap_umask(const char *file, int line, mode_t mask)
 {
+  assert(file != NULL);
+
   /* achu: never supposed to fail.  Go fig. */
   return umask(mask);
+}
+
+int
+wrap_gettimeofday(const char *file, int line, struct timeval *tv, struct timezone *tz)
+{
+  int ret;
+
+  assert(file != NULL);
+
+  if ((ret = gettimeofday(tv, tz)) < 0)
+    err_exit("Gettimeofday(%s:%d): %s", file, line, strerror(errno));
+
+  return ret;
+}
+
+time_t 
+wrap_time(const char *file, int line, time_t *t)
+{
+  time_t ret;
+
+  assert(file != NULL);
+
+  if ((ret = time(t)) == ((time_t)-1))
+    err_exit("Time(%s:%d): %s", file, line, strerror(errno));
+
+  return ret;
+}
+
+struct tm *
+wrap_localtime(const char *file, int line, const time_t *timep)
+{
+  struct tm *tmptr;
+  
+  assert(file != NULL);
+
+  if (!(tmptr = localtime(timep)))
+    err_exit("Localtime(%s:%d)", file, line);
+
+  return tmptr;
+}
+
+struct tm *
+wrap_localtime_r(const char *file, int line, const time_t *timep, struct tm *result)
+{
+  struct tm *tmptr;
+  
+  assert(file != NULL);
+
+  if (!(tmptr = localtime_r(timep, result)))
+    err_exit("Localtime(%s:%d)", file, line);
+
+  return tmptr;
+}
+
+int 
+wrap_gethostname(const char *file, int line, char *name, size_t len)
+{
+  int ret;
+
+  assert(file != NULL);
+
+  if ((ret = gethostname(name, len)) < 0)
+    err_exit("Gethostname(%s:%d): %s", file, line, strerror(errno));
+
+  return ret;
+}
+
+int 
+wrap_inet_pton(const char *file, int line, int af, const char *src, void *dst)
+{
+  int ret;
+  
+  assert(file != NULL);
+
+  if ((ret = inet_pton(af, src, dst)) < 0)
+    err_exit("Inet_pton(%s:%d): %s", file, line, strerror(errno));
+
+  return ret;
 }

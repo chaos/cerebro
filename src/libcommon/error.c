@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: error.c,v 1.2 2004-07-06 17:06:26 achu Exp $
+ *  $Id: error.c,v 1.3 2005-01-03 17:48:38 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -11,6 +11,7 @@
 #endif /* STDC_HEADERS */
 #include <syslog.h>
 #include <assert.h>
+#include <errno.h>
 
 #include "error.h"
 
@@ -91,4 +92,9 @@ err_exit(const char *fmt, ...)
   _err(LOG_ERR, fmt, ap);
   va_end(ap);
   exit(1);
+}
+
+void lsd_fatal_error(char *file, int line, char *mesg)
+{
+  err_exit("LSD FATAL ERROR(%s:%d) %s: %s", file, line, mesg, strerror(errno));
 }

@@ -1,3 +1,5 @@
 - README description
+- config file documentation
+- IPv6
 - cerebro.spec.in, descriptions
-- not multicast, single-cast option
+- remember to disable SIGPIPE

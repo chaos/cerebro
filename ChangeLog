@@ -1,3 +1,75 @@
+2005-01-02  Albert Chu  <chu11@llnl.gov>
+
+	* src/cerebrod/cerebrod.h, src/cerebrod/cerebrod_speaker.h,
+	src/cerebrod/cerebrod_speaker.c: New files.
+
+	* src/cerebrod/cerebrod_config.c
+	(_cerebrod_calculated_heartbeat_frequency_ranged): New function.
+
+	* src/cerebrod/cerebrod_config.h, src/cerebrod/cerebrod_config.c
+	(_cerebrod_config_parse, _cb_heartbeat_freq,
+	_cerebrod_calculate_configuration): Support fixed frequency and
+	ranged frequencies.
+
+	* src/cerebrod/cerebrod_heartbeat.h,
+	src/cerebrod/cerebrod_heartbeat.c (cerebrod_heartbeat_construct):
+	New function.  Rename struct cerebrod_heartbeat_t to struct
+	cerebrod_heartbeat.
+
+	* src/libcommon/wrappers.h, src/libcommon/wrappers.c
+	(Bind, wrap_bind): New macros and functions.
+
+2005-01-01  Albert Chu  <chu11@llnl.gov>
+
+	* configure.ac: Updated with threads and lsd defines.
+
+	* config/acx_pthread.m4: New file.
+
+	* src/cerebrod/cerebrod_heartbeat.h: Include new file.
+	
+	* src/cerebrod/cerebrod_boottime.h,
+	src/cerebrod/cerebrod_boottime.c: Renamed to cerebrod_cache.h and
+	cerebrod_cache.c.
+
+	* src/cerebrod/cerebrod_cache.h, src/cerebrod/cerebrod_cache.c
+	(cerebrod_get_starttime, cerebrod_cache_starttime,
+	cerebrod_cache_boottime, cerebrod_cache_hostname,
+	cerebrod_get_hostname): New functions.
+
+	* src/cerebrod/cerebrod_heartbeat.h: Add program starttime to
+	heartbeat.
+
+	* src/cerebrod/cerebrod_heartbeat.c (cerebrod_heartbeat_marshall,
+	cerebrod_heartbeat_unmarshall): Add starttime
+	marshalling/unmarshalling.
+
+	* src/cerebrod/cerebrod_config.h, src/cerebrod/cerebrod_config.c
+	(cerebrod_config): New function.
+
+	* src/cerebrod/cerebrod_config.h, src/cerebrod/cerebrod_config.c
+	(cerebrod_config_default, cerebrod_cmdline_parse,
+	cerebrod_config_parse, cerebrod_calculate_configuration): Made
+	static and renamed to _cerebrod_config_default,
+	_cerebrod_cmdline_parse, _cerebrod_config_parse,
+	_cerebrod_calculate_configuration respectively.
+
+	* src/cerebrod_config.c (_cerebrod_config_dump): New function.
+
+	* src/cerebrod/Makefile.am: Update appropriately.
+	
+	* src/libcommon/wrappers.h, src/libcommon/wrappers.c
+	(Gettimeofday, wrap_gettimeofday, Inet_pton, wrap_inet_pton, Time,
+	wrap_time): New macros and functions.
+
+2004-12-31  Albert Chu  <chu11@llnl.gov>
+
+	* src/cerebrod/cerebrod_config.h, src/cerebrod/cerebrod_config.c:
+	Modified to support singlecast as well as multicast configuration.
+	Added configuration file checks and singlecast vs. multicast
+	configuration detection.
+
+	* src/libcommon/wrappers.c: Added asserts.
+	
 2004-12-23  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerebrod/cerebrod_config.c, src/cerebrod/cerebrod_daemon.c,

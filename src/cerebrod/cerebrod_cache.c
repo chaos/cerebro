@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_boottime.c,v 1.5 2004-11-17 00:49:31 achu Exp $
+ *  $Id: cerebrod_cache.c,v 1.1 2005-01-03 17:48:38 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -13,9 +13,11 @@
 #include <ctype.h>
 #endif /* STDC_HEADERS */
 #include <limits.h>
+#include <assert.h>
 #include <errno.h>
 
-#include "cerebrod_boottime.h"
+#include "cerebrod.h"
+#include "cerebrod_cache.h"
 #include "error.h"
 #include "wrappers.h"
 
@@ -23,23 +25,38 @@
 #define CEREBROD_BOOTTIME_FILE     "/proc/stat"
 #define CEREBROD_BOOTTIME_KEYWORD  "btime"
 
-u_int32_t cerebrod_boottime = 0;
-
 /* On some systems, due to kernel bugs, the boottime value may change
- * as the system executes.  We will cache the first boottime value
- * read from /proc and assume it is the correct boottime.
+ * as the system executes.  We will assume the first boottime value
+ * read from /proc is correct.
  */
-u_int32_t
-cerebrod_get_boottime(void)
+
+static u_int32_t cerebrod_starttime = 0;
+static u_int32_t cerebrod_boottime = 0;
+static char cerebrod_hostname[MAXHOSTNAMELEN];
+static int cerebrod_hostname_len = 0;
+
+static void
+_cerebrod_cache_starttime(void)
+{
+  struct timeval tv;
+
+  assert(!cerebrod_starttime);
+
+  Gettimeofday(&tv, NULL);
+
+  cerebrod_starttime = tv.tv_sec;
+}
+
+static void
+_cerebrod_cache_boottime(void)
 {
   int fd, len;
   char *bootvalptr, *endptr, *tempptr;
   char buf[CEREBROD_BOOTTIME_BUFLEN];
   u_int32_t ret;
-  
-  if (cerebrod_boottime)
-    return cerebrod_boottime;
-  
+
+  assert(!cerebrod_boottime);
+
   fd = Open(CEREBROD_BOOTTIME_FILE, O_RDONLY, 0);
   len = Read(fd, buf, CEREBROD_BOOTTIME_BUFLEN);
 
@@ -67,5 +84,48 @@ cerebrod_get_boottime(void)
     err_exit("cerebrod_boottime: boottime value parse error");
 
   cerebrod_boottime = ret;
-  return ret;
+}
+
+static void
+_cerebrod_cache_hostname(void)
+{
+  assert(!cerebrod_hostname_len);
+  memset(cerebrod_hostname, '\0', MAXHOSTNAMELEN);
+  Gethostname(cerebrod_hostname, MAXHOSTNAMELEN);
+  /* Guarantee truncation */
+  cerebrod_hostname[MAXHOSTNAMELEN-1] = '\0';
+  cerebrod_hostname_len = strlen(cerebrod_hostname);
+}
+
+void
+cerebrod_cache(void)
+{
+  _cerebrod_cache_starttime();
+  _cerebrod_cache_boottime();
+  _cerebrod_cache_hostname();
+}
+
+u_int32_t
+cerebrod_get_starttime(void)
+{
+  assert(cerebrod_starttime);
+
+  return cerebrod_starttime;
+}
+
+u_int32_t
+cerebrod_get_boottime(void)
+{
+  assert(cerebrod_boottime);
+  
+  return cerebrod_boottime;
+}
+
+void
+cerebrod_get_hostname(char *buf, unsigned int len)
+{
+  assert(buf && len > 0);
+  assert(len > cerebrod_hostname_len);
+  
+  strcpy(buf, cerebrod_hostname);
 }

@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.3 2004-07-12 15:15:02 achu Exp $
+## $Id: configure.ac,v 1.4 2005-01-03 17:48:37 achu Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -65,8 +65,14 @@ AC_CHECK_FUNCS( \
   getopt_long \
 )
 
-# Do this last, you could add compile options which can make function
-# checks fail 
+ACX_PTHREAD([], AC_MSG_ERROR([Posix threads required to build]))
+AC_DEFINE(WITH_PTHREADS, 1, [Define pthreads])
+LIBS="$PTHREAD_LIBS $LIBS"
+CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
+
+AC_DEFINE(WITH_LSD_FATAL_ERROR_FUNC, 1, [Define lsd_fatal_error])
+
+# Check for debugging last, since it may affect configure tests
 AC_DEBUG
 
 ##

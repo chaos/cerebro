@@ -105,6 +105,14 @@ time_t cerebro_last_downtime(cerebro_t handle, const char *node);
 are uptime and boottime redundant 
 ???  
 
+New idea: 12/31/04
+- Create new nodeupdown library outside of cerebro library.  Will allow older
+programs to still link properly.  Just update the library libtool age/rev 
+appropriately.
+- load_data() function takes a flag indicating the type of master list
+being passed in.
+- Or create backwards compatability nodeupdown that calls the new library
+
 --> status monitoring
 
 Retrieve the status of 'name' on 'node'.
@@ -154,6 +162,9 @@ int cerebro_module_init();
 int cerebro_module_status_get_val(int32_t *val);
 int cerebro_module_cleanup();
 
+New idea: 1/2/04
+- Instead of a period, offer a period or a range.
+
 --> event registration
 
 Events are handled by the user calling an event register function for
@@ -190,6 +201,11 @@ int cerebro_status_event_register(cerebro_t handle, const char *name, const char
                                   cerebro_comp_type_t c, int32_t val, int current, int *fd);
 int cerebro_status_parse_event(cerebro_t handle, int fd, cerebro_comp_type_t *c, int32_t *val, 
                                char *nodebuf, int nodebuflen);
+
+New idea: 12/31/04
+Also have dynamically loadable module be registered/called when an
+event occurs.  Allows users to monitor/log/etc. as they see fit.
+Would be perfect for Terry H's bootttime syslogging requirement.
 
 whatsup tool
 ------------

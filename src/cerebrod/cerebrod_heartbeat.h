@@ -1,27 +1,28 @@
 /*****************************************************************************\
- *  $Id: cerebrod_heartbeat.h,v 1.2 2004-11-17 00:49:31 achu Exp $
+ *  $Id: cerebrod_heartbeat.h,v 1.3 2005-01-03 17:48:38 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_HEARTBEAT_H
 #define _CEREBROD_HEARTBEAT_H
 
-#include <sys/param.h>
+#include "cerebrod.h"
 
-#ifndef MAXHOSTNAMELEN
-#define MAXHOSTNAMELEN 64
-#endif
-
-struct cerebrod_heartbeat_t
+struct cerebrod_heartbeat
   {
     int32_t version;
     char hostname[MAXHOSTNAMELEN];
+    u_int32_t starttime;
     u_int32_t boottime;
   };
 
-#define CEREBROD_HEARTBEAT_LEN  (sizeof(int32_t) + MAXHOSTNAMELEN \
+#define CEREBROD_HEARTBEAT_LEN  (sizeof(int32_t) \
+                                 + MAXHOSTNAMELEN \
+                                 + sizeof(u_int32_t) \
                                  + sizeof(u_int32_t))
 
-int cerebrod_heartbeat_marshall(struct cerebrod_heartbeat_t *cb, char *buffer, int len);
-int cerebrod_heartbeat_unmarshall(struct cerebrod_heartbeat_t *cb, char *buffer, int len);
+void cerebrod_heartbeat_construct(struct cerebrod_heartbeat *hb);
+void cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb);
+int cerebrod_heartbeat_marshall(struct cerebrod_heartbeat *hb, char *buffer, int len);
+int cerebrod_heartbeat_unmarshall(struct cerebrod_heartbeat *hb, char *buffer, int len);
 
 #endif /* _CEREBROD_HEARTBEAT_H */
