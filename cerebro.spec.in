@@ -14,7 +14,6 @@ Cerebro is a collection of tools for dynamically monitoring a cluster of nodes.
 %setup  -q -n %{name}-%{version}-%{release}
 
 %build
-./autogen.sh
 %configure --program-prefix=%{?_program_prefix:%{_program_prefix}}
 make 
 
