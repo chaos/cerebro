@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebrod.conf.5.in,v 1.4 2005-03-20 18:11:19 achu Exp $
+\."$Id: cerebrod.conf.5.in,v 1.5 2005-03-20 18:20:39 achu Exp $
 \."#############################################################################
 .TH cerebrod.conf 5 "May 2005" "cerebrod.conf @VERSION@" "cerebrod.conf"
 .SH "NAME"
@@ -21,8 +21,6 @@ file can be specified on the command line with the
 .I -c
 option.
 
-XXX need to do defaults
-
 .SH "CONFIGURATION OPTIONS"
 The following are a list of configuration options that can be
 specified in the configuration file.  Each configuration option must
@@ -40,43 +38,48 @@ daemon sends out heartbeat packets containing
 information.  The frequency should be specified in seconds.  The
 frequency can be specified either as a static frequency or a range of
 frequencies.  If a range is specified, a random number of seconds
-within that range is selected for every heartbeat packet sent.
+within that range is selected for every heartbeat packet sent.  The
+default value is a minimum frequency of 10 seconds and a maximum
+frequency of 20 seconds.
+.TP
+.I heartbeat_source_port num 
+Specify the source port that heartbeat packets should be sent from.
+This should be different than the destination port specified below.
+The default source port is 8851.
 .TP
 .I heartbeat_destination_port num 
 Specify the destination port that heartbeat packets should be sent to.
-This should be different than the source port specified below.
+This should be different than the source port specified above.  The
+default destination port is 8850.
 .TP
 .I heartbeat_destination_ip ip_address
 Specify the destination ip address that heartbeat packets should be
 sent to.  The destination ip address may be either a singlecast or
-multicast address.
-.I heartbeat_source_port num 
-Specify the source port that heartbeat packets should be sent from.  
-This should be different than the destination port specified above.
+multicast address. The default destination IP address is 239.2.11.72.
 .TP
 .I heartbeat_network_interface (network_interface | ip_address | subnet)
 Specify the network interface heartbeat packets should be sent out of.
 The network interface can be specified as a network interface (i.e.
 eth0), an ip address (i.e. 192.168.1.1) or a subnet using CIDR
-notation (i.e. 192.168.1.1/16).  If a network interface is not
-specified,
+notation (i.e. 192.168.1.1/16).  By default, when a network interface
+is not specified,
 .B cerebrod
 will search for and select an appropriate network interface. If the
 machine running 
 .B cerebrod
 contains multiple network interfaces, it would be recommended that the
-appropriate network interface be listed.
+appropriate network interface be configured.
 .TP
 .I heartbeat_ttl num
 Specify the heartbeat packet time to live parameter.  This parameter
 is only used if the heartbeat destination ip address is a multicast ip
-address.
+address.  The default ttl is 1.
 .TP
 .I speak ( on | off )
 Specify if the
 .B cerebrod
 daemon should send out packets or not.  Generally speaking, this should
-always be turned on.
+always be turned on.  The default configuration turns this option on.
 .TP
 .I listen ( on | off )
 Specify if the
@@ -86,11 +89,12 @@ should be turned off for all but just a few machines in a cluster.  Just
 a few of the machines should be responsible for collecting the
 .B Cerebro
 data so that computational power of the cluster as a whole isn't lost.
+The default configuration turns this option on.
 .TP
 .I listen_threads num
 Specify the number of listening threads the 
 .B cerebrod
-listener server should execute.
+listener server should execute.  The default executes 2 threads.
 .TP
 .I updown_server ( on | off )
 Specify if the
@@ -102,10 +106,13 @@ if the
 .I listen
 option is turned on.  If the 
 .I listen
-option is turned off, the updown_server will not be started.
+option is turned off, the updown_server will not be started.  The default
+turns this option on as long as the 
+.I listen
+option is turned on.
 .TP
 .I updown_server_port num
-Specify the updown server port.
+Specify the updown server port.  The default server port is 8852.
 .TP
 .I clusterlist_module ( name | filename | path )
 Specify the clusterlist module to be loaded for parsing a
@@ -116,7 +123,8 @@ first searched for in the
 package library, @CEREBROD_MODULE_DIR@.  They are then searched for in
 the current directory.
 
-The following clusterlist modules are currently searched for by
+When this option is not configured, the following clusterlist modules
+are currently searched for by
 .B cerebrod
 in the following order:
  
@@ -155,25 +163,27 @@ genders: filename=<file> - Specify the path to the genders database.
  
 hostsfile: filename=<file> - Specify the path to the hostsfile database.
 
+By default, no options are passed to the clusterlist module loaded.
+
 .if @MANPAGE_DEBUG@ \{
 .TP
-.I speak_debug
+.I speak_debug ( on | off )
 Turn on speak debugging.  Requires that debugging be turned on from
 the command line with the
 .I -d
-option.
+option.  This option is turned off by default.
 .TP
-.I listen_debug
+.I listen_debug ( on | off )
 Turn on listen debugging.  Requires that debugging be turned on from
 the command line with the
 .I -d
-option. 
+option.  This option is turned off by default.
 .TP
-.I updown_server_debug
+.I updown_server_debug ( on | off )
 Turn on updown server debugging.  Requires that debugging be turned on
 from the command line with the
 .I -d
-option.
+option.  This option is turned off by default.
 \}
 .SH "FILES"
 @CEREBROD_CONFIGFILE_DEFAULT@
