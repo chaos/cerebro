@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.7 2004-08-10 22:12:03 geller2 Exp $
+ *  $Id: cerebrod_config.c,v 1.8 2004-08-18 21:11:01 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -20,19 +20,15 @@
 #include <sys/ioctl.h>
 #include <netinet/in.h>
 #include <net/if.h>
-#include <regex.h>
+
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
-
 
 #include "cerebrod_config.h"
 #include "conffile.h"
 #include "error.h"
 #include "wrappers.h"
-
-/* Message when someone specifies a bad CIDR address */
-#define CIDR_PARSE_ERROR "Invalid CIDR syntax"
 
 extern struct cerebrod_config conf;
 
@@ -49,6 +45,8 @@ cerebrod_config_default(void)
   conf.mcast_ip = CEREBROD_MCAST_IP_DEFAULT;
   conf.mcast_port = CEREBROD_MCAST_PORT_DEFAULT;
   conf.mcast_listen_threads = CEREBROD_MCAST_LISTEN_THREADS_DEFAULT;
+
+  conf.multicast_interface = NULL;
 }
 
 static void
@@ -204,6 +202,30 @@ cerebrod_config_parse(void)
 }
 
 /* From Unix Network Programming, by R. Stevens, Chapter 16 */
+static void 
+_get_if_conf(void **buf, struct ifconf *ifc, int fd)
+{
+  int lastlen = -1, len = sizeof(struct ifreq) * 100;
+
+  for(;;)
+    {
+      *buf = Malloc(len);
+      ifc->ifc_len = len;
+      ifc->ifc_buf = *buf;
+
+      if (ioctl(fd, SIOCGIFCONF, ifc) < 0)
+        err_exit("_get_if_conf: ioctl: %s", strerror(errno));
+
+      if (ifc->ifc_len == lastlen)
+	break;
+
+      lastlen = ifc->ifc_len;
+      len += 10 * sizeof(struct ifreq);
+      Free(*buf);
+    }
+}
+
+/* From Unix Network Programming, by R. Stevens, Chapter 16 */
 static int
 _get_ifr_len(struct ifreq *ifr)
 {
@@ -235,28 +257,6 @@ _get_ifr_len(struct ifreq *ifr)
   return len;
 }
 
-void _get_if_conf(void **buf, struct ifconf *ifc, int fd)
-{
-  int lastlen = -1, len=sizeof(struct ifreq)*100;    /* Used for looping */
-
-  for(;;)
-    {
-      *buf = Malloc(len);
-      ifc->ifc_len = len;
-      ifc->ifc_buf = *buf;
-
-      if(ioctl(fd, SIOCGIFCONF, ifc) == -1)
-	err_exit("IOCTL Failed");
-
-      if(ifc->ifc_len == lastlen)
-	break;
-
-      lastlen = ifc->ifc_len;
-      len += 10 * sizeof(struct ifreq);
-      Free(*buf);
-    }
-}
-
 void
 cerebrod_calculate_configuration(void)
 {
@@ -269,90 +269,133 @@ cerebrod_calculate_configuration(void)
       /* Case A: No interface specified, find any multicast interface */
       struct ifconf ifc;
       struct ifreq *ifr;
-      int len;
       void *buf = NULL, *ptr = NULL;
-      int fd = Socket(AF_INET, SOCK_DGRAM, 0);
+      int fd;
                                                                     
       /* From Unix Network Programming, by R. Stevens, Chapter 16 */
+
+      fd = Socket(AF_INET, SOCK_DGRAM, 0);
 
       _get_if_conf(&buf, &ifc, fd);
 
       /* Check all interfaces */
       for (ptr = buf; ptr < buf + ifc.ifc_len; ) 
 	{
+          struct ifreq ifr_tmp;
+          int len;
+
 	  ifr = (struct ifreq *)ptr;
-                                                                                    
+
 	  len = _get_ifr_len(ifr);
-                                                                                    
+
 	  ptr += sizeof(ifr->ifr_name) + len;
 	  
-	  if(ioctl(fd, SIOCGIFFLAGS, ifr) == -1)
-	    err_exit("IOCTL Failed");
+          /* Null termination not required, don't use wrapper */
+          strncpy(ifr_tmp.ifr_name, ifr->ifr_name, IFNAMSIZ);
 
-	  if (!(ifr->ifr_flags & IFF_UP)
-	      || !(ifr->ifr_flags & IFF_MULTICAST))
+	  if(ioctl(fd, SIOCGIFFLAGS, &ifr_tmp) < 0)
+	    err_exit("cerebrod_calculate_configuration: ioctl: %s",
+                     strerror(errno));
+
+	  if (!(ifr_tmp.ifr_flags & IFF_UP)
+	      || !(ifr_tmp.ifr_flags & IFF_MULTICAST))
 	    continue;
 
 	  conf.multicast_interface = Strdup(ifr->ifr_name);
 	  break;
 	}
+
       Free(buf);
       Close(fd);
     }
-  else if (strchr(conf.network_interface, '/'))
+  else if (strchr(conf.network_interface, '.'))
     {
-	struct ifconf ifc;                                     /* The struct that holds the interface configs */
-	struct ifreq *ifr;                                     /* The config struct */
-	struct sockaddr_in *sinptr;                            /* Used to hold the ip address */
-	void *buf = NULL, *ptr = NULL;
-	int fd = Socket(AF_INET, SOCK_DGRAM, 0);               /* Counter and file descriptor */  
-	struct in_addr net_s;
-	u_int32_t current_ip, net;
-	int mask;
-	char *tok;
+      /* Case B: IP address or subnet specified */
+      struct ifconf ifc;
+      struct ifreq *ifr;
+      void *buf = NULL, *ptr = NULL;
+      int fd;
+      struct in_addr net_s;
+      u_int32_t current_ip, net;
+      char *tok;
+      int mask = 0;
+      char *network_interface_cpy;
+      
+      if (strchr(conf.network_interface, ':'))
+        err_exit("IPv6 IP addresses currently not supported, please specify"
+                 "IPv4 IP address");
 
-	_get_if_conf(&buf, &ifc, fd);
+      /* From Unix Network Programming, by R. Stevens, Chapter 16 */
+
+      _get_if_conf(&buf, &ifc, fd);
+      
+      fd = Socket(AF_INET, SOCK_DGRAM, 0);
+      
+      network_interface_cpy = Strdup(conf.network_interface);
+
+      /* If no '/', then just an IP address, mask is 0 bits */
+      if ((tok = strtok(network_interface_cpy, "/")))
+        {
+          if (inet_pton(AF_INET, tok, &net_s) < 0)
+            err_exit("network interface '%s' IP address resolution "
+                     "failed", conf.network_interface);
+          
+          mask = atoi(strtok(NULL, ""));
+          if (mask < 1 || mask > 32)
+            err_exit("network interface '%s' subnet mask improper",
+                     conf.network_interface);
+        }
+      else
+        {
+          if (inet_pton(AF_INET, network_interface_cpy, &net_s) < 0)
+            err_exit("network interface '%s' IP address resolution "
+                     "failed", conf.network_interface);
+        }
+
+      net = htonl(net_s.s_addr) >> (32 - mask);
+
+      /* Check all interfaces */
+      for(ptr = buf; ptr < buf + ifc.ifc_len;)
+        { 
+          struct ifreq ifr_tmp;
+          struct sockaddr_in *sinptr;
+          int len;
+
+	  ifr = (struct ifreq *)ptr;
+
+	  len = _get_ifr_len(ifr);
+
+	  ptr += sizeof(ifr->ifr_name) + len;
 	  
-	if(tok = strtok(conf.network_interface, "/") == NULL)
-	  err_exit(CIDR_PARSE_ERROR);
+          sinptr = (struct sockaddr_in *)&ifr->ifr_addr;
+          
+          current_ip = htonl((sinptr->sin_addr).s_addr) >> (32 - mask);
+          
+          /* Null termination not required, don't use wrapper */
+          strncpy(ifr_tmp.ifr_name, ifr->ifr_name, IFNAMSIZ);
 
-	if(inet_pton(AF_INET, tok, &net_s) == -1)
-	  err_exit(CIDR_PARSE_ERROR);
+          if (ioctl(fd, SIOCGIFFLAGS, &ifr_tmp) < 0)
+            err_exit("cerebrod_calculate_configuration: ioctl: %s",
+                     strerror(errno));
+          
+	  if (!(ifr_tmp.ifr_flags & IFF_UP)
+	      || !(ifr_tmp.ifr_flags & IFF_MULTICAST))
+	    continue;
+          
+          if (net != current_ip)
+            continue;
 
-	mask = atoi(strtok(NULL, ""));
-
-	if(mask < 1 || mask > 32)
-	  err_exit(CIDR_PARSE_ERROR);
-
-	net = htonl(net_s.s_addr)>>(32-mask);
-
-	if(net == NULL)
-	  err_exit(CIDR_PARSE_ERROR);
-
-	/* Iterate through the struct, and parse though for IPs and interfaces */
-	for(ptr = buf; ptr < buf + ifc.ifc_len;)
-	  { 
-	    ifr = (struct ifreq *)ptr;
-	    ptr += sizeof(ifr->ifr_name) + sizeof(struct sockaddr);
-	    sinptr = (struct sockaddr_in *)&ifr->ifr_addr;
-	    
-	    current_ip = htonl((sinptr->sin_addr).s_addr)>>(32-mask);
-
-	    ioctl(fd, SIOCGIFFLAGS, ifr);
-	    
-	    if (!(ifr->ifr_flags & IFF_UP))
-	      continue;
-
-	    if (!(ifr->ifr_flags & IFF_MULTICAST))
-	      continue;
-
-	    if(net == current_ip){
-	      conf.multicast_interface = Strdup(ifr->ifr_name);
-	    }
-	    
+          conf.multicast_interface = Strdup(ifr->ifr_name);
+          break;
 	}
-	Free(buf);
-	Close(fd);
+      
+      if (conf.multicast_interface == NULL)
+        err_exit("network interface '%s' up and with multicast "
+                 "not found", conf.network_interface);
+      
+      Free(buf);
+      Free(network_interface_cpy);
+      Close(fd);
     }
   else
     {
@@ -361,6 +404,7 @@ cerebrod_calculate_configuration(void)
       int fd;
 
       fd = Socket(AF_INET, SOCK_DGRAM, 0);
+
       Strncpy(ifr.ifr_name, conf.network_interface, IFNAMSIZ);
 
       if (ioctl(fd, SIOCGIFFLAGS, &ifr) < 0) 
@@ -369,7 +413,8 @@ cerebrod_calculate_configuration(void)
 	    err_exit("network interface '%s' not found",
 		     conf.network_interface);
 	  else
-	    err_exit("ioctl: %s", strerror(errno));
+	    err_exit("cerebrod_calculate_configuration: ioctl: %s",
+                     strerror(errno));
 	}
 
       if (!(ifr.ifr_flags & IFF_UP))
@@ -379,7 +424,7 @@ cerebrod_calculate_configuration(void)
       if (!(ifr.ifr_flags & IFF_MULTICAST))
 	  err_exit("network interface '%s' not a multicast interface",
 		   conf.network_interface);
-
+      
       conf.multicast_interface = Strdup(conf.network_interface);
 
       Close(fd);
