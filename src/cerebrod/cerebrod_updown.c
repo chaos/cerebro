@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.c,v 1.8 2005-03-16 18:45:55 achu Exp $
+ *  $Id: cerebrod_updown.c,v 1.9 2005-03-16 19:36:42 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -53,7 +53,7 @@ _cerebrod_updown_create_and_setup_socket(void)
   struct sockaddr_in server_addr;
   int temp_fd;
 
-  if ((temp_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
+  if ((temp_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
       err_debug("_cerebrod_updownd_create_and_setup_socket: socket: %s",
 		strerror(errno));
