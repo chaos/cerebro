@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.8 2005-03-14 22:05:55 achu Exp $
+## $Id: Makefile.am,v 1.9 2005-03-14 22:17:35 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -36,7 +36,8 @@ endif
 pkglib_LTLIBRARIES = \
 	$(GENDERSLLNL_CLUSTERLIST_MODULE) \
 	$(GENDERS_CLUSTERLIST_MODULE) \
-	cerebrod_clusterlist_hostsfile.la
+	cerebrod_clusterlist_hostsfile.la \
+	cerebrod_clusterlist_none.la
 
 MODULE_FLAGS = -module -avoid-version
 
@@ -54,6 +55,11 @@ cerebrod_clusterlist_hostsfile_la_SOURCES = cerebrod_clusterlist_hostsfile.c
 cerebrod_clusterlist_hostsfile_la_LDFLAGS = $(MODULE_FLAGS)
 cerebrod_clusterlist_hostsfile_la_CFLAGS = -I$(srcdir)/../libcommon
 cerebrod_clusterlist_hostsfile_la_LIBADD = ../libcommon/libcommon.la
+
+cerebrod_clusterlist_none_la_SOURCES = cerebrod_clusterlist_none.c
+cerebrod_clusterlist_none_la_LDFLAGS = $(MODULE_FLAGS)
+cerebrod_clusterlist_none_la_CFLAGS = -I$(srcdir)/../libcommon
+cerebrod_clusterlist_none_la_LIBADD = ../libcommon/libcommon.la
 
 ../libcommon/libcommon.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`

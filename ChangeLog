@@ -15,6 +15,10 @@
 	* src/libcommon/wrappers.h, src/libcommon/wrappers.c
 	(List_delete_all, List_for_each, wrap_list_delete_all,
 	wrap_list_for_each): New functions.
+
+	* src/cerebrod/cerebrod_clusterlist_none.c: New file.
+
+	* src/cerebrod/Makefile.am: Update with none module.
 	
 2005-03-13  Albert Chu  <chu11@llnl.gov>
 
