@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.c,v 1.5 2005-03-16 17:08:26 achu Exp $
+ *  $Id: cerebrod_updown.c,v 1.6 2005-03-16 17:09:36 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -238,59 +238,6 @@ cerebrod_updown(void *arg)
     }
 
   return NULL;			/* NOT REACHED */
-}
-
-static int
-_reinsert(void *data, const void *key, void *arg)
-{
-  hash_t newhash;
- 
-  assert(data && key && arg);
- 
-  newhash = *((hash_t *)arg);
-  Hash_insert(newhash, key, data);
-  return 1;
-}
- 
-static int
-_removeall(void *data, const void *key, void *arg)
-{
-  return 1;
-}
- 
-static void
-_rehash(void)
-{
-  hash_t newhash;
-  int rv;
- 
-  /* Should be called with lock already set */
-#ifndef NDEBUG
-  rv = Pthread_mutex_trylock(&updown_node_data_lock);
-  if (rv != EBUSY)
-    err_exit("cerebrod_heartbeat_dump: updown_node_data_lock not locked");
-#endif /* NDEBUG */
- 
-  updown_node_data_hash_size += CEREBROD_UPDOWN_NODE_DATA_HASH_SIZE_INCREMENT;
-   
-  newhash = Hash_create(updown_node_data_hash_size,
-                        (hash_key_f)hash_key_string,
-                        (hash_cmp_f)strcmp,
-                        (hash_del_f)_Free);
-   
-  rv = Hash_for_each(updown_node_data_index, _reinsert, &newhash);
-  if (rv != updown_node_data_numnodes)
-    err_exit("_rehash: invalid reinsert count: rv=%d numnodes=%d",
-             rv, updown_node_data_numnodes);
- 
-  rv = Hash_delete_if(updown_node_data_index, _removeall, NULL);
-  if (rv != updown_node_data_numnodes)
-    err_exit("_rehash: invalid removeall count: rv=%d numnodes=%d",
-             rv, updown_node_data_numnodes);
- 
-  Hash_destroy(updown_node_data_index);
- 
-  updown_node_data_index = newhash;
 }
 
 static void
