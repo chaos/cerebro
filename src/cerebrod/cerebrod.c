@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.10 2005-02-15 01:22:31 achu Exp $
+ *  $Id: cerebrod.c,v 1.11 2005-02-17 00:36:50 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -24,6 +24,7 @@ pthread_mutex_t debug_output_mutex = PTHREAD_MUTEX_INITIALIZER;
 #endif /* NDEBUG */
 
 extern struct cerebrod_config conf;
+extern int cerebrod_listener_initialization_complete;
 
 static void
 _cerebrod_initialization(void)
@@ -52,17 +53,9 @@ main(int argc, char **argv)
   /* Call after daemonization, since daemonization closes currently open fds */
   openlog(argv[0], LOG_ODELAY | LOG_PID, LOG_DAEMON);
 
-  if (conf.speak)
-    {
-      pthread_t thread;
-      pthread_attr_t attr;
-
-      Pthread_attr_init(&attr);
-      Pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-      Pthread_create(&thread, &attr, cerebrod_speaker, NULL);
-      Pthread_attr_destroy(&attr);
-    }
-
+  /* Start listener first, since it may need to listen for packets
+   * from a later created spaker thread 
+   */
   if (conf.listen)
     {
       int i;
@@ -77,6 +70,20 @@ main(int argc, char **argv)
           Pthread_create(&thread, &attr, cerebrod_listener, NULL);
           Pthread_attr_destroy(&attr);
         }
+    }
+
+  /* No need for locking */
+  while (cerebrod_listener_initialization_complete == 0) {}
+
+  if (conf.speak)
+    {
+      pthread_t thread;
+      pthread_attr_t attr;
+
+      Pthread_attr_init(&attr);
+      Pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+      Pthread_create(&thread, &attr, cerebrod_speaker, NULL);
+      Pthread_attr_destroy(&attr);
     }
 
   for (;;) {}
