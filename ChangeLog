@@ -1,6 +1,7 @@
 2005-03-16  Albert Chu  <chu11@llnl.gov>
 
-	* src/cerbrod/cerebrod_util.h, src/cerbrod/cerebrod_util.c: New files.
+	* src/cerbrod/cerebrod_util.h, src/cerbrod/cerebrod_util.c: New
+	files.
 
 	* src/cerebrod/cerebrod_listener.c, src/cerebrod_updown.c: Re-work
 	with new rehashing common functions.
