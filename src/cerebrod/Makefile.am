@@ -1,11 +1,13 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.21 2005-03-22 07:33:01 achu Exp $
+## $Id: Makefile.am,v 1.22 2005-03-22 20:56:40 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
 
 if WITH_STATIC_MODULES
 STATIC_MODULES_HEADERS = cerebrod_static_modules.h
+else
+DYNAMIC_MODULE_HEADERS = cerebrod_dynamic_modules.h
 endif
 
 noinst_HEADERS = cerebrod.h \
@@ -20,7 +22,8 @@ noinst_HEADERS = cerebrod.h \
 		 cerebrod_speaker.h \
 		 cerebrod_updown.h \
 		 cerebrod_util.h \
-		 $(STATIC_MODULES_HEADERS)
+		 $(STATIC_MODULES_HEADERS) \
+		 $(DYNAMIC_MODULES_HEADERS)
 
 #
 # cerebrod daemon
@@ -40,15 +43,17 @@ GENDERS_STATIC_LIBS         = $(GENDERS_LIBS)
 endif
 
 if WITH_STATIC_MODULES
-STATIC_MODULE_SOURCES = $(GENDERSLLNL_STATIC_SOURCES) \
-		        $(GENDERS_STATIC_SOURCES) \
-                        $(GENDERS_UTIL_STATIC_SOURCES) \
-			cerebrod_clusterlist_util.c \
-		        cerebrod_clusterlist_hostsfile.c \
-		        cerebrod_clusterlist_none.c
-STATIC_MODULE_LIBS    = $(GENDERSLLNL_STATIC_LIBS) $(GENDERS_STATIC_LIBS)
+STATIC_MODULES_SOURCES  = $(GENDERSLLNL_STATIC_SOURCES) \
+	   	          $(GENDERS_STATIC_SOURCES) \
+                          $(GENDERS_UTIL_STATIC_SOURCES) \
+		 	  cerebrod_clusterlist_util.c \
+		          cerebrod_clusterlist_hostsfile.c \
+		          cerebrod_clusterlist_none.c \
+			  cerebrod_static_modules.c
+STATIC_MODULES_LIBS     = $(GENDERSLLNL_STATIC_LIBS) $(GENDERS_STATIC_LIBS)
 else
-EXPORT_DYNAMIC_FLAGS  = -export-dynamic
+DYNAMIC_MODULES_SOURCES = cerebrod_dynamic_modules.c
+MODULE_EXPORT_FLAGS     = -export-dynamic
 endif
 
 sbin_PROGRAMS    = cerebrod
@@ -62,9 +67,10 @@ cerebrod_SOURCES = cerebrod.c \
 		   cerebrod_speaker.c \
 		   cerebrod_updown.c \
 		   cerebrod_util.c \
-		   $(STATIC_MODULE_SOURCES)
+		   $(STATIC_MODULES_SOURCES) \
+		   $(DYNAMIC_MODULES_SOURCES)
 cerebrod_CFLAGS  = -I$(srcdir)/../libcommon
-cerebrod_LDFLAGS = $(EXPORT_DYNAMIC_FLAGS) $(STATIC_MODULE_LIBS)
+cerebrod_LDFLAGS = $(MODULE_EXPORT_FLAGS) $(STATIC_MODULES_LIBS)
 cerebrod_LDADD   = ../libcommon/libcommon.la
 
 #

@@ -1,3 +1,37 @@
+2005-03-22  Albert Chu  <chu11@llnl.gov>
+
+	More code cleanup
+
+	* src/cerebrod/cerebrod_static_modules.c,
+	src/cerebrod/cerebrod_dynamic_modules.h,
+	src/cerebrod/cerebrod_dynamic_modules.c: New files.
+
+	* src/cerebrod/Makefile.am: Re-worked for new files appropriately.
+
+	* src/cerebrod/cerebrod_config.c
+	(_cerebrod_find_static_config_module,
+	_cerebrod_find_static_clusterlist_module): Removed due to new
+	common functions in src/cerebrod/cerebrod_static_modules.c.
+
+	* src/cerebrod/cerebrod_config.c: Removed static_config_modules
+	and config_modules arrays due to new ones stored in
+	src/cerebrod/cerebrod_static_modules.c and
+	src/cerebrod/cerebrod_dynamic_modules.c.
+
+	* src/cerebrod/cerebrod_clusterlist.c: Removed
+	static_clusterlist_modules and clusterlist_modules arrays due to
+	new ones stored in src/cerebrod/cerebrod_static_modules.c and
+	src/cerebrod/cerebrod_dynamic_modules.c.
+
+	* src/cerebrod/cerebrod_util.h, src/cerebrod/cerebrod_util.c
+	(cerebrod_search_dir_for_module): Moved into
+	src/cerebrod/cerebrod_dynamic_modules.h and
+	src/cerebrod/cerebrod_dynamic_modules.c.
+
+	* src/cerebrod/cerebrod_config.c,
+	src/cerebrod/cerebrod_clusterlist.c: Use common functions for
+	effectively overall.  Fix for new variable and function names.
+
 2005-03-21  Albert Chu  <chu11@llnl.gov>
 	
 	Static module compilation code cleanup
