@@ -11,6 +11,10 @@
 	* config/ac_hostsfile.m4: New file.
 
 	* configure.ac: Updated to configure hostsfile default path.
+
+	* src/libcommon/wrappers.h, src/libcommon/wrappers.c
+	(List_delete_all, List_for_each, wrap_list_delete_all,
+	wrap_list_for_each): New functions.
 	
 2005-03-13  Albert Chu  <chu11@llnl.gov>
 
