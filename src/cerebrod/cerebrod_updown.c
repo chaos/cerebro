@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.c,v 1.2 2005-03-16 00:25:13 achu Exp $
+ *  $Id: cerebrod_updown.c,v 1.3 2005-03-16 00:53:36 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -299,7 +299,7 @@ _cerebrod_updown_output_insert(struct cerebrod_updown_node_data *ud)
 #ifndef NDEBUG
   assert(ud);
  
-  if (conf.debug)
+  if (conf.debug && conf.updown_server_debug)
     {
       Pthread_mutex_lock(&debug_output_mutex);
       fprintf(stderr, "**************************************\n");
@@ -316,7 +316,7 @@ _cerebrod_updown_output_update(struct cerebrod_updown_node_data *ud)
 #ifndef NDEBUG
   assert(ud);
  
-  if (conf.debug)
+  if (conf.debug && conf.updown_server_debug)
     {
       struct tm tm;
       char strbuf[CEREBROD_STRING_BUFLEN];
@@ -357,7 +357,7 @@ static void
 _cerebrod_updown_dump_updown_node_data(void)
 {
 #ifndef NDEBUG
-  if (conf.debug)
+  if (conf.debug && conf.updown_server_debug)
     {
       int rv;
  
@@ -408,8 +408,6 @@ cerebrod_updown_update_data(char *node, u_int32_t last_received)
       key = Strdup(node);
 
       ud->node = Strdup(node);
-      ud->discovered = 1;
-      ud->last_received = last_received;
       Pthread_mutex_init(&(ud->updown_node_data_lock), NULL);
 
       /* Re-hash if our hash is getting too small */
@@ -419,7 +417,8 @@ cerebrod_updown_update_data(char *node, u_int32_t last_received)
       List_append(updown_node_data, ud);
       Hash_insert(updown_node_data_index, key, ud);
       updown_node_data_numnodes++;
-      return;
+
+      _cerebrod_updown_output_insert(ud);
     }
   Pthread_mutex_unlock(&updown_node_data_lock);
   

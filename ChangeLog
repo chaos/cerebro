@@ -40,6 +40,14 @@
 	(_cerebrod_listener_dump_cluster_node_data_hash): Remove
 	Hash_count use, use cluster_data_hash_numnodes instead.
 
+	* src/cerebrod/cerebrod_config.h, src/cerebrod/cerebrod_config.c
+	(_cerebrod_config_parse, _cerebrod_config_default): Added
+	additional server debugging configuration flags.
+
+	* src/cerebrod/cerebrod_speaker.c, src/cerebrod/cerebrod_listen.c,
+	src/cerebrod_updown.c: Fix debug output based on new configuration
+	parameters.
+
 2005-03-14  Albert Chu  <chu11@llnl.gov>
 
 	* src/libcommon/wrappers.h, src/libcommon/wrappers.c (Lt_dlinit,

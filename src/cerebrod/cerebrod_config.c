@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.27 2005-03-15 23:14:39 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.28 2005-03-16 00:53:36 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -44,7 +44,7 @@ _cerebrod_config_default(void)
 {
   memset(&conf, '\0', sizeof(struct cerebrod_config));
 
-  conf.debug = 0;
+  conf.debug = CEREBROD_DEBUG_DEFAULT;
   conf.configfile = CEREBROD_CONFIGFILE_DEFAULT;
   conf.heartbeat_frequency_min = CEREBROD_HEARTBEAT_FREQUENCY_MIN_DEFAULT;
   conf.heartbeat_frequency_max = CEREBROD_HEARTBEAT_FREQUENCY_MAX_DEFAULT;
@@ -56,10 +56,13 @@ _cerebrod_config_default(void)
   conf.speak = CEREBROD_SPEAK_DEFAULT;
   conf.listen = CEREBROD_LISTEN_DEFAULT;
   conf.listen_threads = CEREBROD_LISTEN_THREADS_DEFAULT;
-  conf.updown_server = CEREBROD_UPDOWN_SERVER;
-  conf.updown_server_port = CEREBROD_UPDOWN_SERVER_PORT;
+  conf.updown_server = CEREBROD_UPDOWN_SERVER_DEFAULT;
+  conf.updown_server_port = CEREBROD_UPDOWN_SERVER_PORT_DEFAULT;
   conf.clusterlist_module = CEREBROD_CLUSTERLIST_MODULE_DEFAULT;
   conf.clusterlist_module_cmdline = CEREBROD_CLUSTERLIST_MODULE_CMDLINE_DEFAULT;
+  conf.speak_debug = CEREBROD_SPEAK_DEBUG_DEFAULT;
+  conf.listen_debug = CEREBROD_LISTEN_DEBUG_DEFAULT;
+  conf.updown_server_debug = CEREBROD_UPDOWN_SERVER_DEBUG_DEFAULT;
 }
 
 static void
@@ -191,7 +194,8 @@ _cerebrod_config_parse(void)
     heartbeat_network_interface_flag, heartbeat_ttl_flag, speak_flag, 
     listen_flag, listen_threads_flag, updown_server_flag, 
     updown_server_port_flag, clusterlist_module_flag, 
-    clusterlist_module_cmdline_flag;
+    clusterlist_module_cmdline_flag, speak_debug_flag, listen_debug_flag, 
+    updown_server_debug_flag;
   
   struct conffile_option options[] =
     {
@@ -223,6 +227,12 @@ _cerebrod_config_parse(void)
       {"clusterlist_module_cmdline", CONFFILE_OPTION_STRING, -1, _cb_stringptr,
        1, 0, &clusterlist_module_cmdline_flag, 
        &(conf.clusterlist_module_cmdline), 0},
+      {"speak_debug", CONFFILE_OPTION_BOOL, -1, conffile_bool,
+       1, 0, &speak_debug_flag, &conf.speak_debug, 0},
+      {"listen_debug", CONFFILE_OPTION_BOOL, -1, conffile_bool,
+       1, 0, &listen_debug_flag, &conf.listen_debug, 0},
+      {"updown_server_debug", CONFFILE_OPTION_BOOL, -1, conffile_bool,
+       1, 0, &updown_server_debug_flag, &conf.updown_server_debug, 0},
     };
   conffile_t cf = NULL;
   int num;

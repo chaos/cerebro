@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.24 2005-03-16 00:25:13 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.25 2005-03-16 00:53:36 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -193,7 +193,7 @@ _cerebrod_listener_dump_heartbeat(struct cerebrod_heartbeat *hb)
 #ifndef NDEBUG
   assert(hb);
 
-  if (conf.debug)
+  if (conf.debug && conf.listen_debug)
     {
       time_t t;
       struct tm tm;
@@ -237,7 +237,7 @@ static void
 _cerebrod_listener_dump_cluster_node_data_hash(void)
 {
 #ifndef NDEBUG
-  if (conf.debug)
+  if (conf.debug && conf.listen_debug)
     {
       int rv;
 

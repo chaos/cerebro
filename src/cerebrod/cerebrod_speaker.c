@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.13 2005-03-15 23:14:39 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.14 2005-03-16 00:53:36 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -127,7 +127,7 @@ _cerebrod_speaker_dump_heartbeat(struct cerebrod_heartbeat *hb)
 #ifndef NDEBUG
   assert(hb);
 
-  if (conf.debug)
+  if (conf.debug && conf.speak_debug)
     {
       time_t t;
       struct tm tm;

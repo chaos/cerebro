@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.h,v 1.18 2005-03-15 23:14:39 achu Exp $
+ *  $Id: cerebrod_config.h,v 1.19 2005-03-16 00:53:36 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_CONFIG_H
@@ -17,6 +17,8 @@
  * 
  */
 
+
+#define CEREBROD_DEBUG_DEFAULT                        0
 #define CEREBROD_CONFIGFILE_DEFAULT                   "/etc/cerebrod.conf"
 #define CEREBROD_HEARTBEAT_FREQUENCY_MIN_DEFAULT      10
 #define CEREBROD_HEARTBEAT_FREQUENCY_MAX_DEFAULT      20
@@ -28,10 +30,13 @@
 #define CEREBROD_SPEAK_DEFAULT                        1
 #define CEREBROD_LISTEN_DEFAULT                       1
 #define CEREBROD_LISTEN_THREADS_DEFAULT               2
-#define CEREBROD_UPDOWN_SERVER                        1
-#define CEREBROD_UPDOWN_SERVER_PORT                   8652
+#define CEREBROD_UPDOWN_SERVER_DEFAULT                1
+#define CEREBROD_UPDOWN_SERVER_PORT_DEFAULT           8652
 #define CEREBROD_CLUSTERLIST_MODULE_DEFAULT           NULL
 #define CEREBROD_CLUSTERLIST_MODULE_CMDLINE_DEFAULT   NULL
+#define CEREBROD_SPEAK_DEBUG_DEFAULT                  0
+#define CEREBROD_LISTEN_DEBUG_DEFAULT                 0
+#define CEREBROD_UPDOWN_SERVER_DEBUG_DEFAULT          0
 
 /* Configuration
  *
@@ -86,6 +91,7 @@ struct cerebrod_config
   int heartbeat_ttl;
 
   int speak;
+
   int listen;
   int listen_threads;
 
@@ -94,6 +100,10 @@ struct cerebrod_config
 
   char *clusterlist_module;
   char *clusterlist_module_cmdline;
+
+  int speak_debug;
+  int listen_debug;
+  int updown_server_debug;
 
   /* Determined by cerebrod based on configuration */
 
