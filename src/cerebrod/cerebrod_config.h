@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.h,v 1.12 2005-02-01 01:09:32 achu Exp $
+ *  $Id: cerebrod_config.h,v 1.13 2005-02-01 01:33:11 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_CONFIG_H
@@ -13,15 +13,21 @@
  * - listen interface?
  */
 
+/* Design Notes:
+ * 
+ */
+
 #define CEREBROD_CONFIGFILE_DEFAULT                  "/etc/cerebrod.conf"
 #define CEREBROD_HEARTBEAT_FREQUENCY_MIN_DEFAULT     10
 #define CEREBROD_HEARTBEAT_FREQUENCY_MAX_DEFAULT     20
+#define CEREBROD_HEARTBEAT_SOURCE_PORT_DEFAULT       8651
 #define CEREBROD_HEARTBEAT_DESTINATION_PORT_DEFAULT  8650
 #define CEREBROD_HEARTBEAT_DESTINATION_IP_DEFAULT    "239.2.11.72"
 #define CEREBROD_LISTEN_DEFAULT                      1
 #define CEREBROD_SPEAK_DEFAULT                       1
-#define CEREBROD_HEARTBEAT_SOURCE_PORT_DEFAULT       8651
+#define CEREBROD_SPEAK_FROM_NETWORK_INTERFACE        NULL
 #define CEREBROD_SPEAK_TTL_DEFAULT                   1
+#define CEREBROD_LISTEN_ON_NETWORK_INTERFACE         NULL
 #define CEREBROD_LISTEN_THREADS_DEFAULT              2
 
 /* Configuration
@@ -48,6 +54,11 @@
  * - ip address/subnet - will be found/checked
  * speak_ttl
  * - num
+ * listen_on_network_interface
+ * - not specified - we pick an interface
+ * - network interface - will be checked.
+ * - ip address - will be checked
+ * - ip address/subnet - will be found/checked
  * listen_threads
  * - num
  *

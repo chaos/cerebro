@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.20 2005-02-01 01:09:32 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.21 2005-02-01 01:33:11 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -51,8 +51,9 @@ _cerebrod_config_default(void)
   conf.heartbeat_destination_ip = CEREBROD_HEARTBEAT_DESTINATION_IP_DEFAULT;
   conf.listen = CEREBROD_LISTEN_DEFAULT;
   conf.speak = CEREBROD_SPEAK_DEFAULT;
-  conf.speak_from_network_interface = NULL;
+  conf.speak_from_network_interface = CEREBROD_SPEAK_FROM_NETWORK_INTERFACE_DEFAULT;
   conf.speak_ttl = CEREBROD_SPEAK_TTL_DEFAULT;
+  conf.listen_on_network_interface = CEREBROD_LISTEN_ON_NETWORK_INTERFACE_DEFAULT;
   conf.listen_threads = CEREBROD_LISTEN_THREADS_DEFAULT;
 }
 
@@ -182,7 +183,8 @@ _cerebrod_config_parse(void)
 {
   int heartbeat_frequency_flag, heartbeat_source_port_flag, heartbeat_destination_port_flag, 
     heartbeat_destination_ip_flag, listen_flag, speak_flag, 
-    speak_from_network_interface_flag, speak_ttl_flag, listen_threads_flag;
+    speak_from_network_interface_flag, speak_ttl_flag, 
+    listen_from_network_interface_flag, listen_threads_flag;
 
   struct conffile_option options[] =
     {
@@ -203,6 +205,9 @@ _cerebrod_config_parse(void)
        &(conf.speak_from_network_interface), 0},
       {"speak_ttl", CONFFILE_OPTION_INT, -1, conffile_int,
        1, 0, &speak_ttl_flag, &(conf.speak_ttl), 0},
+      {"listen_on_network_interface", CONFFILE_OPTION_STRING, -1, _cb_stringptr,
+       1, 0, &listen_on_network_interface_flag, 
+       &(conf.listen_on_network_interface), 0},
       {"listen_threads", CONFFILE_OPTION_INT, -1, conffile_int,
        1, 0, &listen_threads_flag, &(conf.listen_threads), 0},
     };
@@ -652,6 +657,8 @@ _cerebrod_config_dump(void)
       fprintf(stderr, "* listen: %d\n", conf.listen);
       fprintf(stderr, "* speak: %d\n", conf.speak);
       fprintf(stderr, "* speak_from_network_interface: \"%s\"\n", conf.speak_from_network_interface);
+      fprintf(stderr, "* listen_on_network_interface: \"%s\"\n", conf.listen_on_network_interface);
+      fprintf(stderr, "* listen_threads: %d\n", conf.listen_threds);
       fprintf(stderr, "* multicast: %d\n", conf.multicast);
       fprintf(stderr, "* heartbeat_destination_in_addr: %s\n", inet_ntoa(conf.heartbeat_destination_in_addr));
       fprintf(stderr, "* speak_from_in_addr: %s\n", inet_ntoa(conf.speak_from_in_addr));

@@ -5,6 +5,9 @@
 	speak_to_port to heartbeat_destination_ip and
 	heartbeat_destination_port.  Removed listen_port configuration.
 	Globally renamed speak_from_port to heartbeat_source_port.
+
+	* src/cerebrod/cerebrod_config.h, src/cerebrod/cerebrod_config.c:
+	Begin listen_on_network_interface configuration option addition.
 	
 2005-01-23  Albert Chu  <chu11@llnl.gov>
 
