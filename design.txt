@@ -1,0 +1,244 @@
+Renaming the Project
+--------------------
+
+The majority of what's being added has almost nothing to do with
+"whatsup" and the concept of a "nodeupdown" library.  I think we need
+a new project name.  Some time ago, I thought of "cerebro" ...
+
+a) it's a part of the central nervous system, playing off the word
+"ganglia" very well.
+
+b) it's the computer Professor Xavier (X-men) uses to watch and
+monitor mutant activity (the key words of 'watch' and 'monitor')
+
+"cerebrod" daemon
+-----------------
+
+Installed on every node of the cluster.  Each node will multicast
+heartbeat data at some frequency (most likely a random time between
+10-20 seconds).  Management nodes will be the only ones configured to
+listen for multicast heartbeats.
+
+The daemon will have several servers in which programs can connect
+to. A data server will allow programs to connect to and retrieve data
+from the daemon.  This will be similar to the ganglia's XML server.
+An event server will will allow users to set up event requests.  A
+status server will allow users to update status information on
+configurable "status data".  The servers and heartbeat listeners will
+each run in a separate thread.  Different threads will be used to
+process incoming or outgoing data.
+
+A configuration file (similar to ganglia's) will allow the user to
+specify an interface, IP address, IP address range, port, thread
+counts, frequency of heartbeat messages, loadable modules, and other
+options as they are determined.
+
+The daemon will use internal marshalling functions (compared to
+ganglia's use of the 'xdr' library).  Packet formats will be based on
+the following:
+
+struct foo
+  {
+    int32_t version;
+    char hostname[64];
+    uint32_t boottime;
+    char status_name[16];
+    uint32_t update_time1;
+    int32_t status_value1
+    char status_name2[16];
+    uint32_t update_time2;
+    int32_t status_value2
+    ...
+    char status_name16[16];
+    uint32_t update_time16;
+    int32_t status_value16
+  };
+
+The overall packet size will be variable length depending on the
+number of status variables that are currently being monitored.
+
+The daemon will maintain a database of the last up/down times for
+nodes.  It's necessary to maintain this database so the last known
+boottime will be known when the daemon is restarted.
+
+libcerebro library
+------------------
+
+--> core
+
+Similar to nodeupdown/genders, nothing fancy. 
+
+cerebro_t cerebro_handle_create(void);
+int cerebro_handle_destroy(cerebro_t handle);
+int cerebro_load_data(cerebro_t handle, 
+                      const char *hostname,
+                      int port,
+                      int timeout_len,
+                      char *gendersfile);
+                      ^^^ last parameter configurable via autoconf,
+                          may be something other than gendersfile
+int cerebro_errnum(cerebro_t handle);
+char *cerebro_strerror(int errnum);
+char *cerebro_errormsg(cerebro_t handle);
+void cerebro_perror(cerebro_t handle, const char *msg);
+
+--> up/down library code 
+
+Similar to the old nodeupdown library, nothing fancy.
+
+int cerebro_get_up_nodes(cerebro_t handle, char *buf, int buflen);
+int cerebro_get_down_nodes(cerebro_t handle, char *buf, int buflen);
+int cerebro_is_node_up(cerebro_t handle, const char *node);
+int cerebro_is_node_down(cerebro_t handle, const char *node);
+int cerebro_up_count(cerebro_t handle);
+int cerebro_down_count(cerebro_t handle);
+
+--> up/down time
+
+Retrieve various times ...
+
+time_t cerebro_last_boottime(cerebro_t handle, const char *node);
+time_t cerebro_last_uptime(cerebro_t handle, const char *node);
+time_t cerebro_last_downtime(cerebro_t handle, const char *node);
+
+??? 
+are uptime and boottime redundant 
+???  
+
+--> status monitoring
+
+Retrieve the status of 'name' on 'node'.
+
+int cerebro_get_status(cerebro_t handle, const char *name, const char *node, int32_t *val);
+
+Retrieve all nodes with a particular status
+
+typedef enum 
+  {
+    CEREBRO_EQUAL = 0,
+    CEREBRO_ODD = 1,
+    CEREBRO_EVEN = 2,
+    CEREBRO_LESS_THAN = 1, 
+    CEREBRO_LESS_THAN_EQUAL_TO = 2,
+    CEREBRO_GREATER_THAN = 3,
+    CEREBRO_GREATER_THAN_EQUAL_TO = 4
+  } cerebro_comp_type_t;
+
+int cerebro_get_status_nodes(cerebro_t handle, const char *name, 
+                             int32_t val, cerebro_comp_type_t c,
+                             char *buf, int buflen);
+
+--> status registration/update
+
+User may have cerebro monitor status info on nodes in one of two ways
+
+1) Program registers and manually updates status value on a regular
+   basis.  Functions will connect to the local daemon.
+
+int cerebro_register_status(cerebro_t handle, const char *name);
+int cerebro_unregister_status(cerebro_t handle, const char *name);
+int cerebro_update_status(cerebro_t handle, const char *name, int32_t val);
+
+Internally, functions will contact the local updownd daemon's "status
+server" to register/unregister status names or update the current
+status value.
+
+2) Dynamically loadable module is loaded when cerebrod is loaded.  The
+module will supply functions which allow cerebrod to monitor the
+status information for the user.  The following interface is required
+in the module:
+
+char *cerebro_module_status_name();
+int cerebro_module_status_period();
+int cerebro_module_init();
+int cerebro_module_status_get_val(int32_t *val);
+int cerebro_module_cleanup();
+
+--> event registration
+
+Events are handled by the user calling an event register function for
+the appropriate event/function.  The function will return a file
+descriptor.  The user is responsible for selecting/polling from this
+file descriptor.  When there is something to read, the user calls a
+parse event register to determine what happened.
+
+typedef enum 
+  {
+    NODEUPDOWN_UP = 0,
+    NODEUPDOWN_DOWN = 1,
+    NODEUPDOWN_BOOT = 2,
+  } nodeupdown_event_type_t;
+
+???
+are up and boot redundant
+???
+
+/* "current" refers to current state.  For example, if a user requests
+event monitoring for "down" nodes, should currently down nodes trigger
+an event?? */
+
+/* Deal with up/down/boot events */
+
+int cerebro_event_register(cerebro_t handle, cerebro_event_type_t e, 
+                           const char *nodes, int current, int *fd);
+int cerebro_parse_event(cerebro_t handle, int fd, cerebro_event_type_t *e, 
+                        char *nodebuf, int nodebuflen);
+
+/* Deal with status events */
+
+int cerebro_status_event_register(cerebro_t handle, const char *name, const char *nodes, 
+                                  cerebro_comp_type_t c, int32_t val, int current, int *fd);
+int cerebro_status_parse_event(cerebro_t handle, int fd, cerebro_comp_type_t *c, int32_t *val, 
+                               char *nodebuf, int nodebuflen);
+
+whatsup tool
+------------
+
+Essentially the same as the old whatsup command.  A new addition
+"--monitor" option owill run continuously and output events people are
+interested in.  i.e.
+
+> whatsup --monitor down
+thunder3: Down 3/4/04 12:48pm
+thunder408: Down 3/8/04 20:50pm
+
+> whatsup --monitor up,down
+thunder588: Up 3/10/04 3:34am
+thunder1000: Down 3/17/04 8:45am
+
+Still need to think about the command line options and output in more
+detail.
+
+Perhaps also have an option that'll beep on an event?
+
+cerebroadmin tool
+-----------------
+
+Allow user to modify/change current state of data stored in cerebrod
+and monitor events.  Certain options will be available depending on
+whether the node is listening to multicast packets or not.
+
+a) register/unregister/update values from the command line
+
+> cerebroadmin --register foo
+> cerebroadmin --update_value foo=11    
+
+b) retrieve/dump current data
+
+> cerebroadmin --dump foo
+thunder0: 10
+thunder1: 18
+thunder2: N/A 
+...
+
+c) clear out/reset data stored in cerebrod
+
+> cerebroadmin --reset foo
+
+d) monitor events
+
+> cerebroadmin --event foo>=10
+thunder800: foo=15 4:58am
+
+Other options/uses may be discovered during development.  Command line
+options and output still needs to be thought out in more detail.
