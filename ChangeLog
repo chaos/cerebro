@@ -5,6 +5,8 @@
 	* src/cerebrod/cerebrod_listener.c, src/cerebrod_updown.c: Re-work
 	with new rehashing common functions.
 
+	* src/cerebrod/Makefile.am: Updated with new files.
+
 2005-03-15  Albert Chu  <chu11@llnl.gov>
 
 	Begin support of updown server.
