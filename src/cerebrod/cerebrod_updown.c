@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.c,v 1.22 2005-03-30 18:26:02 achu Exp $
+ *  $Id: cerebrod_updown.c,v 1.23 2005-03-30 18:40:12 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -944,8 +944,7 @@ _cerebrod_updown_output_update(struct cerebrod_updown_node_data *ud)
  
       Pthread_mutex_lock(&debug_output_mutex);
       fprintf(stderr, "**************************************\n");
-      fprintf(stderr, "* Updown Server Update: Node=%s Last_Received=%s\n", 
-              ud->node, strbuf);
+      fprintf(stderr, "* Updown Server Update: Node=%s Last_Received=%s\n", ud->node, strbuf);
       fprintf(stderr, "**************************************\n");
       Pthread_mutex_unlock(&debug_output_mutex);
     }

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.62 2005-03-30 18:26:02 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.63 2005-03-30 18:40:12 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -1390,41 +1390,25 @@ _cerebrod_config_dump(void)
       fprintf(stderr, "* -------------------------------\n");
       fprintf(stderr, "* Command Line Options\n");
       fprintf(stderr, "* -------------------------------\n");
-      fprintf(stderr, "* debug: %d\n", 
-	      conf.debug);
-      fprintf(stderr, "* config_file: \"%s\"\n", 
-	      conf.config_file);
-      fprintf(stderr, "* config_module: \"%s\"\n", 
-	      conf.config_module);
+      fprintf(stderr, "* debug: %d\n", conf.debug);
+      fprintf(stderr, "* config_file: \"%s\"\n", conf.config_file);
+      fprintf(stderr, "* config_module: \"%s\"\n", conf.config_module);
       fprintf(stderr, "* -------------------------------\n");
       fprintf(stderr, "* Configuration File Options\n");
       fprintf(stderr, "* -------------------------------\n");
-      fprintf(stderr, "* heartbeat_frequency_min: %d\n", 
-	      conf.heartbeat_frequency_min);
-      fprintf(stderr, "* heartbeat_frequency_max: %d\n", 
-	      conf.heartbeat_frequency_max);
-      fprintf(stderr, "* heartbeat_source_port: %d\n", 
-	      conf.heartbeat_source_port);
-      fprintf(stderr, "* heartbeat_destination_port: %d\n", 
-	      conf.heartbeat_destination_port);
-      fprintf(stderr, "* heartbeat_destination_ip: \"%s\"\n", 
-	      conf.heartbeat_destination_ip);
-      fprintf(stderr, "* heartbeat_network_interface: \"%s\"\n", 
-	      conf.heartbeat_network_interface);
-      fprintf(stderr, "* heartbeat_ttl: %d\n", 
-	      conf.heartbeat_ttl);
-      fprintf(stderr, "* speak: %d\n", 
-	      conf.speak);
-      fprintf(stderr, "* listen: %d\n", 
-	      conf.listen);
-      fprintf(stderr, "* listen_threads: %d\n", 
-	      conf.listen_threads);
-      fprintf(stderr, "* updown_server: %d\n", 
-	      conf.updown_server);
-      fprintf(stderr, "* updown_server_port: %d\n", 
-	      conf.updown_server_port);
-      fprintf(stderr, "* clusterlist_module: %s\n", 
-	      conf.clusterlist_module);
+      fprintf(stderr, "* heartbeat_frequency_min: %d\n", conf.heartbeat_frequency_min);
+      fprintf(stderr, "* heartbeat_frequency_max: %d\n", conf.heartbeat_frequency_max);
+      fprintf(stderr, "* heartbeat_source_port: %d\n", conf.heartbeat_source_port);
+      fprintf(stderr, "* heartbeat_destination_port: %d\n", conf.heartbeat_destination_port);
+      fprintf(stderr, "* heartbeat_destination_ip: \"%s\"\n", conf.heartbeat_destination_ip);
+      fprintf(stderr, "* heartbeat_network_interface: \"%s\"\n", conf.heartbeat_network_interface);
+      fprintf(stderr, "* heartbeat_ttl: %d\n", conf.heartbeat_ttl);
+      fprintf(stderr, "* speak: %d\n", conf.speak);
+      fprintf(stderr, "* listen: %d\n", conf.listen);
+      fprintf(stderr, "* listen_threads: %d\n", conf.listen_threads);
+      fprintf(stderr, "* updown_server: %d\n", conf.updown_server);
+      fprintf(stderr, "* updown_server_port: %d\n", conf.updown_server_port);
+      fprintf(stderr, "* clusterlist_module: %s\n", conf.clusterlist_module);
       fprintf(stderr, "* clusterlist_module_options: ");
       if (!conf.clusterlist_module_options)
         fprintf(stderr, "%s\n", (char *)conf.clusterlist_module_options);
@@ -1438,28 +1422,19 @@ _cerebrod_config_dump(void)
             }
           fprintf(stderr, "\n");
         }
-      fprintf(stderr, "* speak_debug: %d\n", 
-	      conf.speak_debug);
-      fprintf(stderr, "* listen_debug: %d\n", 
-	      conf.listen_debug);
-      fprintf(stderr, "* updown_server_debug: %d\n", 
-	      conf.updown_server_debug);
+      fprintf(stderr, "* speak_debug: %d\n", conf.speak_debug);
+      fprintf(stderr, "* listen_debug: %d\n", conf.listen_debug);
+      fprintf(stderr, "* updown_server_debug: %d\n", conf.updown_server_debug);
       fprintf(stderr, "* -------------------------------\n");
       fprintf(stderr, "* Calculated Configuration\n");
       fprintf(stderr, "* -------------------------------\n");
-      fprintf(stderr, "* multicast: %d\n", 
-	      conf.multicast);
-      fprintf(stderr, "* heartbeat_destination_ip_in_addr: %s\n", 
-	      inet_ntoa(conf.heartbeat_destination_ip_in_addr));
-      fprintf(stderr, "* heartbeat_network_interface_in_addr: %s\n", 
-	      inet_ntoa(conf.heartbeat_network_interface_in_addr));
-      fprintf(stderr, "* heartbeat_interface_index: %d\n", 
-	      conf.heartbeat_interface_index);
+      fprintf(stderr, "* multicast: %d\n", conf.multicast);
+      fprintf(stderr, "* heartbeat_destination_ip_in_addr: %s\n", inet_ntoa(conf.heartbeat_destination_ip_in_addr));
+      fprintf(stderr, "* heartbeat_network_interface_in_addr: %s\n", inet_ntoa(conf.heartbeat_network_interface_in_addr));
+      fprintf(stderr, "* heartbeat_interface_index: %d\n", conf.heartbeat_interface_index);
 #if !WITH_STATIC_MODULES
-      fprintf(stderr, "* config_module_file: %s\n", 
-	      conf.config_module_file);
-      fprintf(stderr, "* clusterlist_module_file: %s\n", 
-	      conf.clusterlist_module_file);
+      fprintf(stderr, "* config_module_file: %s\n", conf.config_module_file);
+      fprintf(stderr, "* clusterlist_module_file: %s\n", conf.clusterlist_module_file);
 #endif /* !WITH_STATIC_MODULES */
       fprintf(stderr, "**************************************\n");
     }
