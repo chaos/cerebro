@@ -1,0 +1,27 @@
+Name:    @PROJECT@ 
+Version: @VERSION@
+Release: @RELEASE@
+Summary: FOO
+Copyright: none
+Group: System Environment/Base
+BuildRoot: %{_tmppath}/%{name}-%{version}
+
+%description
+Cerebro is a FOO
+
+%prep
+%setup  -q -n %{name}-%{version}
+
+%build
+./autogen.sh
+%configure --program-prefix=%{?_program_prefix:%{_program_prefix}}
+make 
+
+%install
+rm -rf $RPM_BUILD_ROOT
+DESTDIR="$RPM_BUILD_ROOT" make install
+
+%files
+%defattr(-,root,root)
+%doc README NEWS ChangeLog 
+/
