@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.h,v 1.7 2005-03-30 18:46:58 achu Exp $
+ *  $Id: cerebrod_updown.h,v 1.8 2005-03-30 18:48:30 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_UPDOWN_H
@@ -55,6 +55,6 @@ void *cerebrod_updown(void *);
  * Update updown server with last_received time for a specific cluster
  * node
  */
-void cerebrod_updown_update_data(char *node, u_int32_t last_received);
+void cerebrod_updown_update_data(char *nodename, u_int32_t last_received);
 
 #endif /* _CEREBROD_UPDOWN_H */

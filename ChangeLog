@@ -12,7 +12,8 @@
 
 	* src/libcerebro/Makefile.am: Add symbol export map.
 
-	* Globally rename hostname to nodename.
+	* Globally rename hostname to nodename.  Rename 'node' variables
+	to 'nodename' variables.
 	
 2005-03-29  Albert Chu  <chu11@llnl.gov>
 

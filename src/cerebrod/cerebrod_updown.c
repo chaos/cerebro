@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.c,v 1.24 2005-03-30 18:46:58 achu Exp $
+ *  $Id: cerebrod_updown.c,v 1.25 2005-03-30 18:48:30 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -1019,7 +1019,7 @@ _cerebrod_updown_dump_updown_node_data_list(void)
 }
 
 void 
-cerebrod_updown_update_data(char *node, u_int32_t last_received)
+cerebrod_updown_update_data(char *nodename, u_int32_t last_received)
 {
   struct cerebrod_updown_node_data *ud;
   int update_output_flag = 0;
@@ -1029,15 +1029,15 @@ cerebrod_updown_update_data(char *node, u_int32_t last_received)
 		      __FILE__, __FUNCTION__, __LINE__);
 
   Pthread_mutex_lock(&updown_node_data_lock);
-  if (!(ud = Hash_find(updown_node_data_index, node)))
+  if (!(ud = Hash_find(updown_node_data_index, nodename)))
     {
       char *key;
 
       ud = Malloc(sizeof(struct cerebrod_updown_node_data));
 
-      key = Strdup(node);
+      key = Strdup(nodename);
 
-      ud->nodename = Strdup(node);
+      ud->nodename = Strdup(nodename);
       Pthread_mutex_init(&(ud->updown_node_data_lock), NULL);
 
       /* Re-hash if our hash is getting too small */
