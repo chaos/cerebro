@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.34 2005-03-17 18:51:52 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.35 2005-03-18 01:36:30 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -40,6 +40,11 @@
 
 struct cerebrod_config conf;
 
+char *config_modules[] = {
+  "cerebrod_config_gendersllnl.la",
+  NULL
+};
+
 static void
 _cerebrod_config_default(void)
 {
@@ -70,9 +75,10 @@ static void
 _usage(void)
 {
   fprintf(stderr, "Usage: cerebrod [OPTIONS]\n"
-          "-h    --help        Output Help\n"
-          "-v    --version     Output Version\n"
-          "-c    --configfile  Specify alternate config file\n");
+          "-h    --help         Output Help\n"
+          "-v    --version      Output Version\n"
+          "-c    --configfile   Specify alternate config file\n"
+          "-m    --configmodule Specify configuration module\n");
 #ifndef NDEBUG
   fprintf(stderr, 
           "-d    --debug       Turn on debugging (can be used multiple times)\n");
@@ -92,9 +98,9 @@ _cerebrod_cmdline_parse(int argc, char **argv)
 { 
   char c;
 #ifndef NDEBUG
-  char *options = "hvc:d";
+  char *options = "hvc:m:d";
 #else
-  char *options = "hvc:";
+  char *options = "hvc:m:";
 #endif /* NDEBUG */
 
   assert(argv);
@@ -105,6 +111,7 @@ _cerebrod_cmdline_parse(int argc, char **argv)
       {"help",                0, NULL, 'h'},
       {"version",             0, NULL, 'v'},
       {"configfile",          1, NULL, 'c'},
+      {"configmodule",        1, NULL, 'm'},
 #ifndef NDEBUG
       {"debug",               0, NULL, 'd'},
 #endif /* NDEBUG */
@@ -131,6 +138,9 @@ _cerebrod_cmdline_parse(int argc, char **argv)
         case 'c':       /* --configfile */
           conf.configfile = Strdup(optarg);
           break;
+        case 'm':       /* --configmodule */
+          conf.configmodule = Strdup(optarg);
+          break;
 #ifndef NDEBUG
         case 'd':       /* --debug */
           conf.debug++;
@@ -141,6 +151,107 @@ _cerebrod_cmdline_parse(int argc, char **argv)
           err_exit("unknown command line option '%c'", optopt);
         }          
     }
+}
+
+static struct cerebrod_config_module_info *config_module_info = NULL;
+static struct cerebrod_config_module_ops *config_module_ops = NULL;
+static lt_dlhandle module_config_dl_handle = NULL;
+
+static void
+_load_module(char *module_path)
+{
+  assert(module_path);
+
+  module_config_dl_handle = Lt_dlopen(module_path);
+  config_module_info = (struct cerebrod_config_module_info *)Lt_dlsym(config_module_dl_handle, "config_module_info");
+  config_module_ops = (struct cerebrod_config_module_ops *)Lt_dlsym(config_module_dl_handle, "config_module_ops");
+
+  if (!config_module_info->config_module_name)
+    err_exit("config module '%s' does not contain a valid name");
+  
+#ifndef NDEBUG
+  if (conf.debug)
+    {
+      fprintf(stderr, "**************************************\n");
+      fprintf(stderr, "* Cerebrod Config Configuration:\n");
+      fprintf(stderr, "* -----------------------\n");
+      fprintf(stderr, "* Loaded config module: %s\n", module_path); 
+      fprintf(stderr, "**************************************\n");
+    }
+#endif /* NDEBUG */
+}
+
+static int
+_search_dir(char *search_dir)
+{
+  DIR *dir;
+  int i = 0;
+
+  assert(search_dir);
+
+  if (!(dir = opendir(search_dir)))
+    return 0;
+
+  while (config_modules[i] != NULL)
+    {
+      struct dirent *dirent;
+
+      while ((dirent = readdir(dir)))
+	{
+	  if (!strcmp(dirent->d_name, config_modules[i]))
+	    {
+              char filebuf[MAXPATHLEN+1];
+
+              memset(filebuf, '\0', MAXPATHLEN+1);
+              snprintf(filebuf, MAXPATHLEN, "%s/%s",
+                       search_dir, config_modules[i]);
+
+	      _load_module(filebuf);
+	      goto found_dir;
+	    }
+	}
+      
+      rewinddir(dir);
+      i++;
+    }
+ found_dir:
+  Closedir(dir);
+  
+  return (config_module_dl_handle) ? 1 : 0;
+}
+
+static void
+_find_config_module(void)
+{
+  assert(!config_module_dl_handle);
+
+  if (_search_dir(CEREBROD_MODULE_DIR))
+    return;
+
+  if (_search_dir("."))
+    return;
+}
+
+static void
+_cerebrod_config_setup(void)
+{
+  assert(!config_module_dl_handle);
+
+  Lt_dlinit();
+
+  if (conf.configmodule) 
+    {
+      struct stat buf;
+
+      if (stat(conf.configmodule, &buf) < 0)
+        err_exit("config module '%s' not found", conf.configmodule);
+
+      _load_module(conf.config_module);
+    }
+  else
+    _find_config_module();
+
+  Lt_dlfinish();
 }
 
 static int
@@ -882,6 +993,7 @@ cerebrod_config(int argc, char **argv)
 
   _cerebrod_config_default();
   _cerebrod_cmdline_parse(argc, argv);
+  _cerebrod_config_module();
   _cerebrod_config_parse();
   _cerebrod_pre_calculate_configuration_config_check();
   _cerebrod_calculate_configuration();

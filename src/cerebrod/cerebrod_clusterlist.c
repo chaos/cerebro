@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist.c,v 1.7 2005-03-17 22:32:03 achu Exp $
+ *  $Id: cerebrod_clusterlist.c,v 1.8 2005-03-18 01:36:30 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -33,7 +33,7 @@ char *clusterlist_modules[] = {
 extern struct cerebrod_config conf;
 static struct cerebrod_clusterlist_module_info *clusterlist_module_info = NULL;
 static struct cerebrod_clusterlist_module_ops *clusterlist_module_ops = NULL;
-lt_dlhandle clusterlist_module_dl_handle = NULL;
+static lt_dlhandle clusterlist_module_dl_handle = NULL;
 
 static void
 _load_module(char *module_path)

@@ -87,6 +87,8 @@
 	(cerebrod_listener): Re-work so hostname could be
 	CEREBROD_MAXHOSTNAMELEN in length exactly.  Null termination not
 	required in the packet itself.
+
+	* Begun initial work on config modules.
 		
 2005-03-16  Albert Chu  <chu11@llnl.gov>
 

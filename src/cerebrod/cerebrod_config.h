@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.h,v 1.21 2005-03-17 05:46:57 achu Exp $
+ *  $Id: cerebrod_config.h,v 1.22 2005-03-18 01:36:30 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_CONFIG_H
@@ -9,14 +9,7 @@
 
 /* Later Configuration
  * - Max status allowed
- * - setuid
- * - listen interface?
  */
-
-/* Design Notes:
- * 
- */
-
 
 #define CEREBROD_DEBUG_DEFAULT                        0
 #define CEREBROD_CONFIGFILE_DEFAULT                   "/etc/cerebrod.conf"
@@ -80,6 +73,7 @@ struct cerebrod_config
   /* Set by the user on the command line */
   int debug;
   char *configfile;
+  char *configmodule;
 
   /* Set by the user in the configuration file */
   unsigned int heartbeat_frequency_min;
@@ -117,5 +111,18 @@ struct cerebrod_config
 };
 
 void cerebrod_config(int argc, char **argv);
+
+typedef int (*Cerebrod_config_load_default)(struct cerebrod_config *conf);
+
+struct cerebrod_config_module_info
+{
+  char *config_module_name;
+};
+ 
+struct cerebrod_config_module_ops
+{
+  Cerebrod_config_load_default load_default;
+};
+
 
 #endif /* _CEREBROD_CONFIG_H */
