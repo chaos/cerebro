@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: error.c,v 1.5 2005-03-17 00:24:25 achu Exp $
+ *  $Id: error.c,v 1.6 2005-03-21 16:48:21 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -94,7 +94,13 @@ err_exit(const char *fmt, ...)
   exit(1);
 }
 
-void lsd_fatal_error(char *file, int line, char *mesg)
+/* 
+ * lsd_fatal_error
+ *
+ * for lsd libs like list.[ch] and hash.[ch]
+ */
+void 
+lsd_fatal_error(char *file, int line, char *mesg)
 {
   err_exit("LSD FATAL ERROR(%s:%d) %s: %s", file, line, mesg, strerror(errno));
 }
