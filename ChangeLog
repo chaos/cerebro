@@ -1,3 +1,12 @@
+2005-02-09  Albert Chu  <chu11@llnl.gov>
+
+	* src/cerebrod/cerebrod_listener.h,
+	src/cerebrod/cerebrod_listener.c: Completed basic listener
+	functionality.  Added rehashing of hash when hash is too large.
+
+	* src/libcommon/wrappers.h, src/libcommon/wrappers.c: Added
+	various hashing wrappers.
+	
 2005-02-03  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerebrod/cerebrod_config.h, src/cerebrod_config.c: Renamed

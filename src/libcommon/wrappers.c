@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.c,v 1.9 2005-01-24 16:57:01 achu Exp $
+ *  $Id: wrappers.c,v 1.10 2005-02-09 21:58:31 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -287,19 +287,6 @@ wrap_localtime_r(const char *file, int line, const time_t *timep, struct tm *res
 }
 
 int 
-wrap_gethostname(const char *file, int line, char *name, size_t len)
-{
-  int ret;
-
-  assert(file != NULL);
-
-  if ((ret = gethostname(name, len)) < 0)
-    err_exit("gethostname(%s:%d): %s", file, line, strerror(errno));
-
-  return ret;
-}
-
-int 
 wrap_pthread_create(const char *file, int line, pthread_t *thread, pthread_attr_t *attr, void *(*start_routine)(void *), void *arg)
 {
   int ret;
@@ -391,6 +378,19 @@ wrap_pthread_mutex_unlock(const char *file, int line, pthread_mutex_t *mutex)
   return ret;
 }
 
+int
+wrap_pthread_mutex_init(const char *file, int line, pthread_mutex_t *mutex, const pthread_mutexattr_t *mutexattr)
+{
+  int ret;
+  
+  assert(file != NULL);
+
+  if ((ret = pthread_mutex_init(mutex, mutexattr)) != 0)
+    err_exit("pthread_mutex_init(%s:%d): %s", file, line, strerror(ret));
+
+  return ret;
+}
+
 pid_t 
 wrap_fork(const char *file, int line)
 {
@@ -413,6 +413,19 @@ wrap_signal(const char *file, int line, int signum, Sighandler_t handler)
 
   if ((ret = signal(signum, handler)) == SIG_ERR)
     err_exit("signal(%s:%d): %s", file, line, strerror(errno));
+
+  return ret;
+}
+
+int 
+wrap_gethostname(const char *file, int line, char *name, size_t len)
+{
+  int ret;
+
+  assert(file != NULL);
+
+  if ((ret = gethostname(name, len)) < 0)
+    err_exit("gethostname(%s:%d): %s", file, line, strerror(errno));
 
   return ret;
 }
@@ -443,3 +456,70 @@ wrap_hash_create(const char *file, int line, int size, hash_key_f key_f, hash_cm
   return ret;
 }
 
+void *
+wrap_hash_find(const char *file, int line, hash_t h, const void *key)
+{
+  void *ret;
+
+  assert(file != NULL);
+
+  ret = hash_find(h, key);
+  if (!ret && errno != 0)
+    err_exit("hash_find(%s:%d): %s", file, line, strerror(errno));
+
+  return ret;
+}
+
+void *
+wrap_hash_insert(const char *file, int line, hash_t h, const void *key, void *data)
+{
+  void *ret;
+
+  assert(file != NULL);
+
+  if (!(ret = hash_insert(h, key, data)))
+    err_exit("hash_insert(%s:%d): %s", file, line, strerror(errno));
+
+  return ret;
+}
+
+int 
+wrap_hash_delete_if(const char *file, int line, hash_t h, hash_arg_f argf, void *arg)
+{
+  int ret;
+
+  assert(file != NULL);
+  
+  if ((ret = hash_delete_if(h, argf, arg)) < 0)
+    err_exit("hash_delete_if(%s:%d): %s", file, line, strerror(errno));
+
+  return ret;
+}
+
+int 
+wrap_hash_for_each(const char *file, int line, hash_t h, hash_arg_f argf, void *arg)
+{
+  int ret;
+
+  assert(file != NULL);
+
+  if ((ret = hash_for_each(h, argf, arg)) < 0)
+    err_exit("hash_for_each(%s:%d): %s", file, line, strerror(errno));
+
+  return ret;
+}
+
+void
+wrap_hash_destroy(const char *file, int line, hash_t h)
+{
+  int ret;
+
+  assert(file != NULL);
+
+  if (!h)
+    err_exit("hash_destroy(%s:%d): NULL hash pointer", file, line);
+
+  hash_destroy(h);
+
+  return;
+}

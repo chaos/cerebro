@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.9 2005-02-04 00:09:01 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.10 2005-02-09 21:58:31 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -27,6 +27,7 @@
 
 #define CEREBROD_LISTENER_HASH_SIZE_DEFAULT   1024
 #define CEREBROD_LISTENER_HASH_SIZE_INCREMENT 1024
+#define CEREBROD_LISTENER_REHASH_LIMIT        (cluster_data_hash_size*2)
 
 extern struct cerebrod_config conf;
 #ifndef NDEBUG
@@ -57,7 +58,7 @@ _cerebrod_listener_create_and_setup_socket(void)
     }
 
   if (conf.multicast)
-    {
+     {
       /* XXX: Probably lots of portability problems here */
       struct ip_mreqn imr;
 
@@ -168,14 +169,64 @@ _cerebrod_listener_dump_heartbeat(struct cerebrod_heartbeat *hb)
 #endif /* NDEBUG */
 }
 
+static int
+_reinsert(void *data, const void *key, void *arg)
+{
+  hash_t newhash = *((hash_t *)arg);
+  Hash_insert(newhash, key, data);
+  return 1;
+}
+
+static int
+_removeall(void *data, const void *key, void *arg)
+{
+  return 1;
+}
+
+static void
+_rehash(void)
+{
+  hash_t newhash;
+  int rv;
+
+  /* Should be called with lock already set */
+  rv = Pthread_mutex_trylock(&cluster_data_hash_lock);
+  if (rv != EBUSY)
+    err_exit("cerebrod_heartbeat_dump: cluster_data_hash_lock not locked");
+
+  cluster_data_hash_size += CEREBROD_LISTENER_HASH_SIZE_INCREMENT;
+  
+  newhash = Hash_create(cluster_data_hash_size,
+                        (hash_key_f)hash_key_string,
+                        (hash_cmp_f)strcmp,
+                        (hash_del_f)free);
+  
+  rv = Hash_for_each(cluster_data_hash, _reinsert, &newhash);
+  if (rv != cluster_data_hash_numnodes)
+    err_exit("_rehash: invalid reinsert count: rv=%d numnodes=%d",
+             rv, cluster_data_hash_numnodes);
+
+  rv = Hash_delete_if(cluster_data_hash, _removeall, NULL);
+  if (rv != cluster_data_hash_numnodes)
+    err_exit("_rehash: invalid removeall count: rv=%d numnodes=%d",
+             rv, cluster_data_hash_numnodes);
+
+  Hash_destroy(cluster_data_hash);
+
+  cluster_data_hash = newhash;
+}
+
 void *
 cerebrod_listener(void *arg)
 {
+  struct timeval tv;
+
   _cerebrod_listener_initialize();
 
   for (;;)
     {
       struct cerebrod_heartbeat hb;
+      struct cerebrod_node_data *nd;
       char hbbuf[CEREBROD_PACKET_BUFLEN];
       int rv, hblen;
 
@@ -232,6 +283,27 @@ cerebrod_listener(void *arg)
 	  err_debug("cerebrod_listener: invalid cerebrod packet version read");
 	  continue;
 	}
+
+      Pthread_mutex_lock(&cluster_data_hash_lock);
+      if (!(nd = Hash_find(cluster_data_hash, hb.hostname)))
+        {
+          /* Re-hash if our hash is getting too small */
+          if ((cluster_data_hash_numnodes + 1) > CEREBROD_LISTENER_REHASH_LIMIT)
+            _rehash();
+          
+          nd = (struct cerebrod_node_data *)Malloc(sizeof(struct cerebrod_node_data));
+          Pthread_mutex_init(&(nd->node_data_lock), NULL);
+          Hash_insert(cluster_data_hash, hb.hostname, nd);
+          cluster_data_hash_numnodes++;
+        }
+      Pthread_mutex_unlock(&cluster_data_hash_lock);
+
+      Pthread_mutex_lock(&(nd->node_data_lock));
+      Gettimeofday(&tv, NULL);
+      nd->starttime = hb.starttime;
+      nd->boottime = hb.boottime;
+      nd->last_received_heartbeat_time = tv.tv_sec;
+      Pthread_mutex_unlock(&(nd->node_data_lock));
     }
 
   return NULL;			/* NOT REACHED */
