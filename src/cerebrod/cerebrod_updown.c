@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.c,v 1.6 2005-03-16 17:09:36 achu Exp $
+ *  $Id: cerebrod_updown.c,v 1.7 2005-03-16 17:17:34 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -25,11 +25,11 @@
 #include "fd.h"
 #include "wrappers.h"
 
-#define CEREBROD_UPDOWN_BACKLOG                       10
+#define CEREBROD_UPDOWN_BACKLOG                        10
 
-#define CEREBROD_UPDOWN_NODE_DATA_HASH_SIZE_DEFAULT   1024
-#define CEREBROD_UPDOWN_NODE_DATA_HASH_SIZE_INCREMENT 1024
-#define CEREBROD_UPDOWN_REHASH_LIMIT                  (updown_node_data_hash_size*2)
+#define CEREBROD_UPDOWN_NODE_DATA_INDEX_SIZE_DEFAULT   1024
+#define CEREBROD_UPDOWN_NODE_DATA_INDEX_SIZE_INCREMENT 1024
+#define CEREBROD_UPDOWN_REHASH_LIMIT                   (updown_node_data_index_size*2)
 
 extern struct cerebrod_config conf;
 #ifndef NDEBUG
@@ -44,7 +44,7 @@ List updown_node_data = NULL;
 hash_t updown_node_data_index = NULL;
 
 int updown_node_data_numnodes;
-int updown_node_data_hash_size;
+int updown_node_data_index_size;
 pthread_mutex_t updown_node_data_lock = PTHREAD_MUTEX_INITIALIZER;
 
 static int
@@ -112,16 +112,16 @@ _cerebrod_updown_initialize(void)
   if (numnodes > 0)
     {
       updown_node_data_numnodes = numnodes;
-      updown_node_data_hash_size = numnodes;
+      updown_node_data_index_size = numnodes;
     }
   else
     {
       updown_node_data_numnodes = 0;
-      updown_node_data_hash_size = CEREBROD_UPDOWN_NODE_DATA_HASH_SIZE_DEFAULT;
+      updown_node_data_index_size = CEREBROD_UPDOWN_NODE_DATA_INDEX_SIZE_DEFAULT;
     }
 
   updown_node_data = List_create((ListDelF)_Free);
-  updown_node_data_index = Hash_create(updown_node_data_hash_size,
+  updown_node_data_index = Hash_create(updown_node_data_index_size,
                                        (hash_key_f)hash_key_string,
                                        (hash_cmp_f)strcmp,
                                        (hash_del_f)_Free);
@@ -167,6 +167,7 @@ cerebrod_updown_service_connection(void *arg)
 
   client_fd = *((int *)arg);
 
+  Free(arg);
   Close(client_fd);
   exit(0);
 }
@@ -357,8 +358,8 @@ cerebrod_updown_update_data(char *node, u_int32_t last_received)
       /* Re-hash if our hash is getting too small */
       if ((updown_node_data_numnodes + 1) > CEREBROD_UPDOWN_REHASH_LIMIT)
 	cerebrod_rehash(&updown_node_data_index,
-			&updown_node_data_hash_size,
-			CEREBROD_UPDOWN_NODE_DATA_HASH_SIZE_INCREMENT,
+			&updown_node_data_index_size,
+			CEREBROD_UPDOWN_NODE_DATA_INDEX_SIZE_INCREMENT,
 			updown_node_data_numnodes,
 			&updown_node_data_lock);
 
