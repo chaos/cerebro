@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.59 2005-03-29 21:30:29 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.60 2005-03-29 21:55:40 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -657,7 +657,12 @@ _cerebrod_config_parse(void)
   num = sizeof(options)/sizeof(struct conffile_option);
   if (conffile_parse(cf, conf.config_file, options, num, NULL, 0, 0) < 0)
     {
-      /* Its not an error if the file doesn't exist */
+      /* Its not an error if the default configuration file doesn't exist */
+
+      if (conffile_errnum(cf) == CONFFILE_ERR_EXIST
+          && strcmp(conf.config_file, CEREBROD_CONFIG_FILE_DEFAULT) != 0)
+        err_exit("configuration file '%s' not found", conf.config_file);
+
       if (conffile_errnum(cf) != CONFFILE_ERR_EXIST)
         {
           char buf[CONFFILE_MAX_ERRMSGLEN];
@@ -665,8 +670,6 @@ _cerebrod_config_parse(void)
             err_exit("conffile_parse: errnum = %d", conffile_errnum(cf));
           err_exit("config file error: %s", buf);
         }
-      else
-        cerebrod_err_debug("configuration file '%s' not found", conf.config_file);
     }
   conffile_handle_destroy(cf);
 }

@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.7 2005-03-23 17:37:33 achu Exp $
+## $Id: Makefile.am,v 1.8 2005-03-29 21:55:40 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -18,13 +18,15 @@ LTDL_SOURCES = ltdl.c
 LTDL_LIBADD = $(LIBADD_DL)
 endif
 
-noinst_LTLIBRARIES = libcommon.la
+noinst_LTLIBRARIES = libcommon.la libwrappers.la
 libcommon_la_SOURCES = conffile.c \
 		       error.c \
 		       fd.c \
 		       hash.c \
 		       list.c \
 		       thread.c \
-		       wrappers.c \
 		       $(LTDL_SOURCES)
 libcommon_la_LIBADD = $(LTDL_LIBADD)
+
+libwrappers_la_SOURCES = wrappers.c
+libwrappers_la_LIBADD = libcommon.la
