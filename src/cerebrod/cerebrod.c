@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.17 2005-03-17 22:32:03 achu Exp $
+ *  $Id: cerebrod.c,v 1.18 2005-03-18 21:35:51 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -45,6 +45,10 @@ static void
 _cerebrod_post_config_initialization(void)
 {
   cerebrod_clusterlist_setup();
+
+  if (conf.clusterlist_module_options)
+    cerebrod_clusterlist_parse_options();
+
   cerebrod_clusterlist_init();
 
   if (conf.updown_server)

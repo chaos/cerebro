@@ -14,6 +14,16 @@
 	(genders_clusterlist_init),
 	src/cerebrod/cerebrod_clusterlist_gendersllnl.c
 	(gendersllnl_clusterlist_init): Fix argument param bug.
+
+	* src/cerebrod/cerebrod_clusterlist.c
+	(cerebrod_clusterlist_parse_options): Fix assertion bug.
+
+	* src/cerebrod/cerebrod_config.c
+	(_cerebrod_post_calculate_configuration_config_check),
+	src/cerebrod/cerebrod.c (_cerebrod_post_config_initialization):
+	Move option parsing from
+	_cerebrod_post_calculate_configuration_config_ to
+	_cerebrod_post_config_initialization.
 	
 2005-03-17  Albert Chu  <chu11@llnl.gov>
 

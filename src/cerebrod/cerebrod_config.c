@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.37 2005-03-18 19:04:25 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.38 2005-03-18 21:35:51 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -947,9 +947,6 @@ _cerebrod_post_calculate_configuration_config_check(void)
       if (!found_interface)
         err_exit("heartbeat destination address not found");
     }
-
-  if (conf.clusterlist_module_options)
-    cerebrod_clusterlist_parse_options();
 }
 
 static void 
@@ -976,7 +973,19 @@ _cerebrod_config_dump(void)
       fprintf(stderr, "* updown_server: %d\n", conf.updown_server);
       fprintf(stderr, "* updown_server_port: %d\n", conf.updown_server_port);
       fprintf(stderr, "* clusterlist_module: %s\n", conf.clusterlist_module);
-      fprintf(stderr, "* clusterlist_module_options: %s\n", conf.clusterlist_module_options);
+      fprintf(stderr, "* clusterlist_module_options: ");
+      if (!conf.clusterlist_module_options)
+        fprintf(stderr, "%s\n", conf.clusterlist_module_options);
+      else
+        {
+          int i = 0;
+          while (conf.clusterlist_module_options[i] != NULL) 
+            {
+              fprintf(stderr, "%s ", conf.clusterlist_module_options[i]);
+              i++;
+            }
+          fprintf(stderr, "\n");
+        }
       fprintf(stderr, "* speak_debug: %d\n", conf.speak_debug);
       fprintf(stderr, "* listen_debug: %d\n", conf.listen_debug);
       fprintf(stderr, "* updown_server_debug: %d\n", conf.updown_server_debug);
