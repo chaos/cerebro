@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.34 2005-03-29 21:30:29 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.35 2005-03-30 05:41:45 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -29,7 +29,6 @@
 #include "cerebrod_heartbeat.h"
 #include "cerebrod_updown.h"
 #include "cerebrod_util.h"
-#include "error.h"
 #include "fd.h"
 #include "wrappers.h"
 
@@ -94,7 +93,8 @@ _cerebrod_listener_create_and_setup_socket(void)
 
   if ((temp_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {
-      cerebrod_err_debug("_cerebrod_listener_create_and_setup_socket: socket: %s",
+      cerebrod_err_debug("%s(%s:%d): socket: %s",
+			 __FILE__, __FUNCTION__, __LINE__,
                          strerror(errno));
       return -1;
     }
@@ -119,7 +119,8 @@ _cerebrod_listener_create_and_setup_socket(void)
 		     &imr,
 		     sizeof(struct ip_mreqn)) < 0)
 	{
-	  cerebrod_err_debug("_cerebrod_listener_create_and_setup_socket: setsockopt: %s",
+	  cerebrod_err_debug("%s(%s:%d): setsockopt: %s",
+			     __FILE__, __FUNCTION__, __LINE__,
                              strerror(errno));
 	  return -1;
 	}
@@ -134,9 +135,12 @@ _cerebrod_listener_create_and_setup_socket(void)
   memcpy(&heartbeat_addr.sin_addr,
          &conf.heartbeat_destination_ip_in_addr,
          sizeof(struct in_addr));
-  if (bind(temp_fd, (struct sockaddr *)&heartbeat_addr, sizeof(struct sockaddr_in)) < 0)
+  if (bind(temp_fd, 
+	   (struct sockaddr *)&heartbeat_addr, 
+	   sizeof(struct sockaddr_in)) < 0)
     {
-      cerebrod_err_debug("_cerebrod_listener_create_and_setup_socket: bind: %s",
+      cerebrod_err_debug("%s(%s:%d): bind: %s",
+			 __FILE__, __FUNCTION__, __LINE__,
                          strerror(errno));
       return -1;
     }
@@ -158,7 +162,8 @@ _cerebrod_listener_initialize(void)
 
   Pthread_mutex_lock(&listener_fd_lock);
   if ((listener_fd = _cerebrod_listener_create_and_setup_socket()) < 0)
-    err_exit("_cerebrod_listener_initialize: listener_fd setup failed");
+    cerebrod_err_exit("%s(%s:%d): listener_fd setup failed",
+		      __FILE__, __FUNCTION__, __LINE__);
   Pthread_mutex_unlock(&listener_fd_lock);
 
   /* If a clusterlist is found/used, use the numnodes count as the 
@@ -218,7 +223,9 @@ _cerebrod_listener_dump_heartbeat(struct cerebrod_heartbeat *hb)
  */
 #ifndef NDEBUG
 static int
-_cerebrod_listener_dump_cluster_node_data_item(void *data, const void *key, void *arg)
+_cerebrod_listener_dump_cluster_node_data_item(void *data, 
+					       const void *key, 
+					       void *arg)
 {
   struct cerebrod_node_data *nd;
 
@@ -261,15 +268,16 @@ _cerebrod_listener_dump_cluster_node_data_hash(void)
                              _cerebrod_listener_dump_cluster_node_data_item,
                              NULL);
           if (rv != cluster_data_hash_numnodes)
-            err_exit("_cerebrod_listener_dump_cluster_node_data_hash: "
-                     "invalid dump count: rv=%d numnodes=%d",
-                     rv, cluster_data_hash_numnodes);
+	    {
+	      fprintf(stderr, "_cerebrod_listener_dump_cluster_node_data_hash: "
+		      "invalid dump count: rv=%d numnodes=%d",
+		      rv, cluster_data_hash_numnodes);
+	      exit(1);
+	    }
         }
       else
-        /* We already have the debug_output_mutex lock, so call
-         * err_debug() instead of cerebrod_err_debug().
-         */
-        err_debug("_cerebrod_listener_dump_cluster_node_data_hash: called with empty hash");
+        fprintf(stderr, "_cerebrod_listener_dump_cluster_node_data_hash: "
+		"called with empty hash\n");
       fprintf(stderr, "**************************************\n");
       Pthread_mutex_unlock(&debug_output_mutex);
       Pthread_mutex_unlock(&cluster_data_hash_lock);
@@ -321,18 +329,24 @@ cerebrod_listener(void *arg)
 
               if ((listener_fd = _cerebrod_listener_create_and_setup_socket()) < 0)
 		{
-		  cerebrod_err_debug("cerebrod_listener: error re-initializing socket");
+		  cerebrod_err_debug("%s(%s:%d): error re-initializing socket",
+				     __FILE__, __FUNCTION__, __LINE__);
 
 		  /* Wait a bit, so we don't spin */
 		  sleep(CEREBROD_LISTENER_REINITIALIZE_WAIT);
 		}
               else
-                cerebrod_err_debug("cerebrod_listener: success re-initializing socket");
+                cerebrod_err_debug("%s(%s:%d): success re-initializing socket",
+				   __FILE__, __FUNCTION__, __LINE__);
             }
           else if (errno == EINTR)
-            cerebrod_err_debug("cerebrod_listener: recvfrom: %s", strerror(errno));
+            cerebrod_err_debug("%s(%s:%d): recvfrom: %s", 
+			       __FILE__, __FUNCTION__, __LINE__,
+			       strerror(errno));
           else
-            err_exit("cerebrod_listener: recvfrom: %s", strerror(errno));
+            cerebrod_err_exit("%s(%s:%d): recvfrom: %s", 
+			      __FILE__, __FUNCTION__, __LINE__,
+			      strerror(errno));
 	}
       Pthread_mutex_unlock(&listener_fd_lock);
 
@@ -346,13 +360,15 @@ cerebrod_listener(void *arg)
       _cerebrod_listener_dump_heartbeat(&hb);
       if (hb.version != CEREBROD_HEARTBEAT_PROTOCOL_VERSION)
 	{
-	  cerebrod_err_debug("cerebrod_listener: invalid cerebrod packet version read");
+	  cerebrod_err_debug("%s(%s:%d): invalid cerebrod packet version read",
+			     __FILE__, __FUNCTION__, __LINE__);
 	  continue;
 	}
       
       if (!cerebrod_clusterlist_node_in_cluster(hb.hostname))
         {
-          cerebrod_err_debug("cerebrod_listener: received non-cluster packet from: %s",
+          cerebrod_err_debug("%s(%s:%d): received non-cluster packet from: %s",
+			     __FILE__, __FUNCTION__, __LINE__,
                              hb.hostname);
           continue;
         }
@@ -366,8 +382,10 @@ cerebrod_listener(void *arg)
                                             hostname_key, 
                                             CEREBRO_MAXHOSTNAMELEN+1) < 0)
         {
-          err_output("cerebrod_listener: cerebrod_clusterlist_get_nodename "
-                     "error: %s", hb.hostname);
+          cerebrod_err_output("%s(%s:%d): cerebrod_clusterlist_get_nodename "
+			      "error: %s", 
+			      __FILE__, __FUNCTION__, __LINE__,
+			      hb.hostname);
           continue;
         }
 

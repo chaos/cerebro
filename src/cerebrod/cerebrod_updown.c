@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.c,v 1.20 2005-03-29 21:30:29 achu Exp $
+ *  $Id: cerebrod_updown.c,v 1.21 2005-03-30 05:41:45 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -27,7 +27,6 @@
 #include "cerebrod_error.h"
 #include "cerebrod_util.h"
 #include "cerebrod.h"
-#include "error.h"
 #include "fd.h"
 #include "list.h"
 #include "wrappers.h"
@@ -106,7 +105,8 @@ _cerebrod_updown_create_and_setup_socket(void)
 
   if ((temp_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
-      cerebrod_err_debug("_cerebrod_updownd_create_and_setup_socket: socket: %s",
+      cerebrod_err_debug("%s(%s:%d): socket: %s",
+			 __FILE__, __FUNCTION__, __LINE__,
                          strerror(errno));
       return -1;
     }
@@ -119,16 +119,20 @@ _cerebrod_updown_create_and_setup_socket(void)
   server_addr.sin_port = htons(conf.updown_server_port);
   server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
-  if (bind(temp_fd, (struct sockaddr *)&server_addr, sizeof(struct sockaddr_in)) < 0)
+  if (bind(temp_fd, 
+	   (struct sockaddr *)&server_addr, 
+	   sizeof(struct sockaddr_in)) < 0)
     {
-      cerebrod_err_debug("_cerebrod_updownd_create_and_setup_socket: bind: %s",
+      cerebrod_err_debug("%s(%s:%d): bind: %s",
+			 __FILE__, __FUNCTION__, __LINE__,
                          strerror(errno));
       return -1;
     }
 
   if (listen(temp_fd, CEREBROD_UPDOWN_BACKLOG) < 0)
     {
-      cerebrod_err_debug("_cerebrod_updownd_create_and_setup_socket: listen: %s",
+      cerebrod_err_debug("%s(%s:%d): listen: %s",
+			 __FILE__, __FUNCTION__, __LINE__,
                          strerror(errno));
       return -1;
     }
@@ -164,11 +168,13 @@ _cerebrod_updown_initialize(void)
     return;
 
   if ((updown_fd = _cerebrod_updown_create_and_setup_socket()) < 0)
-    err_exit("_cerebrod_updown_initialize: updown_fd setup failed");
+    cerebrod_err_exit("%s(%s:%d): updown_fd setup failed",
+		      __FILE__, __FUNCTION__, __LINE__);
 
   if ((numnodes = cerebrod_clusterlist_numnodes()) < 0)
-    err_exit("_cerebrod_updown_initialize: cerebrod_clusterlist_numnodes: %s",
-             strerror(errno));
+    cerebrod_err_exit("%s(%s:%d): cerebrod_clusterlist_numnodes: %s",
+		      __FILE__, __FUNCTION__, __LINE__,
+		      strerror(errno));
 
   if (numnodes > 0)
     {
@@ -200,8 +206,9 @@ _cerebrod_updown_initialize(void)
       nodes = (char **)Malloc(sizeof(char *) * numnodes);
 
       if (cerebrod_clusterlist_get_all_nodes(nodes, numnodes) < 0)
-        err_exit("_cerebrod_updown_initialize: cerebrod_clusterlist_get_all_nodes: %s",
-                 strerror(errno));
+        cerebrod_err_exit("%s(%s:%d): cerebrod_clusterlist_get_all_nodes: %s",
+			  __FILE__, __FUNCTION__, __LINE__,
+			  strerror(errno));
 
       for (i = 0; i < numnodes; i++)
         {
@@ -247,25 +254,34 @@ _cerebrod_updown_response_marshall(struct cerebro_updown_response *res,
 
   memset(buffer, '\0', bufferlen);
 
-  if ((ret = cerebro_marshall_int32(res->version, buffer + c, bufferlen - c)) < 0)
+  if ((ret = cerebro_marshall_int32(res->version, 
+				    buffer + c, 
+				    bufferlen - c)) < 0)
     {
-      cerebrod_err_debug("_cerebrod_updown_response_marshall: cerebro_marshall_int32: %s",
+      cerebrod_err_debug("%s(%s:%d): cerebro_marshall_int32: %s",
+			 __FILE__, __FUNCTION__, __LINE__,
                          strerror(errno));
       return -1;
     }
   c += ret;
  
-  if ((ret = cerebro_marshall_uint32(res->updown_err_code, buffer + c, bufferlen - c)) < 0)
+  if ((ret = cerebro_marshall_uint32(res->updown_err_code, 
+				     buffer + c, 
+				     bufferlen - c)) < 0)
     {
-      cerebrod_err_debug("_cerebrod_updown_response_marshall: cerebro_marshall_uint32: %s",
+      cerebrod_err_debug("%s(%s:%d): cerebro_marshall_uint32: %s",
+			 __FILE__, __FUNCTION__, __LINE__,
                          strerror(errno));
       return -1;
     }
   c += ret;
 
-  if ((ret = cerebro_marshall_uint8(res->end_of_responses, buffer + c, bufferlen - c)) < 0)
+  if ((ret = cerebro_marshall_uint8(res->end_of_responses, 
+				    buffer + c, 
+				    bufferlen - c)) < 0)
     {
-      cerebrod_err_debug("_cerebrod_updown_response_marshall: cerebro_marshall_uint8: %s",
+      cerebrod_err_debug("%s(%s:%d): cerebro_marshall_uint8: %s",
+			 __FILE__, __FUNCTION__, __LINE__,
                          strerror(errno));
       return -1;
     }
@@ -275,14 +291,18 @@ _cerebrod_updown_response_marshall(struct cerebro_updown_response *res,
                                      sizeof(res->hostname),
                                      buffer + c,
                                      bufferlen - c)) < 0)
-    err_exit("cerebrod_heartbeat_marshall: cerebro_marshall_buffer: %s",
-             strerror(errno));
+    cerebrod_err_exit("%s(%s:%d): cerebro_marshall_buffer: %s",
+		      __FILE__, __FUNCTION__, __LINE__,
+		      strerror(errno));
   c += ret;
 
 
-  if ((ret = cerebro_marshall_uint8(res->updown_state, buffer + c, bufferlen - c)) < 0)
+  if ((ret = cerebro_marshall_uint8(res->updown_state, 
+				    buffer + c, 
+				    bufferlen - c)) < 0)
     {
-      cerebrod_err_debug("_cerebrod_updown_response_marshall: cerebro_marshall_uint8: %s",
+      cerebrod_err_debug("%s(%s:%d): cerebro_marshall_uint8: %s",
+			 __FILE__, __FUNCTION__, __LINE__,
                          strerror(errno));
       return -1;
     }
@@ -308,39 +328,52 @@ _cerebrod_updown_request_unmarshall(struct cerebro_updown_request *req,
  
   if (CEREBRO_UPDOWN_REQUEST_LEN > bufferlen)
     {
-      cerebrod_err_debug("_cerebrod_updown_request_unmarshall: received buffer length "
-                         "too small: need %d, bufferlen %d", CEREBRO_UPDOWN_REQUEST_LEN,
+      cerebrod_err_debug("%s(%s:%d): received buffer length "
+                         "too small: need %d, bufferlen %d", 
+			 CEREBRO_UPDOWN_REQUEST_LEN,
+			 __FILE__, __FUNCTION__, __LINE__,
                          bufferlen);
       return -1;
     }
    
   if (CEREBRO_UPDOWN_REQUEST_LEN != bufferlen)
     {
-      cerebrod_err_debug("_cerebrod_updown_request_unmarshall: received buffer length "
-                         "unexpected size: expect %d, bufferlen %d", CEREBRO_UPDOWN_REQUEST_LEN,
+      cerebrod_err_debug("%s(%s:%d): received buffer length "
+                         "unexpected size: expect %d, bufferlen %d", 
+			 CEREBRO_UPDOWN_REQUEST_LEN,
+			 __FILE__, __FUNCTION__, __LINE__,
                          bufferlen);
       return -1;
     }
    
-  if ((ret = cerebro_unmarshall_int32(&(req->version), buffer + c, bufferlen - c)) < 0)
+  if ((ret = cerebro_unmarshall_int32(&(req->version), 
+				      buffer + c, 
+				      bufferlen - c)) < 0)
     {
-      cerebrod_err_debug("_cerebrod_updown_request_unmarshall: cerebro_unmarshall_int32: %s",
+      cerebrod_err_debug("%s(%s:%d): cerebro_unmarshall_int32: %s",
+			 __FILE__, __FUNCTION__, __LINE__,
                          strerror(errno));
       return -1;
     }
   c += ret;
  
-  if ((ret = cerebro_unmarshall_uint32(&(req->updown_request), buffer + c, bufferlen - c)) < 0)
+  if ((ret = cerebro_unmarshall_uint32(&(req->updown_request), 
+				       buffer + c, 
+				       bufferlen - c)) < 0)
     {
-      cerebrod_err_debug("_cerebrod_updown_request_unmarshall: cerebro_unmarshall_uint32: %s",
+      cerebrod_err_debug("%s(%s:%d): cerebro_unmarshall_uint32: %s",
+			 __FILE__, __FUNCTION__, __LINE__,
                          strerror(errno));
       return -1;
     }
   c += ret;
  
-  if ((ret = cerebro_unmarshall_uint32(&(req->timeout_len), buffer + c, bufferlen - c)) < 0)
+  if ((ret = cerebro_unmarshall_uint32(&(req->timeout_len), 
+				       buffer + c, 
+				       bufferlen - c)) < 0)
     {
-      cerebrod_err_debug("_cerebrod_updown_request_unmarshall: cerebro_unmarshall_uint32: %s",
+      cerebrod_err_debug("%s(%s:%d): cerebro_unmarshall_uint32: %s",
+			 __FILE__, __FUNCTION__, __LINE__,
                          strerror(errno));
       return -1;
     }
@@ -357,7 +390,8 @@ _cerebrod_updown_request_unmarshall(struct cerebro_updown_request *req,
  * Return req packet and 0 on success, -1 on error
  */
 static int
-_cerebrod_updown_receive_request(int client_fd,	struct cerebro_updown_request *req)
+_cerebrod_updown_receive_request(int client_fd,	
+				 struct cerebro_updown_request *req)
 {
   int rv, bytes_read = 0;
   char buffer[CEREBROD_PACKET_BUFLEN];
@@ -380,7 +414,8 @@ _cerebrod_updown_receive_request(int client_fd,	struct cerebro_updown_request *r
   
       if ((rv = select(client_fd + 1, &rfds, NULL, NULL, &tv)) < 0)
 	{
-	  cerebrod_err_debug("_cerebrod_updown_receive_request: select: %s", 
+	  cerebrod_err_debug("%s(%s:%d): select: %s", 
+			     __FILE__, __FUNCTION__, __LINE__,
                              strerror(errno));
 	  goto err_out;
 	}
@@ -408,7 +443,8 @@ _cerebrod_updown_receive_request(int client_fd,	struct cerebro_updown_request *r
 			     buffer + bytes_read, 
 			     CEREBRO_UPDOWN_REQUEST_LEN - bytes_read)) < 0)
 	    {
-	      cerebrod_err_debug("_cerebrod_updown_receive_request: fd_read_n: %s", 
+	      cerebrod_err_debug("%s(%s:%d): fd_read_n: %s", 
+				 __FILE__, __FUNCTION__, __LINE__,
                                  strerror(errno));
 	      goto err_out;
 	    }
@@ -421,7 +457,8 @@ _cerebrod_updown_receive_request(int client_fd,	struct cerebro_updown_request *r
 	}
       else
 	{
-	  cerebrod_err_debug("_cerebrod_updown_receive_request: rv != 0 but fd not set");
+	  cerebrod_err_debug("%s(%s:%d): rv != 0 but fd not set",
+			     __FILE__, __FUNCTION__, __LINE__);
 	  goto err_out;
 	}
     }
@@ -470,7 +507,8 @@ _cerebrod_updown_request_dump(struct cerebro_updown_request *req)
  * Return 0 on success, -1 on error
  */
 static int
-_cerebrod_updown_send_response(int client_fd, struct cerebro_updown_response *res)
+_cerebrod_updown_send_response(int client_fd, 
+			       struct cerebro_updown_response *res)
 {
   char buffer[CEREBROD_PACKET_BUFLEN];
   int res_len;
@@ -482,14 +520,16 @@ _cerebrod_updown_send_response(int client_fd, struct cerebro_updown_response *re
 						    buffer, 
 						    CEREBROD_PACKET_BUFLEN)) < 0)
     {
-      cerebrod_err_debug("_cerebrod_updown_send_response: _cerebrod_updown_response_marshall: %s",
+      cerebrod_err_debug("%s(%s:%d): _cerebrod_updown_response_marshall: %s",
+			 __FILE__, __FUNCTION__, __LINE__,
                          strerror(errno));
       return -1;
     }
 
   if (fd_write_n(client_fd, buffer, res_len) < 0)
     {
-      cerebrod_err_debug("_cerebrod_updown_send_response: fd_write_n: %s",
+      cerebrod_err_debug("%s(%s:%d): fd_write_n: %s",
+			 __FILE__, __FUNCTION__, __LINE__,
                          strerror(errno));
       return -1;
     }
@@ -556,13 +596,15 @@ _cerebrod_updown_evaluate_updown_state(void *x, void *arg)
   /* Should be called with lock already set */
   rv = Pthread_mutex_trylock(&updown_node_data_lock);
   if (rv != EBUSY)
-    err_exit("_cerebrod_updown_evaluate_updown_state: mutex not locked");
+    cerebrod_err_exit("%s(%s:%d): mutex not locked",	
+		      __FILE__, __FUNCTION__, __LINE__);
 
   /* With locking, it shouldn't be possible for local time to be
    * greater than the time stored in any last_received time.
    */
   if (ed->time_now < ud->last_received)
-    cerebrod_err_debug("_cerebrod_updown_evaluate_updown_state: last_received time later than time_now time");
+    cerebrod_err_debug("%s(%s:%d): last_received time later than time_now time",
+		       __FILE__, __FUNCTION__, __LINE__);
 #endif /* NDEBUG */
 
   if ((ed->time_now - ud->last_received) < ed->timeout_len)
@@ -582,7 +624,9 @@ _cerebrod_updown_evaluate_updown_state(void *x, void *arg)
   res->end_of_responses = CEREBRO_UPDOWN_IS_NOT_LAST_RESPONSE;
 #ifndef NDEBUG
   if (ud->node && strlen(ud->node) > CEREBRO_MAXHOSTNAMELEN)
-    cerebrod_err_debug("_cerebrod_updown_evaluate_updown_state: invalid node name length: %s", ud->node);
+    cerebrod_err_debug("%s(%s:%d): invalid node name length: %s", 
+		       __FILE__, __FUNCTION__, __LINE__,
+		       ud->node);
 #endif /* NDEBUG */
   /* strncpy, b/c terminating character not required */
   strncpy(res->hostname, ud->node, CEREBRO_MAXHOSTNAMELEN);
@@ -590,7 +634,9 @@ _cerebrod_updown_evaluate_updown_state(void *x, void *arg)
 
   if (!list_append(ed->node_responses, res))
     {
-      cerebrod_err_debug("_cerebrod_updown_evaluate_updown_state: list_append: %s", strerror(errno));
+      cerebrod_err_debug("%s(%s:%d): list_append: %s", 
+			 __FILE__, __FUNCTION__, __LINE__,
+			 strerror(errno));
       Free(res);
       return -1;
     }
@@ -659,7 +705,9 @@ _cerebrod_updown_respond_with_updown_nodes(int client_fd,
 
   if (!(node_responses = list_create((ListDelF)_Free)))
     {
-      cerebrod_err_debug("_cerebrod_updown_respond_with_updown_nodes: list_create failed: %s", strerror(errno));
+      cerebrod_err_debug("%s(%s:%d): list_create failed: %s", 
+			 __FILE__, __FUNCTION__, __LINE__,
+			 strerror(errno));
       Pthread_mutex_unlock(&updown_node_data_lock);
       _cerebrod_updown_respond_with_error(client_fd,
 					  CEREBRO_UPDOWN_ERR_CODE_INTERNAL_SYSTEM_ERROR);
@@ -673,7 +721,9 @@ _cerebrod_updown_respond_with_updown_nodes(int client_fd,
   ed.time_now = tv.tv_sec;
   ed.node_responses = node_responses;
 
-  if (list_for_each(updown_node_data, _cerebrod_updown_evaluate_updown_state, &ed) < 0)
+  if (list_for_each(updown_node_data, 
+		    _cerebrod_updown_evaluate_updown_state, 
+		    &ed) < 0)
     {
       Pthread_mutex_unlock(&updown_node_data_lock);
       _cerebrod_updown_respond_with_error(client_fd,
@@ -688,7 +738,9 @@ _cerebrod_updown_respond_with_updown_nodes(int client_fd,
 
   if (List_count(node_responses))
     {
-      if (list_for_each(node_responses, _cerebrod_updown_send_node_responses, &client_fd) < 0)
+      if (list_for_each(node_responses, 
+			_cerebrod_updown_send_node_responses, 
+			&client_fd) < 0)
         {
           Pthread_mutex_unlock(&updown_node_data_lock);
           _cerebrod_updown_respond_with_error(client_fd,
@@ -760,7 +812,9 @@ _cerebrod_updown_service_connection(void *arg)
   if (!req.timeout_len)
     req.timeout_len = CEREBRO_UPDOWN_TIMEOUT_LEN_DEFAULT;
 
-  if (_cerebrod_updown_respond_with_updown_nodes(client_fd, req.updown_request, req.timeout_len) < 0)
+  if (_cerebrod_updown_respond_with_updown_nodes(client_fd, 
+						 req.updown_request, 
+						 req.timeout_len) < 0)
     goto done;
 
  done:
@@ -806,18 +860,24 @@ cerebrod_updown(void *arg)
 
               if ((updown_fd = _cerebrod_updown_create_and_setup_socket()) < 0)
 		{
-		  cerebrod_err_debug("cerebrod_updown: error re-initializing socket");
+		  cerebrod_err_debug("%s(%s:%d): error re-initializing socket",
+				     __FILE__, __FUNCTION__, __LINE__);
 
 		  /* Wait a bit, so we don't spin */
 		  sleep(CEREBROD_UPDOWN_REINITIALIZE_WAIT);
 		}
               else
-                cerebrod_err_debug("cerebrod_updown: success re-initializing socket");
+                cerebrod_err_debug("%s(%s:%d): success re-initializing socket",
+				   __FILE__, __FUNCTION__, __LINE__);
             }
           else if (errno == EINTR)
-            cerebrod_err_debug("cerebrod_updown: recvfrom: %s", strerror(errno));
+            cerebrod_err_debug("%s(%s:%d): recvfrom: %s", 
+			       __FILE__, __FUNCTION__, __LINE__,
+			       strerror(errno));
           else
-            err_exit("cerebrod_updown: recvfrom: %s", strerror(errno));
+            cerebrod_err_exit("%s(%s:%d): recvfrom: %s", 
+			      __FILE__, __FUNCTION__, __LINE__,
+			      strerror(errno));
 	}
 
       if (client_fd < 0)
@@ -940,15 +1000,15 @@ _cerebrod_updown_dump_updown_node_data_list(void)
                              _cerebrod_updown_dump_updown_node_data_item,
                              NULL);
           if (rv != updown_node_data_index_numnodes)
-            err_exit("_cerebrod_updown_dump_updown_node_data: "
-                     "invalid dump count: rv=%d numnodes=%d",
-                     rv, updown_node_data_index_numnodes);
+	    {
+	      fprintf(stderr, "_cerebrod_updown_dump_updown_node_data: "
+		      "invalid dump count: rv=%d numnodes=%d",
+		      rv, updown_node_data_index_numnodes);
+	      exit(1);
+	    }
         }
       else
-        /* We already have the debug_output_mutex lock, so call
-         * err_debug() instead of cerebrod_err_debug().
-         */
-        err_debug("_cerebrod_updown_dump_node_data: called with empty list");
+        fprintf(stderr, "_cerebrod_updown_dump_node_data: called with empty list\n");
       fprintf(stderr, "**************************************\n");
       Pthread_mutex_unlock(&debug_output_mutex);
       Pthread_mutex_unlock(&updown_node_data_lock);
@@ -962,7 +1022,8 @@ cerebrod_updown_update_data(char *node, u_int32_t last_received)
   struct cerebrod_updown_node_data *ud;
 
   if (!cerebrod_updown_initialization_complete)
-    err_exit("cerebrod_updown_update_data: initialization not complete");
+    cerebrod_err_exit("%s(%s:%d): initialization not complete",
+		      __FILE__, __FUNCTION__, __LINE__);
 
   Pthread_mutex_lock(&updown_node_data_lock);
   if (!(ud = Hash_find(updown_node_data_index, node)))

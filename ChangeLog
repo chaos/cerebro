@@ -1,5 +1,15 @@
 2005-03-29  Albert Chu  <chu11@llnl.gov>
 
+	* src/cerebrod/cerebrod_error.h, src/cerebrod/cerebrod_error.c
+	(cerebrod_err_init, cerebrod_err_get_flags,
+	cerebrod_err_set_flags, cerebrod_err_output, cerebrod_err_exit):
+	New functions.
+
+	* src/cerebrod/: Globally use new err functions appropriately and
+	various code cleanup.
+	
+2005-03-29  Albert Chu  <chu11@llnl.gov>
+
 	* src/cerebrod/cerebrod_config.c (cerebrod_config_cleanup): Fix
 	static modules bug.
 

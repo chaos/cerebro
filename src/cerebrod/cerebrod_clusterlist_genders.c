@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_genders.c,v 1.17 2005-03-25 19:44:05 achu Exp $
+ *  $Id: cerebrod_clusterlist_genders.c,v 1.18 2005-03-30 05:41:45 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -21,7 +21,7 @@
 #include "cerebrod_clusterlist.h"
 #include "cerebrod_clusterlist_genders_util.h"
 #include "cerebrod_clusterlist_util.h"
-#include "error.h"
+#include "cerebrod_error.h"
 #include "wrappers.h"
 
 /* 
@@ -117,6 +117,7 @@ genders_clusterlist_node_in_cluster(char *node)
 {
   int ret, free_flag = 0;
   char *nodePtr = NULL;
+  char *clusterlist_module_name = cerebrod_clusterlist_module_name();
 
   assert(genders_handle);
   assert(node);
@@ -134,8 +135,10 @@ genders_clusterlist_node_in_cluster(char *node)
     nodePtr = node;
 
   if ((ret = genders_isnode(genders_handle, nodePtr)) < 0)
-    err_exit("genders_clusterlist_node_in_cluster: genders_isnode: %s",
-	     genders_errormsg(genders_handle));
+    cerebrod_err_exit("%s(%s:%d): %s clusterlist module: genders_isnode: %s",
+		      __FILE__, __FUNCTION__, __LINE__,
+		      clusterlist_module_name, 
+		      genders_errormsg(genders_handle));
 
   if (free_flag)
     Free(nodePtr);

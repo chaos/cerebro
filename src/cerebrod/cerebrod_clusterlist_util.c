@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_util.c,v 1.4 2005-03-23 17:37:33 achu Exp $
+ *  $Id: cerebrod_clusterlist_util.c,v 1.5 2005-03-30 05:41:45 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -17,7 +17,7 @@
 #include "cerebrod.h"
 #include "cerebrod_clusterlist.h"
 #include "cerebrod_clusterlist_util.h"
-#include "error.h"
+#include "cerebrod_error.h"
 #include "wrappers.h"
 
 int 
@@ -38,19 +38,19 @@ cerebrod_clusterlist_parse_filename(char **options, char **filename)
 	  char *p = strchr(options[i], '=');
 
 	  if (!p)
-	    err_exit("%s clusterlist module: filename unspecified", 
-                     clusterlist_module_name);
+	    cerebrod_err_exit("%s clusterlist module: filename unspecified", 
+			      clusterlist_module_name);
 
 	  p++;
 	  if (p == '\0')
-	    err_exit("%s clusterlist module: filename unspecified", 
-                     clusterlist_module_name);
+	    cerebrod_err_exit("%s clusterlist module: filename unspecified", 
+			      clusterlist_module_name);
 
 	  *filename = Strdup(p);
 	}
       else
-	err_exit("%s clusterlist module: option '%s' unrecognized", 
-                 clusterlist_module_name, options[i]);
+	cerebrod_err_exit("%s clusterlist module: option '%s' unrecognized", 
+			  clusterlist_module_name, options[i]);
 
       i++;
     }
@@ -60,8 +60,8 @@ cerebrod_clusterlist_parse_filename(char **options, char **filename)
       struct stat buf;
 
       if (stat(*filename, &buf) < 0)
-        err_exit("%s clusterlist module: filename '%s' not found",
-                 clusterlist_module_name, *filename);
+        cerebrod_err_exit("%s clusterlist module: filename '%s' not found",
+			  clusterlist_module_name, *filename);
     }
 
   return 0;
@@ -80,8 +80,11 @@ cerebrod_clusterlist_copy_nodename(char *node, char *buf, unsigned int buflen)
   len = strlen(node);
 
   if ((len + 1) > buflen)
-    err_exit("%s clusterlist module: cerebrod_clusterlist_copy_nodename: buflen too small: %d %d", 
-             clusterlist_module_name, len, buflen);
+    cerebrod_err_exit("%s(%s:%d): %s clusterlist module: "
+		      "cerebrod_clusterlist_copy_nodename: "
+		      "buflen too small: %d %d", 
+		      __FILE__, __FUNCTION__, __LINE__,
+		      clusterlist_module_name, len, buflen);
 
   strcpy(buf, node);
 

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_none.c,v 1.11 2005-03-25 19:44:05 achu Exp $
+ *  $Id: cerebrod_clusterlist_none.c,v 1.12 2005-03-30 05:41:45 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -18,7 +18,7 @@
 
 #include "cerebrod_clusterlist.h"
 #include "cerebrod_clusterlist_util.h"
-#include "error.h"
+#include "cerebrod_error.h"
 #include "wrappers.h"
 
 /* 
@@ -37,7 +37,8 @@ none_clusterlist_parse_options(char **options)
   /* None module takes no options */
   while (options[i] != NULL)
     {
-      err_exit("none clusterlist module: option '%s' unrecognized", options[i]);
+      cerebrod_err_exit("none clusterlist module: option '%s' unrecognized", 
+			options[i]);
       i++;
     }
 

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_daemon.c,v 1.5 2005-03-20 20:34:48 achu Exp $
+ *  $Id: cerebrod_daemon.c,v 1.6 2005-03-30 05:41:45 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -14,7 +14,6 @@
 #include <assert.h>
 
 #include "cerebrod_daemon.h"
-#include "error.h"
 #include "wrappers.h"
 
 void

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.28 2005-03-29 23:58:22 achu Exp $
+ *  $Id: cerebrod.c,v 1.29 2005-03-30 05:41:45 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -15,10 +15,10 @@
 #include "cerebrod_config.h"
 #include "cerebrod_daemon.h"
 #include "cerebrod_data.h"
+#include "cerebrod_error.h"
 #include "cerebrod_listener.h"
 #include "cerebrod_speaker.h"
 #include "cerebrod_updown.h"
-#include "error.h"
 #include "wrappers.h"
 
 #ifndef NDEBUG
@@ -78,8 +78,8 @@ _cerebrod_post_config_initialization(void)
 int 
 main(int argc, char **argv)
 {
-  err_init(argv[0]);
-  err_set_flags(ERROR_STDERR | ERROR_SYSLOG);
+  cerebrod_err_init(argv[0]);
+  cerebrod_err_set_flags(CEREBROD_ERROR_STDERR | CEREBROD_ERROR_SYSLOG);
 
   _cerebrod_pre_config_initialization();
 
@@ -89,15 +89,15 @@ main(int argc, char **argv)
 
 #ifdef NDEBUG
   cerebrod_daemon_init();
-  err_set_flags(ERROR_SYSLOG);
+  cerebrod_err_set_flags(ERROR_SYSLOG);
 #else  /* !NDEBUG */
   if (!conf.debug)
     {
       cerebrod_daemon_init();
-      err_set_flags(ERROR_SYSLOG);
+      cerebrod_err_set_flags(ERROR_SYSLOG);
     }
   else
-    err_set_flags(ERROR_STDERR);
+    cerebrod_err_set_flags(ERROR_STDERR);
 #endif /* !NDEBUG */
 
   /* Call after daemonization, since daemonization closes currently

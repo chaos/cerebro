@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_heartbeat.c,v 1.16 2005-03-29 21:30:29 achu Exp $
+ *  $Id: cerebrod_heartbeat.c,v 1.17 2005-03-30 05:41:45 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -23,7 +23,6 @@
 #include "cerebrod_config.h"
 #include "cerebrod_data.h"
 #include "cerebrod_error.h"
-#include "error.h"
 #include "wrappers.h"
 
 extern struct cerebrod_config conf;
@@ -54,7 +53,11 @@ cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb)
 
       ret = Pthread_mutex_trylock(&debug_output_mutex);
       if (ret != EBUSY)
-	err_exit("cerebrod_heartbeat_dump: debug_output_mutex not locked");
+	{
+	  fprintf(stderr, "cerebrod_heartbeat_dump: "
+		  "debug_output_mutex not locked");
+	  exit(1);
+	}
       
       fprintf(stderr, "**************************************\n");
       fprintf(stderr, "* Cerebrod Heartbeat:\n");     
@@ -78,27 +81,37 @@ cerebrod_heartbeat_marshall(struct cerebrod_heartbeat *hb,
   assert(bufferlen >= CEREBROD_HEARTBEAT_LEN);
 
   memset(buffer, '\0', bufferlen);
-  if ((ret = cerebro_marshall_int32(hb->version, buffer + c, bufferlen - c)) < 0)
-    err_exit("cerebrod_heartbeat_marshall: cerebro_marshall_int32: %s",
-             strerror(errno));
+  if ((ret = cerebro_marshall_int32(hb->version, 
+				    buffer + c, 
+				    bufferlen - c)) < 0)
+    cerebrod_err_exit("%s(%s:%d): cerebro_marshall_int32: %s",
+		      __FILE__, __FUNCTION__, __LINE__,
+		      strerror(errno));
   c += ret;
 
   if ((ret = cerebro_marshall_buffer(hb->hostname, 
                                      sizeof(hb->hostname), 
                                      buffer + c, 
                                      bufferlen - c)) < 0)
-    err_exit("cerebrod_heartbeat_marshall: cerebro_marshall_buffer: %s",
-             strerror(errno));
+    cerebrod_err_exit("%s(%s:%d): cerebro_marshall_buffer: %s",
+		      __FILE__, __FUNCTION__, __LINE__,
+		      strerror(errno));
   c += ret;
 
-  if ((ret = cerebro_marshall_uint32(hb->starttime, buffer + c, bufferlen - c)) < 0)
-    err_exit("cerebrod_heartbeat_marshall: cerebro_marshall_uint32: %s",
-             strerror(errno));
+  if ((ret = cerebro_marshall_uint32(hb->starttime, 
+				     buffer + c, 
+				     bufferlen - c)) < 0)
+    cerebrod_err_exit("%s(%s:%d): cerebro_marshall_uint32: %s",
+		      __FILE__, __FUNCTION__, __LINE__,
+		      strerror(errno));
   c += ret;
 
-  if ((ret = cerebro_marshall_uint32(hb->boottime, buffer + c, bufferlen - c)) < 0)
-    err_exit("cerebrod_heartbeat_marshall: cerebro_marshall_uint32: %s",
-             strerror(errno));
+  if ((ret = cerebro_marshall_uint32(hb->boottime, 
+				     buffer + c, 
+				     bufferlen - c)) < 0)
+    cerebrod_err_exit("%s(%s:%d): cerebro_marshall_uint32: %s",
+		      __FILE__, __FUNCTION__, __LINE__,
+		      strerror(errno));
   c += ret;
 
   return c;
@@ -106,7 +119,8 @@ cerebrod_heartbeat_marshall(struct cerebrod_heartbeat *hb,
 
 int 
 cerebrod_heartbeat_unmarshall(struct cerebrod_heartbeat *hb, 
-			      char *buffer, int bufferlen)
+			      char *buffer, 
+			      int bufferlen)
 {
   int ret, c = 0;
 
@@ -114,41 +128,53 @@ cerebrod_heartbeat_unmarshall(struct cerebrod_heartbeat *hb,
 
   if (CEREBROD_HEARTBEAT_LEN > bufferlen)
     {
-      cerebrod_err_debug("cerebrod_heartbeat_ummarshall: received buffer length "
-                         "too small: need %d, bufferlen %d", CEREBROD_HEARTBEAT_LEN, 
-                         bufferlen);
+      cerebrod_err_debug("%s(%s:%d): received buffer length "
+                         "too small: need %d, bufferlen %d", 
+			 __FILE__, __FUNCTION__, __LINE__,
+			 CEREBROD_HEARTBEAT_LEN, bufferlen);
       return -1;
     }
   
   if (CEREBROD_HEARTBEAT_LEN != bufferlen)
     {
-      cerebrod_err_debug("cerebrod_heartbeat_marshall: received buffer length "
-                         "unexpected size: expect %d, bufferlen %d", CEREBROD_HEARTBEAT_LEN,
-                         bufferlen);
+      cerebrod_err_debug("%s(%s:%d): received buffer length "
+                         "unexpected size: expect %d, bufferlen %d", 
+			 __FILE__, __FUNCTION__, __LINE__,
+			 CEREBROD_HEARTBEAT_LEN, bufferlen);
       return -1;
     }
   
-  if ((ret = cerebro_unmarshall_int32(&(hb->version), buffer + c, bufferlen - c)) < 0)
-      err_exit("cerebrod_heartbeat_unmarshall: cerebro_unmarshall_int32: %s",
-               strerror(errno));
+  if ((ret = cerebro_unmarshall_int32(&(hb->version), 
+				      buffer + c, 
+				      bufferlen - c)) < 0)
+      cerebrod_err_exit("%s(%s:%d): cerebro_unmarshall_int32: %s",
+			__FILE__, __FUNCTION__, __LINE__,
+			strerror(errno));
   c += ret;
 
   if ((ret = cerebro_unmarshall_buffer(hb->hostname, 
                                        sizeof(hb->hostname), 
                                        buffer + c, 
                                        bufferlen - c)) < 0)
-    err_exit("cerebrod_heartbeat_unmarshall: cerebro_unmarshall_buffer: %s",
-             strerror(errno));
+    cerebrod_err_exit("%s(%s:%d): cerebro_unmarshall_buffer: %s",
+		      __FILE__, __FUNCTION__, __LINE__,
+		      strerror(errno));
   c += ret;
 
-  if ((ret = cerebro_unmarshall_uint32(&(hb->starttime), buffer + c, bufferlen - c)) < 0)
-    err_exit("cerebrod_heartbeat_unmarshall: cerebro_unmarshall_uint32: %s",
-             strerror(errno));
+  if ((ret = cerebro_unmarshall_uint32(&(hb->starttime), 
+				       buffer + c, 
+				       bufferlen - c)) < 0)
+    cerebrod_err_exit("%s(%s:%d): cerebro_unmarshall_uint32: %s",
+		      __FILE__, __FUNCTION__, __LINE__,
+		      strerror(errno));
   c += ret;
 
-  if ((ret = cerebro_unmarshall_uint32(&(hb->boottime), buffer + c, bufferlen - c)) < 0)
-    err_exit("cerebrod_heartbeat_unmarshall: cerebro_unmarshall_uint32: %s",
-             strerror(errno));
+  if ((ret = cerebro_unmarshall_uint32(&(hb->boottime), 
+				       buffer + c, 
+				       bufferlen - c)) < 0)
+    cerebrod_err_exit("%s(%s:%d): cerebro_unmarshall_uint32: %s",
+		      __FILE__, __FUNCTION__, __LINE__,
+		      strerror(errno));
   c += ret;
   
   return 0;

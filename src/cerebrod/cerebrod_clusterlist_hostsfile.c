@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_hostsfile.c,v 1.16 2005-03-25 19:44:05 achu Exp $
+ *  $Id: cerebrod_clusterlist_hostsfile.c,v 1.17 2005-03-30 05:41:45 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -21,8 +21,8 @@
 
 #include "cerebrod_clusterlist.h"
 #include "cerebrod_clusterlist_util.h"
+#include "cerebrod_error.h"
 #include "cerebrod.h"
-#include "error.h"
 #include "fd.h"
 #include "wrappers.h"
 
@@ -71,15 +71,21 @@ static int
 _readline(int fd, char *buf, int buflen)
 {
   int ret;
+  char *clusterlist_module_name = cerebrod_clusterlist_module_name();
 
   assert(buf);
 
   if ((ret = fd_read_line(fd, buf, buflen)) < 0)
-    err_exit("_readline: fd_read_line: %s", strerror(errno));
+    cerebrod_err_exit("%s(%s:%d): %s clusterlist module: fd_read_line: %s", 
+		      __FILE__, __FUNCTION__, __LINE__,
+		      clusterlist_module_name, strerror(errno));
 
   /* buflen - 1 b/c fd_read_line guarantees null termination */
   if (ret >= (buflen-1))
-    err_exit("_readline: fd_read_line: line truncation");
+    cerebrod_err_exit("%s(%s:%d): %s clusterlist module: "
+		      "fd_read_line: line truncation",
+		      __FILE__, __FUNCTION__, __LINE__, 
+		      clusterlist_module_name);
 
   return ret;
 }
@@ -203,7 +209,8 @@ hostsfile_clusterlist_init(void)
     file = CEREBROD_CLUSTERLIST_HOSTSFILE_DEFAULT;
 
   if ((fd = open(file, O_RDONLY)) < 0)
-    err_exit("hostsfile clusterlist file '%s' cannot be opened", hostsfile_file);
+    cerebrod_err_exit("hostsfile clusterlist file '%s' cannot be opened", 
+		      hostsfile_file);
 
   while ((len = _readline(fd, buf, CEREBROD_PARSE_BUFLEN)) > 0)
     {
@@ -223,11 +230,13 @@ hostsfile_clusterlist_init(void)
         continue;
 
       if (strchr(hostPtr, ' ') || strchr(hostPtr, '\t'))
-        err_exit("hostsfile clusterlist parse error: host contains whitespace");
+        cerebrod_err_exit("hostsfile clusterlist parse error: "
+			  "host contains whitespace");
 
       if (strlen(hostPtr) > CEREBRO_MAXHOSTNAMELEN)
-        err_exit("hostsfile clusterlist parse error: hostname '%s' exceeds "
-                 "maximum length", hostPtr);
+        cerebrod_err_exit("hostsfile clusterlist parse error: "
+			  "hostname '%s' exceeds maximum length", 
+			  hostPtr);
       
       str = Strdup(hostPtr);
       List_append(hosts, str);
@@ -266,6 +275,7 @@ hostsfile_clusterlist_get_all_nodes(char **nodes, unsigned int nodeslen)
   char *node;
   ListIterator itr;
   int numnodes, i = 0;
+  char *clusterlist_module_name = cerebrod_clusterlist_module_name();
 
   assert(hosts);
   assert(nodes);
@@ -273,7 +283,9 @@ hostsfile_clusterlist_get_all_nodes(char **nodes, unsigned int nodeslen)
   numnodes = list_count(hosts);
 
   if (numnodes > nodeslen)
-    err_exit("hostsfile_clusterlist_get_all_nodes: nodeslen too smalll");
+    cerebrod_err_exit("%s(%s:%d): %s clusterlist module: nodeslen too small",
+		      __FILE__, __FUNCTION__, __LINE__,
+		      clusterlist_module_name);
 
   itr = List_iterator_create(hosts);
 
@@ -281,7 +293,9 @@ hostsfile_clusterlist_get_all_nodes(char **nodes, unsigned int nodeslen)
     nodes[i++] = Strdup(node);
 
   if (i > numnodes)
-    err_exit("hostsfile_clusterlist_get_all_nodes: iterator count error");
+    cerebrod_err_exit("%s(%s:%d): %s clusterlist module: iterator count error",
+		      __FILE__, __FUNCTION__, __LINE__,
+		      clusterlist_module_name);
 
   List_iterator_destroy(itr);
 
