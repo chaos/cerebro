@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.20 2005-02-17 00:36:50 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.21 2005-03-14 19:07:25 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -151,9 +151,11 @@ _rehash(void)
   int rv;
 
   /* Should be called with lock already set */
+#ifndef NDEBUG
   rv = Pthread_mutex_trylock(&cluster_data_hash_lock);
   if (rv != EBUSY)
     err_exit("cerebrod_heartbeat_dump: cluster_data_hash_lock not locked");
+#endif /* NDEBUG */
 
   cluster_data_hash_size += CEREBROD_LISTENER_HASH_SIZE_INCREMENT;
   
