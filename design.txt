@@ -73,10 +73,7 @@ int cerebro_handle_destroy(cerebro_t handle);
 int cerebro_load_data(cerebro_t handle, 
                       const char *hostname,
                       int port,
-                      int timeout_len,
-                      char *gendersfile);
-                      ^^^ last parameter configurable via autoconf,
-                          may be something other than gendersfile
+                      int timeout_len);
 int cerebro_errnum(cerebro_t handle);
 char *cerebro_strerror(int errnum);
 char *cerebro_errormsg(cerebro_t handle);
