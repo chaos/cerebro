@@ -2,7 +2,6 @@
   - cerebro.1 manpage
 - IPv6
 - cerebro.spec.in, descriptions
-- remove hostname from heartbeat, useless?
 - Non-pthreads support?
 - remove hash/list buffering in list.c hash.c?
 
@@ -12,7 +11,6 @@
 - test
    - fd leaking
    - mem-leaking
-
 
 - to GPL
   - on all headers
