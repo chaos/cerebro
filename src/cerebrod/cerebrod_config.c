@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.28 2005-03-16 00:53:36 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.29 2005-03-16 20:52:04 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -781,6 +781,14 @@ _cerebrod_config_dump(void)
       fprintf(stderr, "* speak: %d\n", conf.speak);
       fprintf(stderr, "* listen: %d\n", conf.listen);
       fprintf(stderr, "* listen_threads: %d\n", conf.listen_threads);
+      fprintf(stderr, "* updown_server: %d\n", conf.updown_server);
+      fprintf(stderr, "* updown_server_port: %d\n", conf.updown_server_port);
+      fprintf(stderr, "* clusterlist_module: %s\n", conf.clusterlist_module);
+      fprintf(stderr, "* clusterlist_module_cmdline: %s\n", conf.clusterlist_module_cmdline);
+      fprintf(stderr, "* speak_debug: %d\n", conf.speak_debug);
+      fprintf(stderr, "* listen_debug: %d\n", conf.listen_debug);
+      fprintf(stderr, "* updown_server_debug: %d\n", conf.updown_server_debug);
+      fprintf(stderr, "* -----------------------\n");
       fprintf(stderr, "* multicast: %d\n", conf.multicast);
       fprintf(stderr, "* heartbeat_destination_ip_in_addr: %s\n", inet_ntoa(conf.heartbeat_destination_ip_in_addr));
       fprintf(stderr, "* heartbeat_network_interface_in_addr: %s\n", inet_ntoa(conf.heartbeat_network_interface_in_addr));

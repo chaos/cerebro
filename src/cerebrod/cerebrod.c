@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.14 2005-03-16 19:37:59 achu Exp $
+ *  $Id: cerebrod.c,v 1.15 2005-03-16 20:52:04 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -77,10 +77,10 @@ main(int argc, char **argv)
       Pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
       Pthread_create(&thread, &attr, cerebrod_updown, NULL);
       Pthread_attr_destroy(&attr);
-    }
 
-  /* No need for locking */
-  while (cerebrod_updown_initialization_complete == 0) {}
+      /* No need for locking */
+      while (cerebrod_updown_initialization_complete == 0) {}
+    }
 
   /* Start listener before speaker, since the listener may need to
    * listen for packets from a later created speaker thread
@@ -99,10 +99,10 @@ main(int argc, char **argv)
           Pthread_create(&thread, &attr, cerebrod_listener, NULL);
           Pthread_attr_destroy(&attr);
         }
-    }
 
-  /* No need for locking */
-  while (cerebrod_listener_initialization_complete == 0) {}
+      /* No need for locking */
+      while (cerebrod_listener_initialization_complete == 0) {}
+    }
 
   if (conf.speak)
     {

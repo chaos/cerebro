@@ -11,6 +11,18 @@
 	src/cerebrod/cerebrod.c
 	(main): Call appropriate updown server functions.
 
+	* src/cerebrod/cerebrod_clusterlist_genders.c
+	(genders_clusterlist_node_in_cluster),
+	src/cerebrod/cerebrod_clusterlist_gendersllnl.c
+	(gendersllnl_clusterlist_node_in_cluster,
+	gendersllnl_clusterlist_get_nodename): Fix memory corruption bug.
+
+	* src/libcommon/wrappers.h, src/libcommon/wrappers.c
+	(Pthread_cond_wait, Pthread_cond_signal, wrap_pthread_cond_wait,
+	wrap_pthread_cond_signal): New macros and functions.
+
+	* src/cerebrod/Makefile.am: Fix dynamic module symbol problems.
+
 2005-03-15  Albert Chu  <chu11@llnl.gov>
 
 	Begin support of updown server.

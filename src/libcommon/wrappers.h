@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.h,v 1.15 2005-03-16 00:25:13 achu Exp $
+ *  $Id: wrappers.h,v 1.16 2005-03-16 20:52:04 achu Exp $
 \*****************************************************************************/
 
 #ifndef _WRAPPERS_H
@@ -157,6 +157,10 @@ struct tm *wrap_localtime_r(const char *file, int line, const time_t *timep, str
         wrap_pthread_mutex_unlock(__FILE__, __LINE__, mutex)
 #define Pthread_mutex_init(mutex, mutexattr) \
         wrap_pthread_mutex_init(__FILE__, __LINE__, mutex, mutexattr)
+#define Pthread_cond_signal(cond) \
+        wrap_pthread_cond_signal(__FILE__, __LINE__, cond)
+#define Pthread_cond_wait(cond, mutex) \
+        wrap_pthread_cond_wait(__FILE__, __LINE__, cond, mutex)
 
 int wrap_pthread_create(const char *file, int line, pthread_t *thread, pthread_attr_t *attr, void *(*start_routine)(void *), void *arg);
 int wrap_pthread_attr_init(const char *file, int line, pthread_attr_t *attr);
@@ -166,6 +170,8 @@ int wrap_pthread_mutex_lock(const char *file, int line, pthread_mutex_t *mutex);
 int wrap_pthread_mutex_trylock(const char *file, int line, pthread_mutex_t *mutex);
 int wrap_pthread_mutex_unlock(const char *file, int line, pthread_mutex_t *mutex);
 int wrap_pthread_mutex_init(const char *file, int line, pthread_mutex_t *mutex, const pthread_mutexattr_t *mutexattr);
+int wrap_pthread_cond_signal(const char *file, int line, pthread_cond_t *cond);
+int wrap_pthread_cond_wait(const char *file, int line, pthread_cond_t *cond, pthread_mutex_t *mutex);
 
 /* 
  * Misc System Call Wrappers 

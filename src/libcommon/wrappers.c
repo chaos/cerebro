@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.c,v 1.16 2005-03-16 00:25:13 achu Exp $
+ *  $Id: wrappers.c,v 1.17 2005-03-16 20:52:04 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -49,7 +49,10 @@ wrap_free(const char *file, int line, void *ptr)
       int i, size;
       char *c;
 
-      assert(*((int *)p) == MALLOC_MAGIC);
+      /* assert(*((int *)p) == MALLOC_MAGIC); */
+      if (!(*((int *)p) == MALLOC_MAGIC))
+        err_exit("free(%s:%d): memory corruption", file, line);
+
       size = *((int *)(p + sizeof(int)));
       
       c = (char *)(p + 2*sizeof(int) + size);
@@ -561,6 +564,41 @@ wrap_pthread_mutex_init(const char *file, int line, pthread_mutex_t *mutex, cons
 
   if ((ret = pthread_mutex_init(mutex, mutexattr)) != 0)
     err_exit("pthread_mutex_init(%s:%d): %s", file, line, strerror(ret));
+
+  return ret;
+}
+
+int 
+wrap_pthread_cond_signal(const char *file, int line, pthread_cond_t *cond)
+{
+  int ret;
+
+  assert(file != NULL);
+
+  if (!cond)
+    err_exit("pthread_cond_signal(%s:%d): null cond pointer", file, line);
+
+  if ((ret = pthread_cond_signal(cond)) != 0)
+    err_exit("pthread_cond_signal(%s:%d): %s", file, line, strerror(ret));
+
+  return ret;
+}
+
+int 
+wrap_pthread_cond_wait(const char *file, int line, pthread_cond_t *cond, pthread_mutex_t *mutex)
+{
+  int ret;
+
+  assert(file != NULL);
+
+  if (!cond)
+    err_exit("pthread_cond_wait(%s:%d): null cond pointer", file, line);
+
+  if (!mutex)
+    err_exit("pthread_cond_wait(%s:%d): null mutex pointer", file, line);
+
+  if ((ret = pthread_cond_wait(cond, mutex)) != 0)
+    err_exit("pthread_cond_signal(%s:%d): %s", file, line, strerror(ret));
 
   return ret;
 }

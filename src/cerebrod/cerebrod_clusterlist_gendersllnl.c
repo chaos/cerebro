@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_gendersllnl.c,v 1.3 2005-03-14 23:46:02 achu Exp $
+ *  $Id: cerebrod_clusterlist_gendersllnl.c,v 1.4 2005-03-16 20:52:04 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -162,7 +162,7 @@ gendersllnl_clusterlist_numnodes(void)
 int
 gendersllnl_clusterlist_node_in_cluster(char *node)
 {
-  int ret;
+  int ret, free_flag = 0;
   char *nodePtr = NULL;
 
   assert(handle);
@@ -176,6 +176,7 @@ gendersllnl_clusterlist_node_in_cluster(char *node)
       nodePtr = Strdup(node);
       p = strchr(nodePtr, '.');
       *p = '\0';
+      free_flag++;
     }
   else
     nodePtr = node;
@@ -184,7 +185,8 @@ gendersllnl_clusterlist_node_in_cluster(char *node)
     err_exit("gendersllnl_clusterlist_node_in_cluster: genders_isnode: %s",
 	     genders_errormsg(handle));
 
-  Free(nodePtr);
+  if (free_flag)
+    Free(nodePtr);
 
   return ret;
 }
@@ -192,7 +194,7 @@ gendersllnl_clusterlist_node_in_cluster(char *node)
 int
 gendersllnl_clusterlist_get_nodename(char *node, char *buf, int buflen)
 {
-  int len;
+  int len, free_flag = 0;
   char *nodePtr = NULL;
 
   assert(handle);
@@ -208,6 +210,7 @@ gendersllnl_clusterlist_get_nodename(char *node, char *buf, int buflen)
       nodePtr = Strdup(node);
       p = strchr(nodePtr, '.');
       *p = '\0';
+      free_flag++;
     }
   else
     nodePtr = node;
@@ -216,7 +219,8 @@ gendersllnl_clusterlist_get_nodename(char *node, char *buf, int buflen)
     err_exit("gendersllnl_clusterlist_get_nodename: genders_to_gendname: %s",
 	     genders_errormsg(handle));
 
-  Free(nodePtr);
+  if (free_flag)
+    Free(nodePtr);
 
   return 0;
 }
