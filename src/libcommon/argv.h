@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: argv.h,v 1.1 2005-03-14 20:52:04 achu Exp $
+ *  $Id: argv.h,v 1.2 2005-03-17 00:23:33 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2003 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -32,10 +32,10 @@
  * from 'cmdline' string.  Characters in the 'ignore' set are treated as white
  * space.  Caller must free with argv_destroy().
  */
-void argv_create(char *cmdline, char *ignore, int *argcPtr, char ***argvPtr);
+int argv_create(char *cmdline, char *ignore, int *argcPtr, char ***argvPtr);
 
 /* Destroy an argv array created by argv_create.
  */
-void argv_destroy(char **argv);
+int argv_destroy(char **argv);
 
 #endif

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: argv.c,v 1.1 2005-03-14 20:52:04 achu Exp $
+ *  $Id: argv.c,v 1.2 2005-03-17 00:23:33 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2003 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -34,7 +34,6 @@
 #endif /* STDC_HEADERS */
 #include <assert.h>
 
-#include "wrappers.h"
 #include "argv.h"
 
 /* make a copy of the first word in str and advance str past it */
@@ -53,7 +52,8 @@ static char *_nextargv(char **strp, char *ignore)
     len = str - word;
 
     if (len > 0) {
-        cpy = (char *)Malloc(len + 1);
+        if (!(cpy = (char *)malloc(len + 1)))
+            return NULL;
         memcpy(cpy, word, len);
         cpy[len] = '\0';
     }
@@ -82,32 +82,54 @@ static int _sizeargv(char *str, char *ignore)
 /* Create a null-terminated argv array given a command line.
  * Characters in the 'ignore' set are treated like white space. 
  */
-void argv_create(char *cmdline, char *ignore, int *argcPtr, char ***argvPtr)
+int argv_create(char *cmdline, char *ignore, int *argcPtr, char ***argvPtr)
 {
-    int argc = _sizeargv(cmdline, ignore);
-    char **argv = (char **)Malloc(sizeof(char *) * (argc + 1));
-    int i;
+    int argc; 
+    char **argv; 
+    int i, j;
+
+    if (!cmdline || !ignore || !argcPtr || !argvPtr) {
+        errno = EINVAL;
+        return -1;
+    }
+
+    if ((argc = _sizeargv(cmdline, ignore)) == 0)
+        return 0;
+    
+    if (!(argv = (char **)malloc(sizeof(char *) * (argc + 1))))
+        return -1;
 
     for (i = 0; i < argc; i++) {
-        argv[i] = _nextargv(&cmdline, ignore);
-        assert(argv[i] != NULL);
+        if (!(argv[i] = _nextargv(&cmdline, ignore))) {
+            for (j = 0; j < i; j++)
+                free(argv[j]);
+            free(argv);
+            return -1;
+        }
     }
     argv[i] = NULL;
 
     *argcPtr = argc;
     *argvPtr = argv;
-    return;
+    return 0;
 }
 
 /* Destroy a null-terminated argv array.
  */
-void argv_destroy(char **argv)
+int argv_destroy(char **argv)
 {
     int i;
 
+    if (!argv) {
+        errno = EINVAL;
+        return -1;
+    }
+
     for (i = 0; argv[i] != NULL; i++)
-        Free((void *)argv[i]);
-    Free((void *)argv);
+        free((void *)argv[i]);
+    free((void *)argv);
+
+    return 0;
 }
 
 /*
