@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_hostsfile.c,v 1.15 2005-03-24 01:29:21 achu Exp $
+ *  $Id: cerebrod_clusterlist_hostsfile.c,v 1.16 2005-03-25 19:44:05 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -15,11 +15,13 @@
 #include <assert.h>
 #include <errno.h>
 
+#include "cerebro_defs.h"
+
 #include "cerebrod_clusterlist_module.h"
 
-#include "cerebrod.h"
 #include "cerebrod_clusterlist.h"
 #include "cerebrod_clusterlist_util.h"
+#include "cerebrod.h"
 #include "error.h"
 #include "fd.h"
 #include "wrappers.h"
@@ -223,7 +225,7 @@ hostsfile_clusterlist_init(void)
       if (strchr(hostPtr, ' ') || strchr(hostPtr, '\t'))
         err_exit("hostsfile clusterlist parse error: host contains whitespace");
 
-      if (strlen(hostPtr) > CEREBROD_MAXHOSTNAMELEN)
+      if (strlen(hostPtr) > CEREBRO_MAXHOSTNAMELEN)
         err_exit("hostsfile clusterlist parse error: hostname '%s' exceeds "
                  "maximum length", hostPtr);
       

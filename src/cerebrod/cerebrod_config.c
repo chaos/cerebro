@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.56 2005-03-25 18:34:11 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.57 2005-03-25 19:44:05 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -492,6 +492,7 @@ _cerebrod_config_module_setup(void)
     }
 
  done:
+  ;
 #endif /* !WITH_STATIC_MODULES */
 }
 

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.32 2005-03-20 21:24:58 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.33 2005-03-25 19:44:05 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -17,6 +17,10 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+
+#include "cerebro_defs.h"
+
+#include "cerebrod_heartbeat_protocol.h"
 
 #include "cerebrod_listener.h"
 #include "cerebrod_clusterlist.h"
@@ -281,8 +285,8 @@ cerebrod_listener(void *arg)
       struct cerebrod_heartbeat hb;
       struct cerebrod_node_data *nd;
       char hbbuf[CEREBROD_PACKET_BUFLEN];
-      char hostname_buf[CEREBROD_MAXHOSTNAMELEN+1];
-      char hostname_key[CEREBROD_MAXHOSTNAMELEN+1];
+      char hostname_buf[CEREBRO_MAXHOSTNAMELEN+1];
+      char hostname_key[CEREBRO_MAXHOSTNAMELEN+1];
       int rv, hblen, cluster_data_updated_flag = 0;
 
       Pthread_mutex_lock(&listener_fd_lock);
@@ -336,7 +340,7 @@ cerebrod_listener(void *arg)
 	continue;
 
       _cerebrod_listener_dump_heartbeat(&hb);
-      if (hb.version != CEREBROD_PROTOCOL_VERSION)
+      if (hb.version != CEREBROD_HEARTBEAT_PROTOCOL_VERSION)
 	{
 	  err_debug("cerebrod_listener: invalid cerebrod packet version read");
 	  continue;
@@ -350,13 +354,13 @@ cerebrod_listener(void *arg)
         }
       
       /* Guarantee truncation */
-      memset(hostname_buf, '\0', CEREBROD_MAXHOSTNAMELEN+1);
-      memcpy(hostname_buf, hb.hostname, CEREBROD_MAXHOSTNAMELEN);
+      memset(hostname_buf, '\0', CEREBRO_MAXHOSTNAMELEN+1);
+      memcpy(hostname_buf, hb.hostname, CEREBRO_MAXHOSTNAMELEN);
 
-      memset(hostname_key, '\0', CEREBROD_MAXHOSTNAMELEN+1);
+      memset(hostname_key, '\0', CEREBRO_MAXHOSTNAMELEN+1);
       if (cerebrod_clusterlist_get_nodename(hostname_buf,
                                             hostname_key, 
-                                            CEREBROD_MAXHOSTNAMELEN+1) < 0)
+                                            CEREBRO_MAXHOSTNAMELEN+1) < 0)
         {
           err_output("cerebrod_listener: cerebrod_clusterlist_get_nodename "
                      "error: %s", hb.hostname);

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_heartbeat.c,v 1.12 2005-03-20 20:34:48 achu Exp $
+ *  $Id: cerebrod_heartbeat.c,v 1.13 2005-03-25 19:44:05 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -15,10 +15,12 @@
 #include <assert.h>
 #include <errno.h>
 
+#include "cerebro_defs.h"
+#include "cerebrod_heartbeat_protocol.h"
+
 #include "cerebrod_heartbeat.h"
 #include "cerebrod_config.h"
 #include "cerebrod_data.h"
-#include "cerebrod.h"
 #include "error.h"
 #include "wrappers.h"
 
@@ -32,8 +34,8 @@ cerebrod_heartbeat_construct(struct cerebrod_heartbeat *hb)
 {
   assert(hb);
 
-  hb->version = CEREBROD_PROTOCOL_VERSION;
-  cerebrod_get_hostname(hb->hostname, CEREBROD_MAXHOSTNAMELEN);
+  hb->version = CEREBROD_HEARTBEAT_PROTOCOL_VERSION;
+  cerebrod_get_hostname(hb->hostname, CEREBRO_MAXHOSTNAMELEN);
   hb->starttime = cerebrod_get_starttime();
   hb->boottime = cerebrod_get_boottime();
 }

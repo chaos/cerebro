@@ -18,6 +18,12 @@
 	* src/cerebrod/cerebrod_config.c (_config_load_dynamic_module,
 	_cerebrod_config_module_setup): Remove calls to Lt_dlclose and
 	Lt_dlexit, so config module is kept upon on exit.
+
+	* src/libcerebro/cerebro_defs.h,
+	src/libcerebro/cerebrod_heartbeat_protocol.h,
+	src/libcerebro/cerebro_updown_protocol.h: New files.
+	
+	* src/cerebrod/: Re-work for new header files and variable renaming.
 	
 2005-03-23  Albert Chu  <chu11@llnl.gov>
 

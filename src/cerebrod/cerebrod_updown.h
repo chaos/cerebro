@@ -1,12 +1,11 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.h,v 1.3 2005-03-20 21:24:58 achu Exp $
+ *  $Id: cerebrod_updown.h,v 1.4 2005-03-25 19:44:05 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_UPDOWN_H
 #define _CEREBROD_UPDOWN_H
 
 #include <pthread.h>
-#include "cerebrod.h"
 
 #define CEREBROD_UPDOWN_REINITIALIZE_WAIT 2
 

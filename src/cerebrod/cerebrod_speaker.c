@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.15 2005-03-20 21:24:58 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.16 2005-03-25 19:44:05 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -17,6 +17,8 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+
+#include "cerebrod_heartbeat_protocol.h"
 
 #include "cerebrod_speaker.h"
 #include "cerebrod_config.h"

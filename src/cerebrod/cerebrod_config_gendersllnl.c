@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config_gendersllnl.c,v 1.6 2005-03-25 18:34:11 achu Exp $
+ *  $Id: cerebrod_config_gendersllnl.c,v 1.7 2005-03-25 19:44:05 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -20,9 +20,10 @@
 
 #include <gendersllnl.h>
 
+#include "cerebro_defs.h"
+
 #include "cerebrod_config_module.h"
 
-#include "cerebrod.h"
 #include "cerebrod_config.h"
 #include "error.h"
 #include "wrappers.h"
@@ -48,7 +49,7 @@ int
 gendersllnl_config_load_default(struct cerebrod_module_config *conf)
 {
   genders_t handle = NULL;
-  char altnamebuf[CEREBROD_MAXHOSTNAMELEN+1];
+  char altnamebuf[CEREBRO_MAXHOSTNAMELEN+1];
   int ret;
 
   assert(conf);
@@ -77,12 +78,12 @@ gendersllnl_config_load_default(struct cerebrod_module_config *conf)
       conf->updown_server = 0;
     }
 
-  memset(altnamebuf, '\0', CEREBROD_MAXHOSTNAMELEN+1);
+  memset(altnamebuf, '\0', CEREBRO_MAXHOSTNAMELEN+1);
   if ((ret = genders_testattr(handle, 
                               NULL, 
                               GENDERS_ALTNAME_ATTRIBUTE,
                               altnamebuf,
-                              CEREBROD_MAXHOSTNAMELEN)) < 0)
+                              CEREBRO_MAXHOSTNAMELEN)) < 0)
     err_exit("genders_config_load_default: genders_testattr: %s",
              genders_errormsg(handle));
 

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_gendersllnl.c,v 1.17 2005-03-24 01:29:21 achu Exp $
+ *  $Id: cerebrod_clusterlist_gendersllnl.c,v 1.18 2005-03-25 19:44:05 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -18,7 +18,6 @@
 
 #include "cerebrod_clusterlist_module.h"
 
-#include "cerebrod.h"
 #include "cerebrod_clusterlist.h"
 #include "cerebrod_clusterlist_genders_util.h"
 #include "cerebrod_clusterlist_util.h"

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_data.c,v 1.2 2005-03-20 20:34:48 achu Exp $
+ *  $Id: cerebrod_data.c,v 1.3 2005-03-25 19:44:05 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -16,7 +16,8 @@
 #include <assert.h>
 #include <errno.h>
 
-#include "cerebrod.h"
+#include "cerebro_defs.h"
+
 #include "cerebrod_data.h"
 #include "error.h"
 #include "wrappers.h"
@@ -49,7 +50,7 @@ static u_int32_t cerebrod_boottime = 0;
  *
  * cached system hostname and hostname length
  */
-static char cerebrod_hostname[CEREBROD_MAXHOSTNAMELEN+1];
+static char cerebrod_hostname[CEREBRO_MAXHOSTNAMELEN+1];
 static int cerebrod_hostname_len = 0;
 
 /*
@@ -122,8 +123,8 @@ static void
 _cerebrod_cache_hostname(void)
 {
   assert(!cerebrod_hostname_len);
-  memset(cerebrod_hostname, '\0', CEREBROD_MAXHOSTNAMELEN+1);
-  Gethostname(cerebrod_hostname, CEREBROD_MAXHOSTNAMELEN);
+  memset(cerebrod_hostname, '\0', CEREBRO_MAXHOSTNAMELEN+1);
+  Gethostname(cerebrod_hostname, CEREBRO_MAXHOSTNAMELEN);
   cerebrod_hostname_len = strlen(cerebrod_hostname);
 }
 

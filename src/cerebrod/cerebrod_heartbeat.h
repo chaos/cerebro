@@ -1,29 +1,11 @@
 /*****************************************************************************\
- *  $Id: cerebrod_heartbeat.h,v 1.5 2005-03-20 20:21:18 achu Exp $
+ *  $Id: cerebrod_heartbeat.h,v 1.6 2005-03-25 19:44:05 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_HEARTBEAT_H
 #define _CEREBROD_HEARTBEAT_H
 
 #include "cerebrod.h"
-
-/* 
- * struct cerebrod_heartbeat
- *
- * defines heartbeat data sent/received from each cerebrod daemon
- */
-struct cerebrod_heartbeat
-  {
-    int32_t version;
-    char hostname[CEREBROD_MAXHOSTNAMELEN];
-    u_int32_t starttime;
-    u_int32_t boottime;
-  };
-
-#define CEREBROD_HEARTBEAT_LEN  (sizeof(int32_t) \
-                                 + CEREBROD_MAXHOSTNAMELEN \
-                                 + sizeof(u_int32_t) \
-                                 + sizeof(u_int32_t))
 
 /* 
  * cerebrod_heartbeat_construct

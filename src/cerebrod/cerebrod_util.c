@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_util.c,v 1.7 2005-03-22 20:56:40 achu Exp $
+ *  $Id: cerebrod_util.c,v 1.8 2005-03-25 19:44:05 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -16,7 +16,6 @@
 #include <errno.h>
 
 #include "cerebrod_util.h"
-#include "cerebrod.h"
 #include "error.h"
 #include "wrappers.h"
 
@@ -73,7 +72,7 @@ cerebrod_rehash(hash_t *old_hash,
     {
       rv = Pthread_mutex_trylock(hash_mutex);
       if (rv != EBUSY)
-	err_exit("cerebrod_heartbeat_dump: hash_mutex not locked");
+	err_exit("cerebrod_rehash: hash_mutex not locked");
     }
 #endif /* NDEBUG */
 
