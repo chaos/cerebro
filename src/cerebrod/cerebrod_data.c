@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_cache.c,v 1.3 2005-03-17 23:10:51 achu Exp $
+ *  $Id: cerebrod_data.c,v 1.1 2005-03-20 20:10:14 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -17,7 +17,7 @@
 #include <errno.h>
 
 #include "cerebrod.h"
-#include "cerebrod_cache.h"
+#include "cerebrod_data.h"
 #include "error.h"
 #include "wrappers.h"
 
@@ -25,16 +25,38 @@
 #define CEREBROD_BOOTTIME_FILE     "/proc/stat"
 #define CEREBROD_BOOTTIME_KEYWORD  "btime"
 
-/* On some systems, due to kernel bugs, the boottime value may change
- * as the system executes.  We will assume the first boottime value
- * read from /proc is correct.
+/* cerebrod_starttime 
+ *
+ * cached cerebrod starttime value
  */
-
 static u_int32_t cerebrod_starttime = 0;
+
+
+/* 
+ * cerebrod_boottime
+ *
+ * cached system boottime 
+ *
+ * On some systems, due to kernel bugs, the boottime value may change
+ * as the system executes.  We will read the boottime value from
+ * /proc, cache it, and assume that is always correct.
+ */
 static u_int32_t cerebrod_boottime = 0;
+
+/*
+ * cerebrod_hostname
+ * cerebrod_hostname_len
+ *
+ * cached system hostname and hostname length
+ */
 static char cerebrod_hostname[CEREBROD_MAXHOSTNAMELEN+1];
 static int cerebrod_hostname_len = 0;
 
+/*
+ * _cerebrod_cache_starttime
+ *
+ * cache the cerebrod starttime
+ */
 static void
 _cerebrod_cache_starttime(void)
 {
@@ -47,6 +69,11 @@ _cerebrod_cache_starttime(void)
   cerebrod_starttime = tv.tv_sec;
 }
 
+/*
+ * _cerebrod_cache_boottime
+ *
+ * cache the system boottime
+ */
 static void
 _cerebrod_cache_boottime(void)
 {
@@ -86,6 +113,11 @@ _cerebrod_cache_boottime(void)
   cerebrod_boottime = ret;
 }
 
+/*
+ * _cerebrod_cache_hostname
+ *
+ * cache the system hostname and length
+ */
 static void
 _cerebrod_cache_hostname(void)
 {
@@ -95,14 +127,25 @@ _cerebrod_cache_hostname(void)
   cerebrod_hostname_len = strlen(cerebrod_hostname);
 }
 
+/* 
+ * cerebrod_load_data
+ *
+ * Load and cache cerebrod starttme, machine boottime, and machine
+ * hostname
+ */
 void
-cerebrod_cache(void)
+cerebrod_load_data(void)
 {
   _cerebrod_cache_starttime();
   _cerebrod_cache_boottime();
   _cerebrod_cache_hostname();
 }
 
+/* 
+ * cerebrod_get_starttime
+ *
+ * Return the cached cerebrod starttime
+ */
 u_int32_t
 cerebrod_get_starttime(void)
 {
@@ -111,6 +154,11 @@ cerebrod_get_starttime(void)
   return cerebrod_starttime;
 }
 
+/* 
+ * cerebrod_get_boottime
+ *
+ * Return the cached system boottime
+ */
 u_int32_t
 cerebrod_get_boottime(void)
 {
@@ -119,6 +167,11 @@ cerebrod_get_boottime(void)
   return cerebrod_boottime;
 }
 
+/* 
+ * cerebrod_get_hostname
+ *
+ * Return the cached system hostname
+ */
 void
 cerebrod_get_hostname(char *buf, unsigned int len)
 {

@@ -23,6 +23,10 @@
 	* src/cerebrod/cerebrod_config.c (_cerebrod_config_dump): Add
 	forgotten field.
 
+	* src/cerebrod/cerebrod_cache.h, src/cerebrod/cerebrod_cache.c:
+	Renamed to cerebrod_system_data.h and cerebrod_system_data.c.  API
+	modified appropriately and changed globally.
+
 	* src/cerebrod/: Added significant commenting and documentation
 	throughout code.  
 

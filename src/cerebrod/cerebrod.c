@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.18 2005-03-18 21:35:51 achu Exp $
+ *  $Id: cerebrod.c,v 1.19 2005-03-20 20:10:14 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -11,10 +11,10 @@
 #include <syslog.h>
 
 #include "cerebrod.h"
-#include "cerebrod_cache.h"
 #include "cerebrod_clusterlist.h"
 #include "cerebrod_config.h"
 #include "cerebrod_daemon.h"
+#include "cerebrod_data.h"
 #include "cerebrod_listener.h"
 #include "cerebrod_speaker.h"
 #include "cerebrod_updown.h"
@@ -35,12 +35,22 @@ extern int cerebrod_updown_initialization_complete;
 extern pthread_cond_t cerebrod_updown_initialization_cond;
 extern pthread_mutex_t cerebrod_updown_initialization_complete_lock;
 
+/* 
+ * _cerebrod_pre_config_initialization
+ *
+ * Perform initialization routines prior to configuring cerebrod
+ */
 static void
 _cerebrod_pre_config_initialization(void)
 {
-  cerebrod_cache();
+  cerebrod_load_data();
 }
 
+/* 
+ * _cerebrod_post_config_initialization
+ *
+ * Perform initialization routines after configuration is determined
+ */
 static void
 _cerebrod_post_config_initialization(void)
 {
@@ -78,8 +88,8 @@ main(int argc, char **argv)
   /* Call after daemonization, since daemonization closes currently open fds */
   openlog(argv[0], LOG_ODELAY | LOG_PID, LOG_DAEMON);
 
-  /* Start servers first, because they need to be initialized before
-   * the listener my begin receiving data.
+  /* Start updown server.  Start before listener before the listener
+     begins receiving data.
    */
   if (conf.updown_server)
     {
@@ -99,8 +109,9 @@ main(int argc, char **argv)
       Pthread_mutex_unlock(&cerebrod_updown_initialization_complete_lock);
     }
 
-  /* Start listener before speaker, since the listener may need to
-   * listen for packets from a later created speaker thread
+  /* Start listening server.  Start before speaker, since the listener
+   * may need to listen for packets from a later created speaker
+   * thread
    */
   if (conf.listen)
     {
@@ -125,6 +136,7 @@ main(int argc, char **argv)
       Pthread_mutex_unlock(&cerebrod_listener_initialization_complete_lock);
     }
 
+  /* Start speaker */
   if (conf.speak)
     {
       pthread_t thread;
