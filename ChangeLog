@@ -7,6 +7,10 @@
 
 	* src/cerebrod/Makefile.am: Updated with new files.
 
+	* src/cerebrod/cerebrod_listener.c (cerebrod_listener),
+	src/cerebrod/cerebrod.c
+	(main): Call appropriate updown server functions.
+
 2005-03-15  Albert Chu  <chu11@llnl.gov>
 
 	Begin support of updown server.

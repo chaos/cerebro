@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.26 2005-03-16 15:55:28 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.27 2005-03-16 17:08:26 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -22,6 +22,8 @@
 #include "cerebrod_clusterlist.h"
 #include "cerebrod_config.h"
 #include "cerebrod_heartbeat.h"
+#include "cerebrod_updown.h"
+#include "cerebrod_util.h"
 #include "error.h"
 #include "fd.h"
 #include "wrappers.h"
@@ -227,7 +229,7 @@ cerebrod_listener(void *arg)
       struct cerebrod_node_data *nd;
       char hbbuf[CEREBROD_PACKET_BUFLEN];
       char hostname_key[MAXHOSTNAMELEN];
-      int rv, hblen;
+      int rv, hblen, cluster_data_updated_flag = 0;
 
       Pthread_mutex_lock(&listener_fd_lock);
       if ((rv = recvfrom(listener_fd, 
@@ -332,8 +334,12 @@ cerebrod_listener(void *arg)
           nd->starttime = hb.starttime;
           nd->boottime = hb.boottime;
           nd->last_received = tv.tv_sec;
+	  cluster_data_updated_flag++;
         }
       Pthread_mutex_unlock(&(nd->node_data_lock));
+
+      if (conf.updown_server && cluster_data_updated_flag)
+	cerebrod_updown_update_data(hostname_key, nd->last_received);
 
       _cerebrod_listener_dump_cluster_node_data_hash();
     }

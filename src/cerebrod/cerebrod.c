@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.12 2005-03-14 17:05:14 achu Exp $
+ *  $Id: cerebrod.c,v 1.13 2005-03-16 17:08:26 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -17,6 +17,7 @@
 #include "cerebrod_daemon.h"
 #include "cerebrod_listener.h"
 #include "cerebrod_speaker.h"
+#include "cerebrod_updown.h"
 #include "error.h"
 #include "wrappers.h"
 
@@ -26,6 +27,7 @@ pthread_mutex_t debug_output_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 extern struct cerebrod_config conf;
 extern int cerebrod_listener_initialization_complete;
+extern int cerebrod_updown_initialization_complete;
 
 static void
 _cerebrod_pre_config_initialization(void)
@@ -62,8 +64,25 @@ main(int argc, char **argv)
   /* Call after daemonization, since daemonization closes currently open fds */
   openlog(argv[0], LOG_ODELAY | LOG_PID, LOG_DAEMON);
 
-  /* Start listener first, since it may need to listen for packets
-   * from a later created spaker thread 
+  /* Start servers first, because they need to be initialized before
+   * the listener my begin receiving data.
+   */
+  if (conf.updown_server)
+    {
+      pthread_t thread;
+      pthread_attr_t attr;
+
+      Pthread_attr_init(&attr);
+      Pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+      Pthread_create(&thread, &attr, cerebrod_updown, NULL);
+      Pthread_attr_destroy(&attr);
+    }
+
+  /* No need for locking */
+  while (cerebrod_updown_initialization_complete == 0) {}
+
+  /* Start listener before speaker, since the listener may need to
+   * listen for packets from a later created speaker thread
    */
   if (conf.listen)
     {

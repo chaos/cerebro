@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.c,v 1.4 2005-03-16 15:55:28 achu Exp $
+ *  $Id: cerebrod_updown.c,v 1.5 2005-03-16 17:08:26 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -393,10 +393,7 @@ cerebrod_updown_update_data(char *node, u_int32_t last_received)
   struct cerebrod_updown_node_data *ud;
 
   if (!cerebrod_updown_initialization_complete)
-    {
-      err_debug("cerebrod_updown_update_data: not up yet");
-      return;
-    }
+    err_exit("cerebrod_updown_update_data: initialization not complete");
 
   Pthread_mutex_lock(&updown_node_data_lock);
   if (!(ud = Hash_find(updown_node_data_index, node)))
