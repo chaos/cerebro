@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.21 2005-02-01 01:33:11 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.22 2005-02-01 16:19:01 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -184,7 +184,7 @@ _cerebrod_config_parse(void)
   int heartbeat_frequency_flag, heartbeat_source_port_flag, heartbeat_destination_port_flag, 
     heartbeat_destination_ip_flag, listen_flag, speak_flag, 
     speak_from_network_interface_flag, speak_ttl_flag, 
-    listen_from_network_interface_flag, listen_threads_flag;
+    listen_on_network_interface_flag, listen_threads_flag;
 
   struct conffile_option options[] =
     {
@@ -246,27 +246,50 @@ _cerebrod_config_check(void)
       && strchr(conf.speak_from_network_interface, '.'))
     {
       if (strchr(conf.speak_from_network_interface, '/'))
-        {
-          char *speak_from_network_interface_cpy = Strdup(conf.speak_from_network_interface);
+	{
+	  char *speak_from_network_interface_cpy = Strdup(conf.speak_from_network_interface);
 	  char *tok;
-
-          tok = strtok(speak_from_network_interface_cpy, "/");
-          if (!Inet_pton(AF_INET, tok, &addr_temp))
-            err_exit("speak from network interface IP address '%s' "
-                     "improperly format", conf.speak_from_network_interface);
-
-          Free(speak_from_network_interface_cpy);
-        }
+	  
+	  tok = strtok(speak_from_network_interface_cpy, "/");
+	  if (!Inet_pton(AF_INET, tok, &addr_temp))
+	    err_exit("speak from network interface IP address '%s' "
+		     "improperly format", conf.speak_from_network_interface);
+	  
+	  Free(speak_from_network_interface_cpy);
+	}
       else
-        {
-          if (!Inet_pton(AF_INET, conf.speak_from_network_interface, &addr_temp))
-            err_exit("speak from network interface IP address '%s' "
-                     "improperly format", conf.speak_from_network_interface);
-        }
+	{
+	  if (!Inet_pton(AF_INET, conf.speak_from_network_interface, &addr_temp))
+	    err_exit("speak from network interface IP address '%s' "
+		     "improperly format", conf.speak_from_network_interface);
+	}
     }
 
   if (conf.speak_ttl <= 0)
     err_exit("speak ttl '%d' invalid", conf.speak_ttl);
+
+  if (conf.listen_on_network_interface
+      && strchr(conf.listen_on_network_interface, '.'))
+    {
+      if (strchr(conf.listen_on_network_interface, '/'))
+	{
+	  char *listen_on_network_interface_cpy = Strdup(conf.listen_on_network_interface);
+	  char *tok;
+	  
+	  tok = strtok(listen_on_network_interface_cpy, "/");
+	  if (!Inet_pton(AF_INET, tok, &addr_temp))
+	    err_exit("listen on network interface IP address '%s' "
+		     "improperly format", conf.listen_on_network_interface);
+	  
+	  Free(listen_on_network_interface_cpy);
+	}
+      else
+	{
+	  if (!Inet_pton(AF_INET, conf.listen_on_network_interface, &addr_temp))
+	    err_exit("listen on network interface IP address '%s' "
+		     "improperly format", conf.listen_on_network_interface);
+	}
+    }
 }
 
 static void
@@ -371,13 +394,17 @@ _get_ifr_len(struct ifreq *ifr)
 }
 
 static void
-_cerebrod_calculate_speak_from_in_addr(void)
+_cerebrod_calculate_in_addr_and_index(char *network_interface,
+				      struct in_addr *interface_in_addr,
+				      int *interface_index)
 {
-  if (!conf.speak_from_network_interface)
+  assert(interface_in_addr && interface_index);
+  
+  if (!network_interface)
     {
       /* Case A: No interface specified
-       * - If multicast speak to IP address specified, find a multicast interface
-       * - If singlecast speak to IP address specified, use INADDR_ANY
+       * - If multicast heartbeat IP address specified, find a multicast interface
+       * - If singlecast heartbeat IP address specified, use INADDR_ANY
        */
       if (conf.multicast)
 	{
@@ -426,23 +453,23 @@ _cerebrod_calculate_speak_from_in_addr(void)
 			 strerror(errno));
 	      
 	      sinptr = (struct sockaddr_in *)&ifr->ifr_addr;
-	      conf.speak_from_in_addr.s_addr = sinptr->sin_addr.s_addr;
-	      conf.speak_from_interface_index = ifr_tmp.ifr_ifindex;
+	      interface_in_addr->s_addr = sinptr->sin_addr.s_addr;
+	      *interface_index = ifr_tmp.ifr_ifindex;
 	      found_interface++;
 	      break;
 	    }
 
 	  if (!found_interface)
 	    err_exit("network interface with multicast not found", 
-		     conf.speak_from_network_interface);
+		     network_interface);
 
 	  Free(buf);
 	  Close(fd);
 	}
       else
-	conf.speak_from_in_addr.s_addr = INADDR_ANY;
+	interface_in_addr->s_addr = INADDR_ANY;
     }
-  else if (strchr(conf.speak_from_network_interface, '.'))
+  else if (strchr(network_interface, '.'))
     {
       /* Case B: IP address or subnet specified */
       struct ifconf ifc;
@@ -456,38 +483,38 @@ _cerebrod_calculate_speak_from_in_addr(void)
 
       _get_if_conf(&buf, &ifc, fd);
      
-      if (strchr(conf.speak_from_network_interface, '/'))
+      if (strchr(network_interface, '/'))
 	{
-	  char *speak_from_network_interface_cpy = Strdup(conf.speak_from_network_interface);
+	  char *network_interface_cpy = Strdup(network_interface);
 	  char *snm, *ptr, *tok;
 
-	  tok = strtok(speak_from_network_interface_cpy, "/");
+	  tok = strtok(network_interface_cpy, "/");
 	  if (!Inet_pton(AF_INET, tok, &addr_temp))
-            err_exit("speak from network interface IP address '%s' "
-                     "improperly format", conf.speak_from_network_interface);
+            err_exit("network interface IP address '%s' "
+                     "improperly format", network_interface);
 
 	  if (!(snm = strtok(NULL, "")))
 	    err_exit("network interface '%s' subnet mask not specified",
-		     conf.speak_from_network_interface);
+		     network_interface);
 	  else
 	    {
 	      mask = strtol(snm, &ptr, 10);
 	      if (ptr != (snm + strlen(snm)))
 		err_exit("network interface '%s' subnet mask improper",
-			 conf.speak_from_network_interface);
+			 network_interface);
 	      else if (mask < 1 || mask > IPADDR_BITS)
 		err_exit("network interface '%s' subnet mask size invalid",
-			 conf.speak_from_network_interface);
+			 network_interface);
 	    }
 
-	  Free(speak_from_network_interface_cpy);
+	  Free(network_interface_cpy);
 	}
       else
 	{
 	  /* If no '/', then just an IP address, mask is all bits */
-	  if (!Inet_pton(AF_INET, conf.speak_from_network_interface, &addr_temp))
-            err_exit("speak from network interface IP address '%s' "
-                     "improperly format", conf.speak_from_network_interface);
+	  if (!Inet_pton(AF_INET, network_interface, &addr_temp))
+            err_exit("network interface IP address '%s' "
+                     "improperly format", network_interface);
 	  mask = IPADDR_BITS;
 	}
 
@@ -535,16 +562,21 @@ _cerebrod_calculate_speak_from_in_addr(void)
 		err_exit("cerebrod_calculate_configuration: ioctl: %s",
 			 strerror(errno));
 
-	      conf.speak_from_in_addr.s_addr = sinptr->sin_addr.s_addr;
-	      conf.speak_from_interface_index = ifr_tmp.ifr_ifindex;
+	      interface_in_addr->s_addr = sinptr->sin_addr.s_addr;
+	      *interface_index = ifr_tmp.ifr_ifindex;
 	      found_interface++;
 	      break;
 	    }
 	}
       
       if (!found_interface)
-	err_exit("network interface '%s' with multicast "
-		 "not found", conf.speak_from_network_interface);
+	{
+	  if (conf.multicast)
+	    err_exit("network interface '%s' with multicast "
+		     "not found", network_interface);
+	  else
+	    err_exit("network interface '%s' not found", network_interface);
+	}
       
       Free(buf);
       Close(fd);
@@ -574,7 +606,7 @@ _cerebrod_calculate_speak_from_in_addr(void)
 
 	  ptr += sizeof(ifr->ifr_name) + len;
           
-	  if (!strcmp(conf.speak_from_network_interface, ifr->ifr_name))
+	  if (!strcmp(network_interface, ifr->ifr_name))
 	    {
 	      struct sockaddr_in *sinptr;
 	      struct ifreq ifr_tmp;
@@ -589,11 +621,11 @@ _cerebrod_calculate_speak_from_in_addr(void)
 
 	      if (!(ifr_tmp.ifr_flags & IFF_UP))
 		err_exit("network interface '%s' not up",
-			 conf.speak_from_network_interface);
+			 network_interface);
 	      
 	      if (conf.multicast && !(ifr_tmp.ifr_flags & IFF_MULTICAST))
 		err_exit("network interface '%s' not a multicast interface",
-			 conf.speak_from_network_interface);
+			 network_interface);
 
 	      /* Null termination not required, don't use strncpy() wrapper */
 	      memset(&ifr_tmp, '\0', sizeof(struct ifreq));
@@ -604,8 +636,8 @@ _cerebrod_calculate_speak_from_in_addr(void)
 			 strerror(errno));
 
 	      sinptr = (struct sockaddr_in *)&ifr->ifr_addr;
-	      conf.speak_from_in_addr.s_addr = sinptr->sin_addr.s_addr;
-	      conf.speak_from_interface_index = ifr_tmp.ifr_ifindex;
+	      interface_in_addr->s_addr = sinptr->sin_addr.s_addr;
+	      *interface_index = ifr_tmp.ifr_ifindex;
 	      found_interface++;
 	      break;
 	    }
@@ -613,7 +645,7 @@ _cerebrod_calculate_speak_from_in_addr(void)
 
       if (!found_interface)
 	err_exit("network interface '%s' not found",
-		 conf.speak_from_network_interface);
+		 network_interface);
 
       Free(buf);
       Close(fd);
@@ -621,21 +653,48 @@ _cerebrod_calculate_speak_from_in_addr(void)
 }
 
 static void
+_cerebrod_calculate_speak_from_in_addr_and_index()
+{
+  _cerebrod_calculate_in_addr_and_index(conf.speak_from_network_interface,
+					&conf.speak_from_in_addr,
+					&conf.speak_from_interface_index);
+}
+
+static void
+_cerebrod_calculate_listen_on_in_addr_and_index()
+{
+  _cerebrod_calculate_in_addr_and_index(conf.listen_on_network_interface,
+					&conf.listen_on_in_addr,
+					&conf.listen_on_interface_index);
+}
+
+static void
 _cerebrod_calculate_configuration(void)
 {
-  /* Step 0: Determine if we are single casting or multicasting */
+  /* Determine if the heartbeat is single or multi casted */
   _cerebrod_calculate_multicast();
 
-  /* Step 1: Determine if the heartbeat frequencey is ranged or fixed */
-  _cerebrod_calculate_heartbeat_frequency_ranged();
+  if (conf.speak)
+    {
+      /* Determine if the heartbeat frequencey is ranged or fixed */
+      _cerebrod_calculate_heartbeat_frequency_ranged();
 
-  /* Step 2: Calculate the destination ip */
-  _cerebrod_calculate_heartbeat_destination_in_addr();
+      /* Calculate the destination ip */
+      _cerebrod_calculate_heartbeat_destination_in_addr();
 
-  /* Step 3: Determine the appropriate network interface to use based
-   * on the user's speak_from_network_interface input.
-   */
-  _cerebrod_calculate_speak_from_in_addr();
+      /* Determine the appropriate network interface to use based on
+       * the user's speak_from_network_interface input.
+       */
+      _cerebrod_calculate_speak_from_in_addr_and_index();
+    }
+
+  if (conf.listen)
+    {
+      /* Determine the appropriate network interface to use based on
+       * the user's listen_on_network_interface input.
+       */
+      _cerebrod_calculate_listen_on_in_addr_and_index();
+    }
 }
 
 static void 
@@ -658,11 +717,13 @@ _cerebrod_config_dump(void)
       fprintf(stderr, "* speak: %d\n", conf.speak);
       fprintf(stderr, "* speak_from_network_interface: \"%s\"\n", conf.speak_from_network_interface);
       fprintf(stderr, "* listen_on_network_interface: \"%s\"\n", conf.listen_on_network_interface);
-      fprintf(stderr, "* listen_threads: %d\n", conf.listen_threds);
+      fprintf(stderr, "* listen_threads: %d\n", conf.listen_threads);
       fprintf(stderr, "* multicast: %d\n", conf.multicast);
       fprintf(stderr, "* heartbeat_destination_in_addr: %s\n", inet_ntoa(conf.heartbeat_destination_in_addr));
       fprintf(stderr, "* speak_from_in_addr: %s\n", inet_ntoa(conf.speak_from_in_addr));
       fprintf(stderr, "* speak_from_interface_index: %d\n", conf.speak_from_interface_index);
+      fprintf(stderr, "* listen_on_in_addr: %s\n", inet_ntoa(conf.listen_on_in_addr));
+      fprintf(stderr, "* listen_on_interface_index: %d\n", conf.listen_on_interface_index);
       fprintf(stderr, "**************************************\n");
     }
 #endif /* NDEBUG */

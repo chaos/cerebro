@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.h,v 1.13 2005-02-01 01:33:11 achu Exp $
+ *  $Id: cerebrod_config.h,v 1.14 2005-02-01 16:19:01 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_CONFIG_H
@@ -17,18 +17,18 @@
  * 
  */
 
-#define CEREBROD_CONFIGFILE_DEFAULT                  "/etc/cerebrod.conf"
-#define CEREBROD_HEARTBEAT_FREQUENCY_MIN_DEFAULT     10
-#define CEREBROD_HEARTBEAT_FREQUENCY_MAX_DEFAULT     20
-#define CEREBROD_HEARTBEAT_SOURCE_PORT_DEFAULT       8651
-#define CEREBROD_HEARTBEAT_DESTINATION_PORT_DEFAULT  8650
-#define CEREBROD_HEARTBEAT_DESTINATION_IP_DEFAULT    "239.2.11.72"
-#define CEREBROD_LISTEN_DEFAULT                      1
-#define CEREBROD_SPEAK_DEFAULT                       1
-#define CEREBROD_SPEAK_FROM_NETWORK_INTERFACE        NULL
-#define CEREBROD_SPEAK_TTL_DEFAULT                   1
-#define CEREBROD_LISTEN_ON_NETWORK_INTERFACE         NULL
-#define CEREBROD_LISTEN_THREADS_DEFAULT              2
+#define CEREBROD_CONFIGFILE_DEFAULT                   "/etc/cerebrod.conf"
+#define CEREBROD_HEARTBEAT_FREQUENCY_MIN_DEFAULT      10
+#define CEREBROD_HEARTBEAT_FREQUENCY_MAX_DEFAULT      20
+#define CEREBROD_HEARTBEAT_SOURCE_PORT_DEFAULT        8651
+#define CEREBROD_HEARTBEAT_DESTINATION_PORT_DEFAULT   8650
+#define CEREBROD_HEARTBEAT_DESTINATION_IP_DEFAULT     "239.2.11.72"
+#define CEREBROD_LISTEN_DEFAULT                       1
+#define CEREBROD_SPEAK_DEFAULT                        1
+#define CEREBROD_SPEAK_FROM_NETWORK_INTERFACE_DEFAULT NULL
+#define CEREBROD_SPEAK_TTL_DEFAULT                    1
+#define CEREBROD_LISTEN_ON_NETWORK_INTERFACE_DEFAULT  NULL
+#define CEREBROD_LISTEN_THREADS_DEFAULT               2
 
 /* Configuration
  *
@@ -93,11 +93,17 @@ struct cerebrod_config
   int listen_threads;
 
   /* Determined by cerebrod based on configuration */
+
+  /* speaker configuration */
   int multicast;
   int heartbeat_frequency_ranged;
   struct in_addr heartbeat_destination_in_addr;
   struct in_addr speak_from_in_addr;
   int speak_from_interface_index;
+
+  /* listener configuration */
+  struct in_addr listen_on_in_addr;
+  int listen_on_interface_index;
 };
 
 void cerebrod_config(int argc, char **argv);
