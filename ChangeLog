@@ -24,8 +24,8 @@
 
 	* Makefile.am: Add etc subdir.
 
-	* src/libcommon/wrappers.h, src/libcommon/wrappers.c (_Free): New
-	function.
+	* src/libcommon/wrappers.h, src/libcommon/wrappers.c (_Free,
+	List_count, wrap_list_count): New macros and functions.
 
 	* src/cerebrod/cerebrod_clusterlist_hostsfile.c
 	(hostsfile_clusterlist_init, hostsfile_clusterlist_finish): Rework
@@ -34,7 +34,11 @@
 	* src/cerebrod/cerebrod_clusterlist_hostsfile.c (_all): Removed function.
 
 	* src/cerebrod/cerebrod_listener.c
-	(_cerebrod_listener_initialize): Rework using _Free.
+	(_cerebrod_listener_initialize, _rehash): Rework using _Free.
+
+	* src/cerebrod/cerbrod_updown.c
+	(_cerebrod_listener_dump_cluster_node_data_hash): Remove
+	Hash_count use, use cluster_data_hash_numnodes instead.
 
 2005-03-14  Albert Chu  <chu11@llnl.gov>
 

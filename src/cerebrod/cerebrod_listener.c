@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.23 2005-03-15 23:14:39 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.24 2005-03-16 00:25:13 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -41,8 +41,8 @@ pthread_mutex_t cerebrod_listener_initialization_complete_lock = PTHREAD_MUTEX_I
 int listener_fd;
 pthread_mutex_t listener_fd_lock = PTHREAD_MUTEX_INITIALIZER;
 hash_t cluster_data_hash = NULL;
-int cluster_data_hash_size;
 int cluster_data_hash_numnodes;
+int cluster_data_hash_size;
 pthread_mutex_t cluster_data_hash_lock = PTHREAD_MUTEX_INITIALIZER;
 
 static int
@@ -170,7 +170,7 @@ _rehash(void)
   newhash = Hash_create(cluster_data_hash_size,
                         (hash_key_f)hash_key_string,
                         (hash_cmp_f)strcmp,
-                        (hash_del_f)free);
+                        (hash_del_f)_Free);
   
   rv = Hash_for_each(cluster_data_hash, _reinsert, &newhash);
   if (rv != cluster_data_hash_numnodes)
@@ -239,17 +239,16 @@ _cerebrod_listener_dump_cluster_node_data_hash(void)
 #ifndef NDEBUG
   if (conf.debug)
     {
-      int rv, count;
+      int rv;
 
       Pthread_mutex_lock(&cluster_data_hash_lock);
       Pthread_mutex_lock(&debug_output_mutex);
-      count = Hash_count(cluster_data_hash);
       fprintf(stderr, "**************************************\n");
       fprintf(stderr, "* Cluster Node Hash State\n");
       fprintf(stderr, "* -----------------------\n");
-      fprintf(stderr, "* Hashed Nodes: %d\n", count);
+      fprintf(stderr, "* Hashed Nodes: %d\n", cluster_data_hash_numnodes);
       fprintf(stderr, "* -----------------------\n");
-      if (count > 0)
+      if (cluster_data_hash_numnodes > 0)
         {          
           rv = Hash_for_each(cluster_data_hash, 
                              _cerebrod_listener_dump_cluster_node_data_item,

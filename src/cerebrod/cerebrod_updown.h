@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.h,v 1.1 2005-03-15 23:14:39 achu Exp $
+ *  $Id: cerebrod_updown.h,v 1.2 2005-03-16 00:25:13 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_UPDOWN_H
@@ -19,5 +19,6 @@ struct cerebrod_updown_node_data
 #define CEREBROD_UPDOWN_REINITIALIZE_WAIT 2
 
 void *cerebrod_updown(void *);
+void cerebrod_updown_update_data(char *node, u_int32_t last_received);
 
 #endif /* _CEREBROD_UPDOWN_H */

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.c,v 1.15 2005-03-15 23:14:39 achu Exp $
+ *  $Id: wrappers.c,v 1.16 2005-03-16 00:25:13 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -725,6 +725,17 @@ wrap_list_destroy(const char *file, int line, List l)
   list_destroy(l);
 
   return;
+}
+
+int
+wrap_list_count(const char *file, int line, List l)
+{
+  assert(file != NULL);
+
+  if (!l)
+    err_exit("list_count(%s:%d): null l pointer", file, line);
+
+  return list_count(l);
 }
 
 void *

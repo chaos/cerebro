@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.h,v 1.14 2005-03-15 23:14:39 achu Exp $
+ *  $Id: wrappers.h,v 1.15 2005-03-16 00:25:13 achu Exp $
 \*****************************************************************************/
 
 #ifndef _WRAPPERS_H
@@ -211,6 +211,8 @@ int wrap_lt_dlclose(const char *file, int line, void *handle);
         wrap_list_create(__FILE__, __LINE__, f)
 #define List_destroy(l) \
         wrap_list_destroy(__FILE__, __LINE__, l)
+#define List_count(l) \
+        wrap_list_count(__FILE__, __LINE__, l)
 #define List_append(l, x) \
         wrap_list_append(__FILE__, __LINE__, l, x)
 #define List_delete_all(l, f, key) \
@@ -224,6 +226,7 @@ int wrap_lt_dlclose(const char *file, int line, void *handle);
 
 List wrap_list_create(const char *file, int line, ListDelF f);
 void wrap_list_destroy(const char *file, int line, List l);
+int wrap_list_count(const char *file, int line, List l);
 void *wrap_list_append (const char *file, int line, List l, void *x);
 int wrap_list_delete_all(const char *file, int line, List l, ListFindF f, void *key);
 int wrap_list_for_each(const char *file, int line, List l, ListForF f, void *arg);
