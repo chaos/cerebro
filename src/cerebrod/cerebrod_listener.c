@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.21 2005-03-14 19:07:25 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.22 2005-03-14 23:46:02 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -19,6 +19,7 @@
 #include <netinet/in.h>
 
 #include "cerebrod_listener.h"
+#include "cerebrod_clusterlist.h"
 #include "cerebrod_config.h"
 #include "cerebrod_heartbeat.h"
 #include "error.h"
@@ -272,6 +273,7 @@ cerebrod_listener(void *arg)
       struct cerebrod_heartbeat hb;
       struct cerebrod_node_data *nd;
       char hbbuf[CEREBROD_PACKET_BUFLEN];
+      char hostname_key[MAXHOSTNAMELEN];
       int rv, hblen;
 
       Pthread_mutex_lock(&listener_fd_lock);
@@ -334,20 +336,32 @@ cerebrod_listener(void *arg)
 	  err_debug("cerebrod_listener: invalid cerebrod packet version read");
 	  continue;
 	}
+      
+      if (!cerebrod_clusterlist_node_in_cluster(hb.hostname))
+        {
+          err_debug("cerebrod_listener: received non-cluster packet from: %s",
+                    hb.hostname);
+          continue;
+        }
+      
+      if (cerebrod_clusterlist_get_nodename(hb.hostname, 
+                                            hostname_key, 
+                                            MAXHOSTNAMELEN) < 0)
+        {
+          err_output("cerebrod_listener: cerebrod_clusterlist_get_nodename "
+                     "error: %s", hb.hostname);
+          continue;
+        }
 
       Pthread_mutex_lock(&cluster_data_hash_lock);
-      nd = Hash_find(cluster_data_hash, hb.hostname);
-      Pthread_mutex_unlock(&cluster_data_hash_lock);
-
+      nd = Hash_find(cluster_data_hash, hostname_key);
       if (!nd)
         {
           char *key;
 
-          key = Strdup(hb.hostname);
+          key = Strdup(hostname_key);
           nd = (struct cerebrod_node_data *)Malloc(sizeof(struct cerebrod_node_data));
           Pthread_mutex_init(&(nd->node_data_lock), NULL);
-
-          Pthread_mutex_lock(&cluster_data_hash_lock);
 
           /* Re-hash if our hash is getting too small */
           if ((cluster_data_hash_numnodes + 1) > CEREBROD_LISTENER_REHASH_LIMIT)
@@ -355,9 +369,8 @@ cerebrod_listener(void *arg)
 
           Hash_insert(cluster_data_hash, key, nd);
           cluster_data_hash_numnodes++;
-
-          Pthread_mutex_unlock(&cluster_data_hash_lock);
         }
+      Pthread_mutex_unlock(&cluster_data_hash_lock);
 
       Pthread_mutex_lock(&(nd->node_data_lock));
       Gettimeofday(&tv, NULL);

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_genders.c,v 1.2 2005-03-14 22:05:55 achu Exp $
+ *  $Id: cerebrod_clusterlist_genders.c,v 1.3 2005-03-14 23:46:02 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -163,13 +163,27 @@ int
 genders_clusterlist_node_in_cluster(char *node)
 {
   int ret;
+  char *nodePtr = NULL;
 
   assert(handle);
   assert(node);
 
-  if ((ret = genders_isnode(handle, node)) < 0)
+  /* Shorten hostname if necessary */
+  if (strchr(node, '.'))
+    {
+      char *p;
+      nodePtr = Strdup(node);
+      p = strchr(nodePtr, '.');
+      *p = '\0';
+    }
+  else
+    nodePtr = node;
+
+  if ((ret = genders_isnode(handle, nodePtr)) < 0)
     err_exit("genders_clusterlist_node_in_cluster: genders_isnode: %s",
 	     genders_errormsg(handle));
+
+  Free(nodePtr);
 
   return ret;
 }
@@ -204,5 +218,3 @@ struct cerebrod_clusterlist_ops clusterlist_ops =
     &genders_clusterlist_node_in_cluster,
     &genders_clusterlist_get_nodename,
   };
-
-
