@@ -1,3 +1,13 @@
+2005-02-15  Albert Chu  <chu11@llnl.gov>
+
+	* src/cerebrod/cerebrod_listener.c (cerebrod_listener),
+	src/cerebrod/cerebrod_speaker.c (_cerebrod_speaker_initialize,
+	cerebrod_speaker): Use recvfrom/sendto interface rather than
+	read/write interface for sending packets.
+
+	* src/cerebrod/cerebrod_listener.c
+	(_cerebrod_listener_dump_cluster_node_dat): Fix assert bug.
+	
 2005-02-14  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerebrod/cerebrod_config.c

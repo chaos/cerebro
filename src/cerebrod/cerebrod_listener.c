@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.15 2005-02-15 01:55:00 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.16 2005-02-15 17:04:01 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -229,7 +229,7 @@ _cerebrod_listener_dump_cluster_node_data_item(void *data, const void *key, void
 {
   struct cerebrod_node_data *nd;
 
-  assert(data && key && arg);
+  assert(data && key);
 
   nd = (struct cerebrod_node_data *)&data;
 
@@ -253,8 +253,8 @@ _cerebrod_listener_dump_cluster_node_data_hash(void)
       Pthread_mutex_lock(&cluster_data_hash_lock);
       Pthread_mutex_lock(&debug_output_mutex);
       fprintf(stderr, "**************************************\n");
-      fprintf(stderr, "* Cluster Node Hash Stated\n");
-      fprintf(stderr, "* ------------------------\n");
+      fprintf(stderr, "* Cluster Node Hash State\n");
+      fprintf(stderr, "* -----------------------\n");
       rv = Hash_for_each(cluster_data_hash, 
                          _cerebrod_listener_dump_cluster_node_data_item,
                          NULL);
@@ -284,7 +284,12 @@ cerebrod_listener(void *arg)
       int rv, hblen;
 
       Pthread_mutex_lock(&listener_fd_lock);
-      if ((rv = fd_read_n(listener_fd, hbbuf, CEREBROD_PACKET_BUFLEN)) < 0)
+      if ((rv = recvfrom(listener_fd, 
+                         hbbuf, 
+                         CEREBROD_PACKET_BUFLEN, 
+                         0, 
+                         NULL, 
+                         NULL)) < 0)
 	{
           /* For errnos EINVAL, EBADF, ENODEV, assume the device has
            * been temporarily brought down then back up.  For example,
@@ -318,8 +323,10 @@ cerebrod_listener(void *arg)
               else
                 err_debug("cerebrod_listener: success re-initializing socket");
             }
+          else if (errno == EINTR)
+            err_debug("cerebrod_listener: recvfrom: %s", strerror(errno));
           else
-            err_exit("cerebrod_listener: fd_read_n: %s", strerror(errno));
+            err_exit("cerebrod_listener: recvfrom: %s", strerror(errno));
 	}
       Pthread_mutex_unlock(&listener_fd_lock);
 

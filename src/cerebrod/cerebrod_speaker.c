@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.11 2005-02-15 01:47:57 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.12 2005-02-15 17:04:01 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -42,7 +42,7 @@ _cerebrod_speaker_initialize(void)
 static int
 _cerebrod_speaker_create_and_setup_socket(void)
 {
-  struct sockaddr_in heartbeat_destination_addr, heartbeat_addr;
+  struct sockaddr_in heartbeat_addr;
   int temp_fd;
 
   if ((temp_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
@@ -118,20 +118,6 @@ _cerebrod_speaker_create_and_setup_socket(void)
       return -1;
     }
 
-  /* Connect to the speak to address */
-  memset(&heartbeat_destination_addr, '\0', sizeof(struct sockaddr_in));
-  heartbeat_destination_addr.sin_family = AF_INET;
-  heartbeat_destination_addr.sin_port = htons(conf.heartbeat_destination_port);
-  memcpy(&heartbeat_destination_addr.sin_addr,
-	 &conf.heartbeat_destination_ip_in_addr,
-	 sizeof(struct in_addr));
-  if (connect(temp_fd, (struct sockaddr *)&heartbeat_destination_addr, sizeof(struct sockaddr_in)) < 0)
-    {
-      err_debug("_cerebrod_speaker_create_and_setup_socket: connect: %s", 
-		strerror(errno));
-      return -1;
-    }
-
   return temp_fd;
 }
 
@@ -173,9 +159,10 @@ cerebrod_speaker(void *arg)
 
   while (1)
     {
+      struct sockaddr_in heartbeat_destination_addr;
       struct cerebrod_heartbeat hb;
       char hbbuf[CEREBROD_PACKET_BUFLEN];
-      int hblen, sleep_time;
+      int rv, hblen, sleep_time;
 
       /* Algorithm from srand(3) manpage */
       if (conf.heartbeat_frequency_ranged)
@@ -190,39 +177,57 @@ cerebrod_speaker(void *arg)
 
       _cerebrod_speaker_dump_heartbeat(&hb);
       
-      if (fd_write_n(fd, hbbuf, hblen) < 0)
-	{
-	  /* For errnos EINVAL, EBADF, ENODEV, assume the device has
-	   * been temporarily brought down then back up.  For example,
-	   * this can occur if the administrator runs
-	   * '/etc/init.d/network restart'.  We just need to re-setup
-	   * the socket.
-	   * 
-	   * If fd < 0, the network device just isn't back up yet from
-	   * the previous time we got an errno EINVAL, EBADF, or
-	   * ENODEV.
-	   */
-	  if (errno == EINVAL 
-	      || errno == EBADF
-	      || errno == ENODEV
-	      || fd < 0)
-	    {
-	      if (!(fd < 0))
-		close(fd);	/* no-wrapper, make best effort */
+      memset(&heartbeat_destination_addr, '\0', sizeof(struct sockaddr_in));
+      heartbeat_destination_addr.sin_family = AF_INET;
+      heartbeat_destination_addr.sin_port = htons(conf.heartbeat_destination_port);
+      memcpy(&heartbeat_destination_addr.sin_addr,
+             &conf.heartbeat_destination_ip_in_addr,
+             sizeof(struct in_addr));
 
-	      /* XXX: Should we re-calc in-addrs? Its even more unlikely
-	       * that a system administrator will change IPs, subnets, etc.
-	       * on us.
-	       */
-	      if ((fd = _cerebrod_speaker_create_and_setup_socket()) < 0)
-		err_debug("cerebrod_speaker: error re-initializing socket");
-	      else
-		err_debug("cerebrod_speaker: success re-initializing socket");
-	    }
-	  else
-	    err_exit("cerebrod_speaker: fd_write_n: %s", strerror(errno));
-	}
-
+      if ((rv = sendto(fd, 
+                       hbbuf, 
+                       hblen, 
+                       0, 
+                       (struct sockaddr *)&heartbeat_destination_addr,
+                       sizeof(struct sockaddr_in))) != hblen)
+        {
+          if (rv < 0)
+            {
+              /* For errnos EINVAL, EBADF, ENODEV, assume the device has
+               * been temporarily brought down then back up.  For example,
+               * this can occur if the administrator runs
+               * '/etc/init.d/network restart'.  We just need to re-setup
+               * the socket.
+               * 
+               * If fd < 0, the network device just isn't back up yet from
+               * the previous time we got an errno EINVAL, EBADF, or
+               * ENODEV.
+               */
+              if (errno == EINVAL 
+                  || errno == EBADF
+                  || errno == ENODEV
+                  || fd < 0)
+                {
+                  if (!(fd < 0))
+                    close(fd);	/* no-wrapper, make best effort */
+                  
+                  /* XXX: Should we re-calc in-addrs? Its even more unlikely
+                   * that a system administrator will change IPs, subnets, etc.
+                   * on us.
+                   */
+                  if ((fd = _cerebrod_speaker_create_and_setup_socket()) < 0)
+                    err_debug("cerebrod_speaker: error re-initializing socket");
+                  else
+                    err_debug("cerebrod_speaker: success re-initializing socket");
+                }
+              else if (errno == EINTR)
+                err_debug("cerebrod_speaker: sendto: %s", strerror(errno));
+              else
+                err_exit("cerebrod_speaker: sendto: %s", strerror(errno));
+            }
+          else
+            err_debug("cerebrod_speaker: sendto: invalid bytes sent: %d", rv);
+        }
       sleep(sleep_time);
     }
 
