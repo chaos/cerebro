@@ -19,3 +19,6 @@
 
 - libcerebro - local vs. installed header inclusion???
   - basically concerns use of "cerebro_defs.h" in protocol header files
+
+- cerebrod_clusterlist_module to cerebro_clusterlist_module
+  - needs to be loaded by updown library?
