@@ -52,7 +52,30 @@
 	* src/cerebrod/cerebrod_config.c
 	(_cerebrod_post_calculate_configuration_config_check): Call
 	cerebrod_clusterlist_parse_options.
+
+	* src/cerebrod/cerebrod.c (_cerebrod_post_config_initialization):
+	Ignore SIGPIPE if we are running any servers.
+
+	* src/cerebrod/cerebrod_clusterlist_util.h,
+	src/cerebrod/cerebrod_clusterlist_util.c
+	(cerebrod_clusterlist_copy_nodename): New function.
 	
+	* src/cerebrod/cerebrod_clusterlist_none.c
+	(none_clusterlist_get_nodename),
+	src/cerebrod/cerebrod_clusterlist_hostsfile.c
+	(hostsfile_clusterlist_get_nodename),
+	src/cerebrod/cerebrod_clusterlist_genders.c
+	(genders_clusterlist_get_nodename): Use
+	cerebrod_clusterlist_copy_nodename new.
+
+	* src/cerebrod/cerebrod_clusterlist_genders_util.h,
+	src/cerebrod/cerebrod_clusterlist_genders_util.c: New files.
+
+	* src/cerebrod/cerebrod_clusterlist_genders.c,
+	src/cerebrod/cerebrod_clusterlist_gendersllnl.c: Rework to use
+	common functions in
+	src/cerebrod/cerebrod_clusterlist_genders_util.c.
+		
 2005-03-16  Albert Chu  <chu11@llnl.gov>
 
 	* src/libcommon/argv.h, src/libcommon/argv.c: Removed files.
@@ -99,7 +122,8 @@
 	* src/cerebrod/cerebrod_config.c (_cerebrod_config_dump): Add
 	debug for new clusterlist_module_file config calculation.
 
-	* src/cerebrod/cerebrod_config.c (_cerebrod_calculate_clusterlist_module): new function.
+	* src/cerebrod/cerebrod_config.c
+	(_cerebrod_calculate_clusterlist_module): new function.
 
 	* src/cerebrod/cerebrod_config.c
 	(_cerebrod_pre_calculate_configuration_config_check,

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.16 2005-03-16 21:06:45 achu Exp $
+ *  $Id: cerebrod.c,v 1.17 2005-03-17 22:32:03 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -46,6 +46,9 @@ _cerebrod_post_config_initialization(void)
 {
   cerebrod_clusterlist_setup();
   cerebrod_clusterlist_init();
+
+  if (conf.updown_server)
+    Signal(SIGPIPE, SIG_IGN);
 }
 
 int 

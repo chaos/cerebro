@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_util.c,v 1.1 2005-03-17 18:51:52 achu Exp $
+ *  $Id: cerebrod_clusterlist_util.c,v 1.2 2005-03-17 22:32:03 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -62,6 +62,27 @@ cerebrod_clusterlist_parse_filename(char **options, char **filename)
         err_exit("%s clusterlist module: filename '%s' not found",
                  clusterlist_module_name, *filename);
     }
+
+  return 0;
+}
+
+int 
+cerebrod_clusterlist_copy_nodename(char *node, char *buf, int buflen)
+{
+  int len;
+  char *clusterlist_module_name = cerebrod_clusterlist_module_name();
+
+  assert(node);
+  assert(buf);
+  assert(buflen > 0);
+
+  len = strlen(node);
+
+  if ((len + 1) > buflen)
+    err_exit("%s clusterlist module: cerebrod_clusterlist_copy_nodename: buflen too small: %d %d", 
+             clusterlist_module_name, len, buflen);
+
+  strcpy(buf, node);
 
   return 0;
 }

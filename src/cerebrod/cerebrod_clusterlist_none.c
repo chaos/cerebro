@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_none.c,v 1.3 2005-03-17 18:51:52 achu Exp $
+ *  $Id: cerebrod_clusterlist_none.c,v 1.4 2005-03-17 22:32:03 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -71,21 +71,11 @@ none_clusterlist_node_in_cluster(char *node)
 int
 none_clusterlist_get_nodename(char *node, char *buf, int buflen)
 {
-  int len;
-
   assert(node);
   assert(buf);
   assert(buflen > 0);
 
-  len = strlen(node);
-
-  if ((len + 1) > buflen)
-    err_exit("none_clusterlist_get_nodename: buflen too small: %d %d",
-	     len, buflen);
-
-  strcpy(buf, node);
-
-  return 0;
+  return cerebrod_clusterlist_copy_nodename(node, buf, buflen);
 }
 
 struct cerebrod_clusterlist_module_info clusterlist_module_info =

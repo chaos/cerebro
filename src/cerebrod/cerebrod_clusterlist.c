@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist.c,v 1.6 2005-03-17 18:51:52 achu Exp $
+ *  $Id: cerebrod_clusterlist.c,v 1.7 2005-03-17 22:32:03 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -43,6 +43,9 @@ _load_module(char *module_path)
   clusterlist_module_dl_handle = Lt_dlopen(module_path);
   clusterlist_module_info = (struct cerebrod_clusterlist_module_info *)Lt_dlsym(clusterlist_module_dl_handle, "clusterlist_module_info");
   clusterlist_module_ops = (struct cerebrod_clusterlist_module_ops *)Lt_dlsym(clusterlist_module_dl_handle, "clusterlist_module_ops");
+
+  if (!clusterlist_module_info->clusterlist_module_name)
+    err_exit("clusterlist module '%s' does not contain a valid name");
   
 #ifndef NDEBUG
   if (conf.debug)
