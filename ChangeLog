@@ -88,6 +88,8 @@
 	* src/cerebrod/cerebrod_clusterlist_genders.c,
 	src/cerebrod/cerebrod_clusterlist_gendersllnl.c: Rename some
 	globals to stop name clobbering on static builds.
+
+	* src/cerebrod/cerebrod_static_modules.h: New file.
 	
 2005-03-20  Albert Chu  <chu11@llnl.gov>
 
