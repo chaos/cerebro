@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.23 2005-02-04 00:09:01 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.24 2005-02-10 00:22:11 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -229,7 +229,7 @@ _cerebrod_config_parse(void)
 }
 
 static void
-_cerebrod_config_check(void)
+_cerebrod_pre_calculate_configuration_config_check(void)
 {
   struct in_addr addr_temp;
   
@@ -656,6 +656,56 @@ _cerebrod_calculate_configuration(void)
     }
 }
 
+static void
+_cerebrod_post_calculate_configuration_config_check(void)
+{
+  if (!conf.multicast && conf.listen)
+    {
+      struct ifconf ifc;
+      struct ifreq *ifr;
+      void *buf = NULL, *ptr = NULL;
+      int fd, found_interface = 0;
+      struct in_addr addr_temp;
+
+      fd = Socket(AF_INET, SOCK_DGRAM, 0);
+      _get_if_conf(&buf, &ifc, fd);
+     
+      /* If no '/', then just an IP address, mask is all bits */
+      if (!Inet_pton(AF_INET, conf.heartbeat_destination_ip, &addr_temp))
+        err_exit("heartbeat destination IP address '%s' "
+                 "improperly format", conf.heartbeat_destination_ip);
+
+      /* Check all interfaces */
+      for(ptr = buf; ptr < buf + ifc.ifc_len;)
+	{ 
+	  struct sockaddr_in *sinptr;
+	  int len;
+
+	  ifr = (struct ifreq *)ptr;
+
+	  len = _get_ifr_len(ifr);
+
+	  ptr += sizeof(ifr->ifr_name) + len;
+          
+	  sinptr = (struct sockaddr_in *)&ifr->ifr_addr;
+          
+          if (!memcmp((void *)&addr_temp, 
+                      (void *)&sinptr->sin_addr, 
+                      sizeof(struct in_addr)))
+            {
+	      found_interface++;
+	      break;
+            }
+	}
+      
+      Free(buf);
+      Close(fd);
+
+      if (!found_interface)
+        err_exit("heartbeat destination address not found");
+    }
+}
+
 static void 
 _cerebrod_config_dump(void)
 {
@@ -694,7 +744,8 @@ cerebrod_config(int argc, char **argv)
   _cerebrod_config_default();
   _cerebrod_cmdline_parse(argc, argv);
   _cerebrod_config_parse();
-  _cerebrod_config_check();
+  _cerebrod_pre_calculate_configuration_config_check();
   _cerebrod_calculate_configuration();
+  _cerebrod_post_calculate_configuration_config_check();
   _cerebrod_config_dump();
 }

@@ -6,6 +6,9 @@
 
 	* src/libcommon/wrappers.h, src/libcommon/wrappers.c: Added
 	various hashing wrappers.
+
+	* src/cerebrod/cerebrod_config.c: Added additional checks on
+	unicast and listener.
 	
 2005-02-03  Albert Chu  <chu11@llnl.gov>
 
