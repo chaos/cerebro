@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.9 2004-08-20 00:14:54 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.10 2004-10-07 18:49:10 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -322,7 +322,7 @@ cerebrod_calculate_configuration(void)
       
       if (strchr(conf.network_interface, ':'))
         err_exit("IPv6 IP addresses currently not supported, please specify"
-                 "IPv4 IP address");
+                 "an IPv4 IP address");
 
       /* From Unix Network Programming, by R. Stevens, Chapter 16 */
 
