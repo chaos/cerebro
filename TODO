@@ -28,3 +28,8 @@
   - basically concerns use of "cerebro_defs.h" in protocol header files
 
 - hostname -> nodename
+
+- cerebrod_err_exit
+  - and err_output??
+
+
