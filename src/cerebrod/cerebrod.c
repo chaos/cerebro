@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.20 2005-03-20 21:24:58 achu Exp $
+ *  $Id: cerebrod.c,v 1.21 2005-03-21 14:41:00 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -88,8 +88,8 @@ main(int argc, char **argv)
   /* Call after daemonization, since daemonization closes currently open fds */
   openlog(argv[0], LOG_ODELAY | LOG_PID, LOG_DAEMON);
 
-  /* Start updown server.  Start before listener before the listener
-     begins receiving data.
+  /* Start updown server.  Start before the listener begins receiving
+   * data.
    */
   if (conf.updown_server)
     {
