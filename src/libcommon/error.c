@@ -1,18 +1,14 @@
 /*****************************************************************************\
- *  $Id: error.c,v 1.1.1.1 2004-07-02 22:31:29 achu Exp $
+ *  $Id: error.c,v 1.2 2004-07-06 17:06:26 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
 #include "config.h"
-#endif
-
-#include <stdio.h>
-#include <stdlib.h>
+#endif /* HAVE_CONFIG_H */
 
 #if STDC_HEADERS
 #include <string.h>
-#include <stdarg.h>
-#endif
+#endif /* STDC_HEADERS */
 #include <syslog.h>
 #include <assert.h>
 

@@ -1,14 +1,19 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.1.1.1 2004-07-02 22:31:29 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.2 2004-07-06 17:06:26 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
 #include "config.h"
-#endif
+#endif /* HAVE_CONFIG_H */
 
 #include <stdio.h>
 #include <stdlib.h>
+#if STDC_HEADERS
+#include <string.h>
+#endif /* STDC_HEADERS */
+#if HAVE_GETOPT_H
 #include <getopt.h>
+#endif /* HAVE_GETOPT_H */
 
 #include "cerebrod_config.h"
 #include "conffile.h"
@@ -24,6 +29,8 @@ cerebrod_config_default(void)
   conf.configfile = CEREBROD_CONFIGFILE_DEFAULT;
   conf.heartbeat_freq_min = CEREBROD_HEARTBEAT_FREQ_MIN_DEFAULT;
   conf.heartbeat_freq_max = CEREBROD_HEARTBEAT_FREQ_MAX_DEFAULT;
+  conf.listen = CEREBROD_LISTEN_DEFAULT;
+  conf.listen = CEREBROD_SPEAK_DEFAULT;
   conf.network_interface = NULL;
   conf.mcast_ip = CEREBROD_MCAST_IP_DEFAULT;
   conf.mcast_port = CEREBROD_MCAST_PORT_DEFAULT;
@@ -137,17 +144,20 @@ _cb_stringptr(conffile_t cf, struct conffile_data *data,
   return 0;
 }
 
-
 void
 cerebrod_config_parse(void)
 {
-  int heartbeat_freq_flag, network_interface_flag, mcast_ip_flag, 
-    mcast_port_flag, mcast_listen_threads_flag;
+  int heartbeat_freq_flag, listen_flag, speak_flag, network_interface_flag, 
+    mcast_ip_flag, mcast_port_flag, mcast_listen_threads_flag;
 
   struct conffile_option options[] =
     {
       {"heartbeat_freq", CONFFILE_OPTION_LIST_INT, 2, _cb_heartbeat_freq,
        1, 0, &heartbeat_freq_flag, NULL, 0},
+      {"listen", CONFFILE_OPTION_BOOL, -1, conffile_bool,
+       1, 0, &listen_flag, &conf.listen, 0},
+      {"speak", CONFFILE_OPTION_BOOL, -1, conffile_bool,
+       1, 0, &speak_flag, &conf.speak, 0},
       {"network_interface", CONFFILE_OPTION_STRING, -1, _cb_stringptr,
        1, 0, &network_interface_flag, &(conf.network_interface), 0},
       {"mcast_ip", CONFFILE_OPTION_STRING, -1, _cb_stringptr,
@@ -177,4 +187,26 @@ cerebrod_config_parse(void)
     }
 
   conffile_handle_destroy(cf);
+}
+
+void
+cerebrod_calculate_configuration(void)
+{
+  /* Step 1: Determine the appropriate network interface to use based
+   * on the user's input
+   */
+
+  if (!conf.network_interface)
+    {
+      /* Case A: No interface specified */
+    }
+  else if (strchr(conf.network_interface, '.'))
+    {
+      /* Case B: IP address specified */
+    }
+  else
+    {
+      /* Case C: Interface name specified */
+    }
+  
 }

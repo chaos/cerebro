@@ -1,12 +1,20 @@
 /*****************************************************************************\
- *  $Id: error.h,v 1.1.1.1 2004-07-02 22:31:29 achu Exp $
+ *  $Id: error.h,v 1.2 2004-07-06 17:06:26 achu Exp $
 \*****************************************************************************/
 
 #ifndef _ERROR_H
 #define _ERROR_H
 
+#if HAVE_CONFIG_H
+#include "config.h"
+#endif /* HAVE_CONFIG_H */
+
 #include <stdio.h>
+#include <stdlib.h>
+#if STDC_HEADERS
+#include <string.h>
 #include <stdarg.h>
+#endif /* STDC_HEADERS */
 
 #define ERROR_STDERR 0x01
 #define ERROR_SYSLOG 0x02

@@ -1,30 +1,29 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.2 2004-07-03 00:34:15 achu Exp $
+ *  $Id: cerebrod.c,v 1.3 2004-07-06 17:06:26 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
 #include "config.h"
-#endif
+#endif /* HAVE_CONFIG_H */
 
 #include <stdio.h>
 #include <stdlib.h>
 #if TIME_WITH_SYS_TIME
 # include <sys/time.h>
 # include <time.h>
-#else
+#else  /* !TIME_WITH_SYS_TIME */
 # if HAVE_SYS_TIME_H
 #  include <sys/time.h>
-# else
+# else /* !HAVE_SYS_TIME_H */
 #  include <time.h>
-# endif
-#endif
+# endif /* !HAVE_SYS_TIME_H */
+#endif /* !TIME_WITH_SYS_TIME */
 
 #include "cerebrod_boottime.h"
 #include "cerebrod_config.h"
 #include "error.h"
 
 struct cerebrod_config conf;
-time_t cerebrod_boottime;
 
 int 
 main(int argc, char **argv)
@@ -36,6 +35,5 @@ main(int argc, char **argv)
   cerebrod_cmdline_parse(argc, argv);
   cerebrod_config_parse();
 
-  cerebrod_boottime = cerebrod_get_boottime();
   return 0;
 }

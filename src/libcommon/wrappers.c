@@ -1,10 +1,10 @@
 /*****************************************************************************\
- *  $Id: wrappers.c,v 1.2 2004-07-03 00:34:15 achu Exp $
+ *  $Id: wrappers.c,v 1.3 2004-07-06 17:06:26 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
 #include "config.h"
-#endif
+#endif /* HAVE_CONFIG_H */
 
 #include <limits.h>
 #include <assert.h>
@@ -19,7 +19,7 @@
 #define MALLOC_PAD_LEN    16
 
 void *
-wrap_malloc(char *file, int line, size_t size)
+wrap_malloc(const char *file, int line, size_t size)
 {
   void *ptr;
 
@@ -37,7 +37,7 @@ wrap_malloc(char *file, int line, size_t size)
 }
 
 void
-wrap_free(char *file, int line, void *ptr)
+wrap_free(const char *file, int line, void *ptr)
 {
   assert(file != NULL);
 
@@ -59,7 +59,7 @@ wrap_free(char *file, int line, void *ptr)
 }
 
 char *
-wrap_strdup(char *file, int line, const char *s)
+wrap_strdup(const char *file, int line, const char *s)
 {
   char *ptr;
 
@@ -71,8 +71,19 @@ wrap_strdup(char *file, int line, const char *s)
   return ptr;
 }
 
+char *
+wrap_strncpy(const char *file, int line, char *dest, const char *src, size_t n)
+{
+  char *ret;
+
+  ret = strncpy(dest, src, n);
+  dest[n-1] = '\0';
+  
+  return ret;
+}
+
 int 
-wrap_open(char *file, int line, const char *pathname, int flags, int mode)
+wrap_open(const char *file, int line, const char *pathname, int flags, int mode)
 {
   int fd;
 
@@ -84,7 +95,7 @@ wrap_open(char *file, int line, const char *pathname, int flags, int mode)
 }
 
 int 
-wrap_close(char *file, int line, int fd)
+wrap_close(const char *file, int line, int fd)
 {
   int ret;
                                  
@@ -96,7 +107,7 @@ wrap_close(char *file, int line, int fd)
 }
 
 ssize_t
-wrap_read(char *file, int line, int fd, void *buf, size_t count)
+wrap_read(const char *file, int line, int fd, void *buf, size_t count)
 {
   ssize_t ret;
 
@@ -109,7 +120,7 @@ wrap_read(char *file, int line, int fd, void *buf, size_t count)
 }
 
 ssize_t
-wrap_write(char *file, int line, int fd, const void *buf, size_t count)
+wrap_write(const char *file, int line, int fd, const void *buf, size_t count)
 {
   ssize_t ret;
 
@@ -122,7 +133,7 @@ wrap_write(char *file, int line, int fd, const void *buf, size_t count)
 }
 
 int
-wrap_socket(char *file, int line, int domain, int type, int protocol)
+wrap_socket(const char *file, int line, int domain, int type, int protocol)
 {
   int fd;
 
@@ -135,7 +146,7 @@ wrap_socket(char *file, int line, int domain, int type, int protocol)
 }
 
 int
-wrap_getsockopt(char *file, int line, int s, int level, int optname, void *optval, socklen_t *optlen)
+wrap_getsockopt(const char *file, int line, int s, int level, int optname, void *optval, socklen_t *optlen)
 {
   int ret;
 
@@ -148,7 +159,7 @@ wrap_getsockopt(char *file, int line, int s, int level, int optname, void *optva
 }
 
 int
-wrap_setsockopt(char *file, int line, int s, int level, int optname, const void *optval, socklen_t optlen)
+wrap_setsockopt(const char *file, int line, int s, int level, int optname, const void *optval, socklen_t optlen)
 {
   int ret;
 
@@ -158,4 +169,43 @@ wrap_setsockopt(char *file, int line, int s, int level, int optname, const void 
     err_exit("socket(%s:%d): %s", file, line, strerror(errno));
 
   return ret;
+}
+
+pid_t 
+wrap_fork(const char *file, int line)
+{
+  pid_t pid;
+
+  if ((pid = fork()) < 0)
+    err_exit("fork(%s:%d): %s", file, line, strerror(errno));
+
+  return pid;
+}
+
+Sighandler_t
+wrap_signal(const char *file, int line, int signum, Sighandler_t handler)
+{
+  Sighandler_t ret;
+
+  if ((ret = signal(signum, handler)) == SIG_ERR)
+    err_exit("signal(%s:%d): %s", file, line, strerror(errno));
+
+  return ret;
+}
+
+int
+wrap_chdir(const char *file, int line, const char *path)
+{
+  int ret;
+
+  if ((ret = chdir(path)) < 0)
+    err_exit("Chdir((%s:%d): %s", file, line, strerror(errno));
+
+  return ret;
+}
+
+mode_t
+wrap_umask(const char *file, int line, mode_t mask)
+{
+  umask(mask);
 }
