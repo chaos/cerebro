@@ -1,3 +1,8 @@
+2004-12-23  Albert Chu  <chu11@llnl.gov>
+
+	* src/cerebrod/cerebrod_config.c, src/cerebrod/cerebrod_daemon.c,
+	src/cerebrod/cerebrod/heartbeat.c: Added asserts.
+	
 2004-11-16  Albert Chu  <chu11@llnl.gov>
 
 	* Initial commit.

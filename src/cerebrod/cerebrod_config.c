@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.13 2004-11-08 19:07:51 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.14 2004-12-27 16:48:27 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -82,6 +82,8 @@ cerebrod_cmdline_parse(int argc, char **argv)
 #else
   char *options = "hvc:";
 #endif
+
+  assert(argv);
 
 #if HAVE_GETOPT_LONG
   struct option long_options[] =
@@ -210,6 +212,8 @@ _get_if_conf(void **buf, struct ifconf *ifc, int fd)
 {
   int lastlen = -1, len = sizeof(struct ifreq) * 100;
 
+  assert(buf && ifc);
+
   for(;;)
     {
       *buf = Malloc(len);
@@ -233,6 +237,8 @@ static int
 _get_ifr_len(struct ifreq *ifr)
 {
   int len;
+
+  assert(ifr);
 
 #if HAVE_SA_LEN
   if (sizeof(struct sockaddr) > ifr->ifr_addr.sa_len)

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_daemon.c,v 1.1 2004-07-06 17:06:26 achu Exp $
+ *  $Id: cerebrod_daemon.c,v 1.2 2004-12-27 16:48:27 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -12,6 +12,7 @@
 #include <unistd.h>
 #endif /* HAVE_UNISTD_H */
 #include <syslog.h>
+#include <assert.h>
 
 #include "cerebrod_daemon.h"
 #include "error.h"
@@ -24,6 +25,8 @@ cerebrod_daemon_init(const char *progname)
   pid_t pid;
   int i;
  
+  assert(progname);
+
   pid = Fork();
   if (pid != 0)			/* Terminate Parent */
     exit(0);

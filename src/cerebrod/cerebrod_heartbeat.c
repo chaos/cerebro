@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_heartbeat.c,v 1.2 2004-11-17 00:49:31 achu Exp $
+ *  $Id: cerebrod_heartbeat.c,v 1.3 2004-12-27 16:48:27 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -22,6 +22,7 @@ static int
 _marshall_int32(int32_t val, char *buffer)
 {
   int32_t temp;
+  assert(buffer);
   temp = htonl(val);
   memcpy(buffer, (void *)&temp, sizeof(temp));
   return sizeof(temp);
@@ -31,6 +32,7 @@ static int
 _marshall_uint32(u_int32_t val, char *buffer)
 {
   u_int32_t temp;
+  assert(buffer);
   temp = htonl(val);
   memcpy(buffer, (void *)&temp, sizeof(temp));
   return sizeof(temp);
@@ -39,6 +41,7 @@ _marshall_uint32(u_int32_t val, char *buffer)
 static int
 _marshall_buffer(char *buf, int buflen, char *buffer)
 {
+  assert(buf && buflen > 0 && buffer);
   memcpy(buffer, buf, buflen);
   return buflen;
 }
@@ -47,6 +50,7 @@ static int
 _unmarshall_int32(int32_t *val, char *buffer)
 {
   int32_t temp;
+  assert(val && buffer);
   memcpy((void *)&temp, buffer, sizeof(temp));
   *val = ntohl(temp);
   return sizeof(temp);
@@ -56,6 +60,7 @@ static int
 _unmarshall_uint32(u_int32_t *val, char *buffer)
 {
   u_int32_t temp;
+  assert(val && buffer);
   memcpy((void *)&temp, buffer, sizeof(temp));
   *val = ntohl(temp);
   return sizeof(temp);
@@ -64,6 +69,7 @@ _unmarshall_uint32(u_int32_t *val, char *buffer)
 static int
 _unmarshall_buffer(char *buf, int buflen, char *buffer)
 {
+  assert(buf && buflen > 0 && buffer);
   memcpy(buf, buffer, buflen);
   return buflen;
 }
@@ -73,6 +79,8 @@ cerebrod_heartbeat_marshall(struct cerebrod_heartbeat_t *cb,
 			    char *buffer, int len) 
 {
   int c = 0;
+
+  assert(cb && buffer && len > 0);
 
   if (CEREBROD_HEARTBEAT_LEN < len)
     err_exit("cerebrod_heartbeat_marshall: internal buffer length "
@@ -91,6 +99,8 @@ cerebrod_heartbeat_unmarshall(struct cerebrod_heartbeat_t *cb,
 			      char *buffer, int len)
 {
   int c = 0;
+
+  assert(cb && buffer && len > 0);
 
   if (CEREBROD_HEARTBEAT_LEN > len)
     err_exit("cerebrod_heartbeat_ummarshall: received buffer length "
