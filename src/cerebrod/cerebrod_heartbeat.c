@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_heartbeat.c,v 1.1 2004-11-08 19:07:51 achu Exp $
+ *  $Id: cerebrod_heartbeat.c,v 1.2 2004-11-17 00:49:31 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -11,53 +11,99 @@
 #if STDC_HEADERS
 #include <string.h>
 #endif /* STDC_HEADERS */
+#include <netinet/in.h>
 #include <assert.h>
 #include <errno.h>
 
 #include "cerebrod_heartbeat.h"
 #include "error.h"
 
-/*
-struct cerebro_heartbeat_t
-  {
-    int32_t version;
-    char hostname[MAXHOSTNAMELEN];
-    u_int32_t boottime;
-  };
-*/
-
-int 
-cerebrod_heartbeat_marshall(struct cerebro_heartbeat_t *cb, 
-			    char *buffer, int len) 
+static int
+_marshall_int32(int32_t val, char *buffer)
 {
   int32_t temp;
-  int ret_len = 0;
+  temp = htonl(val);
+  memcpy(buffer, (void *)&temp, sizeof(temp));
+  return sizeof(temp);
+}
 
-  if ((ret_len + sizeof(temp)) > len)
-    err_exit("cerebrod_heartbeat_marshall: internal buffer length "
-	     "too short: %d", len);
-  temp = htonl(cb->version);
-  memcpy(buffer + ret_len, (void *)&temp, sizeof(temp));
-  ret_len += sizeof(temp);
+static int
+_marshall_uint32(u_int32_t val, char *buffer)
+{
+  u_int32_t temp;
+  temp = htonl(val);
+  memcpy(buffer, (void *)&temp, sizeof(temp));
+  return sizeof(temp);
+}
 
-  if ((ret_len + sizeof(temp)) > len)
-    err_exit("cerebrod_heartbeat_marshall: internal buffer length "
-	     "too short: %d", len);
-  memcpy(buffer + ret_len, cb->hostname, MAXHOSTNAMELEN);
-  ret_len += MAXHOSTNAMELEN;
+static int
+_marshall_buffer(char *buf, int buflen, char *buffer)
+{
+  memcpy(buffer, buf, buflen);
+  return buflen;
+}
 
-  if ((ret_len + sizeof(temp)) > len)
-    err_exit("cerebrod_heartbeat_marshall: internal buffer length "
-	     "too short: %d", len);
-  temp = htonl(cb->boottime);
-  memcpy(buffer + ret_len, (void *)&temp, sizeof(temp));
-  ret_len += sizeof(temp);
+static int
+_unmarshall_int32(int32_t *val, char *buffer)
+{
+  int32_t temp;
+  memcpy((void *)&temp, buffer, sizeof(temp));
+  *val = ntohl(temp);
+  return sizeof(temp);
+}
 
-  return ret_len;
+static int
+_unmarshall_uint32(u_int32_t *val, char *buffer)
+{
+  u_int32_t temp;
+  memcpy((void *)&temp, buffer, sizeof(temp));
+  *val = ntohl(temp);
+  return sizeof(temp);
+}
+
+static int
+_unmarshall_buffer(char *buf, int buflen, char *buffer)
+{
+  memcpy(buf, buffer, buflen);
+  return buflen;
 }
 
 int 
-cerebrod_heartbeat_unmarshall(struct cerebro_heartbeat_t *cb, 
+cerebrod_heartbeat_marshall(struct cerebrod_heartbeat_t *cb, 
+			    char *buffer, int len) 
+{
+  int c = 0;
+
+  if (CEREBROD_HEARTBEAT_LEN < len)
+    err_exit("cerebrod_heartbeat_marshall: internal buffer length "
+	     "too small: expect %d, len %d", CEREBROD_HEARTBEAT_LEN, 
+	     len);
+   
+  c += _marshall_int32(cb->version, buffer + c);
+  c += _marshall_buffer(cb->hostname, sizeof(cb->hostname), buffer + c);
+  c += _marshall_uint32(cb->boottime, buffer + c);
+
+  return c;
+}
+
+int 
+cerebrod_heartbeat_unmarshall(struct cerebrod_heartbeat_t *cb, 
 			      char *buffer, int len)
 {
+  int c = 0;
+
+  if (CEREBROD_HEARTBEAT_LEN > len)
+    err_exit("cerebrod_heartbeat_ummarshall: received buffer length "
+	     "too small: expect %d, len %d", CEREBROD_HEARTBEAT_LEN, 
+	     len);
+  if (CEREBROD_HEARTBEAT_LEN != len)
+    err_debug("cerebrod_heartbeat_marshall: received buffer length "
+	      "unexpected size: expect %d, len %d", CEREBROD_HEARTBEAT_LEN,
+	      len);
+
+  c += _unmarshall_int32(&(cb->version), buffer + c);
+  c += _unmarshall_buffer(cb->hostname, sizeof(cb->hostname), buffer + c);
+  c += _unmarshall_uint32(&(cb->boottime), buffer + c);
+  
+  return 0;
 }

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: fd.c,v 1.1.1.1 2004-07-02 22:31:29 achu Exp $
+ *  $Id: fd.c,v 1.2 2004-11-17 00:49:31 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2001-2002 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -31,12 +31,16 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include <stdlib.h>
+#if STDC_HEADERS
+#include <string.h>
+#endif /* STDC_HEADERS */
+#if HAVE_FCNTL_H
+#include <fcntl.h>
+#endif /* HAVE_FCNTL_H */
 #include <assert.h>
 #include <errno.h>
-#include <fcntl.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
+
 #include "fd.h"
 
 

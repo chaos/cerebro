@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_boottime.c,v 1.4 2004-11-08 19:07:51 achu Exp $
+ *  $Id: cerebrod_boottime.c,v 1.5 2004-11-17 00:49:31 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -25,6 +25,10 @@
 
 u_int32_t cerebrod_boottime = 0;
 
+/* On some systems, due to kernel bugs, the boottime value may change
+ * as the system executes.  We will cache the first boottime value
+ * read from /proc and assume it is the correct boottime.
+ */
 u_int32_t
 cerebrod_get_boottime(void)
 {

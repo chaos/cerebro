@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: fd.h,v 1.1.1.1 2004-07-02 22:31:29 achu Exp $
+ *  $Id: fd.h,v 1.2 2004-11-17 00:49:31 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2001-2002 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -34,7 +34,9 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <sys/types.h>
+#if HAVE_UNISTD_H
 #include <unistd.h>
+#endif /* HAVE_UNISTD_H */
 
 
 int fd_set_close_on_exec (int fd);
