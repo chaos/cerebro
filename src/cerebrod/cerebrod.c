@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.19 2005-03-20 20:10:14 achu Exp $
+ *  $Id: cerebrod.c,v 1.20 2005-03-20 21:24:58 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -28,11 +28,11 @@ pthread_mutex_t debug_output_mutex = PTHREAD_MUTEX_INITIALIZER;
 extern struct cerebrod_config conf;
 
 extern int cerebrod_listener_initialization_complete;
-extern pthread_cond_t cerebrod_listener_initialization_cond;
+extern pthread_cond_t cerebrod_listener_initialization_complete_cond;
 extern pthread_mutex_t cerebrod_listener_initialization_complete_lock;
 
 extern int cerebrod_updown_initialization_complete;
-extern pthread_cond_t cerebrod_updown_initialization_cond;
+extern pthread_cond_t cerebrod_updown_initialization_complete_cond;
 extern pthread_mutex_t cerebrod_updown_initialization_complete_lock;
 
 /* 
@@ -104,7 +104,7 @@ main(int argc, char **argv)
       /* Wait for initialization to complete */
       Pthread_mutex_lock(&cerebrod_updown_initialization_complete_lock);
       while (cerebrod_updown_initialization_complete == 0)
-        Pthread_cond_wait(&cerebrod_updown_initialization_cond,
+        Pthread_cond_wait(&cerebrod_updown_initialization_complete_cond,
                           &cerebrod_updown_initialization_complete_lock);
       Pthread_mutex_unlock(&cerebrod_updown_initialization_complete_lock);
     }
@@ -131,7 +131,7 @@ main(int argc, char **argv)
       /* Wait for initialization to complete */
       Pthread_mutex_lock(&cerebrod_listener_initialization_complete_lock);
       while (cerebrod_listener_initialization_complete == 0)
-        Pthread_cond_wait(&cerebrod_listener_initialization_cond,
+        Pthread_cond_wait(&cerebrod_listener_initialization_complete_cond,
                           &cerebrod_listener_initialization_complete_lock);
       Pthread_mutex_unlock(&cerebrod_listener_initialization_complete_lock);
     }

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.31 2005-03-17 23:12:37 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.32 2005-03-20 21:24:58 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -37,17 +37,50 @@ extern struct cerebrod_config conf;
 extern pthread_mutex_t debug_output_mutex;
 #endif /* NDEBUG */
 
+/* 
+ * cerebrod_listener_initialization_complete
+ * cerebrod_listener_initialization_complete_cond
+ * cerebrod_listener_initialization_complete_lock
+ *
+ * variables for synchronizing initialization between different pthreads
+ * and signaling when it is complete
+ */
 int cerebrod_listener_initialization_complete = 0;
-pthread_cond_t cerebrod_listener_initialization_cond = PTHREAD_COND_INITIALIZER;
+pthread_cond_t cerebrod_listener_initialization_complete_cond = PTHREAD_COND_INITIALIZER;
 pthread_mutex_t cerebrod_listener_initialization_complete_lock = PTHREAD_MUTEX_INITIALIZER;
 
+/* 
+ * listener_fd
+ * listener_fd_lock
+ *
+ * listener file descriptor and lock to protect concurrent access
+ */
 int listener_fd;
 pthread_mutex_t listener_fd_lock = PTHREAD_MUTEX_INITIALIZER;
+
+/*
+ * cluster_data_hash
+ * cluster_data_hash_numnodes
+ * cluster_data_hash_size
+ * cluster_data_hash_lock
+ *
+ * cluster node data, number of currently hashed entries, hash size, and 
+ * lock to protect concurrent access
+ */
 hash_t cluster_data_hash = NULL;
 int cluster_data_hash_numnodes;
 int cluster_data_hash_size;
 pthread_mutex_t cluster_data_hash_lock = PTHREAD_MUTEX_INITIALIZER;
 
+/* 
+ * _cerebrod_listener_create_and_setup_socket
+ *
+ * Create and setup the listener socket.  Do not use wrappers in this
+ * function.  We want to give the daemon additional chances to
+ * "survive" an error condition.
+ *
+ * Returns file descriptor on success, -1 on error
+ */
 static int
 _cerebrod_listener_create_and_setup_socket(void)
 {
@@ -75,7 +108,6 @@ _cerebrod_listener_create_and_setup_socket(void)
              sizeof(struct in_addr));
       imr.imr_ifindex = conf.heartbeat_interface_index;
 
-      /* Join the multicast group */
       if (setsockopt(temp_fd,
 		     SOL_IP,
 		     IP_ADD_MEMBERSHIP,
@@ -107,6 +139,11 @@ _cerebrod_listener_create_and_setup_socket(void)
   return temp_fd;
 }
 
+/* 
+ * _cerebrod_listener_initialize
+ *
+ * perform listener initialization
+ */
 static void
 _cerebrod_listener_initialize(void)
 {
@@ -122,7 +159,6 @@ _cerebrod_listener_initialize(void)
   /* If a clusterlist is found/used, use the numnodes count as the 
    * initializing hash size. 
    */
-
   cluster_data_hash_size = cerebrod_clusterlist_numnodes();
   if (!cluster_data_hash_size)
     cluster_data_hash_size = CEREBROD_LISTENER_HASH_SIZE_DEFAULT;
@@ -133,11 +169,16 @@ _cerebrod_listener_initialize(void)
 				  (hash_cmp_f)strcmp,
 				  (hash_del_f)_Free);
   cerebrod_listener_initialization_complete++;
-  Pthread_cond_signal(&cerebrod_listener_initialization_cond);
+  Pthread_cond_signal(&cerebrod_listener_initialization_complete_cond);
  done:
   Pthread_mutex_unlock(&cerebrod_listener_initialization_complete_lock);
 }
 
+/* 
+ * _cerebrod_listener_dump_heartbeat
+ *
+ * Dump contents of heartbeat packet
+ */
 static void
 _cerebrod_listener_dump_heartbeat(struct cerebrod_heartbeat *hb)
 {
@@ -165,6 +206,11 @@ _cerebrod_listener_dump_heartbeat(struct cerebrod_heartbeat *hb)
 #endif /* NDEBUG */
 }
 
+/* 
+ * _cerebrod_listener_dump_cluster_node_data_item
+ *
+ * callback function from hash_for_each to dump cluster node data
+ */
 #ifndef NDEBUG
 static int
 _cerebrod_listener_dump_cluster_node_data_item(void *data, const void *key, void *arg)
@@ -184,6 +230,11 @@ _cerebrod_listener_dump_cluster_node_data_item(void *data, const void *key, void
 }
 #endif /* NDEBUG */
 
+/* 
+ * _cerebrod_listener_dump_cluster_node_data_hash
+ *
+ * Dump contents of cluster node data hash
+ */
 static void
 _cerebrod_listener_dump_cluster_node_data_hash(void)
 {

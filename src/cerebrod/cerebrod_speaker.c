@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.14 2005-03-16 00:53:36 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.15 2005-03-20 21:24:58 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -30,14 +30,14 @@ extern struct cerebrod_config conf;
 extern pthread_mutex_t debug_output_mutex;
 #endif /* NDEBUG */
 
-static void
-_cerebrod_speaker_initialize(void)
-{
-  srand(Time(NULL));
-}
-
-/* Do not use wrappers in this function, give the daemon additional
- * chances to "survive" an error condition.
+/* 
+ * _cerebrod_speaker_create_and_setup_socket
+ *
+ * Create and setup the speaker socket.  Do not use wrappers in this
+ * function.  We want to give the daemon additional chances to
+ * "survive" an error condition.
+ *
+ * Returns file descriptor on success, -1 on error
  */
 static int
 _cerebrod_speaker_create_and_setup_socket(void)
@@ -67,7 +67,6 @@ _cerebrod_speaker_create_and_setup_socket(void)
 	     sizeof(struct in_addr));
       imr.imr_ifindex = conf.heartbeat_interface_index;
       
-      /* Sort of like a multicast-bind */
       if (setsockopt(temp_fd,
 		     SOL_IP,
 		     IP_MULTICAST_IF,
@@ -104,7 +103,6 @@ _cerebrod_speaker_create_and_setup_socket(void)
 	}
     }
 
-  /* Even if we're multicasting, the port still needs to be bound */
   memset(&heartbeat_addr, '\0', sizeof(struct sockaddr_in));
   heartbeat_addr.sin_family = AF_INET;
   heartbeat_addr.sin_port = htons(conf.heartbeat_source_port);
@@ -121,6 +119,22 @@ _cerebrod_speaker_create_and_setup_socket(void)
   return temp_fd;
 }
 
+/* 
+ * _cerebrod_speaker_initialize
+ *
+ * perform speaker initialization
+ */
+static void
+_cerebrod_speaker_initialize(void)
+{
+  srand(Time(NULL));
+}
+
+/* 
+ * _cerebrod_speaker_dump_heartbeat
+ *
+ * Dump contents of heartbeat packet
+ */
 static void
 _cerebrod_speaker_dump_heartbeat(struct cerebrod_heartbeat *hb)
 {
@@ -170,7 +184,6 @@ cerebrod_speaker(void *arg)
       else
 	sleep_time = conf.heartbeat_frequency_min;
 
-      /* XXX: Cache rather than re-construct each time? */
       cerebrod_heartbeat_construct(&hb);
   
       hblen = cerebrod_heartbeat_marshall(&hb, hbbuf, CEREBROD_PACKET_BUFLEN);

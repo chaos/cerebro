@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_util.c,v 1.4 2005-03-20 20:34:48 achu Exp $
+ *  $Id: cerebrod_util.c,v 1.5 2005-03-20 21:24:58 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -57,7 +57,7 @@ void
 cerebrod_rehash(hash_t *old_hash,
 		int *hash_size,
 		int hash_size_increment,
-		int hash_numnodes,
+		int hash_num,
 		pthread_mutex_t *hash_mutex)
 {
   hash_t new_hash;
@@ -66,7 +66,7 @@ cerebrod_rehash(hash_t *old_hash,
   assert(old_hash);
   assert(hash_size);
   assert(hash_size_increment > 0);
-  assert(hash_numnodes > 0);
+  assert(hash_num > 0);
   assert(hash_mutex);
 
 #ifndef NDEBUG
@@ -87,14 +87,14 @@ cerebrod_rehash(hash_t *old_hash,
 			 (hash_del_f)_Free);
   
   rv = Hash_for_each(*old_hash, _hash_reinsert, &new_hash);
-  if (rv != hash_numnodes)
-    err_exit("_rehash: invalid reinsert count: rv=%d numnodes=%d",
-             rv, hash_numnodes);
+  if (rv != hash_num)
+    err_exit("_rehash: invalid reinsert count: rv=%d num=%d",
+             rv, hash_num);
 
   rv = Hash_delete_if(*old_hash, _hash_removeall, NULL);
-  if (rv != hash_numnodes)
-    err_exit("_rehash: invalid removeall count: rv=%d numnodes=%d",
-             rv, hash_numnodes);
+  if (rv != hash_num)
+    err_exit("_rehash: invalid removeall count: rv=%d num=%d",
+             rv, hash_num);
 
   Hash_destroy(*old_hash);
 

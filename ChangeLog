@@ -28,7 +28,7 @@
 	modified appropriately and changed globally.
 
 	* src/cerebrod/: Added significant commenting and documentation
-	throughout code.  
+	throughout code and various cleanup.
 
 2005-03-19  Albert Chu  <chu11@llnl.gov>
 
