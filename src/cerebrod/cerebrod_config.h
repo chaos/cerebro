@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.h,v 1.5 2005-01-03 17:48:38 achu Exp $
+ *  $Id: cerebrod_config.h,v 1.6 2005-01-04 23:45:53 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_CONFIG_H
@@ -8,6 +8,7 @@
 #include <netinet/in.h>
 
 /* Later Configuration
+ * - max cluster nodes?
  * - Max status allowed
  * - setuid
  * - ttl
