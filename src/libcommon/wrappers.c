@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.c,v 1.3 2004-07-06 17:06:26 achu Exp $
+ *  $Id: wrappers.c,v 1.4 2004-08-18 21:17:31 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -204,8 +204,13 @@ wrap_chdir(const char *file, int line, const char *path)
   return ret;
 }
 
+#if 0
+
+not done
+
 mode_t
 wrap_umask(const char *file, int line, mode_t mask)
 {
   umask(mask);
 }
+#endif
