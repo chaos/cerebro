@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.10 2005-02-09 21:58:31 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.11 2005-02-09 23:57:04 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -271,7 +271,7 @@ cerebrod_listener(void *arg)
       Pthread_mutex_unlock(&listener_fd_lock);
      
       /* No packet read */
-      if (rv < 0)
+      if (rv <= 0)
 	continue;
 
       if ((hblen = cerebrod_heartbeat_unmarshall(&hb, hbbuf, rv)) < 0)
