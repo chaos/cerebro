@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_heartbeat.h,v 1.3 2005-01-03 17:48:38 achu Exp $
+ *  $Id: cerebrod_heartbeat.h,v 1.4 2005-03-17 22:59:27 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_HEARTBEAT_H
@@ -10,13 +10,13 @@
 struct cerebrod_heartbeat
   {
     int32_t version;
-    char hostname[MAXHOSTNAMELEN];
+    char hostname[CEREBROD_MAXHOSTNAMELEN];
     u_int32_t starttime;
     u_int32_t boottime;
   };
 
 #define CEREBROD_HEARTBEAT_LEN  (sizeof(int32_t) \
-                                 + MAXHOSTNAMELEN \
+                                 + CEREBROD_MAXHOSTNAMELEN \
                                  + sizeof(u_int32_t) \
                                  + sizeof(u_int32_t))
 

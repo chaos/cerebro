@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_cache.c,v 1.1 2005-01-03 17:48:38 achu Exp $
+ *  $Id: cerebrod_cache.c,v 1.2 2005-03-17 22:59:27 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -32,7 +32,7 @@
 
 static u_int32_t cerebrod_starttime = 0;
 static u_int32_t cerebrod_boottime = 0;
-static char cerebrod_hostname[MAXHOSTNAMELEN];
+static char cerebrod_hostname[CEREBROD_MAXHOSTNAMELEN];
 static int cerebrod_hostname_len = 0;
 
 static void
@@ -90,10 +90,8 @@ static void
 _cerebrod_cache_hostname(void)
 {
   assert(!cerebrod_hostname_len);
-  memset(cerebrod_hostname, '\0', MAXHOSTNAMELEN);
-  Gethostname(cerebrod_hostname, MAXHOSTNAMELEN);
-  /* Guarantee truncation */
-  cerebrod_hostname[MAXHOSTNAMELEN-1] = '\0';
+  memset(cerebrod_hostname, '\0', CEREBROD_MAXHOSTNAMELEN);
+  Gethostname(cerebrod_hostname, CEREBROD_MAXHOSTNAMELEN);
   cerebrod_hostname_len = strlen(cerebrod_hostname);
 }
 

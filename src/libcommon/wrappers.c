@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.c,v 1.22 2005-03-17 05:05:53 achu Exp $
+ *  $Id: wrappers.c,v 1.23 2005-03-17 22:59:27 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -648,6 +648,9 @@ wrap_gethostname(const char *file, int line, char *name, size_t len)
   if ((ret = gethostname(name, len)) < 0)
     err_exit("gethostname(%s:%d): len=%d: %s", 
              file, line, len, strerror(errno));
+
+  /* guarantee truncation */
+  name[len-1] = '\0';
 
   return ret;
 }
