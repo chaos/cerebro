@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_gendersllnl.c,v 1.4 2005-03-16 20:52:04 achu Exp $
+ *  $Id: cerebrod_clusterlist_gendersllnl.c,v 1.5 2005-03-17 01:42:00 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -33,14 +33,15 @@ _cmdline_parse(int argc, char **argv)
   char c;
   char *options = "f:";
 
-  assert(argv);
-
 #if HAVE_GETOPT_LONG
   struct option long_options[] =
     {
-      {"filename",            1, NULL, 'c'},
+      {"filename", 1, NULL, 'f'},
+      {0, 0, 0, 0}
     };
 #endif /* HAVE_GETOPT_LONG */
+
+  assert(argv);
 
   /* turn off output messages */
   opterr = 0;
@@ -54,7 +55,7 @@ _cmdline_parse(int argc, char **argv)
       switch (c)
 	{
 	case 'f':
-	  gendersllnl_file = optarg;
+	  gendersllnl_file = Strdup(optarg);
 	  break;
 	case '?':
 	default:
@@ -73,11 +74,11 @@ gendersllnl_clusterlist_init(char *cmdline)
       char **argv;
       int argc;
 
-      argv_create(cmdline, "", &argc, &argv);
+      Argv_create(cmdline, "", &argc, &argv);
 
       _cmdline_parse(argc, argv);
 
-      argv_destroy(argv);
+      Argv_destroy(argv);
     }
 
   if (!(handle = genders_handle_create()))
@@ -109,6 +110,7 @@ gendersllnl_clusterlist_finish(void)
     err_exit("gendersllnl_clusterlist_finish: genders_handle_destroy: %s",
 	     genders_errormsg(handle));
 
+  Free(gendersllnl_file);
   handle = NULL;
   gendersllnl_file = NULL;
 

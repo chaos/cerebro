@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.29 2005-03-16 20:52:04 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.30 2005-03-17 01:42:00 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -186,6 +186,40 @@ _cb_stringptr(conffile_t cf, struct conffile_data *data,
   return 0;
 }
 
+static int
+_cb_cmdline(conffile_t cf, struct conffile_data *data,
+            char *optionname, int option_type, void *option_ptr,
+            int option_data, void *app_ptr, int app_data)
+{
+  if (option_ptr == NULL)
+    {
+      conffile_seterrnum(cf, CONFFILE_ERR_PARAMETERS);
+      return -1;
+    }
+
+  /* Create a string resembling a command line string
+   */
+  if (data->stringlist_len > 0)
+    {
+      char **buf = (char **)option_ptr; 
+      int i, needed_buflen = 1; /* starts at 1 for '\0' */
+
+      for (i = 0; i < data->stringlist_len; i++)
+        needed_buflen += strlen(data->stringlist[i]) + 1;
+      
+      *buf = Malloc(needed_buflen);
+      memset(*buf, '\0', needed_buflen);
+
+      for (i = 0; i < data->stringlist_len; i++)
+        {
+          strcat(*buf, data->stringlist[i]);
+          strcat(*buf, " ");
+        }
+    }
+
+  return 0;
+}
+
 static void
 _cerebrod_config_parse(void)
 {
@@ -224,9 +258,11 @@ _cerebrod_config_parse(void)
        1, 0, &updown_server_port_flag, &(conf.updown_server_port), 0},
       {"clusterlist_module", CONFFILE_OPTION_STRING, -1, _cb_stringptr,
        1, 0, &clusterlist_module_flag, &(conf.clusterlist_module), 0},
-      {"clusterlist_module_cmdline", CONFFILE_OPTION_STRING, -1, _cb_stringptr,
+
+      {"clusterlist_module_cmdline", CONFFILE_OPTION_LIST_STRING, -1, _cb_cmdline,
        1, 0, &clusterlist_module_cmdline_flag, 
        &(conf.clusterlist_module_cmdline), 0},
+
       {"speak_debug", CONFFILE_OPTION_BOOL, -1, conffile_bool,
        1, 0, &speak_debug_flag, &conf.speak_debug, 0},
       {"listen_debug", CONFFILE_OPTION_BOOL, -1, conffile_bool,

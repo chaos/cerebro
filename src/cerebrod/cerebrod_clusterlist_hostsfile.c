@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_hostsfile.c,v 1.3 2005-03-15 23:14:39 achu Exp $
+ *  $Id: cerebrod_clusterlist_hostsfile.c,v 1.4 2005-03-17 01:42:00 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -33,14 +33,15 @@ _cmdline_parse(int argc, char **argv)
   char c;
   char *options = "f:";
 
-  assert(argv);
-
 #if HAVE_GETOPT_LONG
   struct option long_options[] =
     {
-      {"filename",            1, NULL, 'c'},
+      {"filename", 1, NULL, 'f'},
+      {0, 0, 0, 0}
     };
 #endif /* HAVE_GETOPT_LONG */
+
+  assert(argv);
 
   /* turn off output messages */
   opterr = 0;
@@ -54,7 +55,7 @@ _cmdline_parse(int argc, char **argv)
       switch (c)
 	{
 	case 'f':
-	  hostsfile_file = optarg;
+	  hostsfile_file = Strdup(optarg);
 	  break;
 	case '?':
 	default:
@@ -151,6 +152,7 @@ hostsfile_clusterlist_init(char *cmdline)
 {
   int fd, len;
   char buf[CEREBROD_PARSE_BUFLEN];
+  char *file;
 
   assert(!hosts);
 
@@ -159,17 +161,21 @@ hostsfile_clusterlist_init(char *cmdline)
       char **argv;
       int argc;
 
-      argv_create(cmdline, "", &argc, &argv);
+      Argv_create(cmdline, "", &argc, &argv);
 
       _cmdline_parse(argc, argv);
 
-      argv_destroy(argv);
+      Argv_destroy(argv);
     }
 
   hosts = List_create((ListDelF)_Free);
 
-  hostsfile_file = CEREBROD_CLUSTERLIST_HOSTSFILE_DEFAULT;
-  if ((fd = open(hostsfile_file, O_RDONLY)) < 0)
+  if (hostsfile_file)
+    file = hostsfile_file;
+  else
+    file = CEREBROD_CLUSTERLIST_HOSTSFILE_DEFAULT;
+
+  if ((fd = open(file, O_RDONLY)) < 0)
     err_exit("hostsfile clusterlist file '%s' cannot be opened", hostsfile_file);
 
   while ((len = _readline(fd, buf, CEREBROD_PARSE_BUFLEN)) > 0)
@@ -210,6 +216,7 @@ hostsfile_clusterlist_finish(void)
   assert(hosts);
 
   List_destroy(hosts);
+  Free(hostsfile_file);
   hosts = NULL;
   hostsfile_file = NULL;
 

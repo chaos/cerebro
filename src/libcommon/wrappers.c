@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.c,v 1.20 2005-03-17 00:24:25 achu Exp $
+ *  $Id: wrappers.c,v 1.21 2005-03-17 01:42:00 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -1026,4 +1026,45 @@ wrap_hash_destroy(const char *file, int line, hash_t h)
   hash_destroy(h);
 
   return;
+}
+
+int 
+wrap_argv_create(const char *file, int line, char *cmdline, char *ignore, int *argcPtr, char ***argvPtr)
+{
+  int ret;
+
+  assert(file != NULL);
+
+  if (!cmdline)
+    err_exit("argv_create(%s:%d): null cmdline pointer", file, line);
+
+  if (!ignore)
+    err_exit("argv_create(%s:%d): null ignore pointer", file, line);
+
+  if (!argcPtr)
+    err_exit("argv_create(%s:%d): null argcPtr pointer", file, line);
+
+  if (!argvPtr)
+    err_exit("argv_create(%s:%d): null argvPtr pointer", file, line);
+
+  if ((ret = argv_create(cmdline, ignore, argcPtr, argvPtr)) < 0)
+    err_exit("argv_create(%s:%d): %s", strerror(errno));
+
+  return ret;
+}
+
+int 
+wrap_argv_destroy(const char *file, int line, char **argv)
+{
+  int ret;
+
+  assert(file != NULL);
+  
+  if (!argv)
+    err_exit("argv_create(%s:%d): null argv pointer", file, line);
+
+  if ((ret = argv_destroy(argv)) < 0)
+    err_exit("argv_destroy(%s:%d): %s", strerror(errno));
+
+  return ret;
 }

@@ -33,6 +33,40 @@
 	* src/libcommon/wrappers.c (wrap_list_for_each): Fix debug logic
 	error.
 
+	* src/libcommon/argv.h, src/libcommon/argv.c (argv_create,
+	argv_destroy, _nextargv, _sizeargv): Re-worked not to use
+	wrapper functions.
+
+	* src/libcommon/wrappers.h, src/libcommon/wrappers.c (Argv_create,
+	Argv_destroy, wrap_argv_create, wrap_argv_destroy): New macros and
+	functions.
+
+	* src/cerebrod/cerebrod_clusterlist_hostsfile.c
+	(hostsfile_clusterlist_init),
+	src/cerebrod/cerebrod_clusterlist_genders.c
+	(genders_clusterlist_init),
+	src/cerebrod/cerebrod_clusterlist_gendersllnl.c
+	(gendersllnl_clusterlist_init): Use new Argv_create and
+	Argv_destroy macros.
+
+	* src/cerebrod/cerebrod_clusterlist_hostsfile.c
+	(hostsfile_clusterlist_destroy, _cmdline_parse),
+	src/cerebrod/cerebrod_clusterlist_genders.c
+	(genders_clusterlist_destroy, _cmdline_parse),
+	src/cerebrod/cerebrod_clusterlist_gendersllnl.c
+	(gendersllnl_clusterlist_destroy, _cmdline_parse): Fix memory
+	corruption logic error.
+
+	* src/cerebrod/cerebrod_clusterlist_hostsfile.c
+	(_cmdline_parse), src/cerebrod/cerebrod_clusterlist_genders.c
+	(_cmdline_parse), src/cerebrod/cerebrod_clusterlist_gendersllnl.c
+	(_cmdline_parse): Fix seg fault bug and getopt parsing bug.
+
+	* src/cerebrod/cerebrod_config.c (_cb_cmdline): New function.
+	
+	* src/cerebrod/cerebrod_config.c (_cerebrod_config_parse): Use new
+	_cb_cmdline appropriately.
+
 2005-03-15  Albert Chu  <chu11@llnl.gov>
 
 	Begin support of updown server.

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: argv.c,v 1.2 2005-03-17 00:23:33 achu Exp $
+ *  $Id: argv.c,v 1.3 2005-03-17 01:42:00 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2003 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -33,6 +33,7 @@
 #include <ctype.h>
 #endif /* STDC_HEADERS */
 #include <assert.h>
+#include <errno.h>
 
 #include "argv.h"
 

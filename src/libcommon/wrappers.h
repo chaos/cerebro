@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.h,v 1.18 2005-03-17 00:24:25 achu Exp $
+ *  $Id: wrappers.h,v 1.19 2005-03-17 01:42:00 achu Exp $
 \*****************************************************************************/
 
 #ifndef _WRAPPERS_H
@@ -45,6 +45,7 @@
 #include "ltdl.h"
 #include "list.h"
 #include "hash.h"
+#include "argv.h"
 
 /* 
  * Memory/String Wrappers 
@@ -238,6 +239,7 @@ int wrap_list_delete_all(const char *file, int line, List l, ListFindF f, void *
 int wrap_list_for_each(const char *file, int line, List l, ListForF f, void *arg);
 ListIterator wrap_list_iterator_create(const char *file, int line, List l);
 void wrap_list_iterator_destroy(const char *file, int line, ListIterator i);
+
 /* 
  * Hash lib wrappers 
  */
@@ -265,6 +267,17 @@ void *wrap_hash_insert(const char *file, int line, hash_t h, const void *key, vo
 void *wrap_hash_remove (const char *file, int line, hash_t h, const void *key);
 int wrap_hash_delete_if(const char *file, int line, hash_t h, hash_arg_f argf, void *arg);
 int wrap_hash_for_each(const char *file, int line, hash_t h, hash_arg_f argf, void *arg);
-void wrap_hash_destroy(const char *file, int line, hash_t h)
-;
+void wrap_hash_destroy(const char *file, int line, hash_t h);
+
+/*
+ * Argv lib wrappers
+ */
+#define Argv_create(cmdline, ignore, argcPtr, argvPtr) \
+        wrap_argv_create(__FILE__, __LINE__, cmdline, ignore, argcPtr, argvPtr)
+#define Argv_destroy(argv) \
+        wrap_argv_destroy(__FILE__, __LINE__, argv)
+
+int wrap_argv_create(const char *file, int line, char *cmdline, char *ignore, int *argcPtr, char ***argvPtr);
+int wrap_argv_destroy(const char *file, int line, char **argv);
+
 #endif /* _WRAPPERS_H */
