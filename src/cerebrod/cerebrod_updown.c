@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.c,v 1.11 2005-03-16 21:06:45 achu Exp $
+ *  $Id: cerebrod_updown.c,v 1.12 2005-03-19 03:28:29 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -21,6 +21,7 @@
 #include "cerebrod_updown.h"
 #include "cerebrod_clusterlist.h"
 #include "cerebrod_config.h"
+#include "cerebrod_util.h"
 #include "error.h"
 #include "fd.h"
 #include "wrappers.h"

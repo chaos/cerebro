@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.10 2005-03-19 00:24:11 achu Exp $
+## $Id: configure.ac,v 1.11 2005-03-19 03:28:29 achu Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -28,6 +28,7 @@ AC_PROG_MAKE_SET
 AC_LIBTOOL_DLOPEN
 AC_PROG_LIBTOOL
 AC_LIB_LTDL
+AC_DEBUG
 
 ##
 # Checks for header files.

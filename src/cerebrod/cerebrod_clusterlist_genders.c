@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_genders.c,v 1.10 2005-03-18 19:04:25 achu Exp $
+ *  $Id: cerebrod_clusterlist_genders.c,v 1.11 2005-03-19 03:28:29 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -32,6 +32,8 @@ genders_clusterlist_parse_options(char **options)
 
   if (options)
     cerebrod_clusterlist_parse_filename(options, &genders_file);
+
+  return 0;
 }
 
 int 

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_hostsfile.c,v 1.8 2005-03-17 22:59:27 achu Exp $
+ *  $Id: cerebrod_clusterlist_hostsfile.c,v 1.9 2005-03-19 03:28:29 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -32,6 +32,8 @@ hostsfile_clusterlist_parse_options(char **options)
 
   if (options)
     cerebrod_clusterlist_parse_filename(options, &hostsfile_file);
+
+  return 0;
 }
 
 static int

@@ -1,5 +1,9 @@
 2005-03-18  Albert Chu  <chu11@llnl.gov>
 
+	* Fixed variety of compiler warnings.
+	
+2005-03-18  Albert Chu  <chu11@llnl.gov>
+
 	* src/cerebrod/cerebrod_config.c (_cerebrod_config_module_setup,
 	_find_config_module, _search_dir, _load_module): New functions.
 

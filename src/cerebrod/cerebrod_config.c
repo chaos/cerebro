@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.39 2005-03-18 23:27:05 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.40 2005-03-19 03:28:29 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -612,7 +612,7 @@ _cerebrod_calculate_in_addr_and_index(char *network_interface,
       struct ifconf ifc;
       struct ifreq *ifr;
       void *buf = NULL, *ptr = NULL;
-      int fd, mask, found_interface = 0;
+      int fd, mask = 0, found_interface = 0;
       struct in_addr addr_temp;
       u_int32_t conf_masked_ip;
 
@@ -816,7 +816,6 @@ _cerebrod_calculate_clusterlist_module(void)
       else
 	{
 	  char filebuf[MAXPATHLEN+1];
-	  int found = 0;
 
 	  memset(filebuf, '\0', MAXPATHLEN+1);
 	  snprintf(filebuf, MAXPATHLEN, "%s/%s", 
@@ -960,7 +959,7 @@ _cerebrod_config_dump(void)
       fprintf(stderr, "* clusterlist_module: %s\n", conf.clusterlist_module);
       fprintf(stderr, "* clusterlist_module_options: ");
       if (!conf.clusterlist_module_options)
-        fprintf(stderr, "%s\n", conf.clusterlist_module_options);
+        fprintf(stderr, "%s\n", (char *)conf.clusterlist_module_options);
       else
         {
           int i = 0;
