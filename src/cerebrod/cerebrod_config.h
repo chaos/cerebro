@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.h,v 1.24 2005-03-20 18:11:19 achu Exp $
+ *  $Id: cerebrod_config.h,v 1.25 2005-03-20 19:35:49 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_CONFIG_H
@@ -7,8 +7,8 @@
 
 #include <netinet/in.h>
 
-/* Later Configuration
- * - Max status allowed
+/*
+ * Cerebrod default configuration values
  */
 
 #define CEREBROD_DEBUG_DEFAULT                        0
@@ -30,49 +30,15 @@
 #define CEREBROD_LISTEN_DEBUG_DEFAULT                 0
 #define CEREBROD_UPDOWN_SERVER_DEBUG_DEFAULT          0
 
-/* Configuration
- *
- * Can be set by user:
- * heartbeat_frequency
- * - heartbeat frequency
- * - 1 val for fixed frequency
- * - 2 vals for range (val1 must be < val2)
- * heartbeat_source_port
- * - the port to speak from
- * heartbeat_destination_port
- * - the port to send heartbeats to
- * heartbeat_destination_ip
- * - to ip to send heartbeats to, may be remote IP or multicast
- * heartbeat_network_interface
- * - not specified - we pick an interface
- * - network interface - will be checked.
- * - ip address - will be checked
- * - ip address/subnet - will be found/checked
- * heartbeat_ttl
- * - num
- * speak
- * - on/off
- * listen
- * - on/off
- * listen_threads
- * - num
- * clusterlist_module
- * - can be any string to file
- * clusterlist_module_options
- * - key=val combinations
- *
- * updown_server
- * - on/off
- * updown_server_port
- * - num
+/*
+ * cerebrod_config - configuration structure used by all of cerebrod.
  */
-
 struct cerebrod_config
 {
   /* Set by the user on the command line */
   int debug;
-  char *configfile;
-  char *configmodule;
+  char *config_file;
+  char *config_module;
 
   /* Set by the user in the configuration file */
   unsigned int heartbeat_frequency_min;
@@ -106,22 +72,41 @@ struct cerebrod_config
   struct in_addr heartbeat_network_interface_in_addr;
   int heartbeat_interface_index;
 
+  char *config_module_file;
   char *clusterlist_module_file;
 };
 
-void cerebrod_config(int argc, char **argv);
-
+/*
+ * Cerebrod_config_load_default
+ *
+ * function prototype for config module configuration loading.
+ */
 typedef int (*Cerebrod_config_load_default)(struct cerebrod_config *conf);
 
+/*
+ * cerebrod_config_module_info - contains config module information.  Required
+ * to be defined in each config module.
+ */
 struct cerebrod_config_module_info
 {
   char *config_module_name;
 };
  
+/*
+ * cerebrod_config_module_ops - contains config module functions.  Required
+ * to be defined in each config module.
+ */
 struct cerebrod_config_module_ops
 {
   Cerebrod_config_load_default load_default;
 };
 
+/*
+ * cerebrod_config
+ * 
+ * perform all cerebrod configuration.  Includes command line parsing,
+ * config module loading, and configuration file parsing
+ */
+void cerebrod_config(int argc, char **argv);
 
 #endif /* _CEREBROD_CONFIG_H */

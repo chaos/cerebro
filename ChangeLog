@@ -7,7 +7,25 @@
 	* src/cerebrod/cerebrod_config.h: New default ports.
 
 	* man/cerebrod.conf.5.in: Completed first draft.
-	
+
+	* src/cerebrod/cerebrod_config.c (_config_load_module),
+	src/cerebrod/cerebrod_clusterlist.c (_clusterlist_load_module):
+	Add additional module loading checks.
+
+	* src/cerebrod/cerebrod_clusterlist.c
+	(cerebrod_clusterlist_setup): Fix filename bug.
+
+	* src/cerebrod/cerebrod_config.c (_cerebrod_config_module_setup,
+	_cerebrod_cmdline_parse_check): Fix logic error in check/load
+	routines.  Rename "configfile" and "configmodule" to "config_file"
+	and "config_module" globally respectively.
+
+	* src/cerebrod/cerebrod_config.c (_cerebrod_config_dump): Add
+	forgotten field.
+
+	* src/cerebrod/: Added significant commenting and documentation
+	throughout code.  
+
 2005-03-19  Albert Chu  <chu11@llnl.gov>
 
 	* Fixed variety of compiler warnings.

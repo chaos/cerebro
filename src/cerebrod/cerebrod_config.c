@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.44 2005-03-20 18:11:19 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.45 2005-03-20 19:35:49 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -39,21 +39,35 @@
 #define IPADDR_BITS          32   
 #define IPADDR6_BITS        128
 
+/* 
+ * conf
+ *
+ * cerebrod configuration used by all of cerebrod
+ */
 struct cerebrod_config conf;
 
+/* config_modules
+ * 
+ * configuration modules to search for by default
+ */
 char *config_modules[] = {
   "cerebrod_config_gendersllnl.la",
   NULL
 };
 int config_modules_len = 1;
 
+/* 
+ * _cerebrod_config_default 
+ *
+ * initialize conf structure with default values.
+ */
 static void
 _cerebrod_config_default(void)
 {
   memset(&conf, '\0', sizeof(struct cerebrod_config));
 
   conf.debug = CEREBROD_DEBUG_DEFAULT;
-  conf.configfile = CEREBROD_CONFIGFILE_DEFAULT;
+  conf.config_file = CEREBROD_CONFIG_FILE_DEFAULT;
   conf.heartbeat_frequency_min = CEREBROD_HEARTBEAT_FREQUENCY_MIN_DEFAULT;
   conf.heartbeat_frequency_max = CEREBROD_HEARTBEAT_FREQUENCY_MAX_DEFAULT;
   conf.heartbeat_source_port = CEREBROD_HEARTBEAT_SOURCE_PORT_DEFAULT;
@@ -73,21 +87,31 @@ _cerebrod_config_default(void)
   conf.updown_server_debug = CEREBROD_UPDOWN_SERVER_DEBUG_DEFAULT;
 }
 
+/* 
+ * _usage 
+ * 
+ * output usage and exit
+ */
 static void
 _usage(void)
 {
   fprintf(stderr, "Usage: cerebrod [OPTIONS]\n"
-          "-h    --help         Output Help\n"
-          "-v    --version      Output Version\n"
-          "-c    --configfile   Specify alternate config file\n"
-          "-m    --configmodule Specify configuration module\n");
+          "-h    --help          Output Help\n"
+          "-v    --version       Output Version\n"
+          "-c    --config_file   Specify alternate config file\n"
+          "-m    --config_module Specify configuration module\n");
 #ifndef NDEBUG
   fprintf(stderr, 
-          "-d    --debug       Turn on debugging and run daemon in foreground\n");
+          "-d    --debug         Turn on debugging and run daemon in foreground\n");
 #endif /* NDEBUG */
   exit(0);
 }
 
+/* 
+ * _version 
+ * 
+ * output version and exit
+ */
 static void
 _version(void)
 {
@@ -95,6 +119,14 @@ _version(void)
   exit(0);
 }
 
+/* 
+ * _cerebrod_cmdline_parse
+ *
+ * parse command line options
+ *
+ * - argc - number of command line arguments
+ * - argv - command line arguments array
+ */
 static void
 _cerebrod_cmdline_parse(int argc, char **argv)
 { 
@@ -112,8 +144,8 @@ _cerebrod_cmdline_parse(int argc, char **argv)
     {
       {"help",                0, NULL, 'h'},
       {"version",             0, NULL, 'v'},
-      {"configfile",          1, NULL, 'c'},
-      {"configmodule",        1, NULL, 'm'},
+      {"config_file",          1, NULL, 'c'},
+      {"config_module",        1, NULL, 'm'},
 #ifndef NDEBUG
       {"debug",               0, NULL, 'd'},
 #endif /* NDEBUG */
@@ -137,11 +169,11 @@ _cerebrod_cmdline_parse(int argc, char **argv)
         case 'v':       /* --version */
           _version();
           break;
-        case 'c':       /* --configfile */
-          conf.configfile = Strdup(optarg);
+        case 'c':       /* --config_file */
+          conf.config_file = Strdup(optarg);
           break;
-        case 'm':       /* --configmodule */
-          conf.configmodule = Strdup(optarg);
+        case 'm':       /* --config_module */
+          conf.config_module = Strdup(optarg);
           break;
 #ifndef NDEBUG
         case 'd':       /* --debug */
@@ -155,32 +187,115 @@ _cerebrod_cmdline_parse(int argc, char **argv)
     }
 }
 
+/* 
+ * _cerebrod_cmdline_parse_check:
+ *
+ * check validity of command line parameters
+ */
 static void
 _cerebrod_cmdline_parse_check(void)
 {
-  if (conf.configfile)
+  /* Check if the configuration file exists */
+  if (conf.config_file)
     {
-      /* The default configfile is allowed to be missing, so don't
-       * bother checking for it 
+      /* The default config_file is allowed to be missing, so don't
+       * bother checking if it exists.
        */
-      if (strcmp(conf.configfile, CEREBROD_CONFIGFILE_DEFAULT) != 0)
+      if (strcmp(conf.config_file, CEREBROD_CONFIG_FILE_DEFAULT) != 0)
         {
           struct stat buf;
   
-          if (stat(conf.configfile, &buf) < 0)
-            err_exit("config file '%s' not found", conf.configfile);
+          if (stat(conf.config_file, &buf) < 0)
+            err_exit("config file '%s' not found", conf.config_file);
         }
     }
 
-  if (conf.configmodule)
+  /* Check if the configuration module exists */
+  if (conf.config_module)
     {
       struct stat buf;
-  
-      if (stat(conf.configmodule, &buf) < 0)
-        err_exit("config module '%s' not found", conf.configmodule);
+
+      /* Don't use stat() wrapper, we want to receive the error */
+
+      if (conf.config_module[0] == '/')
+	{
+	  /* Case A: User specified absolute path to config module */
+	  if (stat(conf.config_module, &buf) < 0)
+	    err_exit("config module '%s' not found", 
+		     conf.config_module);
+	  
+	  conf.config_module_file = Strdup(conf.config_module);
+	}
+      else
+	{
+	  /* Case B: Search for config module */
+	  char filebuf[MAXPATHLEN+1];
+
+	  /* Assume user passed in config filename.  Search in
+	   * module directory.
+	   */
+	  memset(filebuf, '\0', MAXPATHLEN+1);
+	  snprintf(filebuf, MAXPATHLEN, "%s/%s", 
+		   CEREBROD_MODULE_DIR, conf.config_module);
+
+	  if (!stat(filebuf, &buf))
+	    {
+	      conf.config_module_file = Strdup(filebuf);
+	      return;
+	    }
+
+	  /* Assume user passed in config filename.  Search in
+	   * current directory.
+	   */
+	  memset(filebuf, '\0', MAXPATHLEN+1);
+	  snprintf(filebuf, MAXPATHLEN, "./%s", conf.config_module);
+
+	  if (!stat(filebuf, &buf))
+	    {
+	      conf.config_module_file = Strdup(filebuf);
+	      return;
+	    }
+
+	  /* Assume user passed in config module name.  Search in
+	   * module directory.
+	   */
+	  memset(filebuf, '\0', MAXPATHLEN+1);
+	  snprintf(filebuf, MAXPATHLEN, "%s/cerebrod_config_%s.la", 
+		   CEREBROD_MODULE_DIR, conf.config_module);
+
+	  if (!stat(filebuf, &buf))
+	    {
+	      conf.config_module_file = Strdup(filebuf);
+	      return;
+	    }
+
+	  /* Assume user passed in config module name.  Search in
+	   * current directory.
+	   */
+	  memset(filebuf, '\0', MAXPATHLEN+1);
+	  snprintf(filebuf, MAXPATHLEN, "./cerebrod_config_%s.la", conf.config_module);
+
+	  if (!stat(filebuf, &buf))
+	    {
+	      conf.config_module_file = Strdup(filebuf);
+	      return;
+	    }
+
+	  if (!conf.config_module_file)
+	    err_exit("config module '%s' not found", conf.config_module);
+	}
     }
 }
 
+/* 
+ * _config_load_module
+ *
+ * load a configuration module and all appropriate symbols
+ *
+ * - module_path - full path to config module to load
+ *
+ * Returns 1 on loading success, 0 on loading failure, -1 on fatal error
+ */
 static int
 _config_load_module(char *module_path)
 {
@@ -196,6 +311,9 @@ _config_load_module(char *module_path)
 
   if (!config_module_info->config_module_name)
     err_exit("config module '%s' does not contain a valid name");
+
+  if (!config_module_ops->load_default)
+    err_exit("config module '%s' does not contain valid load_default function");
   
 #ifndef NDEBUG
   if (conf.debug)
@@ -208,6 +326,7 @@ _config_load_module(char *module_path)
     }
 #endif /* NDEBUG */
 
+  /* Load the alternate default configuration from the configuration module */
   if ((*config_module_ops->load_default)(&conf) < 0)
     err_exit("%s config module: load_default failed: %s",
              config_module_info->config_module_name, strerror(errno));
@@ -217,59 +336,22 @@ _config_load_module(char *module_path)
   return 1;
 }
 
+/*
+ * _config_module_setup
+ *
+ * load configuration module.  search for configuration module to load
+ * if necessary
+ */
 static void
 _cerebrod_config_module_setup(void)
 {
   Lt_dlinit();
 
-  if (conf.configmodule && conf.configmodule[0] == '/')
+  if (conf.config_module_file)
     {
-      if (_config_load_module(conf.configmodule) != 1)
+      if (_config_load_module(conf.config_module_file) != 1)
 	err_exit("config module '%s' could not be loaded",
-		 conf.configmodule);
-    }
-  else if (conf.configmodule)
-    {
-      char filebuf[MAXPATHLEN+1];
-      int ret;
-
-      memset(filebuf, '\0', MAXPATHLEN+1);
-      snprintf(filebuf, MAXPATHLEN, "%s/%s", 
-	       CEREBROD_MODULE_DIR, conf.configmodule);
-
-      if ((ret = _config_load_module(filebuf)) < 0)
-	err_exit("error loading config module '%s'",
-		 conf.configmodule);
-      if (ret == 1)
-	goto done;
-
-      memset(filebuf, '\0', MAXPATHLEN+1);
-      snprintf(filebuf, MAXPATHLEN, "./%s", conf.configmodule);
-
-      if ((ret = _config_load_module(filebuf)) < 0)
-	err_exit("error loading config module '%s'",
-		 conf.configmodule);
-      if (ret == 1)
-	goto done;
-
-      memset(filebuf, '\0', MAXPATHLEN+1);
-      snprintf(filebuf, MAXPATHLEN, "%s/cerebrod_clusterlist_%s.la", 
-	       CEREBROD_MODULE_DIR, conf.configmodule);
-
-      if ((ret = _config_load_module(filebuf)) < 0)
-	err_exit("error loading config module '%s'",
-		 conf.configmodule);
-      if (ret == 1)
-	goto done;
-
-      memset(filebuf, '\0', MAXPATHLEN+1);
-      snprintf(filebuf, MAXPATHLEN, "./cerebrod_clusterlist_%s.la", conf.configmodule);
-
-      if ((ret = _config_load_module(filebuf)) < 0)
-	err_exit("error loading config module '%s'",
-		 conf.configmodule);
-      if (ret == 1)
-	goto done;
+		 conf.config_module);
     }
   else
     {
@@ -290,6 +372,14 @@ _cerebrod_config_module_setup(void)
   Lt_dlexit();
 }
 
+/*
+ * _cb_heartbeat_freq
+ *
+ * conffile callback function that parses and stores heartbeat
+ * configuration data
+ *
+ * Returns 0 on success, -1 on error
+ */
 static int
 _cb_heartbeat_freq(conffile_t cf, struct conffile_data *data,
                    char *optionname, int option_type, void *option_ptr,
@@ -319,6 +409,13 @@ _cb_heartbeat_freq(conffile_t cf, struct conffile_data *data,
   return 0;
 }
 
+/*
+ * _cb_stringptr
+ *
+ * conffile callback function that parses and stores a string
+ *
+ * Returns 0 on success, -1 on error
+ */
 static int
 _cb_stringptr(conffile_t cf, struct conffile_data *data,
               char *optionname, int option_type, void *option_ptr,
@@ -334,6 +431,14 @@ _cb_stringptr(conffile_t cf, struct conffile_data *data,
   return 0;
 }
 
+/*
+ * _cb_module_options
+ *
+ * conffile callback function that parses and stores an array of
+ * clusterlist module options.
+ *
+ * Returns 0 on success, -1 on error
+ */
 static int
 _cb_module_options(conffile_t cf, struct conffile_data *data,
 		   char *optionname, int option_type, void *option_ptr,
@@ -360,6 +465,12 @@ _cb_module_options(conffile_t cf, struct conffile_data *data,
   return 0;
 }
 
+/*
+ * _cb_config_parse
+ * 
+ * Using the conffile configuration file parsing library, parse the cerebrod
+ * configuration file.
+ */
 static void
 _cerebrod_config_parse(void)
 {
@@ -375,12 +486,12 @@ _cerebrod_config_parse(void)
     {
       {"heartbeat_frequency", CONFFILE_OPTION_LIST_INT, -1, _cb_heartbeat_freq,
        1, 0, &heartbeat_frequency_flag, NULL, 0},
+      {"heartbeat_source_port", CONFFILE_OPTION_INT, -1, conffile_int,
+       1, 0, &heartbeat_source_port_flag, &(conf.heartbeat_source_port), 0},
       {"heartbeat_destination_port", CONFFILE_OPTION_INT, -1, conffile_int,
        1, 0, &heartbeat_destination_port_flag, &(conf.heartbeat_destination_port), 0},
       {"heartbeat_destination_ip", CONFFILE_OPTION_STRING, -1, _cb_stringptr,
        1, 0, &heartbeat_destination_ip_flag, &(conf.heartbeat_destination_ip), 0},
-      {"heartbeat_source_port", CONFFILE_OPTION_INT, -1, conffile_int,
-       1, 0, &heartbeat_source_port_flag, &(conf.heartbeat_source_port), 0},
       {"heartbeat_network_interface", CONFFILE_OPTION_STRING, -1, _cb_stringptr,
        1, 0, &heartbeat_network_interface_flag, 
        &(conf.heartbeat_network_interface), 0},
@@ -415,7 +526,7 @@ _cerebrod_config_parse(void)
     err_exit("conffile_handle_create: failed to create handle");
 
   num = sizeof(options)/sizeof(struct conffile_option);
-  if (conffile_parse(cf, conf.configfile, options, num, NULL, 0, 0) < 0)
+  if (conffile_parse(cf, conf.config_file, options, num, NULL, 0, 0) < 0)
     {
       /* Its not an error if the file doesn't exist */
       if (conffile_errnum(cf) != CONFFILE_ERR_EXIST)
@@ -430,6 +541,12 @@ _cerebrod_config_parse(void)
   conffile_handle_destroy(cf);
 }
 
+/*
+ * _cerebrod_pre_calculate_configuration_config_check
+ * 
+ * Check configuration settings for errors before analyzing
+ * configuration data.
+ */
 static void
 _cerebrod_pre_calculate_configuration_config_check(void)
 {
@@ -487,6 +604,11 @@ _cerebrod_pre_calculate_configuration_config_check(void)
     }
 }
 
+/*
+ * _cerebrod_calculate_multicast
+ * 
+ * Determine if the heartbeat_destination_ip is a multicast address
+ */
 static void
 _cerebrod_calculate_multicast(void)
 {
@@ -511,6 +633,11 @@ _cerebrod_calculate_multicast(void)
     }
 }
 
+/*
+ * _cerebrod_calculate_heartbeat_frequency_ranged
+ * 
+ * Determine if the heartbeat frequencey is static or ranged
+ */
 static void
 _cerebrod_calculate_heartbeat_frequency_ranged(void)
 {
@@ -520,6 +647,11 @@ _cerebrod_calculate_heartbeat_frequency_ranged(void)
     conf.heartbeat_frequency_ranged = 0;
 }
 
+/*
+ * _cerebrod_calculate_heartbeat_destination_ip_in_addr
+ * 
+ * Convert the destination ip address from presentable to network order
+ */
 static void
 _cerebrod_calculate_heartbeat_destination_ip_in_addr(void)
 {
@@ -528,7 +660,14 @@ _cerebrod_calculate_heartbeat_destination_ip_in_addr(void)
 	     conf.heartbeat_destination_ip);
 }
 
-/* From Unix Network Programming, by R. Stevens, Chapter 16 */
+/*
+ * _get_if_conf
+ *
+ * Retrieve network interface configuration.  Code is mostly from Unix
+ * Network Programming by R. Stevens, Chapter 16
+ * 
+ * Return buffer of local network interface configurations.
+ */
 static void 
 _get_if_conf(void **buf, struct ifconf *ifc, int fd)
 {
@@ -554,7 +693,14 @@ _get_if_conf(void **buf, struct ifconf *ifc, int fd)
     }
 }
 
-/* From Unix Network Programming, by R. Stevens, Chapter 16 */
+/*
+ * _get_ifr_len
+ *
+ * Determine the length of an ifreq structure.  Code is mostly from
+ * Unix Network Programming by R. Stevens, Chapter 16
+ *
+ * Return calculated length of the ifreq structure
+ */
 static int
 _get_ifr_len(struct ifreq *ifr)
 {
@@ -588,6 +734,14 @@ _get_ifr_len(struct ifreq *ifr)
   return len;
 }
 
+/*
+ * _cerebrod_calculate_in_addr_and_index
+ *
+ * Calculate a network interface ip address and interface index
+ * based on the network interface passed in.
+ *
+ * Return calculated ip address and interface index.
+ */
 static void
 _cerebrod_calculate_in_addr_and_index(char *network_interface,
 				      struct in_addr *interface_in_addr,
@@ -847,14 +1001,26 @@ _cerebrod_calculate_in_addr_and_index(char *network_interface,
     }
 }
 
+/*
+ * _cerebrod_calculate_heartbeat_network_interface_in_addr_and_index
+ *
+ * Calculate the heartbeat ip address and interface index based on the
+ * network interface passed in the configuration file.
+ */
 static void
-_cerebrod_calculate_heartbeat_network_interface_in_addr_and_index()
+_cerebrod_calculate_heartbeat_network_interface_in_addr_and_index(void)
 {
   _cerebrod_calculate_in_addr_and_index(conf.heartbeat_network_interface,
 					&conf.heartbeat_network_interface_in_addr,
 					&conf.heartbeat_interface_index);
 }
 
+/*
+ * _cerebrod_calculate_clusterlist_module
+ *
+ * Search for and determine the full path to the clusterlist module we
+ * wish to use
+ */
 static void
 _cerebrod_calculate_clusterlist_module(void)
 {
@@ -862,19 +1028,25 @@ _cerebrod_calculate_clusterlist_module(void)
     {
       struct stat buf;
 
-      /* No wrappers, want to receive error */
+      /* Don't use stat() wrapper, we want to receive the error */
+
       if (conf.clusterlist_module[0] == '/')
 	{
+	  /* Case A: User specified absolute path to clusterlist module */
 	  if (stat(conf.clusterlist_module, &buf) < 0)
-	    err_exit("clusterlist_module '%s' not found", 
+	    err_exit("clusterlist module '%s' not found", 
 		     conf.clusterlist_module);
 	  
 	  conf.clusterlist_module_file = Strdup(conf.clusterlist_module);
 	}
       else
 	{
+	  /* Case B: Search for clusterlist module */
 	  char filebuf[MAXPATHLEN+1];
 
+	  /* Assume user passed in clusterlist filename.  Search in
+	   * module directory.
+	   */
 	  memset(filebuf, '\0', MAXPATHLEN+1);
 	  snprintf(filebuf, MAXPATHLEN, "%s/%s", 
 		   CEREBROD_MODULE_DIR, conf.clusterlist_module);
@@ -885,6 +1057,9 @@ _cerebrod_calculate_clusterlist_module(void)
 	      return;
 	    }
 
+	  /* Assume user passed in clusterlist filename.  Search in
+	   * current directory.
+	   */
 	  memset(filebuf, '\0', MAXPATHLEN+1);
 	  snprintf(filebuf, MAXPATHLEN, "./%s", conf.clusterlist_module);
 
@@ -894,6 +1069,9 @@ _cerebrod_calculate_clusterlist_module(void)
 	      return;
 	    }
 
+	  /* Assume user passed in clusterlist module name.  Search in
+	   * module directory.
+	   */
 	  memset(filebuf, '\0', MAXPATHLEN+1);
 	  snprintf(filebuf, MAXPATHLEN, "%s/cerebrod_clusterlist_%s.la", 
 		   CEREBROD_MODULE_DIR, conf.clusterlist_module);
@@ -904,6 +1082,9 @@ _cerebrod_calculate_clusterlist_module(void)
 	      return;
 	    }
 
+	  /* Assume user passed in clusterlist module name.  Search in
+	   * current directory.
+	   */
 	  memset(filebuf, '\0', MAXPATHLEN+1);
 	  snprintf(filebuf, MAXPATHLEN, "./cerebrod_clusterlist_%s.la", conf.clusterlist_module);
 
@@ -914,11 +1095,16 @@ _cerebrod_calculate_clusterlist_module(void)
 	    }
 
 	  if (!conf.clusterlist_module_file)
-	    err_exit("clusterlist_module '%s' not found", conf.clusterlist_module);
+	    err_exit("clusterlist module '%s' not found", conf.clusterlist_module);
 	}
     }
 }
 
+/*
+ * _cerebrod_calculate_configuration
+ *
+ * analyze and calculate configuration based on settings
+ */
 static void
 _cerebrod_calculate_configuration(void)
 {
@@ -936,11 +1122,16 @@ _cerebrod_calculate_configuration(void)
    */
   _cerebrod_calculate_heartbeat_network_interface_in_addr_and_index();
 
-  /* Determine the clusterlist module to use
-   */
+  /* Determine the clusterlist module to use */
   _cerebrod_calculate_clusterlist_module();
 }
 
+/*
+ * _cerebrod_post_calculate_configuration_config_check
+ * 
+ * Check configuration settings for errors after configuration data
+ * has been analyzed.
+ */
 static void
 _cerebrod_post_calculate_configuration_config_check(void)
 {
@@ -991,6 +1182,11 @@ _cerebrod_post_calculate_configuration_config_check(void)
     }
 }
 
+/* 
+ * _cerebrod_config_dump
+ * 
+ * Dump configuration data
+ */
 static void 
 _cerebrod_config_dump(void)
 {
@@ -999,9 +1195,15 @@ _cerebrod_config_dump(void)
     {
       fprintf(stderr, "**************************************\n");
       fprintf(stderr, "* Cerebrod Configuration:\n");     
-      fprintf(stderr, "* -----------------------\n");
+      fprintf(stderr, "* -------------------------------\n");
+      fprintf(stderr, "* Command Line Options\n");
+      fprintf(stderr, "* -------------------------------\n");
       fprintf(stderr, "* debug: %d\n", conf.debug);
-      fprintf(stderr, "* configfile: \"%s\"\n", conf.configfile);
+      fprintf(stderr, "* config_file: \"%s\"\n", conf.config_file);
+      fprintf(stderr, "* config_module: \"%s\"\n", conf.config_module);
+      fprintf(stderr, "* -------------------------------\n");
+      fprintf(stderr, "* Configuration File Options\n");
+      fprintf(stderr, "* -------------------------------\n");
       fprintf(stderr, "* heartbeat_frequency_min: %d\n", conf.heartbeat_frequency_min);
       fprintf(stderr, "* heartbeat_frequency_max: %d\n", conf.heartbeat_frequency_max);
       fprintf(stderr, "* heartbeat_source_port: %d\n", conf.heartbeat_source_port);
@@ -1031,7 +1233,9 @@ _cerebrod_config_dump(void)
       fprintf(stderr, "* speak_debug: %d\n", conf.speak_debug);
       fprintf(stderr, "* listen_debug: %d\n", conf.listen_debug);
       fprintf(stderr, "* updown_server_debug: %d\n", conf.updown_server_debug);
-      fprintf(stderr, "* -----------------------\n");
+      fprintf(stderr, "* -------------------------------\n");
+      fprintf(stderr, "* Calculated Configuration\n");
+      fprintf(stderr, "* -------------------------------\n");
       fprintf(stderr, "* multicast: %d\n", conf.multicast);
       fprintf(stderr, "* heartbeat_destination_ip_in_addr: %s\n", inet_ntoa(conf.heartbeat_destination_ip_in_addr));
       fprintf(stderr, "* heartbeat_network_interface_in_addr: %s\n", inet_ntoa(conf.heartbeat_network_interface_in_addr));
@@ -1042,6 +1246,12 @@ _cerebrod_config_dump(void)
 #endif /* NDEBUG */
 }
 
+/*
+ * cerebrod_config
+ * 
+ * perform all cerebrod configuration.  Includes command line parsing,
+ * config module loading, and configuration file parsing
+ */
 void
 cerebrod_config(int argc, char **argv)
 {

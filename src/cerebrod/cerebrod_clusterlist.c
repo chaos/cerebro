@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist.c,v 1.10 2005-03-19 19:06:24 achu Exp $
+ *  $Id: cerebrod_clusterlist.c,v 1.11 2005-03-20 19:35:49 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -48,6 +48,27 @@ _clusterlist_load_module(char *module_path)
 
   if (!clusterlist_module_info->clusterlist_module_name)
     err_exit("clusterlist module '%s' does not contain a valid name");
+
+  if (!clusterlist_module_ops->parse_options)
+    err_exit("clusterlist module '%s' does not contain valid parse_options function");
+
+  if (!clusterlist_module_ops->init)
+    err_exit("clusterlist module '%s' does not contain valid init function");
+
+  if (!clusterlist_module_ops->finish)
+    err_exit("clusterlist module '%s' does not contain valid finish function");
+
+  if (!clusterlist_module_ops->get_all_nodes)
+    err_exit("clusterlist module '%s' does not contain valid get_all_nodes function");
+
+  if (!clusterlist_module_ops->numnodes)
+    err_exit("clusterlist module '%s' does not contain valid numnodes function");
+
+  if (!clusterlist_module_ops->node_in_cluster)
+    err_exit("clusterlist module '%s' does not contain valid node_in_cluster function");
+
+  if (!clusterlist_module_ops->get_nodename)
+    err_exit("clusterlist module '%s' does not contain valid get_nodename function");
   
 #ifndef NDEBUG
   if (conf.debug)
@@ -72,7 +93,7 @@ cerebrod_clusterlist_setup(void)
 
   if (conf.clusterlist_module_file)
     {
-      if (_clusterlist_load_module(conf.clusterlist_module) != 1)
+      if (_clusterlist_load_module(conf.clusterlist_module_file) != 1)
         err_exit("clusterlist module '%s' could not be loaded", 
                  conf.clusterlist_module_file);
     }
