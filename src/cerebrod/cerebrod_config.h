@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.h,v 1.3 2004-07-06 17:06:26 achu Exp $
+ *  $Id: cerebrod_config.h,v 1.4 2004-07-27 14:28:14 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_CONFIG_H
@@ -27,11 +27,10 @@ struct cerebrod_config
   char *configfile;
 
   /* Set by the user in the configuration file */
-
-  unsigned int heartbeat_freq_min;
-  unsigned int heartbeat_freq_max;
   int listen;
   int speak;
+  unsigned int heartbeat_freq_min;
+  unsigned int heartbeat_freq_max;
   char *network_interface;
   char *mcast_ip;
   int mcast_port;
@@ -44,5 +43,6 @@ struct cerebrod_config
 void cerebrod_config_default(void);
 void cerebrod_cmdline_parse(int argc, char **argv);
 void cerebrod_config_parse(void);
+void cerebrod_calculate_configuration(void);
 
 #endif /* _CEREBROD_CONFIG_H */

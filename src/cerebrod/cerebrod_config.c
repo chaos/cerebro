@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.3 2004-07-12 15:15:02 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.4 2004-07-27 14:28:14 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -14,6 +14,12 @@
 #if HAVE_GETOPT_H
 #include <getopt.h>
 #endif /* HAVE_GETOPT_H */
+#include <assert.h>
+#include <errno.h>
+
+#include <sys/ioctl.h>
+#include <netinet/in.h>
+#include <net/if.h>
 
 #include "cerebrod_config.h"
 #include "conffile.h"
@@ -27,10 +33,10 @@ cerebrod_config_default(void)
 {
   conf.debug = 0;
   conf.configfile = CEREBROD_CONFIGFILE_DEFAULT;
-  conf.heartbeat_freq_min = CEREBROD_HEARTBEAT_FREQ_MIN_DEFAULT;
-  conf.heartbeat_freq_max = CEREBROD_HEARTBEAT_FREQ_MAX_DEFAULT;
   conf.listen = CEREBROD_LISTEN_DEFAULT;
   conf.speak = CEREBROD_SPEAK_DEFAULT;
+  conf.heartbeat_freq_min = CEREBROD_HEARTBEAT_FREQ_MIN_DEFAULT;
+  conf.heartbeat_freq_max = CEREBROD_HEARTBEAT_FREQ_MAX_DEFAULT;
   conf.network_interface = NULL;
   conf.mcast_ip = CEREBROD_MCAST_IP_DEFAULT;
   conf.mcast_port = CEREBROD_MCAST_PORT_DEFAULT;
@@ -152,12 +158,12 @@ cerebrod_config_parse(void)
 
   struct conffile_option options[] =
     {
-      {"heartbeat_freq", CONFFILE_OPTION_LIST_INT, 2, _cb_heartbeat_freq,
-       1, 0, &heartbeat_freq_flag, NULL, 0},
       {"listen", CONFFILE_OPTION_BOOL, -1, conffile_bool,
        1, 0, &listen_flag, &conf.listen, 0},
       {"speak", CONFFILE_OPTION_BOOL, -1, conffile_bool,
        1, 0, &speak_flag, &conf.speak, 0},
+      {"heartbeat_freq", CONFFILE_OPTION_LIST_INT, 2, _cb_heartbeat_freq,
+       1, 0, &heartbeat_freq_flag, NULL, 0},
       {"network_interface", CONFFILE_OPTION_STRING, -1, _cb_stringptr,
        1, 0, &network_interface_flag, &(conf.network_interface), 0},
       {"mcast_ip", CONFFILE_OPTION_STRING, -1, _cb_stringptr,
@@ -182,32 +188,14 @@ cerebrod_config_parse(void)
           char buf[CONFFILE_MAX_ERRMSGLEN];
           if (conffile_errmsg(cf, buf, CONFFILE_MAX_ERRMSGLEN) < 0)
             err_exit("conffile_parse: errnum = %d", conffile_errnum(cf));
-          err_exit("conffile_parse: %s", buf);
+          err_exit("config file error: %s", buf);
         }
     }
 
   conffile_handle_destroy(cf);
 }
 
-static int
-_interface_valid(int fd, char *interface_name)
-{
-  struct ifreq ifr;
-
-  assert(fd >= 0 && interface_name != NULL);
-
-  Strncpy(ifr.ifr_name, interface_name, IFNAMSIZ);
-  if (ioctl(fd, SIOCGIFFLAGS, &ifr) < 0) 
-      err_exit("ioctl: %s", strerror(errno));
-
-  if ((ifr.ifr_flags & IFF_UP)
-      && (ifr.ifr_flags & IFF_MULTICAST))
-    return 1;
-  else
-    return 0;
-}
-
-/* _get_ifr_len: From Unix Network Programming by R. Stevens */
+/* From Unix Network Programming, by R. Stevens, Chapter 16 */
 static int
 _get_ifr_len(struct ifreq *ifr)
 {
@@ -249,10 +237,150 @@ cerebrod_calculate_configuration(void)
   if (!conf.network_interface)
     {
       /* Case A: No interface specified, find any multicast interface */
+      struct ifconf ifc;
+      struct ifreq *ifr;
+      int lastlen = -1, fd, len = sizeof(struct ifreq) * 100;
+      void *buf = NULL, *ptr = NULL;
+                                                                                    
+      /* From Unix Network Programming, by R. Stevens, Chapter 16 */
+                                                                                    
+      fd = Socket(AF_INET, SOCK_DGRAM, 0);
+                                                                                    
+      /* get all active interfaces */
+      while(1) 
+	{
+	  buf = Malloc(len);
+                                                                                    
+	  ifc.ifc_len = len;
+	  ifc.ifc_buf = buf;
+                                                                                    
+	  if (ioctl(fd, SIOCGIFCONF, &ifc) < 0) 
+	    err_exit("cerebrod_calculate_configuration: ioctl: %s",
+		     strerror(errno));
+	  else 
+	    {
+	      if (ifc.ifc_len == lastlen)
+		break;
+	      lastlen = ifc.ifc_len;
+	    }
+	  
+	  len += 10 * sizeof(struct ifreq);
+	  Free(buf);
+	}
+
+      /* Check all interfaces */
+      for (ptr = buf; ptr < buf + ifc.ifc_len; ) 
+	{
+	  struct ifreq ifr_tmp;
+	  
+	  ifr = (struct ifreq *)ptr;
+                                                                                    
+	  len = _get_ifr_len(ifr);
+                                                                                    
+	  ptr += sizeof(ifr->ifr_name) + len;
+	  
+	  /* Null termination not required, don't use wrapper */
+	  strncpy(ifr_tmp.ifr_name, ifr->ifr_name, IFNAMSIZ);
+
+	  if (ioctl(fd, SIOCGIFFLAGS, &ifr_tmp) < 0) 
+	    err_exit("ioctl: %s", strerror(errno));
+	  
+	  if (!(ifr_tmp.ifr_flags & IFF_UP)
+	      || !(ifr_tmp.ifr_flags & IFF_MULTICAST))
+	    continue;
+
+	  conf.multicast_interface = Strdup(ifr_tmp.ifr_name);
+	  break;
+	}
+      
+      Free(buf);
     }
   else if (strchr(conf.network_interface, '.'))
     {
       /* Case B: IP address specified */
+      struct ifconf ifc;
+      struct ifreq *ifr;
+      int lastlen = -1, fd, len = sizeof(struct ifreq) * 100;
+      void *buf = NULL, *ptr = NULL;
+                                                                                    
+      if (strchr(conf.network_interface, ':'))
+	err_exit("IPv6 IP addresses currently not supported, please specify"
+		 "IPv5 IP address");
+
+      /* From Unix Network Programming, by R. Stevens, Chapter 16 */
+                                                                                    
+      fd = Socket(AF_INET, SOCK_DGRAM, 0);
+                                                                                    
+      /* get all active interfaces */
+      while(1) 
+	{
+	  buf = Malloc(len);
+                                                                                    
+	  ifc.ifc_len = len;
+	  ifc.ifc_buf = buf;
+                                                                                    
+	  if (ioctl(fd, SIOCGIFCONF, &ifc) < 0) 
+	    err_exit("cerebrod_calculate_configuration: ioctl: %s",
+		     strerror(errno));
+	  else 
+	    {
+	      if (ifc.ifc_len == lastlen)
+		break;
+	      lastlen = ifc.ifc_len;
+	    }
+	  
+	  len += 10 * sizeof(struct ifreq);
+	  Free(buf);
+	}
+
+      /* Check all interfaces */
+      for (ptr = buf; ptr < buf + ifc.ifc_len; ) 
+	{
+	  struct ifreq ifr_tmp;
+	  char *addr;
+
+	  ifr = (struct ifreq *)ptr;
+                                                                                    
+	  len = _get_ifr_len(ifr);
+                                                                                    
+	  ptr += sizeof(ifr->ifr_name) + len;
+	  
+	  /* Currently no IPv6 support */
+	  if (ifr->ifr_addr.sa_family != AF_INET)
+	    continue;
+
+	  if (!_compare_ip());
+
+	  /*
+	  sin = (struct sockaddr_in *)&ifr->ifr_addr;
+                                                                                   
+	  addr = inet_ntoa(sin->sin_addr);
+	  if (strcmp(addr,"127.0.0.1") == 0)
+	    continue;
+	  
+	  if (memcmp(munge_addr, (void *)&sin->sin_addr.s_addr, addr_len) == 0) {
+	    found++;
+	    break;
+	  }
+	  */
+
+	  /* Null termination not required, don't use wrapper */
+	  strncpy(ifr_tmp.ifr_name, ifr->ifr_name, IFNAMSIZ);
+
+	  if (ioctl(fd, SIOCGIFFLAGS, &ifr_tmp) < 0) 
+	    err_exit("ioctl: %s", strerror(errno));
+	  
+	  if (!(ifr_tmp.ifr_flags & IFF_UP))
+	    continue;
+	  
+	  if (!(ifr_tmp.ifr_flags & IFF_MULTICAST))
+	    continue;
+
+	  conf.multicast_interface = Strdup(ifr_tmp.ifr_name);
+	  break;
+	}
+      
+      Free(buf);
     }
   else
     {
