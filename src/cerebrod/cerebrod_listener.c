@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.13 2005-02-15 01:22:31 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.14 2005-02-15 01:47:57 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -62,6 +62,7 @@ _cerebrod_listener_create_and_setup_socket(void)
       /* XXX: Probably lots of portability problems here */
       struct ip_mreqn imr;
 
+      memset(&imr, '\0', sizeof(struct ip_mreqn));
       memcpy(&imr.imr_multiaddr,
              &conf.heartbeat_destination_ip_in_addr,
              sizeof(struct in_addr));
@@ -82,6 +83,7 @@ _cerebrod_listener_create_and_setup_socket(void)
 	  return -1;
 	}
 
+      memset(&imr, '\0', sizeof(struct ip_mreqn));
       memcpy(&imr.imr_multiaddr,
              &conf.heartbeat_destination_ip_in_addr,
              sizeof(struct in_addr));
@@ -104,6 +106,7 @@ _cerebrod_listener_create_and_setup_socket(void)
     }
 
   /* Even if we're multicasting, the port still needs to be bound */
+  memset(&heartbeat_addr, '\0', sizeof(struct sockaddr_in));
   heartbeat_addr.sin_family = AF_INET;
   heartbeat_addr.sin_port = htons(conf.heartbeat_destination_port);
   memcpy(&heartbeat_addr.sin_addr,
@@ -319,7 +322,7 @@ cerebrod_listener(void *arg)
             err_exit("cerebrod_listener: fd_read_n: %s", strerror(errno));
 	}
       Pthread_mutex_unlock(&listener_fd_lock);
-     
+
       /* No packet read */
       if (rv <= 0)
 	continue;
