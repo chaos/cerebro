@@ -3,6 +3,7 @@
 	* src/cerebrod/cerebrod_listener.h,
 	src/cerebrod/cerebrod_listener.c: Completed basic listener
 	functionality.  Added rehashing of hash when hash is too large.
+	Added cluster_node_data_hash debugging.
 
 	* src/libcommon/wrappers.h, src/libcommon/wrappers.c: Added
 	various hashing wrappers.

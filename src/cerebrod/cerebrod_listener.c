@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.11 2005-02-09 23:57:04 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.12 2005-02-10 00:58:40 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -142,37 +142,14 @@ _cerebrod_listener_initialize(void)
   Pthread_mutex_unlock(&initialization_complete_lock);
 }
 
-static void
-_cerebrod_listener_dump_heartbeat(struct cerebrod_heartbeat *hb)
-{
-#ifndef NDEBUG
-  assert(hb);
-
-  if (conf.debug)
-    {
-      time_t t;
-      struct tm tm;
-      char strbuf[CEREBROD_STRING_BUFLEN];
-
-      t = Time(NULL);
-      Localtime_r(&t, &tm);
-      strftime(strbuf, CEREBROD_STRING_BUFLEN, "%H:%M:%S", &tm);
-
-      Pthread_mutex_lock(&debug_output_mutex);
-      fprintf(stderr, "**************************************\n");
-      fprintf(stderr, "* Received Heartbeat: %s\n", strbuf);     
-      fprintf(stderr, "* -----------------------\n");
-      cerebrod_heartbeat_dump(hb);
-      fprintf(stderr, "**************************************\n");
-      Pthread_mutex_unlock(&debug_output_mutex);
-    }
-#endif /* NDEBUG */
-}
-
 static int
 _reinsert(void *data, const void *key, void *arg)
 {
-  hash_t newhash = *((hash_t *)arg);
+  hash_t newhash;
+
+  assert(data && key && arg);
+
+  newhash = *((hash_t *)arg);
   Hash_insert(newhash, key, data);
   return 1;
 }
@@ -214,6 +191,79 @@ _rehash(void)
   Hash_destroy(cluster_data_hash);
 
   cluster_data_hash = newhash;
+}
+
+static void
+_cerebrod_listener_dump_heartbeat(struct cerebrod_heartbeat *hb)
+{
+#ifndef NDEBUG
+  assert(hb);
+
+  if (conf.debug)
+    {
+      time_t t;
+      struct tm tm;
+      char strbuf[CEREBROD_STRING_BUFLEN];
+
+      t = Time(NULL);
+      Localtime_r(&t, &tm);
+      strftime(strbuf, CEREBROD_STRING_BUFLEN, "%H:%M:%S", &tm);
+
+      Pthread_mutex_lock(&debug_output_mutex);
+      fprintf(stderr, "**************************************\n");
+      fprintf(stderr, "* Received Heartbeat: %s\n", strbuf);     
+      fprintf(stderr, "* -----------------------\n");
+      cerebrod_heartbeat_dump(hb);
+      fprintf(stderr, "**************************************\n");
+      Pthread_mutex_unlock(&debug_output_mutex);
+    }
+#endif /* NDEBUG */
+}
+
+#ifndef NDEBUG
+static int
+_cerebrod_listener_dump_cluster_node_data_item(void *data, const void *key, void *arg)
+{
+  struct cerebrod_node_data *nd;
+
+  assert(data && key && arg);
+
+  nd = (struct cerebrod_node_data *)&data;
+
+  Pthread_mutex_lock(&(nd->node_data_lock));
+  fprintf(stderr, "* %s: starttime=%u boottime=%u last_received=%u\n", 
+          (char *)key, nd->starttime, nd->boottime, nd->last_received);
+  Pthread_mutex_unlock(&(nd->node_data_lock));
+
+  return 1;
+}
+#endif /* NDEBUG */
+
+static void
+_cerebrod_listener_dump_cluster_node_data_hash(void)
+{
+#ifndef NDEBUG
+  if (conf.debug)
+    {
+      int rv;
+
+      Pthread_mutex_lock(&cluster_data_hash_lock);
+      Pthread_mutex_lock(&debug_output_mutex);
+      fprintf(stderr, "**************************************\n");
+      fprintf(stderr, "* Cluster Node Hash Stated\n");
+      fprintf(stderr, "* ------------------------\n");
+      rv = Hash_for_each(cluster_data_hash, 
+                         _cerebrod_listener_dump_cluster_node_data_item,
+                         NULL);
+      if (rv != cluster_data_hash_numnodes)
+        err_exit("_cerebrod_listener_dump_cluster_node_data_hash: "
+                 "invalid dump count: rv=%d numnodes=%d",
+                 rv, cluster_data_hash_numnodes);
+      fprintf(stderr, "**************************************\n");
+      Pthread_mutex_unlock(&debug_output_mutex);
+      Pthread_mutex_unlock(&cluster_data_hash_lock);
+    }
+#endif /* NDEBUG */
 }
 
 void *
@@ -302,8 +352,10 @@ cerebrod_listener(void *arg)
       Gettimeofday(&tv, NULL);
       nd->starttime = hb.starttime;
       nd->boottime = hb.boottime;
-      nd->last_received_heartbeat_time = tv.tv_sec;
+      nd->last_received = tv.tv_sec;
       Pthread_mutex_unlock(&(nd->node_data_lock));
+
+      _cerebrod_listener_dump_cluster_node_data_hash();
     }
 
   return NULL;			/* NOT REACHED */

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.h,v 1.4 2005-02-09 21:58:31 achu Exp $
+ *  $Id: cerebrod_listener.h,v 1.5 2005-02-10 00:58:40 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_LISTENER_H
@@ -12,7 +12,7 @@ struct cerebrod_node_data
   {
     u_int32_t starttime;
     u_int32_t boottime;
-    u_int32_t last_received_heartbeat_time;
+    u_int32_t last_received;
     pthread_mutex_t node_data_lock;
   };
 
