@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.6 2005-02-01 01:09:32 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.7 2005-02-01 22:04:53 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -118,7 +118,7 @@ _cerebrod_speaker_create_and_setup_socket(void)
 
   /* Connect to the speak to address */
   heartbeat_destination_addr.sin_family = AF_INET;
-  speak_from_addr.sin_port = htons(conf.heartbeat_destination_port);
+  heartbeat_destination_addr.sin_port = htons(conf.heartbeat_destination_port);
   memcpy(&heartbeat_destination_addr.sin_addr,
 	 &conf.heartbeat_destination_in_addr,
 	 sizeof(struct in_addr));

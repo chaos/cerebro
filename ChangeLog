@@ -1,3 +1,11 @@
+2005-02-01  Albert Chu  <chu11@llnl.gov>
+
+	* src/cerebrod/cerebrod_config.h, src/cerebrod/cerebrod_config.c:
+	Support listen_on_network_interface configuration and
+	configuration calculation.  Fix configuration check corner cases.
+
+	* src/cerebrod/cerebrod_listener.c: Continue work on listener.
+	
 2005-01-31  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerebrod/cerebrod_config.h, src/cerebrod/cerebrod_config.c,

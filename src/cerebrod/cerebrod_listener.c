@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.3 2005-02-01 01:00:13 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.4 2005-02-01 22:04:53 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -45,9 +45,10 @@ pthread_mutex_t heartbeat_hash_lock = PTHREAD_MUTEX_INITIALIZER;
 static void
 _cerebrod_listener_create_and_setup_socket(void)
 {
+  struct sockaddr_in listen_on_addr;
+
   listener_fd = Socket(AF_INET, SOCK_DGRAM, 0);
 
-#if 0
   if (conf.multicast)
     {
       /* XXX: Probably lots of portability problems here */
@@ -55,30 +56,30 @@ _cerebrod_listener_create_and_setup_socket(void)
       int optval;
 
       memcpy(&imr.imr_multiaddr,
-             &conf.speak_to_in_addr,
+             &conf.heartbeat_destination_in_addr,
              sizeof(struct in_addr));
       memcpy(&imr.imr_address,
-             &conf.speak_from_in_addr,
+             &conf.listen_on_in_addr,
              sizeof(struct in_addr));
-      imr.imr_ifindex = conf.speak_from_interface_index;
+      imr.imr_ifindex = conf.listen_on_interface_index;
 
       /* Sort of like a multicast-bind */
-      Setsockopt(temp_fd,
+      Setsockopt(listener_fd,
 		 SOL_IP,
 		 IP_MULTICAST_IF,
 		 &imr,
 		 sizeof(struct ip_mreqn));
 
       memcpy(&imr.imr_multiaddr,
-             &conf.speak_to_in_addr,
+             &conf.heartbeat_destination_in_addr,
              sizeof(struct in_addr));
       memcpy(&imr.imr_address,
-             &conf.speak_from_in_addr,
+             &conf.listen_on_in_addr,
              sizeof(struct in_addr));
-      imr.imr_ifindex = conf.speak_from_interface_index;
+      imr.imr_ifindex = conf.listen_on_interface_index;
 
-      /* Sort of like a multicast-bind */
-      Setsockopt(temp_fd,
+      /* Join the multicast group */
+      Setsockopt(listener_fd,
 		 SOL_IP,
 		 IP_ADD_MEMBERSHIP,
 		 &imr,
@@ -86,31 +87,12 @@ _cerebrod_listener_create_and_setup_socket(void)
     }
 
   /* Even if we're multicasting, the port still needs to be bound */
-  speak_from_addr.sin_family = AF_INET;
-  speak_from_addr.sin_port = htons(conf.speak_from_port);
-  memcpy(&speak_from_addr.sin_addr,
-         &conf.speak_from_in_addr,
+  listen_on_addr.sin_family = AF_INET;
+  listen_on_addr.sin_port = htons(conf.heartbeat_destination_port);
+  memcpy(&listen_on_addr.sin_addr,
+         &conf.listen_on_in_addr,
          sizeof(struct in_addr));
-  if (bind(temp_fd, (struct sockaddr *)&speak_from_addr, sizeof(struct sockaddr_in)))
-    {
-      err_debug("_cerebrod_speaker_create_and_setup_socket: bind: %s",
-                strerror(errno));
-      return -1;
-    }
-
-  /* Connect to the speak to address */
-  speak_to_addr.sin_family = AF_INET;
-  speak_from_addr.sin_port = htons(conf.speak_to_port);
-  memcpy(&speak_to_addr.sin_addr,
-         &conf.speak_to_in_addr,
-         sizeof(struct in_addr));
-  if (connect(temp_fd, (struct sockaddr *)&speak_to_addr, sizeof(struct sockaddr_in)) < 0)
-    {
-      err_debug("_cerebrod_speaker_create_and_setup_socket: connect: %s",
-                strerror(errno));
-      return -1;
-    }
-#endif
+  Bind(listener_fd, (struct sockaddr *)&listen_on_addr, sizeof(struct sockaddr_in));
 }
 
 static void
@@ -118,7 +100,7 @@ _cerebrod_listener_initialize(void)
 {
   Pthread_mutex_lock(&initialization_complete_lock);
   if (initialization_complete)
-    return;
+    goto done;
 
   _cerebrod_listener_create_and_setup_socket();
 
@@ -129,6 +111,7 @@ _cerebrod_listener_initialize(void)
 			       (hash_cmp_f)strcmp,
 			       (hash_del_f)list_destroy);
   initialization_complete++;
+ done:
   Pthread_mutex_unlock(&initialization_complete_lock);
 }
 
