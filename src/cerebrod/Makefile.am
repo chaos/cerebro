@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.17 2005-03-20 20:10:14 achu Exp $
+## $Id: Makefile.am,v 1.18 2005-03-21 16:58:17 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -17,6 +17,10 @@ noinst_HEADERS = cerebrod.h \
 		 cerebrod_updown.h \
 		 cerebrod_util.h
 
+#
+# cerebrod daemon
+#
+
 sbin_PROGRAMS = cerebrod
 cerebrod_SOURCES = cerebrod.c \
 		   cerebrod_clusterlist.c \
@@ -31,6 +35,10 @@ cerebrod_SOURCES = cerebrod.c \
 cerebrod_CFLAGS = -I$(srcdir)/../libcommon
 cerebrod_LDFLAGS = -export-dynamic
 cerebrod_LDADD = ../libcommon/libcommon.la
+
+#
+# cerebrod config and clusterlist modules
+#
 
 if WITH_GENDERSLLNL
 GENDERSLLNL_CONFIG_MODULE = cerebrod_config_gendersllnl.la
@@ -54,19 +62,25 @@ cerebrod_config_gendersllnl_la_SOURCES = cerebrod_config_gendersllnl.c
 cerebrod_config_gendersllnl_la_LDFLAGS = $(MODULE_FLAGS) $(GENDERSLLNL_LIBS)
 cerebrod_config_gendersllnl_la_CFLAGS = -I$(srcdir)/../libcommon
 
-cerebrod_clusterlist_gendersllnl_la_SOURCES = cerebrod_clusterlist_gendersllnl.c cerebrod_clusterlist_util.c cerebrod_clusterlist_genders_util.c
+cerebrod_clusterlist_gendersllnl_la_SOURCES = cerebrod_clusterlist_gendersllnl.c \
+					      cerebrod_clusterlist_genders_util.c \
+					      cerebrod_clusterlist_util.c 
 cerebrod_clusterlist_gendersllnl_la_LDFLAGS = $(MODULE_FLAGS) $(GENDERSLLNL_LIBS)
 cerebrod_clusterlist_gendersllnl_la_CFLAGS = -I$(srcdir)/../libcommon
 
-cerebrod_clusterlist_genders_la_SOURCES = cerebrod_clusterlist_genders.c cerebrod_clusterlist_util.c cerebrod_clusterlist_genders_util.c
+cerebrod_clusterlist_genders_la_SOURCES = cerebrod_clusterlist_genders.c \
+					  cerebrod_clusterlist_genders_util.c \
+					  cerebrod_clusterlist_util.c
 cerebrod_clusterlist_genders_la_LDFLAGS = $(MODULE_FLAGS) $(GENDERS_LIBS)
 cerebrod_clusterlist_genders_la_CFLAGS = -I$(srcdir)/../libcommon
 
-cerebrod_clusterlist_hostsfile_la_SOURCES = cerebrod_clusterlist_hostsfile.c cerebrod_clusterlist_util.c
+cerebrod_clusterlist_hostsfile_la_SOURCES = cerebrod_clusterlist_hostsfile.c \
+					    cerebrod_clusterlist_util.c
 cerebrod_clusterlist_hostsfile_la_LDFLAGS = $(MODULE_FLAGS)
 cerebrod_clusterlist_hostsfile_la_CFLAGS = -I$(srcdir)/../libcommon
 
-cerebrod_clusterlist_none_la_SOURCES = cerebrod_clusterlist_none.c cerebrod_clusterlist_util.c
+cerebrod_clusterlist_none_la_SOURCES = cerebrod_clusterlist_none.c \
+				       cerebrod_clusterlist_util.c
 cerebrod_clusterlist_none_la_LDFLAGS = $(MODULE_FLAGS)
 cerebrod_clusterlist_none_la_CFLAGS = -I$(srcdir)/../libcommon
 

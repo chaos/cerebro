@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_hostsfile.c,v 1.11 2005-03-21 14:36:47 achu Exp $
+ *  $Id: cerebrod_clusterlist_hostsfile.c,v 1.12 2005-03-21 16:58:17 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -117,6 +117,7 @@ _remove_comments(char *buf, int buflen)
           comment_flag++;
           retlen--;
         }
+      i++;
     }
 
   return retlen;
