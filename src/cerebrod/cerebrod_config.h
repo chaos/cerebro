@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.h,v 1.23 2005-03-19 08:40:14 achu Exp $
+ *  $Id: cerebrod_config.h,v 1.24 2005-03-20 18:11:19 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_CONFIG_H
@@ -14,8 +14,8 @@
 #define CEREBROD_DEBUG_DEFAULT                        0
 #define CEREBROD_HEARTBEAT_FREQUENCY_MIN_DEFAULT      10
 #define CEREBROD_HEARTBEAT_FREQUENCY_MAX_DEFAULT      20
-#define CEREBROD_HEARTBEAT_SOURCE_PORT_DEFAULT        8650
-#define CEREBROD_HEARTBEAT_DESTINATION_PORT_DEFAULT   8651
+#define CEREBROD_HEARTBEAT_SOURCE_PORT_DEFAULT        8850
+#define CEREBROD_HEARTBEAT_DESTINATION_PORT_DEFAULT   8851
 #define CEREBROD_HEARTBEAT_DESTINATION_IP_DEFAULT     "239.2.11.72"
 #define CEREBROD_HEARTBEAT_NETWORK_INTERFACE_DEFAULT  NULL
 #define CEREBROD_HEARTBEAT_TTL_DEFAULT                1
@@ -23,7 +23,7 @@
 #define CEREBROD_LISTEN_DEFAULT                       1
 #define CEREBROD_LISTEN_THREADS_DEFAULT               2
 #define CEREBROD_UPDOWN_SERVER_DEFAULT                1
-#define CEREBROD_UPDOWN_SERVER_PORT_DEFAULT           8652
+#define CEREBROD_UPDOWN_SERVER_PORT_DEFAULT           8852
 #define CEREBROD_CLUSTERLIST_MODULE_DEFAULT           NULL
 #define CEREBROD_CLUSTERLIST_MODULE_OPTIONS_DEFAULT   NULL
 #define CEREBROD_SPEAK_DEBUG_DEFAULT                  0

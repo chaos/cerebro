@@ -1,3 +1,13 @@
+2005-03-20  Albert Chu  <chu11@llnl.gov>
+
+	* src/cerebrod/cerebrod_config.c
+	(_cerebrod_pre_calculate_configuration_config_check): Add
+	port checks.
+
+	* src/cerebrod/cerebrod_config.h: New default ports.
+
+	* man/cerebrod.conf.5.in: Completed first draft.
+	
 2005-03-19  Albert Chu  <chu11@llnl.gov>
 
 	* Fixed variety of compiler warnings.
@@ -24,7 +34,7 @@
 	src/cerebrod/cerebrod_clusterlist.c (cerebrod_clusterlist_setup):
 	Support new cerebrod_search_dir_for_module interface.
 
-	* man/cerebrod.8.in, man/cerebrod.conf.5.in: First draft.
+	* man/cerebrod.8.in: Completed first draft.
 
 	* config/ac_genders.m4, config/ac_gendersllnl.m4: Add manpage
 	substitution flags.

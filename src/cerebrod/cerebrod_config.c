@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.43 2005-03-19 19:23:49 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.44 2005-03-20 18:11:19 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -462,6 +462,10 @@ _cerebrod_pre_calculate_configuration_config_check(void)
 	}
     }
 
+  if (conf.heartbeat_destination_port == conf.heartbeat_source_port)
+    err_exit("heartbeat destination and source ports '%d' cannot be identical",
+	     conf.heartbeat_destination_port);
+
   if (conf.heartbeat_ttl <= 0)
     err_exit("heartbeat ttl '%d' invalid", conf.heartbeat_ttl);
 
@@ -473,6 +477,14 @@ _cerebrod_pre_calculate_configuration_config_check(void)
    */
   if (!conf.listen)
     conf.updown_server = 0;
+
+  if (conf.updown_server)
+    {
+      if (conf.updown_server_port == conf.heartbeat_destination_port)
+	err_exit("updown server port '%d' cannot be identical to heartbeat destination port");
+      if (conf.updown_server_port == conf.heartbeat_source_port)
+	err_exit("updown server port '%d' cannot be identical to heartbeat source port");
+    }
 }
 
 static void
