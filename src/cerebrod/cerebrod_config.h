@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.h,v 1.11 2005-02-01 01:00:13 achu Exp $
+ *  $Id: cerebrod_config.h,v 1.12 2005-02-01 01:09:32 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_CONFIG_H
@@ -20,7 +20,7 @@
 #define CEREBROD_HEARTBEAT_DESTINATION_IP_DEFAULT    "239.2.11.72"
 #define CEREBROD_LISTEN_DEFAULT                      1
 #define CEREBROD_SPEAK_DEFAULT                       1
-#define CEREBROD_SPEAK_FROM_PORT_DEFAULT             8651
+#define CEREBROD_HEARTBEAT_SOURCE_PORT_DEFAULT       8651
 #define CEREBROD_SPEAK_TTL_DEFAULT                   1
 #define CEREBROD_LISTEN_THREADS_DEFAULT              2
 
@@ -31,6 +31,8 @@
  * - heartbeat frequency
  * - 1 val for fixed frequency
  * - 2 vals for range (val1 must be < val2)
+ * heartbeat_source_port
+ * - the port to speak from
  * heartbeat_destination_port
  * - the port to send heartbeats to
  * heartbeat_destination_ip
@@ -39,8 +41,6 @@
  * - on/off
  * speak
  * - on/off
- * speak_from_port
- * - the port to speak from
  * speak_from_network_interface
  * - not specified - we pick an interface
  * - network interface - will be checked.
@@ -70,14 +70,15 @@ struct cerebrod_config
   /* Set by the user in the configuration file */
   unsigned int heartbeat_frequency_min;
   unsigned int heartbeat_frequency_max;
+  int heartbeat_source_port;
   int heartbeat_destination_port;
   char *heartbeat_destination_ip;
 
   int listen;
   int speak;
-  int speak_from_port;
   char *speak_from_network_interface;
   int speak_ttl;
+  char *listen_on_network_interface;
   int listen_threads;
 
   /* Determined by cerebrod based on configuration */

@@ -4,6 +4,7 @@
 	src/cerebrod/cerebrod_speaker.c: Globally renamed speak_to_ip and
 	speak_to_port to heartbeat_destination_ip and
 	heartbeat_destination_port.  Removed listen_port configuration.
+	Globally renamed speak_from_port to heartbeat_source_port.
 	
 2005-01-23  Albert Chu  <chu11@llnl.gov>
 

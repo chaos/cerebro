@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.5 2005-02-01 00:44:05 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.6 2005-02-01 01:09:32 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -105,7 +105,7 @@ _cerebrod_speaker_create_and_setup_socket(void)
 
   /* Even if we're multicasting, the port still needs to be bound */
   speak_from_addr.sin_family = AF_INET;
-  speak_from_addr.sin_port = htons(conf.speak_from_port);
+  speak_from_addr.sin_port = htons(conf.heartbeat_source_port);
   memcpy(&speak_from_addr.sin_addr,
 	 &conf.speak_from_in_addr,
 	 sizeof(struct in_addr));

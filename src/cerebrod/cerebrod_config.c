@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.19 2005-02-01 00:44:05 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.20 2005-02-01 01:09:32 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -46,11 +46,11 @@ _cerebrod_config_default(void)
   conf.configfile = CEREBROD_CONFIGFILE_DEFAULT;
   conf.heartbeat_frequency_min = CEREBROD_HEARTBEAT_FREQUENCY_MIN_DEFAULT;
   conf.heartbeat_frequency_max = CEREBROD_HEARTBEAT_FREQUENCY_MAX_DEFAULT;
+  conf.heartbeat_source_port = CEREBROD_HEARTBEAT_SOURCE_PORT_DEFAULT;
   conf.heartbeat_destination_port = CEREBROD_HEARTBEAT_DESTINATION_PORT_DEFAULT;
   conf.heartbeat_destination_ip = CEREBROD_HEARTBEAT_DESTINATION_IP_DEFAULT;
   conf.listen = CEREBROD_LISTEN_DEFAULT;
   conf.speak = CEREBROD_SPEAK_DEFAULT;
-  conf.speak_from_port = CEREBROD_SPEAK_FROM_PORT_DEFAULT;
   conf.speak_from_network_interface = NULL;
   conf.speak_ttl = CEREBROD_SPEAK_TTL_DEFAULT;
   conf.listen_threads = CEREBROD_LISTEN_THREADS_DEFAULT;
@@ -180,10 +180,9 @@ _cb_stringptr(conffile_t cf, struct conffile_data *data,
 static void
 _cerebrod_config_parse(void)
 {
-  int heartbeat_frequency_flag, heartbeat_destination_port_flag, 
+  int heartbeat_frequency_flag, heartbeat_source_port_flag, heartbeat_destination_port_flag, 
     heartbeat_destination_ip_flag, listen_flag, speak_flag, 
-    speak_from_port_flag, speak_from_network_interface_flag, 
-    speak_ttl_flag, listen_threads_flag;
+    speak_from_network_interface_flag, speak_ttl_flag, listen_threads_flag;
 
   struct conffile_option options[] =
     {
@@ -193,12 +192,12 @@ _cerebrod_config_parse(void)
        1, 0, &heartbeat_destination_port_flag, &(conf.heartbeat_destination_port), 0},
       {"heartbeat_destination_ip", CONFFILE_OPTION_STRING, -1, _cb_stringptr,
        1, 0, &heartbeat_destination_ip_flag, &(conf.heartbeat_destination_ip), 0},
+      {"heartbeat_source_port", CONFFILE_OPTION_INT, -1, conffile_int,
+       1, 0, &heartbeat_source_port_flag, &(conf.heartbeat_source_port), 0},
       {"listen", CONFFILE_OPTION_BOOL, -1, conffile_bool,
        1, 0, &listen_flag, &conf.listen, 0},
       {"speak", CONFFILE_OPTION_BOOL, -1, conffile_bool,
        1, 0, &speak_flag, &conf.speak, 0},
-      {"speak_from_port", CONFFILE_OPTION_INT, -1, conffile_int,
-       1, 0, &speak_from_port_flag, &(conf.speak_from_port), 0},
       {"speak_from_network_interface", CONFFILE_OPTION_STRING, -1, _cb_stringptr,
        1, 0, &speak_from_network_interface_flag, 
        &(conf.speak_from_network_interface), 0},
@@ -647,11 +646,11 @@ _cerebrod_config_dump(void)
       fprintf(stderr, "* configfile: \"%s\"\n", conf.configfile);
       fprintf(stderr, "* heartbeat_frequency_min: %d\n", conf.heartbeat_frequency_min);
       fprintf(stderr, "* heartbeat_frequency_max: %d\n", conf.heartbeat_frequency_max);
+      fprintf(stderr, "* heartbeat_source_port: %d\n", conf.heartbeat_source_port);
       fprintf(stderr, "* heartbeat_destination_port: %d\n", conf.heartbeat_destination_port);
       fprintf(stderr, "* heartbeat_destination_ip: \"%s\"\n", conf.heartbeat_destination_ip);
       fprintf(stderr, "* listen: %d\n", conf.listen);
       fprintf(stderr, "* speak: %d\n", conf.speak);
-      fprintf(stderr, "* speak_from_port: %d\n", conf.speak_from_port);
       fprintf(stderr, "* speak_from_network_interface: \"%s\"\n", conf.speak_from_network_interface);
       fprintf(stderr, "* multicast: %d\n", conf.multicast);
       fprintf(stderr, "* heartbeat_destination_in_addr: %s\n", inet_ntoa(conf.heartbeat_destination_in_addr));
