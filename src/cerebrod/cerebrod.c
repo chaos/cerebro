@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.27 2005-03-29 22:24:02 achu Exp $
+ *  $Id: cerebrod.c,v 1.28 2005-03-29 23:58:22 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -100,7 +100,9 @@ main(int argc, char **argv)
     err_set_flags(ERROR_STDERR);
 #endif /* !NDEBUG */
 
-  /* Call after daemonization, since daemonization closes currently open fds */
+  /* Call after daemonization, since daemonization closes currently
+   * open fds 
+   */
   openlog(argv[0], LOG_ODELAY | LOG_PID, LOG_DAEMON);
 
   /* Start updown server.  Start before the listener begins receiving
@@ -164,8 +166,7 @@ main(int argc, char **argv)
     }
 
   for (;;) 
-    {
-      sleep(INT_MAX);
-    }
+    sleep(INT_MAX);
+
   return 0;			/* NOT REACHED */
 }
