@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.h,v 1.22 2005-03-25 18:34:11 achu Exp $
+ *  $Id: wrappers.h,v 1.23 2005-03-26 17:22:31 achu Exp $
 \*****************************************************************************/
 
 #ifndef _WRAPPERS_H
@@ -26,6 +26,8 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <netdb.h>
+#include <sys/select.h>
+#include <sys/poll.h>
 
 #if TIME_WITH_SYS_TIME
 # include <sys/time.h>
@@ -111,6 +113,14 @@ int wrap_closedir(const char *file, int line, DIR *dir);
         wrap_bind(__FILE__, __LINE__, sockfd, my_addr, addrlen)
 #define Connect(sockfd, serv_addr, addrlen) \
         wrap_connect(__FILE__, __LINE__, sockfd, serv_addr, addrlen)
+#define Listen(s, backlog) \
+        wrap_listen(__FILE__, __LINE__, s, backlog)
+#define Accept(s, addr, addrlen) \
+        wrap_accept(__FILE__, __LINE__, s, addr, addrlen)
+#define Select(n, readfds, writefds, exceptfds, timeout) \
+        wrap_select(__FILE__, __LINE__, n, readfds, writefds, exceptfds, timeout)
+#define Poll(ufds, nfds, timeout) \
+        wrap_poll(__FILE__, __LINE__, ufds, nfds, timeout)
 #define Getsockopt(s, level, optname, optval, optlen) \
         wrap_getsockopt(__FILE__, __LINE__, s, level, optname, optval, optlen)
 #define Setsockopt(s, level, optname, optval, optlen) \
@@ -125,6 +135,10 @@ int wrap_closedir(const char *file, int line, DIR *dir);
 int wrap_socket(const char *file, int line, int domain, int type, int protocol);
 int wrap_bind(const char *file, int line, int sockfd, struct sockaddr *my_addr, socklen_t addrlen);
 int wrap_connect(const char *file, int line, int sockfd, struct sockaddr *serv_addr, socklen_t addrlen);
+int wrap_listen(const char *file, int line, int s, int backlog);
+int wrap_accept(const char *file, int line, int s, struct sockaddr *addr, socklen_t *addrlen);
+int wrap_select(const char *file, int line, int n, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout);
+int wrap_poll(const char *file, int line, struct pollfd *ufds, unsigned int nfds, int timeout);
 int wrap_getsockopt(const char *file, int line, int s, int level, int optname, void *optval, socklen_t *optlen);
 int wrap_setsockopt(const char *file, int line, int s, int level, int optname, const void *optval, socklen_t optlen);
 struct hostent *wrap_gethostbyname(const char *file, int line, const char *name);

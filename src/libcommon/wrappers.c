@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.c,v 1.26 2005-03-25 18:34:11 achu Exp $
+ *  $Id: wrappers.c,v 1.27 2005-03-26 17:22:31 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -301,6 +301,123 @@ wrap_connect(const char *file, int line, int sockfd, struct sockaddr *serv_addr,
     err_exit("connect(%s:%d): addrlen=%d: %s", 
              file, line, addrlen, strerror(errno));
 
+  return ret;
+}
+
+int 
+wrap_listen(const char *file, int line, int s, int backlog)
+{
+  int ret;
+
+  assert(file != NULL);
+
+  if (!(backlog > 0 || backlog <= INT_MAX))
+    err_exit("listen(%s:%d): invalid backlog: %d", file, line, backlog);
+
+  if ((ret = listen(s, backlog)) < 0)
+    err_exit("listen(%s:%d): backlog=%d: %s", 
+             file, line, backlog, strerror(errno));
+
+  return ret;
+}
+
+int 
+wrap_accept(const char *file, int line, int s, struct sockaddr *addr, socklen_t *addrlen)
+{
+  int ret;
+
+  assert(file != NULL);
+
+  if (!addr)
+    err_exit("accept(%s:%d): null addr pointer", file, line);
+
+  if (!addrlen)
+    err_exit("accept(%s:%d): null addrlen pointer", file, line);
+
+  if (!(*addrlen > 0 || *addrlen <= INT_MAX))
+    err_exit("accept(%s:%d): invalid addrlen: %d", file, line, *addrlen);
+
+  if ((ret = accept(s, addr, addrlen)) < 0)
+    err_exit("accept(%s:%d): %s", file, line, strerror(errno));
+
+  return ret;
+}
+
+int 
+wrap_select(const char *file, int line, int n, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout)
+{
+  int ret;
+  struct timeval timeout_orig, timeout_current;
+  struct timeval start, end, delta;
+  
+  assert(file != NULL);
+
+  /* readfds, writefds, exceptfds, and timeout could each be null, but
+   * not all can be null at the same time
+   */
+  if (!readfds && !writefds && !exceptfds && !timeout)
+    err_exit("select(%s:%d): all null pointers", file, line);
+
+  if (timeout) 
+    {
+      timeout_orig = *timeout;
+      timeout_current = *timeout;
+      Gettimeofday(&start, NULL);
+    }
+
+  do 
+    {
+      ret = select(n, readfds, writefds, exceptfds, &timeout_current);
+      if (ret < 0 && errno != EINTR)
+	err_exit("select(%s:%d): %s", strerror(errno));
+      if (ret < 0 && timeout != NULL) 
+	{
+	  Gettimeofday(&end, NULL);
+	  /* delta = end-start */
+	  timersub(&end, &start, &delta);     
+	  /* timeout_current = timeout_orig-delta */
+	  timersub(&timeout_orig, &delta, &timeout_current);     
+	}
+    } 
+  while (ret < 0);
+
+  return ret;
+}
+
+int 
+wrap_poll(const char *file, int line, struct pollfd *ufds, unsigned int nfds, int timeout)
+{
+  int ret;
+  struct timeval timeout_orig, timeout_current;
+  struct timeval start, end, delta;
+                                                                         
+  if (!ufds)  
+    err_exit("poll(%s:%d): null ufds pointer", file, line);
+
+  /* timeout can be <= 0 */
+
+  /* Poll uses timeout in milliseconds */
+  if (timeout >= 0) 
+    {
+      timeout_orig.tv_sec = (long)timeout/1000;
+      timeout_orig.tv_usec = (timeout % 1000) * 1000;
+      Gettimeofday(&start, NULL);
+    }
+
+  do {
+    ret = poll(ufds, nfds, timeout);
+    if (ret < 0 && errno != EINTR)
+      err_exit("poll(%s:%d): %s", strerror(errno));
+    if (ret < 0 && timeout >= 0) {
+      Gettimeofday(&end, NULL);
+      /* delta = end-start */
+      timersub(&end, &start, &delta);     
+      /* timeout_current = timeout_orig-delta */
+      timersub(&timeout_orig, &delta, &timeout_current);
+      timeout = (timeout_current.tv_sec * 1000) + (timeout_current.tv_usec/1000);
+    }
+  } while (ret < 0);
+                                                                         
   return ret;
 }
 

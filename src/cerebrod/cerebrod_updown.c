@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.c,v 1.16 2005-03-25 19:44:05 achu Exp $
+ *  $Id: cerebrod_updown.c,v 1.17 2005-03-26 17:22:31 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -239,6 +239,8 @@ cerebrod_updown_service_connection(void *arg)
   int client_fd;
 
   client_fd = *((int *)arg);
+
+  
 
   Free(arg);
   Close(client_fd);

@@ -1,3 +1,9 @@
+2005-03-26  Albert Chu  <chu11@llnl.gov>
+
+	* src/libcommon/wrappers.h, src/libcommon/wrappers.c (Listen,
+	Accept, Select, Poll, wrap_listen, wrap_accept, wrap_select,
+	wrap_poll): New macros and functions.
+	
 2005-03-25  Albert Chu  <chu11@llnl.gov>
 
 	* src/libcommon/wrappers.h, src/libcommon/wrappers.c
