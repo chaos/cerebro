@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.c,v 1.3 2005-03-16 00:53:36 achu Exp $
+ *  $Id: cerebrod_updown.c,v 1.4 2005-03-16 15:55:28 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -412,7 +412,11 @@ cerebrod_updown_update_data(char *node, u_int32_t last_received)
 
       /* Re-hash if our hash is getting too small */
       if ((updown_node_data_numnodes + 1) > CEREBROD_UPDOWN_REHASH_LIMIT)
-        _rehash();
+	cerebrod_rehash(&updown_node_data_index,
+			&updown_node_data_hash_size,
+			CEREBROD_UPDOWN_NODE_DATA_HASH_SIZE_INCREMENT,
+			updown_node_data_numnodes,
+			&updown_node_data_lock);
 
       List_append(updown_node_data, ud);
       Hash_insert(updown_node_data_index, key, ud);

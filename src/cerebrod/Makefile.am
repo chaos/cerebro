@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.10 2005-03-15 23:14:39 achu Exp $
+## $Id: Makefile.am,v 1.11 2005-03-16 15:55:28 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -13,7 +13,8 @@ noinst_HEADERS = cerebrod.h \
 		 cerebrod_heartbeat.h \
 		 cerebrod_listener.h \
 		 cerebrod_speaker.h \
-		 cerebrod_updown.h
+		 cerebrod_updown.h \
+		 cerebrod_util.h
 cerebrod_SOURCES = cerebrod.c \
 		   cerebrod_cache.c \
 		   cerebrod_clusterlist.c \
@@ -22,7 +23,8 @@ cerebrod_SOURCES = cerebrod.c \
 		   cerebrod_heartbeat.c \
 		   cerebrod_listener.c \
 		   cerebrod_speaker.c \
-		   cerebrod_updown.c
+		   cerebrod_updown.c \
+		   cerebrod_util.c
 cerebrod_CFLAGS = -I$(srcdir)/../libcommon \
 		  -DCEREBROD_MODULE_DIR=\"$(pkglibdir)\"
 cerebrod_LDADD = ../libcommon/libcommon.la

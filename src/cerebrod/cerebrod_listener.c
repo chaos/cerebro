@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.25 2005-03-16 00:53:36 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.26 2005-03-16 15:55:28 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -132,59 +132,6 @@ _cerebrod_listener_initialize(void)
   cerebrod_listener_initialization_complete++;
  done:
   Pthread_mutex_unlock(&cerebrod_listener_initialization_complete_lock);
-}
-
-static int
-_reinsert(void *data, const void *key, void *arg)
-{
-  hash_t newhash;
-
-  assert(data && key && arg);
-
-  newhash = *((hash_t *)arg);
-  Hash_insert(newhash, key, data);
-  return 1;
-}
-
-static int
-_removeall(void *data, const void *key, void *arg)
-{
-  return 1;
-}
-
-static void
-_rehash(void)
-{
-  hash_t newhash;
-  int rv;
-
-  /* Should be called with lock already set */
-#ifndef NDEBUG
-  rv = Pthread_mutex_trylock(&cluster_data_hash_lock);
-  if (rv != EBUSY)
-    err_exit("cerebrod_heartbeat_dump: cluster_data_hash_lock not locked");
-#endif /* NDEBUG */
-
-  cluster_data_hash_size += CEREBROD_LISTENER_HASH_SIZE_INCREMENT;
-  
-  newhash = Hash_create(cluster_data_hash_size,
-                        (hash_key_f)hash_key_string,
-                        (hash_cmp_f)strcmp,
-                        (hash_del_f)_Free);
-  
-  rv = Hash_for_each(cluster_data_hash, _reinsert, &newhash);
-  if (rv != cluster_data_hash_numnodes)
-    err_exit("_rehash: invalid reinsert count: rv=%d numnodes=%d",
-             rv, cluster_data_hash_numnodes);
-
-  rv = Hash_delete_if(cluster_data_hash, _removeall, NULL);
-  if (rv != cluster_data_hash_numnodes)
-    err_exit("_rehash: invalid removeall count: rv=%d numnodes=%d",
-             rv, cluster_data_hash_numnodes);
-
-  Hash_destroy(cluster_data_hash);
-
-  cluster_data_hash = newhash;
 }
 
 static void
@@ -367,7 +314,11 @@ cerebrod_listener(void *arg)
 
           /* Re-hash if our hash is getting too small */
           if ((cluster_data_hash_numnodes + 1) > CEREBROD_LISTENER_REHASH_LIMIT)
-            _rehash();
+            cerebrod_rehash(&cluster_data_hash, 
+			    &cluster_data_hash_size,
+			    CEREBROD_LISTENER_HASH_SIZE_INCREMENT,
+			    cluster_data_hash_numnodes,
+			    &cluster_data_hash_lock);
 
           Hash_insert(cluster_data_hash, key, nd);
           cluster_data_hash_numnodes++;
