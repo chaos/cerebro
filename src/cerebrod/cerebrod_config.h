@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.h,v 1.19 2005-03-16 00:53:36 achu Exp $
+ *  $Id: cerebrod_config.h,v 1.20 2005-03-17 05:05:52 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_CONFIG_H
@@ -33,7 +33,7 @@
 #define CEREBROD_UPDOWN_SERVER_DEFAULT                1
 #define CEREBROD_UPDOWN_SERVER_PORT_DEFAULT           8652
 #define CEREBROD_CLUSTERLIST_MODULE_DEFAULT           NULL
-#define CEREBROD_CLUSTERLIST_MODULE_CMDLINE_DEFAULT   NULL
+#define CEREBROD_CLUSTERLIST_MODULE_OPTIONS_DEFAULT   NULL
 #define CEREBROD_SPEAK_DEBUG_DEFAULT                  0
 #define CEREBROD_LISTEN_DEBUG_DEFAULT                 0
 #define CEREBROD_UPDOWN_SERVER_DEBUG_DEFAULT          0
@@ -66,7 +66,7 @@
  * - num
  * clusterlist_module
  * - can be any string to file
- * clusterlist_module_cmdline
+ * clusterlist_module_options
  * - key=val combinations
  *
  * updown_server
@@ -99,7 +99,7 @@ struct cerebrod_config
   int updown_server_port;
 
   char *clusterlist_module;
-  char *clusterlist_module_cmdline;
+  char **clusterlist_module_options;
 
   int speak_debug;
   int listen_debug;

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.30 2005-03-17 01:42:00 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.31 2005-03-17 05:05:52 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -59,7 +59,7 @@ _cerebrod_config_default(void)
   conf.updown_server = CEREBROD_UPDOWN_SERVER_DEFAULT;
   conf.updown_server_port = CEREBROD_UPDOWN_SERVER_PORT_DEFAULT;
   conf.clusterlist_module = CEREBROD_CLUSTERLIST_MODULE_DEFAULT;
-  conf.clusterlist_module_cmdline = CEREBROD_CLUSTERLIST_MODULE_CMDLINE_DEFAULT;
+  conf.clusterlist_module_options = CEREBROD_CLUSTERLIST_MODULE_OPTIONS_DEFAULT;
   conf.speak_debug = CEREBROD_SPEAK_DEBUG_DEFAULT;
   conf.listen_debug = CEREBROD_LISTEN_DEBUG_DEFAULT;
   conf.updown_server_debug = CEREBROD_UPDOWN_SERVER_DEBUG_DEFAULT;
@@ -187,9 +187,9 @@ _cb_stringptr(conffile_t cf, struct conffile_data *data,
 }
 
 static int
-_cb_cmdline(conffile_t cf, struct conffile_data *data,
-            char *optionname, int option_type, void *option_ptr,
-            int option_data, void *app_ptr, int app_data)
+_cb_module_options(conffile_t cf, struct conffile_data *data,
+		   char *optionname, int option_type, void *option_ptr,
+		   int option_data, void *app_ptr, int app_data)
 {
   if (option_ptr == NULL)
     {
@@ -197,24 +197,16 @@ _cb_cmdline(conffile_t cf, struct conffile_data *data,
       return -1;
     }
 
-  /* Create a string resembling a command line string
-   */
   if (data->stringlist_len > 0)
     {
-      char **buf = (char **)option_ptr; 
-      int i, needed_buflen = 1; /* starts at 1 for '\0' */
+      char ***p = (char ***)option_ptr; 
+      int i;
+
+      *p = (char **)Malloc(sizeof(char *) * (data->stringlist_len + 1));
 
       for (i = 0; i < data->stringlist_len; i++)
-        needed_buflen += strlen(data->stringlist[i]) + 1;
-      
-      *buf = Malloc(needed_buflen);
-      memset(*buf, '\0', needed_buflen);
-
-      for (i = 0; i < data->stringlist_len; i++)
-        {
-          strcat(*buf, data->stringlist[i]);
-          strcat(*buf, " ");
-        }
+	(*p)[i] = Strdup(data->stringlist[i]);
+      (*p)[i] = NULL;
     }
 
   return 0;
@@ -228,7 +220,7 @@ _cerebrod_config_parse(void)
     heartbeat_network_interface_flag, heartbeat_ttl_flag, speak_flag, 
     listen_flag, listen_threads_flag, updown_server_flag, 
     updown_server_port_flag, clusterlist_module_flag, 
-    clusterlist_module_cmdline_flag, speak_debug_flag, listen_debug_flag, 
+    clusterlist_module_options_flag, speak_debug_flag, listen_debug_flag, 
     updown_server_debug_flag;
   
   struct conffile_option options[] =
@@ -259,9 +251,9 @@ _cerebrod_config_parse(void)
       {"clusterlist_module", CONFFILE_OPTION_STRING, -1, _cb_stringptr,
        1, 0, &clusterlist_module_flag, &(conf.clusterlist_module), 0},
 
-      {"clusterlist_module_cmdline", CONFFILE_OPTION_LIST_STRING, -1, _cb_cmdline,
-       1, 0, &clusterlist_module_cmdline_flag, 
-       &(conf.clusterlist_module_cmdline), 0},
+      {"clusterlist_module_options", CONFFILE_OPTION_LIST_STRING, -1, 
+       _cb_module_options, 1, 0, &clusterlist_module_options_flag, 
+       &(conf.clusterlist_module_options), 0},
 
       {"speak_debug", CONFFILE_OPTION_BOOL, -1, conffile_bool,
        1, 0, &speak_debug_flag, &conf.speak_debug, 0},
@@ -820,7 +812,7 @@ _cerebrod_config_dump(void)
       fprintf(stderr, "* updown_server: %d\n", conf.updown_server);
       fprintf(stderr, "* updown_server_port: %d\n", conf.updown_server_port);
       fprintf(stderr, "* clusterlist_module: %s\n", conf.clusterlist_module);
-      fprintf(stderr, "* clusterlist_module_cmdline: %s\n", conf.clusterlist_module_cmdline);
+      fprintf(stderr, "* clusterlist_module_options: %s\n", conf.clusterlist_module_options);
       fprintf(stderr, "* speak_debug: %d\n", conf.speak_debug);
       fprintf(stderr, "* listen_debug: %d\n", conf.listen_debug);
       fprintf(stderr, "* updown_server_debug: %d\n", conf.updown_server_debug);

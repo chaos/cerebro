@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_none.c,v 1.1 2005-03-14 22:17:35 achu Exp $
+ *  $Id: cerebrod_clusterlist_none.c,v 1.2 2005-03-17 05:05:52 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -20,7 +20,7 @@
 #include "wrappers.h"
 
 int 
-none_clusterlist_init(char *cmdline)
+none_clusterlist_init(char **options)
 {
   return 0;
 }

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist.h,v 1.1 2005-03-14 17:05:14 achu Exp $
+ *  $Id: cerebrod_clusterlist.h,v 1.2 2005-03-17 05:05:52 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_CLUSTERLIST_H
@@ -8,7 +8,7 @@
 #include "list.h"
 #include "wrappers.h"
 
-typedef int (*Cerebrod_clusterlist_init)(char *cmdline);
+typedef int (*Cerebrod_clusterlist_init)(char **options);
 typedef int (*Cerebrod_clusterlist_finish)(void);
 typedef int (*Cerebrod_clusterlist_get_all_nodes)(char **nodes, unsigned int nodeslen);
 typedef int (*Cerebrod_clusterlist_numnodes)(void);

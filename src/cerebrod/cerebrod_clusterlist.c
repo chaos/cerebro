@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist.c,v 1.2 2005-03-14 17:15:21 achu Exp $
+ *  $Id: cerebrod_clusterlist.c,v 1.3 2005-03-17 05:05:52 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -118,7 +118,7 @@ cerebrod_clusterlist_init(void)
 {
   assert(clusterlist_ops && clusterlist_dl_handle);
 
-  return ((*clusterlist_ops->init)(conf.clusterlist_module_cmdline));
+  return ((*clusterlist_ops->init)(conf.clusterlist_module_options));
 }
 
 int 

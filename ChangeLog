@@ -1,5 +1,41 @@
 2005-03-16  Albert Chu  <chu11@llnl.gov>
 
+	* src/libcommon/argv.h, src/libcommon/argv.c: Removed files.
+	
+	* src/libcommon/wrappers.h, src/libcommon/wrappers.c (Argv_create,
+	Argv_destroy, wrap_argv_create, wrap_argv_destroy): Removed.
+
+	* src/libcommon/Makefile.am: Updated appropriately.
+
+	* src/cerebrod/cerebrod_config.h: Re-work
+	clusterlist_module_cmdline into new clusterlist_module_options
+	format.
+
+	* src/cerebrod/cerebrod_config.c (_cb_cmdline): Renamed to
+	_cb_module_options.
+
+	* src/cerebrod/cerebrod_config.h, src/cerebrod/cerebrod_config.c:
+	Globally renamed clusterlist_module_cmdline to
+	clusterlist_module_options.
+
+	* src/cerebrod/cerebrod_clusterlist.h,
+	src/cerebrod/cerebrod_clusterlist.c (cerebrod_clusterlist_init):
+	Init is now based off a new options format.
+
+	* src/cerebrod/cerebrod_clusterlist_hostsfile.c
+	(_cmdline_parse), src/cerebrod/cerebrod_clusterlist_genders.c
+	(_cmdline_parse), src/cerebrod/cerebrod_clusterlist_gendersllnl.c
+	(_cmdline_parse): Re-worked into new _parse_options function.
+
+	* src/cerebrod/cerebrod_clusterlist_hostsfile.c
+	(hostsfile_clusterlist_init),
+	src/cerebrod/cerebrod_clusterlist_genders.c
+	(genders_clusterlist_init),
+	src/cerebrod/cerebrod_clusterlist_gendersllnl.c
+	(gendersllnl_clusterlist_init): Re-worked using new options format.
+
+2005-03-16  Albert Chu  <chu11@llnl.gov>
+
 	* src/cerbrod/cerebrod_util.h, src/cerbrod/cerebrod_util.c: New
 	files.
 

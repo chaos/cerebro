@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.h,v 1.19 2005-03-17 01:42:00 achu Exp $
+ *  $Id: wrappers.h,v 1.20 2005-03-17 05:05:53 achu Exp $
 \*****************************************************************************/
 
 #ifndef _WRAPPERS_H
@@ -45,7 +45,6 @@
 #include "ltdl.h"
 #include "list.h"
 #include "hash.h"
-#include "argv.h"
 
 /* 
  * Memory/String Wrappers 
@@ -268,16 +267,5 @@ void *wrap_hash_remove (const char *file, int line, hash_t h, const void *key);
 int wrap_hash_delete_if(const char *file, int line, hash_t h, hash_arg_f argf, void *arg);
 int wrap_hash_for_each(const char *file, int line, hash_t h, hash_arg_f argf, void *arg);
 void wrap_hash_destroy(const char *file, int line, hash_t h);
-
-/*
- * Argv lib wrappers
- */
-#define Argv_create(cmdline, ignore, argcPtr, argvPtr) \
-        wrap_argv_create(__FILE__, __LINE__, cmdline, ignore, argcPtr, argvPtr)
-#define Argv_destroy(argv) \
-        wrap_argv_destroy(__FILE__, __LINE__, argv)
-
-int wrap_argv_create(const char *file, int line, char *cmdline, char *ignore, int *argcPtr, char ***argvPtr);
-int wrap_argv_destroy(const char *file, int line, char **argv);
 
 #endif /* _WRAPPERS_H */

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_hostsfile.c,v 1.4 2005-03-17 01:42:00 achu Exp $
+ *  $Id: cerebrod_clusterlist_hostsfile.c,v 1.5 2005-03-17 05:05:52 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -12,9 +12,6 @@
 #include <string.h>
 #include <ctype.h>
 #endif /* STDC_HEADERS */
-#if HAVE_GETOPT_H
-#include <getopt.h>
-#endif /* HAVE_GETOPT_H */
 #include <assert.h>
 #include <errno.h>
 
@@ -28,39 +25,31 @@ List hosts = NULL;
 char *hostsfile_file = NULL;
 
 static void
-_cmdline_parse(int argc, char **argv)
+_parse_options(char **options)
 {
-  char c;
-  char *options = "f:";
+  int i = 0;
 
-#if HAVE_GETOPT_LONG
-  struct option long_options[] =
+  assert(options);
+
+  while (options[i] != NULL)
     {
-      {"filename", 1, NULL, 'f'},
-      {0, 0, 0, 0}
-    };
-#endif /* HAVE_GETOPT_LONG */
-
-  assert(argv);
-
-  /* turn off output messages */
-  opterr = 0;
-
-#if HAVE_GETOPT_LONG
-  while ((c = getopt_long(argc, argv, options, long_options, NULL)) != -1)
-#else
-  while ((c = getopt(argc, argv, options)) != -1)
-#endif
-    {
-      switch (c)
+      if (strstr(options[i], "filename"))
 	{
-	case 'f':
-	  hostsfile_file = Strdup(optarg);
-	  break;
-	case '?':
-	default:
-	  err_exit("hostsfile_clusterlist: unknown command line option '%c'", optopt);
+	  char *p = strchr(options[i], '=');
+
+	  if (!p)
+	    err_exit("hostsfile clusterlist module: filename unspecified");
+
+	  p++;
+	  if (p == '\0')
+	    err_exit("hostsfile clusterlist module: filename unspecified");
+
+	  hostsfile_file = Strdup(p);
 	}
+      else
+	err_exit("hostsfile clusterlist module: option '%s' unrecognized", options[i]);
+
+      i++;
     }
 }
 
@@ -148,7 +137,7 @@ _move_past_whitespace(char *buf)
 }
 
 int 
-hostsfile_clusterlist_init(char *cmdline)
+hostsfile_clusterlist_init(char **options)
 {
   int fd, len;
   char buf[CEREBROD_PARSE_BUFLEN];
@@ -156,17 +145,8 @@ hostsfile_clusterlist_init(char *cmdline)
 
   assert(!hosts);
 
-  if (cmdline)
-    {
-      char **argv;
-      int argc;
-
-      Argv_create(cmdline, "", &argc, &argv);
-
-      _cmdline_parse(argc, argv);
-
-      Argv_destroy(argv);
-    }
+  if (options)
+    _parse_options(options);
 
   hosts = List_create((ListDelF)_Free);
 
