@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_heartbeat.c,v 1.6 2005-01-18 18:43:35 achu Exp $
+ *  $Id: cerebrod_heartbeat.c,v 1.7 2005-01-24 16:57:01 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -149,7 +149,7 @@ cerebrod_heartbeat_unmarshall(struct cerebrod_heartbeat *hb,
   if (CEREBROD_HEARTBEAT_LEN > len)
     {
       err_debug("cerebrod_heartbeat_ummarshall: received buffer length "
-		"too small: expect %d, len %d", CEREBROD_HEARTBEAT_LEN, 
+		"too small: need %d, len %d", CEREBROD_HEARTBEAT_LEN, 
 		len);
       return -1;
     }

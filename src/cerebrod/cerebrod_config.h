@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.h,v 1.8 2005-01-18 18:43:35 achu Exp $
+ *  $Id: cerebrod_config.h,v 1.9 2005-01-24 16:57:01 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_CONFIG_H
@@ -8,10 +8,9 @@
 #include <netinet/in.h>
 
 /* Later Configuration
- * - max cluster nodes?
  * - Max status allowed
  * - setuid
- * - listen interface
+ * - listen interface?
  */
 
 #define CEREBROD_CONFIGFILE_DEFAULT                  "/etc/cerebrod.conf"
@@ -19,10 +18,11 @@
 #define CEREBROD_HEARTBEAT_FREQUENCY_MAX_DEFAULT     20
 #define CEREBROD_LISTEN_DEFAULT                      1
 #define CEREBROD_SPEAK_DEFAULT                       1
+#define CEREBROD_SPEAK_TO_PORT_DEFAULT               8650
 #define CEREBROD_SPEAK_TO_IP_DEFAULT                 "239.2.11.72"
 #define CEREBROD_SPEAK_FROM_PORT_DEFAULT             8650
 #define CEREBROD_SPEAK_TTL_DEFAULT                   1
-#define CEREBROD_LISTEN_PORT_DEFAULT                 8651
+#define CEREBROD_LISTEN_PORT_DEFAULT                 8650
 #define CEREBROD_LISTEN_THREADS_DEFAULT              2
 
 /* Configuration
@@ -36,10 +36,12 @@
  * - on/off
  * speak
  * - on/off
+ * speak_to_port
+ - - the port to speak to
  * speak_to_ip
  * - to speak to, may be remote IP or multicast
  * speak_from_port
- * - the port
+ * - the port to speak from
  * speak_from_network_interface
  * - not specified - we pick an interface
  * - network interface - will be checked.
@@ -73,12 +75,13 @@ struct cerebrod_config
   unsigned int heartbeat_frequency_max;
   int listen;
   int speak;
+  int speak_to_port;
   char *speak_to_ip;
   int speak_from_port;
   char *speak_from_network_interface;
   int speak_ttl;
   int listen_port;
-  unsigned int listen_threads;
+  int listen_threads;
 
   /* Determined by cerebrod based on configuration */
   int multicast;

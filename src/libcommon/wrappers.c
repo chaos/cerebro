@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.c,v 1.8 2005-01-18 18:43:35 achu Exp $
+ *  $Id: wrappers.c,v 1.9 2005-01-24 16:57:01 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -416,3 +416,30 @@ wrap_signal(const char *file, int line, int signum, Sighandler_t handler)
 
   return ret;
 }
+
+List 
+wrap_list_create(const char *file, int line, ListDelF f)
+{
+  List ret;
+
+  assert(file != NULL);
+
+  if (!(ret = list_create(f)))
+    err_exit("hash_create(%s:%d): %s", file, line, strerror(errno));
+
+  return ret;
+}
+
+hash_t 
+wrap_hash_create(const char *file, int line, int size, hash_key_f key_f, hash_cmp_f cmp_f, hash_del_f del_f)
+{
+  hash_t ret;
+
+  assert(file != NULL);
+
+  if (!(ret = hash_create(size, key_f, cmp_f, del_f)))
+    err_exit("hash_create(%s:%d): %s", file, line, strerror(errno));
+
+  return ret;
+}
+

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.17 2005-01-18 18:43:35 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.18 2005-01-24 16:57:01 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -30,12 +30,12 @@
 #include "error.h"
 #include "wrappers.h"
 
-extern struct cerebrod_config conf;
-
 #define MULTICAST_CLASS_MIN 224
 #define MULTICAST_CLASS_MAX 239
 #define IPADDR_BITS          32   
 #define IPADDR6_BITS        128
+
+struct cerebrod_config conf;
 
 static void
 _cerebrod_config_default(void)
@@ -48,6 +48,7 @@ _cerebrod_config_default(void)
   conf.speak = CEREBROD_SPEAK_DEFAULT;
   conf.heartbeat_frequency_min = CEREBROD_HEARTBEAT_FREQUENCY_MIN_DEFAULT;
   conf.heartbeat_frequency_max = CEREBROD_HEARTBEAT_FREQUENCY_MAX_DEFAULT;
+  conf.speak_to_port = CEREBROD_SPEAK_TO_PORT_DEFAULT;
   conf.speak_to_ip = CEREBROD_SPEAK_TO_IP_DEFAULT;
   conf.speak_from_port = CEREBROD_SPEAK_FROM_PORT_DEFAULT;
   conf.speak_from_network_interface = NULL;
@@ -180,8 +181,8 @@ _cb_stringptr(conffile_t cf, struct conffile_data *data,
 static void
 _cerebrod_config_parse(void)
 {
-  int heartbeat_frequency_flag, listen_flag, speak_flag, speak_to_ip_flag, 
-    speak_from_port_flag, speak_from_network_interface_flag, 
+  int heartbeat_frequency_flag, listen_flag, speak_flag, speak_to_port_flag, 
+    speak_to_ip_flag, speak_from_port_flag, speak_from_network_interface_flag, 
     speak_ttl_flag, listen_port_flag, listen_threads_flag;
 
   struct conffile_option options[] =
@@ -192,6 +193,8 @@ _cerebrod_config_parse(void)
        1, 0, &listen_flag, &conf.listen, 0},
       {"speak", CONFFILE_OPTION_BOOL, -1, conffile_bool,
        1, 0, &speak_flag, &conf.speak, 0},
+      {"speak_to_port", CONFFILE_OPTION_INT, -1, conffile_int,
+       1, 0, &speak_to_port_flag, &(conf.speak_to_port), 0},
       {"speak_to_ip", CONFFILE_OPTION_STRING, -1, _cb_stringptr,
        1, 0, &speak_to_ip_flag, &(conf.speak_to_ip), 0},
       {"speak_from_port", CONFFILE_OPTION_INT, -1, conffile_int,
@@ -199,7 +202,7 @@ _cerebrod_config_parse(void)
       {"speak_from_network_interface", CONFFILE_OPTION_STRING, -1, _cb_stringptr,
        1, 0, &speak_from_network_interface_flag, 
        &(conf.speak_from_network_interface), 0},
-      {"speak_ttl", CONFFILE_OPTION_INT, -1, confffile_int,
+      {"speak_ttl", CONFFILE_OPTION_INT, -1, conffile_int,
        1, 0, &speak_ttl_flag, &(conf.speak_ttl), 0},
       {"listen_port", CONFFILE_OPTION_INT, -1, conffile_int,
        1, 0, &listen_port_flag, &(conf.listen_port), 0},

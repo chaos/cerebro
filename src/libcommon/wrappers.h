@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.h,v 1.7 2005-01-18 23:03:41 achu Exp $
+ *  $Id: wrappers.h,v 1.8 2005-01-24 16:57:01 achu Exp $
 \*****************************************************************************/
 
 #ifndef _WRAPPERS_H
@@ -24,6 +24,7 @@
 #include <sys/stat.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <netinet/in.h>
 #if TIME_WITH_SYS_TIME
 # include <sys/time.h>
 # include <time.h>
@@ -39,6 +40,9 @@
 #endif /* _GNU_SOURCE */
 #include <pthread.h>
 #include <signal.h>
+
+#include "hash.h"
+#include "list.h"
 
 /* Memory/String Wrappers */
 #define Malloc(size) \
@@ -106,11 +110,19 @@
 #define Pthread_mutex_unlock(mutex) \
         wrap_pthread_mutex_unlock(__FILE__, __LINE__, mutex)
 
-/* Misc */
+/* Misc System Call Wrappers */
 #define Fork() \
         wrap_fork(__FILE__, __LINE__);
 #define Signal(signum, handler) \
         wrap_signal(__FILE__, __LINE__, signum, handler)
+
+/* List lib wrappers */
+#define List_create(f) \
+        wrap_list_create(__FILE__, __LINE__, f)
+
+/* Hash lib wrappers */
+#define Hash_create(size, key_f, cmp_f, del_f) \
+        wrap_hash_create(__FILE__, __LINE__, size, key_f, cmp_f, del_f)
 
 typedef void (*Sighandler_t)(int);
 
@@ -144,5 +156,6 @@ int wrap_pthread_mutex_trylock(const char *file, int line, pthread_mutex_t *mute
 int wrap_pthread_mutex_unlock(const char *file, int line, pthread_mutex_t *mutex);
 pid_t wrap_fork(const char *file, int line);
 Sighandler_t wrap_signal(const char *file, int line, int signum, Sighandler_t handler);
-
+List wrap_list_create(const char *file, int line, ListDelF f);
+hash_t wrap_hash_create (const char *file, int line, int size, hash_key_f key_f, hash_cmp_f cmp_f, hash_del_f del_f);
 #endif /* _WRAPPERS_H */

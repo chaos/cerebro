@@ -1,3 +1,38 @@
+2005-01-23  Albert Chu  <chu11@llnl.gov>
+
+	* src/cerebrod/cerebrod_listener.c: Begin work on cerebrod_listener
+
+	* src/cerebrod/wrappers.h, src/cerebrod/wrappers.c (List_create,
+	wrap_list_create, Hash_create, wrap_hash_create): New macros and
+	functions.
+
+	* src/cerebrod/cerebrod_config.h, src/cerebrod/cerebrod_config.c
+	(_cerebrod_config_default, _cerebrod_config_parse),
+	src/cerebrod/cerebrod_speaker.c
+	(_cerebrod_speaker_create_and_setup_socket): Add and use
+	speak_to_port configuration option.
+	
+2005-01-22  Albert Chu  <chu11@llnl.gov>
+
+	* src/cerebrod/cerebrod_speaker.c (cerebrod_speaker): Fix corner
+	case for errno survival on writes and sleep_time.  Cleaned up
+	code.
+
+	* src/cerebrod/cerebrod_speaker.c
+	(_cerebrod_speaker_create_and_setup_socket): Fix errno check
+	corner case.
+
+	* src/libcommon/hash.h, src/libcommon/hash.c,
+	src/libcommon/list.h, src/libcommon/list.c,
+	src/libcommon/thread.h, src/libcommon/thread.c: New files.
+
+	* src/libcommon/Makefile.am: Update for new files.
+
+	* src/cerebrod/cerebrod_listener.h,
+	src/cerebrod/cerebrod_listener.c: New files.
+
+	* src/cerebrod/Makefile.am: Update for new files.
+
 2005-01-16  Albert Chu  <chu11@llnl.gov>
 	
 	* src/cerebrod/cerebrod_config.h, src/cerebrod/cerebrod_config.c

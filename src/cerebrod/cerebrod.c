@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.8 2005-01-18 18:43:35 achu Exp $
+ *  $Id: cerebrod.c,v 1.9 2005-01-24 16:57:01 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -18,10 +18,11 @@
 #include "error.h"
 #include "wrappers.h"
 
-struct cerebrod_config conf;
 #ifndef NDEBUG
 pthread_mutex_t debug_output_mutex = PTHREAD_MUTEX_INITIALIZER;
 #endif /* NDEBUG */
+
+extern struct cerebrod_config conf;
 
 static void
 _cerebrod_initialization(void)
@@ -62,5 +63,5 @@ main(int argc, char **argv)
     }
 
   for (;;) {}
-  return 0;
+  return 0;			/* NOT REACHED */
 }

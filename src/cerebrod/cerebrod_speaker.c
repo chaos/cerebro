@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.3 2005-01-18 18:43:35 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.4 2005-01-24 16:57:01 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -11,19 +11,23 @@
 #if STDC_HEADERS
 #include <string.h>
 #endif /* STDC_HEADERS */
-#include <netinet/in.h>
 #include <errno.h>
 #include <assert.h>
+
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
 
 #include "cerebrod_speaker.h"
 #include "cerebrod_config.h"
 #include "cerebrod_heartbeat.h"
 #include "error.h"
+#include "fd.h"
 #include "wrappers.h"
 
 extern struct cerebrod_config conf;
 #ifndef NDEBUG
-pthread_mutex_t debug_output_mutex;
+extern pthread_mutex_t debug_output_mutex;
 #endif /* NDEBUG */
 
 static void
@@ -33,7 +37,7 @@ _cerebrod_speaker_initialize(void)
 }
 
 /* Do not use wrappers in this function, give the daemon additional
- * chances to "survive" and error condition.
+ * chances to "survive" an error condition.
  */
 static int
 _cerebrod_speaker_create_and_setup_socket(void)
@@ -41,7 +45,12 @@ _cerebrod_speaker_create_and_setup_socket(void)
   struct sockaddr_in speak_to_addr, speak_from_addr;
   int temp_fd;
 
-  temp_fd = Socket(AF_INET, SOCK_DGRAM, 0);
+  if ((temp_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
+    {
+      err_debug("_cerebrod_speaker_create_and_setup_socket: socket: %s", 
+		strerror(errno));
+      return -1;
+    }
 
   if (conf.multicast)
     {
@@ -109,7 +118,7 @@ _cerebrod_speaker_create_and_setup_socket(void)
 
   /* Connect to the speak to address */
   speak_to_addr.sin_family = AF_INET;
-  speak_from_addr.sin_port = htons(conf.listen_port);
+  speak_from_addr.sin_port = htons(conf.speak_to_port);
   memcpy(&speak_to_addr.sin_addr,
 	 &conf.speak_to_in_addr,
 	 sizeof(struct in_addr));
@@ -166,7 +175,10 @@ cerebrod_speaker(void *arg)
       int hblen, sleep_time;
 
       /* Algorithm from srand(3) manpage */
-      sleep_time = conf.heartbeat_frequency_min + ((((double)(conf.heartbeat_frequency_max - conf.heartbeat_frequency_min))*rand())/(RAND_MAX+1.0));
+      if (conf.heartbeat_frequency_ranged)
+	sleep_time = conf.heartbeat_frequency_min + ((((double)(conf.heartbeat_frequency_max - conf.heartbeat_frequency_min))*rand())/(RAND_MAX+1.0));
+      else
+	sleep_time = conf.heartbeat_frequency_min;
 
       /* XXX: Cache rather than re-construct each time? */
       cerebrod_heartbeat_construct(&hb);
@@ -177,18 +189,32 @@ cerebrod_speaker(void *arg)
       
       if (fd_write_n(fd, hbbuf, hblen) < 0)
 	{
-	  /* For any of the following errnos, assume the device has
-	   * been temporarily brought down.  For example, if the
-	   * administrator runs '/etc/init.d/network restart'.
+	  /* For errnos EINVAL, EBADF, ENODEV, assume the device has
+	   * been temporarily brought down then back up.  For example,
+	   * this can occur if the administrator runs
+	   * '/etc/init.d/network restart'.  We just need to re-setup
+	   * the socket.
+	   * 
+	   * If fd < 0, the network device just isn't back up yet from
+	   * the previous time we got an errno EINVAL, EBADF, or
+	   * ENODEV.
 	   */
 	  if (errno == EINVAL 
 	      || errno == EBADF
-	      || errno == ENODEV)
+	      || errno == ENODEV
+	      || fd < 0)
 	    {
-	      err_debug("cerebrod_speaker: re-initializing socket: %s", strerror(errno));
-	      /* No wrapper on close(), make best attempt */
-	      close(fd);	
-	      fd = _cerebrod_speaker_create_and_setup_socket();
+	      if (!(fd < 0))
+		Close(fd);	
+
+	      /* XXX: Should we re-calc in-addrs? Its even more unlikely
+	       * that a system administrator will change IPs, subnets, etc.
+	       * on us.
+	       */
+	      if ((fd = _cerebrod_speaker_create_and_setup_socket()) < 0)
+		err_debug("cerebrod_speaker: error re-initializing socket");
+	      else
+		err_debug("cerebrod_speaker: success re-initializing socket");
 	    }
 	  else
 	    err_exit("cerebrod_speaker: fd_write_n: %s", strerror(errno));
@@ -197,5 +223,5 @@ cerebrod_speaker(void *arg)
       sleep(sleep_time);
     }
 
-  return NULL;
+  return NULL;			/* NOT REACHED */
 }
