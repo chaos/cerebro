@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.c,v 1.7 2005-01-10 16:41:15 achu Exp $
+ *  $Id: wrappers.c,v 1.8 2005-01-18 18:43:35 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -135,6 +135,28 @@ wrap_write(const char *file, int line, int fd, const void *buf, size_t count)
 }
 
 int
+wrap_chdir(const char *file, int line, const char *path)
+{
+  int ret;
+
+  assert(file != NULL);
+
+  if ((ret = chdir(path)) < 0)
+    err_exit("chdir(%s:%d): %s", file, line, strerror(errno));
+
+  return ret;
+}
+
+mode_t
+wrap_umask(const char *file, int line, mode_t mask)
+{
+  assert(file != NULL);
+
+  /* achu: never supposed to fail.  Go fig. */
+  return umask(mask);
+}
+
+int
 wrap_socket(const char *file, int line, int domain, int type, int protocol)
 {
   int fd;
@@ -199,52 +221,17 @@ wrap_setsockopt(const char *file, int line, int s, int level, int optname, const
   return ret;
 }
 
-pid_t 
-wrap_fork(const char *file, int line)
-{
-  pid_t pid;
-
-  assert(file != NULL);
-
-  if ((pid = fork()) < 0)
-    err_exit("fork(%s:%d): %s", file, line, strerror(errno));
-
-  return pid;
-}
-
-Sighandler_t
-wrap_signal(const char *file, int line, int signum, Sighandler_t handler)
-{
-  Sighandler_t ret;
-
-  assert(file != NULL);
-
-  if ((ret = signal(signum, handler)) == SIG_ERR)
-    err_exit("signal(%s:%d): %s", file, line, strerror(errno));
-
-  return ret;
-}
-
-int
-wrap_chdir(const char *file, int line, const char *path)
+int 
+wrap_inet_pton(const char *file, int line, int af, const char *src, void *dst)
 {
   int ret;
-
+  
   assert(file != NULL);
 
-  if ((ret = chdir(path)) < 0)
-    err_exit("chdir(%s:%d): %s", file, line, strerror(errno));
+  if ((ret = inet_pton(af, src, dst)) < 0)
+    err_exit("inet_pton(%s:%d): %s", file, line, strerror(errno));
 
   return ret;
-}
-
-mode_t
-wrap_umask(const char *file, int line, mode_t mask)
-{
-  assert(file != NULL);
-
-  /* achu: never supposed to fail.  Go fig. */
-  return umask(mask);
 }
 
 int
@@ -313,14 +300,119 @@ wrap_gethostname(const char *file, int line, char *name, size_t len)
 }
 
 int 
-wrap_inet_pton(const char *file, int line, int af, const char *src, void *dst)
+wrap_pthread_create(const char *file, int line, pthread_t *thread, pthread_attr_t *attr, void *(*start_routine)(void *), void *arg)
 {
   int ret;
   
   assert(file != NULL);
 
-  if ((ret = inet_pton(af, src, dst)) < 0)
-    err_exit("inet_pton(%s:%d): %s", file, line, strerror(errno));
+  if ((ret = pthread_create(thread, attr, start_routine, arg)) != 0)
+    err_exit("pthread_create(%s:%d): %s", file, line, strerror(ret));
+
+  return ret;
+}
+
+int 
+wrap_pthread_attr_init(const char *file, int line, pthread_attr_t *attr)
+{
+  int ret;
+  
+  assert(file != NULL);
+
+  if ((ret = pthread_attr_init(attr)) != 0)
+    err_exit("pthread_attr_init(%s:%d): %s", file, line, strerror(ret));
+
+  return ret;
+}
+
+int 
+wrap_pthread_attr_destroy(const char *file, int line, pthread_attr_t *attr)
+{
+  int ret;
+  
+  assert(file != NULL);
+
+  if ((ret = pthread_attr_destroy(attr)) != 0)
+    err_exit("pthread_attr_destroy(%s:%d): %s", file, line, strerror(ret));
+
+  return ret;
+}
+
+int 
+wrap_pthread_attr_setdetachstate(const char *file, int line, pthread_attr_t *attr, int detachstate)
+{
+  int ret;
+  
+  assert(file != NULL);
+
+  if ((ret = pthread_attr_setdetachstate(attr, detachstate)) != 0)
+    err_exit("pthread_attr_setdetachstate(%s:%d): %s", file, line, strerror(ret));
+
+  return ret;
+}
+
+int
+wrap_pthread_mutex_lock(const char *file, int line, pthread_mutex_t *mutex)
+{
+  int ret;
+  
+  assert(file != NULL);
+
+  if ((ret = pthread_mutex_lock(mutex)) != 0)
+    err_exit("pthread_mutex_lock(%s:%d): %s", file, line, strerror(ret));
+
+  return ret;
+}
+
+int 
+wrap_pthread_mutex_trylock(const char *file, int line, pthread_mutex_t *mutex)
+{
+  int ret;
+  
+  assert(file != NULL);
+
+  ret = pthread_mutex_trylock(mutex);
+  if (ret != 0 && ret != EBUSY)
+    err_exit("pthread_mutex_trylock(%s:%d): %s", file, line, strerror(ret));
+
+  return ret;
+}
+
+int 
+wrap_pthread_mutex_unlock(const char *file, int line, pthread_mutex_t *mutex)
+{
+  int ret;
+  
+  assert(file != NULL);
+
+  if ((ret = pthread_mutex_unlock(mutex)) != 0)
+    err_exit("pthread_mutex_unlock(%s:%d): %s", file, line, strerror(ret));
+
+  return ret;
+}
+
+pid_t 
+wrap_fork(const char *file, int line)
+{
+  pid_t pid;
+
+  assert(file != NULL);
+
+  if ((pid = fork()) < 0)
+    err_exit("fork(%s:%d): %s", file, line, strerror(errno));
+
+  return pid;
+}
+
+Sighandler_t
+wrap_signal(const char *file, int line, int signum, Sighandler_t handler)
+{
+  Sighandler_t ret;
+
+  assert(file != NULL);
+
+  if ((ret = signal(signum, handler)) == SIG_ERR)
+    err_exit("signal(%s:%d): %s", file, line, strerror(errno));
 
   return ret;
 }

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.h,v 1.7 2005-01-10 16:41:14 achu Exp $
+ *  $Id: cerebrod_config.h,v 1.8 2005-01-18 18:43:35 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_CONFIG_H
@@ -11,8 +11,6 @@
  * - max cluster nodes?
  * - Max status allowed
  * - setuid
- * - ttl
- * - listen port
  * - listen interface
  */
 
@@ -23,6 +21,7 @@
 #define CEREBROD_SPEAK_DEFAULT                       1
 #define CEREBROD_SPEAK_TO_IP_DEFAULT                 "239.2.11.72"
 #define CEREBROD_SPEAK_FROM_PORT_DEFAULT             8650
+#define CEREBROD_SPEAK_TTL_DEFAULT                   1
 #define CEREBROD_LISTEN_PORT_DEFAULT                 8651
 #define CEREBROD_LISTEN_THREADS_DEFAULT              2
 
@@ -46,6 +45,8 @@
  * - network interface - will be checked.
  * - ip address - will be checked
  * - ip address/subnet - will be found/checked
+ * speak_ttl
+ * - num
  * listen_port
  * - num
  * listen_threads
@@ -75,6 +76,7 @@ struct cerebrod_config
   char *speak_to_ip;
   int speak_from_port;
   char *speak_from_network_interface;
+  int speak_ttl;
   int listen_port;
   unsigned int listen_threads;
 

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.16 2005-01-10 16:41:14 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.17 2005-01-18 18:43:35 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -30,7 +30,7 @@
 #include "error.h"
 #include "wrappers.h"
 
-struct cerebrod_config conf;
+extern struct cerebrod_config conf;
 
 #define MULTICAST_CLASS_MIN 224
 #define MULTICAST_CLASS_MAX 239
@@ -51,6 +51,7 @@ _cerebrod_config_default(void)
   conf.speak_to_ip = CEREBROD_SPEAK_TO_IP_DEFAULT;
   conf.speak_from_port = CEREBROD_SPEAK_FROM_PORT_DEFAULT;
   conf.speak_from_network_interface = NULL;
+  conf.speak_ttl = CEREBROD_SPEAK_TTL_DEFAULT;
   conf.listen_port = CEREBROD_LISTEN_PORT_DEFAULT;
   conf.listen_threads = CEREBROD_LISTEN_THREADS_DEFAULT;
 }
@@ -181,7 +182,7 @@ _cerebrod_config_parse(void)
 {
   int heartbeat_frequency_flag, listen_flag, speak_flag, speak_to_ip_flag, 
     speak_from_port_flag, speak_from_network_interface_flag, 
-    listen_port_flag, listen_threads_flag;
+    speak_ttl_flag, listen_port_flag, listen_threads_flag;
 
   struct conffile_option options[] =
     {
@@ -198,6 +199,8 @@ _cerebrod_config_parse(void)
       {"speak_from_network_interface", CONFFILE_OPTION_STRING, -1, _cb_stringptr,
        1, 0, &speak_from_network_interface_flag, 
        &(conf.speak_from_network_interface), 0},
+      {"speak_ttl", CONFFILE_OPTION_INT, -1, confffile_int,
+       1, 0, &speak_ttl_flag, &(conf.speak_ttl), 0},
       {"listen_port", CONFFILE_OPTION_INT, -1, conffile_int,
        1, 0, &listen_port_flag, &(conf.listen_port), 0},
       {"listen_threads", CONFFILE_OPTION_INT, -1, conffile_int,
@@ -223,6 +226,83 @@ _cerebrod_config_parse(void)
     }
 
   conffile_handle_destroy(cf);
+}
+
+static void
+_cerebrod_config_check(void)
+{
+  struct in_addr addr_temp;
+  
+  if (!Inet_pton(AF_INET, conf.speak_to_ip, &addr_temp))
+    err_exit("speak to IP address '%s' improperly format",
+	     conf.speak_from_network_interface);
+
+  if (conf.speak_from_network_interface
+      && strchr(conf.speak_from_network_interface, '.'))
+    {
+      if (strchr(conf.speak_from_network_interface, '/'))
+        {
+          char *speak_from_network_interface_cpy = Strdup(conf.speak_from_network_interface);
+	  char *tok;
+
+          tok = strtok(speak_from_network_interface_cpy, "/");
+          if (!Inet_pton(AF_INET, tok, &addr_temp))
+            err_exit("speak from network interface IP address '%s' "
+                     "improperly format", conf.speak_from_network_interface);
+
+          Free(speak_from_network_interface_cpy);
+        }
+      else
+        {
+          if (!Inet_pton(AF_INET, conf.speak_from_network_interface, &addr_temp))
+            err_exit("speak from network interface IP address '%s' "
+                     "improperly format", conf.speak_from_network_interface);
+        }
+    }
+
+  if (conf.speak_ttl <= 0)
+    err_exit("speak ttl '%d' invalid", conf.speak_ttl);
+}
+
+static void
+_cerebrod_calculate_multicast(void)
+{
+  if (strchr(conf.speak_to_ip, '.'))
+    {
+      char *speak_to_ip_cpy = Strdup(conf.speak_to_ip);
+      char *tok, *ptr;
+      int ip_class;
+      
+      tok = strtok(speak_to_ip_cpy, ".");
+      ip_class = strtol(tok, &ptr, 10);
+      if (ptr != (tok + strlen(tok)))
+	err_exit("speak to IP address '%s' improperly format",
+		 conf.speak_from_network_interface);
+      
+      if (ip_class >= MULTICAST_CLASS_MIN
+	  && ip_class <= MULTICAST_CLASS_MAX)
+	conf.multicast = 1;
+      else
+	conf.multicast = 0;
+      Free(speak_to_ip_cpy);
+    }
+}
+
+static void
+_cerebrod_calculate_heartbeat_frequency_ranged(void)
+{
+  if (conf.heartbeat_frequency_max > 0)
+    conf.heartbeat_frequency_ranged = 1;
+  else
+    conf.heartbeat_frequency_ranged = 0;
+}
+
+static void
+_cerebrod_calculate_speak_to_in_addr(void)
+{
+  if (!Inet_pton(AF_INET, conf.speak_to_ip, &conf.speak_to_in_addr))
+    err_exit("speak to IP address '%s' improperly format",
+	     conf.speak_from_network_interface);
 }
 
 /* From Unix Network Programming, by R. Stevens, Chapter 16 */
@@ -283,80 +363,6 @@ _get_ifr_len(struct ifreq *ifr)
 #endif /* HAVE_SA_LEN */
 
   return len;
-}
-
-static void
-_cerebrod_config_check(void)
-{
-  struct in_addr addr_temp;
-  
-  if (!Inet_pton(AF_INET, conf.speak_to_ip, &addr_temp))
-    err_exit("speak to IP address '%s' improperly format",
-	     conf.speak_from_network_interface);
-
-  if (conf.speak_from_network_interface
-      && strchr(conf.speak_from_network_interface, '.'))
-    {
-      if (strchr(conf.speak_from_network_interface, '/'))
-        {
-          char *speak_from_network_interface_cpy = Strdup(conf.speak_from_network_interface);
-	  char *tok;
-
-          tok = strtok(speak_from_network_interface_cpy, "/");
-          if (!Inet_pton(AF_INET, tok, &addr_temp))
-            err_exit("speak from network interface IP address '%s' "
-                     "improperly format", conf.speak_from_network_interface);
-
-          Free(speak_from_network_interface_cpy);
-        }
-      else
-        {
-          if (!Inet_pton(AF_INET, conf.speak_from_network_interface, &addr_temp))
-            err_exit("speak from network interface IP address '%s' "
-                     "improperly format", conf.speak_from_network_interface);
-        }
-    }
-}
-
-static void
-_cerebrod_calculate_multicast(void)
-{
-  if (strchr(conf.speak_to_ip, '.'))
-    {
-      char *speak_to_ip_cpy = Strdup(conf.speak_to_ip);
-      char *tok, *ptr;
-      int ip_class;
-      
-      tok = strtok(speak_to_ip_cpy, ".");
-      ip_class = strtol(tok, &ptr, 10);
-      if (ptr != (tok + strlen(tok)))
-	err_exit("speak to IP address '%s' improperly format",
-		 conf.speak_from_network_interface);
-      
-      if (ip_class >= MULTICAST_CLASS_MIN
-	  && ip_class <= MULTICAST_CLASS_MAX)
-	conf.multicast = 1;
-      else
-	conf.multicast = 0;
-      Free(speak_to_ip_cpy);
-    }
-}
-
-static void
-_cerebrod_calculate_heartbeat_frequency_ranged(void)
-{
-  if (conf.heartbeat_frequency_max > 0)
-    conf.heartbeat_frequency_ranged = 1;
-  else
-    conf.heartbeat_frequency_ranged = 0;
-}
-
-static void
-_cerebrod_calculate_speak_to_in_addr(void)
-{
-  if (!Inet_pton(AF_INET, conf.speak_to_ip, &conf.speak_to_in_addr))
-    err_exit("speak to IP address '%s' improperly format",
-	     conf.speak_from_network_interface);
 }
 
 static void

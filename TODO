@@ -3,3 +3,5 @@
 - IPv6
 - cerebro.spec.in, descriptions
 - remember to disable SIGPIPE
+- remove hostname from heartbeat, useless?
+- Non-pthreads support?

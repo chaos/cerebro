@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_heartbeat.c,v 1.5 2005-01-10 16:41:14 achu Exp $
+ *  $Id: cerebrod_heartbeat.c,v 1.6 2005-01-18 18:43:35 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -20,8 +20,12 @@
 #include "cerebrod_config.h"
 #include "cerebrod.h"
 #include "error.h"
+#include "wrappers.h"
 
 extern struct cerebrod_config conf;
+#ifndef NDEBUG
+pthread_mutex_t debug_output_mutex;
+#endif /* NDEBUG */
 
 void
 cerebrod_heartbeat_construct(struct cerebrod_heartbeat *hb)
@@ -42,6 +46,12 @@ cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb)
 
   if (conf.debug)
     {
+      int ret;
+
+      ret = Pthread_mutex_trylock(&debug_output_mutex);
+      if (ret != EBUSY)
+	err_exit("cerebrod_heartbeat_dump: debug_output_mutex not locked");
+      
       fprintf(stderr, "**************************************\n");
       fprintf(stderr, "* Cerebrod Heartbeat:\n");     
       fprintf(stderr, "* -------------------\n");
@@ -117,12 +127,8 @@ cerebrod_heartbeat_marshall(struct cerebrod_heartbeat *hb,
   int c = 0;
 
   assert(hb && buffer && len > 0);
+  assert(len >= CEREBROD_HEARTBEAT_LEN);
 
-  if (CEREBROD_HEARTBEAT_LEN > len)
-    err_exit("cerebrod_heartbeat_marshall: internal buffer length "
-	     "too small: expect %d, len %d", CEREBROD_HEARTBEAT_LEN, 
-	     len);
-   
   memset(buffer, '\0', len);
   c += _marshall_int32(hb->version, buffer + c);
   c += _marshall_buffer(hb->hostname, sizeof(hb->hostname), buffer + c);
@@ -141,13 +147,20 @@ cerebrod_heartbeat_unmarshall(struct cerebrod_heartbeat *hb,
   assert(hb && buffer && len > 0);
 
   if (CEREBROD_HEARTBEAT_LEN > len)
-    err_exit("cerebrod_heartbeat_ummarshall: received buffer length "
-	     "too small: expect %d, len %d", CEREBROD_HEARTBEAT_LEN, 
-	     len);
+    {
+      err_debug("cerebrod_heartbeat_ummarshall: received buffer length "
+		"too small: expect %d, len %d", CEREBROD_HEARTBEAT_LEN, 
+		len);
+      return -1;
+    }
+  
   if (CEREBROD_HEARTBEAT_LEN != len)
-    err_debug("cerebrod_heartbeat_marshall: received buffer length "
-	      "unexpected size: expect %d, len %d", CEREBROD_HEARTBEAT_LEN,
-	      len);
+    {
+      err_debug("cerebrod_heartbeat_marshall: received buffer length "
+		"unexpected size: expect %d, len %d", CEREBROD_HEARTBEAT_LEN,
+		len);
+      return -1;
+    }
 
   c += _unmarshall_int32(&(hb->version), buffer + c);
   c += _unmarshall_buffer(hb->hostname, sizeof(hb->hostname), buffer + c);

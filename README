@@ -1,20 +1,13 @@
-Cerebro is a collection of tools and libraries for dynamically
-monitoring a cluster of nodes.
+Cerebro is a collection of tools and libraries for monitoring a
+cluster of nodes.
 
 This project as been named Cerebro to pay homage to the the Ganglia
 project (http://ganglia.sourceforge.net).  A heavily modified version
 of Ganglia was once used at Lawrence Livermore National Laboratory to
-support our Linux clusters. 
-
-Over time, the gmond daemon was "hacked" to support a number of local
-performance enhancements and features.  A number of features desired
-by users, system administrators, and other developers could not be
-added to Ganglia without significant architectural changes.
-
-Since a large part of the Ganglia package was already removed from our
-local package, it was apparent that an internally developed monitoring
-tool was needed.  To pay homage to Ganglia, another member of the
-central nervous system was chosen for this project's name.
+support our Linux clusters. Over time, it was apparent that an
+internally developed monitoring tool was needed instead of this
+heavily modified Ganglia.  To pay homage to Ganglia, another member of
+the central nervous system was chosen for this project's name.
 
 It is only coincidence that another famous monitoring tool/machine is
 also named Cerebro.  Cerebro was the best name I could find.  I

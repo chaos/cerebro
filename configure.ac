@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.4 2005-01-03 17:48:37 achu Exp $
+## $Id: configure.ac,v 1.5 2005-01-18 18:43:34 achu Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -26,6 +26,7 @@ AM_MAINTAINER_MODE
 AC_PROG_CC
 AC_PROG_LIBTOOL
 AC_PROG_MAKE_SET
+AC_DEBUG
 
 ##
 # Checks for header files.
@@ -68,12 +69,9 @@ AC_CHECK_FUNCS( \
 ACX_PTHREAD([], AC_MSG_ERROR([Posix threads required to build]))
 AC_DEFINE(WITH_PTHREADS, 1, [Define pthreads])
 LIBS="$PTHREAD_LIBS $LIBS"
-CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
+CFLAGS="$PTHREAD_CFLAGS $CFLAGS"
 
 AC_DEFINE(WITH_LSD_FATAL_ERROR_FUNC, 1, [Define lsd_fatal_error])
-
-# Check for debugging last, since it may affect configure tests
-AC_DEBUG
 
 ##
 # Epilogue.

@@ -1,3 +1,54 @@
+2005-01-16  Albert Chu  <chu11@llnl.gov>
+	
+	* src/cerebrod/cerebrod_config.h, src/cerebrod/cerebrod_config.c
+	(_cerebrod_config_default, _cerebrod_config_parse,
+	_cerebrod_config_check), src/cerebrod_speaker.c
+	(_cerebrod_speaker_create_and_setup_socket): Support ttl
+	configuration option.
+	
+2005-01-15  Albert Chu  <chu11@llnl.gov>
+
+	Add initial pthread support.
+
+	* src/libcommon/wrappers.h, src/libcommon/wrappers.c
+	(Pthread_create, Pthread_attr_init, Pthread_attr_destroy,
+	Pthread_attr_setdetachstate, Pthread_mutex_lock,
+	Pthread_mutex_trylock, Pthread_mutex_unlock, wrap_pthread_create,
+	wrap_pthread_attr_init, wrap_pthread_attr_destroy,
+	wrap_pthread_attr_setdetachstate, wrap_pthread_mutex_lock,
+	wrap_pthread_mutex_trylock, wrap_pthread_mutex_unlock): New macros
+	and functions.
+	
+	* src/cerebrod/cerebrod_daemon.h, src/cerebrod/cerebrod_daemon.c
+	(cerebrod_daemon_init): Removed openlog call and progname parameter.
+
+	* src/cerebrod/cerebrod.c (main): Fix error flags and call
+	cerebrod_daemon_init to daemonize.  Pthread speaker.
+
+	* src/cerebrod/cerebrod_speaker.h, src/cerebrod/cerebrod_speaker.c
+	(cerebrod_speaker): Fix prototype to remove warnings.  Add code to
+	survive various error conditions.
+
+	* src/cerebrod/cerebrod_heartbeat.c (cerebrod_heartbeat_marshall):
+	Change if statement check to assert.
+	
+	* src/cerebrod/cerebrod_heartbeat.c (cerebrod_heartbeat_unmarshall):
+	Return -1 on errors instead of exitting.
+
+	* src/cerebrod/cerebrod_speaker.c
+	(_cerebrod_speaker_send_heartbeat): removed function.
+
+	* src/cerebrod/cerebrod_speaker.c
+	(_cerebrod_speaker_create_and_setup_socket): Fixed to aid in
+	survival of error conditions.
+
+	* src/cerebrod/cerebrod.c, src/cerebrod/cerebrod_heartbeat.c
+	(cerebrod_heartbeat_dump), src/cerebrod/cerebrod_speaker.c
+	(_cerebrod_speaker_dump_heartbeat): Added mutex locking for debug
+	output.
+	
+	* configure.ac: Fix pthread building problem.
+	
 2005-01-09  Albert Chu  <chu11@llnl.gov>
 
 	* src/libcommon/wrappers.h, src/libcommon/wrappers.c (Connect,

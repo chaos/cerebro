@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: ac_debug.m4,v 1.1.1.1 2004-07-02 22:31:29 achu Exp $
+## $Id: ac_debug.m4,v 1.2 2005-01-18 18:43:34 achu Exp $
 ##*****************************************************************************
 #  AUTHOR:
 #    Chris Dunlap <cdunlap@llnl.gov>
@@ -39,7 +39,7 @@ AC_DEFUN([AC_DEBUG],
   else
     if test -z "$ac_save_CFLAGS"; then
       test "$GCC" = yes && CFLAGS="-O3 -Wall -fno-strict-aliasing" || CFLAGS="-O3"
-          LDFLAGS="${LDFLAGS--s}"
+	  LDFLAGS="${LDFLAGS--s}"
     fi
     AC_DEFINE([NDEBUG], [1],
       [Define to 1 if you are building a production release.])
