@@ -29,6 +29,9 @@
 	src/cerebrod/cerebrod.c (main): Fix pthread logic problem with
 	condition variables.
 
+	* src/libcommon/wrappers.c (wrap_list_for_each): Fix debug logic
+	error.
+
 2005-03-15  Albert Chu  <chu11@llnl.gov>
 
 	Begin support of updown server.

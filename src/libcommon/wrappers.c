@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.c,v 1.17 2005-03-16 20:52:04 achu Exp $
+ *  $Id: wrappers.c,v 1.18 2005-03-16 21:29:54 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -830,8 +830,7 @@ wrap_list_for_each(const char *file, int line, List l, ListForF f, void *arg)
   if (!f)
     err_exit("list_for_each(%s:%d): null f pointer", file, line);
 
-  if (!arg)
-    err_exit("list_for_each(%s:%d): null arg pointer", file, line);
+  /* arg can be null */
 
   if ((ret = list_for_each(l, f, arg)) < 0)
     err_exit("list_for_each(%s:%d): %s", file, line, strerror(errno));
