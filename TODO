@@ -6,5 +6,3 @@
 - remove hostname from heartbeat, useless?
 - Non-pthreads support?
 - remove hash/list buffering in list.c hash.c?
-- if speak_to_ip is non-multicast check if listener has 
-  the speak_to_ip.
