@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.30 2005-03-17 23:10:51 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.31 2005-03-17 23:12:37 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -303,7 +303,7 @@ cerebrod_listener(void *arg)
       memcpy(hostname_buf, hb.hostname, CEREBROD_MAXHOSTNAMELEN);
 
       memset(hostname_key, '\0', CEREBROD_MAXHOSTNAMELEN+1);
-      if (cerebrod_clusterlist_get_nodename(hostname_buf,, 
+      if (cerebrod_clusterlist_get_nodename(hostname_buf,
                                             hostname_key, 
                                             CEREBROD_MAXHOSTNAMELEN+1) < 0)
         {
