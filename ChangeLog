@@ -33,6 +33,9 @@
 
 	* src/cerebrod/cerebrod_speaker.c (_cerebrod_speaker_initialize):
 	Improve initialization routine.
+
+	* src/libcommon/wrappers.h, src/libcommon/wrappers.c: Add function
+	name output to wrappers.
 	
 2005-03-28  Albert Chu  <chu11@llnl.gov>
 
