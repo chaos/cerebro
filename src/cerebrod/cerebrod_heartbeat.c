@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_heartbeat.c,v 1.7 2005-01-24 16:57:01 achu Exp $
+ *  $Id: cerebrod_heartbeat.c,v 1.8 2005-02-01 22:37:28 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -32,7 +32,7 @@ cerebrod_heartbeat_construct(struct cerebrod_heartbeat *hb)
 {
   assert(hb);
 
-  hb->version = CEREBROD_VERSION;
+  hb->version = CEREBROD_PROTOCOL_VERSION;
   cerebrod_get_hostname(hb->hostname, MAXHOSTNAMELEN);
   hb->starttime = cerebrod_get_starttime();
   hb->boottime = cerebrod_get_boottime();

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.4 2005-02-01 22:04:53 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.5 2005-02-01 22:37:28 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -37,10 +37,10 @@ pthread_mutex_t initialization_complete_lock = PTHREAD_MUTEX_INITIALIZER;
 
 int listener_fd;
 pthread_mutex_t listener_fd_lock = PTHREAD_MUTEX_INITIALIZER;
-hash_t heartbeat_hash;
-int heartbeat_hash_size;
-int heartbeat_hash_numnodes;
-pthread_mutex_t heartbeat_hash_lock = PTHREAD_MUTEX_INITIALIZER;
+hash_t cluster_data_hash;
+int cluster_data_hash_size;
+int cluster_data_hash_numnodes;
+pthread_mutex_t cluster_data_hash_lock = PTHREAD_MUTEX_INITIALIZER;
 
 static void
 _cerebrod_listener_create_and_setup_socket(void)
@@ -53,7 +53,6 @@ _cerebrod_listener_create_and_setup_socket(void)
     {
       /* XXX: Probably lots of portability problems here */
       struct ip_mreqn imr;
-      int optval;
 
       memcpy(&imr.imr_multiaddr,
              &conf.heartbeat_destination_in_addr,
@@ -104,12 +103,12 @@ _cerebrod_listener_initialize(void)
 
   _cerebrod_listener_create_and_setup_socket();
 
-  heartbeat_hash_size = CEREBROD_LISTENER_HASH_SIZE_DEFAULT;
-  heartbeat_hash_numnodes = 0;
-  heartbeat_hash = Hash_create(heartbeat_hash_size,
-			       (hash_key_f)hash_key_string,
-			       (hash_cmp_f)strcmp,
-			       (hash_del_f)list_destroy);
+  cluster_data_hash_size = CEREBROD_LISTENER_HASH_SIZE_DEFAULT;
+  cluster_data_hash_numnodes = 0;
+  cluster_data_hash = Hash_create(cluster_data_hash_size,
+				  (hash_key_f)hash_key_string,
+				  (hash_cmp_f)strcmp,
+				  (hash_del_f)free);
   initialization_complete++;
  done:
   Pthread_mutex_unlock(&initialization_complete_lock);

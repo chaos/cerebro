@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.h,v 1.1 2005-01-03 17:48:38 achu Exp $
+ *  $Id: cerebrod.h,v 1.2 2005-02-01 22:37:28 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_H
@@ -14,6 +14,6 @@
 #define CEREBROD_PACKET_BUFLEN  1024
 #define CEREBROD_STRING_BUFLEN  1024
 
-#define CEREBROD_VERSION 1
+#define CEREBROD_PROTOCOL_VERSION 1
 
 #endif /* _CEREBROD_H */
