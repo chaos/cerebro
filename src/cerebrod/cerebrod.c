@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.24 2005-03-25 18:34:11 achu Exp $
+ *  $Id: cerebrod.c,v 1.25 2005-03-29 21:30:29 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -22,6 +22,16 @@
 #include "wrappers.h"
 
 #ifndef NDEBUG
+/*  
+ * debug_output_mutex
+ *
+ * To coordinate output of debugging info to stderr.
+ *
+ * Locking Rule: Always lock data structure locks before grabbing
+ * debugging locks.
+ *
+ * Lucking Rule: Only lock around fprintf or similar statements.
+ */
 pthread_mutex_t debug_output_mutex = PTHREAD_MUTEX_INITIALIZER;
 #endif /* NDEBUG */
 

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist.c,v 1.19 2005-03-24 01:29:21 achu Exp $
+ *  $Id: cerebrod_clusterlist.c,v 1.20 2005-03-29 21:30:29 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -21,6 +21,7 @@
 #include "cerebrod.h"
 #include "cerebrod_clusterlist.h"
 #include "cerebrod_config.h"
+#include "cerebrod_error.h"
 #if WITH_STATIC_MODULES
 #include "cerebrod_static_modules.h"
 #else /* !WITH_STATIC_MODULES */
@@ -171,7 +172,7 @@ cerebrod_clusterlist_setup(void)
 
           if (!ptr[i]->clusterlist_module_name)
             {
-              err_debug("static clusterlist module index '%d' does not contain name", i);
+              cerebrod_err_debug("static clusterlist module index '%d' does not contain name", i);
               continue;
             }
 

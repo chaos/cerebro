@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.58 2005-03-27 08:23:50 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.59 2005-03-29 21:30:29 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -30,6 +30,7 @@
 #include "cerebrod_config_module.h"
 
 #include "cerebrod_config.h"
+#include "cerebrod_error.h"
 #if WITH_STATIC_MODULES
 #include "cerebrod_static_modules.h"
 #else /* !WITH_STATIC_MODULES */
@@ -456,7 +457,7 @@ _cerebrod_config_module_setup(void)
           int rv;
           if (!ptr[i]->config_module_name)
             {
-              err_debug("static config module index '%d' does not contain name", i);
+              cerebrod_err_debug("static config module index '%d' does not contain name", i);
               continue;
             }
           if ((rv = _cerebrod_load_alternate_configuration(ptr[i])) < 0)
@@ -665,7 +666,7 @@ _cerebrod_config_parse(void)
           err_exit("config file error: %s", buf);
         }
       else
-        err_debug("configuration file '%s' not found", conf.config_file);
+        cerebrod_err_debug("configuration file '%s' not found", conf.config_file);
     }
   conffile_handle_destroy(cf);
 }
@@ -1412,6 +1413,6 @@ cerebrod_config_cleanup(void)
 {
 #if !WITH_STATIC_MODULES
   Lt_dlclose(config_module_dl_handle);
-#endif /* !WITH_STATIC_MODULES */
   Lt_dlexit();
+#endif /* !WITH_STATIC_MODULES */
 }

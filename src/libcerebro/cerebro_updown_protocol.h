@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_updown_protocol.h,v 1.6 2005-03-28 17:40:10 achu Exp $
+ *  $Id: cerebro_updown_protocol.h,v 1.7 2005-03-29 21:30:29 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_UPDOWN_PROTOCOL_H
@@ -10,10 +10,17 @@
 
 /* Updown server protocol
  *
- * Client -> Server: Cerebro updown request.
+ * Client -> Server
+ * - Cerebro updown request.
  * 
- * Server -> Client: Stream of updown responses indicating 
- *                   up/down status of each node.
+ * Server -> Client
+ * - Stream of updown responses indicating up/down status of each
+ *   node.  Stream of nodes returns will depend on the request.
+ *   After the stream of nodes is complete, a "end of responses"
+ *   response will indicate the end of stream and completion of
+ *   the updown request.  This "end of responses" response will be
+ *   sent even if no nodes are returned (i.e. only down nodes are
+ *   requested, but all nodes are up).
  */
 
 #define CEREBRO_UPDOWN_PROTOCOL_VERSION                1
@@ -63,15 +70,15 @@ struct cerebro_updown_response
 {
   int32_t version;
   u_int32_t updown_err_code;
+  u_int8_t end_of_responses;
   char hostname[CEREBRO_MAXHOSTNAMELEN];
   u_int8_t updown_state;
-  u_int8_t is_last_response;
 };
   
 #define CEREBRO_UPDOWN_RESPONSE_LEN  (sizeof(int32_t) \
                                       + sizeof(u_int32_t) \
-                                      + CEREBRO_MAXHOSTNAMELEN \
                                       + sizeof(u_int8_t) \
+                                      + CEREBRO_MAXHOSTNAMELEN \
                                       + sizeof(u_int8_t))
 
 #endif /* _CEREBRO_UPDOWN_PROTOCOL_H */

@@ -1,7 +1,28 @@
+2005-03-29  Albert Chu  <chu11@llnl.gov>
+
+	* src/cerebrod/cerebrod_config.c (cerebrod_config_cleanup): Fix
+	static modules bug.
+
+	* src/cerebrod/cerebrod_updown.c
+	(_cerebrod_updown_send_node_responses): New function.
+	
+	* src/libcerebro/cerebro_updown_protocol.h,
+	src/cerebrod/cerebrod_updown.c
+	(_cerebrod_updown_request_marshall,
+	_cerebrod_updown_evaluate_updown_state,
+	_cerebrod_updown_respond_with_updown_nodes): Continued work to
+	complete updown server functionality.
+
+	* src/cerebrod/cerebrod_error.h, src/cerebrod/cerebrod_error.c:
+	New files.
+
+	* src/cerebrod/: Globally use cerebrod_err_debug instead of
+	err_debug when appropriate.
+	
 2005-03-28  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerebrod/cerebrod_updown.c
-	(_cerebrod_updown_evaluate_updown_state): Completed work.
+	(_cerebrod_updown_evaluate_updown_state): Continued work.
 	
 2005-03-27  Albert Chu  <chu11@llnl.gov>
 

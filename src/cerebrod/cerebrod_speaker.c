@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.16 2005-03-25 19:44:05 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.17 2005-03-29 21:30:29 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -22,6 +22,7 @@
 
 #include "cerebrod_speaker.h"
 #include "cerebrod_config.h"
+#include "cerebrod_error.h"
 #include "cerebrod_heartbeat.h"
 #include "error.h"
 #include "fd.h"
@@ -49,8 +50,8 @@ _cerebrod_speaker_create_and_setup_socket(void)
 
   if ((temp_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {
-      err_debug("_cerebrod_speaker_create_and_setup_socket: socket: %s", 
-		strerror(errno));
+      cerebrod_err_debug("_cerebrod_speaker_create_and_setup_socket: socket: %s", 
+                         strerror(errno));
       return -1;
     }
 
@@ -75,8 +76,8 @@ _cerebrod_speaker_create_and_setup_socket(void)
 		     &imr,
 		     sizeof(struct ip_mreqn)) < 0)
 	{
-	  err_debug("_cerebrod_speaker_create_and_setup_socket: setsockopt: %s", 
-		    strerror(errno));
+	  cerebrod_err_debug("_cerebrod_speaker_create_and_setup_socket: setsockopt: %s", 
+                             strerror(errno));
 	  return -1;
 	}
 
@@ -87,8 +88,8 @@ _cerebrod_speaker_create_and_setup_socket(void)
 		     &optval, 
 		     sizeof(optval)) < 0)
 	{
-	  err_debug("_cerebrod_speaker_create_and_setup_socket: setsockopt: %s", 
-		    strerror(errno));
+	  cerebrod_err_debug("_cerebrod_speaker_create_and_setup_socket: setsockopt: %s", 
+                             strerror(errno));
 	  return -1;
 	}
 
@@ -99,8 +100,8 @@ _cerebrod_speaker_create_and_setup_socket(void)
 		     &optval,
 		     sizeof(optval)) < 0)
 	{
-	  err_debug("_cerebrod_speaker_create_and_setup_socket: setsockopt: %s", 
-		    strerror(errno));
+	  cerebrod_err_debug("_cerebrod_speaker_create_and_setup_socket: setsockopt: %s", 
+                             strerror(errno));
 	  return -1;
 	}
     }
@@ -113,8 +114,8 @@ _cerebrod_speaker_create_and_setup_socket(void)
 	 sizeof(struct in_addr));
   if (bind(temp_fd, (struct sockaddr *)&heartbeat_addr, sizeof(struct sockaddr_in))) 
     {
-      err_debug("_cerebrod_speaker_create_and_setup_socket: bind: %s", 
-		strerror(errno));
+      cerebrod_err_debug("_cerebrod_speaker_create_and_setup_socket: bind: %s", 
+                         strerror(errno));
       return -1;
     }
 
@@ -227,17 +228,17 @@ cerebrod_speaker(void *arg)
                     close(fd);	/* no-wrapper, make best effort */
                   
                   if ((fd = _cerebrod_speaker_create_and_setup_socket()) < 0)
-                    err_debug("cerebrod_speaker: error re-initializing socket");
+                    cerebrod_err_debug("cerebrod_speaker: error re-initializing socket");
                   else
-                    err_debug("cerebrod_speaker: success re-initializing socket");
+                    cerebrod_err_debug("cerebrod_speaker: success re-initializing socket");
                 }
               else if (errno == EINTR)
-                err_debug("cerebrod_speaker: sendto: %s", strerror(errno));
+                cerebrod_err_debug("cerebrod_speaker: sendto: %s", strerror(errno));
               else
                 err_exit("cerebrod_speaker: sendto: %s", strerror(errno));
             }
           else
-            err_debug("cerebrod_speaker: sendto: invalid bytes sent: %d", rv);
+            cerebrod_err_debug("cerebrod_speaker: sendto: invalid bytes sent: %d", rv);
         }
       sleep(sleep_time);
     }

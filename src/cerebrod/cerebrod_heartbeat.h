@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_heartbeat.h,v 1.7 2005-03-27 08:23:50 achu Exp $
+ *  $Id: cerebrod_heartbeat.h,v 1.8 2005-03-29 21:30:29 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_HEARTBEAT_H
@@ -17,7 +17,8 @@ void cerebrod_heartbeat_construct(struct cerebrod_heartbeat *hb);
 /* 
  * cerebrod_heartbeat_dump
  *
- * dump contents of a heartbeat packet
+ * dump contents of a heartbeat packet.  Should be called with
+ * debug_output_mutex held.
  */
 void cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb);
 

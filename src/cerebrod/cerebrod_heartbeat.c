@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_heartbeat.c,v 1.15 2005-03-27 08:23:50 achu Exp $
+ *  $Id: cerebrod_heartbeat.c,v 1.16 2005-03-29 21:30:29 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -22,6 +22,7 @@
 #include "cerebrod_heartbeat.h"
 #include "cerebrod_config.h"
 #include "cerebrod_data.h"
+#include "cerebrod_error.h"
 #include "error.h"
 #include "wrappers.h"
 
@@ -113,17 +114,17 @@ cerebrod_heartbeat_unmarshall(struct cerebrod_heartbeat *hb,
 
   if (CEREBROD_HEARTBEAT_LEN > bufferlen)
     {
-      err_debug("cerebrod_heartbeat_ummarshall: received buffer length "
-		"too small: need %d, bufferlen %d", CEREBROD_HEARTBEAT_LEN, 
-		bufferlen);
+      cerebrod_err_debug("cerebrod_heartbeat_ummarshall: received buffer length "
+                         "too small: need %d, bufferlen %d", CEREBROD_HEARTBEAT_LEN, 
+                         bufferlen);
       return -1;
     }
   
   if (CEREBROD_HEARTBEAT_LEN != bufferlen)
     {
-      err_debug("cerebrod_heartbeat_marshall: received buffer length "
-		"unexpected size: expect %d, bufferlen %d", CEREBROD_HEARTBEAT_LEN,
-		bufferlen);
+      cerebrod_err_debug("cerebrod_heartbeat_marshall: received buffer length "
+                         "unexpected size: expect %d, bufferlen %d", CEREBROD_HEARTBEAT_LEN,
+                         bufferlen);
       return -1;
     }
   

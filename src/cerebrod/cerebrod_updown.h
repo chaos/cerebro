@@ -1,11 +1,12 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.h,v 1.5 2005-03-28 17:40:10 achu Exp $
+ *  $Id: cerebrod_updown.h,v 1.6 2005-03-29 21:30:29 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_UPDOWN_H
 #define _CEREBROD_UPDOWN_H
 
 #include <pthread.h>
+#include "list.h"
 
 #define CEREBROD_UPDOWN_REINITIALIZE_WAIT 2
 
@@ -33,9 +34,9 @@ struct cerebrod_updown_evaluation_data
   u_int32_t updown_request;
   u_int32_t timeout_len;
   u_int32_t time_now;
-  u_int32_t numnodes;
-  u_int32_t count;
+  List node_responses;
 };
+
 
 /*
  * cerebrod_updown
