@@ -22,3 +22,5 @@
 
 - cerebrod_clusterlist_module to cerebro_clusterlist_module
   - needs to be loaded by updown library?
+
+- genders indexing for speed
