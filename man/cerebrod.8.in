@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebrod.8.in,v 1.5 2005-03-20 02:22:18 achu Exp $
+\."$Id: cerebrod.8.in,v 1.6 2005-03-20 07:11:27 achu Exp $
 \."#############################################################################
 .TH cerebrod 8 "May 2005" "cerebrod @VERSION@" cerebrod
 .SH "NAME"
@@ -35,7 +35,7 @@ Turn on debugging and run daemon in foreground
 .SH "CONFIGURATION FILE"
 The configuration file configures the features and behavior of the
 .B cerebrod 
-daemon.  The configuration will ultimately affect the utility of
+daemon.  The configuration ultimately affects the utility of
 the 
 .B Cerebro
 suite of tools and libraries.

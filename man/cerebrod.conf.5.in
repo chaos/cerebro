@@ -1,3 +1,71 @@
 \."#############################################################################
-\."$Id: cerebrod.conf.5.in,v 1.2 2005-03-19 00:25:47 achu Exp $
+\."$Id: cerebrod.conf.5.in,v 1.3 2005-03-20 07:11:27 achu Exp $
 \."#############################################################################
+.TH cerebrod.conf 5 "May 2005" "cerebrod.conf @VERSION@" "cerebrod.conf"
+.SH "NAME"
+cerebrod.conf \- cerebrod configuration file
+.SH "DESCRIPTION"
+The 
+.B cerebrod
+configuration file configures the features and behavior of the
+.B cerebrod
+daemon.  The configuration ultimately affects the utility of
+the
+.B Cerebro
+suite of tools and libraries.
+
+The default configuration file loaded by
+.B cerebrod
+is @CEREBROD_CONFIGFILE_DEFAULT@, however an alternate configuration
+file can be specified on the command line with the
+.I -c
+option.
+
+.SH "CONFIGURATION OPTIONS"
+The following are a list of configuration options that can be
+specified in the configuration file.  Each configuration option must
+be listed on a separate line.  Arguments for an option are separated
+by any amount of whitespace.  Multiple arguments are also separated by
+whitespace.  Comments can be marked by using the pound sign ("#")
+character, and lines can be continued on the next using backslash
+("\\").
+.TP
+.I heartbeat_frequency
+Specify the frequencey at which the 
+.B cerebrod
+.TP
+.I heartbeat_destination_port
+.TP
+.I heartbeat_destination_ip
+.TP
+.I heartbeat_source_port
+.TP
+.I heartbeat_network_interface
+.TP
+.I heartbeat_ttl
+.TP
+.I speak
+.TP
+.I listen
+.TP
+.I listen_threads
+.TP
+.I updown_server
+.TP
+.I updown_server_port
+.TP
+.I clusterlist_module
+.TP
+.I clusterlist_module_options
+.if @MANPAGE_DEBUG@ \{
+.TP
+.I speak_debug
+.TP
+.I listen_debug
+.TP
+.I updown_server_debug
+\}
+.SH "FILES"
+@CEREBROD_CONFIGFILE_DEFAULT@
+.SH "SEE ALSO"
+cerebrod(1), cerebrod(8)
