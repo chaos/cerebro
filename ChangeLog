@@ -1,3 +1,8 @@
+2005-03-31  Albert Chu  <chu11@llnl.gov>
+
+	* src/cerebrod/Makefile.am: modulelib dir based on module dir
+	determined in autoconf.
+	
 2005-03-30  Albert Chu  <chu11@llnl.gov>
 
 	* Minor code cleanup throughout

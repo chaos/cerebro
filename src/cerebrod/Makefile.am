@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.27 2005-03-29 21:55:40 achu Exp $
+## $Id: Makefile.am,v 1.28 2005-03-31 18:19:44 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -92,11 +92,12 @@ GENDERS_CLUSTERLIST_MODULE     = cerebrod_clusterlist_genders.la
 endif
 
 if !WITH_STATIC_MODULES
-pkglib_LTLIBRARIES = $(GENDERSLLNL_CONFIG_MODULE) \
-		     $(GENDERSLLNL_CLUSTERLIST_MODULE) \
-		     $(GENDERS_CLUSTERLIST_MODULE) \
-		     cerebrod_clusterlist_hostsfile.la \
-		     cerebrod_clusterlist_none.la
+modulelibdir = $(CEREBROD_MODULE_DIR)
+modulelib_LTLIBRARIES = $(GENDERSLLNL_CONFIG_MODULE) \
+		        $(GENDERSLLNL_CLUSTERLIST_MODULE) \
+		        $(GENDERS_CLUSTERLIST_MODULE) \
+		        cerebrod_clusterlist_hostsfile.la \
+		        cerebrod_clusterlist_none.la
 endif
 
 MODULE_FLAGS = -module -avoid-version
