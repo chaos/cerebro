@@ -1,18 +1,16 @@
 - README description
-- config file documentation
 - IPv6
 - cerebro.spec.in, descriptions
-- remember to disable SIGPIPE
 - remove hostname from heartbeat, useless?
 - Non-pthreads support?
 - remove hash/list buffering in list.c hash.c?
-- daemon init.d script
 
 - static modules support
-- more debugging in wrappers
-- timeout option?? - for mem-leak debuggin
 
 - build clusterlist none in cerebrod binary?
+
+- split libcommon to common and binary only libs?
+  - i.e. wrappers and error stuff in separate lib
 
 - test
    - fd leaking

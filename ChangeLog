@@ -1,6 +1,8 @@
 2005-03-21  Albert Chu  <chu11@llnl.gov>
 
-	* src/cerebrod/cerebrod_clusterlist.h: Modified Cerebrod_clusterlist_get_nodename prototype to take a unsigned int buflen instead of an int buflen.
+	* src/cerebrod/cerebrod_clusterlist.h: Modified
+	Cerebrod_clusterlist_get_nodename prototype to take a unsigned int
+	buflen instead of an int buflen.
 
 	* src/cerebrod/cerebrod_clusterlist.c,
 	src/cerebrod/cerebrod_clusterlist_none.c,
@@ -10,6 +12,14 @@
 	src/cerebrod_clusterlist_util.h,
 	src/cerebrod/cerebrod_clusterlist_util.c: Modified for changed
 	parameter type.
+
+	* src/: Added more commenting throughout and various code cleanup
+
+	* src/cerebrod/cerebrod_clusterlist_hostsfile.c
+	(_remove_comments): Fix loop bug.
+
+	* config/ac_genders.m4, config/ac_gendersllnl.m4: Make genders and
+	gendersllnl auto-configurable on or off.
 	
 2005-03-20  Albert Chu  <chu11@llnl.gov>
 
