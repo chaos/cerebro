@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.h,v 1.9 2005-02-09 21:58:31 achu Exp $
+ *  $Id: wrappers.h,v 1.10 2005-02-15 21:14:39 achu Exp $
 \*****************************************************************************/
 
 #ifndef _WRAPPERS_H
@@ -182,6 +182,8 @@ List wrap_list_create(const char *file, int line, ListDelF f);
  */
 #define Hash_create(size, key_f, cmp_f, del_f) \
         wrap_hash_create(__FILE__, __LINE__, size, key_f, cmp_f, del_f)
+#define Hash_count(h) \
+        wrap_hash_count(__FILE__, __LINE__, h)
 #define Hash_find(h, key) \
         wrap_hash_find(__FILE__, __LINE__, h, key)
 #define Hash_insert(h, key, data) \
@@ -194,6 +196,7 @@ List wrap_list_create(const char *file, int line, ListDelF f);
         wrap_hash_destroy(__FILE__, __LINE__, h)
 
 hash_t wrap_hash_create (const char *file, int line, int size, hash_key_f key_f, hash_cmp_f cmp_f, hash_del_f del_f);
+int wrap_hash_count(const char *file, int line, hash_t h);
 void *wrap_hash_find(const char *file, int line, hash_t h, const void *key);
 void *wrap_hash_insert(const char *file, int line, hash_t h, const void *key, void *data);
 int wrap_hash_delete_if(const char *file, int line, hash_t h, hash_arg_f argf, void *arg);

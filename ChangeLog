@@ -6,8 +6,22 @@
 	read/write interface for sending packets.
 
 	* src/cerebrod/cerebrod_listener.c
-	(_cerebrod_listener_dump_cluster_node_dat): Fix assert bug.
-	
+	(_cerebrod_listener_dump_cluster_node_data): Fix assert bug. Add
+	hash count to output.
+
+	* src/cerebrod/cerebrod_listener.c
+	(_cerebrod_listener_dump_cluster_node_data_item): Fix pointer
+	error.
+
+	* src/cerebrod/cerebrod_listener.c (cerebrod_listener): Fix hash
+	key buffering error.
+
+	* src/libcommon/wrappers.h, src/libcommon/wrappers.c (Hash_count,
+	wrap_hash_count): New functions and macros.
+
+	* src/libcommon/wrappers.c (wrap_hash_insert): Add additional
+	error check.
+
 2005-02-14  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerebrod/cerebrod_config.c

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.16 2005-02-15 17:04:01 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.17 2005-02-15 21:14:39 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -231,7 +231,7 @@ _cerebrod_listener_dump_cluster_node_data_item(void *data, const void *key, void
 
   assert(data && key);
 
-  nd = (struct cerebrod_node_data *)&data;
+  nd = (struct cerebrod_node_data *)data;
 
   Pthread_mutex_lock(&(nd->node_data_lock));
   fprintf(stderr, "* %s: starttime=%u boottime=%u last_received=%u\n", 
@@ -248,20 +248,28 @@ _cerebrod_listener_dump_cluster_node_data_hash(void)
 #ifndef NDEBUG
   if (conf.debug)
     {
-      int rv;
+      int rv, count;
 
       Pthread_mutex_lock(&cluster_data_hash_lock);
       Pthread_mutex_lock(&debug_output_mutex);
+      count = Hash_count(cluster_data_hash);
       fprintf(stderr, "**************************************\n");
       fprintf(stderr, "* Cluster Node Hash State\n");
       fprintf(stderr, "* -----------------------\n");
-      rv = Hash_for_each(cluster_data_hash, 
-                         _cerebrod_listener_dump_cluster_node_data_item,
-                         NULL);
-      if (rv != cluster_data_hash_numnodes)
-        err_exit("_cerebrod_listener_dump_cluster_node_data_hash: "
-                 "invalid dump count: rv=%d numnodes=%d",
-                 rv, cluster_data_hash_numnodes);
+      fprintf(stderr, "* Hashed Nodes: %d\n", count);
+      fprintf(stderr, "* -----------------------\n");
+      if (count > 0)
+        {          
+          rv = Hash_for_each(cluster_data_hash, 
+                             _cerebrod_listener_dump_cluster_node_data_item,
+                             NULL);
+          if (rv != cluster_data_hash_numnodes)
+            err_exit("_cerebrod_listener_dump_cluster_node_data_hash: "
+                     "invalid dump count: rv=%d numnodes=%d",
+                     rv, cluster_data_hash_numnodes);
+        }
+      else
+        err_debug("_cerebrod_listener_dump_cluster_node_data_hash: called with empty hash");
       fprintf(stderr, "**************************************\n");
       Pthread_mutex_unlock(&debug_output_mutex);
       Pthread_mutex_unlock(&cluster_data_hash_lock);
@@ -344,16 +352,20 @@ cerebrod_listener(void *arg)
 	  continue;
 	}
 
+      /* XXX: More parallelism can be added */
       Pthread_mutex_lock(&cluster_data_hash_lock);
       if (!(nd = Hash_find(cluster_data_hash, hb.hostname)))
         {
+          char *key;
+
           /* Re-hash if our hash is getting too small */
           if ((cluster_data_hash_numnodes + 1) > CEREBROD_LISTENER_REHASH_LIMIT)
             _rehash();
           
+          key = Strdup(hb.hostname);
           nd = (struct cerebrod_node_data *)Malloc(sizeof(struct cerebrod_node_data));
           Pthread_mutex_init(&(nd->node_data_lock), NULL);
-          Hash_insert(cluster_data_hash, hb.hostname, nd);
+          Hash_insert(cluster_data_hash, key, nd);
           cluster_data_hash_numnodes++;
         }
       Pthread_mutex_unlock(&cluster_data_hash_lock);

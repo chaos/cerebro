@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.c,v 1.10 2005-02-09 21:58:31 achu Exp $
+ *  $Id: wrappers.c,v 1.11 2005-02-15 21:14:39 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -456,6 +456,22 @@ wrap_hash_create(const char *file, int line, int size, hash_key_f key_f, hash_cm
   return ret;
 }
 
+int 
+wrap_hash_count(const char *file, int line, hash_t h)
+{
+  int ret;
+
+  assert(file != NULL);
+
+  if (!(ret = hash_count(h)))
+    {
+      if (errno != 0)
+        err_exit("hash_count(%s:%d): %s", file, line, strerror(errno));
+    }
+
+  return ret;
+}
+
 void *
 wrap_hash_find(const char *file, int line, hash_t h, const void *key)
 {
@@ -479,6 +495,8 @@ wrap_hash_insert(const char *file, int line, hash_t h, const void *key, void *da
 
   if (!(ret = hash_insert(h, key, data)))
     err_exit("hash_insert(%s:%d): %s", file, line, strerror(errno));
+  if (ret != data)
+    err_exit("hash_insert(%s:%d): invalid insert", file, line);
 
   return ret;
 }
@@ -512,8 +530,6 @@ wrap_hash_for_each(const char *file, int line, hash_t h, hash_arg_f argf, void *
 void
 wrap_hash_destroy(const char *file, int line, hash_t h)
 {
-  int ret;
-
   assert(file != NULL);
 
   if (!h)
