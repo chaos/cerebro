@@ -22,6 +22,10 @@
 
 	* src/cerebrod/cerebrod_listener.c (cerebrod_listener): Add
 	clusterlist support.
+
+	* src/cerebrod/cerebrod_clusterlist_none.c: New file.
+
+	* Makefile.am: Updated with new module.
 	
 2005-03-13  Albert Chu  <chu11@llnl.gov>
 
