@@ -55,6 +55,10 @@
 	* src/cerebrod/cerebrod_clusterlist.c (_load_module): Globally
 	rename to _clusterlist_load_module.
 
+	* man/cerebrod.8.in, man/cerebrod/cerebrod.conf.5.in: New files.
+
+	* configure.ac, man/Makefile.am: Updated for new manpages.
+
 2005-03-17  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerebrod/cerebrod_clusterlist_genders.c
