@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_none.c,v 1.12 2005-03-30 05:41:45 achu Exp $
+ *  $Id: cerebrod_clusterlist_none.c,v 1.13 2005-04-07 04:43:10 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -117,7 +117,7 @@ none_clusterlist_get_nodename(char *node, char *buf, unsigned int buflen)
 
 #if WITH_STATIC_MODULES
 struct cerebrod_clusterlist_module_info none_clusterlist_module_info =
-#else
+#else /* !WITH_STATIC_MODULES */
 struct cerebrod_clusterlist_module_info clusterlist_module_info =
 #endif /* !WITH_STATIC_MODULES */
   {

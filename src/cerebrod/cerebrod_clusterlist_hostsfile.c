@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_hostsfile.c,v 1.18 2005-03-30 18:46:58 achu Exp $
+ *  $Id: cerebrod_clusterlist_hostsfile.c,v 1.19 2005-04-07 04:43:10 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -350,7 +350,7 @@ hostsfile_clusterlist_get_nodename(char *node, char *buf, unsigned int buflen)
 
 #if WITH_STATIC_MODULES
 struct cerebrod_clusterlist_module_info hostsfile_clusterlist_module_info =
-#else
+#else /* !WITH_STATIC_MODULES */
 struct cerebrod_clusterlist_module_info clusterlist_module_info =
 #endif /* !WITH_STATIC_MODULES */
   {

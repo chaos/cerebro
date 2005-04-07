@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config_gendersllnl.c,v 1.9 2005-03-30 18:46:58 achu Exp $
+ *  $Id: cerebrod_config_gendersllnl.c,v 1.10 2005-04-07 04:43:10 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -119,7 +119,7 @@ gendersllnl_config_load_default(struct cerebrod_module_config *conf)
 
 #if WITH_STATIC_MODULES
 struct cerebrod_config_module_info gendersllnl_config_module_info =
-#else
+#else /* !WITH_STATIC_MODULES */
 struct cerebrod_config_module_info config_module_info =
 #endif /* !WITH_STATIC_MODULES */
   {
