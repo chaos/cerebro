@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_genders_util.c,v 1.4 2005-03-30 05:41:45 achu Exp $
+ *  $Id: cerebrod_clusterlist_genders_util.c,v 1.5 2005-04-20 19:43:22 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -21,11 +21,10 @@
 #include "wrappers.h"
 
 int 
-cerebrod_clusterlist_genders_init(genders_t *handle, char *file)
+cerebrod_clusterlist_genders_init(genders_t *handle, char *file, char *clusterlist_module_name)
 {
-  char *clusterlist_module_name = cerebrod_clusterlist_module_name();
-
   assert(handle);
+  assert(clusterlist_module_name);
 
   if (!(*handle = genders_handle_create()))
     cerebrod_err_exit("%s(%s:%d): genders_handle_create",
@@ -55,11 +54,10 @@ cerebrod_clusterlist_genders_init(genders_t *handle, char *file)
 }
 
 int
-cerebrod_clusterlist_genders_finish(genders_t *handle, char **file)
+cerebrod_clusterlist_genders_finish(genders_t *handle, char **file, char *clusterlist_module_name)
 {
-  char *clusterlist_module_name = cerebrod_clusterlist_module_name();
-
   assert(handle && file);
+  assert(clusterlist_module_name);
 
   if (genders_handle_destroy(*handle) < 0)
     cerebrod_err_exit("%s(%s:%d): %s clusterlist module: "
@@ -75,14 +73,14 @@ cerebrod_clusterlist_genders_finish(genders_t *handle, char **file)
 }
 
 int
-cerebrod_clusterlist_genders_get_all_nodes(genders_t handle, char **nodes, unsigned int nodeslen)
+cerebrod_clusterlist_genders_get_all_nodes(genders_t handle, char **nodes, unsigned int nodeslen, char *clusterlist_module_name)
 {
   char **nodelist;
   int i, nodelistlen, numnodes;
-  char *clusterlist_module_name = cerebrod_clusterlist_module_name();
   
   assert(handle);
   assert(nodes);
+  assert(clusterlist_module_name);
 
   if ((nodelistlen = genders_nodelist_create(handle, &nodelist)) < 0)
     cerebrod_err_exit("%s(%s:%d): %s clusterlist module: "
@@ -115,12 +113,12 @@ cerebrod_clusterlist_genders_get_all_nodes(genders_t handle, char **nodes, unsig
 }
 
 int 
-cerebrod_clusterlist_genders_numnodes(genders_t handle)
+cerebrod_clusterlist_genders_numnodes(genders_t handle, char *clusterlist_module_name)
 {
   int ret;
-  char *clusterlist_module_name = cerebrod_clusterlist_module_name();
 
   assert(handle);
+  assert(clusterlist_module_name);
 
   if ((ret = genders_getnumnodes(handle)) < 0)
     cerebrod_err_exit("%s(%s:%d): %s clusterlist module: "

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_module.h,v 1.3 2005-04-20 18:11:12 achu Exp $
+ *  $Id: cerebrod_clusterlist_module.h,v 1.4 2005-04-20 19:43:22 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_CLUSTERLIST_MODULE_H
@@ -14,7 +14,7 @@
  *
  * Returns 0 on success, -1 on error
  */
-typedef int (*cerebrod_clusterlist_parse_options)(char **options);
+typedef int (*Cerebrod_clusterlist_parse_options)(char **options);
 
 /*
  * cerebrod_clusterlist_init
@@ -24,7 +24,7 @@ typedef int (*cerebrod_clusterlist_parse_options)(char **options);
  *
  * Returns 0 on success, -1 on error
  */
-typedef int (*cerebrod_clusterlist_init)(void);
+typedef int (*Cerebrod_clusterlist_init)(void);
 
 /*
  * cerebrod_clusterlist_finish
@@ -33,7 +33,7 @@ typedef int (*cerebrod_clusterlist_init)(void);
  *
  * Returns 0 on success, -1 on error
  */
-typedef int (*cerebrod_clusterlist_finish)(void);
+typedef int (*Cerebrod_clusterlist_finish)(void);
 
 /*
  * cerebrod_clusterlist_get_all_nodes
@@ -48,7 +48,7 @@ typedef int (*cerebrod_clusterlist_finish)(void);
  *
  * Returns number of cluster nodes copied in the buffer  on success, -1 on error
  */
-typedef int (*cerebrod_clusterlist_get_all_nodes)(char **nodes, unsigned int nodeslen);
+typedef int (*Cerebrod_clusterlist_get_all_nodes)(char **nodes, unsigned int nodeslen);
 
 /*
  * cerebrod_clusterlist_numnodes
@@ -58,7 +58,7 @@ typedef int (*cerebrod_clusterlist_get_all_nodes)(char **nodes, unsigned int nod
  *
  * Returns number of cluster nodes on success, -1 on error
  */
-typedef int (*cerebrod_clusterlist_numnodes)(void);
+typedef int (*Cerebrod_clusterlist_numnodes)(void);
 
 /*
  * cerebrod_clusterlist_node_in_cluster
@@ -70,7 +70,7 @@ typedef int (*cerebrod_clusterlist_numnodes)(void);
  *
  * Returns 1 if node is in cluster, 0 if not, -1 on error
  */
-typedef int (*cerebrod_clusterlist_node_in_cluster)(char *node);
+typedef int (*Cerebrod_clusterlist_node_in_cluster)(char *node);
 
 /*
  * cerebrod_clusterlist_get_nodename
@@ -87,7 +87,7 @@ typedef int (*cerebrod_clusterlist_node_in_cluster)(char *node);
  *
  * Returns nodename in buffer, 0 on success, -1 on error
  */
-typedef int (*cerebrod_clusterlist_get_nodename)(char *node, char *buf, unsigned int buflen);
+typedef int (*Cerebrod_clusterlist_get_nodename)(char *node, char *buf, unsigned int buflen);
 	     
 /*  
  * struct cerebrod_clusterlist_module_info
@@ -98,13 +98,13 @@ typedef int (*cerebrod_clusterlist_get_nodename)(char *node, char *buf, unsigned
 struct cerebrod_clusterlist_module_info
 {
   char *clusterlist_module_name;
-  cerebrod_clusterlist_parse_options parse_options;
-  cerebrod_clusterlist_init init;
-  cerebrod_clusterlist_finish finish;
-  cerebrod_clusterlist_get_all_nodes get_all_nodes;
-  cerebrod_clusterlist_numnodes numnodes;
-  cerebrod_clusterlist_node_in_cluster node_in_cluster;
-  cerebrod_clusterlist_get_nodename get_nodename;
+  Cerebrod_clusterlist_parse_options parse_options;
+  Cerebrod_clusterlist_init init;
+  Cerebrod_clusterlist_finish finish;
+  Cerebrod_clusterlist_get_all_nodes get_all_nodes;
+  Cerebrod_clusterlist_numnodes numnodes;
+  Cerebrod_clusterlist_node_in_cluster node_in_cluster;
+  Cerebrod_clusterlist_get_nodename get_nodename;
 };
 
 #endif /* _CEREBROD_CLUSTERLIST_MODULE_H */

@@ -8,8 +8,17 @@
 	* src/libcommon/Makefile.am: Put libwrappers and libcommon back
 	into just libcommon.
 
-	* src/cerebrod/Makefile.am: Remove symbols exporting, force all
-	modules to hae the symbols they require.
+	* src/cerebrod/Makefile.am,
+	src/cerebrod/cerebrod_clusterlist_gendersllnl.c,
+	src/cerebrod/cerebrod_clusterlist_genders.c,
+	src/cerebrod/cerebrod_clusterlist_hostsfile.c,
+	src/cerebrod/cerebrod_clusterlist_none.c,
+	src/cerebrod/cerebrod_clusterlist_util.h,
+	src/cerebrod/cerebrod_clusterlist_utilc,
+	src/cerebrod/cerebrod_clusterlist_genders_util.h,
+	src/cerebrod/cerebrod_clusterlist_genders_util.c: Remove symbols
+	exporting, force all modules to hae the symbols they require.
+	Made appropriate changes to support this.
 	
 2005-04-01  Albert Chu  <chu11@llnl.gov>
 

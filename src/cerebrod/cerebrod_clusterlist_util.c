@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_util.c,v 1.5 2005-03-30 05:41:45 achu Exp $
+ *  $Id: cerebrod_clusterlist_util.c,v 1.6 2005-04-20 19:43:22 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -21,13 +21,13 @@
 #include "wrappers.h"
 
 int 
-cerebrod_clusterlist_parse_filename(char **options, char **filename)
+cerebrod_clusterlist_parse_filename(char **options, char **filename, char *clusterlist_module_name)
 {
   int i = 0;
-  char *clusterlist_module_name = cerebrod_clusterlist_module_name();
 
   assert(options);
   assert(filename);
+  assert(clusterlist_module_name);
 
   *filename = NULL;
 
@@ -68,14 +68,14 @@ cerebrod_clusterlist_parse_filename(char **options, char **filename)
 }
 
 int 
-cerebrod_clusterlist_copy_nodename(char *node, char *buf, unsigned int buflen)
+cerebrod_clusterlist_copy_nodename(char *node, char *buf, unsigned int buflen, char *clusterlist_module_name)
 {
   int len;
-  char *clusterlist_module_name = cerebrod_clusterlist_module_name();
 
   assert(node);
   assert(buf);
   assert(buflen > 0);
+  assert(clusterlist_module_name);
 
   len = strlen(node);
 

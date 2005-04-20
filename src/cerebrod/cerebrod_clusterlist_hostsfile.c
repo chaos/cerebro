@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_hostsfile.c,v 1.19 2005-04-07 04:43:10 achu Exp $
+ *  $Id: cerebrod_clusterlist_hostsfile.c,v 1.20 2005-04-20 19:43:22 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -26,6 +26,8 @@
 #include "fd.h"
 #include "wrappers.h"
 
+#define HOSTSFILE_CLUSTERLIST_MODULE_NAME "hostsfile"
+
 /* 
  * hosts
  *
@@ -51,7 +53,9 @@ hostsfile_clusterlist_parse_options(char **options)
   assert(!hosts);
 
   if (options)
-    cerebrod_clusterlist_parse_filename(options, &hostsfile_file);
+    cerebrod_clusterlist_parse_filename(options, 
+                                        &hostsfile_file, 
+                                        HOSTSFILE_CLUSTERLIST_MODULE_NAME);
 
   return 0;
 }
@@ -275,7 +279,6 @@ hostsfile_clusterlist_get_all_nodes(char **nodes, unsigned int nodeslen)
   char *node;
   ListIterator itr;
   int numnodes, i = 0;
-  char *clusterlist_module_name = cerebrod_clusterlist_module_name();
 
   assert(hosts);
   assert(nodes);
@@ -285,7 +288,7 @@ hostsfile_clusterlist_get_all_nodes(char **nodes, unsigned int nodeslen)
   if (numnodes > nodeslen)
     cerebrod_err_exit("%s(%s:%d): %s clusterlist module: nodeslen too small",
 		      __FILE__, __FUNCTION__, __LINE__,
-		      clusterlist_module_name);
+		      HOSTSFILE_CLUSTERLIST_MODULE_NAME);
 
   itr = List_iterator_create(hosts);
 
@@ -295,7 +298,7 @@ hostsfile_clusterlist_get_all_nodes(char **nodes, unsigned int nodeslen)
   if (i > numnodes)
     cerebrod_err_exit("%s(%s:%d): %s clusterlist module: iterator count error",
 		      __FILE__, __FUNCTION__, __LINE__,
-		      clusterlist_module_name);
+		      HOSTSFILE_CLUSTERLIST_MODULE_NAME);
 
   List_iterator_destroy(itr);
 
@@ -345,7 +348,10 @@ hostsfile_clusterlist_get_nodename(char *node, char *buf, unsigned int buflen)
   assert(node);
   assert(buf);
 
-  return cerebrod_clusterlist_copy_nodename(node, buf, buflen);
+  return cerebrod_clusterlist_copy_nodename(node, 
+                                            buf, 
+                                            buflen, 
+                                            HOSTSFILE_CLUSTERLIST_MODULE_NAME);
 }
 
 #if WITH_STATIC_MODULES
@@ -354,7 +360,7 @@ struct cerebrod_clusterlist_module_info hostsfile_clusterlist_module_info =
 struct cerebrod_clusterlist_module_info clusterlist_module_info =
 #endif /* !WITH_STATIC_MODULES */
   {
-    "hostsfile",
+    HOSTSFILE_CLUSTERLIST_MODULE_NAME,
     &hostsfile_clusterlist_parse_options,
     &hostsfile_clusterlist_init,
     &hostsfile_clusterlist_finish,
