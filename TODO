@@ -21,3 +21,6 @@
   - basically concerns use of "cerebro_defs.h" in protocol header files
 
 - maps for lib/modules
+
+- cerebrod_clusterlist -> cerebro_clusterlist
+  - move clusterlist mods into lib
