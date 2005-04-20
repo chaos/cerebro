@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: conffile.c,v 1.4 2005-04-20 21:19:38 achu Exp $
+ *  $Id: conffile.c,v 1.5 2005-04-20 21:23:52 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2003 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -30,12 +30,18 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
+#if STDC_HEADERS
 #include <ctype.h>
+#include <string.h>
+#endif /* STDC_HEADERS */
+#if HAVE_UNISTD_H
+#include <unistd.h>
+#endif /* HAVE_UNISTD_H */
+#if HAVE_FCNTL_H
+#include <fcntl.h>
+#endif /* HAVE_FCNTL_H */
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <fcntl.h>
 
 #include "conffile.h"
 #include "fd.h"
