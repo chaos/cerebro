@@ -1,3 +1,16 @@
+2005-04-20  Albert Chu  <chu11@llnl.gov>
+
+	* src/cerebrod/cerebrod_clusterlist_gendersllnl.c
+	(gendersllnl_clusterlist_init): Added genders indexing.
+
+	* config/ac_gendersllnl.m4: Check for genders indexing.
+
+	* src/libcommon/Makefile.am: Put libwrappers and libcommon back
+	into just libcommon.
+
+	* src/cerebrod/Makefile.am: Remove symbols exporting, force all
+	modules to hae the symbols they require.
+	
 2005-04-01  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerebrod/cerebrod_clusterlist_genders.c

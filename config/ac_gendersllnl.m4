@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: ac_gendersllnl.m4,v 1.5 2005-03-21 17:55:48 achu Exp $
+## $Id: ac_gendersllnl.m4,v 1.6 2005-04-20 18:09:22 achu Exp $
 ##*****************************************************************************
 
 AC_DEFUN([AC_GENDERSLLNL],
@@ -27,6 +27,12 @@ AC_DEFUN([AC_GENDERSLLNL],
      GENDERSLLNL_LIBS="-lgendersllnl"
      MANPAGE_GENDERSLLNL=1
      ac_with_gendersllnl=yes
+   
+     AC_CHECK_LIB(genders,
+                  genders_index_attrvals,
+                  AC_DEFINE(HAVE_GENDERS_INDEX_ATTRVALS, [1],
+                            [define genders_index_attrvals exists]),
+                  [])
   else
      MANPAGE_GENDERSLLNL=0
      ac_with_gendersllnl=no

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_gendersllnl.c,v 1.21 2005-04-07 04:43:10 achu Exp $
+ *  $Id: cerebrod_clusterlist_gendersllnl.c,v 1.22 2005-04-20 18:09:22 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -63,10 +63,25 @@ gendersllnl_clusterlist_parse_options(char **options)
 int
 gendersllnl_clusterlist_init(void)
 {
+  int rv;
+
   assert(!gendersllnl_handle);
 
-  return cerebrod_clusterlist_genders_init(&gendersllnl_handle, 
-					   gendersllnl_file);
+  rv = cerebrod_clusterlist_genders_init(&gendersllnl_handle, 
+                                         gendersllnl_file);
+
+#if HAVE_GENDERS_INDEX_ATTRVALS
+  if (!rv)
+    {
+      /* This is for performance improvements if the indexing API
+       * functions are available.  Don't fail and return -1, since the
+       * rest is not dependent on this section of code.
+       */
+      genders_index_attrvals(gendersllnl_handle, GENDERS_ALTNAME_ATTRIBUTE);
+    }
+#endif /* HAVE_GENDERS_INDEX_ATTRVALS */
+
+  return rv;
 }
 
 /* 
