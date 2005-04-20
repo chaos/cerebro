@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_dynamic_modules.c,v 1.3 2005-04-02 00:36:52 achu Exp $
+ *  $Id: cerebrod_dynamic_modules.c,v 1.4 2005-04-20 23:36:26 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -43,10 +43,10 @@ int dynamic_config_modules_len = 1;
  * dynamic clusterlist modules to search for by default
  */
 char *dynamic_clusterlist_modules[] = {
-  "cerebrod_clusterlist_gendersllnl.la",
-  "cerebrod_clusterlist_genders.la",
-  "cerebrod_clusterlist_none.la",
-  "cerebrod_clusterlist_hostsfile.la",
+  "cerebro_clusterlist_gendersllnl.la",
+  "cerebro_clusterlist_genders.la",
+  "cerebro_clusterlist_none.la",
+  "cerebro_clusterlist_hostsfile.la",
   NULL
 };
 int dynamic_clusterlist_modules_len = 4;

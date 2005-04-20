@@ -1,5 +1,10 @@
 2005-04-20  Albert Chu  <chu11@llnl.gov>
 
+	Partitioned clusterlist modules into separate dir.  Major Changes
+	throughout.
+	
+2005-04-20  Albert Chu  <chu11@llnl.gov>
+
 	* src/cerebrod/cerebrod_clusterlist_gendersllnl.c
 	(gendersllnl_clusterlist_init): Added genders indexing.
 
@@ -19,7 +24,7 @@
 	src/cerebrod/cerebrod_clusterlist_genders_util.c: Remove symbols
 	exporting, force all modules to hae the symbols they require.
 	Made appropriate changes to support this.
-	
+
 2005-04-01  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerebrod/cerebrod_clusterlist_genders.c

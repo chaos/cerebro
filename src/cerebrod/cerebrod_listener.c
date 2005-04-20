@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.37 2005-03-30 18:46:58 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.38 2005-04-20 23:36:26 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -383,10 +383,10 @@ cerebrod_listener(void *arg)
                                             nodename_key, 
                                             CEREBRO_MAXNODENAMELEN+1) < 0)
         {
-          cerebrod_err_output("%s(%s:%d): cerebrod_clusterlist_get_nodename "
-			      "error: %s", 
-			      __FILE__, __FUNCTION__, __LINE__,
-                              hb.nodename);
+          cerebrod_err_debug("%s(%s:%d): cerebrod_clusterlist_get_nodename "
+                             "error: %s", 
+                             __FILE__, __FUNCTION__, __LINE__,
+                             hb.nodename);
           continue;
         }
 

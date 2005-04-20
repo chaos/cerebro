@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_hostsfile.c,v 1.20 2005-04-20 19:43:22 achu Exp $
+ *  $Id: cerebro_clusterlist_hostsfile.c,v 1.1 2005-04-20 23:36:26 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -17,16 +17,14 @@
 
 #include "cerebro_defs.h"
 
-#include "cerebrod_clusterlist_module.h"
-
-#include "cerebrod_clusterlist.h"
-#include "cerebrod_clusterlist_util.h"
-#include "cerebrod_error.h"
-#include "cerebrod.h"
+#include "cerebro_clusterlist_module.h"
+#include "cerebro_clusterlist_util.h"
+#include "error.h"
 #include "fd.h"
 #include "wrappers.h"
 
 #define HOSTSFILE_CLUSTERLIST_MODULE_NAME "hostsfile"
+#define HOSTSFILE_PARSE_BUFLEN            4096
 
 /* 
  * hosts
@@ -53,7 +51,7 @@ hostsfile_clusterlist_parse_options(char **options)
   assert(!hosts);
 
   if (options)
-    cerebrod_clusterlist_parse_filename(options, 
+    cerebro_clusterlist_parse_filename(options, 
                                         &hostsfile_file, 
                                         HOSTSFILE_CLUSTERLIST_MODULE_NAME);
 
@@ -72,24 +70,24 @@ hostsfile_clusterlist_parse_options(char **options)
  * Return amount of data read into the buffer
  */
 static int
-_readline(int fd, char *buf, int buflen)
+_readline(int fd, char *buf, int buflen, char *clusterlist_module_name)
 {
   int ret;
-  char *clusterlist_module_name = cerebrod_clusterlist_module_name();
 
   assert(buf);
+  assert(clusterlist_module_name);
 
   if ((ret = fd_read_line(fd, buf, buflen)) < 0)
-    cerebrod_err_exit("%s(%s:%d): %s clusterlist module: fd_read_line: %s", 
-		      __FILE__, __FUNCTION__, __LINE__,
-		      clusterlist_module_name, strerror(errno));
-
+    err_exit("%s(%s:%d): %s clusterlist module: fd_read_line: %s", 
+             __FILE__, __FUNCTION__, __LINE__,
+             clusterlist_module_name, strerror(errno));
+  
   /* buflen - 1 b/c fd_read_line guarantees null termination */
   if (ret >= (buflen-1))
-    cerebrod_err_exit("%s(%s:%d): %s clusterlist module: "
-		      "fd_read_line: line truncation",
-		      __FILE__, __FUNCTION__, __LINE__, 
-		      clusterlist_module_name);
+    err_exit("%s(%s:%d): %s clusterlist module: "
+             "fd_read_line: line truncation",
+             __FILE__, __FUNCTION__, __LINE__, 
+             clusterlist_module_name);
 
   return ret;
 }
@@ -200,7 +198,7 @@ int
 hostsfile_clusterlist_init(void)
 {
   int fd, len;
-  char buf[CEREBROD_PARSE_BUFLEN];
+  char buf[HOSTSFILE_PARSE_BUFLEN];
   char *file;
 
   assert(!hosts);
@@ -210,13 +208,16 @@ hostsfile_clusterlist_init(void)
   if (hostsfile_file)
     file = hostsfile_file;
   else
-    file = CEREBROD_CLUSTERLIST_HOSTSFILE_DEFAULT;
+    file = CEREBRO_CLUSTERLIST_HOSTSFILE_DEFAULT;
 
   if ((fd = open(file, O_RDONLY)) < 0)
-    cerebrod_err_exit("hostsfile clusterlist file '%s' cannot be opened", 
-		      hostsfile_file);
-
-  while ((len = _readline(fd, buf, CEREBROD_PARSE_BUFLEN)) > 0)
+    err_exit("hostsfile clusterlist file '%s' cannot be opened", 
+             hostsfile_file);
+  
+  while ((len = _readline(fd, 
+                          buf, 
+                          HOSTSFILE_PARSE_BUFLEN,
+                          HOSTSFILE_CLUSTERLIST_MODULE_NAME)) > 0)
     {
       char *hostPtr;
       char *str;
@@ -286,9 +287,9 @@ hostsfile_clusterlist_get_all_nodes(char **nodes, unsigned int nodeslen)
   numnodes = list_count(hosts);
 
   if (numnodes > nodeslen)
-    cerebrod_err_exit("%s(%s:%d): %s clusterlist module: nodeslen too small",
-		      __FILE__, __FUNCTION__, __LINE__,
-		      HOSTSFILE_CLUSTERLIST_MODULE_NAME);
+    err_exit("%s(%s:%d): %s clusterlist module: nodeslen too small",
+             __FILE__, __FUNCTION__, __LINE__,
+             HOSTSFILE_CLUSTERLIST_MODULE_NAME);
 
   itr = List_iterator_create(hosts);
 
@@ -296,9 +297,9 @@ hostsfile_clusterlist_get_all_nodes(char **nodes, unsigned int nodeslen)
     nodes[i++] = Strdup(node);
 
   if (i > numnodes)
-    cerebrod_err_exit("%s(%s:%d): %s clusterlist module: iterator count error",
-		      __FILE__, __FUNCTION__, __LINE__,
-		      HOSTSFILE_CLUSTERLIST_MODULE_NAME);
+    err_exit("%s(%s:%d): %s clusterlist module: iterator count error",
+             __FILE__, __FUNCTION__, __LINE__,
+             HOSTSFILE_CLUSTERLIST_MODULE_NAME);
 
   List_iterator_destroy(itr);
 
@@ -348,16 +349,16 @@ hostsfile_clusterlist_get_nodename(char *node, char *buf, unsigned int buflen)
   assert(node);
   assert(buf);
 
-  return cerebrod_clusterlist_copy_nodename(node, 
+  return cerebro_clusterlist_copy_nodename(node, 
                                             buf, 
                                             buflen, 
                                             HOSTSFILE_CLUSTERLIST_MODULE_NAME);
 }
 
 #if WITH_STATIC_MODULES
-struct cerebrod_clusterlist_module_info hostsfile_clusterlist_module_info =
+struct cerebro_clusterlist_module_info hostsfile_clusterlist_module_info =
 #else /* !WITH_STATIC_MODULES */
-struct cerebrod_clusterlist_module_info clusterlist_module_info =
+struct cerebro_clusterlist_module_info clusterlist_module_info =
 #endif /* !WITH_STATIC_MODULES */
   {
     HOSTSFILE_CLUSTERLIST_MODULE_NAME,

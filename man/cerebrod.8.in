@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebrod.8.in,v 1.10 2005-03-24 01:29:21 achu Exp $
+\."$Id: cerebrod.8.in,v 1.11 2005-04-20 23:36:26 achu Exp $
 \."#############################################################################
 .TH cerebrod 8 "May 2005" "cerebrod @VERSION@" cerebrod
 .SH "NAME"
@@ -103,11 +103,10 @@ searched for by
 in the above order.
 \}
 .el \{
-Configuration modules are first searched for in the 
+Configuration modules are searched for in the 
 .B Cerebro
-package library directory, @CEREBROD_MODULE_DIR@.  They are then
-searched for in the current directory.  A configuration module can
-also be specified on the command line with the
+package library directory, @CEREBROD_MODULE_DIR@.  A configuration
+module can also be specified on the command line with the
 .I -c 
 option.
 
@@ -146,10 +145,9 @@ The
 .B cerebrod
 daemon dynamically loads the clusterlist module selected by the user
 or searches for one when one is not specified.  Clusterlist modules
-are first searched for in the
+are searched for in the
 .B Cerebro
-package library, @CEREBROD_MODULE_DIR@.  They are then searched for in
-the current directory.  
+package library, @CEREBROD_MODULE_DIR@.  
 \}
 
 The following config modules

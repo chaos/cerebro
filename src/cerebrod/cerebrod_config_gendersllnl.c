@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config_gendersllnl.c,v 1.10 2005-04-07 04:43:10 achu Exp $
+ *  $Id: cerebrod_config_gendersllnl.c,v 1.11 2005-04-20 23:36:26 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -25,7 +25,7 @@
 #include "cerebrod_config_module.h"
 
 #include "cerebrod_config.h"
-#include "cerebrod_error.h"
+#include "error.h"
 #include "wrappers.h"
 
 extern int h_errno;
@@ -55,18 +55,18 @@ gendersllnl_config_load_default(struct cerebrod_module_config *conf)
   assert(conf);
 
   if (!(handle = genders_handle_create()))
-    cerebrod_err_exit("%s(%s:%d): genders_handle_create",
-		      __FILE__, __FUNCTION__, __LINE__);
+    err_exit("%s(%s:%d): genders_handle_create",
+             __FILE__, __FUNCTION__, __LINE__);
  
   if (genders_load_data(handle, NULL) < 0)
-    cerebrod_err_exit("%s(%s:%d): genders_load_data: %s", 
-		      __FILE__, __FUNCTION__, __LINE__,
-		      genders_errormsg(handle));
+    err_exit("%s(%s:%d): genders_load_data: %s", 
+             __FILE__, __FUNCTION__, __LINE__,
+             genders_errormsg(handle));
 
   if ((ret = genders_testattr(handle, NULL, "mgmt", NULL, 0)) < 0)
-    cerebrod_err_exit("%s(%s:%d): genders_testattr: %s", 
-		      __FILE__, __FUNCTION__, __LINE__,
-		      genders_errormsg(handle));
+    err_exit("%s(%s:%d): genders_testattr: %s", 
+             __FILE__, __FUNCTION__, __LINE__,
+             genders_errormsg(handle));
     
   if (ret)
     {
@@ -87,9 +87,9 @@ gendersllnl_config_load_default(struct cerebrod_module_config *conf)
                               GENDERS_ALTNAME_ATTRIBUTE,
                               altnamebuf,
                               CEREBRO_MAXNODENAMELEN)) < 0)
-    cerebrod_err_exit("%s(%s:%d): genders_testattr: %s",
-		      __FILE__, __FUNCTION__, __LINE__,
-		      genders_errormsg(handle));
+    err_exit("%s(%s:%d): genders_testattr: %s",
+             __FILE__, __FUNCTION__, __LINE__,
+             genders_errormsg(handle));
 
   if (ret)
     {
@@ -110,9 +110,9 @@ gendersllnl_config_load_default(struct cerebrod_module_config *conf)
     }
 
   if (genders_handle_destroy(handle) < 0)
-    cerebrod_err_exit("%s(%s:%d): genders_handle_destroy: %s",
-		      __FILE__, __FUNCTION__, __LINE__,
-		      genders_errormsg(handle));
+    err_exit("%s(%s:%d): genders_handle_destroy: %s",
+             __FILE__, __FUNCTION__, __LINE__,
+             genders_errormsg(handle));
 
   return 0;
 }

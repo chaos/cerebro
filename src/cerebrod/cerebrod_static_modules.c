@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_static_modules.c,v 1.4 2005-03-30 18:26:02 achu Exp $
+ *  $Id: cerebrod_static_modules.c,v 1.5 2005-04-20 23:36:26 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -40,7 +40,7 @@ struct cerebrod_config_module_info *static_config_modules[] =
  *
  * clusterlist modules statically compiled in
  */
-struct cerebrod_clusterlist_module_info *static_clusterlist_modules[] =
+struct cerebro_clusterlist_module_info *static_clusterlist_modules[] =
   {
 #if WITH_GENDERSLLNL
     &gendersllnl_clusterlist_module_info,
@@ -78,10 +78,10 @@ cerebrod_find_static_config_module(char *name)
   return NULL;
 }
 
-struct cerebrod_clusterlist_module_info *
+struct cerebro_clusterlist_module_info *
 cerebrod_find_static_clusterlist_module(char *name)
 {
-  struct cerebrod_clusterlist_module_info **ptr;
+  struct cerebro_clusterlist_module_info **ptr;
   int i = 0;
   
   assert(name);

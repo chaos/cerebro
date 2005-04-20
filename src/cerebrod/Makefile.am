@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.29 2005-04-20 18:09:22 achu Exp $
+## $Id: Makefile.am,v 1.30 2005-04-20 23:36:26 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -12,8 +12,6 @@ endif
 
 noinst_HEADERS = cerebrod.h \
 		 cerebrod_clusterlist.h \
-		 cerebrod_clusterlist_util.h \
-		 cerebrod_clusterlist_genders_util.h \
 		 cerebrod_config.h \
                  cerebrod_daemon.h \
 		 cerebrod_data.h \
@@ -31,30 +29,20 @@ noinst_HEADERS = cerebrod.h \
 #
 
 if WITH_GENDERSLLNL
-GENDERSLLNL_STATIC_SOURCES  = cerebrod_config_gendersllnl.c \
-		              cerebrod_clusterlist_gendersllnl.c
-GENDERS_UTIL_STATIC_SOURCES = cerebrod_clusterlist_genders_util.c
+GENDERSLLNL_STATIC_SOURCES  = cerebrod_config_gendersllnl.c
 GENDERSLLNL_STATIC_LIBS     = $(GENDERSLLNL_LIBS)
-endif
-
-if WITH_GENDERS
-GENDERS_STATIC_SOURCES      = cerebrod_clusterlist_genders.c
-GENDERS_UTIL_STATIC_SOURCES = cerebrod_clusterlist_genders_util.c
-GENDERS_STATIC_LIBS         = $(GENDERS_LIBS)
 endif
 
 if WITH_STATIC_MODULES
 STATIC_MODULES_SOURCES  = $(GENDERSLLNL_STATIC_SOURCES) \
-	   	          $(GENDERS_STATIC_SOURCES) \
-                          $(GENDERS_UTIL_STATIC_SOURCES) \
-		 	  cerebrod_clusterlist_util.c \
-		          cerebrod_clusterlist_hostsfile.c \
-		          cerebrod_clusterlist_none.c \
 			  cerebrod_static_modules.c
-STATIC_MODULES_LIBS     = $(GENDERSLLNL_STATIC_LIBS) $(GENDERS_STATIC_LIBS)
+STATIC_MODULES_LIBS     = $(GENDERSLLNL_STATIC_LIBS)
 else
 DYNAMIC_MODULES_SOURCES = cerebrod_dynamic_modules.c
 endif
+
+cerebro_clusterlist_module_builddir=`cd $(top_builddir)/src/clusterlist && pwd`
+cerebrod_config_module_builddir=`cd $(top_builddir)/src/cerebrod && pwd`
 
 sbin_PROGRAMS    = cerebrod
 cerebrod_SOURCES = cerebrod.c \
@@ -70,7 +58,9 @@ cerebrod_SOURCES = cerebrod.c \
 		   cerebrod_util.c \
 		   $(STATIC_MODULES_SOURCES) \
 		   $(DYNAMIC_MODULES_SOURCES)
-cerebrod_CFLAGS  = -I$(srcdir)/../libcerebro \
+cerebrod_CFLAGS  = -DCEREBRO_CLUSTERLIST_MODULE_BUILDDIR=\"$(cerebro_clusterlist_module_builddir)\" \
+		   -DCEREBROD_CONFIG_MODULE_BUILDDIR=\"$(cerebrod_config_module_builddir)\" \
+		   -I$(srcdir)/../libcerebro \
 		   -I$(srcdir)/../libcommon
 cerebrod_LDFLAGS = $(STATIC_MODULES_LIBS)
 cerebrod_LDADD   = ../libcerebro/libcerebro.la \
@@ -81,21 +71,12 @@ cerebrod_LDADD   = ../libcerebro/libcerebro.la \
 #
 
 if WITH_GENDERSLLNL
-GENDERSLLNL_CONFIG_MODULE      = cerebrod_config_gendersllnl.la
-GENDERSLLNL_CLUSTERLIST_MODULE = cerebrod_clusterlist_gendersllnl.la
-endif
-
-if WITH_GENDERS
-GENDERS_CLUSTERLIST_MODULE     = cerebrod_clusterlist_genders.la
+GENDERSLLNL_CONFIG_MODULE = cerebrod_config_gendersllnl.la
 endif
 
 if !WITH_STATIC_MODULES
-modulelibdir = $(CEREBROD_MODULE_DIR)
-modulelib_LTLIBRARIES = $(GENDERSLLNL_CONFIG_MODULE) \
-		        $(GENDERSLLNL_CLUSTERLIST_MODULE) \
-		        $(GENDERS_CLUSTERLIST_MODULE) \
-		        cerebrod_clusterlist_hostsfile.la \
-		        cerebrod_clusterlist_none.la
+modulelibdir = $(CEREBRO_MODULE_DIR)
+modulelib_LTLIBRARIES = $(GENDERSLLNL_CONFIG_MODULE)
 endif
 
 MODULE_FLAGS = -module -avoid-version
@@ -105,36 +86,6 @@ cerebrod_config_gendersllnl_la_LDFLAGS = $(MODULE_FLAGS) $(GENDERSLLNL_LIBS)
 cerebrod_config_gendersllnl_la_CFLAGS  = -I$(srcdir)/../libcerebro \
 					 -I$(srcdir)/../libcommon
 cerebrod_config_gendersllnl_la_LIBADD  = ../libcommon/libcommon.la
-
-cerebrod_clusterlist_gendersllnl_la_SOURCES = cerebrod_clusterlist_gendersllnl.c \
-					      cerebrod_clusterlist_genders_util.c \
-					      cerebrod_clusterlist_util.c 
-cerebrod_clusterlist_gendersllnl_la_LDFLAGS = $(MODULE_FLAGS) $(GENDERSLLNL_LIBS)
-cerebrod_clusterlist_gendersllnl_la_CFLAGS  = -I$(srcdir)/../libcerebro \
-					      -I$(srcdir)/../libcommon
-cerebrod_clusterlist_gendersllnl_la_LIBADD  = ../libcommon/libcommon.la
-
-cerebrod_clusterlist_genders_la_SOURCES = cerebrod_clusterlist_genders.c \
-					  cerebrod_clusterlist_genders_util.c \
-					  cerebrod_clusterlist_util.c
-cerebrod_clusterlist_genders_la_LDFLAGS = $(MODULE_FLAGS) $(GENDERS_LIBS)
-cerebrod_clusterlist_genders_la_CFLAGS  = -I$(srcdir)/../libcerebro \
-					  -I$(srcdir)/../libcommon
-cerebrod_clusterlist_genders_la_LIBADD  = ../libcommon/libcommon.la
-
-cerebrod_clusterlist_hostsfile_la_SOURCES = cerebrod_clusterlist_hostsfile.c \
-					    cerebrod_clusterlist_util.c
-cerebrod_clusterlist_hostsfile_la_LDFLAGS = $(MODULE_FLAGS)
-cerebrod_clusterlist_hostsfile_la_CFLAGS  = -I$(srcdir)/../libcerebro \
-					    -I$(srcdir)/../libcommon
-cerebrod_clusterlist_hostsfile_la_LIBADD  = ../libcommon/libcommon.la
-
-cerebrod_clusterlist_none_la_SOURCES = cerebrod_clusterlist_none.c \
-				       cerebrod_clusterlist_util.c
-cerebrod_clusterlist_none_la_LDFLAGS = $(MODULE_FLAGS)
-cerebrod_clusterlist_none_la_CFLAGS  = -I$(srcdir)/../libcerebro \
-				       -I$(srcdir)/../libcommon
-cerebrod_clusterlist_none_la_LIBADD  = ../libcommon/libcommon.la
 
 ../libcerebro/libcerebro.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist.c,v 1.22 2005-03-30 18:26:02 achu Exp $
+ *  $Id: cerebrod_clusterlist.c,v 1.23 2005-04-20 23:36:26 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -16,7 +16,7 @@
 
 #include <sys/param.h>
 
-#include "cerebrod_clusterlist_module.h"
+#include "cerebro_clusterlist_module.h"
 
 #include "cerebrod.h"
 #include "cerebrod_clusterlist.h"
@@ -37,7 +37,7 @@ extern struct cerebrod_config conf;
  *
  * clusterlist module info and operations
  */
-static struct cerebrod_clusterlist_module_info *clusterlist_module_info = NULL;
+static struct cerebro_clusterlist_module_info *clusterlist_module_info = NULL;
 
 #if !WITH_STATIC_MODULES
 /* 
@@ -56,7 +56,7 @@ static lt_dlhandle clusterlist_module_dl_handle = NULL;
  * Returns 1 on loading success, 0 on loading failure, -1 on fatal error
  */
 static int
-_clusterlist_check_module_data(struct cerebrod_clusterlist_module_info *clusterlist_module_info_l)
+_clusterlist_check_module_data(struct cerebro_clusterlist_module_info *clusterlist_module_info_l)
 {
   assert(clusterlist_module_info_l);
 
@@ -99,7 +99,7 @@ _clusterlist_check_module_data(struct cerebrod_clusterlist_module_info *clusterl
   if (conf.debug)
     {
       fprintf(stderr, "**************************************\n");
-      fprintf(stderr, "* Cerebrod Clusterlist Configuration:\n");
+      fprintf(stderr, "* Cerebro Clusterlist Configuration:\n");
       fprintf(stderr, "* -----------------------\n");
       fprintf(stderr, "* Loaded clusterlist module: %s\n", 
 	      clusterlist_module_info_l->clusterlist_module_name);
@@ -147,7 +147,7 @@ _clusterlist_load_dynamic_module(char *module_path)
 
   clusterlist_module_dl_handle = Lt_dlopen(module_path);
 
-  clusterlist_module_info = (struct cerebrod_clusterlist_module_info *)Lt_dlsym(clusterlist_module_dl_handle, "clusterlist_module_info");
+  clusterlist_module_info = (struct cerebro_clusterlist_module_info *)Lt_dlsym(clusterlist_module_dl_handle, "clusterlist_module_info");
 
   if (!clusterlist_module_info->clusterlist_module_name)
     cerebrod_err_exit("clusterlist module '%s' does not contain a valid name", 
@@ -171,7 +171,7 @@ cerebrod_clusterlist_setup(void)
     }
   else
     {
-      struct cerebrod_clusterlist_module_info **ptr;
+      struct cerebro_clusterlist_module_info **ptr;
       int i = 0;
 
       ptr = &static_clusterlist_modules[0];
@@ -208,13 +208,13 @@ cerebrod_clusterlist_setup(void)
     }
   else
     {
-      if (cerebrod_search_dir_for_module(CEREBROD_MODULE_DIR,
+      if (cerebrod_search_dir_for_module(CEREBRO_CLUSTERLIST_MODULE_BUILDDIR,
                                          dynamic_clusterlist_modules,
 					 dynamic_clusterlist_modules_len,
                                          _clusterlist_load_dynamic_module))
         goto done;
 
-      if (cerebrod_search_dir_for_module(".",
+      if (cerebrod_search_dir_for_module(CEREBRO_MODULE_DIR,
                                          dynamic_clusterlist_modules,
 					 dynamic_clusterlist_modules_len,
                                          _clusterlist_load_dynamic_module))

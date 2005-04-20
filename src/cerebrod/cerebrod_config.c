@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.63 2005-03-30 18:40:12 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.64 2005-04-20 23:36:26 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -254,7 +254,7 @@ _cerebrod_cmdline_parse_check(void)
 	   */
 	  memset(filebuf, '\0', MAXPATHLEN+1);
 	  snprintf(filebuf, MAXPATHLEN, "%s/%s", 
-		   CEREBROD_MODULE_DIR, conf.config_module);
+		   CEREBRO_MODULE_DIR, conf.config_module);
 
 	  if (!stat(filebuf, &buf))
 	    {
@@ -266,7 +266,8 @@ _cerebrod_cmdline_parse_check(void)
 	   * current directory.
 	   */
 	  memset(filebuf, '\0', MAXPATHLEN+1);
-	  snprintf(filebuf, MAXPATHLEN, "./%s", conf.config_module);
+	  snprintf(filebuf, MAXPATHLEN, "%s/%s", 
+                   CEREBROD_CONFIG_MODULE_BUILDDIR, conf.config_module);
 
 	  if (!stat(filebuf, &buf))
 	    {
@@ -279,7 +280,7 @@ _cerebrod_cmdline_parse_check(void)
 	   */
 	  memset(filebuf, '\0', MAXPATHLEN+1);
 	  snprintf(filebuf, MAXPATHLEN, "%s/cerebrod_config_%s.la", 
-		   CEREBROD_MODULE_DIR, conf.config_module);
+		   CEREBRO_MODULE_DIR, conf.config_module);
 
 	  if (!stat(filebuf, &buf))
 	    {
@@ -291,8 +292,8 @@ _cerebrod_cmdline_parse_check(void)
 	   * current directory.
 	   */
 	  memset(filebuf, '\0', MAXPATHLEN+1);
-	  snprintf(filebuf, MAXPATHLEN, "./cerebrod_config_%s.la", 
-		   conf.config_module);
+	  snprintf(filebuf, MAXPATHLEN, "%s/cerebrod_config_%s.la", 
+		   CEREBROD_CONFIG_MODULE_BUILDDIR, conf.config_module);
 
 	  if (!stat(filebuf, &buf))
 	    {
@@ -486,13 +487,13 @@ _cerebrod_config_module_setup(void)
     }
   else
     {
-      if (cerebrod_search_dir_for_module(CEREBROD_MODULE_DIR,
+      if (cerebrod_search_dir_for_module(CEREBROD_CONFIG_MODULE_BUILDDIR,
                                          dynamic_config_modules,
 					 dynamic_config_modules_len,
                                          _config_load_dynamic_module))
         goto done;
-      
-      if (cerebrod_search_dir_for_module(".",
+
+      if (cerebrod_search_dir_for_module(CEREBRO_MODULE_DIR,
                                          dynamic_config_modules,
 					 dynamic_config_modules_len,
                                          _config_load_dynamic_module))
@@ -1235,7 +1236,7 @@ _cerebrod_calculate_clusterlist_module(void)
 	   */
 	  memset(filebuf, '\0', MAXPATHLEN+1);
 	  snprintf(filebuf, MAXPATHLEN, "%s/%s", 
-		   CEREBROD_MODULE_DIR, conf.clusterlist_module);
+		   CEREBRO_MODULE_DIR, conf.clusterlist_module);
 
 	  if (!stat(filebuf, &buf))
 	    {
@@ -1260,7 +1261,7 @@ _cerebrod_calculate_clusterlist_module(void)
 	   */
 	  memset(filebuf, '\0', MAXPATHLEN+1);
 	  snprintf(filebuf, MAXPATHLEN, "%s/cerebrod_clusterlist_%s.la", 
-		   CEREBROD_MODULE_DIR, conf.clusterlist_module);
+		   CEREBRO_MODULE_DIR, conf.clusterlist_module);
 
 	  if (!stat(filebuf, &buf))
 	    {

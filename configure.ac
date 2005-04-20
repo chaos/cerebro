@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.18 2005-03-30 18:26:02 achu Exp $
+## $Id: configure.ac,v 1.19 2005-04-20 23:36:26 achu Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -66,7 +66,7 @@ AC_CHECK_HEADERS( \
 #
 # Check for new default cerebrod paths
 #
-AC_CEREBROD_MODULE_DIR
+AC_CEREBRO_MODULE_DIR
 AC_CEREBROD_CONFIG_FILE
 
 #
@@ -138,6 +138,7 @@ AC_CONFIG_FILES( \
   man/cerebrod.conf.5 \
   src/Makefile \
   src/cerebrod/Makefile \
+  src/clusterlist/Makefile \
   src/libcerebro/Makefile \
   src/libcommon/Makefile \
 )

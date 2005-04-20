@@ -1,9 +1,10 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.2 2005-03-23 17:37:33 achu Exp $
+## $Id: Makefile.am,v 1.3 2005-04-20 23:36:26 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
 
 SUBDIRS = cerebrod \
-	  libcerebro \
-	  libcommon
+	  clusterlist \
+	  libcommon \
+	  libcerebro

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist_none.c,v 1.14 2005-04-20 19:43:22 achu Exp $
+ *  $Id: cerebro_clusterlist_none.c,v 1.1 2005-04-20 23:36:26 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -14,11 +14,9 @@
 #include <assert.h>
 #include <errno.h>
 
-#include "cerebrod_clusterlist_module.h"
-
-#include "cerebrod_clusterlist.h"
-#include "cerebrod_clusterlist_util.h"
-#include "cerebrod_error.h"
+#include "cerebro_clusterlist_module.h"
+#include "cerebro_clusterlist_util.h"
+#include "error.h"
 #include "wrappers.h"
 
 #define NONE_CLUSTERLIST_MODULE_NAME "none"
@@ -39,8 +37,8 @@ none_clusterlist_parse_options(char **options)
   /* None module takes no options */
   while (options[i] != NULL)
     {
-      cerebrod_err_exit("none clusterlist module: option '%s' unrecognized", 
-			options[i]);
+      err_exit("none clusterlist module: option '%s' unrecognized", 
+               options[i]);
       i++;
     }
 
@@ -114,16 +112,16 @@ none_clusterlist_get_nodename(char *node, char *buf, unsigned int buflen)
   assert(node);
   assert(buf);
 
-  return cerebrod_clusterlist_copy_nodename(node, 
-                                            buf, 
-                                            buflen, 
-                                            NONE_CLUSTERLIST_MODULE_NAME);
+  return cerebro_clusterlist_copy_nodename(node, 
+                                           buf, 
+                                           buflen, 
+                                           NONE_CLUSTERLIST_MODULE_NAME);
 }
 
 #if WITH_STATIC_MODULES
-struct cerebrod_clusterlist_module_info none_clusterlist_module_info =
+struct cerebro_clusterlist_module_info none_clusterlist_module_info =
 #else /* !WITH_STATIC_MODULES */
-struct cerebrod_clusterlist_module_info clusterlist_module_info =
+struct cerebro_clusterlist_module_info clusterlist_module_info =
 #endif /* !WITH_STATIC_MODULES */
   {
     NONE_CLUSTERLIST_MODULE_NAME,

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_static_modules.h,v 1.3 2005-03-24 01:29:21 achu Exp $
+ *  $Id: cerebrod_static_modules.h,v 1.4 2005-04-20 23:36:26 achu Exp $
 \*****************************************************************************/
  
 #ifndef _CEREBROD_STATIC_MODULES_H
@@ -26,21 +26,21 @@ extern struct cerebrod_config_module_info gendersllnl_config_module_info;
  * Clusterlist modules
  */
 #if WITH_GENDERSLLNL
-extern struct cerebrod_clusterlist_module_info gendersllnl_clusterlist_module_info;
+extern struct cerebro_clusterlist_module_info gendersllnl_clusterlist_module_info;
 #endif
 
 #if WITH_GENDERS
-extern struct cerebrod_clusterlist_module_info genders_clusterlist_module_info;
+extern struct cerebro_clusterlist_module_info genders_clusterlist_module_info;
 #endif
 
-extern struct cerebrod_clusterlist_module_info hostsfile_clusterlist_module_info;
-extern struct cerebrod_clusterlist_module_info none_clusterlist_module_info;
+extern struct cerebro_clusterlist_module_info hostsfile_clusterlist_module_info;
+extern struct cerebro_clusterlist_module_info none_clusterlist_module_info;
 
 /*
  * Module arrays
  */
 extern struct cerebrod_config_module_info *static_config_modules[];
-extern struct cerebrod_clusterlist_module_info *static_clusterlist_modules[];
+extern struct cerebro_clusterlist_module_info *static_clusterlist_modules[];
 
 /*
  * cerebrod_find_static_config_module
@@ -53,10 +53,10 @@ struct cerebrod_config_module_info *cerebrod_find_static_config_module(char *nam
 /*
  * cerebrod_find_static_clusterlist_module
  *
- * Returns pointer to cerebrod_clusterlist_module_info structure with
+ * Returns pointer to cerebro_clusterlist_module_info structure with
  * the name, NULL if one is not found
  */
-struct cerebrod_clusterlist_module_info *cerebrod_find_static_clusterlist_module(char *name);
+struct cerebro_clusterlist_module_info *cerebrod_find_static_clusterlist_module(char *name);
 
 #endif /* WITH_STATIC_MODULES */
 
