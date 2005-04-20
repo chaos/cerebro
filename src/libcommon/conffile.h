@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: conffile.h,v 1.1.1.1 2004-07-02 22:31:29 achu Exp $
+ *  $Id: conffile.h,v 1.2 2005-04-20 21:19:38 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2003 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
