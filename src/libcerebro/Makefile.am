@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.6 2005-04-20 18:09:22 achu Exp $
+## $Id: Makefile.am,v 1.7 2005-04-20 18:13:52 achu Exp $
 ##*****************************************************************************
 
 if WITH_GNU_LD
@@ -14,7 +14,7 @@ cerebroheadersdir = $(includedir)/cerebro
 
 cerebroheaders_HEADERS = cerebro_defs.h \
 			 cerebro_marshalling.h \
-			 cerebro_clusterlist_module.h \
+			 cerebrod_clusterlist_module.h \
 			 cerebrod_config_module.h
 
 lib_LTLIBRARIES       = libcerebro.la
