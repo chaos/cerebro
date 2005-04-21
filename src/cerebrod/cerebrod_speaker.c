@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.20 2005-03-30 18:46:58 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.21 2005-04-21 22:00:33 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -19,12 +19,12 @@
 #include <netinet/in.h>
 
 #include "cerebro_defs.h"
+#include "cerebro_error.h"
 #include "cerebrod_heartbeat_protocol.h"
 
 #include "cerebrod_speaker.h"
 #include "cerebrod_config.h"
 #include "cerebrod_data.h"
-#include "cerebrod_error.h"
 #include "cerebrod_heartbeat.h"
 #include "fd.h"
 #include "wrappers.h"
@@ -51,9 +51,9 @@ _cerebrod_speaker_create_and_setup_socket(void)
 
   if ((temp_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {
-      cerebrod_err_debug("%s(%s:%d): socket: %s", 
-			 __FILE__, __FUNCTION__, __LINE__,
-                         strerror(errno));
+      cerebro_err_debug("%s(%s:%d): socket: %s", 
+                        __FILE__, __FUNCTION__, __LINE__,
+                        strerror(errno));
       return -1;
     }
 
@@ -78,9 +78,9 @@ _cerebrod_speaker_create_and_setup_socket(void)
 		     &imr,
 		     sizeof(struct ip_mreqn)) < 0)
 	{
-	  cerebrod_err_debug("%s(%s:%d): setsockopt: %s", 
-			     __FILE__, __FUNCTION__, __LINE__,
-                             strerror(errno));
+	  cerebro_err_debug("%s(%s:%d): setsockopt: %s", 
+                            __FILE__, __FUNCTION__, __LINE__,
+                            strerror(errno));
 	  return -1;
 	}
 
@@ -91,9 +91,9 @@ _cerebrod_speaker_create_and_setup_socket(void)
 		     &optval, 
 		     sizeof(optval)) < 0)
 	{
-	  cerebrod_err_debug("%s(%s:%d): setsockopt: %s", 
-			     __FILE__, __FUNCTION__, __LINE__,
-                             strerror(errno));
+	  cerebro_err_debug("%s(%s:%d): setsockopt: %s", 
+                            __FILE__, __FUNCTION__, __LINE__,
+                            strerror(errno));
 	  return -1;
 	}
 
@@ -104,9 +104,9 @@ _cerebrod_speaker_create_and_setup_socket(void)
 		     &optval,
 		     sizeof(optval)) < 0)
 	{
-	  cerebrod_err_debug("%s(%s:%d): setsockopt: %s", 
-			     __FILE__, __FUNCTION__, __LINE__,
-                             strerror(errno));
+	  cerebro_err_debug("%s(%s:%d): setsockopt: %s", 
+                            __FILE__, __FUNCTION__, __LINE__,
+                            strerror(errno));
 	  return -1;
 	}
     }
@@ -121,9 +121,9 @@ _cerebrod_speaker_create_and_setup_socket(void)
 	   (struct sockaddr *)&heartbeat_addr, 
 	   sizeof(struct sockaddr_in)) < 0) 
     {
-      cerebrod_err_debug("%s(%s:%d): bind: %s", 
-			 __FILE__, __FUNCTION__, __LINE__,
-                         strerror(errno));
+      cerebro_err_debug("%s(%s:%d): bind: %s", 
+                        __FILE__, __FUNCTION__, __LINE__,
+                        strerror(errno));
       return -1;
     }
 
@@ -198,8 +198,8 @@ cerebrod_speaker(void *arg)
 
   _cerebrod_speaker_initialize();
   if ((fd = _cerebrod_speaker_create_and_setup_socket()) < 0)
-    cerebrod_err_exit("%s(%s:%d): fd setup failed",
-		      __FILE__, __FUNCTION__, __LINE__);
+    cerebro_err_exit("%s(%s:%d): fd setup failed",
+                     __FILE__, __FUNCTION__, __LINE__);
 
   while (1)
     {
@@ -255,25 +255,25 @@ cerebrod_speaker(void *arg)
                     close(fd);	/* no-wrapper, make best effort */
                   
                   if ((fd = _cerebrod_speaker_create_and_setup_socket()) < 0)
-                    cerebrod_err_debug("%s(%s:%d): error re-initializing socket",
-				       __FILE__, __FUNCTION__, __LINE__);
+                    cerebro_err_debug("%s(%s:%d): error re-initializing socket",
+                                      __FILE__, __FUNCTION__, __LINE__);
                   else
-                    cerebrod_err_debug("%s(%s:%d): success re-initializing "
-				       "socket",
-				       __FILE__, __FUNCTION__, __LINE__);
+                    cerebro_err_debug("%s(%s:%d): success re-initializing "
+                                      "socket",
+                                      __FILE__, __FUNCTION__, __LINE__);
                 }
               else if (errno == EINTR)
-                cerebrod_err_debug("%s(%s:%d): sendto: %s", 
-				   __FILE__, __FUNCTION__, __LINE__,
-				   strerror(errno));
+                cerebro_err_debug("%s(%s:%d): sendto: %s", 
+                                  __FILE__, __FUNCTION__, __LINE__,
+                                  strerror(errno));
               else
-                cerebrod_err_exit("%s(%s:%d): sendto: %s", 
-				  __FILE__, __FUNCTION__, __LINE__,
-				  strerror(errno));
+                cerebro_err_exit("%s(%s:%d): sendto: %s", 
+                                 __FILE__, __FUNCTION__, __LINE__,
+                                 strerror(errno));
             }
           else
-            cerebrod_err_debug("%s(%s:%d): sendto: invalid bytes sent: %d", 
-			       __FILE__, __FUNCTION__, __LINE__, rv);
+            cerebro_err_debug("%s(%s:%d): sendto: invalid bytes sent: %d", 
+                              __FILE__, __FUNCTION__, __LINE__, rv);
         }
       sleep(sleep_time);
     }

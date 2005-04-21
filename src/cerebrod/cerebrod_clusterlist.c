@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist.c,v 1.23 2005-04-20 23:36:26 achu Exp $
+ *  $Id: cerebrod_clusterlist.c,v 1.24 2005-04-21 22:00:33 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -16,12 +16,12 @@
 
 #include <sys/param.h>
 
+#include "cerebro_error.h"
 #include "cerebro_clusterlist_module.h"
 
 #include "cerebrod.h"
 #include "cerebrod_clusterlist.h"
 #include "cerebrod_config.h"
-#include "cerebrod_error.h"
 #if WITH_STATIC_MODULES
 #include "cerebrod_static_modules.h"
 #else /* !WITH_STATIC_MODULES */
@@ -61,39 +61,39 @@ _clusterlist_check_module_data(struct cerebro_clusterlist_module_info *clusterli
   assert(clusterlist_module_info_l);
 
   if (!clusterlist_module_info_l->parse_options)
-    cerebrod_err_exit("clusterlist module '%s' does not contain "
-		      "valid parse_options function",
-		      clusterlist_module_info_l->clusterlist_module_name);
+    cerebro_err_exit("clusterlist module '%s' does not contain "
+                     "valid parse_options function",
+                     clusterlist_module_info_l->clusterlist_module_name);
 
   if (!clusterlist_module_info_l->init)
-    cerebrod_err_exit("clusterlist module '%s' does not contain "
-		      "valid init function",
-		      clusterlist_module_info_l->clusterlist_module_name);
+    cerebro_err_exit("clusterlist module '%s' does not contain "
+                     "valid init function",
+                     clusterlist_module_info_l->clusterlist_module_name);
   
   if (!clusterlist_module_info_l->finish)
-    cerebrod_err_exit("clusterlist module '%s' does not contain "
-		      "valid finish function",
-		      clusterlist_module_info_l->clusterlist_module_name);
+    cerebro_err_exit("clusterlist module '%s' does not contain "
+                     "valid finish function",
+                     clusterlist_module_info_l->clusterlist_module_name);
 
   if (!clusterlist_module_info_l->get_all_nodes)
-    cerebrod_err_exit("clusterlist module '%s' does not contain "
-		      "valid get_all_nodes function",
-		      clusterlist_module_info_l->clusterlist_module_name);
+    cerebro_err_exit("clusterlist module '%s' does not contain "
+                     "valid get_all_nodes function",
+                     clusterlist_module_info_l->clusterlist_module_name);
 
   if (!clusterlist_module_info_l->numnodes)
-    cerebrod_err_exit("clusterlist module '%s' does not contain "
-		      "valid numnodes function",
-		      clusterlist_module_info_l->clusterlist_module_name);
-
+    cerebro_err_exit("clusterlist module '%s' does not contain "
+                     "valid numnodes function",
+                     clusterlist_module_info_l->clusterlist_module_name);
+  
   if (!clusterlist_module_info_l->node_in_cluster)
-    cerebrod_err_exit("clusterlist module '%s' does not contain "
-		      "valid node_in_cluster function",
-		      clusterlist_module_info_l->clusterlist_module_name);
+    cerebro_err_exit("clusterlist module '%s' does not contain "
+                     "valid node_in_cluster function",
+                     clusterlist_module_info_l->clusterlist_module_name);
   
   if (!clusterlist_module_info_l->get_nodename)
-    cerebrod_err_exit("clusterlist module '%s' does not contain "
-		      "valid get_nodename function",
-		      clusterlist_module_info_l->clusterlist_module_name);
+    cerebro_err_exit("clusterlist module '%s' does not contain "
+                     "valid get_nodename function",
+                     clusterlist_module_info_l->clusterlist_module_name);
 
 #ifndef NDEBUG
   if (conf.debug)
@@ -126,7 +126,7 @@ _clusterlist_load_static_module(char *name)
   assert(name);
 
   if (!(clusterlist_module_info = cerebrod_find_static_clusterlist_module(name)))
-    cerebrod_err_exit("clusterlist module '%s' not found", name);
+    cerebro_err_exit("clusterlist module '%s' not found", name);
 
   return _clusterlist_check_module_data(clusterlist_module_info);
 }
@@ -150,8 +150,8 @@ _clusterlist_load_dynamic_module(char *module_path)
   clusterlist_module_info = (struct cerebro_clusterlist_module_info *)Lt_dlsym(clusterlist_module_dl_handle, "clusterlist_module_info");
 
   if (!clusterlist_module_info->clusterlist_module_name)
-    cerebrod_err_exit("clusterlist module '%s' does not contain a valid name", 
-		      module_path);
+    cerebro_err_exit("clusterlist module '%s' does not contain a valid name", 
+                     module_path);
 
   return _clusterlist_check_module_data(clusterlist_module_info);
 }
@@ -166,8 +166,8 @@ cerebrod_clusterlist_setup(void)
   if (conf.clusterlist_module)
     {
       if (_clusterlist_load_static_module(conf.clusterlist_module) != 1)
-        cerebrod_err_exit("clusterlist module '%s' could not be loaded",
-			  conf.clusterlist_module);
+        cerebro_err_exit("clusterlist module '%s' could not be loaded",
+                         conf.clusterlist_module);
     }
   else
     {
@@ -181,14 +181,14 @@ cerebrod_clusterlist_setup(void)
 
           if (!ptr[i]->clusterlist_module_name)
             {
-              cerebrod_err_debug("static clusterlist module index '%d' "
-				 "does not contain name", i);
+              cerebro_err_debug("static clusterlist module index '%d' "
+                                "does not contain name", i);
               continue;
             }
 
           if ((rv = _clusterlist_check_module_data(ptr[i])) < 0)
-            cerebrod_err_exit("clusterlist module '%s' could not be loaded",
-			      ptr[i]->clusterlist_module_name);
+            cerebro_err_exit("clusterlist module '%s' could not be loaded",
+                             ptr[i]->clusterlist_module_name);
           if (rv) 
             {
               clusterlist_module_info = ptr[i];
@@ -203,8 +203,8 @@ cerebrod_clusterlist_setup(void)
   if (conf.clusterlist_module_file)
     {
       if (_clusterlist_load_dynamic_module(conf.clusterlist_module_file) != 1)
-        cerebrod_err_exit("clusterlist module '%s' could not be loaded", 
-			  conf.clusterlist_module_file);
+        cerebro_err_exit("clusterlist module '%s' could not be loaded", 
+                         conf.clusterlist_module_file);
     }
   else
     {
@@ -221,7 +221,7 @@ cerebrod_clusterlist_setup(void)
         goto done;
 
       if (!clusterlist_module_dl_handle)
-        cerebrod_err_exit("no valid cluster list modules found");
+        cerebro_err_exit("no valid cluster list modules found");
     }
 
  done:

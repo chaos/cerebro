@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_dynamic_modules.c,v 1.4 2005-04-20 23:36:26 achu Exp $
+ *  $Id: cerebrod_dynamic_modules.c,v 1.5 2005-04-21 22:00:33 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -18,10 +18,11 @@
 
 #include <sys/param.h>
 
+#include "cerebro_error.h"
+
 #include "cerebrod_dynamic_modules.h"
 #include "cerebrod_config.h"
 #include "cerebrod_clusterlist.h"
-#include "cerebrod_error.h"
 #include "wrappers.h"
 
 /*
@@ -84,9 +85,9 @@ cerebrod_search_dir_for_module(char *search_dir,
                        search_dir, modules_list[i]);
 
               if ((ret = load_module(filebuf)) < 0)
-                cerebrod_err_exit("%s(%s:%d): load_module: %s",
-				  __FILE__, __FUNCTION__, __LINE__,
-				  strerror(errno));
+                cerebro_err_exit("%s(%s:%d): load_module: %s",
+                                 __FILE__, __FUNCTION__, __LINE__,
+                                 strerror(errno));
 
               if (ret)
                 {

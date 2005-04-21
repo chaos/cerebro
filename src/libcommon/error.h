@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: error.h,v 1.5 2005-03-21 16:48:21 achu Exp $
+ *  $Id: error.h,v 1.6 2005-04-21 22:00:33 achu Exp $
 \*****************************************************************************/
 
 #ifndef _ERROR_H
@@ -16,8 +16,9 @@
 #include <stdarg.h>
 #endif /* STDC_HEADERS */
 
-#define ERROR_STDERR 0x01
-#define ERROR_SYSLOG 0x02
+#define ERROR_STDOUT 0x0001
+#define ERROR_STDERR 0x0002
+#define ERROR_SYSLOG 0x0004
 
 /*  
  * err_init

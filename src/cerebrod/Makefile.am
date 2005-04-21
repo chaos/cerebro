@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.32 2005-04-21 00:37:31 achu Exp $
+## $Id: Makefile.am,v 1.33 2005-04-21 22:00:33 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -15,7 +15,6 @@ noinst_HEADERS = cerebrod.h \
 		 cerebrod_config.h \
                  cerebrod_daemon.h \
 		 cerebrod_data.h \
-		 cerebrod_error.h \
 		 cerebrod_heartbeat.h \
 		 cerebrod_listener.h \
 		 cerebrod_speaker.h \
@@ -34,6 +33,7 @@ STATIC_MODULES_LDADDS   = ../modules/clusterlist/libclusterlistmodules.la \
 			  ../modules/config/libconfigmodules.la
 else
 DYNAMIC_MODULES_SOURCES = cerebrod_dynamic_modules.c
+DYNAMIC_MODULES_FLAGS   = -export-dynamic
 endif
 
 cerebro_clusterlist_module_builddir=`cd $(top_builddir)/src/modules/clusterlist && pwd`
@@ -45,7 +45,6 @@ cerebrod_SOURCES = cerebrod.c \
 		   cerebrod_config.c \
                    cerebrod_daemon.c \
 		   cerebrod_data.c \
-		   cerebrod_error.c \
 		   cerebrod_heartbeat.c \
 		   cerebrod_listener.c \
 		   cerebrod_speaker.c \
@@ -57,7 +56,7 @@ cerebrod_CFLAGS  = -DCEREBRO_CLUSTERLIST_MODULE_BUILDDIR=\"$(cerebro_clusterlist
 		   -DCEREBROD_CONFIG_MODULE_BUILDDIR=\"$(cerebrod_config_module_builddir)\" \
 		   -I$(srcdir)/../libcerebro \
 		   -I$(srcdir)/../libcommon
-cerebrod_LDFLAGS = $(STATIC_MODULES_LIBS)
+cerebrod_LDFLAGS = $(DYNAMIC_MODULES_FLAGS) $(STATIC_MODULES_LIBS)
 cerebrod_LDADD   = ../libcerebro/libcerebro.la \
 		   ../libcommon/libcommon.la \
 		   $(STATIC_MODULES_LDADDS)

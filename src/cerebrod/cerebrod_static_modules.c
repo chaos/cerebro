@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_static_modules.c,v 1.5 2005-04-20 23:36:26 achu Exp $
+ *  $Id: cerebrod_static_modules.c,v 1.6 2005-04-21 22:00:33 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -16,10 +16,11 @@
 #include <errno.h>
 #include <assert.h>
 
+#include "cerebro_error.h"
+
 #include "cerebrod_static_modules.h"
 #include "cerebrod_config.h"
 #include "cerebrod_clusterlist.h"
-#include "cerebrod_error.h"
 
 /*
  * static_config_modules
@@ -66,8 +67,8 @@ cerebrod_find_static_config_module(char *name)
     {
       if (!ptr[i]->config_module_name)
         {
-          cerebrod_err_debug("static config module index '%d' "
-			     "does not contain name", i);
+          cerebro_err_debug("static config module index '%d' "
+                            "does not contain name", i);
           continue;
         }
       if (!strcmp(ptr[i]->config_module_name, name))
@@ -91,8 +92,8 @@ cerebrod_find_static_clusterlist_module(char *name)
     {
       if (!ptr[i]->clusterlist_module_name)
         {
-          cerebrod_err_debug("static clusterlist module index '%d' "
-			     "does not contain name", i);
+          cerebro_err_debug("static clusterlist module index '%d' "
+                            "does not contain name", i);
           continue;
         }
       if (!strcmp(ptr[i]->clusterlist_module_name, name))

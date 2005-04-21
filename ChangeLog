@@ -1,6 +1,16 @@
 2005-04-21  Albert Chu  <chu11@llnl.gov>
 
+	* src/libcerebro/cerebro_error.h, src/libcerebro/cerebro_error.c:
+	New files.
+
+	* src/cerebrod/cerebrod_error.h, src/cerebrod/cerebrod_error.c:
+	Removed files.
+	
+	Reworked error output based on new cerebro_error library API.
+
 	Code cleanup throughout.
+
+	Added mapping to cerebrod and modules.
 	
 2005-04-20  Albert Chu  <chu11@llnl.gov>
 

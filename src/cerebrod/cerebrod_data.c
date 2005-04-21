@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_data.c,v 1.5 2005-03-30 18:46:58 achu Exp $
+ *  $Id: cerebrod_data.c,v 1.6 2005-04-21 22:00:33 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -17,9 +17,9 @@
 #include <errno.h>
 
 #include "cerebro_defs.h"
+#include "cerebro_error.h"
 
 #include "cerebrod_data.h"
-#include "cerebrod_error.h"
 #include "wrappers.h"
 
 #define CEREBROD_BOOTTIME_BUFLEN   4096
@@ -102,17 +102,17 @@ _cerebrod_cache_boottime(void)
       *tempptr = '\0';
     }
   else
-    cerebrod_err_exit("%s(%s:%d): boottime file parse error",
-		      __FILE__, __FUNCTION__, __LINE__);
+    cerebro_err_exit("%s(%s:%d): boottime file parse error",
+                     __FILE__, __FUNCTION__, __LINE__);
 
   errno = 0;
   ret = (u_int32_t)strtol(bootvalptr, &endptr, 10);
   if ((ret == LONG_MIN || ret == LONG_MAX) && errno == ERANGE)
-    cerebrod_err_exit("%s(%s:%d): boottime out of range",
-		      __FILE__, __FUNCTION__, __LINE__);
+    cerebro_err_exit("%s(%s:%d): boottime out of range",
+                     __FILE__, __FUNCTION__, __LINE__);
   if ((bootvalptr + strlen(bootvalptr)) != endptr)
-    cerebrod_err_exit("%s(%s:%d): boottime value parse error",
-		      __FILE__, __FUNCTION__, __LINE__);
+    cerebro_err_exit("%s(%s:%d): boottime value parse error",
+                     __FILE__, __FUNCTION__, __LINE__);
 
   cerebrod_boottime = ret;
 }

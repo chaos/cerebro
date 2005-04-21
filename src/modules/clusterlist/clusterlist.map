@@ -1,0 +1,6 @@
+{
+  global:
+    clusterlist_module_info;
+  local:
+    *;
+};

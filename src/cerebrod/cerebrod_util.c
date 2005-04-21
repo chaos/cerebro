@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_util.c,v 1.9 2005-03-30 05:41:45 achu Exp $
+ *  $Id: cerebrod_util.c,v 1.10 2005-04-21 22:00:33 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -15,8 +15,9 @@
 #include <assert.h>
 #include <errno.h>
 
+#include "cerebro_error.h"
+
 #include "cerebrod_util.h"
-#include "cerebrod_error.h"
 #include "wrappers.h"
 
 /* 
@@ -72,8 +73,8 @@ cerebrod_rehash(hash_t *old_hash,
     {
       rv = Pthread_mutex_trylock(hash_mutex);
       if (rv != EBUSY)
-	cerebrod_err_exit("%s(%s:%d): hash_mutex not locked",
-			  __FILE__, __FUNCTION__, __LINE__);
+	cerebro_err_exit("%s(%s:%d): hash_mutex not locked",
+                         __FILE__, __FUNCTION__, __LINE__);
     }
 #endif /* NDEBUG */
 
@@ -86,15 +87,15 @@ cerebrod_rehash(hash_t *old_hash,
   
   rv = Hash_for_each(*old_hash, _hash_reinsert, &new_hash);
   if (rv != hash_num)
-    cerebrod_err_exit("%s(%s:%d): invalid reinsert count: rv=%d num=%d",
-		      __FILE__, __FUNCTION__, __LINE__,
-		      rv, hash_num);
+    cerebro_err_exit("%s(%s:%d): invalid reinsert count: rv=%d num=%d",
+                     __FILE__, __FUNCTION__, __LINE__,
+                     rv, hash_num);
 
   rv = Hash_delete_if(*old_hash, _hash_removeall, NULL);
   if (rv != hash_num)
-    cerebrod_err_exit("%s(%s:%d): invalid removeall count: rv=%d num=%d",
-		      __FILE__, __FUNCTION__, __LINE__,
-		      rv, hash_num);
+    cerebro_err_exit("%s(%s:%d): invalid removeall count: rv=%d num=%d",
+                     __FILE__, __FUNCTION__, __LINE__,
+                     rv, hash_num);
 
   Hash_destroy(*old_hash);
 

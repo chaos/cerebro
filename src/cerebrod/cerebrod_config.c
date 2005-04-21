@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.65 2005-04-21 17:59:15 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.66 2005-04-21 22:00:33 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -27,10 +27,10 @@
 
 #include <sys/param.h>
 
+#include "cerebro_error.h"
 #include "cerebrod_config_module.h"
 
 #include "cerebrod_config.h"
-#include "cerebrod_error.h"
 #if WITH_STATIC_MODULES
 #include "cerebrod_static_modules.h"
 #else /* !WITH_STATIC_MODULES */
@@ -192,7 +192,7 @@ _cerebrod_cmdline_parse(int argc, char **argv)
 #endif /* NDEBUG */
         case '?':
         default:
-          cerebrod_err_exit("unknown command line option '%c'", optopt);
+          cerebro_err_exit("unknown command line option '%c'", optopt);
         }          
     }
 }
@@ -216,7 +216,7 @@ _cerebrod_cmdline_parse_check(void)
           struct stat buf;
   
           if (stat(conf.config_file, &buf) < 0)
-            cerebrod_err_exit("config file '%s' not found", conf.config_file);
+            cerebro_err_exit("config file '%s' not found", conf.config_file);
         }
     }
 
@@ -225,7 +225,7 @@ _cerebrod_cmdline_parse_check(void)
   if (conf.config_module)
     {
       if (!cerebrod_find_static_config_module(conf.config_module))
-	cerebrod_err_exit("config module '%s' not found", conf.config_module);
+	cerebro_err_exit("config module '%s' not found", conf.config_module);
     }
 #else  /* !WITH_STATIC_MODULES */
   /* Check if the configuration module exists */
@@ -239,8 +239,8 @@ _cerebrod_cmdline_parse_check(void)
 	{
 	  /* Case A: User specified absolute path to config module */
 	  if (stat(conf.config_module, &buf) < 0)
-	    cerebrod_err_exit("config module '%s' not found", 
-			      conf.config_module);
+	    cerebro_err_exit("config module '%s' not found", 
+                             conf.config_module);
 	  
 	  conf.config_module_file = Strdup(conf.config_module);
 	}
@@ -302,8 +302,8 @@ _cerebrod_cmdline_parse_check(void)
 	    }
 
 	  if (!conf.config_module_file)
-	    cerebrod_err_exit("config module '%s' not found", 
-			      conf.config_module);
+	    cerebro_err_exit("config module '%s' not found", 
+                             conf.config_module);
 	}
     done:
       ;
@@ -327,9 +327,9 @@ _cerebrod_load_alternate_configuration(struct cerebrod_config_module_info *confi
   assert(config_module_info);
 
   if (!config_module_info->load_default)
-    cerebrod_err_exit("config module '%s' does not contain "
-		      "valid load_default function", 
-                      config_module_info->config_module_name);
+    cerebro_err_exit("config module '%s' does not contain "
+                     "valid load_default function", 
+                     config_module_info->config_module_name);
 
 #ifndef NDEBUG
   if (conf.debug)
@@ -361,8 +361,8 @@ _cerebrod_load_alternate_configuration(struct cerebrod_config_module_info *confi
 
   /* Load the alternate default configuration from the configuration module */
   if ((*config_module_info->load_default)(&module_conf) < 0)
-    cerebrod_err_exit("%s config module: load_default failed: %s", 
-		      config_module_info->config_module_name, strerror(errno));
+    cerebro_err_exit("%s config module: load_default failed: %s", 
+                     config_module_info->config_module_name, strerror(errno));
 
   /* Load new defaults */
   conf.heartbeat_frequency_min = module_conf.heartbeat_frequency_min;
@@ -401,8 +401,8 @@ _config_load_static_module(char *name)
   assert(name);
 
   if (!(config_module_info = cerebrod_find_static_config_module(name)))
-    cerebrod_err_exit("%s(%s:%d): config module '%s' name not found", 
-		      __FILE__, __FUNCTION__, __LINE__, name);
+    cerebro_err_exit("%s(%s:%d): config module '%s' name not found", 
+                     __FILE__, __FUNCTION__, __LINE__, name);
   
   return _cerebrod_load_alternate_configuration(config_module_info);
 }
@@ -428,8 +428,8 @@ _config_load_dynamic_module(char *module_path)
   config_module_info = (struct cerebrod_config_module_info *)Lt_dlsym(config_module_dl_handle, "config_module_info");
 
   if (!config_module_info->config_module_name)
-    cerebrod_err_exit("config module '%s' does not contain a valid name", 
-		      module_path);
+    cerebro_err_exit("config module '%s' does not contain a valid name", 
+                     module_path);
 
   rv = _cerebrod_load_alternate_configuration(config_module_info);
 
@@ -450,8 +450,8 @@ _cerebrod_config_module_setup(void)
   if (conf.config_module)
     {
       if (_config_load_static_module(conf.config_module) != 1)
-	cerebrod_err_exit("config module '%s' could not be loaded",
-			  conf.config_module);
+	cerebro_err_exit("config module '%s' could not be loaded",
+                         conf.config_module);
     }
   else
     {
@@ -464,13 +464,13 @@ _cerebrod_config_module_setup(void)
           int rv;
           if (!ptr[i]->config_module_name)
             {
-              cerebrod_err_debug("static config module index '%d' "
-				 "does not contain name", i);
+              cerebro_err_debug("static config module index '%d' "
+                                "does not contain name", i);
               continue;
             }
           if ((rv = _cerebrod_load_alternate_configuration(ptr[i])) < 0)
-            cerebrod_err_exit("config module '%s' could not be loaded", 
-			      ptr[i]->config_module_name);
+            cerebro_err_exit("config module '%s' could not be loaded", 
+                             ptr[i]->config_module_name);
           if (rv)
             break;
           i++;
@@ -482,8 +482,8 @@ _cerebrod_config_module_setup(void)
   if (conf.config_module_file)
     {
       if (_config_load_dynamic_module(conf.config_module_file) != 1)
-	cerebrod_err_exit("config module '%s' could not be loaded",
-			  conf.config_module);
+	cerebro_err_exit("config module '%s' could not be loaded",
+                         conf.config_module);
     }
   else
     {
@@ -674,8 +674,8 @@ _cerebrod_config_parse(void)
   int num;
     
   if ((cf = conffile_handle_create()) == NULL) 
-    cerebrod_err_exit("%s(%s:%d): failed to create handle",
-		      __FILE__, __FUNCTION__, __LINE__);
+    cerebro_err_exit("%s(%s:%d): failed to create handle",
+                     __FILE__, __FUNCTION__, __LINE__);
     
   num = sizeof(options)/sizeof(struct conffile_option);
   if (conffile_parse(cf, conf.config_file, options, num, NULL, 0, 0) < 0)
@@ -684,16 +684,16 @@ _cerebrod_config_parse(void)
 
       if (conffile_errnum(cf) == CONFFILE_ERR_EXIST
           && strcmp(conf.config_file, CEREBROD_CONFIG_FILE_DEFAULT) != 0)
-        cerebrod_err_exit("configuration file '%s' not found", 
-			  conf.config_file);
+        cerebro_err_exit("configuration file '%s' not found", 
+                         conf.config_file);
 
       if (conffile_errnum(cf) != CONFFILE_ERR_EXIST)
         {
           char buf[CONFFILE_MAX_ERRMSGLEN];
           if (conffile_errmsg(cf, buf, CONFFILE_MAX_ERRMSGLEN) < 0)
-            cerebrod_err_exit("conffile_parse: errnum = %d", 
-			      conffile_errnum(cf));
-          cerebrod_err_exit("config file error: %s", buf);
+            cerebro_err_exit("conffile_parse: errnum = %d", 
+                             conffile_errnum(cf));
+          cerebro_err_exit("config file error: %s", buf);
         }
     }
   conffile_handle_destroy(cf);
@@ -711,8 +711,8 @@ _cerebrod_pre_calculate_configuration_config_check(void)
   struct in_addr addr_temp;
   
   if (!Inet_pton(AF_INET, conf.heartbeat_destination_ip, &addr_temp))
-    cerebrod_err_exit("heartbeat destination IP address '%s' improperly format",
-		      conf.heartbeat_destination_ip);
+    cerebro_err_exit("heartbeat destination IP address '%s' improperly format",
+                     conf.heartbeat_destination_ip);
 
   if (conf.heartbeat_network_interface
       && strchr(conf.heartbeat_network_interface, '.'))
@@ -724,31 +724,31 @@ _cerebrod_pre_calculate_configuration_config_check(void)
 	  
 	  tok = strtok(heartbeat_network_interface_cpy, "/");
 	  if (!Inet_pton(AF_INET, tok, &addr_temp))
-	    cerebrod_err_exit("network interface IP address '%s' "
-			      "improperly format", 
-			      conf.heartbeat_network_interface);
+	    cerebro_err_exit("network interface IP address '%s' "
+                             "improperly format", 
+                             conf.heartbeat_network_interface);
 	  
 	  Free(heartbeat_network_interface_cpy);
 	}
       else
 	{
 	  if (!Inet_pton(AF_INET, conf.heartbeat_network_interface, &addr_temp))
-	    cerebrod_err_exit("network interface IP address '%s' "
-			      "improperly format", 
-			      conf.heartbeat_network_interface);
+	    cerebro_err_exit("network interface IP address '%s' "
+                             "improperly format", 
+                             conf.heartbeat_network_interface);
 	}
     }
 
   if (conf.heartbeat_destination_port == conf.heartbeat_source_port)
-    cerebrod_err_exit("heartbeat destination and source ports '%d' "
+    cerebro_err_exit("heartbeat destination and source ports '%d' "
 		      "cannot be identical",
 		      conf.heartbeat_destination_port);
 
   if (conf.heartbeat_ttl <= 0)
-    cerebrod_err_exit("heartbeat ttl '%d' invalid", conf.heartbeat_ttl);
+    cerebro_err_exit("heartbeat ttl '%d' invalid", conf.heartbeat_ttl);
 
   if (conf.listen_threads <= 0)
-    cerebrod_err_exit("listen threads '%d' invalid", conf.listen_threads);
+    cerebro_err_exit("listen threads '%d' invalid", conf.listen_threads);
 
   /* If the listening server is turned off, none of the other
    * servers can be on.  So we turn them off.
@@ -759,19 +759,19 @@ _cerebrod_pre_calculate_configuration_config_check(void)
   if (conf.updown_server)
     {
       if (conf.updown_server_port == conf.heartbeat_destination_port)
-	cerebrod_err_exit("updown server port '%d' cannot be identical "
-			  "to heartbeat destination port");
+	cerebro_err_exit("updown server port '%d' cannot be identical "
+                         "to heartbeat destination port");
       if (conf.updown_server_port == conf.heartbeat_source_port)
-	cerebrod_err_exit("updown server port '%d' cannot be identical "
-			  "to heartbeat source port");
+	cerebro_err_exit("updown server port '%d' cannot be identical "
+                         "to heartbeat source port");
     }
 
 #if WITH_STATIC_MODULES
   if (conf.clusterlist_module)
     {
       if (!cerebrod_find_static_clusterlist_module(conf.clusterlist_module))
-	cerebrod_err_exit("clusterlist module '%s' not found", 
-			  conf.clusterlist_module);
+	cerebro_err_exit("clusterlist module '%s' not found", 
+                         conf.clusterlist_module);
     }
 #endif /* WITH_STATIC_MODULES */
 }
@@ -793,9 +793,9 @@ _cerebrod_calculate_multicast(void)
       tok = strtok(heartbeat_destination_ip_cpy, ".");
       ip_class = strtol(tok, &ptr, 10);
       if (ptr != (tok + strlen(tok)))
-	cerebrod_err_exit("heartbeat destination IP address '%s' "
-			  "improperly format",
-			  conf.heartbeat_destination_ip);
+	cerebro_err_exit("heartbeat destination IP address '%s' "
+                         "improperly format",
+                         conf.heartbeat_destination_ip);
       
       if (ip_class >= MULTICAST_CLASS_MIN
 	  && ip_class <= MULTICAST_CLASS_MAX)
@@ -831,9 +831,9 @@ _cerebrod_calculate_heartbeat_destination_ip_in_addr(void)
   if (!Inet_pton(AF_INET, 
                  conf.heartbeat_destination_ip, 
                  &conf.heartbeat_destination_ip_in_addr))
-    cerebrod_err_exit("heartbeat destination IP address '%s' "
-		      "improperly format",
-		      conf.heartbeat_destination_ip);
+    cerebro_err_exit("heartbeat destination IP address '%s' "
+                     "improperly format",
+                     conf.heartbeat_destination_ip);
 }
 
 /*
@@ -858,9 +858,9 @@ _get_if_conf(void **buf, struct ifconf *ifc, int fd)
       ifc->ifc_buf = *buf;
 
       if (ioctl(fd, SIOCGIFCONF, ifc) < 0)
-        cerebrod_err_exit("%s(%s:%d): ioctl: %s", 
-			  __FILE__, __FUNCTION__, __LINE__,
-			  strerror(errno));
+        cerebro_err_exit("%s(%s:%d): ioctl: %s", 
+                         __FILE__, __FUNCTION__, __LINE__,
+                         strerror(errno));
 
       if (ifc->ifc_len == lastlen)
         break;
@@ -965,9 +965,9 @@ _cerebrod_calculate_in_addr_and_index(char *network_interface,
 	      strncpy(ifr_tmp.ifr_name, ifr->ifr_name, IFNAMSIZ);
 
 	      if(ioctl(fd, SIOCGIFFLAGS, &ifr_tmp) < 0)
-		cerebrod_err_exit("%s(%s:%d): ioctl: %s",
-				  __FILE__, __FUNCTION__, __LINE__,
-				  strerror(errno));
+		cerebro_err_exit("%s(%s:%d): ioctl: %s",
+                                 __FILE__, __FUNCTION__, __LINE__,
+                                 strerror(errno));
 
 	      if (!(ifr_tmp.ifr_flags & IFF_UP)
 		  || !(ifr_tmp.ifr_flags & IFF_MULTICAST))
@@ -978,9 +978,9 @@ _cerebrod_calculate_in_addr_and_index(char *network_interface,
 	      strncpy(ifr_tmp.ifr_name, ifr->ifr_name, IFNAMSIZ);
 
 	      if(ioctl(fd, SIOCGIFINDEX, &ifr_tmp) < 0)
-		cerebrod_err_exit("%s(%s:%d): ioctl: %s",
-				  __FILE__, __FUNCTION__, __LINE__,
-				  strerror(errno));
+		cerebro_err_exit("%s(%s:%d): ioctl: %s",
+                                 __FILE__, __FUNCTION__, __LINE__,
+                                 strerror(errno));
 	      
 	      sinptr = (struct sockaddr_in *)&ifr->ifr_addr;
 	      interface_in_addr->s_addr = sinptr->sin_addr.s_addr;
@@ -990,9 +990,9 @@ _cerebrod_calculate_in_addr_and_index(char *network_interface,
 	    }
 
 	  if (!found_interface)
-	    cerebrod_err_exit("network interface with multicast not found", 
-			      network_interface);
-
+	    cerebro_err_exit("network interface with multicast not found", 
+                             network_interface);
+          
 	  Free(buf);
 	  Close(fd);
 	}
@@ -1020,22 +1020,22 @@ _cerebrod_calculate_in_addr_and_index(char *network_interface,
 
 	  tok = strtok(network_interface_cpy, "/");
 	  if (!Inet_pton(AF_INET, tok, &addr_temp))
-            cerebrod_err_exit("network interface IP address '%s' "
-			      "improperly format", network_interface);
-
+            cerebro_err_exit("network interface IP address '%s' "
+                             "improperly format", network_interface);
+          
 	  if (!(snm = strtok(NULL, "")))
-	    cerebrod_err_exit("network interface '%s' subnet mask not specified",
-			      network_interface);
+	    cerebro_err_exit("network interface '%s' subnet mask not specified",
+                             network_interface);
 	  else
 	    {
 	      mask = strtol(snm, &ptr, 10);
 	      if (ptr != (snm + strlen(snm)))
-		cerebrod_err_exit("network interface '%s' subnet mask improper",
-				  network_interface);
+		cerebro_err_exit("network interface '%s' subnet mask improper",
+                                 network_interface);
 	      else if (mask < 1 || mask > IPADDR_BITS)
-		cerebrod_err_exit("network interface '%s' subnet mask size "
-				  "invalid",
-				  network_interface);
+		cerebro_err_exit("network interface '%s' subnet mask size "
+                                 "invalid",
+                                 network_interface);
 	    }
 
 	  Free(network_interface_cpy);
@@ -1044,8 +1044,8 @@ _cerebrod_calculate_in_addr_and_index(char *network_interface,
 	{
 	  /* If no '/', then just an IP address, mask is all bits */
 	  if (!Inet_pton(AF_INET, network_interface, &addr_temp))
-            cerebrod_err_exit("network interface IP address '%s' "
-			      "improperly format", network_interface);
+            cerebro_err_exit("network interface IP address '%s' "
+                             "improperly format", network_interface);
 	  mask = IPADDR_BITS;
 	}
 
@@ -1074,9 +1074,9 @@ _cerebrod_calculate_in_addr_and_index(char *network_interface,
 	  strncpy(ifr_tmp.ifr_name, ifr->ifr_name, IFNAMSIZ);
 
 	  if (ioctl(fd, SIOCGIFFLAGS, &ifr_tmp) < 0)
-	    cerebrod_err_exit("%s(%s:%d): ioctl: %s",
-			      __FILE__, __FUNCTION__, __LINE__,
-			      strerror(errno));
+	    cerebro_err_exit("%s(%s:%d): ioctl: %s",
+                             __FILE__, __FUNCTION__, __LINE__,
+                             strerror(errno));
           
 	  if (!(ifr_tmp.ifr_flags & IFF_UP))
 	    continue;
@@ -1091,9 +1091,9 @@ _cerebrod_calculate_in_addr_and_index(char *network_interface,
 	      strncpy(ifr_tmp.ifr_name, ifr->ifr_name, IFNAMSIZ);
 
 	      if(ioctl(fd, SIOCGIFINDEX, &ifr_tmp) < 0)
-		cerebrod_err_exit("%s(%s:%d): ioctl: %s",
-				  __FILE__, __FUNCTION__, __LINE__,
-				  strerror(errno));
+		cerebro_err_exit("%s(%s:%d): ioctl: %s",
+                                 __FILE__, __FUNCTION__, __LINE__,
+                                 strerror(errno));
 
 	      interface_in_addr->s_addr = sinptr->sin_addr.s_addr;
 	      *interface_index = ifr_tmp.ifr_ifindex;
@@ -1105,11 +1105,11 @@ _cerebrod_calculate_in_addr_and_index(char *network_interface,
       if (!found_interface)
 	{
 	  if (conf.multicast)
-	    cerebrod_err_exit("network interface '%s' with multicast "
-			      "not found", network_interface);
+	    cerebro_err_exit("network interface '%s' with multicast "
+                             "not found", network_interface);
 	  else
-	    cerebrod_err_exit("network interface '%s' not found", 
-			      network_interface);
+	    cerebro_err_exit("network interface '%s' not found", 
+                             network_interface);
 	}
       
       Free(buf);
@@ -1150,27 +1150,27 @@ _cerebrod_calculate_in_addr_and_index(char *network_interface,
 	      strncpy(ifr_tmp.ifr_name, ifr->ifr_name, IFNAMSIZ);
 
 	      if(ioctl(fd, SIOCGIFFLAGS, &ifr_tmp) < 0)
-		cerebrod_err_exit("%s(%s:%d): ioctl: %s",
-				  __FILE__, __FUNCTION__, __LINE__,
-				  strerror(errno));
+		cerebro_err_exit("%s(%s:%d): ioctl: %s",
+                                 __FILE__, __FUNCTION__, __LINE__,
+                                 strerror(errno));
 
 	      if (!(ifr_tmp.ifr_flags & IFF_UP))
-		cerebrod_err_exit("network interface '%s' not up",
-				  network_interface);
+		cerebro_err_exit("network interface '%s' not up",
+                                 network_interface);
 	      
 	      if (conf.multicast && !(ifr_tmp.ifr_flags & IFF_MULTICAST))
-		cerebrod_err_exit("network interface '%s' not a multicast "
-				  "interface",
-				  network_interface);
+		cerebro_err_exit("network interface '%s' not a multicast "
+                                 "interface",
+                                 network_interface);
 
 	      /* Null termination not required, don't use strncpy() wrapper */
 	      memset(&ifr_tmp, '\0', sizeof(struct ifreq));
 	      strncpy(ifr_tmp.ifr_name, ifr->ifr_name, IFNAMSIZ);
 
 	      if(ioctl(fd, SIOCGIFINDEX, &ifr_tmp) < 0)
-		cerebrod_err_exit("%s(%s:%d): ioctl: %s",
-				  __FILE__, __FUNCTION__, __LINE__,
-				  strerror(errno));
+		cerebro_err_exit("%s(%s:%d): ioctl: %s",
+                                 __FILE__, __FUNCTION__, __LINE__,
+                                 strerror(errno));
 
 	      sinptr = (struct sockaddr_in *)&ifr->ifr_addr;
 	      interface_in_addr->s_addr = sinptr->sin_addr.s_addr;
@@ -1181,8 +1181,8 @@ _cerebrod_calculate_in_addr_and_index(char *network_interface,
 	}
 
       if (!found_interface)
-	cerebrod_err_exit("network interface '%s' not found",
-			  network_interface);
+	cerebro_err_exit("network interface '%s' not found",
+                         network_interface);
 
       Free(buf);
       Close(fd);
@@ -1223,8 +1223,8 @@ _cerebrod_calculate_clusterlist_module(void)
 	{
 	  /* Case A: User specified absolute path to clusterlist module */
 	  if (stat(conf.clusterlist_module, &buf) < 0)
-	    cerebrod_err_exit("clusterlist module '%s' not found", 
-			      conf.clusterlist_module);
+	    cerebro_err_exit("clusterlist module '%s' not found", 
+                             conf.clusterlist_module);
 	  
 	  conf.clusterlist_module_file = Strdup(conf.clusterlist_module);
 	}
@@ -1285,8 +1285,8 @@ _cerebrod_calculate_clusterlist_module(void)
 	    }
 
 	  if (!conf.clusterlist_module_file)
-	    cerebrod_err_exit("clusterlist module '%s' not found", 
-			      conf.clusterlist_module);
+	    cerebro_err_exit("clusterlist module '%s' not found", 
+                             conf.clusterlist_module);
 	}
     done:
       ;
@@ -1343,8 +1343,8 @@ _cerebrod_post_calculate_configuration_config_check(void)
      
       /* If no '/', then just an IP address, mask is all bits */
       if (!Inet_pton(AF_INET, conf.heartbeat_destination_ip, &addr_temp))
-        cerebrod_err_exit("heartbeat destination IP address '%s' "
-			  "improperly format", conf.heartbeat_destination_ip);
+        cerebro_err_exit("heartbeat destination IP address '%s' "
+                         "improperly format", conf.heartbeat_destination_ip);
 
       /* Check all interfaces */
       for(ptr = buf; ptr < buf + ifc.ifc_len;)
@@ -1373,7 +1373,7 @@ _cerebrod_post_calculate_configuration_config_check(void)
       Close(fd);
 
       if (!found_interface)
-        cerebrod_err_exit("heartbeat destination address not found");
+        cerebro_err_exit("heartbeat destination address not found");
     }
 }
 

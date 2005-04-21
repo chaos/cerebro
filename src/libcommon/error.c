@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: error.c,v 1.6 2005-03-21 16:48:21 achu Exp $
+ *  $Id: error.c,v 1.7 2005-04-21 22:00:33 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -51,10 +51,12 @@ _err(int syslog_level, const char *fmt, va_list ap)
   assert(err_prog != NULL);
 
   vsnprintf(buf, ERROR_BUFLEN, fmt, ap);
-  if (err_flags & ERROR_SYSLOG)
-    syslog(syslog_level, "%s", buf);
+  if (err_flags & ERROR_STDOUT)
+    fprintf(stdout, "%s: %s\n", err_prog, buf);
   if (err_flags & ERROR_STDERR)
     fprintf(stderr, "%s: %s\n", err_prog, buf);
+  if (err_flags & ERROR_SYSLOG)
+    syslog(syslog_level, "%s", buf);
 }
 
 void
