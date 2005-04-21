@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_util.c,v 1.2 2005-04-21 17:59:15 achu Exp $
+ *  $Id: cerebro_clusterlist_util.c,v 1.3 2005-04-21 22:58:53 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -14,8 +14,8 @@
 #include <assert.h>
 #include <errno.h>
 
+#include "cerebro_error.h"
 #include "cerebro_clusterlist_util.h"
-#include "error.h"
 #include "wrappers.h"
 
 int 
@@ -38,19 +38,19 @@ cerebro_clusterlist_parse_filename(char **options,
 	  char *p = strchr(options[i], '=');
 
 	  if (!p)
-	    err_exit("%s clusterlist module: filename unspecified", 
-                     clusterlist_module_name);
+	    cerebro_err_exit("%s clusterlist module: filename unspecified", 
+                             clusterlist_module_name);
 
 	  p++;
 	  if (p == '\0')
-	    err_exit("%s clusterlist module: filename unspecified", 
-                     clusterlist_module_name);
+	    cerebro_err_exit("%s clusterlist module: filename unspecified", 
+                             clusterlist_module_name);
 
 	  *filename = Strdup(p);
 	}
       else
-	err_exit("%s clusterlist module: option '%s' unrecognized", 
-                 clusterlist_module_name, options[i]);
+	cerebro_err_exit("%s clusterlist module: option '%s' unrecognized", 
+                         clusterlist_module_name, options[i]);
 
       i++;
     }
@@ -60,8 +60,8 @@ cerebro_clusterlist_parse_filename(char **options,
       struct stat buf;
 
       if (stat(*filename, &buf) < 0)
-        err_exit("%s clusterlist module: filename '%s' not found",
-                 clusterlist_module_name, *filename);
+        cerebro_err_exit("%s clusterlist module: filename '%s' not found",
+                         clusterlist_module_name, *filename);
     }
 
   return 0;
@@ -83,9 +83,9 @@ cerebro_clusterlist_copy_nodename(char *node,
   len = strlen(node);
 
   if ((len + 1) > buflen)
-    err_exit("%s(%s:%d): %s clusterlist module: buflen too small: %d %d", 
-             __FILE__, __FUNCTION__, __LINE__,
-             clusterlist_module_name, len, buflen);
+    cerebro_err_exit("%s(%s:%d): %s clusterlist module: buflen too small: %d %d", 
+                     __FILE__, __FUNCTION__, __LINE__,
+                     clusterlist_module_name, len, buflen);
 
   strcpy(buf, node);
 

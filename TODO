@@ -20,4 +20,4 @@
 - libcerebro - local vs. installed header inclusion???
   - basically concerns use of "cerebro_defs.h" in protocol header files
 
-- maps for lib/modules
+- maps confine only "cerebro_" instead of "cerebro*"

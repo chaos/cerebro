@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_genders.c,v 1.1 2005-04-21 00:37:31 achu Exp $
+ *  $Id: cerebro_clusterlist_genders.c,v 1.2 2005-04-21 22:58:53 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -17,10 +17,10 @@
 #include <genders.h>
 
 #include "cerebro_defs.h"
+#include "cerebro_error.h"
 #include "cerebro_clusterlist_module.h"
 #include "cerebro_clusterlist_genders_util.h"
 #include "cerebro_clusterlist_util.h"
-#include "error.h"
 #include "wrappers.h"
 
 #define GENDERS_CLUSTERLIST_MODULE_NAME "genders"
@@ -148,10 +148,10 @@ genders_clusterlist_node_in_cluster(char *node)
     nodePtr = node;
 
   if ((ret = genders_isnode(genders_handle, nodePtr)) < 0)
-    err_exit("%s(%s:%d): %s clusterlist module: genders_isnode: %s",
-             __FILE__, __FUNCTION__, __LINE__,
-             GENDERS_CLUSTERLIST_MODULE_NAME, 
-             genders_errormsg(genders_handle));
+    cerebro_err_exit("%s(%s:%d): %s clusterlist module: genders_isnode: %s",
+                     __FILE__, __FUNCTION__, __LINE__,
+                     GENDERS_CLUSTERLIST_MODULE_NAME, 
+                     genders_errormsg(genders_handle));
 
   return ret;
 }

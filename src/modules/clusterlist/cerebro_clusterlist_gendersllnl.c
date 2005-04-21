@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_gendersllnl.c,v 1.1 2005-04-21 00:37:31 achu Exp $
+ *  $Id: cerebro_clusterlist_gendersllnl.c,v 1.2 2005-04-21 22:58:53 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -17,10 +17,10 @@
 #include <gendersllnl.h>
 
 #include "cerebro_defs.h"
+#include "cerebro_error.h"
 #include "cerebro_clusterlist_module.h"
 #include "cerebro_clusterlist_genders_util.h"
 #include "cerebro_clusterlist_util.h"
-#include "error.h"
 #include "wrappers.h"
 
 #define GENDERSLLNL_CLUSTERLIST_MODULE_NAME "gendersllnl"
@@ -163,11 +163,11 @@ gendersllnl_clusterlist_node_in_cluster(char *node)
     nodePtr = node;
 
   if ((ret = genders_isnode_or_altnode(gendersllnl_handle, nodePtr)) < 0)
-    err_exit("%s(%s:%d): %s clusterlist module: genders_isnode: %s",
-             __FILE__, __FUNCTION__, __LINE__, 
-             GENDERSLLNL_CLUSTERLIST_MODULE_NAME,
-             genders_errormsg(gendersllnl_handle));
-
+    cerebro_err_exit("%s(%s:%d): %s clusterlist module: genders_isnode: %s",
+                     __FILE__, __FUNCTION__, __LINE__, 
+                     GENDERSLLNL_CLUSTERLIST_MODULE_NAME,
+                     genders_errormsg(gendersllnl_handle));
+  
   return ret;
 }
 
@@ -201,11 +201,11 @@ gendersllnl_clusterlist_get_nodename(char *node, char *buf, unsigned int buflen)
     nodePtr = node;
 
   if (genders_to_gendname(gendersllnl_handle, nodePtr, buf, buflen) < 0)
-    err_exit("%s(%s:%d): %s clusterlist module: "
-             "genders_to_gendname: %s",
-             __FILE__, __FUNCTION__, __LINE__,
-             GENDERSLLNL_CLUSTERLIST_MODULE_NAME, 
-             genders_errormsg(gendersllnl_handle));
+    cerebro_err_exit("%s(%s:%d): %s clusterlist module: "
+                     "genders_to_gendname: %s",
+                     __FILE__, __FUNCTION__, __LINE__,
+                     GENDERSLLNL_CLUSTERLIST_MODULE_NAME, 
+                     genders_errormsg(gendersllnl_handle));
   return 0;
 }
 

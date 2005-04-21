@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_none.c,v 1.1 2005-04-21 00:37:31 achu Exp $
+ *  $Id: cerebro_clusterlist_none.c,v 1.2 2005-04-21 22:58:53 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -14,9 +14,9 @@
 #include <assert.h>
 #include <errno.h>
 
+#include "cerebro_error.h"
 #include "cerebro_clusterlist_module.h"
 #include "cerebro_clusterlist_util.h"
-#include "error.h"
 #include "wrappers.h"
 
 #define NONE_CLUSTERLIST_MODULE_NAME "none"
