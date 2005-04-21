@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_static_modules.h,v 1.4 2005-04-20 23:36:26 achu Exp $
+ *  $Id: cerebrod_static_modules.h,v 1.5 2005-04-21 00:00:28 achu Exp $
 \*****************************************************************************/
  
 #ifndef _CEREBROD_STATIC_MODULES_H
@@ -11,7 +11,7 @@
 
 #if WITH_STATIC_MODULES
 
-#include "cerebrod_clusterlist_module.h"
+#include "cerebro_clusterlist_module.h"
 #include "cerebrod_config_module.h"
 
 /* 

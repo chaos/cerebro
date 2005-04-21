@@ -1,8 +1,11 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.1 2005-04-20 23:36:26 achu Exp $
+## $Id: Makefile.am,v 1.2 2005-04-21 00:00:28 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
+
+noinst_HEADERS = cerebro_clusterlist_genders_util.h \
+		 cerebro_clusterlist_util.h
 
 #
 # cerebro config and clusterlist modules
@@ -10,13 +13,21 @@
 
 if WITH_GENDERSLLNL
 GENDERSLLNL_CLUSTERLIST_MODULE = cerebro_clusterlist_gendersllnl.la
+GENDERSLLNL_STATIC_SOURCES = cerebro_clusterlist_gendersllnl.c
+GENDERS_STATIC_UTIL_SOURCES = cerebro_clusterlist_genders_util.c
+GENDERSLLNL_STATIC_LIBS = $(GENDERSLLNL_LIBS)
 endif
 
 if WITH_GENDERS
-GENDERS_CLUSTERLIST_MODULE     = cerebro_clusterlist_genders.la
+GENDERS_CLUSTERLIST_MODULE = cerebro_clusterlist_genders.la
+GENDERS_STATIC_SOURCES = cerebro_clusterlist_genders.c
+GENDERS_STATIC_UTIL_SOURCES = cerebro_clusterlist_genders_util.c
+GENDERS_STATIC_LIBS = $(GENDERS_LIBS)
 endif
 
-if !WITH_STATIC_MODULES
+if WITH_STATIC_MODULES
+noinst_LTLIBRARIES = libclusterlistmodules.la
+else
 modulelibdir = $(CEREBRO_MODULE_DIR)
 modulelib_LTLIBRARIES = $(GENDERSLLNL_CLUSTERLIST_MODULE) \
 		        $(GENDERS_CLUSTERLIST_MODULE) \
@@ -25,6 +36,17 @@ modulelib_LTLIBRARIES = $(GENDERSLLNL_CLUSTERLIST_MODULE) \
 endif
 
 MODULE_FLAGS = -module -avoid-version
+
+libclusterlistmodules_la_SOURCES = $(GENDERSLLNL_STATIC_SOURCES) \
+				   $(GENDERS_STATIC_SOURCES) \
+				   $(GENDERS_STATIC_UTIL_SOURCES) \
+				   cerebro_clusterlist_hostsfile.c \
+				   cerebro_clusterlist_none.c \
+				   cerebro_clusterlist_util.c
+libclusterlistmodules_la_CFLAGS  = -I$(srcdir)/../libcerebro \
+				   -I$(srcdir)/../libcommon
+libclusterlistmodules_la_LDFLAGS = $(GENDERSLLNL_STATIC_LIBS) \
+				   $(GENDERS_STATIC_LIBS)
 
 cerebro_clusterlist_gendersllnl_la_SOURCES = cerebro_clusterlist_gendersllnl.c \
 					      cerebro_clusterlist_genders_util.c \

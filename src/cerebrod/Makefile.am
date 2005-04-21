@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.30 2005-04-20 23:36:26 achu Exp $
+## $Id: Makefile.am,v 1.31 2005-04-21 00:00:28 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -37,6 +37,7 @@ if WITH_STATIC_MODULES
 STATIC_MODULES_SOURCES  = $(GENDERSLLNL_STATIC_SOURCES) \
 			  cerebrod_static_modules.c
 STATIC_MODULES_LIBS     = $(GENDERSLLNL_STATIC_LIBS)
+STATIC_MODULES_LDADDS   = ../clusterlist/libclusterlistmodules.la
 else
 DYNAMIC_MODULES_SOURCES = cerebrod_dynamic_modules.c
 endif
@@ -64,7 +65,8 @@ cerebrod_CFLAGS  = -DCEREBRO_CLUSTERLIST_MODULE_BUILDDIR=\"$(cerebro_clusterlist
 		   -I$(srcdir)/../libcommon
 cerebrod_LDFLAGS = $(STATIC_MODULES_LIBS)
 cerebrod_LDADD   = ../libcerebro/libcerebro.la \
-		   ../libcommon/libcommon.la
+		   ../libcommon/libcommon.la \
+		   $(STATIC_MODULER_LDADDS)
 
 #
 # cerebrod config and clusterlist modules
@@ -91,6 +93,9 @@ cerebrod_config_gendersllnl_la_LIBADD  = ../libcommon/libcommon.la
 	@cd `dirname $@` && make `basename $@`
 
 ../libcommon/libcommon.la : force-dependency-check
+	@cd `dirname $@` && make `basename $@`
+
+../clusterlist/libclusterlistmodules.la: force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
 force-dependency-check:
