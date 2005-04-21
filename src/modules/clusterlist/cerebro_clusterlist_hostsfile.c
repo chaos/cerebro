@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_hostsfile.c,v 1.1 2005-04-20 23:36:26 achu Exp $
+ *  $Id: cerebro_clusterlist_hostsfile.c,v 1.1 2005-04-21 00:37:31 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -211,9 +211,8 @@ hostsfile_clusterlist_init(void)
     file = CEREBRO_CLUSTERLIST_HOSTSFILE_DEFAULT;
 
   if ((fd = open(file, O_RDONLY)) < 0)
-    err_exit("hostsfile clusterlist file '%s' cannot be opened", 
-             hostsfile_file);
-  
+    err_exit("hostsfile clusterlist file '%s' cannot be opened", file);
+ 
   while ((len = _readline(fd, 
                           buf, 
                           HOSTSFILE_PARSE_BUFLEN,
