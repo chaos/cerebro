@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config_gendersllnl.c,v 1.1 2005-04-21 00:37:31 achu Exp $
+ *  $Id: cerebrod_config_gendersllnl.c,v 1.2 2005-04-21 17:59:15 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -54,7 +54,7 @@ gendersllnl_config_load_default(struct cerebrod_module_config *conf)
   assert(conf);
 
   if (!(handle = genders_handle_create()))
-    err_exit("%s(%s:%d): genders_handle_create",
+    err_exit("%s(%s:%d): genders_handle_create", 
              __FILE__, __FUNCTION__, __LINE__);
  
   if (genders_load_data(handle, NULL) < 0)

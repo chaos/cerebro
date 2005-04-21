@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_module.h,v 1.3 2005-04-20 23:36:26 achu Exp $
+ *  $Id: cerebro_clusterlist_module.h,v 1.4 2005-04-21 17:59:15 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_CLUSTERLIST_MODULE_H
@@ -48,7 +48,8 @@ typedef int (*Cerebro_clusterlist_finish)(void);
  *
  * Returns number of cluster nodes copied in the buffer  on success, -1 on error
  */
-typedef int (*Cerebro_clusterlist_get_all_nodes)(char **nodes, unsigned int nodeslen);
+typedef int (*Cerebro_clusterlist_get_all_nodes)(char **nodes, 
+                                                 unsigned int nodeslen);
 
 /*
  * Cerebro_clusterlist_numnodes
@@ -87,7 +88,9 @@ typedef int (*Cerebro_clusterlist_node_in_cluster)(char *node);
  *
  * Returns nodename in buffer, 0 on success, -1 on error
  */
-typedef int (*Cerebro_clusterlist_get_nodename)(char *node, char *buf, unsigned int buflen);
+typedef int (*Cerebro_clusterlist_get_nodename)(char *node, 
+                                                char *buf, 
+                                                unsigned int buflen);
 	     
 /*  
  * struct cerebro_clusterlist_module_info

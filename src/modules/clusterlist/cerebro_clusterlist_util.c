@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_util.c,v 1.1 2005-04-21 00:37:31 achu Exp $
+ *  $Id: cerebro_clusterlist_util.c,v 1.2 2005-04-21 17:59:15 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -19,7 +19,9 @@
 #include "wrappers.h"
 
 int 
-cerebro_clusterlist_parse_filename(char **options, char **filename, char *clusterlist_module_name)
+cerebro_clusterlist_parse_filename(char **options, 
+                                   char **filename, 
+                                   char *clusterlist_module_name)
 {
   int i = 0;
 
@@ -66,7 +68,10 @@ cerebro_clusterlist_parse_filename(char **options, char **filename, char *cluste
 }
 
 int 
-cerebro_clusterlist_copy_nodename(char *node, char *buf, unsigned int buflen, char *clusterlist_module_name)
+cerebro_clusterlist_copy_nodename(char *node, 
+                                  char *buf, 
+                                  unsigned int buflen, 
+                                  char *clusterlist_module_name)
 {
   int len;
 
@@ -78,8 +83,7 @@ cerebro_clusterlist_copy_nodename(char *node, char *buf, unsigned int buflen, ch
   len = strlen(node);
 
   if ((len + 1) > buflen)
-    err_exit("%s(%s:%d): %s clusterlist module: "
-             "buflen too small: %d %d", 
+    err_exit("%s(%s:%d): %s clusterlist module: buflen too small: %d %d", 
              __FILE__, __FUNCTION__, __LINE__,
              clusterlist_module_name, len, buflen);
 

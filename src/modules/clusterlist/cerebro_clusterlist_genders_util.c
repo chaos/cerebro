@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_genders_util.c,v 1.1 2005-04-21 00:37:31 achu Exp $
+ *  $Id: cerebro_clusterlist_genders_util.c,v 1.2 2005-04-21 17:59:15 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -20,7 +20,9 @@
 #include "wrappers.h"
 
 int 
-cerebro_clusterlist_genders_init(genders_t *handle, char *file, char *clusterlist_module_name)
+cerebro_clusterlist_genders_init(genders_t *handle, 
+                                 char *file, 
+                                 char *clusterlist_module_name)
 {
   assert(handle);
   assert(clusterlist_module_name);
@@ -43,8 +45,7 @@ cerebro_clusterlist_genders_init(genders_t *handle, char *file, char *clusterlis
                      clusterlist_module_name, GENDERS_DEFAULT_FILE);
 	}
       else
-	err_exit("%s(%s:%d): %s clusterlist module: "
-                 "genders_load_data: %s",
+	err_exit("%s(%s:%d): %s clusterlist module: genders_load_data: %s",
                  __FILE__, __FUNCTION__, __LINE__, 
                  clusterlist_module_name, genders_errormsg(*handle));
     }
@@ -53,14 +54,15 @@ cerebro_clusterlist_genders_init(genders_t *handle, char *file, char *clusterlis
 }
 
 int
-cerebro_clusterlist_genders_finish(genders_t *handle, char **file, char *clusterlist_module_name)
+cerebro_clusterlist_genders_finish(genders_t *handle, 
+                                   char **file, 
+                                   char *clusterlist_module_name)
 {
   assert(handle && file);
   assert(clusterlist_module_name);
 
   if (genders_handle_destroy(*handle) < 0)
-    err_exit("%s(%s:%d): %s clusterlist module: "
-             "genders_handle_destroy: %s",
+    err_exit("%s(%s:%d): %s clusterlist module: genders_handle_destroy: %s",
              __FILE__, __FUNCTION__, __LINE__,
              clusterlist_module_name, genders_errormsg(*handle));
 
@@ -72,7 +74,10 @@ cerebro_clusterlist_genders_finish(genders_t *handle, char **file, char *cluster
 }
 
 int
-cerebro_clusterlist_genders_get_all_nodes(genders_t handle, char **nodes, unsigned int nodeslen, char *clusterlist_module_name)
+cerebro_clusterlist_genders_get_all_nodes(genders_t handle, 
+                                          char **nodes, 
+                                          unsigned int nodeslen, 
+                                          char *clusterlist_module_name)
 {
   char **nodelist;
   int i, nodelistlen, numnodes;
@@ -82,20 +87,17 @@ cerebro_clusterlist_genders_get_all_nodes(genders_t handle, char **nodes, unsign
   assert(clusterlist_module_name);
 
   if ((nodelistlen = genders_nodelist_create(handle, &nodelist)) < 0)
-    err_exit("%s(%s:%d): %s clusterlist module: "
-             "genders_nodelist_create: %s",
+    err_exit("%s(%s:%d): %s clusterlist module: genders_nodelist_create: %s",
              __FILE__, __FUNCTION__, __LINE__,
              clusterlist_module_name, genders_errormsg(handle));
   
   if ((numnodes = genders_getnodes(handle, nodelist, nodelistlen, NULL, NULL)) < 0)
-    err_exit("%s(%s:%d): %s clusterlist module: "
-             "genders_getnodes: %s",
+    err_exit("%s(%s:%d): %s clusterlist module: genders_getnodes: %s",
              __FILE__, __FUNCTION__, __LINE__,
              clusterlist_module_name, genders_errormsg(handle));
 
   if (numnodes > nodeslen)
-    err_exit("%s(%s:%d): %s clusterlist module: "
-             "nodeslen too small", 
+    err_exit("%s(%s:%d): %s clusterlist module: nodeslen too small", 
              __FILE__, __FUNCTION__, __LINE__,
              clusterlist_module_name);
 
@@ -103,8 +105,7 @@ cerebro_clusterlist_genders_get_all_nodes(genders_t handle, char **nodes, unsign
     nodes[i] = Strdup(nodelist[i]);
 
   if (genders_nodelist_destroy(handle, nodelist) < 0)
-    err_exit("%s(%s:%d): %s clusterlist module: "
-             "genders_nodelist_destroy: %s",
+    err_exit("%s(%s:%d): %s clusterlist module: genders_nodelist_destroy: %s",
              __FILE__, __FUNCTION__, __LINE__,
              clusterlist_module_name, genders_errormsg(handle));
   
@@ -112,7 +113,8 @@ cerebro_clusterlist_genders_get_all_nodes(genders_t handle, char **nodes, unsign
 }
 
 int 
-cerebro_clusterlist_genders_numnodes(genders_t handle, char *clusterlist_module_name)
+cerebro_clusterlist_genders_numnodes(genders_t handle, 
+                                     char *clusterlist_module_name)
 {
   int ret;
 
@@ -120,8 +122,7 @@ cerebro_clusterlist_genders_numnodes(genders_t handle, char *clusterlist_module_
   assert(clusterlist_module_name);
 
   if ((ret = genders_getnumnodes(handle)) < 0)
-    err_exit("%s(%s:%d): %s clusterlist module: "
-             "genders_getnumnodes: %s",
+    err_exit("%s(%s:%d): %s clusterlist module: genders_getnumnodes: %s",
              __FILE__, __FUNCTION__, __LINE__,
              clusterlist_module_name, genders_errormsg(handle));
 

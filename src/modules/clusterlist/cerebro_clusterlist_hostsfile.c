@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_hostsfile.c,v 1.1 2005-04-21 00:37:31 achu Exp $
+ *  $Id: cerebro_clusterlist_hostsfile.c,v 1.2 2005-04-21 17:59:15 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -70,24 +70,22 @@ hostsfile_clusterlist_parse_options(char **options)
  * Return amount of data read into the buffer
  */
 static int
-_readline(int fd, char *buf, int buflen, char *clusterlist_module_name)
+_readline(int fd, char *buf, int buflen)
 {
   int ret;
 
   assert(buf);
-  assert(clusterlist_module_name);
 
   if ((ret = fd_read_line(fd, buf, buflen)) < 0)
     err_exit("%s(%s:%d): %s clusterlist module: fd_read_line: %s", 
              __FILE__, __FUNCTION__, __LINE__,
-             clusterlist_module_name, strerror(errno));
+             HOSTSFILE_CLUSTERLIST_MODULE_NAME, strerror(errno));
   
   /* buflen - 1 b/c fd_read_line guarantees null termination */
   if (ret >= (buflen-1))
-    err_exit("%s(%s:%d): %s clusterlist module: "
-             "fd_read_line: line truncation",
+    err_exit("%s(%s:%d): %s clusterlist module: fd_read_line: line truncation",
              __FILE__, __FUNCTION__, __LINE__, 
-             clusterlist_module_name);
+             HOSTSFILE_CLUSTERLIST_MODULE_NAME);
 
   return ret;
 }
@@ -213,10 +211,7 @@ hostsfile_clusterlist_init(void)
   if ((fd = open(file, O_RDONLY)) < 0)
     err_exit("hostsfile clusterlist file '%s' cannot be opened", file);
  
-  while ((len = _readline(fd, 
-                          buf, 
-                          HOSTSFILE_PARSE_BUFLEN,
-                          HOSTSFILE_CLUSTERLIST_MODULE_NAME)) > 0)
+  while ((len = _readline(fd, buf, HOSTSFILE_PARSE_BUFLEN)) > 0)
     {
       char *hostPtr;
       char *str;
@@ -234,13 +229,12 @@ hostsfile_clusterlist_init(void)
         continue;
 
       if (strchr(hostPtr, ' ') || strchr(hostPtr, '\t'))
-        cerebrod_err_exit("hostsfile clusterlist parse error: "
-			  "host contains whitespace");
+        err_exit("hostsfile clusterlist parse error: host contains whitespace");
 
       if (strlen(hostPtr) > CEREBRO_MAXNODENAMELEN)
-        cerebrod_err_exit("hostsfile clusterlist parse error: "
-			  "nodename '%s' exceeds maximum length", 
-			  hostPtr);
+        err_exit("hostsfile clusterlist parse error: "
+                 "nodename '%s' exceeds maximum length", 
+                 hostPtr);
       
       str = Strdup(hostPtr);
       List_append(hosts, str);

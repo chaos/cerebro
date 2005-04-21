@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.64 2005-04-20 23:36:26 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.65 2005-04-21 17:59:15 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -828,7 +828,9 @@ _cerebrod_calculate_heartbeat_frequency_ranged(void)
 static void
 _cerebrod_calculate_heartbeat_destination_ip_in_addr(void)
 {
-  if (!Inet_pton(AF_INET, conf.heartbeat_destination_ip, &conf.heartbeat_destination_ip_in_addr))
+  if (!Inet_pton(AF_INET, 
+                 conf.heartbeat_destination_ip, 
+                 &conf.heartbeat_destination_ip_in_addr))
     cerebrod_err_exit("heartbeat destination IP address '%s' "
 		      "improperly format",
 		      conf.heartbeat_destination_ip);

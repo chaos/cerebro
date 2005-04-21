@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_heartbeat.h,v 1.8 2005-03-29 21:30:29 achu Exp $
+ *  $Id: cerebrod_heartbeat.h,v 1.9 2005-04-21 17:59:15 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_HEARTBEAT_H
@@ -29,7 +29,9 @@ void cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb);
  *
  * Returns length of data copied into buffer, -1 on error 
  */
-int cerebrod_heartbeat_marshall(struct cerebrod_heartbeat *hb, char *buffer, int len);
+int cerebrod_heartbeat_marshall(struct cerebrod_heartbeat *hb, 
+                                char *buffer, 
+                                int len);
 
 /* 
  * cerebrod_heartbeat_unmarshall
@@ -38,6 +40,8 @@ int cerebrod_heartbeat_marshall(struct cerebrod_heartbeat *hb, char *buffer, int
  *
  * Returns 0 on success, -1 on error 
  */
-int cerebrod_heartbeat_unmarshall(struct cerebrod_heartbeat *hb, char *buffer, int len);
+int cerebrod_heartbeat_unmarshall(struct cerebrod_heartbeat *hb, 
+                                  char *buffer, 
+                                  int len);
 
 #endif /* _CEREBROD_HEARTBEAT_H */

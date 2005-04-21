@@ -1,7 +1,11 @@
+2005-04-21  Albert Chu  <chu11@llnl.gov>
+
+	Code cleanup throughout.
+	
 2005-04-20  Albert Chu  <chu11@llnl.gov>
 
-	Partitioned clusterlist modules into separate dir.  Major Changes
-	throughout.
+	Partitioned clusterlist and config modules into separate dir.
+	Major Changes throughout.
 	
 2005-04-20  Albert Chu  <chu11@llnl.gov>
 
