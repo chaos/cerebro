@@ -2,7 +2,7 @@
 # Makefile Include for RPM Construction
 #   by Chris Dunlap <cdunlap@llnl.gov>
 ##
-# $Id: Make-rpm.mk,v 1.2 2005-01-05 21:38:31 achu Exp $
+# $Id: Make-rpm.mk,v 1.3 2005-04-22 22:11:06 achu Exp $
 ##
 # REQUIREMENTS:
 # - requires project to be under CVS version control
@@ -127,6 +127,7 @@ rpm-internal: tar-internal
 	for pkg in $$WITHOUT_OPTIONS; do \
 	   args="$$args --define '_without_$$pkg --without-$$pkg'"; \
     done; \
+	args="$$args --define '_with_llnl --with-llnl'"; \
 	args="$$args $$sign --quiet $$tmp/SPECS/$$proj.spec"; \
 	if ! sh -c "$$rpm $$args" >$$tmp/rpm.log 2>&1; then \
 	        cat $$tmp/rpm.log; exit 1; fi; \
