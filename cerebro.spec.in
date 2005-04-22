@@ -54,7 +54,8 @@ DESTDIR="$RPM_BUILD_ROOT" make install
 %files
 %defattr(-,root,root)
 %doc README NEWS ChangeLog 
-%{_bindir}/*
+%config(noreplace) %{_sysconfdir}/init.d/cerebrod
+%{_sbindir}/*
 %{_includedir}/*
 %if %{?_with_llnl:1}%{!?_with_llnl:0}
 %{_libdir}/cerebro/*
