@@ -23,7 +23,3 @@
 - maps confine only "cerebro_" instead of "cerebro*"
 
 - code review to reduce memory footprint
-
-- init/cleanup for config modules
-
-- finish -> cleanup
