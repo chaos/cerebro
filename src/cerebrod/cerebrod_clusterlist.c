@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist.c,v 1.25 2005-04-22 21:31:04 achu Exp $
+ *  $Id: cerebrod_clusterlist.c,v 1.26 2005-04-22 23:29:59 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -61,39 +61,60 @@ _clusterlist_check_module_data(struct cerebro_clusterlist_module_info *clusterli
   assert(clusterlist_module_info_l);
 
   if (!clusterlist_module_info_l->parse_options)
-    cerebro_err_exit("clusterlist module '%s' does not contain "
-                     "valid parse_options function",
-                     clusterlist_module_info_l->clusterlist_module_name);
+    {
+      cerebro_err_debug("clusterlist module '%s' does not contain "
+                        "valid parse_options function",
+                        clusterlist_module_info_l->clusterlist_module_name);
+      return 0;
+    }
 
   if (!clusterlist_module_info_l->setup)
-    cerebro_err_exit("clusterlist module '%s' does not contain "
-                     "valid setup function",
-                     clusterlist_module_info_l->clusterlist_module_name);
+    {
+      cerebro_err_debug("clusterlist module '%s' does not contain "
+                        "valid setup function",
+                        clusterlist_module_info_l->clusterlist_module_name);
+      return 0;
+    }
   
   if (!clusterlist_module_info_l->cleanup)
-    cerebro_err_exit("clusterlist module '%s' does not contain "
-                     "valid cleanup function",
-                     clusterlist_module_info_l->clusterlist_module_name);
+    {
+      cerebro_err_debug("clusterlist module '%s' does not contain "
+                        "valid cleanup function",
+                        clusterlist_module_info_l->clusterlist_module_name);
+      return 0;
+    }
 
   if (!clusterlist_module_info_l->get_all_nodes)
-    cerebro_err_exit("clusterlist module '%s' does not contain "
-                     "valid get_all_nodes function",
-                     clusterlist_module_info_l->clusterlist_module_name);
+    {
+      cerebro_err_debug("clusterlist module '%s' does not contain "
+                        "valid get_all_nodes function",
+                        clusterlist_module_info_l->clusterlist_module_name);
+      return 0;
+    }
 
   if (!clusterlist_module_info_l->numnodes)
-    cerebro_err_exit("clusterlist module '%s' does not contain "
-                     "valid numnodes function",
-                     clusterlist_module_info_l->clusterlist_module_name);
+    {
+      cerebro_err_debug("clusterlist module '%s' does not contain "
+                        "valid numnodes function",
+                        clusterlist_module_info_l->clusterlist_module_name);
+      return 0;
+    }
   
   if (!clusterlist_module_info_l->node_in_cluster)
-    cerebro_err_exit("clusterlist module '%s' does not contain "
-                     "valid node_in_cluster function",
-                     clusterlist_module_info_l->clusterlist_module_name);
+    {
+      cerebro_err_debug("clusterlist module '%s' does not contain "
+                        "valid node_in_cluster function",
+                        clusterlist_module_info_l->clusterlist_module_name);
+      return 0;
+    }
   
   if (!clusterlist_module_info_l->get_nodename)
-    cerebro_err_exit("clusterlist module '%s' does not contain "
-                     "valid get_nodename function",
-                     clusterlist_module_info_l->clusterlist_module_name);
+    {
+      cerebro_err_debug("clusterlist module '%s' does not contain "
+                        "valid get_nodename function",
+                        clusterlist_module_info_l->clusterlist_module_name);
+      return 0;
+    }
 
 #ifndef NDEBUG
   if (conf.debug)
@@ -143,17 +164,43 @@ _clusterlist_load_static_module(char *name)
 static int
 _clusterlist_load_dynamic_module(char *module_path)
 {
+  int rv;
+
   assert(module_path);
 
-  clusterlist_module_dl_handle = Lt_dlopen(module_path);
+  if (!(clusterlist_module_dl_handle = lt_dlopen(module_path)))
+    {
+      cerebro_err_debug("clusterlist module '%s': lt_dlopen failure: %s", 
+                        lt_dlerror());
+      return 0;
+    }
 
-  clusterlist_module_info = (struct cerebro_clusterlist_module_info *)Lt_dlsym(clusterlist_module_dl_handle, "clusterlist_module_info");
+  /* clear lt_dlerror */
+  lt_dlerror();
+
+  if (!(clusterlist_module_info = (struct cerebro_clusterlist_module_info *)lt_dlsym(clusterlist_module_dl_handle, "clusterlist_module_info")))
+    {
+      const char *err = lt_dlerror();
+      if (err != NULL)
+        cerebro_err_debug("clusterlist module '%s': lt_dlsym failure:: %s", err);
+      return 0;
+    }
 
   if (!clusterlist_module_info->clusterlist_module_name)
-    cerebro_err_exit("clusterlist module '%s' does not contain a valid name", 
-                     module_path);
+    {
+      cerebro_err_debug("clusterlist module '%s' does not contain a valid name", 
+                        module_path);
+      return 0;
+    }
 
-  return _clusterlist_check_module_data(clusterlist_module_info);
+  if ((rv = _clusterlist_check_module_data(clusterlist_module_info)) <= 0)
+    {
+      lt_dlclose(clusterlist_module_dl_handle);
+      clusterlist_module_dl_handle = NULL;
+      clusterlist_module_info = NULL;
+    }
+
+  return rv;
 }
 #endif /* !WITH_STATIC_MODULES */
 
@@ -218,6 +265,11 @@ cerebrod_clusterlist_module_setup(void)
                                          dynamic_clusterlist_modules,
 					 dynamic_clusterlist_modules_len,
                                          _clusterlist_load_dynamic_module))
+        goto done;
+
+      if (cerebrod_search_dir_for_new_module(CEREBRO_MODULE_DIR,
+                                             "cerebro_clusterlist_",
+                                             _clusterlist_load_dynamic_module))
         goto done;
 
       if (!clusterlist_module_dl_handle)

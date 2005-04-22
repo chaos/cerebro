@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.3 2005-04-22 22:05:17 achu Exp $
+## $Id: Makefile.am,v 1.4 2005-04-22 23:29:59 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -10,8 +10,8 @@ CONFIG_OTHER_FLAGS = -Wl,--version-script=$(CONFIG_VERSION_SCRIPT)
 endif
 
 if WITH_GENDERSLLNL
-GENDERSLLNL_CONFIG_MODULE = cerebrod_config_gendersllnl.la
-GENDERSLLNL_STATIC_SOURCES = cerebrod_config_gendersllnl.c
+GENDERSLLNL_CONFIG_MODULE = cerebro_config_gendersllnl.la
+GENDERSLLNL_STATIC_SOURCES = cerebro_config_gendersllnl.c
 GENDERSLLNL_STATIC_LIBS = $(GENDERSLLNL_LIBS)
 endif
 
@@ -30,13 +30,13 @@ libconfigmodules_la_CFLAGS  = -I$(srcdir)/../../libcerebro \
 libconfigmodules_la_LDFLAGS = $(GENDERSLLNL_STATIC_LIBS) \
 			      $(CONFIG_OTHER_FLAGS)
 
-cerebrod_config_gendersllnl_la_SOURCES = cerebrod_config_gendersllnl.c
-cerebrod_config_gendersllnl_la_LDFLAGS = $(MODULE_FLAGS) \
-					 $(GENDERSLLNL_LIBS) \
-					 $(CONFIG_OTHER_FLAGS)
-cerebrod_config_gendersllnl_la_CFLAGS  = -I$(srcdir)/../../libcerebro \
-					 -I$(srcdir)/../../libcommon
-cerebrod_config_gendersllnl_la_LIBADD  = ../../libcommon/libcommon.la
+cerebro_config_gendersllnl_la_SOURCES = cerebro_config_gendersllnl.c
+cerebro_config_gendersllnl_la_LDFLAGS = $(MODULE_FLAGS) \
+				 	$(GENDERSLLNL_LIBS) \
+				 	$(CONFIG_OTHER_FLAGS)
+cerebro_config_gendersllnl_la_CFLAGS  = -I$(srcdir)/../../libcerebro \
+					-I$(srcdir)/../../libcommon
+cerebro_config_gendersllnl_la_LIBADD  = ../../libcommon/libcommon.la
 
 ../../libcommon/libcommon.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`

@@ -8,6 +8,7 @@
 - test
    - fd leaking
    - mem-leaking
+   - new modules search, does it work??
 
 - to GPL
   - on all headers

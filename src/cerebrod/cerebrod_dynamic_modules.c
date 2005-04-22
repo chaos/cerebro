@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_dynamic_modules.c,v 1.5 2005-04-21 22:00:33 achu Exp $
+ *  $Id: cerebrod_dynamic_modules.c,v 1.6 2005-04-22 23:29:59 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -32,7 +32,7 @@
  * dynamic configuration modules to search for by default
  */
 char *dynamic_config_modules[] = {
-  "cerebrod_config_gendersllnl.la",
+  "cerebro_config_gendersllnl.la",
   NULL
 };
 int dynamic_config_modules_len = 1;
@@ -99,6 +99,52 @@ cerebrod_search_dir_for_module(char *search_dir,
       rewinddir(dir);
     }
 
+ done:
+  Closedir(dir);
+
+  return (found) ? 1 : 0;
+}
+
+int
+cerebrod_search_dir_for_new_module(char *search_dir,
+                                   char *signature,
+                                   Cerebrod_load_module load_module)
+{
+  DIR *dir;
+  struct dirent *dirent;
+  int found = 0;
+
+  assert(search_dir);
+  assert(signature);
+  assert(load_module);
+
+  if (!(dir = opendir(search_dir)))
+    return 0;
+
+  while ((dirent = readdir(dir)))
+    {
+      if (strstr(dirent->d_name, signature))
+        {
+          char filebuf[MAXPATHLEN+1];
+          int ret;
+
+          memset(filebuf, '\0', MAXPATHLEN+1);
+          snprintf(filebuf, MAXPATHLEN, "%s/%s",
+                   search_dir, dirent->d_name);
+          
+          if ((ret = load_module(filebuf)) < 0)
+            cerebro_err_exit("%s(%s:%d): load_module: %s",
+                             __FILE__, __FUNCTION__, __LINE__,
+                             strerror(errno));
+
+          if (ret)
+            {
+              found++;
+              goto done;
+            }
+        }
+    }
+  
  done:
   Closedir(dir);
 
