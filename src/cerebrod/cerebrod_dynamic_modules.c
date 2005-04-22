@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_dynamic_modules.c,v 1.6 2005-04-22 23:29:59 achu Exp $
+ *  $Id: cerebrod_dynamic_modules.c,v 1.7 2005-04-22 23:32:29 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -126,7 +126,12 @@ cerebrod_search_dir_for_new_module(char *search_dir,
       if (strstr(dirent->d_name, signature))
         {
           char filebuf[MAXPATHLEN+1];
+          char *ptr;
           int ret;
+
+          ptr = strchr(dirent->d_name, '.');
+          if (!(!strcmp(ptr, ".la") || !strcmp(ptr, ".so")))
+            continue;
 
           memset(filebuf, '\0', MAXPATHLEN+1);
           snprintf(filebuf, MAXPATHLEN, "%s/%s",
