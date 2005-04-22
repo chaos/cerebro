@@ -9,6 +9,8 @@
 
 	* Various re-work, slight design changes, and code cleanup to
 	prepare for libcerebro updown library.
+
+	* cerebro.spec.in: Updated for builds.
 	
 2005-04-21  Albert Chu  <chu11@llnl.gov>
 

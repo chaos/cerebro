@@ -1,7 +1,7 @@
 Name:    @PROJECT@ 
 Version: @VERSION@
 Release: @RELEASE@
-Summary: Cerebro is a collection of tools for dynamically monitoring a cluster of nodes.
+Summary: Cerebro dynamic monitoring tools and libraries
 Group: System Environment/Base
 License: GPL
 Source: %{name}-%{version}-%{release}.tgz
@@ -10,11 +10,41 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}
 %description
 Cerebro is a collection of tools for dynamically monitoring a cluster of nodes.
 
+%{!?_with_genders: %{!?_without_genders: %define _with_genders --with-genders}}
+%{!?_with_gendersllnl: %{!?_without_gendersllnl: %define _with_gendersllnl --with-gen\dersllnl}}
+                                                                                      
+%package gendersllnl
+Summary: whatsup gendersllnl modules package
+Group: System Environment/Base
+Requires: whatsup
+Requires: gendersllnl
+%description gendersllnl
+Gendersllnl modules packages.
+                                                                                      
+%package genders
+Summary: whatsup genders modules package
+Group: System Environment/Base
+Requires: whatsup
+Requires: genders >= 1.2
+%description genders
+Genders modules packages.
+                                                                                      
+%package hostsfile
+Summary: whatsup hostsfile modules package
+Group: System Environment/Base
+Requires: whatsup
+%description hostsfile
+Hostsfile modules packages.
+
 %prep
 %setup  -q -n %{name}-%{version}-%{release}
 
 %build
-%configure --program-prefix=%{?_program_prefix:%{_program_prefix}}
+%configure --program-prefix=%{?_program_prefix:%{_program_prefix}} \
+           %{?_with_genders} \
+           %{?_without_genders} \
+           %{?_with_gendersllnl} \
+           %{?_without_gendersllnl}
 make 
 
 %install
@@ -24,4 +54,32 @@ DESTDIR="$RPM_BUILD_ROOT" make install
 %files
 %defattr(-,root,root)
 %doc README NEWS ChangeLog 
-/
+%{_bindir}/*
+%{_includedir}/*
+%if %{?_with_llnl:1}%{!?_with_llnl:0}
+%{_libdir}/cerebro/*
+%else
+%{_libdir}/cerebro/*none.*
+%endif
+%{_libdir}/libcerebro.*
+%{_mandir}/*
+
+%if %{?_with_llnl:0}%{!?_with_llnl:1}
+                                                                                      
+%if %{?_with_gendersllnl:1}%{!?_with_gendersllnl:0}
+%files gendersllnl
+%defattr(-,root,root)
+%{_libdir}/cerebro/*gendersllnl.*
+%endif
+                                                                                      
+%if %{?_with_genders:1}%{!?_with_genders:0}
+%files genders
+%defattr(-,root,root)
+%{_libdir}/cerebro/*genders.*
+%endif
+                                                                                      
+%files hostsfile
+%defattr(-,root,root)
+%{_libdir}/cerebro/*hostsfile.*
+                                                                                      
+%endif
