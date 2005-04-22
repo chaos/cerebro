@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.11 2005-04-22 18:38:02 achu Exp $
+## $Id: Makefile.am,v 1.12 2005-04-22 22:05:17 achu Exp $
 ##*****************************************************************************
 
 if WITH_GNU_LD
@@ -28,3 +28,5 @@ libcerebro_la_LIBADD  = ../libcommon/libcommon.la
 	@cd `dirname $@` && make `basename $@`
 
 force-dependency-check:
+
+EXTRA_DIST = cerebro.map

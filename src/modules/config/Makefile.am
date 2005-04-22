@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.2 2005-04-21 22:00:33 achu Exp $
+## $Id: Makefile.am,v 1.3 2005-04-22 22:05:17 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -42,3 +42,5 @@ cerebrod_config_gendersllnl_la_LIBADD  = ../../libcommon/libcommon.la
 	@cd `dirname $@` && make `basename $@`
 
 force-dependency-check:
+
+EXTRA_DIST = config.map
