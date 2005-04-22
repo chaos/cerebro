@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.12 2005-04-22 22:05:17 achu Exp $
+## $Id: Makefile.am,v 1.13 2005-04-22 22:44:11 achu Exp $
 ##*****************************************************************************
 
 if WITH_GNU_LD
@@ -12,8 +12,9 @@ noinst_HEADERS = cerebro_updown_protocol.h \
 
 cerebroheadersdir = $(includedir)/cerebro
 
-cerebroheaders_HEADERS = cerebro_defs.h \
-			 cerebro_error.h \
+noinst_HEADERS = cerebro_defs.h
+
+cerebroheaders_HEADERS = cerebro_error.h \
 			 cerebro_marshalling.h \
 			 cerebro_clusterlist_module.h \
 			 cerebro_config_module.h
