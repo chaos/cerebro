@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.66 2005-04-21 22:00:33 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.67 2005-04-22 18:38:02 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -28,7 +28,7 @@
 #include <sys/param.h>
 
 #include "cerebro_error.h"
-#include "cerebrod_config_module.h"
+#include "cerebro_config_module.h"
 
 #include "cerebrod_config.h"
 #if WITH_STATIC_MODULES
@@ -267,7 +267,7 @@ _cerebrod_cmdline_parse_check(void)
 	   */
 	  memset(filebuf, '\0', MAXPATHLEN+1);
 	  snprintf(filebuf, MAXPATHLEN, "%s/%s", 
-                   CEREBROD_CONFIG_MODULE_BUILDDIR, conf.config_module);
+                   CEREBRO_CONFIG_MODULE_BUILDDIR, conf.config_module);
 
 	  if (!stat(filebuf, &buf))
 	    {
@@ -293,7 +293,7 @@ _cerebrod_cmdline_parse_check(void)
 	   */
 	  memset(filebuf, '\0', MAXPATHLEN+1);
 	  snprintf(filebuf, MAXPATHLEN, "%s/cerebrod_config_%s.la", 
-		   CEREBROD_CONFIG_MODULE_BUILDDIR, conf.config_module);
+		   CEREBRO_CONFIG_MODULE_BUILDDIR, conf.config_module);
 
 	  if (!stat(filebuf, &buf))
 	    {
@@ -320,16 +320,14 @@ _cerebrod_cmdline_parse_check(void)
  * Returns 1 on loading success, 0 on loading failure, -1 on fatal error
  */
 static int
-_cerebrod_load_alternate_configuration(struct cerebrod_config_module_info *config_module_info)
+_cerebrod_load_alternate_configuration(struct cerebro_config_module_info *config_module_info)
 {
   struct cerebrod_module_config module_conf;
 
   assert(config_module_info);
 
-  if (!config_module_info->load_default)
-    cerebro_err_exit("config module '%s' does not contain "
-                     "valid load_default function", 
-                     config_module_info->config_module_name);
+  if (!config_module_info->load_cerebrod_default)
+    return 0;
 
 #ifndef NDEBUG
   if (conf.debug)
@@ -360,8 +358,8 @@ _cerebrod_load_alternate_configuration(struct cerebrod_config_module_info *confi
   module_conf.clusterlist_module_options = conf.clusterlist_module_options;
 
   /* Load the alternate default configuration from the configuration module */
-  if ((*config_module_info->load_default)(&module_conf) < 0)
-    cerebro_err_exit("%s config module: load_default failed: %s", 
+  if ((*config_module_info->load_cerebrod_default)(&module_conf) < 0)
+    cerebro_err_exit("%s config module: load_cerebrod_default failed: %s", 
                      config_module_info->config_module_name, strerror(errno));
 
   /* Load new defaults */
@@ -396,7 +394,7 @@ _cerebrod_load_alternate_configuration(struct cerebrod_config_module_info *confi
 static int
 _config_load_static_module(char *name)
 {
-  struct cerebrod_config_module_info *config_module_info;
+  struct cerebro_config_module_info *config_module_info;
 
   assert(name);
 
@@ -419,13 +417,13 @@ _config_load_static_module(char *name)
 static int
 _config_load_dynamic_module(char *module_path)
 {
-  struct cerebrod_config_module_info *config_module_info = NULL;
+  struct cerebro_config_module_info *config_module_info = NULL;
   int rv;
 
   assert(module_path);
 
   config_module_dl_handle = Lt_dlopen(module_path);
-  config_module_info = (struct cerebrod_config_module_info *)Lt_dlsym(config_module_dl_handle, "config_module_info");
+  config_module_info = (struct cerebro_config_module_info *)Lt_dlsym(config_module_dl_handle, "config_module_info");
 
   if (!config_module_info->config_module_name)
     cerebro_err_exit("config module '%s' does not contain a valid name", 
@@ -455,7 +453,7 @@ _cerebrod_config_module_setup(void)
     }
   else
     {
-      struct cerebrod_config_module_info **ptr;
+      struct cerebro_config_module_info **ptr;
       int i = 0;
 
       ptr = &static_config_modules[0];
@@ -487,7 +485,7 @@ _cerebrod_config_module_setup(void)
     }
   else
     {
-      if (cerebrod_search_dir_for_module(CEREBROD_CONFIG_MODULE_BUILDDIR,
+      if (cerebrod_search_dir_for_module(CEREBRO_CONFIG_MODULE_BUILDDIR,
                                          dynamic_config_modules,
 					 dynamic_config_modules_len,
                                          _config_load_dynamic_module))

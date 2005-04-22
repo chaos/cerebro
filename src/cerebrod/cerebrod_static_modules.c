@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_static_modules.c,v 1.6 2005-04-21 22:00:33 achu Exp $
+ *  $Id: cerebrod_static_modules.c,v 1.7 2005-04-22 18:38:02 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -17,6 +17,7 @@
 #include <assert.h>
 
 #include "cerebro_error.h"
+#include "cerebro_config_module.h"
 
 #include "cerebrod_static_modules.h"
 #include "cerebrod_config.h"
@@ -28,7 +29,7 @@
  *
  * configuration modules statically compiled in
  */
-struct cerebrod_config_module_info *static_config_modules[] =
+struct cerebro_config_module_info *static_config_modules[] =
   {
 #if WITH_GENDERSLLNL
     &gendersllnl_config_module_info,
@@ -54,10 +55,10 @@ struct cerebro_clusterlist_module_info *static_clusterlist_modules[] =
     NULL
   };
 
-struct cerebrod_config_module_info *
+struct cerebro_config_module_info *
 cerebrod_find_static_config_module(char *name)
 {
-  struct cerebrod_config_module_info **ptr;
+  struct cerebro_config_module_info **ptr;
   int i = 0;
 
   assert(name);

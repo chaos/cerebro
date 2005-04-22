@@ -1,3 +1,12 @@
+2005-04-22  Albert Chu  <chu11@llnl.gov>
+
+	* src/libcerebro/cerebrod_config_module.h: Renamed to
+	cerebro_config_module.h.  All variable names changed/adjusted
+	appropriately.
+
+	* Reworked cerebrod based on variable name changes and header file
+	renaming.
+	
 2005-04-21  Albert Chu  <chu11@llnl.gov>
 
 	* src/libcerebro/cerebro_error.h, src/libcerebro/cerebro_error.c:

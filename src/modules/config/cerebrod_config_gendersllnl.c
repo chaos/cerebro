@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config_gendersllnl.c,v 1.3 2005-04-21 22:58:53 achu Exp $
+ *  $Id: cerebrod_config_gendersllnl.c,v 1.4 2005-04-22 18:38:02 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -22,8 +22,7 @@
 
 #include "cerebro_defs.h"
 #include "cerebro_error.h"
-
-#include "cerebrod_config_module.h"
+#include "cerebro_config_module.h"
 
 #include "wrappers.h"
 
@@ -117,9 +116,9 @@ gendersllnl_config_load_default(struct cerebrod_module_config *conf)
 }
 
 #if WITH_STATIC_MODULES
-struct cerebrod_config_module_info gendersllnl_config_module_info =
+struct cerebro_config_module_info gendersllnl_config_module_info =
 #else /* !WITH_STATIC_MODULES */
-struct cerebrod_config_module_info config_module_info =
+struct cerebro_config_module_info config_module_info =
 #endif /* !WITH_STATIC_MODULES */
   {
     "gendersllnl",

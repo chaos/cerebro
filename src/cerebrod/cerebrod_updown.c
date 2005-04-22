@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.c,v 1.26 2005-04-21 22:00:33 achu Exp $
+ *  $Id: cerebrod_updown.c,v 1.27 2005-04-22 18:38:02 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -1066,9 +1066,8 @@ cerebrod_updown_update_data(char *nodename, u_int32_t last_received)
       ud->last_received = last_received;
       update_output_flag++;
 
-      /* Can't call a debug output function in here, it
-       * can cause a deadlock b/c the updown_noe_data_lock 
-       * is not locked.
+      /* Can't call a debug output function in here, it can cause a
+       * deadlock b/c the updown_node_data_lock is not locked.
        */
     }
   Pthread_mutex_unlock(&(ud->updown_node_data_lock));
