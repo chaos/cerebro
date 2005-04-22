@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config_gendersllnl.c,v 1.4 2005-04-22 18:38:02 achu Exp $
+ *  $Id: cerebrod_config_gendersllnl.c,v 1.5 2005-04-22 21:31:04 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -28,12 +28,78 @@
 
 extern int h_errno;
 
+#define GENDERSLLNL_CONFIG_MODULE_NAME "gendersllnl"
+
+/*
+ * gendersllnl_handle
+ *
+ * genders handle
+ */
+static genders_t gendersllnl_handle = NULL;
+
 /* 
  * gendersllnl_heartbeat_network_interface
  *
  * Store private management network ip address
  */
 char gendersllnl_heartbeat_network_interface[INET_ADDRSTRLEN+1];
+
+/*
+ * gendersllnl_config_setup
+ *
+ * gendersllnl config module setup function
+ */
+static int
+gendersllnl_config_setup(void)
+{
+  int rv;
+
+  assert(!gendersllnl_handle);
+
+  if (!(gendersllnl_handle = genders_handle_create()))
+    cerebro_err_exit("%s(%s:%d): %s clusterlist module: "
+                     "genders_handle_create",
+                     GENDERSLLNL_CONFIG_MODULE_NAME,
+                     __FILE__, __FUNCTION__, __LINE__);
+ 
+  if (genders_load_data(gendersllnl_handle, NULL) < 0)
+    {
+      if (genders_errnum(gendersllnl_handle) == GENDERS_ERR_OPEN)
+        cerebro_err_exit("%s config module: genders database '%s' "
+                         "cannot be opened",
+                         GENDERSLLNL_CONFIG_MODULE_NAME, 
+                         GENDERS_DEFAULT_FILE);
+      else
+        cerebro_err_exit("%s(%s:%d): %s config module: "
+                         "genders_load_data: %s",
+                         __FILE__, __FUNCTION__, __LINE__,
+                         GENDERSLLNL_CONFIG_MODULE_NAME, 
+                         genders_errormsg(gendersllnl_handle));
+    }
+
+  return rv;
+}
+                                                                                        
+/*
+ * gendersllnl_config_cleanup
+ *
+ * gendersllnl config module cleanup function
+ */
+static int
+gendersllnl_config_cleanup(void)
+{
+  assert(gendersllnl_handle);
+
+  if (genders_handle_destroy(gendersllnl_handle) < 0)
+    cerebro_err_exit("%s(%s:%d): %s config module: "
+                     "genders_handle_destroy: %s",
+                     __FILE__, __FUNCTION__, __LINE__,
+                     GENDERSLLNL_CONFIG_MODULE_NAME, 
+                     genders_errormsg(gendersllnl_handle));
+
+  gendersllnl_handle = NULL;
+  return 0;
+}
 
 /* 
  * gendersllnl_config_load_default
@@ -46,25 +112,16 @@ char gendersllnl_heartbeat_network_interface[INET_ADDRSTRLEN+1];
 int
 gendersllnl_config_load_default(struct cerebrod_module_config *conf)
 {
-  genders_t handle = NULL;
   char altnamebuf[CEREBRO_MAXNODENAMELEN+1];
   int ret;
 
   assert(conf);
+  assert(gendersllnl_handle);
 
-  if (!(handle = genders_handle_create()))
-    cerebro_err_exit("%s(%s:%d): genders_handle_create", 
-                     __FILE__, __FUNCTION__, __LINE__);
- 
-  if (genders_load_data(handle, NULL) < 0)
-    cerebro_err_exit("%s(%s:%d): genders_load_data: %s", 
-                     __FILE__, __FUNCTION__, __LINE__,
-                     genders_errormsg(handle));
-
-  if ((ret = genders_testattr(handle, NULL, "mgmt", NULL, 0)) < 0)
+  if ((ret = genders_testattr(gendersllnl_handle, NULL, "mgmt", NULL, 0)) < 0)
     cerebro_err_exit("%s(%s:%d): genders_testattr: %s", 
                      __FILE__, __FUNCTION__, __LINE__,
-                     genders_errormsg(handle));
+                     genders_errormsg(gendersllnl_handle));
     
   if (ret)
     {
@@ -80,14 +137,14 @@ gendersllnl_config_load_default(struct cerebrod_module_config *conf)
     }
 
   memset(altnamebuf, '\0', CEREBRO_MAXNODENAMELEN+1);
-  if ((ret = genders_testattr(handle, 
+  if ((ret = genders_testattr(gendersllnl_handle, 
                               NULL, 
                               GENDERS_ALTNAME_ATTRIBUTE,
                               altnamebuf,
                               CEREBRO_MAXNODENAMELEN)) < 0)
     cerebro_err_exit("%s(%s:%d): genders_testattr: %s",
                      __FILE__, __FUNCTION__, __LINE__,
-                     genders_errormsg(handle));
+                     genders_errormsg(gendersllnl_handle));
 
   if (ret)
     {
@@ -107,11 +164,6 @@ gendersllnl_config_load_default(struct cerebrod_module_config *conf)
       conf->heartbeat_network_interface = gendersllnl_heartbeat_network_interface;
     }
 
-  if (genders_handle_destroy(handle) < 0)
-    cerebro_err_exit("%s(%s:%d): genders_handle_destroy: %s",
-                     __FILE__, __FUNCTION__, __LINE__,
-                     genders_errormsg(handle));
-
   return 0;
 }
 
@@ -121,6 +173,8 @@ struct cerebro_config_module_info gendersllnl_config_module_info =
 struct cerebro_config_module_info config_module_info =
 #endif /* !WITH_STATIC_MODULES */
   {
-    "gendersllnl",
+    GENDERSLLNL_CONFIG_MODULE_NAME,
+    &gendersllnl_config_setup,
+    &gendersllnl_config_cleanup,
     &gendersllnl_config_load_default,
   };

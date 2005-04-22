@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_genders_util.c,v 1.3 2005-04-21 22:58:53 achu Exp $
+ *  $Id: cerebro_clusterlist_genders_util.c,v 1.4 2005-04-22 21:31:04 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -20,15 +20,17 @@
 #include "wrappers.h"
 
 int 
-cerebro_clusterlist_genders_init(genders_t *handle, 
-                                 char *file, 
-                                 char *clusterlist_module_name)
+cerebro_clusterlist_genders_setup(genders_t *handle, 
+                                  char *file, 
+                                  char *clusterlist_module_name)
 {
   assert(handle);
   assert(clusterlist_module_name);
 
   if (!(*handle = genders_handle_create()))
-    cerebro_err_exit("%s(%s:%d): genders_handle_create",
+    cerebro_err_exit("%s(%s:%d): %s clusterlist module: "
+                     "genders_handle_create",
+                     clusterlist_module_name,
                      __FILE__, __FUNCTION__, __LINE__);
 
   if (genders_load_data(*handle, file) < 0)
@@ -55,9 +57,9 @@ cerebro_clusterlist_genders_init(genders_t *handle,
 }
 
 int
-cerebro_clusterlist_genders_finish(genders_t *handle, 
-                                   char **file, 
-                                   char *clusterlist_module_name)
+cerebro_clusterlist_genders_cleanup(genders_t *handle, 
+                                    char **file, 
+                                    char *clusterlist_module_name)
 {
   assert(handle && file);
   assert(clusterlist_module_name);

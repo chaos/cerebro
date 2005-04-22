@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_module.h,v 1.3 2005-04-22 18:38:02 achu Exp $
+ *  $Id: cerebro_config_module.h,v 1.4 2005-04-22 21:31:04 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_CONFIG_MODULE_H
@@ -29,6 +29,26 @@ struct cerebrod_module_config
 };
 
 /*
+ * Cerebro_config_setup
+ *
+ * function prototype for config module function to setup the
+ * module.  Required to be defined by each config module.
+ *
+ * Returns 0 on success, -1 on error
+ */
+typedef int (*Cerebro_config_setup)(void);
+
+/*
+ * Cerebro_config_cleanup
+ *
+ * function prototype for config module function to cleanup.  Required
+ * to be defined by each config module.
+ *
+ * Returns 0 on success, -1 on error
+ */
+typedef int (*Cerebro_config_cleanup)(void);
+
+/*
  * Cerebro_config_load_cerebrod_default
  *
  * function prototype for config module function to alter default
@@ -47,6 +67,8 @@ typedef int (*Cerebro_config_load_cerebrod_default)(struct cerebrod_module_confi
 struct cerebro_config_module_info
 {
   char *config_module_name;
+  Cerebro_config_setup setup;
+  Cerebro_config_cleanup cleanup;
   Cerebro_config_load_cerebrod_default load_cerebrod_default;
 };
 

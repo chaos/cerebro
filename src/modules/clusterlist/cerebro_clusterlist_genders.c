@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_genders.c,v 1.2 2005-04-21 22:58:53 achu Exp $
+ *  $Id: cerebro_clusterlist_genders.c,v 1.3 2005-04-22 21:31:04 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -30,21 +30,21 @@
  *
  * genders handle
  */
-genders_t genders_handle = NULL;
+static genders_t genders_handle = NULL;
 
 /*  
  * genders_file
  *
  * genders database
  */
-char *genders_file = NULL;
+static char *genders_file = NULL;
 
 /* 
  * genders_clusterlist_parse_options
  *
  * parse options for the genders clusterlist module
  */
-int
+static int
 genders_clusterlist_parse_options(char **options)
 {
   assert(!genders_handle);
@@ -58,33 +58,33 @@ genders_clusterlist_parse_options(char **options)
 }
 
 /* 
- * genders_clusterlist_init
+ * genders_clusterlist_setup
  *
- * genders clusterlist module init function
+ * genders clusterlist module setup function
  */
-int 
-genders_clusterlist_init(void)
+static int 
+genders_clusterlist_setup(void)
 {
   assert(!genders_handle);
 
-  return cerebro_clusterlist_genders_init(&genders_handle, 
-                                          genders_file,
-                                          GENDERS_CLUSTERLIST_MODULE_NAME);
+  return cerebro_clusterlist_genders_setup(&genders_handle, 
+                                           genders_file,
+                                           GENDERS_CLUSTERLIST_MODULE_NAME);
 }
 
 /* 
- * genders_clusterlist_finish
+ * genders_clusterlist_cleanup
  *
- * genders clusterlist module finish function
+ * genders clusterlist module cleanup function
  */
-int
-genders_clusterlist_finish(void)
+static int
+genders_clusterlist_cleanup(void)
 {
   assert(genders_handle);
 
-  return cerebro_clusterlist_genders_finish(&genders_handle, 
-                                            &genders_file,
-                                            GENDERS_CLUSTERLIST_MODULE_NAME);
+  return cerebro_clusterlist_genders_cleanup(&genders_handle, 
+                                             &genders_file,
+                                             GENDERS_CLUSTERLIST_MODULE_NAME);
 }
 
 /*
@@ -92,7 +92,7 @@ genders_clusterlist_finish(void)
  *
  * genders clusterlist module get all nodes function
  */
-int
+static int
 genders_clusterlist_get_all_nodes(char **nodes, unsigned int nodeslen)
 {
   assert(genders_handle);
@@ -109,7 +109,7 @@ genders_clusterlist_get_all_nodes(char **nodes, unsigned int nodeslen)
  *
  * genders clusterlist module numnodes function
  */
-int 
+static int 
 genders_clusterlist_numnodes(void)
 {
   assert(genders_handle);
@@ -123,7 +123,7 @@ genders_clusterlist_numnodes(void)
  *
  * genders clusterlist module node in cluster function
  */
-int
+static int
 genders_clusterlist_node_in_cluster(char *node)
 {
   int ret;
@@ -161,7 +161,7 @@ genders_clusterlist_node_in_cluster(char *node)
  *
  * genders clusterlist module get nodename function
  */
-int
+static int
 genders_clusterlist_get_nodename(char *node, char *buf, unsigned int buflen)
 {
   assert(genders_handle);
@@ -182,8 +182,8 @@ struct cerebro_clusterlist_module_info clusterlist_module_info =
   {
     GENDERS_CLUSTERLIST_MODULE_NAME,
     &genders_clusterlist_parse_options,
-    &genders_clusterlist_init,
-    &genders_clusterlist_finish,
+    &genders_clusterlist_setup,
+    &genders_clusterlist_cleanup,
     &genders_clusterlist_get_all_nodes,
     &genders_clusterlist_numnodes,
     &genders_clusterlist_node_in_cluster,

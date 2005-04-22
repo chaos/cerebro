@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_none.c,v 1.2 2005-04-21 22:58:53 achu Exp $
+ *  $Id: cerebro_clusterlist_none.c,v 1.3 2005-04-22 21:31:04 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -26,7 +26,7 @@
  *
  * parse options for the none clusterlist module
  */
-int
+static int
 none_clusterlist_parse_options(char **options)
 {
   int i = 0;
@@ -46,23 +46,23 @@ none_clusterlist_parse_options(char **options)
 }
 
 /* 
- * none_clusterlist_init
+ * none_clusterlist_setup
  *
- * none clusterlist module init function
+ * none clusterlist module setup function
  */
-int 
-none_clusterlist_init(void)
+static int 
+none_clusterlist_setup(void)
 {
   return 0;
 }
 
 /* 
- * none_clusterlist_finish
+ * none_clusterlist_cleanup
  *
- * none clusterlist module finish function
+ * none clusterlist module cleanup function
  */
-int
-none_clusterlist_finish(void)
+static int
+none_clusterlist_cleanup(void)
 {
   return 0;
 }
@@ -72,7 +72,7 @@ none_clusterlist_finish(void)
  *
  * none clusterlist module get all nodes function
  */
-int
+static int
 none_clusterlist_get_all_nodes(char **nodes, unsigned int nodeslen)
 {
   return 0;
@@ -83,7 +83,7 @@ none_clusterlist_get_all_nodes(char **nodes, unsigned int nodeslen)
  *
  * none clusterlist module numnodes function
  */
-int 
+static int 
 none_clusterlist_numnodes(void)
 {
   return 0;
@@ -94,7 +94,7 @@ none_clusterlist_numnodes(void)
  *
  * none clusterlist module node in cluster function
  */
-int
+static int
 none_clusterlist_node_in_cluster(char *node)
 {
   /* Must assume it is */
@@ -106,7 +106,7 @@ none_clusterlist_node_in_cluster(char *node)
  *
  * none clusterlist module get nodename function
  */
-int
+static int
 none_clusterlist_get_nodename(char *node, char *buf, unsigned int buflen)
 {
   assert(node);
@@ -126,8 +126,8 @@ struct cerebro_clusterlist_module_info clusterlist_module_info =
   {
     NONE_CLUSTERLIST_MODULE_NAME,
     &none_clusterlist_parse_options,
-    &none_clusterlist_init,
-    &none_clusterlist_finish,
+    &none_clusterlist_setup,
+    &none_clusterlist_cleanup,
     &none_clusterlist_get_all_nodes,
     &none_clusterlist_numnodes,
     &none_clusterlist_node_in_cluster,

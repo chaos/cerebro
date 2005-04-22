@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist.c,v 1.24 2005-04-21 22:00:33 achu Exp $
+ *  $Id: cerebrod_clusterlist.c,v 1.25 2005-04-22 21:31:04 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -65,14 +65,14 @@ _clusterlist_check_module_data(struct cerebro_clusterlist_module_info *clusterli
                      "valid parse_options function",
                      clusterlist_module_info_l->clusterlist_module_name);
 
-  if (!clusterlist_module_info_l->init)
+  if (!clusterlist_module_info_l->setup)
     cerebro_err_exit("clusterlist module '%s' does not contain "
-                     "valid init function",
+                     "valid setup function",
                      clusterlist_module_info_l->clusterlist_module_name);
   
-  if (!clusterlist_module_info_l->finish)
+  if (!clusterlist_module_info_l->cleanup)
     cerebro_err_exit("clusterlist module '%s' does not contain "
-                     "valid finish function",
+                     "valid cleanup function",
                      clusterlist_module_info_l->clusterlist_module_name);
 
   if (!clusterlist_module_info_l->get_all_nodes)
@@ -158,7 +158,7 @@ _clusterlist_load_dynamic_module(char *module_path)
 #endif /* !WITH_STATIC_MODULES */
 
 int
-cerebrod_clusterlist_setup(void)
+cerebrod_clusterlist_module_setup(void)
 {
   assert(!clusterlist_module_info);
 
@@ -230,7 +230,7 @@ cerebrod_clusterlist_setup(void)
 }
 
 int 
-cerebrod_clusterlist_cleanup(void)
+cerebrod_clusterlist_module_cleanup(void)
 {
   assert(clusterlist_module_info);
 
@@ -262,19 +262,19 @@ cerebrod_clusterlist_parse_options(void)
 }
 
 int 
-cerebrod_clusterlist_init(void)
+cerebrod_clusterlist_setup(void)
 {
   assert(clusterlist_module_info);
 
-  return ((*clusterlist_module_info->init)());
+  return ((*clusterlist_module_info->setup)());
 }
 
 int 
-cerebrod_clusterlist_finish(void)
+cerebrod_clusterlist_cleanup(void)
 {
   assert(clusterlist_module_info);
 
-  return ((*clusterlist_module_info->finish)());
+  return ((*clusterlist_module_info->cleanup)());
 }
 
 int 

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_hostsfile.c,v 1.3 2005-04-21 22:58:53 achu Exp $
+ *  $Id: cerebro_clusterlist_hostsfile.c,v 1.4 2005-04-22 21:31:04 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -31,21 +31,21 @@
  *
  * list of all hosts
  */
-List hosts = NULL;
+static List hosts = NULL;
 
 /*  
  * hostsfile_file
  *
  * hostsfile database
  */
-char *hostsfile_file = NULL;
+static char *hostsfile_file = NULL;
 
 /* 
  * hostsfile_clusterlist_parse_options
  *
  * parse options for the hostsfile clusterlist module
  */
-int
+static int
 hostsfile_clusterlist_parse_options(char **options)
 {
   assert(!hosts);
@@ -188,13 +188,13 @@ _move_past_whitespace(char *buf)
 }
 
 /* 
- * hostsfile_clusterlist_init
+ * hostsfile_clusterlist_setup
  *
- * hostsfile clusterlist module init function.  Open hostsfile, read
+ * hostsfile clusterlist module setup function.  Open hostsfile, read
  * each line of the hostsfile, and save hosts into hosts list.
  */
-int 
-hostsfile_clusterlist_init(void)
+static int 
+hostsfile_clusterlist_setup(void)
 {
   int fd, len;
   char buf[HOSTSFILE_PARSE_BUFLEN];
@@ -247,12 +247,12 @@ hostsfile_clusterlist_init(void)
 }
 
 /* 
- * hostsfile_clusterlist_finish
+ * hostsfile_clusterlist_cleanup
  *
- * hostsfile clusterlist module finish function
+ * hostsfile clusterlist module cleanup function
  */
-int
-hostsfile_clusterlist_finish(void)
+static int
+hostsfile_clusterlist_cleanup(void)
 {
   assert(hosts);
 
@@ -269,7 +269,7 @@ hostsfile_clusterlist_finish(void)
  *
  * hostsfile clusterlist module get all nodes function
  */
-int
+static int
 hostsfile_clusterlist_get_all_nodes(char **nodes, unsigned int nodeslen)
 {
   char *node;
@@ -306,7 +306,7 @@ hostsfile_clusterlist_get_all_nodes(char **nodes, unsigned int nodeslen)
  *
  * hostsfile clusterlist module numnodes function
  */
-int 
+static int 
 hostsfile_clusterlist_numnodes(void)
 {
   assert(hosts);
@@ -319,7 +319,7 @@ hostsfile_clusterlist_numnodes(void)
  *
  * hostsfile clusterlist module node in cluster function
  */
-int
+static int
 hostsfile_clusterlist_node_in_cluster(char *node)
 {
   void *ret;
@@ -337,7 +337,7 @@ hostsfile_clusterlist_node_in_cluster(char *node)
  *
  * hostsfile clusterlist module get nodename function
  */
-int
+static int
 hostsfile_clusterlist_get_nodename(char *node, char *buf, unsigned int buflen)
 {
   assert(hosts);
@@ -358,8 +358,8 @@ struct cerebro_clusterlist_module_info clusterlist_module_info =
   {
     HOSTSFILE_CLUSTERLIST_MODULE_NAME,
     &hostsfile_clusterlist_parse_options,
-    &hostsfile_clusterlist_init,
-    &hostsfile_clusterlist_finish,
+    &hostsfile_clusterlist_setup,
+    &hostsfile_clusterlist_cleanup,
     &hostsfile_clusterlist_get_all_nodes,
     &hostsfile_clusterlist_numnodes,
     &hostsfile_clusterlist_node_in_cluster,

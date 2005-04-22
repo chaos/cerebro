@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.67 2005-04-22 18:38:02 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.68 2005-04-22 21:31:04 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -51,6 +51,13 @@
  * cerebrod configuration used by all of cerebrod
  */
 struct cerebrod_config conf;
+
+/*
+ * config_module_info
+ *
+ * config module info and operations
+ */
+static struct cerebro_config_module_info *config_module_info = NULL;
 
 #if !WITH_STATIC_MODULES
 /*
@@ -320,7 +327,7 @@ _cerebrod_cmdline_parse_check(void)
  * Returns 1 on loading success, 0 on loading failure, -1 on fatal error
  */
 static int
-_cerebrod_load_alternate_configuration(struct cerebro_config_module_info *config_module_info)
+_cerebrod_load_alternate_configuration(void)
 {
   struct cerebrod_module_config module_conf;
 
@@ -328,6 +335,10 @@ _cerebrod_load_alternate_configuration(struct cerebro_config_module_info *config
 
   if (!config_module_info->load_cerebrod_default)
     return 0;
+
+  if ((*config_module_info->setup)() < 0)
+    cerebro_err_exit("%s config module: setup failed: %s", 
+                     config_module_info->config_module_name, strerror(errno));
 
 #ifndef NDEBUG
   if (conf.debug)
@@ -394,15 +405,13 @@ _cerebrod_load_alternate_configuration(struct cerebro_config_module_info *config
 static int
 _config_load_static_module(char *name)
 {
-  struct cerebro_config_module_info *config_module_info;
-
   assert(name);
 
   if (!(config_module_info = cerebrod_find_static_config_module(name)))
     cerebro_err_exit("%s(%s:%d): config module '%s' name not found", 
                      __FILE__, __FUNCTION__, __LINE__, name);
   
-  return _cerebrod_load_alternate_configuration(config_module_info);
+  return _cerebrod_load_alternate_configuration();
 }
 #else /* !WITH_STATIC_MODULES */
 /* 
@@ -417,7 +426,6 @@ _config_load_static_module(char *name)
 static int
 _config_load_dynamic_module(char *module_path)
 {
-  struct cerebro_config_module_info *config_module_info = NULL;
   int rv;
 
   assert(module_path);
@@ -429,7 +437,7 @@ _config_load_dynamic_module(char *module_path)
     cerebro_err_exit("config module '%s' does not contain a valid name", 
                      module_path);
 
-  rv = _cerebrod_load_alternate_configuration(config_module_info);
+  rv = _cerebrod_load_alternate_configuration();
 
   return rv;
 }
@@ -1458,11 +1466,18 @@ cerebrod_config_setup(int argc, char **argv)
   _cerebrod_config_dump();
 }
 
-void
-cerebrod_config_cleanup(void)
+static void
+_cerebrod_config_module_cleanup(void)
 {
 #if !WITH_STATIC_MODULES
+  (*config_module_info->cleanup)();
   Lt_dlclose(config_module_dl_handle);
   Lt_dlexit();
 #endif /* !WITH_STATIC_MODULES */
+}
+
+void
+cerebrod_config_cleanup(void)
+{
+  _cerebrod_config_module_cleanup();
 }

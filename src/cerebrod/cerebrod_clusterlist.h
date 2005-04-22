@@ -1,28 +1,28 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist.h,v 1.9 2005-03-24 01:29:21 achu Exp $
+ *  $Id: cerebrod_clusterlist.h,v 1.10 2005-04-22 21:31:04 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_CLUSTERLIST_H
 #define _CEREBROD_CLUSTERLIST_H
 
 /*  
- * cerebrod_clusterlist_setup
+ * cerebrod_clusterlist_module_setup
  *
  * load clusterlist module.  search for clusterlist module to load if
  * necessary
  *
  * Return 0 on success, -1 on error
  */
-int cerebrod_clusterlist_setup(void);
+int cerebrod_clusterlist_module_setup(void);
 
 /*  
- * cerebrod_clusterlist_cleanup
+ * cerebrod_clusterlist_module_cleanup
  *
  * cleanup clusterlist module state
  *
  * Return 0 on success, -1 on error
  */
-int cerebrod_clusterlist_cleanup(void);
+int cerebrod_clusterlist_module_cleanup(void);
 
 /* 
  * cerebrod_clusterlist_module_name
@@ -39,18 +39,18 @@ char *cerebrod_clusterlist_module_name(void);
 int cerebrod_clusterlist_parse_options(void);
 
 /* 
- * cerebrod_clusterlist_init
+ * cerebrod_clusterlist_setup
  * 
- * call clusterlist module init function
+ * call clusterlist module setup function
  */
-int cerebrod_clusterlist_init(void);
+int cerebrod_clusterlist_setup(void);
 
 /* 
- * cerebrod_clusterlist_finish
+ * cerebrod_clusterlist_cleanup
  * 
- * call clusterlist module parse finish function
+ * call clusterlist module parse cleanup function
  */
-int cerebrod_clusterlist_finish(void);
+int cerebrod_clusterlist_cleanup(void);
 
 /* 
  * cerebrod_clusterlist_get_all_nodes

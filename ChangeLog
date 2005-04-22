@@ -6,6 +6,9 @@
 
 	* Reworked cerebrod based on variable name changes and header file
 	renaming.
+
+	* Various re-work, slight design changes, and code cleanup to
+	prepare for libcerebro updown library.
 	
 2005-04-21  Albert Chu  <chu11@llnl.gov>
 
