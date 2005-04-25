@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_error.c,v 1.1 2005-04-21 22:00:33 achu Exp $
+ *  $Id: cerebro_error.c,v 1.2 2005-04-25 21:39:27 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -12,7 +12,6 @@
 #include <string.h>
 #include <stdarg.h>
 #endif /* STDC_HEADERS */
-#include <assert.h>
 #include <errno.h>
 #include <pthread.h>
 

@@ -6,6 +6,8 @@
 	* Various build fixes.
 
 	* Continued code cleanup and minor bug fixing.
+
+	* Begin work on cerebro updown API.
 	
 2005-04-22  Albert Chu  <chu11@llnl.gov>
 

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.c,v 1.27 2005-04-22 18:38:02 achu Exp $
+ *  $Id: cerebrod_updown.c,v 1.28 2005-04-25 21:39:27 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -237,7 +237,7 @@ _cerebrod_updown_initialize(void)
 }
 
 /*
- * _cerebrod_updown_request_marshall
+ * _cerebrod_updown_response_marshall
  *
  * marshall contents of a updown response packet buffer
  *
@@ -406,7 +406,7 @@ _cerebrod_updown_receive_request(int client_fd,
     {
       fd_set rfds;
       struct timeval tv;
-      tv.tv_sec = CEREBRO_UPDOWN_PROTOCOL_TIMEOUT_LEN;
+      tv.tv_sec = CEREBRO_UPDOWN_PROTOCOL_CONNECT_TIMEOUT_LEN;
       tv.tv_usec = 0;
       
       FD_ZERO(&rfds);
@@ -551,17 +551,17 @@ _cerebrod_updown_respond_with_error(int client_fd, unsigned int updown_err_code)
   struct cerebro_updown_response res;
   
   assert(client_fd >= 0);
-  assert(updown_err_code == CEREBRO_UPDOWN_ERR_CODE_VERSION_INVALID
-	 || updown_err_code == CEREBRO_UPDOWN_ERR_CODE_UPDOWN_REQUEST_INVALID
-	 || updown_err_code == CEREBRO_UPDOWN_ERR_CODE_TIMEOUT_INVALID
-	 || updown_err_code == CEREBRO_UPDOWN_ERR_CODE_NO_NODES_FOUND
-	 || updown_err_code == CEREBRO_UPDOWN_ERR_CODE_INTERNAL_SYSTEM_ERROR);
+  assert(updown_err_code == CEREBRO_UPDOWN_PROTOCOL_ERR_VERSION_INVALID
+	 || updown_err_code == CEREBRO_UPDOWN_PROTOCOL_ERR_UPDOWN_REQUEST_INVALID
+	 || updown_err_code == CEREBRO_UPDOWN_PROTOCOL_ERR_TIMEOUT_INVALID
+	 || updown_err_code == CEREBRO_UPDOWN_PROTOCOL_ERR_NO_NODES_FOUND
+	 || updown_err_code == CEREBRO_UPDOWN_PROTOCOL_ERR_INTERNAL_SYSTEM_ERROR);
   
   memset(&res, '\0', CEREBRO_UPDOWN_RESPONSE_LEN);
 
   res.version = CEREBRO_UPDOWN_PROTOCOL_VERSION;
   res.updown_err_code = updown_err_code;
-  res.end_of_responses = CEREBRO_UPDOWN_IS_LAST_RESPONSE;
+  res.end_of_responses = CEREBRO_UPDOWN_PROTOCOL_IS_LAST_RESPONSE;
 
   if (_cerebrod_updown_send_response(client_fd, &res) < 0)
     return -1;
@@ -610,20 +610,20 @@ _cerebrod_updown_evaluate_updown_state(void *x, void *arg)
 #endif /* NDEBUG */
 
   if ((ed->time_now - ud->last_received) < ed->timeout_len)
-    updown_state = CEREBRO_UPDOWN_STATE_NODE_UP;
+    updown_state = CEREBRO_UPDOWN_PROTOCOL_STATE_NODE_UP;
   else
-    updown_state = CEREBRO_UPDOWN_STATE_NODE_DOWN;
+    updown_state = CEREBRO_UPDOWN_PROTOCOL_STATE_NODE_DOWN;
 
-  if ((ed->updown_request == CEREBRO_UPDOWN_REQUEST_UP_NODES
-       && updown_state != CEREBRO_UPDOWN_STATE_NODE_UP)
-      || (ed->updown_request == CEREBRO_UPDOWN_REQUEST_DOWN_NODES
-          && updown_state != CEREBRO_UPDOWN_STATE_NODE_DOWN))
+  if ((ed->updown_request == CEREBRO_UPDOWN_PROTOCOL_REQUEST_UP_NODES
+       && updown_state != CEREBRO_UPDOWN_PROTOCOL_STATE_NODE_UP)
+      || (ed->updown_request == CEREBRO_UPDOWN_PROTOCOL_REQUEST_DOWN_NODES
+          && updown_state != CEREBRO_UPDOWN_PROTOCOL_STATE_NODE_DOWN))
     return 0;
 
   res = Malloc(sizeof(struct cerebro_updown_response));
   res->version = CEREBRO_UPDOWN_PROTOCOL_VERSION;
-  res->updown_err_code = CEREBRO_UPDOWN_ERR_CODE_SUCCESS;
-  res->end_of_responses = CEREBRO_UPDOWN_IS_NOT_LAST_RESPONSE;
+  res->updown_err_code = CEREBRO_UPDOWN_PROTOCOL_ERR_SUCCESS;
+  res->end_of_responses = CEREBRO_UPDOWN_PROTOCOL_IS_NOT_LAST_RESPONSE;
 #ifndef NDEBUG
   if (ud->nodename && strlen(ud->nodename) > CEREBRO_MAXNODENAMELEN)
     cerebro_err_debug("%s(%s:%d): invalid node name length: %s", 
@@ -687,9 +687,9 @@ _cerebrod_updown_respond_with_updown_nodes(int client_fd,
   List node_responses = NULL;
 
   assert(client_fd >= 0);
-  assert(updown_request == CEREBRO_UPDOWN_REQUEST_UP_NODES
-	 || updown_request == CEREBRO_UPDOWN_REQUEST_DOWN_NODES
-	 || updown_request == CEREBRO_UPDOWN_REQUEST_UP_AND_DOWN_NODES);
+  assert(updown_request == CEREBRO_UPDOWN_PROTOCOL_REQUEST_UP_NODES
+	 || updown_request == CEREBRO_UPDOWN_PROTOCOL_REQUEST_DOWN_NODES
+	 || updown_request == CEREBRO_UPDOWN_PROTOCOL_REQUEST_UP_AND_DOWN_NODES);
   assert(timeout_len);
   assert(updown_node_data);
 
@@ -701,7 +701,7 @@ _cerebrod_updown_respond_with_updown_nodes(int client_fd,
     {
       Pthread_mutex_unlock(&updown_node_data_lock);
       _cerebrod_updown_respond_with_error(client_fd,
-					  CEREBRO_UPDOWN_ERR_CODE_NO_NODES_FOUND);
+					  CEREBRO_UPDOWN_PROTOCOL_ERR_NO_NODES_FOUND);
       goto err_out;
     }
 
@@ -712,7 +712,7 @@ _cerebrod_updown_respond_with_updown_nodes(int client_fd,
                         strerror(errno));
       Pthread_mutex_unlock(&updown_node_data_lock);
       _cerebrod_updown_respond_with_error(client_fd,
-					  CEREBRO_UPDOWN_ERR_CODE_INTERNAL_SYSTEM_ERROR);
+					  CEREBRO_UPDOWN_PROTOCOL_ERR_INTERNAL_SYSTEM_ERROR);
       goto err_out;
     }
 
@@ -729,7 +729,7 @@ _cerebrod_updown_respond_with_updown_nodes(int client_fd,
     {
       Pthread_mutex_unlock(&updown_node_data_lock);
       _cerebrod_updown_respond_with_error(client_fd,
-					  CEREBRO_UPDOWN_ERR_CODE_INTERNAL_SYSTEM_ERROR);
+					  CEREBRO_UPDOWN_PROTOCOL_ERR_INTERNAL_SYSTEM_ERROR);
       goto err_out;
     }
 
@@ -746,7 +746,7 @@ _cerebrod_updown_respond_with_updown_nodes(int client_fd,
         {
           Pthread_mutex_unlock(&updown_node_data_lock);
           _cerebrod_updown_respond_with_error(client_fd,
-                                              CEREBRO_UPDOWN_ERR_CODE_INTERNAL_SYSTEM_ERROR);
+                                              CEREBRO_UPDOWN_PROTOCOL_ERR_INTERNAL_SYSTEM_ERROR);
           goto err_out;
         }
     }
@@ -754,8 +754,8 @@ _cerebrod_updown_respond_with_updown_nodes(int client_fd,
   /* Send end response */
   memset(&end_res, '\0', sizeof(struct cerebro_updown_response));
   end_res.version = CEREBRO_UPDOWN_PROTOCOL_VERSION;
-  end_res.updown_err_code = CEREBRO_UPDOWN_ERR_CODE_SUCCESS;
-  end_res.end_of_responses = CEREBRO_UPDOWN_IS_LAST_RESPONSE;
+  end_res.updown_err_code = CEREBRO_UPDOWN_PROTOCOL_ERR_SUCCESS;
+  end_res.end_of_responses = CEREBRO_UPDOWN_PROTOCOL_IS_LAST_RESPONSE;
 
   if (_cerebrod_updown_send_response(client_fd, &end_res) < 0)
     return -1;
@@ -798,16 +798,16 @@ _cerebrod_updown_service_connection(void *arg)
   if (req.version != CEREBRO_UPDOWN_PROTOCOL_VERSION)
     {
       _cerebrod_updown_respond_with_error(client_fd, 
-					  CEREBRO_UPDOWN_ERR_CODE_VERSION_INVALID);
+					  CEREBRO_UPDOWN_PROTOCOL_ERR_VERSION_INVALID);
       goto done;
     }
 
-  if (!(req.updown_request == CEREBRO_UPDOWN_REQUEST_UP_NODES
-	|| req.updown_request == CEREBRO_UPDOWN_REQUEST_DOWN_NODES
-	|| req.updown_request == CEREBRO_UPDOWN_REQUEST_UP_AND_DOWN_NODES))
+  if (!(req.updown_request == CEREBRO_UPDOWN_PROTOCOL_REQUEST_UP_NODES
+	|| req.updown_request == CEREBRO_UPDOWN_PROTOCOL_REQUEST_DOWN_NODES
+	|| req.updown_request == CEREBRO_UPDOWN_PROTOCOL_REQUEST_UP_AND_DOWN_NODES))
     {
       _cerebrod_updown_respond_with_error(client_fd,
-					  CEREBRO_UPDOWN_ERR_CODE_UPDOWN_REQUEST_INVALID);
+					  CEREBRO_UPDOWN_PROTOCOL_ERR_UPDOWN_REQUEST_INVALID);
       goto done;
     }
 
