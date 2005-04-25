@@ -19,4 +19,7 @@
 
 - maps confine only "cerebro_" instead of "cerebro*"
 
+- strerror_r and errormsg_r funcs?
+  - only if determined necessary at some point
+
 - code review to reduce memory footprint

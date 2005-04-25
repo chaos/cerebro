@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.14 2005-04-25 15:33:05 achu Exp $
+## $Id: Makefile.am,v 1.15 2005-04-25 23:25:23 achu Exp $
 ##*****************************************************************************
 
 if WITH_GNU_LD
@@ -13,14 +13,19 @@ noinst_HEADERS = cerebro_defs.h \
 
 cerebroheadersdir = $(includedir)/cerebro
 
-cerebroheaders_HEADERS = cerebro_error.h \
+cerebroheaders_HEADERS = cerebro.h \
+			 cerebro_error.h \
 			 cerebro_marshalling.h \
 			 cerebro_clusterlist_module.h \
-			 cerebro_config_module.h
+			 cerebro_config_module.h \
+			 cerebro_updown.h
 
 lib_LTLIBRARIES       = libcerebro.la
 libcerebro_la_CFLAGS  = -D_REENTRANT -I$(srcdir)/../libcommon
-libcerebro_la_SOURCES = cerebro_error.c cerebro_marshalling.c
+libcerebro_la_SOURCES = cerebro.c \
+			cerebro_error.c \
+			cerebro_marshalling.c \
+			cerebro_updown.c
 libcerebro_la_LDFLAGS = -version-info @LIBCEREBRO_VERSION_INFO@ $(CEREBRO_OTHER_FLAGS)
 libcerebro_la_LIBADD  = ../libcommon/libcommon.la
 
