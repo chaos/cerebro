@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_dynamic_modules.c,v 1.10 2005-04-25 15:52:57 achu Exp $
+ *  $Id: cerebrod_dynamic_modules.c,v 1.11 2005-04-25 15:54:11 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -135,7 +135,7 @@ cerebrod_search_for_module(char *search_dir,
 	   * object file or libtool file.
 	   */
           ptr = strchr(dirent->d_name, '.');
-          if (!(!strcmp(ptr, ".la") || !strcmp(ptr, ".so")))
+          if (!ptr || !(!strcmp(ptr, ".la") || !strcmp(ptr, ".so")))
             continue;
 
           memset(filebuf, '\0', MAXPATHLEN+1);
