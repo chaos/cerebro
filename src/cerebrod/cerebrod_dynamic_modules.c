@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_dynamic_modules.c,v 1.7 2005-04-22 23:32:29 achu Exp $
+ *  $Id: cerebrod_dynamic_modules.c,v 1.8 2005-04-25 15:33:05 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -53,10 +53,10 @@ char *dynamic_clusterlist_modules[] = {
 int dynamic_clusterlist_modules_len = 4;
 
 int
-cerebrod_search_dir_for_module(char *search_dir,
-                               char **modules_list,
-                               int modules_list_len,
-                               Cerebrod_load_module load_module)
+cerebrod_lookup_module(char *search_dir,
+		       char **modules_list,
+		       int modules_list_len,
+		       Cerebrod_load_module load_module)
 {
   DIR *dir;
   int i = 0, found = 0;
@@ -106,9 +106,9 @@ cerebrod_search_dir_for_module(char *search_dir,
 }
 
 int
-cerebrod_search_dir_for_new_module(char *search_dir,
-                                   char *signature,
-                                   Cerebrod_load_module load_module)
+cerebrod_search_for_module(char *search_dir,
+			   char *signature,
+			   Cerebrod_load_module load_module)
 {
   DIR *dir;
   struct dirent *dirent;
@@ -129,6 +129,10 @@ cerebrod_search_dir_for_new_module(char *search_dir,
           char *ptr;
           int ret;
 
+	  /* 
+	   * Don't bother trying to load this file unless its a shared
+	   * object file or libtool file.
+	   */
           ptr = strchr(dirent->d_name, '.');
           if (!(!strcmp(ptr, ".la") || !strcmp(ptr, ".so")))
             continue;

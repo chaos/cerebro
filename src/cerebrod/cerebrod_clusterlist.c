@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist.c,v 1.26 2005-04-22 23:29:59 achu Exp $
+ *  $Id: cerebrod_clusterlist.c,v 1.27 2005-04-25 15:33:05 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -255,21 +255,21 @@ cerebrod_clusterlist_module_setup(void)
     }
   else
     {
-      if (cerebrod_search_dir_for_module(CEREBRO_CLUSTERLIST_MODULE_BUILDDIR,
-                                         dynamic_clusterlist_modules,
-					 dynamic_clusterlist_modules_len,
-                                         _clusterlist_load_dynamic_module))
+      if (cerebrod_lookup_module(CEREBRO_CLUSTERLIST_MODULE_BUILDDIR,
+				 dynamic_clusterlist_modules,
+				 dynamic_clusterlist_modules_len,
+				 _clusterlist_load_dynamic_module))
         goto done;
 
-      if (cerebrod_search_dir_for_module(CEREBRO_MODULE_DIR,
-                                         dynamic_clusterlist_modules,
-					 dynamic_clusterlist_modules_len,
-                                         _clusterlist_load_dynamic_module))
+      if (cerebrod_lookup_module(CEREBRO_MODULE_DIR,
+				 dynamic_clusterlist_modules,
+				 dynamic_clusterlist_modules_len,
+				 _clusterlist_load_dynamic_module))
         goto done;
 
-      if (cerebrod_search_dir_for_new_module(CEREBRO_MODULE_DIR,
-                                             "cerebro_clusterlist_",
-                                             _clusterlist_load_dynamic_module))
+      if (cerebrod_search_for_module(CEREBRO_MODULE_DIR,
+				     "cerebro_clusterlist_",
+				     _clusterlist_load_dynamic_module))
         goto done;
 
       if (!clusterlist_module_dl_handle)

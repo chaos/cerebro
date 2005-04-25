@@ -1,3 +1,10 @@
+2005-04-25  Albert Chu  <chu11@llnl.gov>
+
+	* Added support to search for arbitrary modules rather than only
+	those defined.
+
+	* Continued code cleanup and minor bug fixing.
+	
 2005-04-22  Albert Chu  <chu11@llnl.gov>
 
 	* src/libcerebro/cerebrod_config_module.h: Renamed to

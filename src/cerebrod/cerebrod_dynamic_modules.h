@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_dynamic_modules.h,v 1.3 2005-04-22 23:29:59 achu Exp $
+ *  $Id: cerebrod_dynamic_modules.h,v 1.4 2005-04-25 15:33:05 achu Exp $
 \*****************************************************************************/
  
 #ifndef _CEREBROD_STATIC_MODULES_H
@@ -28,9 +28,9 @@ extern int dynamic_clusterlist_modules_len;
 typedef int (*Cerebrod_load_module)(char *);
 
 /*
- * cerebrod_search_dir_for_module
+ * cerebrod_lookup_module
  *
- * search a directory for a module
+ * search a directory and find a module from a list of modules
  *
  * - search_dir - directory to search
  * - modules_list - list of modules to search for
@@ -39,13 +39,13 @@ typedef int (*Cerebrod_load_module)(char *);
  *
  * Returns 1 when a module is found, 0 when one is not.
  */
-int cerebrod_search_dir_for_module(char *search_dir,
-                                   char **modules_list,
-                                   int modules_list_len,
-                                   Cerebrod_load_module load_module);
+int cerebrod_lookup_module(char *search_dir,
+			   char **modules_list,
+			   int modules_list_len,
+			   Cerebrod_load_module load_module);
 
 /*
- * cerebrod_search_dir_for_new_module
+ * cerebrod_search_for_module
  *
  * search a directory for a new module, one currently unknown to
  * cerebrod
@@ -57,9 +57,9 @@ int cerebrod_search_dir_for_module(char *search_dir,
  *
  * Returns 1 when a module is found, 0 when one is not.
  */
-int cerebrod_search_dir_for_new_module(char *search_dir,
-                                       char *signature,
-                                       Cerebrod_load_module load_module);
+int cerebrod_search_for_module(char *search_dir,
+			       char *signature,
+			       Cerebrod_load_module load_module);
 #endif /* !WITH_STATIC_MODULES */
 
 #endif /* _CEREBROD_STATIC_MODULES_H */

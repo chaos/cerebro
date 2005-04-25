@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.69 2005-04-22 23:29:59 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.70 2005-04-25 15:33:05 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -493,20 +493,20 @@ _cerebrod_config_module_setup(void)
     }
   else
     {
-      if (cerebrod_search_dir_for_module(CEREBRO_CONFIG_MODULE_BUILDDIR,
-                                         dynamic_config_modules,
-					 dynamic_config_modules_len,
-                                         _config_load_dynamic_module))
+      if (cerebrod_lookup_module(CEREBRO_CONFIG_MODULE_BUILDDIR,
+				 dynamic_config_modules,
+				 dynamic_config_modules_len,
+				 _config_load_dynamic_module))
         goto done;
 
-      if (cerebrod_search_dir_for_module(CEREBRO_MODULE_DIR,
-                                         dynamic_config_modules,
-					 dynamic_config_modules_len,
-                                         _config_load_dynamic_module))
+      if (cerebrod_lookup_module(CEREBRO_MODULE_DIR,
+				 dynamic_config_modules,
+				 dynamic_config_modules_len,
+				 _config_load_dynamic_module))
 
-      if (cerebrod_search_dir_for_new_module(CEREBRO_MODULE_DIR,
-                                             "cerebro_config_",
-                                             _config_load_dynamic_module))
+      if (cerebrod_search_for_module(CEREBRO_MODULE_DIR,
+				     "cerebro_config_",
+				     _config_load_dynamic_module))
         goto done;
     }
 

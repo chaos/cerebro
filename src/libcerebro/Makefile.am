@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.13 2005-04-22 22:44:11 achu Exp $
+## $Id: Makefile.am,v 1.14 2005-04-25 15:33:05 achu Exp $
 ##*****************************************************************************
 
 if WITH_GNU_LD
@@ -7,12 +7,11 @@ CEREBRO_VERSION_SCRIPT = $(srcdir)/cerebro.map
 CEREBRO_OTHER_FLAGS = -Wl,--version-script=$(CEREBRO_VERSION_SCRIPT)
 endif
 
-noinst_HEADERS = cerebro_updown_protocol.h \
+noinst_HEADERS = cerebro_defs.h \
+		 cerebro_updown_protocol.h \
 		 cerebrod_heartbeat_protocol.h
 
 cerebroheadersdir = $(includedir)/cerebro
-
-noinst_HEADERS = cerebro_defs.h
 
 cerebroheaders_HEADERS = cerebro_error.h \
 			 cerebro_marshalling.h \
