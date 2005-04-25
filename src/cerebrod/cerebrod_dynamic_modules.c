@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_dynamic_modules.c,v 1.8 2005-04-25 15:33:05 achu Exp $
+ *  $Id: cerebrod_dynamic_modules.c,v 1.9 2005-04-25 15:47:53 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -123,7 +123,9 @@ cerebrod_search_for_module(char *search_dir,
 
   while ((dirent = readdir(dir)))
     {
-      if (strstr(dirent->d_name, signature))
+      char *ptr = strstr(dirent->d_name, signature);
+
+      if (ptr && ptr == &dirent->d_name[0])
         {
           char filebuf[MAXPATHLEN+1];
           char *ptr;
