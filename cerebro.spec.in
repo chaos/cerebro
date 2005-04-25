@@ -1,11 +1,15 @@
 Name:    @PROJECT@ 
 Version: @VERSION@
+%if %{?_with_chaos:1}%{!?_with_chaos:0}
+Release: @RELEASE@chaos
+%else
 Release: @RELEASE@
+%endif
 Summary: Cerebro dynamic monitoring tools and libraries
 Group: System Environment/Base
 License: GPL
-Source: %{name}-%{version}-%{release}.tgz
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}
+Source: @PROJECT@-@VERSION@-@RELEASE@.tgz
+BuildRoot: %{_tmppath}/@PROJECT@-@VERSION@-@RELEASE@
 
 %description
 Cerebro is a collection of tools for dynamically monitoring a cluster of nodes.
@@ -37,7 +41,7 @@ Requires: whatsup
 Hostsfile modules packages.
 
 %prep
-%setup  -q -n %{name}-%{version}-%{release}
+%setup  -q -n @PROJECT@-@VERSION@-@RELEASE@
 
 %build
 %configure --program-prefix=%{?_program_prefix:%{_program_prefix}} \
@@ -57,7 +61,7 @@ DESTDIR="$RPM_BUILD_ROOT" make install
 %config(noreplace) %{_sysconfdir}/init.d/cerebrod
 %{_sbindir}/*
 %{_includedir}/*
-%if %{?_with_llnl:1}%{!?_with_llnl:0}
+%if %{?_with_chaos:1}%{!?_with_chaos:0}
 %{_libdir}/cerebro/*
 %else
 %{_libdir}/cerebro/*none.*
@@ -65,7 +69,7 @@ DESTDIR="$RPM_BUILD_ROOT" make install
 %{_libdir}/libcerebro.*
 %{_mandir}/*
 
-%if %{?_with_llnl:0}%{!?_with_llnl:1}
+%if %{?_with_chaos:0}%{!?_with_chaos:1}
                                                                                       
 %if %{?_with_gendersllnl:1}%{!?_with_gendersllnl:0}
 %files gendersllnl

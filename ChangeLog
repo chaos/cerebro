@@ -3,6 +3,8 @@
 	* Added support to search for arbitrary modules rather than only
 	those defined.
 
+	* Various build fixes.
+
 	* Continued code cleanup and minor bug fixing.
 	
 2005-04-22  Albert Chu  <chu11@llnl.gov>

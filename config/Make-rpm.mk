@@ -2,7 +2,7 @@
 # Makefile Include for RPM Construction
 #   by Chris Dunlap <cdunlap@llnl.gov>
 ##
-# $Id: Make-rpm.mk,v 1.3 2005-04-22 22:11:06 achu Exp $
+# $Id: Make-rpm.mk,v 1.4 2005-04-25 20:02:59 achu Exp $
 ##
 # REQUIREMENTS:
 # - requires project to be under CVS version control
@@ -112,9 +112,9 @@ rpm-internal: tar-internal
 	  || spec=$$tmp/$$pkg/$$proj.spec; \
 	if ! test -f $$spec; then \
 	  echo "ERROR: Cannot find $$proj spec file in CVS." 1>&2; exit 1; fi; \
-	sed -e "s/^\([ 	]*Name:\).*/\1 $$proj/i" \
-	    -e "s/^\([ 	]*Version:\).*/\1 $$ver/i" \
-	    -e "s/^\([ 	]*Release:\).*/\1 $$rel/i" \
+        sed -e "s/\@PROJECT\@/$$proj/g" \
+            -e "s/\@VERSION\@/$$ver/g" \
+            -e "s/\@RELEASE\@/$$rel/g" \
 	    -e "s/^\([ 	]*Source0?:\).*/\1 $$pkg.tgz/i" \
 	    <$$spec >$$tmp/SPECS/$$proj.spec; \
 	if ! test -s $$tmp/SPECS/$$proj.spec; then \
@@ -127,7 +127,7 @@ rpm-internal: tar-internal
 	for pkg in $$WITHOUT_OPTIONS; do \
 	   args="$$args --define '_without_$$pkg --without-$$pkg'"; \
     done; \
-	args="$$args --define '_with_llnl --with-llnl'"; \
+	args="$$args --define '_with_chaos --with-chaos'"; \
 	args="$$args $$sign --quiet $$tmp/SPECS/$$proj.spec"; \
 	if ! sh -c "$$rpm $$args" >$$tmp/rpm.log 2>&1; then \
 	        cat $$tmp/rpm.log; exit 1; fi; \
