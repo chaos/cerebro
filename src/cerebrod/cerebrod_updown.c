@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.c,v 1.29 2005-04-26 17:04:29 achu Exp $
+ *  $Id: cerebrod_updown.c,v 1.30 2005-04-26 19:09:56 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -326,20 +326,10 @@ _cerebrod_updown_request_unmarshall(struct cerebro_updown_request *req,
                                     int bufferlen)
 {
   int ret, c = 0;
- 
+
   assert(req && buffer && bufferlen >= 0);
  
-  if (CEREBRO_UPDOWN_REQUEST_LEN > bufferlen)
-    {
-      cerebro_err_debug("%s(%s:%d): received buffer length "
-                        "too small: need %d, bufferlen %d", 
-                        CEREBRO_UPDOWN_REQUEST_LEN,
-                        __FILE__, __FUNCTION__, __LINE__,
-                        bufferlen);
-      return -1;
-    }
-   
-  if (CEREBRO_UPDOWN_REQUEST_LEN != bufferlen)
+  if (bufferlen != CEREBRO_UPDOWN_REQUEST_LEN)
     {
       cerebro_err_debug("%s(%s:%d): received buffer length "
                         "unexpected size: expect %d, bufferlen %d", 
@@ -348,7 +338,7 @@ _cerebrod_updown_request_unmarshall(struct cerebro_updown_request *req,
                         bufferlen);
       return -1;
     }
-   
+  
   if ((ret = cerebro_unmarshall_int32(&(req->version), 
 				      buffer + c, 
 				      bufferlen - c)) < 0)

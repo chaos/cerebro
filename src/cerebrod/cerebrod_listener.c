@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.41 2005-04-26 17:31:35 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.42 2005-04-26 19:09:56 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -199,15 +199,6 @@ _cerebrod_listener_heartbeat_unmarshall(struct cerebrod_heartbeat *hb,
   int ret, c = 0;
   
   assert(hb && buffer && bufferlen >= 0);
-  
-  if (CEREBROD_HEARTBEAT_LEN > bufferlen)
-    {
-      cerebro_err_debug("%s(%s:%d): received buffer length "
-                        "too small: need %d, bufferlen %d",
-                        __FILE__, __FUNCTION__, __LINE__,
-                        CEREBROD_HEARTBEAT_LEN, bufferlen);
-      return -1;
-    }
   
   if (CEREBROD_HEARTBEAT_LEN != bufferlen)
     {
