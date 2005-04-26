@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.c,v 1.1 2005-04-25 23:25:23 achu Exp $
+ *  $Id: cerebro.c,v 1.2 2005-04-26 00:09:13 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -8,10 +8,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#if STDC_HEADERS
-#include <string.h>
-#endif /* STDC_HEADERS */
-#include <errno.h>
 
 #include "cerebro.h"
 #include "cerebro_defs.h"
@@ -21,6 +17,7 @@ char *cerebro_error_messages[] =
     "success",
     "null cerebro_t handle",
     "invalid magic number",
+    "server data not loaded",
     "internal error",
     "errnum out of range",
   };
@@ -36,6 +33,9 @@ cerebro_handle_create(void)
   memset(handle, '\0', sizeof(struct cerebro));
   handle->magic = CEREBRO_MAGIC;
   handle->errnum = CEREBRO_ERR_SUCCESS;
+  handle->loaded_state = 0;
+  handle->updown_data = NULL;
+
  cleanup:
   return handle;
 }

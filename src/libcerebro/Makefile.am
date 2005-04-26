@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.15 2005-04-25 23:25:23 achu Exp $
+## $Id: Makefile.am,v 1.16 2005-04-26 00:09:13 achu Exp $
 ##*****************************************************************************
 
 if WITH_GNU_LD
@@ -21,12 +21,14 @@ cerebroheaders_HEADERS = cerebro.h \
 			 cerebro_updown.h
 
 lib_LTLIBRARIES       = libcerebro.la
-libcerebro_la_CFLAGS  = -D_REENTRANT -I$(srcdir)/../libcommon
+libcerebro_la_CFLAGS  = -D_REENTRANT \
+			-I$(srcdir)/../libcommon
 libcerebro_la_SOURCES = cerebro.c \
 			cerebro_error.c \
 			cerebro_marshalling.c \
 			cerebro_updown.c
-libcerebro_la_LDFLAGS = -version-info @LIBCEREBRO_VERSION_INFO@ $(CEREBRO_OTHER_FLAGS)
+libcerebro_la_LDFLAGS = -version-info @LIBCEREBRO_VERSION_INFO@ \
+			$(CEREBRO_OTHER_FLAGS)
 libcerebro_la_LIBADD  = ../libcommon/libcommon.la
 
 ../libcommon/libcommon.la : force-dependency-check

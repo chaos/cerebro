@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_defs.h,v 1.3 2005-04-25 23:25:23 achu Exp $
+ *  $Id: cerebro_defs.h,v 1.4 2005-04-26 00:09:13 achu Exp $
 \*****************************************************************************/
  
 #ifndef _CEREBRO_DEFS_H
@@ -14,6 +14,19 @@
  */
 #define CEREBRO_MAXNODENAMELEN 64
 
+/* 
+ * CEREBRO_MAGIC
+ *
+ * Magic number for cerebro handle
+ */
+#define CEREBRO_MAGIC 0xF00F1234
+
+/* 
+ * Cerebro loaded state flags
+ *
+ * CEREBRO_UPDOWN_DATA_LOADED - Indicates updown data has been loaded
+ */
+#define CEREBRO_UPDOWN_DATA_LOADED   0x00000001
 
 /* 
  * struct cerebro
@@ -23,9 +36,8 @@
 struct cerebro {
   int32_t magic;
   int32_t errnum;
-  int32_t loaded_flags;
+  int32_t loaded_state;
+  void *updown_data;
 };
-
-#define CEREBRO_MAGIC            0xf00f1234
 
 #endif /* _CEREBRO_DEFS_H */

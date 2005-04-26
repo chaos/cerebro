@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.1 2005-04-25 23:25:23 achu Exp $
+ *  $Id: cerebro.h,v 1.2 2005-04-26 00:09:13 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_H
@@ -8,8 +8,9 @@
 #define CEREBRO_ERR_SUCCESS              0
 #define CEREBRO_ERR_NULLHANDLE           1
 #define CEREBRO_ERR_MAGIC                2
-#define CEREBRO_ERR_INTERNAL             3
-#define CEREBRO_ERR_ERRNUMRANGE          4
+#define CEREBRO_ERR_LOADED_DATA          3
+#define CEREBRO_ERR_INTERNAL             4
+#define CEREBRO_ERR_ERRNUMRANGE          5
 
 typedef struct cerebro *cerebro_t;
 

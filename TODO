@@ -23,3 +23,5 @@
   - only if determined necessary at some point
 
 - code review to reduce memory footprint
+
+- have libcerebro load/call from config module

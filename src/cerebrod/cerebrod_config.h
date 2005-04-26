@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.h,v 1.34 2005-03-29 23:28:45 achu Exp $
+ *  $Id: cerebrod_config.h,v 1.35 2005-04-26 00:09:13 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_CONFIG_H
@@ -54,8 +54,8 @@ struct cerebrod_config
   /* Set by the user in the configuration file */
   unsigned int heartbeat_frequency_min;
   unsigned int heartbeat_frequency_max;
-  int heartbeat_source_port;
-  int heartbeat_destination_port;
+  unsigned int heartbeat_source_port;
+  unsigned int heartbeat_destination_port;
   char *heartbeat_destination_ip;
   char *heartbeat_network_interface;
   int heartbeat_ttl;
@@ -66,7 +66,7 @@ struct cerebrod_config
   int listen_threads;
 
   int updown_server;
-  int updown_server_port;
+  unsigned int updown_server_port;
 
   char *clusterlist_module;
   char **clusterlist_module_options;

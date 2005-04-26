@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_updown.h,v 1.2 2005-04-25 23:25:23 achu Exp $
+ *  $Id: cerebro_updown.h,v 1.3 2005-04-26 00:09:13 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_UPDOWN_H
@@ -14,9 +14,16 @@
  * retrieved, the latest data will be retrieved and updated in the
  * local cache.
  *
+ * hostname - server to connect to
+ * port - port to connect to
+ * timeout_len - timeout length to use to evaluate up vs. down
+ *
  * Returns 0 on success, -1 on error
  */
-int cerebro_updown_load_data(cerebro_t handle);
+int cerebro_updown_load_data(cerebro_t handle, 
+                             const char *hostname, 
+                             unsigned int port, 
+                             unsigned int timeout_len);
 
 /*
  * cerebro_updown_get_up_nodes
