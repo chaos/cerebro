@@ -31,4 +31,4 @@
 
 - updown - allow loading of up/down/or neither
 
-- move heartbeat code into speaker/listener?
+- fix version checking on receved packets 

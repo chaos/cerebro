@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.22 2005-04-26 17:04:29 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.23 2005-04-26 17:31:35 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -20,8 +20,10 @@
 
 #include "cerebro_defs.h"
 #include "cerebro_error.h"
+#include "cerebro_marshalling.h"
 #include "cerebrod_heartbeat_protocol.h"
 
+#include "cerebrod.h"
 #include "cerebrod_speaker.h"
 #include "cerebrod_config.h"
 #include "cerebrod_data.h"
@@ -159,6 +161,76 @@ _cerebrod_speaker_initialize(void)
   srand(seed);
 }
 
+/*
+ * _cerebrod_spaker_heartbeat_init
+ *
+ * construct a heartbeat packet
+ */
+static void
+_cerebrod_spaker_heartbeat_init(struct cerebrod_heartbeat *hb)
+{
+  assert(hb);
+                                                                                      
+  hb->version = CEREBROD_HEARTBEAT_PROTOCOL_VERSION;
+  cerebrod_get_nodename(hb->nodename, CEREBRO_MAXNODENAMELEN);
+  hb->starttime = cerebrod_get_starttime();
+  hb->boottime = cerebrod_get_boottime();
+}
+
+/*
+ * _cerebrod_speaker_heartbeat_marshall
+ *
+ * marshall contents of a heartbeat packet.
+ *
+ * Returns length written to buffer on success, -1 on error
+ */
+int
+_cerebrod_speaker_heartbeat_marshall(struct cerebrod_heartbeat *hb,
+                                     char *buffer,
+                                     int bufferlen)
+{
+  int ret, c = 0;
+                                                                                      
+  assert(hb && buffer && bufferlen > 0);
+  assert(bufferlen >= CEREBROD_HEARTBEAT_LEN);
+  
+  memset(buffer, '\0', bufferlen);
+  if ((ret = cerebro_marshall_int32(hb->version,
+                                    buffer + c,
+                                    bufferlen - c)) < 0)
+    cerebro_err_exit("%s(%s:%d): cerebro_marshall_int32: %s",
+                     __FILE__, __FUNCTION__, __LINE__,
+                     strerror(errno));
+  c += ret;
+  
+  if ((ret = cerebro_marshall_buffer(hb->nodename,
+                                     sizeof(hb->nodename),
+                                     buffer + c,
+                                     bufferlen - c)) < 0)
+    cerebro_err_exit("%s(%s:%d): cerebro_marshall_buffer: %s",
+                     __FILE__, __FUNCTION__, __LINE__,
+                     strerror(errno));
+  c += ret;
+  
+  if ((ret = cerebro_marshall_uint32(hb->starttime,
+                                     buffer + c,
+                                     bufferlen - c)) < 0)
+    cerebro_err_exit("%s(%s:%d): cerebro_marshall_uint32: %s",
+                     __FILE__, __FUNCTION__, __LINE__,
+                     strerror(errno));
+  c += ret;
+  
+  if ((ret = cerebro_marshall_uint32(hb->boottime,
+                                     buffer + c,
+                                     bufferlen - c)) < 0)
+    cerebro_err_exit("%s(%s:%d): cerebro_marshall_uint32: %s",
+                     __FILE__, __FUNCTION__, __LINE__,
+                     strerror(errno));
+  c += ret;
+  
+  return c;
+}
+
 /* 
  * _cerebrod_speaker_dump_heartbeat
  *
@@ -214,9 +286,11 @@ cerebrod_speaker(void *arg)
       else
 	sleep_time = conf.heartbeat_frequency_min;
 
-      cerebrod_heartbeat_construct(&hb);
+      _cerebrod_spaker_heartbeat_init(&hb);
   
-      hblen = cerebrod_heartbeat_marshall(&hb, hbbuf, CEREBRO_PACKET_BUFLEN);
+      hblen = _cerebrod_speaker_heartbeat_marshall(&hb, 
+                                                   hbbuf, 
+                                                   CEREBRO_PACKET_BUFLEN);
 
       _cerebrod_speaker_dump_heartbeat(&hb);
       

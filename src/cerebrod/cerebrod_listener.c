@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.40 2005-04-26 17:04:29 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.41 2005-04-26 17:31:35 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -20,6 +20,7 @@
 
 #include "cerebro_defs.h"
 #include "cerebro_error.h"
+#include "cerebro_marshalling.h"
 #include "cerebrod_heartbeat_protocol.h"
 
 #include "cerebrod_listener.h"
@@ -182,6 +183,77 @@ _cerebrod_listener_initialize(void)
  done:
   Pthread_mutex_unlock(&cerebrod_listener_initialization_complete_lock);
 }
+
+/*
+ * _cerebrod_listener_heartbeat_unmarshall
+ *
+ * unmarshall contents of a heartbeat packet buffer
+ *
+ * Returns 0 on success, -1 on error
+ */
+int
+_cerebrod_listener_heartbeat_unmarshall(struct cerebrod_heartbeat *hb,
+                                        char *buffer,
+                                        int bufferlen)
+{
+  int ret, c = 0;
+  
+  assert(hb && buffer && bufferlen >= 0);
+  
+  if (CEREBROD_HEARTBEAT_LEN > bufferlen)
+    {
+      cerebro_err_debug("%s(%s:%d): received buffer length "
+                        "too small: need %d, bufferlen %d",
+                        __FILE__, __FUNCTION__, __LINE__,
+                        CEREBROD_HEARTBEAT_LEN, bufferlen);
+      return -1;
+    }
+  
+  if (CEREBROD_HEARTBEAT_LEN != bufferlen)
+    {
+      cerebro_err_debug("%s(%s:%d): received buffer length "
+                        "unexpected size: expect %d, bufferlen %d",
+                        __FILE__, __FUNCTION__, __LINE__,
+                        CEREBROD_HEARTBEAT_LEN, bufferlen);
+      return -1;
+    }
+  
+  if ((ret = cerebro_unmarshall_int32(&(hb->version),
+                                      buffer + c,
+                                      bufferlen - c)) < 0)
+    cerebro_err_exit("%s(%s:%d): cerebro_unmarshall_int32: %s",
+                       __FILE__, __FUNCTION__, __LINE__,
+                       strerror(errno));
+  c += ret;
+  
+  if ((ret = cerebro_unmarshall_buffer(hb->nodename,
+                                       sizeof(hb->nodename),
+                                       buffer + c,
+                                       bufferlen - c)) < 0)
+    cerebro_err_exit("%s(%s:%d): cerebro_unmarshall_buffer: %s",
+                     __FILE__, __FUNCTION__, __LINE__,
+                     strerror(errno));
+  c += ret;
+  
+  if ((ret = cerebro_unmarshall_uint32(&(hb->starttime),
+                                       buffer + c,
+                                       bufferlen - c)) < 0)
+    cerebro_err_exit("%s(%s:%d): cerebro_unmarshall_uint32: %s",
+                     __FILE__, __FUNCTION__, __LINE__,
+                     strerror(errno));
+  c += ret;
+                                                                                      
+  if ((ret = cerebro_unmarshall_uint32(&(hb->boottime),
+                                       buffer + c,
+                                       bufferlen - c)) < 0)
+    cerebro_err_exit("%s(%s:%d): cerebro_unmarshall_uint32: %s",
+                     __FILE__, __FUNCTION__, __LINE__,
+                     strerror(errno));
+  c += ret;
+
+  return 0;
+}
+
 
 /* 
  * _cerebrod_listener_dump_heartbeat
@@ -353,7 +425,9 @@ cerebrod_listener(void *arg)
       if (rv <= 0)
 	continue;
 
-      if ((hblen = cerebrod_heartbeat_unmarshall(&hb, hbbuf, rv)) < 0)
+      if ((hblen = _cerebrod_listener_heartbeat_unmarshall(&hb, 
+                                                           hbbuf, 
+                                                           rv)) < 0)
 	continue;
 
       _cerebrod_listener_dump_heartbeat(&hb);
