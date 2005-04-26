@@ -1,9 +1,13 @@
 /*****************************************************************************\
- *  $Id: cerebro_updown.h,v 1.3 2005-04-26 00:09:13 achu Exp $
+ *  $Id: cerebro_updown.h,v 1.4 2005-04-26 17:04:29 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_UPDOWN_H
 #define _CEREBRO_UPDOWN_H
+
+#define CEREBRO_UPDOWN_UP_NODES           0x0001
+#define CEREBRO_UPDOWN_DOWN_NODES         0x0002
+#define CEREBRO_UPDOWN_UP_AND_DOWN_NODES  0x0003
 
 /* 
  * cerebro_updown_load_data
@@ -14,16 +18,37 @@
  * retrieved, the latest data will be retrieved and updated in the
  * local cache.
  *
- * hostname - server to connect to
- * port - port to connect to
- * timeout_len - timeout length to use to evaluate up vs. down
+ * hostname - server to connect to, if NULL defaults to localhost
+ *
+ * port - port to connect to, if 0 defaults to default port
+ *
+ * timeout_len - timeout length to use to evaluate up vs. down, if 0
+ * defaults to default timeout length
+ *
+ * flags - indicate the data to be loaded.  Possible flags:
+ *
+ *   CEREBRO_UPDOWN_UP_NODES
+ *   CEREBRO_UPDOWN_DOWN_NODES
+ *   CEREBRO_UPDOWN_UP_AND_DOWN_NODES
+ * 
+ * if 0 defaults to CEREBRO_UPDOWN_UP_AND_DOWN_NODES
  *
  * Returns 0 on success, -1 on error
  */
 int cerebro_updown_load_data(cerebro_t handle, 
                              const char *hostname, 
                              unsigned int port, 
-                             unsigned int timeout_len);
+                             unsigned int timeout_len,
+                             int flags);
+
+/* 
+ * cerebro_updown_unload_data
+ *
+ * Cleanup allocated updown data
+ *
+ * Returns 0 on success, -1 on error
+ */
+int cerebro_updown_unload_data(cerebro_t handle);
 
 /*
  * cerebro_updown_get_up_nodes

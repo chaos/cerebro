@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_heartbeat.c,v 1.19 2005-04-21 22:00:33 achu Exp $
+ *  $Id: cerebrod_heartbeat.c,v 1.20 2005-04-26 17:04:29 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -73,7 +73,8 @@ cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb)
 
 int 
 cerebrod_heartbeat_marshall(struct cerebrod_heartbeat *hb, 
-			    char *buffer, int bufferlen) 
+			    char *buffer, 
+                            int bufferlen) 
 {
   int ret, c = 0;
 

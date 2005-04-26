@@ -1,3 +1,7 @@
+2005-04-26  Albert Chu  <chu11@llnl.gov>
+
+	* Continued libcerebro updown library work.
+	
 2005-04-25  Albert Chu  <chu11@llnl.gov>
 
 	* Added support to search for arbitrary modules rather than only

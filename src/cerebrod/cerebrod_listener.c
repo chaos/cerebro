@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.39 2005-04-21 22:00:33 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.40 2005-04-26 17:04:29 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -295,7 +295,7 @@ cerebrod_listener(void *arg)
     {
       struct cerebrod_heartbeat hb;
       struct cerebrod_node_data *nd;
-      char hbbuf[CEREBROD_PACKET_BUFLEN];
+      char hbbuf[CEREBRO_PACKET_BUFLEN];
       char nodename_buf[CEREBRO_MAXNODENAMELEN+1];
       char nodename_key[CEREBRO_MAXNODENAMELEN+1];
       int rv, hblen, cluster_data_updated_flag = 0;
@@ -303,7 +303,7 @@ cerebrod_listener(void *arg)
       Pthread_mutex_lock(&listener_fd_lock);
       if ((rv = recvfrom(listener_fd, 
                          hbbuf, 
-                         CEREBROD_PACKET_BUFLEN, 
+                         CEREBRO_PACKET_BUFLEN, 
                          0, 
                          NULL, 
                          NULL)) < 0)

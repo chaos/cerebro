@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.c,v 1.2 2005-04-26 00:09:13 achu Exp $
+ *  $Id: cerebro.c,v 1.3 2005-04-26 17:04:29 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -8,16 +8,23 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#if STDC_HEADERS
+#include <string.h>
+#endif /* STDC_HEADERS */
 
 #include "cerebro.h"
-#include "cerebro_defs.h"
+#include "cerebro_api.h"
+#include "cerebro_util.h"
+#include "cerebro_updown.h"
 
 char *cerebro_error_messages[] =
   {
     "success",
     "null cerebro_t handle",
     "invalid magic number",
+    "invalid parameters",
     "server data not loaded",
+    "out of memory",
     "internal error",
     "errnum out of range",
   };
@@ -31,7 +38,7 @@ cerebro_handle_create(void)
     goto cleanup;
                  
   memset(handle, '\0', sizeof(struct cerebro));
-  handle->magic = CEREBRO_MAGIC;
+  handle->magic = CEREBRO_MAGIC_NUMBER;
   handle->errnum = CEREBRO_ERR_SUCCESS;
   handle->loaded_state = 0;
   handle->updown_data = NULL;
@@ -43,8 +50,23 @@ cerebro_handle_create(void)
 int
 cerebro_handle_destroy(cerebro_t handle)
 {
-  /* "clean" handle */
-  handle->magic = ~CEREBRO_MAGIC;
+  if (cerebro_handle_check(handle) < 0)
+    return -1;
+
+  if (handle->loaded_state & CEREBRO_UPDOWN_DATA_LOADED)
+    {
+      if (cerebro_updown_unload_data(handle) < 0)
+        return -1;
+
+      if (handle->loaded_state & CEREBRO_UPDOWN_DATA_LOADED)
+        {
+          handle->errnum = CEREBRO_ERR_INTERNAL;
+          return -1;
+        }
+    }
+
+  handle->errnum = CEREBRO_ERR_SUCCESS;
+  handle->magic = ~CEREBRO_MAGIC_NUMBER;
   free(handle);
   return 0;
 }
@@ -54,8 +76,8 @@ cerebro_errnum(cerebro_t handle)
 {
   if (!handle)
     return CEREBRO_ERR_NULLHANDLE;
-  else if (handle->magic != CEREBRO_MAGIC)
-    return CEREBRO_ERR_MAGIC;
+  else if (handle->magic != CEREBRO_MAGIC_NUMBER)
+    return CEREBRO_ERR_MAGIC_NUMBER;
   else
     return handle->errnum;
 }

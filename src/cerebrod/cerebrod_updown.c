@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.c,v 1.28 2005-04-25 21:39:27 achu Exp $
+ *  $Id: cerebrod_updown.c,v 1.29 2005-04-26 17:04:29 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -18,6 +18,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
+#include "cerebro_defs.h"
 #include "cerebro_error.h"
 #include "cerebro_marshalling.h"
 #include "cerebro_updown_protocol.h"
@@ -241,11 +242,12 @@ _cerebrod_updown_initialize(void)
  *
  * marshall contents of a updown response packet buffer
  *
- * Returns 0 on success, -1 on error
+ * Returns length written to buffer on success, -1 on error
  */
 static int
 _cerebrod_updown_response_marshall(struct cerebro_updown_response *res,
-				   char *buffer, int bufferlen)
+				   char *buffer, 
+                                   int bufferlen)
 {
   int ret, c = 0;
  
@@ -320,7 +322,8 @@ _cerebrod_updown_response_marshall(struct cerebro_updown_response *res,
  */
 static int
 _cerebrod_updown_request_unmarshall(struct cerebro_updown_request *req,
-				    char *buffer, int bufferlen)
+				    char *buffer, 
+                                    int bufferlen)
 {
   int ret, c = 0;
  
@@ -394,12 +397,12 @@ _cerebrod_updown_receive_request(int client_fd,
 				 struct cerebro_updown_request *req)
 {
   int rv, bytes_read = 0;
-  char buffer[CEREBROD_PACKET_BUFLEN];
+  char buffer[CEREBRO_PACKET_BUFLEN];
 
   assert(client_fd >= 0);
   assert(req);
 
-  memset(buffer, '\0', CEREBROD_PACKET_BUFLEN);
+  memset(buffer, '\0', CEREBRO_PACKET_BUFLEN);
 
   /* Wait for request from client */
   while (bytes_read < CEREBRO_UPDOWN_REQUEST_LEN)
@@ -496,7 +499,7 @@ _cerebrod_updown_request_dump(struct cerebro_updown_request *req)
       fprintf(stderr, "**************************************\n");
       Pthread_mutex_unlock(&debug_output_mutex);
     }
- #endif /* NDEBUG */
+#endif /* NDEBUG */
 }
 
 /*
@@ -510,7 +513,7 @@ static int
 _cerebrod_updown_send_response(int client_fd, 
 			       struct cerebro_updown_response *res)
 {
-  char buffer[CEREBROD_PACKET_BUFLEN];
+  char buffer[CEREBRO_PACKET_BUFLEN];
   int res_len;
 
   assert(client_fd >= 0);
@@ -518,7 +521,7 @@ _cerebrod_updown_send_response(int client_fd,
 
   if ((res_len = _cerebrod_updown_response_marshall(res, 
 						    buffer, 
-						    CEREBROD_PACKET_BUFLEN)) < 0)
+						    CEREBRO_PACKET_BUFLEN)) < 0)
     {
       cerebro_err_debug("%s(%s:%d): _cerebrod_updown_response_marshall: %s",
                         __FILE__, __FUNCTION__, __LINE__,

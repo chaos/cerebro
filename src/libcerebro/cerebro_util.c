@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_util.c,v 1.1 2005-04-26 00:09:13 achu Exp $
+ *  $Id: cerebro_util.c,v 1.2 2005-04-26 17:04:29 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -10,10 +10,10 @@
 #include <stdlib.h>
 
 #include "cerebro.h"
-#include "cerebro_defs.h"
+#include "cerebro_api.h"
 
 int 
-cerebro_handle_err_check(cerebro_t handle)
+cerebro_handle_check(cerebro_t handle)
 {
   if (!handle)
     {
@@ -21,9 +21,9 @@ cerebro_handle_err_check(cerebro_t handle)
       return -1;
     }
 
-  if (handle->magic != CEREBRO_MAGIC)
+  if (handle->magic != CEREBRO_MAGIC_NUMBER)
     {
-      handle->errnum = CEREBRO_ERR_MAGIC;
+      handle->errnum = CEREBRO_ERR_MAGIC_NUMBER;
       return -1;
     }
 

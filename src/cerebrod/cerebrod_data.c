@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_data.c,v 1.6 2005-04-21 22:00:33 achu Exp $
+ *  $Id: cerebrod_data.c,v 1.7 2005-04-26 17:04:29 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -81,7 +81,7 @@ _cerebrod_cache_boottime(void)
   int fd, len;
   char *bootvalptr, *endptr, *tempptr;
   char buf[CEREBROD_BOOTTIME_BUFLEN];
-  u_int32_t ret;
+  long int ret;
 
   assert(!cerebrod_boottime);
 
@@ -114,7 +114,7 @@ _cerebrod_cache_boottime(void)
     cerebro_err_exit("%s(%s:%d): boottime value parse error",
                      __FILE__, __FUNCTION__, __LINE__);
 
-  cerebrod_boottime = ret;
+  cerebrod_boottime = (u_int32_t)ret;
 }
 
 /*

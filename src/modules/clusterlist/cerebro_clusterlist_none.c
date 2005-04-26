@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_none.c,v 1.3 2005-04-22 21:31:04 achu Exp $
+ *  $Id: cerebro_clusterlist_none.c,v 1.4 2005-04-26 17:04:29 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -37,8 +37,8 @@ none_clusterlist_parse_options(char **options)
   /* None module takes no options */
   while (options[i] != NULL)
     {
-      err_exit("none clusterlist module: option '%s' unrecognized", 
-               options[i]);
+      cerebro_err_exit("none clusterlist module: option '%s' unrecognized", 
+                       options[i]);
       i++;
     }
 

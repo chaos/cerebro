@@ -18,6 +18,7 @@
 - doc for writing modules
 
 - maps confine only "cerebro_" instead of "cerebro*"
+  - be more restrictive in general, don't just do cerebro*
 
 - strerror_r and errormsg_r funcs?
   - only if determined necessary at some point
@@ -25,3 +26,9 @@
 - code review to reduce memory footprint
 
 - have libcerebro load/call from config module
+
+- hide marshalling lib? cerebro_defs?
+
+- updown - allow loading of up/down/or neither
+
+- move heartbeat code into speaker/listener?

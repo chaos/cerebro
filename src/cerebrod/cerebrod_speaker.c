@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.21 2005-04-21 22:00:33 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.22 2005-04-26 17:04:29 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -205,7 +205,7 @@ cerebrod_speaker(void *arg)
     {
       struct sockaddr_in heartbeat_destination_addr;
       struct cerebrod_heartbeat hb;
-      char hbbuf[CEREBROD_PACKET_BUFLEN];
+      char hbbuf[CEREBRO_PACKET_BUFLEN];
       int rv, hblen, sleep_time;
 
       /* Algorithm from srand(3) manpage */
@@ -216,7 +216,7 @@ cerebrod_speaker(void *arg)
 
       cerebrod_heartbeat_construct(&hb);
   
-      hblen = cerebrod_heartbeat_marshall(&hb, hbbuf, CEREBROD_PACKET_BUFLEN);
+      hblen = cerebrod_heartbeat_marshall(&hb, hbbuf, CEREBRO_PACKET_BUFLEN);
 
       _cerebrod_speaker_dump_heartbeat(&hb);
       
