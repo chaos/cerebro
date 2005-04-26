@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.43 2005-04-26 20:28:53 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.44 2005-04-26 20:58:56 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -225,6 +225,7 @@ _cerebrod_listener_heartbeat_unmarshall(struct cerebrod_heartbeat *hb,
 
   if (invalid_size)
     {
+      /* Invalid version to be handled by later code */
       if (hb->version != CEREBROD_HEARTBEAT_PROTOCOL_VERSION)
         return 0;
       else

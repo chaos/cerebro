@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_updown.c,v 1.3 2005-04-26 17:04:29 achu Exp $
+ *  $Id: cerebro_updown.c,v 1.4 2005-04-26 20:58:57 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -139,10 +139,10 @@ _cerebro_updown_init_request(cerebro_t handle,
  * Returns length written to buffer on success, -1 on error
  */
 static int
-_cerebrod_updown_request_marshall(cerebro_t handle,
-                                  struct cerebro_updown_request *req,
-                                  char *buffer,
-                                  int bufferlen)
+_cerebro_updown_request_marshall(cerebro_t handle,
+                                 struct cerebro_updown_request *req,
+                                 char *buffer,
+                                 int bufferlen)
 {
   int ret, c = 0;
 
@@ -194,12 +194,13 @@ _cerebrod_updown_request_marshall(cerebro_t handle,
  * Returns 0 on success, -1 on error
  */
 static int
-_cerebrod_updown_response_unmarshall(cerebro_t handle,
-                                     struct cerebro_updown_response *req,
-                                     char *buffer,
-                                     int bufferlen)
+_cerebro_updown_response_unmarshall(cerebro_t handle,
+                                    struct cerebro_updown_response *res,
+                                    char *buffer,
+                                    int bufferlen)
 {
   int ret, c = 0;
+  int invalid_size = 0;
 
 #ifndef NDEBUG
   if (!buffer)
@@ -209,8 +210,51 @@ _cerebrod_updown_response_unmarshall(cerebro_t handle,
     }
 #endif /* NDEBUG */
 
-  ret = 0;
-  c = 0;
+  if (bufferlen != CEREBRO_UPDOWN_RESPONSE_LEN)
+      invalid_size++;
+
+  if (invalid_size && bufferlen < sizeof(res->version))
+    return -1;
+
+  if ((ret = cerebro_unmarshall_int32(&(res->version),
+                                      buffer + c,
+                                      bufferlen - c)) < 0)
+    return -1;
+  c += ret;
+
+  if (invalid_size)
+    {
+      /* Invalid version to be handled by later code */
+      if (res->version != CEREBRO_UPDOWN_PROTOCOL_VERSION)
+        return 0;
+      else
+        return -1;
+    }
+
+  if ((ret = cerebro_unmarshall_uint32(&(res->updown_err_code),
+                                       buffer + c,
+                                       bufferlen - c)) < 0)
+    return -1;
+  c += ret;
+
+  if ((ret = cerebro_unmarshall_uint8(&(res->end_of_responses),
+                                      buffer + c,
+                                      bufferlen - c)) < 0)
+    return -1;
+  c += ret;
+
+  if ((ret = cerebro_unmarshall_buffer(res->nodename,
+                                       sizeof(res->nodename),
+                                       buffer + c,
+                                       bufferlen - c)) < 0)
+    return -1;
+  c += ret;
+
+  if ((ret = cerebro_unmarshall_uint8(&(res->updown_state),
+                                      buffer + c,
+                                      bufferlen - c)) < 0)
+    return -1;
+  c += ret;
 
   return 0;
 }

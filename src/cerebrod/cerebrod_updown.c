@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.c,v 1.31 2005-04-26 20:28:53 achu Exp $
+ *  $Id: cerebrod_updown.c,v 1.32 2005-04-26 20:58:56 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -356,6 +356,7 @@ _cerebrod_updown_request_unmarshall(struct cerebro_updown_request *req,
 
   if (invalid_size)
     {
+      /* Invalid version to be handled by later code */
       if (req->version != CEREBRO_UPDOWN_PROTOCOL_VERSION)
         return 0;
       else

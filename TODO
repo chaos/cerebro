@@ -32,3 +32,5 @@
 - updown - allow loading of up/down/or neither
 
 - fix version checking on receved packets 
+
+- config module stuff for libcerebro load_data functions, like nodeupdown? 
