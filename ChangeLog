@@ -2,7 +2,7 @@
 
 	* Continued libcerebro updown library work.
 
-	* Continued code cleanup.
+	* Fixed packet unmarshalling bugs in cerebrod.
 	
 2005-04-25  Albert Chu  <chu11@llnl.gov>
 

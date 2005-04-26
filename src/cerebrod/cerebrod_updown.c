@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.c,v 1.30 2005-04-26 19:09:56 achu Exp $
+ *  $Id: cerebrod_updown.c,v 1.31 2005-04-26 20:28:53 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -326,6 +326,7 @@ _cerebrod_updown_request_unmarshall(struct cerebro_updown_request *req,
                                     int bufferlen)
 {
   int ret, c = 0;
+  int invalid_size = 0;
 
   assert(req && buffer && bufferlen >= 0);
  
@@ -336,9 +337,12 @@ _cerebrod_updown_request_unmarshall(struct cerebro_updown_request *req,
                         CEREBRO_UPDOWN_REQUEST_LEN,
                         __FILE__, __FUNCTION__, __LINE__,
                         bufferlen);
-      return -1;
+      invalid_size++;
     }
   
+  if (invalid_size && bufferlen < sizeof(req->version))
+    return -1;
+
   if ((ret = cerebro_unmarshall_int32(&(req->version), 
 				      buffer + c, 
 				      bufferlen - c)) < 0)
@@ -349,6 +353,14 @@ _cerebrod_updown_request_unmarshall(struct cerebro_updown_request *req,
       return -1;
     }
   c += ret;
+
+  if (invalid_size)
+    {
+      if (req->version != CEREBRO_UPDOWN_PROTOCOL_VERSION)
+        return 0;
+      else
+        return -1;
+    }
  
   if ((ret = cerebro_unmarshall_uint32(&(req->updown_request), 
 				       buffer + c, 
