@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_updown.c,v 1.7 2005-04-27 15:43:16 achu Exp $
+ *  $Id: cerebro_updown.c,v 1.8 2005-04-27 15:48:33 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -91,14 +91,14 @@ _cerebro_updown_data_check(cerebro_t handle,
 }
 
 /* 
- * _cerebro_updown_err_conversion
+ * _cerebro_updown_protocol_err_conversion
  *
  * Convert updown protocol err codes to API err codes
  *
  * Returns proper err code
  */
 static int
-_cerebro_updown_err_conversion(u_int32_t protocol_error)
+_cerebro_updown_protocol_err_conversion(u_int32_t protocol_error)
 {
   switch(protocol_error)
     {
@@ -487,7 +487,7 @@ _cerebro_updown_receive_responses(cerebro_t handle,
 
       if (res.updown_err_code != CEREBRO_UPDOWN_PROTOCOL_ERR_SUCCESS)
         {
-          handle->errnum = _cerebro_updown_err_conversion(res.updown_err_code);
+          handle->errnum = _cerebro_updown_protocol_err_conversion(res.updown_err_code);
           goto cleanup;
         }
 
