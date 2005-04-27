@@ -49,3 +49,7 @@
   - err_out vs. cleanup
 
 - fix logic, don't create up/down hostlists unless necessary
+
+- clusterlist stuff to libcerebro
+
+- need to rework clusterlists not to exit on errors

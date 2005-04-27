@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.4 2005-04-27 00:01:30 achu Exp $
+ *  $Id: cerebro.h,v 1.5 2005-04-27 15:43:16 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_H
@@ -15,9 +15,14 @@
 #define CEREBRO_ERR_ADDRESS               7
 #define CEREBRO_ERR_CONNECT               8
 #define CEREBRO_ERR_CONNECT_TIMEOUT       9
-#define CEREBRO_ERR_OUTMEM               10 
-#define CEREBRO_ERR_INTERNAL             11
-#define CEREBRO_ERR_ERRNUMRANGE          12 
+#define CEREBRO_ERR_NETWORK              10
+#define CEREBRO_ERR_PROTOCOL             11
+#define CEREBRO_ERR_PROTOCOL_TIMEOUT     12 
+#define CEREBRO_ERR_OVERFLOW             13
+#define CEREBRO_ERR_NODE_NOTFOUND        14
+#define CEREBRO_ERR_OUTMEM               15 
+#define CEREBRO_ERR_INTERNAL             16
+#define CEREBRO_ERR_ERRNUMRANGE          17
 
 typedef struct cerebro *cerebro_t;
 

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_updown_protocol.h,v 1.11 2005-04-27 00:01:30 achu Exp $
+ *  $Id: cerebro_updown_protocol.h,v 1.12 2005-04-27 15:43:17 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_UPDOWN_PROTOCOL_H
@@ -24,6 +24,7 @@
  */
 
 #define CEREBRO_UPDOWN_PROTOCOL_VERSION                    1
+#define CEREBRO_UPDOWN_PROTOCOL_TIMEOUT_LEN                5
 #define CEREBRO_UPDOWN_PROTOCOL_CONNECT_TIMEOUT_LEN        5
 
 #define CEREBRO_UPDOWN_PROTOCOL_ERR_SUCCESS                0

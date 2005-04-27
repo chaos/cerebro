@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.c,v 1.4 2005-04-27 00:01:30 achu Exp $
+ *  $Id: cerebro.c,v 1.5 2005-04-27 15:43:16 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -29,6 +29,11 @@ char *cerebro_error_messages[] =
     "invalid address",
     "connection error",
     "connection timeout",
+    "network communication error",
+    "protocol error",
+    "protocol timeout",
+    "buffer overflow",
+    "node not found",
     "out of memory",
     "internal error",
     "errnum out of range",
