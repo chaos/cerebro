@@ -1,7 +1,6 @@
 - README description
   - cerebro.1 manpage
 - IPv6
-- cerebro.spec.in, descriptions
 - Non-pthreads support?
 - remove hash/list buffering in list.c hash.c?
 
@@ -26,20 +25,10 @@
 
 - code review to reduce memory footprint
 
-- have libcerebro load/call from config module
-
-- hide marshalling lib? cerebro_defs?
-
-- updown - allow loading of up/down/or neither
-
-- fix version checking on receved packets 
-
 - config module stuff for libcerebro load_data functions, like nodeupdown? 
+  - config file too?
 
 - reorg cerebro err codes
-
-- cerebro_error -> cerebrod_error
-  - only for cerebrod and modules?
 
 - debug messages in cerebro/updown library
 
@@ -47,8 +36,6 @@
 
 - consistency between ret vs. rv
   - err_out vs. cleanup
-
-- fix logic, don't create up/down hostlists unless necessary
 
 - clusterlist stuff to libcerebro
 

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_updown.c,v 1.8 2005-04-27 15:48:33 achu Exp $
+ *  $Id: cerebro_updown.c,v 1.9 2005-04-27 18:41:42 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -37,9 +37,7 @@
 #include "fd.h"
 
 #define CEREBRO_UPDOWN_MAGIC_NUMBER             0xF00F5678
-#define CEREBRO_UPDOWN_UP_NODES_LOADED          0x00000001
-#define CEREBRO_UPDOWN_DOWN_NODES_LOADED        0x00000002
-#define CEREBRO_UPDOWN_UP_AND_DOWN_NODES_LOADED 0x00000003
+
 /* 
  * cerebro_updown_data
  *
@@ -48,7 +46,6 @@
  */
 struct cerebro_updown_data {
   int32_t magic;
-  int32_t loaded_nodes;
   hostlist_t up_nodes;
   hostlist_t down_nodes;
 };
@@ -78,14 +75,6 @@ _cerebro_updown_data_check(cerebro_t handle,
       handle->errnum = CEREBRO_ERR_MAGIC_NUMBER;
       return -1;
     }
-
-#ifndef NDEBUG
-  if (!updown_data->up_nodes || !updown_data->down_nodes)
-    {
-      handle->errnum = CEREBRO_ERR_INTERNAL;
-      return -1;
-    }
-#endif /* NDEBUG */
 
   return 0;
 }
@@ -611,18 +600,25 @@ cerebro_updown_load_data(cerebro_t handle,
     }
   memset(updown_data, '\0', sizeof(struct cerebro_updown_data));
   updown_data->magic = CEREBRO_UPDOWN_MAGIC_NUMBER;
-  updown_data->loaded_nodes = 0;
+  updown_data->up_nodes = NULL;
+  updown_data->down_nodes = NULL;
 
-  if (!(updown_data->up_nodes = hostlist_create(NULL)))
+  if (flags & CEREBRO_UPDOWN_UP_NODES)
     {
-      handle->errnum = CEREBRO_ERR_OUTMEM;
-      goto cleanup;
+      if (!(updown_data->up_nodes = hostlist_create(NULL)))
+        {
+          handle->errnum = CEREBRO_ERR_OUTMEM;
+          goto cleanup;
+        }
     }
 
-  if (!(updown_data->down_nodes = hostlist_create(NULL)))
+  if (flags & CEREBRO_UPDOWN_DOWN_NODES)
     {
-      handle->errnum = CEREBRO_ERR_OUTMEM;
-      goto cleanup;
+      if (!(updown_data->down_nodes = hostlist_create(NULL)))
+        {
+          handle->errnum = CEREBRO_ERR_OUTMEM;
+          goto cleanup;
+        }
     }
 
   if (_cerebro_updown_get_updown_data(handle,
@@ -644,29 +640,24 @@ cerebro_updown_load_data(cerebro_t handle,
 
       if (flags == CEREBRO_UPDOWN_UP_AND_DOWN_NODES)
         {
-          hostlist_destroy(updown_data_temp->up_nodes);
-          hostlist_destroy(updown_data_temp->down_nodes);
+          if (updown_data_temp->up_nodes)
+            hostlist_destroy(updown_data_temp->up_nodes);
+          if (updown_data_temp->down_nodes)
+            hostlist_destroy(updown_data_temp->down_nodes);
         }
       else if (flags == CEREBRO_UPDOWN_UP_NODES)
         {
-          if (updown_data_temp->loaded_nodes & CEREBRO_UPDOWN_DOWN_NODES_LOADED)
-            {
-              hostlist_destroy(updown_data->down_nodes);
-              updown_data->down_nodes = updown_data_temp->down_nodes;
-              updown_data->loaded_nodes |= CEREBRO_UPDOWN_DOWN_NODES_LOADED;
-            }
-          hostlist_destroy(updown_data_temp->up_nodes);
+          if (updown_data_temp->up_nodes)
+            hostlist_destroy(updown_data_temp->up_nodes);
+          if (updown_data_temp->down_nodes)
+            updown_data->down_nodes = updown_data_temp->down_nodes;
         }
       else
         {
-          if (updown_data_temp->loaded_nodes & CEREBRO_UPDOWN_UP_NODES_LOADED)
-            {
-              hostlist_destroy(updown_data->up_nodes);
-              updown_data->up_nodes = updown_data_temp->up_nodes;
-              updown_data->loaded_nodes |= CEREBRO_UPDOWN_UP_NODES_LOADED;
-            }
-
-          hostlist_destroy(updown_data_temp->down_nodes);
+          if (updown_data_temp->down_nodes)
+            hostlist_destroy(updown_data_temp->down_nodes);
+          if (updown_data_temp->up_nodes)
+            updown_data->up_nodes = updown_data_temp->up_nodes;
         }
       free(updown_data_temp);
       handle->loaded_state &= ~CEREBRO_UPDOWN_DATA_LOADED;
@@ -759,6 +750,12 @@ _cerebro_updown_get_nodes(cerebro_t handle,
   else
     hl = updown_data->down_nodes;
 
+  if (!hl)
+    {
+      handle->errnum = CEREBRO_ERR_NOT_LOADED;
+      return -1;
+    }
+
   if (hostlist_ranged_string(hl, buflen, buf) < 0)
     {
       handle->errnum = CEREBRO_ERR_OVERFLOW;
@@ -796,6 +793,7 @@ _cerebro_updown_is_node(cerebro_t handle,
 {
   struct cerebro_updown_data *updown_data;
   char buffer[CEREBRO_MAXNODENAMELEN+1];
+  hostlist_t hl;
   int rv, ret;
 
   if (_cerebro_updown_data_loaded_check(handle) < 0)
@@ -818,10 +816,18 @@ _cerebro_updown_is_node(cerebro_t handle,
   updown_data = (struct cerebro_updown_data *)handle->updown_data;
 
   if (up_down_flag == CEREBRO_UPDOWN_UP_NODES)
-    rv = hostlist_find(updown_data->up_nodes, buffer);
+    hl = updown_data->up_nodes;
   else
-    rv = hostlist_find(updown_data->down_nodes, buffer);
-  
+    hl = updown_data->down_nodes;
+
+  if (!hl)
+    {
+      handle->errnum = CEREBRO_ERR_NOT_LOADED;
+      return -1;
+    }
+
+  rv = hostlist_find(hl, buffer);
+ 
   if (rv != -1)
     ret = 1;
   else
@@ -855,6 +861,7 @@ static int
 _cerebro_updown_count(cerebro_t handle, int up_down_flag)
 {
   struct cerebro_updown_data *updown_data;
+  hostlist_t hl;
   int count;
 
   if (_cerebro_updown_data_loaded_check(handle) < 0)
@@ -863,12 +870,19 @@ _cerebro_updown_count(cerebro_t handle, int up_down_flag)
   updown_data = (struct cerebro_updown_data *)handle->updown_data;
   
   if (up_down_flag == CEREBRO_UPDOWN_UP_NODES)
-    count = hostlist_count(updown_data->up_nodes);
+    hl = updown_data->up_nodes;
   else
-    count = hostlist_count(updown_data->down_nodes);
+    hl = updown_data->down_nodes;
 
+  if (!hl)
+    {
+      handle->errnum = CEREBRO_ERR_NOT_LOADED;
+      return -1;
+    }
+
+  count = hostlist_count(hl);
   handle->errnum = CEREBRO_ERR_SUCCESS;
-  return 0;
+  return count;
 }
 
 int 
