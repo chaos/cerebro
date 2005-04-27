@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_util.c,v 1.3 2005-04-27 00:01:30 achu Exp $
+ *  $Id: cerebro_util.c,v 1.4 2005-04-27 23:18:40 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -19,7 +19,6 @@
 #endif /* HAVE_FCNTL_H */
 #include <netinet/in.h>
 #include <netdb.h>
-#include <arpa/inet.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <sys/select.h>
@@ -56,19 +55,12 @@ cerebro_low_timeout_connect(cerebro_t handle,
 {
   int ret, old_flags, fd = -1;
   struct sockaddr_in servaddr;
-  char ipbuf[INET_ADDRSTRLEN+1];
   struct hostent *hptr;
  
   /* valgrind will report a mem-leak in gethostbyname() */
   if (!(hptr = gethostbyname(hostname)))
     {
       handle->errnum = CEREBRO_ERR_HOSTNAME;
-      return -1;
-    }
-       
-  if (!inet_ntop(AF_INET, (void *)hptr->h_addr, ipbuf, INET_ADDRSTRLEN))
-    {
-      handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
  
@@ -83,19 +75,8 @@ cerebro_low_timeout_connect(cerebro_t handle,
   bzero(&servaddr, sizeof(servaddr));
   servaddr.sin_family = AF_INET;
   servaddr.sin_port = htons(port);
- 
-  if ((ret = inet_pton(AF_INET, ipbuf, (void *)&servaddr.sin_addr)) < 0)
-    {
-      handle->errnum = CEREBRO_ERR_INTERNAL;
-      goto cleanup;
-    }
- 
-  if (!ret)
-    {
-      handle->errnum = CEREBRO_ERR_ADDRESS;
-      goto cleanup;
-    }
- 
+  servaddr.sin_addr = *((struct in_addr *)hptr->h_addr);
+
   if ((old_flags = fcntl(fd, F_GETFL, 0)) < 0)
     {
       handle->errnum = CEREBRO_ERR_INTERNAL;

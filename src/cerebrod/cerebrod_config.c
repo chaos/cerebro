@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.71 2005-04-27 18:11:35 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.72 2005-04-27 23:18:40 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -426,8 +426,6 @@ _config_load_static_module(char *name)
 static int
 _config_load_dynamic_module(char *module_path)
 {
-  int rv;
-
   assert(module_path);
 
   config_module_dl_handle = Lt_dlopen(module_path);
@@ -437,9 +435,7 @@ _config_load_dynamic_module(char *module_path)
     cerebro_err_exit("config module '%s' does not contain a valid name", 
                      module_path);
 
-  rv = _cerebrod_load_alternate_configuration();
-
-  return rv;
+  return _cerebrod_load_alternate_configuration();
 }
 #endif /* !WITH_STATIC_MODULES */
 
