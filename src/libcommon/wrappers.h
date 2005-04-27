@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.h,v 1.24 2005-03-30 00:36:34 achu Exp $
+ *  $Id: wrappers.h,v 1.25 2005-04-27 18:11:35 achu Exp $
 \*****************************************************************************/
 
 #ifndef _WRAPPERS_H
@@ -42,7 +42,9 @@
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE 1
 #endif /* _GNU_SOURCE */
+#if HAVE_PTHREAD_H
 #include <pthread.h>
+#endif /* HAVE_PTHREAD_H */
 #include <signal.h>
 #include <dirent.h>
 

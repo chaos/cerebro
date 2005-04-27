@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.c,v 1.34 2005-04-27 15:43:16 achu Exp $
+ *  $Id: cerebrod_updown.c,v 1.35 2005-04-27 18:11:35 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -173,9 +173,8 @@ _cerebrod_updown_initialize(void)
                      __FILE__, __FUNCTION__, __LINE__);
 
   if ((numnodes = cerebrod_clusterlist_numnodes()) < 0)
-    cerebro_err_exit("%s(%s:%d): cerebrod_clusterlist_numnodes: %s",
-                     __FILE__, __FUNCTION__, __LINE__,
-                     strerror(errno));
+    cerebro_err_exit("%s(%s:%d): cerebrod_clusterlist_numnodes",
+                     __FILE__, __FUNCTION__, __LINE__);
 
   if (numnodes > 0)
     {
@@ -207,9 +206,8 @@ _cerebrod_updown_initialize(void)
       nodes = (char **)Malloc(sizeof(char *) * numnodes);
 
       if (cerebrod_clusterlist_get_all_nodes(nodes, numnodes) < 0)
-        cerebro_err_exit("%s(%s:%d): cerebrod_clusterlist_get_all_nodes: %s",
-                         __FILE__, __FUNCTION__, __LINE__,
-                         strerror(errno));
+        cerebro_err_exit("%s(%s:%d): cerebrod_clusterlist_get_all_nodes",
+                         __FILE__, __FUNCTION__, __LINE__);
 
       for (i = 0; i < numnodes; i++)
         {

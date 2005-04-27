@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.31 2005-04-22 21:31:04 achu Exp $
+ *  $Id: cerebrod.c,v 1.32 2005-04-27 18:11:35 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -65,12 +65,20 @@ _cerebrod_pre_config_initialization(void)
 static void
 _cerebrod_post_config_initialization(void)
 {
-  cerebrod_clusterlist_module_setup();
+  if (cerebrod_clusterlist_module_setup() < 0)
+    cerebro_err_exit("%s(%s:%d): cerebrod_clusterlist_module_setup",
+                     __FILE__, __FUNCTION__, __LINE__);
 
   if (conf.clusterlist_module_options)
-    cerebrod_clusterlist_parse_options();
+    {
+      if (cerebrod_clusterlist_parse_options() < 0)
+        cerebro_err_exit("%s(%s:%d): cerebrod_clusterlist_parse_options",
+                         __FILE__, __FUNCTION__, __LINE__);
+    }
 
-  cerebrod_clusterlist_setup();
+  if (cerebrod_clusterlist_setup() < 0)
+    cerebro_err_exit("%s(%s:%d): cerebrod_clusterlist_setup",
+                     __FILE__, __FUNCTION__, __LINE__);
 
   if (conf.updown_server)
     Signal(SIGPIPE, SIG_IGN);

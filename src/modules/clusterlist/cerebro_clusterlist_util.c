@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_util.c,v 1.3 2005-04-21 22:58:53 achu Exp $
+ *  $Id: cerebro_clusterlist_util.c,v 1.4 2005-04-27 18:11:35 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -25,9 +25,30 @@ cerebro_clusterlist_parse_filename(char **options,
 {
   int i = 0;
 
-  assert(options);
-  assert(filename);
-  assert(clusterlist_module_name);
+  if (!options)
+    {
+      cerebro_err_debug("%s(%s:%d): %s clusterlist module: null options",
+                        __FILE__, __FUNCTION__, __LINE__,
+                        clusterlist_module_name);
+      return -1;
+    }
+
+  if (!filename)
+    {
+      cerebro_err_debug("%s(%s:%d): %s clusterlist module: null filename",
+                        __FILE__, __FUNCTION__, __LINE__,
+                        clusterlist_module_name);
+      return -1;
+    }
+
+  if (!clusterlist_module_name)
+    {
+      cerebro_err_debug("%s(%s:%d): %s clusterlist module: null "
+                        "clusterlist_module_name",
+                        __FILE__, __FUNCTION__, __LINE__,
+                        clusterlist_module_name);
+      return -1;
+    }
 
   *filename = NULL;
 
@@ -38,19 +59,34 @@ cerebro_clusterlist_parse_filename(char **options,
 	  char *p = strchr(options[i], '=');
 
 	  if (!p)
-	    cerebro_err_exit("%s clusterlist module: filename unspecified", 
-                             clusterlist_module_name);
+            {
+              cerebro_err_debug("%s clusterlist module: filename unspecified", 
+                                clusterlist_module_name);
+              return -1;
+            }
 
 	  p++;
 	  if (p == '\0')
-	    cerebro_err_exit("%s clusterlist module: filename unspecified", 
-                             clusterlist_module_name);
+            {
+              cerebro_err_debug("%s clusterlist module: filename unspecified", 
+                                clusterlist_module_name);
+              return -1;
+            }
 
-	  *filename = Strdup(p);
+	  if (!(*filename = strdup(p)))
+            {
+              cerebro_err_debug("%s(%s:%d): %s clusterlist module: strdup: %s",
+                                __FILE__, __FUNCTION__, __LINE__,
+                                clusterlist_module_name, strerror(errno));
+              return -1;
+            }
 	}
       else
-	cerebro_err_exit("%s clusterlist module: option '%s' unrecognized", 
-                         clusterlist_module_name, options[i]);
+        {
+          cerebro_err_debug("%s clusterlist module: option '%s' unrecognized", 
+                            clusterlist_module_name, options[i]);
+          return -1;
+        }
 
       i++;
     }
@@ -60,8 +96,11 @@ cerebro_clusterlist_parse_filename(char **options,
       struct stat buf;
 
       if (stat(*filename, &buf) < 0)
-        cerebro_err_exit("%s clusterlist module: filename '%s' not found",
-                         clusterlist_module_name, *filename);
+        {
+          cerebro_err_debug("%s clusterlist module: filename '%s' not found",
+                            clusterlist_module_name, *filename);
+          return -1;
+        }
     }
 
   return 0;
@@ -75,17 +114,48 @@ cerebro_clusterlist_copy_nodename(char *node,
 {
   int len;
 
-  assert(node);
-  assert(buf);
-  assert(buflen > 0);
-  assert(clusterlist_module_name);
+  if (!node)
+    {
+      cerebro_err_debug("%s(%s:%d): %s clusterlist module: null node",
+                        __FILE__, __FUNCTION__, __LINE__,
+                        clusterlist_module_name);
+      return -1;
+    }
+
+  if (!buf)
+    {
+      cerebro_err_debug("%s(%s:%d): %s clusterlist module: null buf",
+                        __FILE__, __FUNCTION__, __LINE__,
+                        clusterlist_module_name);
+      return -1;
+    }
+
+  if (buflen <= 0)
+    {
+      cerebro_err_debug("%s(%s:%d): %s clusterlist module: bad buflen",
+                        __FILE__, __FUNCTION__, __LINE__,
+                        clusterlist_module_name);
+      return -1;
+    }
+
+  if (!clusterlist_module_name)
+    {
+      cerebro_err_debug("%s(%s:%d): %s clusterlist module: null "
+                        "clusterlist_module_name",
+                        __FILE__, __FUNCTION__, __LINE__,
+                        clusterlist_module_name);
+      return -1;
+    }
 
   len = strlen(node);
 
   if ((len + 1) > buflen)
-    cerebro_err_exit("%s(%s:%d): %s clusterlist module: buflen too small: %d %d", 
-                     __FILE__, __FUNCTION__, __LINE__,
-                     clusterlist_module_name, len, buflen);
+    {
+      cerebro_err_debug("%s(%s:%d): %s clusterlist module: buflen too small: %d %d", 
+                        __FILE__, __FUNCTION__, __LINE__,
+                        clusterlist_module_name, len, buflen);
+      return -1;
+    }
 
   strcpy(buf, node);
 

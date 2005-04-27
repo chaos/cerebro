@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_genders.c,v 1.3 2005-04-22 21:31:04 achu Exp $
+ *  $Id: cerebro_clusterlist_genders.c,v 1.4 2005-04-27 18:11:35 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -11,7 +11,6 @@
 #if STDC_HEADERS
 #include <string.h>
 #endif /* STDC_HEADERS */
-#include <assert.h>
 #include <errno.h>
 
 #include <genders.h>
@@ -47,7 +46,14 @@ static char *genders_file = NULL;
 static int
 genders_clusterlist_parse_options(char **options)
 {
-  assert(!genders_handle);
+  if (genders_handle)
+    {
+      cerebro_err_debug("%s(%s:%d): %s clusterlist module: "
+                        "genders_handle non-null",
+                        __FILE__, __FUNCTION__, __LINE__,
+                        GENDERS_CLUSTERLIST_MODULE_NAME);
+      return -1;
+    }
 
   if (options)
     cerebro_clusterlist_parse_filename(options,
@@ -65,7 +71,14 @@ genders_clusterlist_parse_options(char **options)
 static int 
 genders_clusterlist_setup(void)
 {
-  assert(!genders_handle);
+  if (genders_handle)
+    {
+      cerebro_err_debug("%s(%s:%d): %s clusterlist module: "
+                        "genders_handle non-null",
+                        __FILE__, __FUNCTION__, __LINE__,
+                        GENDERS_CLUSTERLIST_MODULE_NAME);
+      return 0;
+    }
 
   return cerebro_clusterlist_genders_setup(&genders_handle, 
                                            genders_file,
@@ -80,7 +93,14 @@ genders_clusterlist_setup(void)
 static int
 genders_clusterlist_cleanup(void)
 {
-  assert(genders_handle);
+  if (!genders_handle)
+    {
+      cerebro_err_debug("%s(%s:%d): %s clusterlist module: "
+                        "genders_handle null",
+                        __FILE__, __FUNCTION__, __LINE__,
+                        GENDERS_CLUSTERLIST_MODULE_NAME);
+      return -1;
+    }
 
   return cerebro_clusterlist_genders_cleanup(&genders_handle, 
                                              &genders_file,
@@ -95,8 +115,23 @@ genders_clusterlist_cleanup(void)
 static int
 genders_clusterlist_get_all_nodes(char **nodes, unsigned int nodeslen)
 {
-  assert(genders_handle);
-  assert(nodes);
+  if (!genders_handle)
+    {
+      cerebro_err_debug("%s(%s:%d): %s clusterlist module: "
+                        "genders_handle null",
+                        __FILE__, __FUNCTION__, __LINE__,
+                        GENDERS_CLUSTERLIST_MODULE_NAME);
+      return -1;
+    }
+
+  if (!nodes)
+    {
+      cerebro_err_debug("%s(%s:%d): %s clusterlist module: "
+                        "invalid nodes parameter",
+                        GENDERS_CLUSTERLIST_MODULE_NAME,
+                        __FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
   
   return cerebro_clusterlist_genders_get_all_nodes(genders_handle, 
                                                    nodes,
@@ -112,7 +147,14 @@ genders_clusterlist_get_all_nodes(char **nodes, unsigned int nodeslen)
 static int 
 genders_clusterlist_numnodes(void)
 {
-  assert(genders_handle);
+  if (!genders_handle)
+    {
+      cerebro_err_debug("%s(%s:%d): %s clusterlist module: "
+                        "genders_handle null",
+                        __FILE__, __FUNCTION__, __LINE__,
+                        GENDERS_CLUSTERLIST_MODULE_NAME);
+      return -1;
+    }
 
   return cerebro_clusterlist_genders_numnodes(genders_handle,
                                               GENDERS_CLUSTERLIST_MODULE_NAME);
@@ -130,8 +172,23 @@ genders_clusterlist_node_in_cluster(char *node)
   char *nodePtr = NULL;
   char nodebuf[CEREBRO_MAXNODENAMELEN+1];
 
-  assert(genders_handle);
-  assert(node);
+  if (!genders_handle)
+    {
+      cerebro_err_debug("%s(%s:%d): %s clusterlist module: "
+                        "genders_handle null",
+                        __FILE__, __FUNCTION__, __LINE__,
+                        GENDERS_CLUSTERLIST_MODULE_NAME);
+      return -1;
+    }
+
+  if (!node)
+    {
+      cerebro_err_debug("%s(%s:%d): %s clusterlist module: "
+                        "invalid node parameter",
+                        GENDERS_CLUSTERLIST_MODULE_NAME,
+                        __FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
 
   /* Shorten hostname if necessary */
   if (strchr(node, '.'))
@@ -164,9 +221,32 @@ genders_clusterlist_node_in_cluster(char *node)
 static int
 genders_clusterlist_get_nodename(char *node, char *buf, unsigned int buflen)
 {
-  assert(genders_handle);
-  assert(node);
-  assert(buf);
+  if (!genders_handle)
+    {
+      cerebro_err_debug("%s(%s:%d): %s clusterlist module: "
+                        "genders_handle null",
+                        __FILE__, __FUNCTION__, __LINE__,
+                        GENDERS_CLUSTERLIST_MODULE_NAME);
+      return -1;
+    }
+
+  if (!node)
+    {
+      cerebro_err_debug("%s(%s:%d): %s clusterlist module: "
+                        "invalid node parameter",
+                        GENDERS_CLUSTERLIST_MODULE_NAME,
+                        __FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+                                                                                        
+  if (!buf)
+    {
+      cerebro_err_debug("%s(%s:%d): %s clusterlist module: "
+                        "invalid buf parameter",
+                        GENDERS_CLUSTERLIST_MODULE_NAME,
+                        __FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
 
   return cerebro_clusterlist_copy_nodename(node, 
                                            buf, 

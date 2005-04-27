@@ -1,11 +1,18 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.h,v 1.7 2005-03-20 21:24:58 achu Exp $
+ *  $Id: cerebrod_listener.h,v 1.8 2005-04-27 18:11:35 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_LISTENER_H
 #define _CEREBROD_LISTENER_H
 
+#if HAVE_CONFIG_H
+#include "config.h"
+#endif /* HAVE_CONFIG_H */
+ 
+#if HAVE_PTHREAD_H
 #include <pthread.h>
+#endif /* HAVE_PTHREAD_H */
+
 #include "cerebrod.h"
 
 #define CEREBROD_LISTENER_REINITIALIZE_WAIT 2

@@ -1,11 +1,18 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.h,v 1.8 2005-03-30 18:48:30 achu Exp $
+ *  $Id: cerebrod_updown.h,v 1.9 2005-04-27 18:11:35 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_UPDOWN_H
 #define _CEREBROD_UPDOWN_H
 
+#if HAVE_CONFIG_H
+#include "config.h"
+#endif /* HAVE_CONFIG_H */
+
+#if HAVE_PTHREAD_H
 #include <pthread.h>
+#endif /* HAVE_PTHREAD_H */
+
 #include "list.h"
 
 #define CEREBROD_UPDOWN_REINITIALIZE_WAIT 2

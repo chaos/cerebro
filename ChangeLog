@@ -1,6 +1,11 @@
 2005-04-27  Albert Chu  <chu11@llnl.gov>
 
 	* Finished first round of libcerebro updown API.
+
+	* Re-worked modules to not exit on errors, error handling is now
+	the reponsibility of the caller.
+
+	* Re-worked cerebrod daemon around above changes.
 	
 2005-04-26  Albert Chu  <chu11@llnl.gov>
 

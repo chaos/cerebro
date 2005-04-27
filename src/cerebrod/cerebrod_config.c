@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.70 2005-04-25 15:33:05 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.71 2005-04-27 18:11:35 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -370,8 +370,8 @@ _cerebrod_load_alternate_configuration(void)
 
   /* Load the alternate default configuration from the configuration module */
   if ((*config_module_info->load_cerebrod_default)(&module_conf) < 0)
-    cerebro_err_exit("%s config module: load_cerebrod_default failed: %s", 
-                     config_module_info->config_module_name, strerror(errno));
+    cerebro_err_exit("%s config module: load_cerebrod_default failed", 
+                     config_module_info->config_module_name);
 
   /* Load new defaults */
   conf.heartbeat_frequency_min = module_conf.heartbeat_frequency_min;

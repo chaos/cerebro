@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_none.c,v 1.4 2005-04-26 17:04:29 achu Exp $
+ *  $Id: cerebro_clusterlist_none.c,v 1.5 2005-04-27 18:11:35 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -11,8 +11,6 @@
 #if STDC_HEADERS
 #include <string.h>
 #endif /* STDC_HEADERS */
-#include <assert.h>
-#include <errno.h>
 
 #include "cerebro_error.h"
 #include "cerebro_clusterlist_module.h"
@@ -29,17 +27,15 @@
 static int
 none_clusterlist_parse_options(char **options)
 {
-  int i = 0;
-
   if (!options)
     return 0;
 
   /* None module takes no options */
-  while (options[i] != NULL)
+  if (options[0])
     {
-      cerebro_err_exit("none clusterlist module: option '%s' unrecognized", 
-                       options[i]);
-      i++;
+      cerebro_err_debug("none clusterlist module: option '%s' unrecognized", 
+                        options[0]);
+      return -1;
     }
 
   return 0;

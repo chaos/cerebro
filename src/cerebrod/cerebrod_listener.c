@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.44 2005-04-26 20:58:56 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.45 2005-04-27 18:11:35 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -169,7 +169,10 @@ _cerebrod_listener_initialize(void)
   /* If a clusterlist is found/used, use the numnodes count as the 
    * initializing hash size. 
    */
-  cluster_data_hash_size = cerebrod_clusterlist_numnodes();
+  if ((cluster_data_hash_size = cerebrod_clusterlist_numnodes()) < 0)
+    cerebro_err_exit("%s(%s:%d): cerebrod_clusterlist_numnodes",
+                     __FILE__, __FUNCTION__, __LINE__);
+  
   if (!cluster_data_hash_size)
     cluster_data_hash_size = CEREBROD_LISTENER_HASH_SIZE_DEFAULT;
 
@@ -445,7 +448,11 @@ cerebrod_listener(void *arg)
 	  continue;
 	}
       
-      if (!cerebrod_clusterlist_node_in_cluster(hb.nodename))
+      if ((rv = cerebrod_clusterlist_node_in_cluster(hb.nodename)) < 0)
+        cerebro_err_exit("%s(%s:%d): cerebrod_clusterlist_node_in_cluster: %s",
+                         __FILE__, __FUNCTION__, __LINE__, hb.nodename);
+      
+      if (!rv)
         {
           cerebro_err_debug("%s(%s:%d): received non-cluster packet from: %s",
                             __FILE__, __FUNCTION__, __LINE__,
@@ -462,8 +469,7 @@ cerebrod_listener(void *arg)
                                             nodename_key, 
                                             CEREBRO_MAXNODENAMELEN+1) < 0)
         {
-          cerebro_err_debug("%s(%s:%d): cerebrod_clusterlist_get_nodename "
-                            "error: %s", 
+          cerebro_err_debug("%s(%s:%d): cerebrod_clusterlist_get_nodename: %s",
                             __FILE__, __FUNCTION__, __LINE__,
                             hb.nodename);
           continue;

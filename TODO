@@ -52,4 +52,4 @@
 
 - clusterlist stuff to libcerebro
 
-- need to rework clusterlists not to exit on errors
+- allow modules to return error codes??
