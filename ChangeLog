@@ -3,6 +3,8 @@
 	* Continued libcerebro updown library work.
 
 	* Fixed packet unmarshalling bugs in cerebrod.
+
+	* Fixed various corner case bugs in cerebrod server.
 	
 2005-04-25  Albert Chu  <chu11@llnl.gov>
 

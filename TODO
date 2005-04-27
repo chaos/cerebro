@@ -8,6 +8,7 @@
 - test
    - fd leaking
    - mem-leaking
+   - updown server, for all error conditions
 
 - to GPL
   - on all headers
@@ -34,3 +35,17 @@
 - fix version checking on receved packets 
 
 - config module stuff for libcerebro load_data functions, like nodeupdown? 
+
+- reorg cerebro err codes
+
+- cerebro_error -> cerebrod_error
+  - only for cerebrod and modules?
+
+- debug messages in cerebro/updown library
+
+- audit, more explicive error codes in libcerebro
+
+- consistency between ret vs. rv
+  - err_out vs. cleanup
+
+- fix logic, don't create up/down hostlists unless necessary

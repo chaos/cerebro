@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.c,v 1.3 2005-04-26 17:04:29 achu Exp $
+ *  $Id: cerebro.c,v 1.4 2005-04-27 00:01:30 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -24,6 +24,11 @@ char *cerebro_error_messages[] =
     "invalid magic number",
     "invalid parameters",
     "server data not loaded",
+    "cerebro version incompatabile",
+    "invalid hostname",
+    "invalid address",
+    "connection error",
+    "connection timeout",
     "out of memory",
     "internal error",
     "errnum out of range",

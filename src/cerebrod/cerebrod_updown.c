@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.c,v 1.32 2005-04-26 20:58:56 achu Exp $
+ *  $Id: cerebrod_updown.c,v 1.33 2005-04-27 00:01:30 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -423,7 +423,7 @@ _cerebrod_updown_receive_request(int client_fd,
 	  cerebro_err_debug("%s(%s:%d): select: %s", 
                             __FILE__, __FUNCTION__, __LINE__,
                             strerror(errno));
-	  goto err_out;
+	  goto cleanup;
 	}
 
       if (!rv)
@@ -436,7 +436,7 @@ _cerebrod_updown_receive_request(int client_fd,
 	   * user.
 	   */
 	  if (!bytes_read)
-	    goto err_out;
+	    goto cleanup;
 	  else
 	    goto unmarshall_received;
 	}
@@ -452,12 +452,12 @@ _cerebrod_updown_receive_request(int client_fd,
 	      cerebro_err_debug("%s(%s:%d): fd_read_n: %s", 
                                 __FILE__, __FUNCTION__, __LINE__,
                                 strerror(errno));
-	      goto err_out;
+	      goto cleanup;
 	    }
 
 	  if (!n)
 	    /* Pipe closed */
-	    goto err_out;
+	    goto cleanup;
 
 	  bytes_read += n;
 	}
@@ -465,17 +465,17 @@ _cerebrod_updown_receive_request(int client_fd,
 	{
 	  cerebro_err_debug("%s(%s:%d): rv != 0 but fd not set",
                             __FILE__, __FUNCTION__, __LINE__);
-	  goto err_out;
+	  goto cleanup;
 	}
     }
 
  unmarshall_received:
   if (_cerebrod_updown_request_unmarshall(req, buffer, bytes_read) < 0)
-    goto err_out;
+    goto cleanup;
 
   return 0;
 
- err_out:
+ cleanup:
   return -1;
 }
 
@@ -560,7 +560,6 @@ _cerebrod_updown_respond_with_error(int client_fd, unsigned int updown_err_code)
   assert(updown_err_code == CEREBRO_UPDOWN_PROTOCOL_ERR_VERSION_INVALID
 	 || updown_err_code == CEREBRO_UPDOWN_PROTOCOL_ERR_UPDOWN_REQUEST_INVALID
 	 || updown_err_code == CEREBRO_UPDOWN_PROTOCOL_ERR_TIMEOUT_INVALID
-	 || updown_err_code == CEREBRO_UPDOWN_PROTOCOL_ERR_NO_NODES_FOUND
 	 || updown_err_code == CEREBRO_UPDOWN_PROTOCOL_ERR_INTERNAL_SYSTEM_ERROR);
   
   memset(&res, '\0', CEREBRO_UPDOWN_RESPONSE_LEN);
@@ -572,6 +571,47 @@ _cerebrod_updown_respond_with_error(int client_fd, unsigned int updown_err_code)
   if (_cerebrod_updown_send_response(client_fd, &res) < 0)
     return -1;
       
+  return 0;
+}
+
+/* 
+ * _cerebrod_updown_respond_with_version_error
+ *
+ * respond to the updown_request with a version error, a special case
+ * error response
+ *
+ * Return 0 on success, -1 on error
+ */
+static int
+_cerebrod_updown_respond_with_version_error(int client_fd, int version)
+{
+  /* 
+   * Currently only one protocol version in this tool's history, so
+   * this is easy
+   */
+
+  if (version == 1)
+    {
+      struct cerebro_updown_response res;
+
+      memset(&res, '\0', CEREBRO_UPDOWN_RESPONSE_LEN);
+
+      res.version = version;
+      res.updown_err_code = CEREBRO_UPDOWN_PROTOCOL_ERR_VERSION_INVALID;
+      res.end_of_responses = CEREBRO_UPDOWN_PROTOCOL_IS_LAST_RESPONSE;
+      
+      if (_cerebrod_updown_send_response(client_fd, &res) < 0)
+        return -1;
+    }
+  else
+    {
+      /* We shouldn't end up here ... eek! */
+
+      if (_cerebrod_updown_respond_with_error(client_fd,
+                                              CEREBRO_UPDOWN_PROTOCOL_ERR_INTERNAL_SYSTEM_ERROR) < 0)
+        return -1;
+    }
+
   return 0;
 }
 
@@ -706,9 +746,7 @@ _cerebrod_updown_respond_with_updown_nodes(int client_fd,
   if (!List_count(updown_node_data))
     {
       Pthread_mutex_unlock(&updown_node_data_lock);
-      _cerebrod_updown_respond_with_error(client_fd,
-					  CEREBRO_UPDOWN_PROTOCOL_ERR_NO_NODES_FOUND);
-      goto err_out;
+      goto end_response;
     }
 
   if (!(node_responses = list_create((ListDelF)_Free)))
@@ -719,7 +757,7 @@ _cerebrod_updown_respond_with_updown_nodes(int client_fd,
       Pthread_mutex_unlock(&updown_node_data_lock);
       _cerebrod_updown_respond_with_error(client_fd,
 					  CEREBRO_UPDOWN_PROTOCOL_ERR_INTERNAL_SYSTEM_ERROR);
-      goto err_out;
+      goto cleanup;
     }
 
   Gettimeofday(&tv, NULL);
@@ -736,7 +774,7 @@ _cerebrod_updown_respond_with_updown_nodes(int client_fd,
       Pthread_mutex_unlock(&updown_node_data_lock);
       _cerebrod_updown_respond_with_error(client_fd,
 					  CEREBRO_UPDOWN_PROTOCOL_ERR_INTERNAL_SYSTEM_ERROR);
-      goto err_out;
+      goto cleanup;
     }
 
   /* Evaluation is done.  Transmission of the results can be done
@@ -753,10 +791,11 @@ _cerebrod_updown_respond_with_updown_nodes(int client_fd,
           Pthread_mutex_unlock(&updown_node_data_lock);
           _cerebrod_updown_respond_with_error(client_fd,
                                               CEREBRO_UPDOWN_PROTOCOL_ERR_INTERNAL_SYSTEM_ERROR);
-          goto err_out;
+          goto cleanup;
         }
     }
 
+ end_response:
   /* Send end response */
   memset(&end_res, '\0', sizeof(struct cerebro_updown_response));
   end_res.version = CEREBRO_UPDOWN_PROTOCOL_VERSION;
@@ -769,7 +808,7 @@ _cerebrod_updown_respond_with_updown_nodes(int client_fd,
   list_destroy(node_responses);
   return 0;
 
- err_out:
+ cleanup:
   if (node_responses)
     list_destroy(node_responses);
   return -1;
@@ -803,8 +842,7 @@ _cerebrod_updown_service_connection(void *arg)
 
   if (req.version != CEREBRO_UPDOWN_PROTOCOL_VERSION)
     {
-      _cerebrod_updown_respond_with_error(client_fd, 
-					  CEREBRO_UPDOWN_PROTOCOL_ERR_VERSION_INVALID);
+      _cerebrod_updown_respond_with_version_error(client_fd, req.version);
       goto done;
     }
 
@@ -879,11 +917,11 @@ cerebrod_updown(void *arg)
                                   __FILE__, __FUNCTION__, __LINE__);
             }
           else if (errno == EINTR)
-            cerebro_err_debug("%s(%s:%d): recvfrom: %s", 
+            cerebro_err_debug("%s(%s:%d): accept: %s", 
                               __FILE__, __FUNCTION__, __LINE__,
                               strerror(errno));
           else
-            cerebro_err_exit("%s(%s:%d): recvfrom: %s", 
+            cerebro_err_exit("%s(%s:%d): accept: %s", 
                              __FILE__, __FUNCTION__, __LINE__,
                              strerror(errno));
 	}

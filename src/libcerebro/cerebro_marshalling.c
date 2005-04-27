@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_marshalling.c,v 1.2 2005-03-28 17:40:10 achu Exp $
+ *  $Id: cerebro_marshalling.c,v 1.3 2005-04-27 00:01:30 achu Exp $
 \*****************************************************************************/
  
 #if HAVE_CONFIG_H
@@ -116,7 +116,7 @@ cerebro_unmarshall_int32(int32_t *val, char *buffer, int bufferlen)
 }
 
 int
-cerebro_unmarshall_u_int8(u_int8_t *val, char *buffer, int bufferlen)
+cerebro_unmarshall_uint8(u_int8_t *val, char *buffer, int bufferlen)
 {
   if (!val || !buffer || bufferlen < sizeof(u_int8_t))
     {

@@ -1,18 +1,23 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.3 2005-04-26 17:04:29 achu Exp $
+ *  $Id: cerebro.h,v 1.4 2005-04-27 00:01:30 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_H
 #define _CEREBRO_H
 
-#define CEREBRO_ERR_SUCCESS              0
-#define CEREBRO_ERR_NULLHANDLE           1
-#define CEREBRO_ERR_MAGIC_NUMBER         2
-#define CEREBRO_ERR_PARAMETERS           3
-#define CEREBRO_ERR_NOT_LOADED           4
-#define CEREBRO_ERR_OUTMEM               5
-#define CEREBRO_ERR_INTERNAL             6
-#define CEREBRO_ERR_ERRNUMRANGE          7
+#define CEREBRO_ERR_SUCCESS               0
+#define CEREBRO_ERR_NULLHANDLE            1
+#define CEREBRO_ERR_MAGIC_NUMBER          2
+#define CEREBRO_ERR_PARAMETERS            3
+#define CEREBRO_ERR_NOT_LOADED            4
+#define CEREBRO_ERR_VERSION_INCOMPATIBLE  5
+#define CEREBRO_ERR_HOSTNAME              6
+#define CEREBRO_ERR_ADDRESS               7
+#define CEREBRO_ERR_CONNECT               8
+#define CEREBRO_ERR_CONNECT_TIMEOUT       9
+#define CEREBRO_ERR_OUTMEM               10 
+#define CEREBRO_ERR_INTERNAL             11
+#define CEREBRO_ERR_ERRNUMRANGE          12 
 
 typedef struct cerebro *cerebro_t;
 

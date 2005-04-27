@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_updown_protocol.h,v 1.10 2005-04-25 21:39:27 achu Exp $
+ *  $Id: cerebro_updown_protocol.h,v 1.11 2005-04-27 00:01:30 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_UPDOWN_PROTOCOL_H
@@ -30,8 +30,7 @@
 #define CEREBRO_UPDOWN_PROTOCOL_ERR_VERSION_INVALID        1
 #define CEREBRO_UPDOWN_PROTOCOL_ERR_UPDOWN_REQUEST_INVALID 2
 #define CEREBRO_UPDOWN_PROTOCOL_ERR_TIMEOUT_INVALID        3
-#define CEREBRO_UPDOWN_PROTOCOL_ERR_NO_NODES_FOUND         4
-#define CEREBRO_UPDOWN_PROTOCOL_ERR_INTERNAL_SYSTEM_ERROR  5
+#define CEREBRO_UPDOWN_PROTOCOL_ERR_INTERNAL_SYSTEM_ERROR  4
 
 #define CEREBRO_UPDOWN_PROTOCOL_REQUEST_UP_NODES           0
 #define CEREBRO_UPDOWN_PROTOCOL_REQUEST_DOWN_NODES         1
