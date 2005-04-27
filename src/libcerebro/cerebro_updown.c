@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_updown.c,v 1.5 2005-04-27 00:01:30 achu Exp $
+ *  $Id: cerebro_updown.c,v 1.6 2005-04-27 00:04:23 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -396,7 +396,10 @@ _cerebro_updown_receive_a_response(cerebro_t handle,
       FD_SET(fd, &rfds);
 
       if ((rv = select(fd + 1, &rfds, NULL, NULL, &tv)) < 0)
-        goto cleanup;
+        {
+          handle->errnum = CEREBRO_ERR_INTERNAL;
+          goto cleanup;
+        }
 
       if (!rv)
         {
@@ -407,8 +410,11 @@ _cerebro_updown_receive_a_response(cerebro_t handle,
            * server to return a invalid version number back to the
            * user.
            */
-          if (!bytes_read)
-            goto cleanup;
+          if (!bytes_read) 
+            {
+              handle->errnum = CEREBRO_ERR_CONNECT_TIMEOUT;
+              goto cleanup;
+            }
           else
             goto unmarshall_received;
         }
@@ -420,16 +426,25 @@ _cerebro_updown_receive_a_response(cerebro_t handle,
           if ((n = fd_read_n(fd,
                              buffer + bytes_read,
                              CEREBRO_UPDOWN_REQUEST_LEN - bytes_read)) < 0)
-            goto cleanup;
+            {
+              handle->errnum = CEREBRO_ERR_INTERNAL;
+              goto cleanup;
+            }
 
           if (!n)
-            /* Pipe closed */
-            goto cleanup;
+            {
+              /* Pipe closed */
+              handle->errnum = CEREBRO_ERR_INTERNAL;
+              goto cleanup;
+            }
 
           bytes_read += n;
         }
       else
-        goto cleanup;
+        {
+          handle->errnum = CEREBRO_ERR_INTERNAL;
+          goto cleanup;
+        }
     }
 
  unmarshall_received:
@@ -454,7 +469,15 @@ _cerebro_updown_receive_responses(cerebro_t handle,
                                   int fd,
                                   struct cerebro_updown_data *updown_data)
 {
+  if (_cerebro_updown_receive_a_response(handle,
+                                         fd, 
+                                         &res) < 0)
+    goto cleanup;
+
+
   return 0;
+ cleanup:
+  return -1;
 }
 
 /*  
