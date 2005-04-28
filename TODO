@@ -7,7 +7,6 @@
 - test
    - fd leaking
    - mem-leaking
-   - updown server, for all error conditions
 
 - to GPL
   - on all headers
@@ -40,7 +39,3 @@
 - clusterlist stuff to libcerebro
 
 - allow modules to return error codes??
-
-- why do i ntop -> pton in low_timeout_connect?
-
-- updown daemon - invalid packet format error
