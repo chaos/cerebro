@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebrod.8.in,v 1.11 2005-04-20 23:36:26 achu Exp $
+\."$Id: cerebrod.8.in,v 1.12 2005-04-28 21:20:52 achu Exp $
 \."#############################################################################
 .TH cerebrod 8 "May 2005" "cerebrod @VERSION@" cerebrod
 .SH "NAME"
@@ -48,8 +48,8 @@ as a whole.
 
 The default configuration file loaded by 
 .B cerebrod
-is @CEREBROD_CONFIG_FILE_DEFAULT@, however an alternate configuration
-file can be specified on the command line with the 
+is @CEREBROD_CONFIG_FILE_DEFAULT@.  An alternate configuration file
+can be specified on the command line with the
 .I -c 
 option.
 
@@ -92,7 +92,7 @@ No configuration modules are searched in this build.
 \}
 
 .ie @MANPAGE_STATIC_MODULES@ \{
-A configuration module can be specified on the command line with
+A specific configuration module can be specified on the command line with
 the
 .I -c 
 option.
@@ -105,8 +105,10 @@ in the above order.
 .el \{
 Configuration modules are searched for in the 
 .B Cerebro
-package library directory, @CEREBROD_MODULE_DIR@.  A configuration
-module can also be specified on the command line with the
+package library directory, @CEREBROD_MODULE_DIR@.  
+
+A configuration module can also be specified on the command line with
+the
 .I -c 
 option.
 
@@ -172,7 +174,7 @@ location.
 hostsfile - Reads and parses a file listing each cluster node on a
 separate line.  Can be passed a filename=value option to specify an
 non-default hostsfile database location.  The default hostsfile is
-located at @CEREBROD_CLUSTERLIST_HOSTSFILE_DEFAULT@.
+located at @CEREBRO_CLUSTERLIST_HOSTSFILE_DEFAULT@.
 
 none - Do not use a cluster list.
 
@@ -191,9 +193,9 @@ clusterlist modules see XXX.
 .SH "FILES"
 @CEREBROD_CONFIG_FILE_DEFAULT@
 
-@CEREBROD_CLUSTERLIST_HOSTSFILE_DEFAULT@
+@CEREBRO_CLUSTERLIST_HOSTSFILE_DEFAULT@
 
-@CEREBROD_MODULE_DIR@
+@CEREBRO_MODULE_DIR@
 .SH "ORIGIN"
 Developed by Albert Chu <chu11@llnl.gov> on LLNL's Linux clusters.
 .SH "SEE ALSO"
