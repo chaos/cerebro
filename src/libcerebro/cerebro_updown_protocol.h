@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_updown_protocol.h,v 1.12 2005-04-27 15:43:17 achu Exp $
+ *  $Id: cerebro_updown_protocol.h,v 1.13 2005-04-28 18:08:27 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_UPDOWN_PROTOCOL_H
@@ -21,6 +21,13 @@
  *   the updown request.  This "end of responses" response will be
  *   sent even if no nodes are returned (i.e. only down nodes are
  *   requested, but all nodes are up).
+ * - On "normal" errors, the "end of responses" packet will contain 
+ *   the error code.
+ * - On version incompatability errors, older version responses
+ *   will be sent from the server containing the error code.
+ * - On version incompatability errors in which an older version does
+ *   not exist and invalid packet format errors, an eight byte packet
+ *   containing only the version and error code will be the response.
  */
 
 #define CEREBRO_UPDOWN_PROTOCOL_VERSION                    1
@@ -31,7 +38,8 @@
 #define CEREBRO_UPDOWN_PROTOCOL_ERR_VERSION_INVALID        1
 #define CEREBRO_UPDOWN_PROTOCOL_ERR_UPDOWN_REQUEST_INVALID 2
 #define CEREBRO_UPDOWN_PROTOCOL_ERR_TIMEOUT_INVALID        3
-#define CEREBRO_UPDOWN_PROTOCOL_ERR_INTERNAL_SYSTEM_ERROR  4
+#define CEREBRO_UPDOWN_PROTOCOL_ERR_PACKET_INVALID         4
+#define CEREBRO_UPDOWN_PROTOCOL_ERR_INTERNAL_SYSTEM_ERROR  5
 
 #define CEREBRO_UPDOWN_PROTOCOL_REQUEST_UP_NODES           0
 #define CEREBRO_UPDOWN_PROTOCOL_REQUEST_DOWN_NODES         1
@@ -82,5 +90,19 @@ struct cerebro_updown_response
                                       + sizeof(u_int8_t) \
                                       + CEREBRO_MAXNODENAMELEN \
                                       + sizeof(u_int8_t))
+
+/*
+ * struct cerebro_updown_err_response
+ *
+ * defines a updown server invalid version or packet response
+ */
+struct cerebro_updown_err_response
+{
+  int32_t version;
+  u_int32_t updown_err_code;
+};
+  
+#define CEREBRO_UPDOWN_ERR_RESPONSE_LEN  (sizeof(int32_t) \
+                                          + sizeof(u_int32_t))
 
 #endif /* _CEREBRO_UPDOWN_PROTOCOL_H */

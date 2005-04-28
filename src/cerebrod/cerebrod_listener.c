@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.45 2005-04-27 18:11:35 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.46 2005-04-28 18:08:27 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -192,7 +192,7 @@ _cerebrod_listener_initialize(void)
  *
  * unmarshall contents of a heartbeat packet buffer
  *
- * Returns 0 on success, -1 on error
+ * Returns length of data unmarshalled on success, -1 on error
  */
 int
 _cerebrod_listener_heartbeat_unmarshall(struct cerebrod_heartbeat *hb,
@@ -200,41 +200,22 @@ _cerebrod_listener_heartbeat_unmarshall(struct cerebrod_heartbeat *hb,
                                         int bufferlen)
 {
   int ret, c = 0;
-  int invalid_size = 0;
 
   assert(hb && buffer && bufferlen >= 0);
   
   memset(hb, '\0', sizeof(struct cerebrod_heartbeat));
 
-  if (CEREBROD_HEARTBEAT_LEN != bufferlen)
-    {
-      cerebro_err_debug("%s(%s:%d): received buffer length "
-                        "unexpected size: expect %d, bufferlen %d",
-                        __FILE__, __FUNCTION__, __LINE__,
-                        CEREBROD_HEARTBEAT_LEN, bufferlen);
-      invalid_size++;
-    }
-
-  if (invalid_size && bufferlen < sizeof(hb->version)) 
-    return -1;
-  
   if ((ret = cerebro_unmarshall_int32(&(hb->version),
                                       buffer + c,
                                       bufferlen - c)) < 0)
     cerebro_err_exit("%s(%s:%d): cerebro_unmarshall_int32: %s",
                        __FILE__, __FUNCTION__, __LINE__,
                        strerror(errno));
+  if (!ret)
+    return c;
+
   c += ret;
 
-  if (invalid_size)
-    {
-      /* Invalid version to be handled by later code */
-      if (hb->version != CEREBROD_HEARTBEAT_PROTOCOL_VERSION)
-        return 0;
-      else
-        return -1;
-    } 
-  
   if ((ret = cerebro_unmarshall_buffer(hb->nodename,
                                        sizeof(hb->nodename),
                                        buffer + c,
@@ -242,6 +223,9 @@ _cerebrod_listener_heartbeat_unmarshall(struct cerebrod_heartbeat *hb,
     cerebro_err_exit("%s(%s:%d): cerebro_unmarshall_buffer: %s",
                      __FILE__, __FUNCTION__, __LINE__,
                      strerror(errno));
+  if (!ret)
+    return c;
+
   c += ret;
   
   if ((ret = cerebro_unmarshall_uint32(&(hb->starttime),
@@ -250,17 +234,25 @@ _cerebrod_listener_heartbeat_unmarshall(struct cerebrod_heartbeat *hb,
     cerebro_err_exit("%s(%s:%d): cerebro_unmarshall_uint32: %s",
                      __FILE__, __FUNCTION__, __LINE__,
                      strerror(errno));
+  if (!ret)
+    return c;
+
   c += ret;
-                                                                                      
+
   if ((ret = cerebro_unmarshall_uint32(&(hb->boottime),
                                        buffer + c,
                                        bufferlen - c)) < 0)
     cerebro_err_exit("%s(%s:%d): cerebro_unmarshall_uint32: %s",
                      __FILE__, __FUNCTION__, __LINE__,
                      strerror(errno));
+  if (!ret)
+    return c;
+
   c += ret;
 
-  return 0;
+
+
+  return c;
 }
 
 
@@ -441,10 +433,21 @@ cerebrod_listener(void *arg)
 
       _cerebrod_listener_dump_heartbeat(&hb);
 
+      if (hblen != CEREBROD_HEARTBEAT_LEN)
+        {
+          cerebro_err_debug("%s(%s:%d): received buffer length "
+                            "unexpected size: expect %d, hblen %d",
+                            __FILE__, __FUNCTION__, __LINE__,
+                            CEREBROD_HEARTBEAT_LEN, hblen);
+          continue;
+        }
+
       if (hb.version != CEREBROD_HEARTBEAT_PROTOCOL_VERSION)
 	{
-	  cerebro_err_debug("%s(%s:%d): invalid cerebrod packet version read",
-                            __FILE__, __FUNCTION__, __LINE__);
+	  cerebro_err_debug("%s(%s:%d): invalid cerebrod packet version read:"
+                            "expect %d, version %d",
+                            __FILE__, __FUNCTION__, __LINE__,
+                            CEREBROD_HEARTBEAT_PROTOCOL_VERSION, hb.version);
 	  continue;
 	}
       

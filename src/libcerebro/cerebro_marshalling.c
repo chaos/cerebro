@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_marshalling.c,v 1.3 2005-04-27 00:01:30 achu Exp $
+ *  $Id: cerebro_marshalling.c,v 1.4 2005-04-28 18:08:27 achu Exp $
 \*****************************************************************************/
  
 #if HAVE_CONFIG_H
@@ -89,14 +89,18 @@ cerebro_marshall_buffer(char *buf, int buflen, char *buffer, int bufferlen)
 int
 cerebro_unmarshall_int8(int8_t *val, char *buffer, int bufferlen)
 {
-  if (!val || !buffer || bufferlen < sizeof(int8_t))
+  if (!val || !buffer)
     {
       errno = EINVAL;
       return -1;
     }
 
-  memcpy((void *)val, buffer, sizeof(int8_t));
-  return sizeof(int8_t);
+  if (bufferlen >= sizeof(int8_t))
+    {
+      memcpy((void *)val, buffer, sizeof(int8_t));
+      return sizeof(int8_t);
+    }
+  return 0;
 }
 
 int
@@ -104,28 +108,36 @@ cerebro_unmarshall_int32(int32_t *val, char *buffer, int bufferlen)
 {
   int32_t temp;
 
-  if (!val || !buffer || bufferlen < sizeof(temp))
+  if (!val || !buffer)
     {
       errno = EINVAL;
       return -1;
     }
 
-  memcpy((void *)&temp, buffer, sizeof(temp));
-  *val = ntohl(temp);
-  return sizeof(temp);
+  if (bufferlen >= sizeof(temp))
+    {
+      memcpy((void *)&temp, buffer, sizeof(temp));
+      *val = ntohl(temp);
+      return sizeof(temp);
+    }
+  return 0;
 }
 
 int
 cerebro_unmarshall_uint8(u_int8_t *val, char *buffer, int bufferlen)
 {
-  if (!val || !buffer || bufferlen < sizeof(u_int8_t))
+  if (!val || !buffer)
     {
       errno = EINVAL;
       return -1;
     }
 
-  memcpy((void *)val, buffer, sizeof(u_int8_t));
-  return sizeof(u_int8_t);
+  if (bufferlen >= sizeof(u_int8_t))
+    {
+      memcpy((void *)val, buffer, sizeof(u_int8_t));
+      return sizeof(u_int8_t);
+    }
+  return 0;
 }
 
 int
@@ -133,27 +145,35 @@ cerebro_unmarshall_uint32(u_int32_t *val, char *buffer, int bufferlen)
 {
   u_int32_t temp;
 
-  if (!val || !buffer || bufferlen < sizeof(temp))
+  if (!val || !buffer)
     {
       errno = EINVAL;
       return -1;
     }
 
-  memcpy((void *)&temp, buffer, sizeof(temp));
-  *val = ntohl(temp);
-  return sizeof(temp);
+  if (bufferlen >= sizeof(temp))
+    {
+      memcpy((void *)&temp, buffer, sizeof(temp));
+      *val = ntohl(temp);
+      return sizeof(temp);
+    }
+  return 0;
 }
 
 int
 cerebro_unmarshall_buffer(char *buf, int buflen, char *buffer, int bufferlen)
 {
-  if (!buf || buflen <= 0 || !buffer || bufferlen < buflen)
+  if (!buf || buflen <= 0 || !buffer)
     {
       errno = EINVAL;
       return -1;
     }
 
-  memcpy(buf, buffer, buflen);
-  return buflen;
+  if (bufferlen >= buflen)
+    {
+      memcpy(buf, buffer, buflen);
+      return buflen;
+    }
+  return 0;
 }
 

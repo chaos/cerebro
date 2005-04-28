@@ -1,3 +1,15 @@
+2005-04-28  Albert Chu  <chu11@llnl.gov>
+
+	* Re-worked packet unmarshalling logic.
+
+	* Fixed updown server to handle more error conditions.
+
+	* Allow updown server to return invalid packet format error code.
+
+	* src/cerebrod/cerebrod_updown.c
+	(_cerebrod_updown_create_and_setup_socket): Turn on SO_REUSEADDR
+	for server debugging.
+	
 2005-04-27  Albert Chu  <chu11@llnl.gov>
 
 	* Finished first round of libcerebro updown API.
