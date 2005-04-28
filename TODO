@@ -46,3 +46,4 @@
 
 - libcerebro_common
   - for marshalling for example
+  - perhaps future module search functions

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_error.c,v 1.2 2005-04-25 21:39:27 achu Exp $
+ *  $Id: cerebro_error.c,v 1.3 2005-04-28 21:33:38 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -26,7 +26,9 @@
  *
  * If set, requires locking before output of stdout or stderr messages
  */
-pthread_mutex_t *error_output_mutex = NULL;
+static pthread_mutex_t *error_output_mutex = NULL;
+
+static int cerebro_err_initialized = 0;
 
 void 
 cerebro_err_init(char *prog)
@@ -34,6 +36,8 @@ cerebro_err_init(char *prog)
   if (!prog)
     return;
   err_init(prog);
+
+  cerebro_err_initialized++;
 }
 
 void 
@@ -82,6 +86,9 @@ cerebro_err_debug(const char *fmt, ...)
   int flags;
   va_list ap;
 
+  if (!cerebro_err_initialized)
+    return; 
+
   if (!fmt)
     return;
 
@@ -108,6 +115,9 @@ cerebro_err_output(const char *fmt, ...)
   char buffer[CEREBRO_ERROR_STRING_BUFLEN];
   int flags;
   va_list ap;
+
+  if (!cerebro_err_initialized)
+    return; 
 
   if (!fmt)
     return;
@@ -136,8 +146,11 @@ cerebro_err_exit(const char *fmt, ...)
   int flags;
   va_list ap;
 
+  if (!cerebro_err_initialized)
+    return; 
+
   if (!fmt)
-    err_exit("cerebro_err_exit called with null format");
+    return;
 
   va_start(ap, fmt);
   vsnprintf(buffer, CEREBRO_ERROR_STRING_BUFLEN, fmt, ap);
