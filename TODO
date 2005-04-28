@@ -42,7 +42,4 @@
 
 - clusterlist/config modules for libcerebro
 
-- all cerebro functions into one cerebro.h header??
-  - hide unload funcs from user?
-
 - module search/loading funcs in libcerebro

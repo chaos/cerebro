@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.18 2005-04-26 20:58:57 achu Exp $
+## $Id: Makefile.am,v 1.19 2005-04-28 21:06:47 achu Exp $
 ##*****************************************************************************
 
 if WITH_GNU_LD
@@ -10,6 +10,7 @@ endif
 noinst_HEADERS = cerebro_defs.h \
 		 cerebro_error.h \
 		 cerebro_marshalling.h \
+		 cerebro_updown.h \
 		 cerebro_updown_protocol.h \
 		 cerebro_util.h \
 		 cerebrod_heartbeat_protocol.h 
@@ -18,8 +19,7 @@ cerebroheadersdir = $(includedir)/cerebro
 
 cerebroheaders_HEADERS = cerebro.h \
 			 cerebro_clusterlist_module.h \
-			 cerebro_config_module.h \
-			 cerebro_updown.h 
+			 cerebro_config_module.h
 
 lib_LTLIBRARIES       = libcerebro.la
 libcerebro_la_CFLAGS  = -D_REENTRANT \

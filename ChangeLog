@@ -13,6 +13,10 @@
 	for server debugging.
 
 	* Finished first round of libcerebro updown API.
+
+	* Put all lib functions under just cerebro.h.
+
+	* Move cerebrod -c and -m options into debug compiles only.
 	
 2005-04-27  Albert Chu  <chu11@llnl.gov>
 

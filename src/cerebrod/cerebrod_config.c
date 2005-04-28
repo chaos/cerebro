@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.72 2005-04-27 23:18:40 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.73 2005-04-28 21:06:47 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -114,11 +114,11 @@ _usage(void)
 {
   fprintf(stderr, "Usage: cerebrod [OPTIONS]\n"
           "-h    --help          Output Help\n"
-          "-v    --version       Output Version\n"
-          "-c    --config_file   Specify alternate config file\n"
-          "-m    --config_module Specify configuration module\n");
+          "-v    --version       Output Version\n");
 #ifndef NDEBUG
   fprintf(stderr, 
+          "-c    --config_file   Specify alternate config file\n"
+          "-m    --config_module Specify configuration module\n"
           "-d    --debug         Turn on debugging and run daemon\n"
 	  "                      in foreground\n");
 #endif /* NDEBUG */
@@ -153,9 +153,9 @@ _cerebrod_cmdline_parse(int argc, char **argv)
     {
       {"help",                0, NULL, 'h'},
       {"version",             0, NULL, 'v'},
+#ifndef NDEBUG
       {"config-file",         1, NULL, 'c'},
       {"config-module",       1, NULL, 'm'},
-#ifndef NDEBUG
       {"debug",               0, NULL, 'd'},
 #endif /* NDEBUG */
     };
@@ -164,9 +164,9 @@ _cerebrod_cmdline_parse(int argc, char **argv)
   assert(argv);
 
   memset(options, '\0', sizeof(options));
-  strcat(options, "hvc:m:");
+  strcat(options, "hv");
 #ifndef NDEBUG
-  strcat(options, "d");
+  strcat(options, "c:m:d");
 #endif /* NDEBUG */
 
   /* turn off output messages */
@@ -186,13 +186,13 @@ _cerebrod_cmdline_parse(int argc, char **argv)
         case 'v':       /* --version */
           _version();
           break;
+#ifndef NDEBUG
         case 'c':       /* --config-file */
           conf.config_file = Strdup(optarg);
           break;
         case 'm':       /* --config-module */
           conf.config_module = Strdup(optarg);
           break;
-#ifndef NDEBUG
         case 'd':       /* --debug */
           conf.debug++;
           break;
