@@ -43,3 +43,6 @@
 - clusterlist/config modules for libcerebro
 
 - module search/loading funcs in libcerebro
+
+- libcerebro_common
+  - for marshalling for example
