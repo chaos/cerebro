@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_hostsfile.c,v 1.5 2005-04-27 18:11:35 achu Exp $
+ *  $Id: cerebro_clusterlist_hostsfile.c,v 1.6 2005-04-28 18:47:25 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -235,7 +235,7 @@ hostsfile_clusterlist_setup(void)
 {
   int len, fd = -1;
   char buf[HOSTSFILE_PARSE_BUFLEN];
-  char *file;
+  char *file, *p;
 
   if (hosts)
     {
@@ -302,6 +302,10 @@ hostsfile_clusterlist_setup(void)
           goto cleanup;
         }
       
+      /* Shorten hostname if necessary */
+      if ((p = strchr(hostPtr, '.')))
+        *p = '\0';
+
       if (!(str = strdup(hostPtr)))
         {
           cerebro_err_debug("%s(%s:%d): %s clusterlist module: strdup: %s", 
@@ -460,6 +464,8 @@ hostsfile_clusterlist_numnodes(void)
 static int
 hostsfile_clusterlist_node_in_cluster(char *node)
 {
+  char nodebuf[CEREBRO_MAXNODENAMELEN+1];
+  char *nodePtr = NULL;
   void *ret;
 
   if (!hosts)
@@ -479,7 +485,21 @@ hostsfile_clusterlist_node_in_cluster(char *node)
       return -1;
     }
 
-  ret = list_find_first(hosts, (ListFindF)strcmp, node);
+  /* Shorten hostname if necessary */
+  if (strchr(node, '.'))
+    {
+      char *p;
+
+      memset(nodebuf, '\0', CEREBRO_MAXNODENAMELEN+1);
+      strncpy(nodebuf, node, CEREBRO_MAXNODENAMELEN);
+      p = strchr(nodebuf, '.');
+      *p = '\0';
+      nodePtr = nodebuf;
+    }
+  else
+    nodePtr = node;
+
+  ret = list_find_first(hosts, (ListFindF)strcmp, nodePtr);
 
   return ((ret) ? 1: 0);
 }
@@ -492,6 +512,9 @@ hostsfile_clusterlist_node_in_cluster(char *node)
 static int
 hostsfile_clusterlist_get_nodename(char *node, char *buf, unsigned int buflen)
 {
+  char nodebuf[CEREBRO_MAXNODENAMELEN+1];
+  char *nodePtr = NULL;
+
   if (!hosts)
     {
       cerebro_err_debug("%s(%s:%d): %s clusterlist module: hosts null", 
@@ -518,10 +541,24 @@ hostsfile_clusterlist_get_nodename(char *node, char *buf, unsigned int buflen)
       return -1;
     }
 
-  return cerebro_clusterlist_copy_nodename(node, 
-                                            buf, 
-                                            buflen, 
-                                            HOSTSFILE_CLUSTERLIST_MODULE_NAME);
+  /* Shorten hostname if necessary */
+  if (strchr(node, '.'))
+    {
+      char *p;
+
+      memset(nodebuf, '\0', CEREBRO_MAXNODENAMELEN+1);
+      strncpy(nodebuf, node, CEREBRO_MAXNODENAMELEN);
+      p = strchr(nodebuf, '.');
+      *p = '\0';
+      nodePtr = nodebuf;
+    }
+  else
+    nodePtr = node;
+
+  return cerebro_clusterlist_copy_nodename(nodePtr, 
+                                           buf, 
+                                           buflen, 
+                                           HOSTSFILE_CLUSTERLIST_MODULE_NAME);
 }
 
 #if WITH_STATIC_MODULES

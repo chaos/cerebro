@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_gendersllnl.c,v 1.4 2005-04-27 18:11:35 achu Exp $
+ *  $Id: cerebro_clusterlist_gendersllnl.c,v 1.5 2005-04-28 18:47:25 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -184,9 +184,9 @@ gendersllnl_clusterlist_numnodes(void)
 static int
 gendersllnl_clusterlist_node_in_cluster(char *node)
 {
-  int ret;
-  char *nodePtr = NULL;
   char nodebuf[CEREBRO_MAXNODENAMELEN+1];
+  char *nodePtr = NULL;
+  int ret;
 
   if (!gendersllnl_handle)
     {
@@ -237,8 +237,8 @@ gendersllnl_clusterlist_node_in_cluster(char *node)
 static int
 gendersllnl_clusterlist_get_nodename(char *node, char *buf, unsigned int buflen)
 {
-  char *nodePtr = NULL;
   char nodebuf[CEREBRO_MAXNODENAMELEN+1];
+  char *nodePtr = NULL;
 
   if (!gendersllnl_handle)
     {

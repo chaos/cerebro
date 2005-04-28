@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_genders.c,v 1.4 2005-04-27 18:11:35 achu Exp $
+ *  $Id: cerebro_clusterlist_genders.c,v 1.5 2005-04-28 18:47:25 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -168,9 +168,9 @@ genders_clusterlist_numnodes(void)
 static int
 genders_clusterlist_node_in_cluster(char *node)
 {
-  int ret;
-  char *nodePtr = NULL;
   char nodebuf[CEREBRO_MAXNODENAMELEN+1];
+  char *nodePtr = NULL;
+  int ret;
 
   if (!genders_handle)
     {
@@ -221,6 +221,9 @@ genders_clusterlist_node_in_cluster(char *node)
 static int
 genders_clusterlist_get_nodename(char *node, char *buf, unsigned int buflen)
 {
+  char nodebuf[CEREBRO_MAXNODENAMELEN+1];
+  char *nodePtr = NULL;
+
   if (!genders_handle)
     {
       cerebro_err_debug("%s(%s:%d): %s clusterlist module: "
@@ -248,7 +251,21 @@ genders_clusterlist_get_nodename(char *node, char *buf, unsigned int buflen)
       return -1;
     }
 
-  return cerebro_clusterlist_copy_nodename(node, 
+  /* Shorten hostname if necessary */
+  if (strchr(node, '.'))
+    {
+      char *p;
+                                                                                      
+      memset(nodebuf, '\0', CEREBRO_MAXNODENAMELEN+1);
+      strncpy(nodebuf, node, CEREBRO_MAXNODENAMELEN);
+      p = strchr(nodebuf, '.');
+      *p = '\0';
+      nodePtr = nodebuf;
+    }
+  else
+    nodePtr = node;
+
+  return cerebro_clusterlist_copy_nodename(nodePtr, 
                                            buf, 
                                            buflen, 
                                            GENDERS_CLUSTERLIST_MODULE_NAME);
