@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.21 2005-04-26 17:04:29 achu Exp $
+## $Id: configure.ac,v 1.22 2005-04-28 23:36:23 achu Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -68,6 +68,7 @@ AC_CHECK_HEADERS( \
 # Check for new default cerebrod paths
 #
 AC_CEREBRO_MODULE_DIR
+AC_CEREBRO_CONFIG_FILE
 AC_CEREBROD_CONFIG_FILE
 
 #

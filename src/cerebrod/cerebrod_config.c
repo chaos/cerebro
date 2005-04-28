@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.74 2005-04-28 21:20:52 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.75 2005-04-28 23:36:23 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -679,7 +679,7 @@ _cerebrod_config_parse(void)
   conffile_t cf = NULL;
   int num;
     
-  if ((cf = conffile_handle_create()) == NULL) 
+  if (!(cf = conffile_handle_create())) 
     cerebro_err_exit("%s(%s:%d): failed to create handle",
                      __FILE__, __FUNCTION__, __LINE__);
     

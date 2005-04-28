@@ -18,6 +18,7 @@
 
 - maps confine only "cerebro_" instead of "cerebro*"
   - be more restrictive in general, don't just do cerebro*
+  - or just specifically list the ones that should be exported
 
 - strerror_r and errormsg_r funcs?
   - only if determined necessary at some point
@@ -39,6 +40,7 @@
 - allow modules to return error codes??
 
 - global config file??
+  - need library func to ignore appropriate options
 
 - clusterlist/config modules for libcerebro
 
@@ -47,3 +49,10 @@
 - libcerebro_common
   - for marshalling for example
   - perhaps future module search functions
+
+- underscore local lib routines that shouldn't be seen by the user?
+
+- set configfile, module, etc. functions
+  - reload config, module, etc. functions
+
+- config module options function

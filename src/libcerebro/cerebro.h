@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.6 2005-04-28 21:06:47 achu Exp $
+ *  $Id: cerebro.h,v 1.7 2005-04-28 23:36:23 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_H
@@ -21,8 +21,10 @@
 #define CEREBRO_ERR_OVERFLOW             13
 #define CEREBRO_ERR_NODE_NOTFOUND        14
 #define CEREBRO_ERR_OUTMEM               15 
-#define CEREBRO_ERR_INTERNAL             16
-#define CEREBRO_ERR_ERRNUMRANGE          17
+#define CEREBRO_ERR_CONFIG               16
+#define CEREBRO_ERR_MODULES              17
+#define CEREBRO_ERR_INTERNAL             18
+#define CEREBRO_ERR_ERRNUMRANGE          19
 
 typedef struct cerebro *cerebro_t;
 

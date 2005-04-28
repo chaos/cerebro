@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_updown.c,v 1.10 2005-04-28 20:49:59 achu Exp $
+ *  $Id: cerebro_updown.c,v 1.11 2005-04-28 23:36:23 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -701,36 +701,6 @@ cerebro_updown_load_data(cerebro_t handle,
   return -1;
 }
 
-int
-cerebro_updown_unload_data(cerebro_t handle)
-{
-  if (cerebro_handle_check(handle) < 0)
-    return -1;
-
-  if (handle->loaded_state & CEREBRO_UPDOWN_DATA_LOADED)
-    {
-      struct cerebro_updown_data *updown_data;
-
-      updown_data = (struct cerebro_updown_data *)handle->updown_data;
-
-      if (_cerebro_updown_data_check(handle, updown_data) < 0)
-        return -1;
-
-      hostlist_destroy(updown_data->up_nodes);
-      updown_data->up_nodes = NULL;
-      hostlist_destroy(updown_data->down_nodes);
-      updown_data->down_nodes = NULL;
-      updown_data->magic = ~CEREBRO_UPDOWN_MAGIC_NUMBER;
-      free(updown_data);
-    }
-
-  handle->loaded_state &= ~CEREBRO_UPDOWN_DATA_LOADED;
-  handle->updown_data = NULL;
-
-  handle->errnum = CEREBRO_ERR_SUCCESS;
-  return 0;
-}
-
 /* 
  * _cerebro_updown_get_nodes
  *
@@ -909,4 +879,34 @@ int
 cerebro_updown_down_count(cerebro_t handle)
 {
   return _cerebro_updown_count(handle, CEREBRO_UPDOWN_DOWN_NODES);
+}
+
+int
+cerebro_updown_unload_data(cerebro_t handle)
+{
+  if (cerebro_handle_check(handle) < 0)
+    return -1;
+
+  if (handle->loaded_state & CEREBRO_UPDOWN_DATA_LOADED)
+    {
+      struct cerebro_updown_data *updown_data;
+
+      updown_data = (struct cerebro_updown_data *)handle->updown_data;
+
+      if (_cerebro_updown_data_check(handle, updown_data) < 0)
+        return -1;
+
+      hostlist_destroy(updown_data->up_nodes);
+      updown_data->up_nodes = NULL;
+      hostlist_destroy(updown_data->down_nodes);
+      updown_data->down_nodes = NULL;
+      updown_data->magic = ~CEREBRO_UPDOWN_MAGIC_NUMBER;
+      free(updown_data);
+    }
+
+  handle->updown_data = NULL;
+
+  handle->loaded_state &= ~CEREBRO_UPDOWN_DATA_LOADED;
+  handle->errnum = CEREBRO_ERR_SUCCESS;
+  return 0;
 }
