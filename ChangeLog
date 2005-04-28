@@ -6,6 +6,8 @@
 
 	* Allow updown server to return invalid packet format error code.
 
+	* Shorten hostnames in hostsfile clusterlist module.
+
 	* src/cerebrod/cerebrod_updown.c
 	(_cerebrod_updown_create_and_setup_socket): Turn on SO_REUSEADDR
 	for server debugging.

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_util.c,v 1.4 2005-04-27 23:18:40 achu Exp $
+ *  $Id: cerebro_util.c,v 1.5 2005-04-28 20:49:59 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -31,19 +31,9 @@
 int 
 cerebro_handle_check(cerebro_t handle)
 {
-  if (!handle)
-    {
-      handle->errnum = CEREBRO_ERR_NULLHANDLE;
-      return -1;
-    }
+  if (!handle || handle->magic != CEREBRO_MAGIC_NUMBER)
+    return -1;
 
-  if (handle->magic != CEREBRO_MAGIC_NUMBER)
-    {
-      handle->errnum = CEREBRO_ERR_MAGIC_NUMBER;
-      return -1;
-    }
-
-  handle->errnum = CEREBRO_ERR_SUCCESS;
   return 0;
 }
 

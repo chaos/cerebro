@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_updown.c,v 1.9 2005-04-27 18:41:42 achu Exp $
+ *  $Id: cerebro_updown.c,v 1.10 2005-04-28 20:49:59 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -95,6 +95,8 @@ _cerebro_updown_protocol_err_conversion(u_int32_t protocol_error)
       return CEREBRO_ERR_SUCCESS;
     case CEREBRO_UPDOWN_PROTOCOL_ERR_VERSION_INVALID:
       return CEREBRO_ERR_VERSION_INCOMPATIBLE;
+    case CEREBRO_UPDOWN_PROTOCOL_ERR_PACKET_INVALID:
+      return CEREBRO_ERR_PROTOCOL;
     case CEREBRO_UPDOWN_PROTOCOL_ERR_UPDOWN_REQUEST_INVALID:
     case CEREBRO_UPDOWN_PROTOCOL_ERR_TIMEOUT_INVALID:
     case CEREBRO_UPDOWN_PROTOCOL_ERR_INTERNAL_SYSTEM_ERROR:
@@ -229,7 +231,6 @@ _cerebro_updown_response_unmarshall(cerebro_t handle,
                                     int bufferlen)
 {
   int ret, c = 0;
-  int invalid_size = 0;
 
 #ifndef NDEBUG
   if (!buffer)
@@ -239,15 +240,6 @@ _cerebro_updown_response_unmarshall(cerebro_t handle,
     }
 #endif /* NDEBUG */
 
-  if (bufferlen != CEREBRO_UPDOWN_RESPONSE_LEN)
-    invalid_size++;
-
-  if (invalid_size && bufferlen < sizeof(res->version))
-    {
-      handle->errnum = CEREBRO_ERR_INTERNAL;
-      return -1;
-    }
-
   if ((ret = cerebro_unmarshall_int32(&(res->version),
                                       buffer + c,
                                       bufferlen - c)) < 0)
@@ -255,20 +247,10 @@ _cerebro_updown_response_unmarshall(cerebro_t handle,
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
+  if (!ret)
+    return c;
+
   c += ret;
-
-  if (invalid_size)
-    {
-      /* Invalid version to be handled by later code */
-      if (res->version != CEREBRO_UPDOWN_PROTOCOL_VERSION)
-        return 0;
-    }
-
-  if (invalid_size && ((bufferlen - c) < sizeof(res->updown_err_code)))
-    {
-      handle->errnum = CEREBRO_ERR_INTERNAL;
-      return -1;
-    }
 
   if ((ret = cerebro_unmarshall_uint32(&(res->updown_err_code),
                                        buffer + c,
@@ -277,20 +259,10 @@ _cerebro_updown_response_unmarshall(cerebro_t handle,
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
+  if (!ret)
+    return c;
+
   c += ret;
-
-  if (invalid_size)
-    {
-      /* Error code to be handled by later code */
-      if (res->updown_err_code != CEREBRO_UPDOWN_PROTOCOL_ERR_SUCCESS)
-        return 0;
-
-      /* Ok, we really have to give up now, the other end didn't give
-       * us anything to work with 
-       */
-      handle->errnum = CEREBRO_ERR_INTERNAL;
-      return -1;
-    }
 
   if ((ret = cerebro_unmarshall_uint8(&(res->end_of_responses),
                                       buffer + c,
@@ -299,6 +271,9 @@ _cerebro_updown_response_unmarshall(cerebro_t handle,
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
+  if (!ret)
+    return c;
+
   c += ret;
 
   if ((ret = cerebro_unmarshall_buffer(res->nodename,
@@ -309,6 +284,9 @@ _cerebro_updown_response_unmarshall(cerebro_t handle,
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
+  if (!ret)
+    return c;
+
   c += ret;
 
   if ((ret = cerebro_unmarshall_uint8(&(res->updown_state),
@@ -318,9 +296,12 @@ _cerebro_updown_response_unmarshall(cerebro_t handle,
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
+  if (!ret)
+    return c;
+
   c += ret;
 
-  return 0;
+  return c;
 }
 
 /* 
@@ -363,7 +344,8 @@ _cerebro_updown_send_request(cerebro_t handle,
  *
  * Receive a single response
  *
- * Returns 0 on success, -1 on error
+ * Returns response packet and length of packet unmarshalled on
+ * success, -1 on error
  */
 static int
 _cerebro_updown_receive_a_response(cerebro_t handle,
@@ -412,9 +394,14 @@ _cerebro_updown_receive_a_response(cerebro_t handle,
         {
           int n;
 
-          if ((n = fd_read_n(fd,
-                             buffer + bytes_read,
-                             CEREBRO_UPDOWN_REQUEST_LEN - bytes_read)) < 0)
+          /* Don't use fd_read_n b/c it loops until exactly
+           * CEREBRO_UPDOWN_RESPONSE_LEN is read.  Due to version
+           * incompatability or error packets, we may want to read a
+           * smaller packet.
+           */
+          if ((n = read(fd,
+                        buffer + bytes_read,
+                        CEREBRO_UPDOWN_RESPONSE_LEN - bytes_read)) < 0)
             {
               handle->errnum = CEREBRO_ERR_INTERNAL;
               goto cleanup;
@@ -423,7 +410,7 @@ _cerebro_updown_receive_a_response(cerebro_t handle,
           if (!n)
             {
               /* Pipe closed */
-              handle->errnum = CEREBRO_ERR_INTERNAL;
+              handle->errnum = CEREBRO_ERR_PROTOCOL;
               goto cleanup;
             }
 
@@ -437,10 +424,13 @@ _cerebro_updown_receive_a_response(cerebro_t handle,
     }
 
  unmarshall_received:
-  if (_cerebro_updown_response_unmarshall(handle, res, buffer, bytes_read) < 0)
+  if ((rv = _cerebro_updown_response_unmarshall(handle, 
+                                                res, 
+                                                buffer, 
+                                                bytes_read)) < 0)
     goto cleanup;
 
-  return 0;
+  return rv;
 
  cleanup:
   return -1;
@@ -460,20 +450,42 @@ _cerebro_updown_receive_responses(cerebro_t handle,
                                   int flags)
 {
   struct cerebro_updown_response res;
-  
+  int res_len;
+
   while (1)
     {
-      if (_cerebro_updown_receive_a_response(handle,
-                                             fd, 
-                                             &res) < 0)
+      if ((res_len = _cerebro_updown_receive_a_response(handle,
+                                                        fd, 
+                                                        &res)) < 0)
         goto cleanup;
+
+      if (res_len != CEREBRO_UPDOWN_RESPONSE_LEN)
+        {
+          if (res_len == CEREBRO_UPDOWN_RESPONSE_LEN)
+            {
+              if (res.version != CEREBRO_UPDOWN_PROTOCOL_VERSION)
+                {
+                  handle->errnum = CEREBRO_ERR_PROTOCOL;
+                  goto cleanup;
+                }
+
+              if (res.updown_err_code != CEREBRO_UPDOWN_PROTOCOL_ERR_SUCCESS)
+                {
+                  handle->errnum = _cerebro_updown_protocol_err_conversion(res.updown_err_code);;
+                  goto cleanup;
+                }
+            }
+
+          handle->errnum = CEREBRO_ERR_PROTOCOL;
+          goto cleanup;
+        }
 
       if (res.version != CEREBRO_UPDOWN_PROTOCOL_VERSION)
         {
           handle->errnum = CEREBRO_ERR_PROTOCOL;
           goto cleanup;
         }
-
+      
       if (res.updown_err_code != CEREBRO_UPDOWN_PROTOCOL_ERR_SUCCESS)
         {
           handle->errnum = _cerebro_updown_protocol_err_conversion(res.updown_err_code);
@@ -483,13 +495,15 @@ _cerebro_updown_receive_responses(cerebro_t handle,
       if (res.end_of_responses == CEREBRO_UPDOWN_PROTOCOL_IS_LAST_RESPONSE)
         break;
 
-      if (flags & CEREBRO_UPDOWN_UP_NODES)
+      if (flags == CEREBRO_UPDOWN_UP_NODES
+          && res.updown_state != CEREBRO_UPDOWN_PROTOCOL_STATE_NODE_UP)
         {
           handle->errnum = CEREBRO_ERR_PROTOCOL;
           goto cleanup;
         }
       
-      if (flags & CEREBRO_UPDOWN_DOWN_NODES)
+      if (flags == CEREBRO_UPDOWN_DOWN_NODES
+          && res.updown_state != CEREBRO_UPDOWN_PROTOCOL_STATE_NODE_DOWN)
         {
           handle->errnum = CEREBRO_ERR_PROTOCOL;
           goto cleanup;

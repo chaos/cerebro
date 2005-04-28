@@ -36,6 +36,13 @@
 - consistency between ret vs. rv
   - err_out vs. cleanup
 
-- clusterlist stuff to libcerebro
-
 - allow modules to return error codes??
+
+- global config file??
+
+- clusterlist/config modules for libcerebro
+
+- all cerebro functions into one cerebro.h header??
+  - hide unload funcs from user?
+
+- module search/loading funcs in libcerebro

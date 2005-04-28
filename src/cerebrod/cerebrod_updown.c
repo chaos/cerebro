@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.c,v 1.36 2005-04-28 18:08:27 achu Exp $
+ *  $Id: cerebrod_updown.c,v 1.37 2005-04-28 20:49:59 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -445,8 +445,8 @@ _cerebrod_updown_request_unmarshall(struct cerebro_updown_request *req,
  *
  * Receive updown server request
  * 
- * Return req packet and length of packet unmarshalled on success, -1
- * on error
+ * Return request packet and length of packet unmarshalled on success,
+ * -1 on error
  */
 static int
 _cerebrod_updown_receive_request(int client_fd,	
