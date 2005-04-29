@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.46 2005-04-28 18:08:27 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.47 2005-04-29 17:12:04 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -21,10 +21,10 @@
 #include "cerebro_defs.h"
 #include "cerebro_error.h"
 #include "cerebro_marshalling.h"
+#include "cerebro_module.h"
 #include "cerebrod_heartbeat_protocol.h"
 
 #include "cerebrod_listener.h"
-#include "cerebrod_clusterlist.h"
 #include "cerebrod_config.h"
 #include "cerebrod_heartbeat.h"
 #include "cerebrod_updown.h"
@@ -169,8 +169,8 @@ _cerebrod_listener_initialize(void)
   /* If a clusterlist is found/used, use the numnodes count as the 
    * initializing hash size. 
    */
-  if ((cluster_data_hash_size = cerebrod_clusterlist_numnodes()) < 0)
-    cerebro_err_exit("%s(%s:%d): cerebrod_clusterlist_numnodes",
+  if ((cluster_data_hash_size = cerebro_clusterlist_numnodes()) < 0)
+    cerebro_err_exit("%s(%s:%d): cerebro_clusterlist_numnodes",
                      __FILE__, __FUNCTION__, __LINE__);
   
   if (!cluster_data_hash_size)
@@ -451,8 +451,8 @@ cerebrod_listener(void *arg)
 	  continue;
 	}
       
-      if ((rv = cerebrod_clusterlist_node_in_cluster(hb.nodename)) < 0)
-        cerebro_err_exit("%s(%s:%d): cerebrod_clusterlist_node_in_cluster: %s",
+      if ((rv = cerebro_clusterlist_node_in_cluster(hb.nodename)) < 0)
+        cerebro_err_exit("%s(%s:%d): cerebro_clusterlist_node_in_cluster: %s",
                          __FILE__, __FUNCTION__, __LINE__, hb.nodename);
       
       if (!rv)
@@ -468,11 +468,11 @@ cerebrod_listener(void *arg)
       memcpy(nodename_buf, hb.nodename, CEREBRO_MAXNODENAMELEN);
 
       memset(nodename_key, '\0', CEREBRO_MAXNODENAMELEN+1);
-      if (cerebrod_clusterlist_get_nodename(nodename_buf,
-                                            nodename_key, 
-                                            CEREBRO_MAXNODENAMELEN+1) < 0)
+      if (cerebro_clusterlist_get_nodename(nodename_buf,
+					   nodename_key, 
+					   CEREBRO_MAXNODENAMELEN+1) < 0)
         {
-          cerebro_err_debug("%s(%s:%d): cerebrod_clusterlist_get_nodename: %s",
+          cerebro_err_debug("%s(%s:%d): cerebro_clusterlist_get_nodename: %s",
                             __FILE__, __FUNCTION__, __LINE__,
                             hb.nodename);
           continue;

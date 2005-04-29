@@ -1,13 +1,11 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.35 2005-04-22 18:38:02 achu Exp $
+## $Id: Makefile.am,v 1.36 2005-04-29 17:12:04 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
 
 if WITH_STATIC_MODULES
 STATIC_MODULES_HEADERFILES = cerebrod_static_modules.h
-else
-DYNAMIC_MODULES_HEADERFILES = cerebrod_dynamic_modules.h
 endif
 
 noinst_HEADERS = cerebrod.h \
@@ -20,8 +18,7 @@ noinst_HEADERS = cerebrod.h \
 		 cerebrod_speaker.h \
 		 cerebrod_updown.h \
 		 cerebrod_util.h \
-		 $(STATIC_MODULES_HEADERFILES) \
-		 $(DYNAMIC_MODULES_HEADERFILES)
+		 $(STATIC_MODULES_HEADERFILES)
 
 #
 # cerebrod daemon
@@ -31,8 +28,6 @@ if WITH_STATIC_MODULES
 STATIC_MODULES_SOURCES  = cerebrod_static_modules.c
 STATIC_MODULES_LDADDS   = ../modules/clusterlist/libclusterlistmodules.la \
 			  ../modules/config/libconfigmodules.la
-else
-DYNAMIC_MODULES_SOURCES = cerebrod_dynamic_modules.c
 endif
 
 cerebro_clusterlist_module_builddir=`cd $(top_builddir)/src/modules/clusterlist && pwd`
@@ -49,8 +44,7 @@ cerebrod_SOURCES = cerebrod.c \
 		   cerebrod_speaker.c \
 		   cerebrod_updown.c \
 		   cerebrod_util.c \
-		   $(STATIC_MODULES_SOURCES) \
-		   $(DYNAMIC_MODULES_SOURCES)
+		   $(STATIC_MODULES_SOURCES)
 cerebrod_CFLAGS  = -DCEREBRO_CLUSTERLIST_MODULE_BUILDDIR=\"$(cerebro_clusterlist_module_builddir)\" \
 		   -DCEREBRO_CONFIG_MODULE_BUILDDIR=\"$(cerebro_config_module_builddir)\" \
 		   -I$(srcdir)/../libcerebro \

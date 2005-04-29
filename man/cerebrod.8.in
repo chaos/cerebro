@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebrod.8.in,v 1.12 2005-04-28 21:20:52 achu Exp $
+\."$Id: cerebrod.8.in,v 1.13 2005-04-29 17:12:04 achu Exp $
 \."#############################################################################
 .TH cerebrod 8 "May 2005" "cerebrod @VERSION@" cerebrod
 .SH "NAME"
@@ -21,13 +21,13 @@ Output help
 .TP
 .B  -v, --version
 Output version
+.if @MANPAGE_DEBUG@ \{
 .TP
 .B  -c, --config-file
 Specify alternate configuration file
 .TP
 .B  -m, --config-module
 Specify configuration module
-.if @MANPAGE_DEBUG@ \{
 .TP
 .B  -d, --debug
 Turn on debugging and run daemon in foreground
@@ -48,10 +48,13 @@ as a whole.
 
 The default configuration file loaded by 
 .B cerebrod
-is @CEREBROD_CONFIG_FILE_DEFAULT@.  An alternate configuration file
+is @CEREBROD_CONFIG_FILE_DEFAULT@.  
+.if @MANPAGE_DEBUG@ \{
+An alternate configuration file
 can be specified on the command line with the
 .I -c 
 option.
+\}
 
 Specific details of the configurable features and
 configurable options can be found in the
@@ -72,13 +75,12 @@ daemon in the cluster based on the parameters stored in the database.
 Therefore, a different configuration file does not have to be written
 and distributed for each cluster node.
 
-The alternate default configuration options can be overrided by the
-options specified in the configuration file.
+The configuration loaded by a configuration module can be overrided by
+the options specified in the configuration file.
 
 The following config modules
-are available to
-.B cerebrod
-by default:
+are distributed by
+.B cerebrod:
 
 .ie @MANPAGE_GENDERSLLNL@ \{
 gendersllnl - Configures the
@@ -92,11 +94,6 @@ No configuration modules are searched in this build.
 \}
 
 .ie @MANPAGE_STATIC_MODULES@ \{
-A specific configuration module can be specified on the command line with
-the
-.I -c 
-option.
-
 When a config module is not specified, the above config modules are
 searched for by
 .B cerebrod
@@ -105,13 +102,22 @@ in the above order.
 .el \{
 Configuration modules are searched for in the 
 .B Cerebro
-package library directory, @CEREBROD_MODULE_DIR@.  
+package library directory, @CEREBROD_MODULE_DIR@, in the above order.
+If none of the above are found, 
+.B cerebrod
+will search for other configuration modules.
+\}
 
+It is not necessary for a configuration module to be found and loaded.
+
+.if @MANPAGE_DEBUG@ \{
 A configuration module can also be specified on the command line with
 the
-.I -c 
+.I -m 
 option.
+\}
 
+.if !@MANPAGE_STATIC_MODULES@ \{
 For more information on writing 
 .B cerebrod
 configuration modules see XXX.
@@ -127,11 +133,11 @@ daemon.  Although
 .B Cerebro
 can be used without a clusterlist, some features will be diminished
 without one.  For example, there will be no way to determine the down
-nodes of the cluster, if there is no knowledge of what all of the
+nodes of the cluster if there is no knowledge of what all of the
 nodes in the cluster actually are.
 
-The list of cluster nodes can be specified in several formats,
-depending on the clusterlist module selected.  Clusterlist modules can
+The list of cluster nodes can be specified in several formats by using
+one of a number of clusterlist modules.  Clusterlist modules can
 be selected using the
 .I clusterlist_module
 configuration option in the
@@ -142,20 +148,9 @@ Configurable options can be passed to the clusterlist modules through the
 configuration file option.  The options are typically listed as
 key=value pairs.
 
-.if !@MANPAGE_STATIC_MODULES@ \{
-The 
-.B cerebrod
-daemon dynamically loads the clusterlist module selected by the user
-or searches for one when one is not specified.  Clusterlist modules
-are searched for in the
-.B Cerebro
-package library, @CEREBROD_MODULE_DIR@.  
-\}
-
 The following config modules
-are available to
-.B cerebrod
-by default:
+are distributed by
+.B cerebrod:
 
 .if @MANPAGE_GENDERSLLNL@ \{
 gendersllnl - Reads and parses a genders database with LLNL specific
@@ -178,14 +173,23 @@ located at @CEREBRO_CLUSTERLIST_HOSTSFILE_DEFAULT@.
 
 none - Do not use a cluster list.
 
+.ie @MANPAGE_STATIC_MODULES@ \{
 When a clusterlist module is not specified, the above clusterlist
 modules are searched for by
 .B cerebrod
 in the above order.
+\}
+.el \{
+Clusterlist modules are searched for in the 
+.B Cerebro
+package library directory, @CEREBROD_MODULE_DIR@, in the above order.
+If none of the above are found, 
+.B cerebrod
+will search for other clusterlist modules.
+\}
 
 .if !@MANPAGE_STATIC_MODULES@ \{
-Other cluster list formats can be parsed by writing a new clusterlist 
-module.  For more information on writing 
+For more information on writing 
 .B cerebrod
 clusterlist modules see XXX.
 \}

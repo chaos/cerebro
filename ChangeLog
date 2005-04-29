@@ -6,6 +6,8 @@
 	  clusterlist and config modules.
 
 	* Putting module search and loading into libcerebro.
+
+	* Rework cerebrod to use new libcerebro module functions.
 	
 2005-04-28  Albert Chu  <chu11@llnl.gov>
 

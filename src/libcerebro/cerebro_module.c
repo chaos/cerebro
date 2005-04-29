@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.c,v 1.4 2005-04-29 14:35:00 achu Exp $
+ *  $Id: cerebro_module.c,v 1.5 2005-04-29 17:12:04 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -296,6 +296,10 @@ cerebro_module_setup(void)
 int 
 cerebro_module_cleanup(void)
 {
+  
+  cerebro_unload_clusterlist_module();
+  cerebro_unload_config_module();
+
   if (lt_dlexit() != 0)
     {
       cerebro_err_debug("%s(%s:%d): lt_dlexit: %s", 

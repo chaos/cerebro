@@ -41,6 +41,7 @@
   - error checking
     - x >= y
     - y < x
+  - naming convention, begin with _cerebro or not
 
 - allow modules to return error codes??
 
@@ -69,3 +70,8 @@
 
 - pthreads locking for clusterlists/config modules?
   - probably not b/c both are read only
+
+- all debug/err_exit funcs, calling errormsg(), strerror(), etc. correctly?
+
+- naming of module funcs
+  - cerebro_config_setup - hmmmm

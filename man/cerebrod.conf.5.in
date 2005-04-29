@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebrod.conf.5.in,v 1.8 2005-04-28 21:20:52 achu Exp $
+\."$Id: cerebrod.conf.5.in,v 1.9 2005-04-29 17:12:04 achu Exp $
 \."#############################################################################
 .TH cerebrod.conf 5 "May 2005" "cerebrod.conf @VERSION@" "cerebrod.conf"
 .SH "NAME"
@@ -16,10 +16,13 @@ suite of tools and libraries.
 
 The default configuration file loaded by
 .B cerebrod
-is @CEREBROD_CONFIG_FILE_DEFAULT@, An alternate configuration file can
-be specified on the command line with the
+is @CEREBROD_CONFIG_FILE_DEFAULT@. 
+.if @MANPAGE_DEBUG@ \{
+An alternate configuration file can be specified on the command line
+with the
 .I -c
 option.
+\}
 
 .SH "CONFIGURATION OPTIONS"
 The following are a list of configuration options that can be
@@ -123,11 +126,7 @@ list/database of cluster nodes.
 .I clusterlist_module ( name | filename | path )
 Specify the clusterlist module to be loaded for parsing a
 list/database of cluster nodes.  The name, filename, or full filename path
-to the clusterlist module can be specified.  Clusterlist modules are
-first searched for in the
-.B Cerebro
-package library, @CEREBROD_MODULE_DIR@.  They are then searched for in
-the current directory.
+to the clusterlist module can be specified.  
 \}
 
 The following clusterlist modules
@@ -149,11 +148,21 @@ hostsfile
  
 none
 
+.ie @MANPAGE_STATIC_MODULES@ \{
 When this option is not configured, the above clusterlist modules are
 searched for by
 .B cerebrod
 in the above order.
-
+\}
+.el \{
+Clusterlist modules are
+searched for in the
+.B Cerebro
+package library directory, @CEREBROD_MODULE_DIR@, in the above order.
+If none of the above are found,
+.B cerebrod
+will search for other clusterlist modules.
+\}
 .TP
 .I clusterlist_module_options str
 Specify arguments to pass to the clusterlist_module.  The arguments

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.32 2005-04-27 18:11:35 achu Exp $
+ *  $Id: cerebrod.c,v 1.33 2005-04-29 17:12:04 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -11,6 +11,7 @@
 #include <syslog.h>
 
 #include "cerebro_error.h"
+#include "cerebro_module.h"
 
 #include "cerebrod.h"
 #include "cerebrod_clusterlist.h"
@@ -54,6 +55,12 @@ extern pthread_mutex_t cerebrod_updown_initialization_complete_lock;
 static void
 _cerebrod_pre_config_initialization(void)
 {
+#if !WITH_STATIC_MODULES
+  if (cerebro_module_setup() < 0)
+    cerebro_err_exit("%s(%s:%d): cerebro_module_setup",
+		     __FILE__, __FUNCTION__, __LINE__);
+#endif /* !WITH_STATIC_MODULES */
+
   cerebrod_load_data();
 }
 
@@ -71,17 +78,29 @@ _cerebrod_post_config_initialization(void)
 
   if (conf.clusterlist_module_options)
     {
-      if (cerebrod_clusterlist_parse_options() < 0)
-        cerebro_err_exit("%s(%s:%d): cerebrod_clusterlist_parse_options",
+      if (cerebro_clusterlist_parse_options(conf.clusterlist_module_options) < 0)
+        cerebro_err_exit("%s(%s:%d): cerebro_clusterlist_parse_options",
                          __FILE__, __FUNCTION__, __LINE__);
     }
 
-  if (cerebrod_clusterlist_setup() < 0)
-    cerebro_err_exit("%s(%s:%d): cerebrod_clusterlist_setup",
+  if (cerebro_clusterlist_setup() < 0)
+    cerebro_err_exit("%s(%s:%d): cerebro_clusterlist_setup",
                      __FILE__, __FUNCTION__, __LINE__);
 
   if (conf.updown_server)
     Signal(SIGPIPE, SIG_IGN);
+}
+
+/* 
+ * _cerebrod_cleanup
+ *
+ * Perform cerebrod cleanup.  Will never be called.  Used as place holder
+ * to indicate appropriate functions to call in the future.
+ */
+static void
+_cerebrod_cleanup(void)
+{
+  cerebro_module_cleanup();
 }
 
 int 
