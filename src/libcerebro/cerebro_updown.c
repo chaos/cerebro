@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_updown.c,v 1.11 2005-04-28 23:36:23 achu Exp $
+ *  $Id: cerebro_updown.c,v 1.12 2005-04-29 14:36:56 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -647,10 +647,10 @@ cerebro_updown_load_data(cerebro_t handle,
     {
       struct cerebro_updown_data *updown_data_temp;
 
+      updown_data_temp = (struct cerebro_updown_data *)handle->updown_data;
+
       if (_cerebro_updown_data_check(handle, updown_data_temp) < 0)
         goto cleanup;
-
-      updown_data_temp = (struct cerebro_updown_data *)handle->updown_data;
 
       if (flags == CEREBRO_UPDOWN_UP_AND_DOWN_NODES)
         {
