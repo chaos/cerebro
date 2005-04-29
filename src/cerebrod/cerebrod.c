@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.33 2005-04-29 17:12:04 achu Exp $
+ *  $Id: cerebrod.c,v 1.34 2005-04-29 18:39:49 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -55,11 +55,9 @@ extern pthread_mutex_t cerebrod_updown_initialization_complete_lock;
 static void
 _cerebrod_pre_config_initialization(void)
 {
-#if !WITH_STATIC_MODULES
   if (cerebro_module_setup() < 0)
     cerebro_err_exit("%s(%s:%d): cerebro_module_setup",
 		     __FILE__, __FUNCTION__, __LINE__);
-#endif /* !WITH_STATIC_MODULES */
 
   cerebrod_load_data();
 }

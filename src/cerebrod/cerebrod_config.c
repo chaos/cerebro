@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.77 2005-04-29 17:12:04 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.78 2005-04-29 18:39:49 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -32,9 +32,6 @@
 #include "cerebro_module.h"
 
 #include "cerebrod_config.h"
-#if WITH_STATIC_MODULES
-#include "cerebrod_static_modules.h"
-#endif /* WITH_STATIC_MODULES */
 #include "cerebrod_util.h"
 #include "conffile.h"
 #include "wrappers.h"
@@ -210,15 +207,21 @@ _cerebrod_cmdline_parse_check(void)
         }
     }
 
+  /* Check if the module exists */
+
 #if WITH_STATIC_MODULES
-  /* Check if the configuration type exists */
   if (conf.config_module)
     {
-      if (!cerebrod_find_static_config_module(conf.config_module))
+      int rv;
+      
+      if ((rv = cerebro_lookup_config_module(conf.config_module)) < 0)
+	cerebro_err_exit("%s(%s:%d): cerebro_lookup_config_module: %s", 
+			 __FILE__, __FUNCTION__, __LINE__, strerror(errno));
+      
+      if (!rv)
 	cerebro_err_exit("config module '%s' not found", conf.config_module);
     }
 #else  /* !WITH_STATIC_MODULES */
-  /* Check if the configuration module exists */
   if (conf.config_module)
     {
       char filebuf[CEREBRO_MAXPATHLEN];
@@ -237,6 +240,7 @@ _cerebrod_cmdline_parse_check(void)
       conf.config_module_file = Strdup(filebuf);
     }
 #endif /* !WITH_STATIC_MODULES */
+
   return;
 }
 
@@ -349,48 +353,24 @@ _config_load_static_module(char *name)
 static void
 _cerebrod_config_module_setup(void)
 {
-#if WITH_STATIC_MODULES
-  if (conf.config_module)
-    {
-      if (_config_load_static_module(conf.config_module) != 1)
-	cerebro_err_exit("config module '%s' could not be loaded",
-                         conf.config_module);
-    }
-  else
-    {
-      struct cerebro_config_module_info **ptr;
-      int i = 0;
+  char *module;
 
-      ptr = &static_config_modules[0];
-      while (ptr[i] != NULL)
-        {
-          int rv;
-          if (!ptr[i]->config_module_name)
-            {
-              cerebro_err_debug("static config module index '%d' "
-                                "does not contain name", i);
-              continue;
-            }
-          if ((rv = _cerebrod_load_alternate_configuration(ptr[i])) < 0)
-            cerebro_err_exit("config module '%s' could not be loaded", 
-                             ptr[i]->config_module_name);
-          if (rv)
-            break;
-          i++;
-        }
-    }
+#if WITH_STATIC_MODULES
+  module = conf.config_module;
 #else  /* !WITH_STATIC_MODULES */
-  if (conf.config_module_file)
+  module = conf.config_module_file;
+#endif /* !WITH_STATIC_MODULES */
+  if (module)
     {
       int rv;
 
-      if ((rv = cerebro_load_config_module(conf.config_module_file)) < 0)
+      if ((rv = cerebro_load_config_module(module)) < 0)
         cerebro_err_exit("%s(%s:%d): cerebro_load_config_module: %s",
                          __FILE__, __FUNCTION__, __LINE__, strerror(errno));
 
       if (!rv)
 	cerebro_err_exit("config module '%s' could not be loaded",
-			 conf.config_module_file);
+			 module);
     }
   else
     {
@@ -399,8 +379,9 @@ _cerebrod_config_module_setup(void)
       if ((rv = cerebro_find_config_module()) < 0)
         cerebro_err_exit("%s(%s:%d): cerebro_find_config_module: %s",
                          __FILE__, __FUNCTION__, __LINE__, strerror(errno));
+
+      /* Doesn't matter if we don't find a config module */
     }
-#endif /* !WITH_STATIC_MODULES */
 }
 
 /*
@@ -667,7 +648,7 @@ _cerebrod_pre_calculate_configuration_config_check(void)
 #if WITH_STATIC_MODULES
   if (conf.clusterlist_module)
     {
-      if (!cerebrod_find_static_clusterlist_module(conf.clusterlist_module))
+      if (!cerebro_lookup_clusterlist_module(conf.clusterlist_module))
 	cerebro_err_exit("clusterlist module '%s' not found", 
                          conf.clusterlist_module);
     }

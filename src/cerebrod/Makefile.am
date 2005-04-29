@@ -1,12 +1,8 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.36 2005-04-29 17:12:04 achu Exp $
+## $Id: Makefile.am,v 1.37 2005-04-29 18:39:49 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
-
-if WITH_STATIC_MODULES
-STATIC_MODULES_HEADERFILES = cerebrod_static_modules.h
-endif
 
 noinst_HEADERS = cerebrod.h \
 		 cerebrod_clusterlist.h \
@@ -17,21 +13,11 @@ noinst_HEADERS = cerebrod.h \
 		 cerebrod_listener.h \
 		 cerebrod_speaker.h \
 		 cerebrod_updown.h \
-		 cerebrod_util.h \
-		 $(STATIC_MODULES_HEADERFILES)
+		 cerebrod_util.h
 
 #
 # cerebrod daemon
 #
-
-if WITH_STATIC_MODULES
-STATIC_MODULES_SOURCES  = cerebrod_static_modules.c
-STATIC_MODULES_LDADDS   = ../modules/clusterlist/libclusterlistmodules.la \
-			  ../modules/config/libconfigmodules.la
-endif
-
-cerebro_clusterlist_module_builddir=`cd $(top_builddir)/src/modules/clusterlist && pwd`
-cerebro_config_module_builddir=`cd $(top_builddir)/src/modules/config && pwd`
 
 sbin_PROGRAMS    = cerebrod
 cerebrod_SOURCES = cerebrod.c \
@@ -43,16 +29,11 @@ cerebrod_SOURCES = cerebrod.c \
 		   cerebrod_listener.c \
 		   cerebrod_speaker.c \
 		   cerebrod_updown.c \
-		   cerebrod_util.c \
-		   $(STATIC_MODULES_SOURCES)
-cerebrod_CFLAGS  = -DCEREBRO_CLUSTERLIST_MODULE_BUILDDIR=\"$(cerebro_clusterlist_module_builddir)\" \
-		   -DCEREBRO_CONFIG_MODULE_BUILDDIR=\"$(cerebro_config_module_builddir)\" \
-		   -I$(srcdir)/../libcerebro \
+		   cerebrod_util.c 
+cerebrod_CFLAGS  = -I$(srcdir)/../libcerebro \
 		   -I$(srcdir)/../libcommon
-cerebrod_LDFLAGS = $(STATIC_MODULES_LIBS)
 cerebrod_LDADD   = ../libcerebro/libcerebro.la \
-		   ../libcommon/libcommon.la \
-		   $(STATIC_MODULES_LDADDS)
+		   ../libcommon/libcommon.la
 
 ../libcerebro/libcerebro.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`

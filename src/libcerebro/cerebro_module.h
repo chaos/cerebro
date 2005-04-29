@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.h,v 1.4 2005-04-29 14:35:00 achu Exp $
+ *  $Id: cerebro_module.h,v 1.5 2005-04-29 18:39:49 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_MODULE_H
@@ -11,9 +11,6 @@
 
 #include "cerebro_clusterlist_module.h"
 #include "cerebro_config_module.h"
-
-#if WITH_STATIC_MODULES                                                                                     
-#else /* !WITH_STATIC_MODULES */
 
 /* 
  * cerebro_module_setup
@@ -36,11 +33,13 @@ int cerebro_module_cleanup(void);
 /*
  * cerebro_load_clusterlist_module
  *
- * Load the clusterlist module specified by the path.
+ * If compiled statically, load the clusterlist module specified by the module name.
+ * 
+ * If compiled dynamically, load the clusterlist module specified by the module path.
  *
  * Returns 1 if module is loaded, 0 if it isn't, -1 on fatal error
  */
-int cerebro_load_clusterlist_module(char *module_path);
+int cerebro_load_clusterlist_module(char *module);
 
 /*
  * cerebro_unload_clusterlist_module
@@ -63,11 +62,13 @@ int cerebro_find_clusterlist_module(void);
 /*
  * cerebro_load_config_module
  *
- * Load the config module specified by the path.
+ * If compiled statically, load the config module specified by the module name.
+ * 
+ * If compiled dynamically, load the config module specified by the module path.
  *
  * Returns 1 if module is loaded, 0 if it isn't, -1 on fatal error
  */
-int cerebro_load_config_module(char *module_path);
+int cerebro_load_config_module(char *module);
 
 /*
  * cerebro_unload_config_module
@@ -87,8 +88,6 @@ int cerebro_unload_config_module(void);
  */
 int cerebro_find_config_module(void);
 
-#endif /* !WITH_STATIC_MODULES */
-
 /* 
  * cerebro_clusterlist_is_loaded
  * 
@@ -103,6 +102,25 @@ int cerebro_clusterlist_is_loaded(void);
  */
 int cerebro_config_is_loaded(void);
 
+#if WITH_STATIC_MODULES
+/* 
+ * cerebro_lookup_clusterlist_module
+ *
+ * Lookup to see if the clusterlist module exists
+ *
+ * Returns 1 if found, 0 if not, -1 on error
+ */
+int cerebro_lookup_clusterlist_module(char *module);
+
+/* 
+ * cerebro_lookup_config_module
+ *
+ * Lookup to see if the config module exists
+ *
+ * Returns 1 if found, 0 if not, -1 on error
+ */
+int cerebro_lookup_config_module(char *module);
+#else /* !WITH_STATIC_MODULES */
 /* 
  * cerebro_lookup_clusterlist_module_path
  *
@@ -130,6 +148,7 @@ int cerebro_lookup_clusterlist_module_path(char *str,
 int cerebro_lookup_config_module_path(char *str, 
 				      char *buf, 
 				      unsigned int buflen);
+#endif /* !WITH_STATIC_MODULES */
 
 /*
  * cerebro_clusterlist_module_name
