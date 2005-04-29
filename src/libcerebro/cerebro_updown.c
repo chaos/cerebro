@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_updown.c,v 1.13 2005-04-29 22:42:08 achu Exp $
+ *  $Id: cerebro_updown.c,v 1.14 2005-04-29 22:55:06 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -29,6 +29,7 @@
 
 #include "cerebro.h"
 #include "cerebro_api.h"
+#include "cerebro_module.h"
 #include "cerebro_util.h"
 #include "cerebro_updown.h"
 #include "cerebro_updown_protocol.h"
@@ -637,7 +638,7 @@ cerebro_updown_load_data(cerebro_t handle,
 
   if (!(handle->loaded_state & CEREBRO_CLUSTERLIST_MODULE_LOADED))
     {
-      if (cerebro_load_clusterlist_module(handle) < 0)
+      if (cerebro_api_load_clusterlist_module(handle) < 0)
 	goto cleanup;
     }
 
@@ -809,7 +810,7 @@ _cerebro_updown_is_node(cerebro_t handle,
       return -1;
     }
 
-  if ((rv = cerebro_clusterlist_is_node(buffer)) < 0)
+  if ((rv = cerebro_clusterlist_node_in_cluster(buffer)) < 0)
     {
       handle->errnum = CEREBRO_ERR_CLUSTERLIST_MODULE;
       return -1;

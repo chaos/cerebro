@@ -75,3 +75,5 @@
 
 - naming of module funcs
   - cerebro_config_setup - hmmmm
+
+- .h file order consistency
