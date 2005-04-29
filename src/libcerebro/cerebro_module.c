@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.c,v 1.7 2005-04-29 18:59:26 achu Exp $
+ *  $Id: cerebro_module.c,v 1.8 2005-04-29 19:09:57 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -35,14 +35,14 @@ static int cerebro_module_library_initialized = 0;
 #if WITH_STATIC_MODULES
 
 #if WITH_GENDERSLLNL
-extern struct cerebrod_config_module_info gendersllnl_config_module_info;
+extern struct cerebro_config_module_info gendersllnl_config_module_info;
 extern struct cerebro_clusterlist_module_info gendersllnl_clusterlist_module_info;
 #endif /* WITH_GENDERSLLNL */
-                                                                                      
+
 #if WITH_GENDERS
 extern struct cerebro_clusterlist_module_info genders_clusterlist_module_info;
 #endif /* WITH_GENDERS */
-                                                                                      
+
 extern struct cerebro_clusterlist_module_info hostsfile_clusterlist_module_info;
 extern struct cerebro_clusterlist_module_info none_clusterlist_module_info;
 
@@ -94,13 +94,6 @@ static lt_dlhandle clusterlist_module_dl_handle = NULL;
 static lt_dlhandle config_module_dl_handle = NULL;
 
 /*
- * clusterlist_module_info
- *
- * clusterlist module info and operations
- */
-static struct cerebro_clusterlist_module_info *clusterlist_module_info = NULL;
-
-/*
  * dynamic_clusterlist_modules
  * dynamic_clusterlist_modules_len
  *
@@ -119,6 +112,13 @@ int dynamic_clusterlist_modules_len = 4;
 #define CEREBRO_CONFIG_FILENAME_SIGNATURE      "cerebro_config_"
 
 #endif /* !WITH_STATIC_MODULES */
+
+/*
+ * clusterlist_module_info
+ *
+ * clusterlist module info and operations
+ */
+static struct cerebro_clusterlist_module_info *clusterlist_module_info = NULL;
 
 /*
  * config_module_info
@@ -762,14 +762,14 @@ cerebro_find_config_module(void)
   while (ptr[i] != NULL)
     {
       int rv;
-                                                                                      
+
       if (!ptr[i]->config_module_name)
 	{
 	  cerebro_err_debug("static config module index '%d' "
 			    "does not contain name", i);
 	  continue;
 	}
-                                                                                      
+
       if ((rv = cerebro_load_config_module(ptr[i]->config_module_name)) < 0)
 	{
 	  cerebro_err_debug("%s(%s:%d): cerebro_load_config_module: %s",
@@ -830,14 +830,14 @@ cerebro_lookup_clusterlist_module(char *module)
 {
   struct cerebro_clusterlist_module_info **ptr;
   int i = 0;
-                                                                                      
+
   if (!module)
     {
       cerebro_err_debug("%s(%s:%d): module null", 
 			__FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
-                                                                                      
+
   ptr = &static_clusterlist_modules[0];
   while (ptr[i] != NULL)
     {
@@ -847,11 +847,11 @@ cerebro_lookup_clusterlist_module(char *module)
                             "does not contain name", i);
           continue;
         }
-      if (!strcmp(ptr[i]->clusterlist_module_name, name))
+      if (!strcmp(ptr[i]->clusterlist_module_name, module))
         return 1;
       i++;
     }
-                                                                                      
+
   return 0;
 }
 
@@ -860,14 +860,14 @@ cerebro_lookup_config_module(char *module)
 {
  struct cerebro_config_module_info **ptr;
   int i = 0;
-                                                                                      
+
   if (!module)
     {
       cerebro_err_debug("%s(%s:%d): module null", 
 			__FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
-                                                                                      
+
   ptr = &static_config_modules[0];
   while (ptr[i] != NULL)
     {
@@ -877,11 +877,11 @@ cerebro_lookup_config_module(char *module)
                             "does not contain name", i);
           continue;
         }
-      if (!strcmp(ptr[i]->config_module_name, name))
+      if (!strcmp(ptr[i]->config_module_name, module))
         return 1;
       i++;
     }
-                                                                                      
+
   return 0;
 }
 #else  /* !WITH_STATIC_MODULES */

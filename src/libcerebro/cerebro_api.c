@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_api.c,v 1.1 2005-04-28 23:36:23 achu Exp $
+ *  $Id: cerebro_api.c,v 1.2 2005-04-29 19:09:57 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -57,9 +57,13 @@ cerebro_handle_create(void)
   handle->errnum = CEREBRO_ERR_SUCCESS;
   handle->loaded_state = 0;
   memset(&(handle->config), '\0', sizeof(struct cerebro_config));
+#if !WITH_STATIC_MODULES
   handle->clusterlist_dl_handle = NULL;
+#endif /* !WITH_STATIC_MODULES */
   handle->clusterlist_module_info = NULL;
+#if !WITH_STATIC_MODULES
   handle->config_dl_handle = NULL;
+#endif /* !WITH_STATIC_MODULES */
   handle->config_module_info = NULL;
   handle->updown_data = NULL;
 
