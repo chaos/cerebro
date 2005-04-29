@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.5 2005-04-29 19:09:57 achu Exp $
+## $Id: Makefile.am,v 1.6 2005-04-29 21:09:24 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -50,7 +50,6 @@ libclusterlistmodules_la_CFLAGS  = -I$(srcdir)/../../libcerebro \
 libclusterlistmodules_la_LDFLAGS = $(GENDERSLLNL_STATIC_LIBS) \
 				   $(GENDERS_STATIC_LIBS) \
 				   $(CLUSTERLIST_OTHER_FLAGS)
-libclusterlistmodules_la_LIBADD = ../libmodule/libmodule.la
 
 cerebro_clusterlist_gendersllnl_la_SOURCES = cerebro_clusterlist_gendersllnl.c \
 					      cerebro_clusterlist_genders_util.c \

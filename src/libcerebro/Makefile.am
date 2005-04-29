@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.24 2005-04-29 20:52:16 achu Exp $
+## $Id: Makefile.am,v 1.25 2005-04-29 21:09:24 achu Exp $
 ##*****************************************************************************
 
 if WITH_GNU_LD
@@ -9,7 +9,8 @@ endif
 
 if WITH_STATIC_MODULES
 STATIC_MODULE_LIBS = ../modules/clusterlist/libclusterlistmodules.la \
-		     ../modules/config/libconfigmodules.la
+		     ../modules/config/libconfigmodules.la \
+		     ../modules/libmodule/libmodule.la
 endif
 
 noinst_HEADERS = cerebro_defs.h \
@@ -53,6 +54,9 @@ libcerebro_la_LIBADD  = ../libcommon/libcommon.la \
 	@cd `dirname $@` && make `basename $@`
 
 ../modules/config/libconfigmodules.la: force-dependency-check
+	@cd `dirname $@` && make `basename $@`
+
+../modules/libmodule/libmodule.la: force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
 force-dependency-check:
