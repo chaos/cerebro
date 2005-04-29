@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.c,v 1.3 2005-04-29 06:53:35 achu Exp $
+ *  $Id: cerebro_module.c,v 1.4 2005-04-29 14:35:00 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -13,6 +13,10 @@
 #endif /* STDC_HEADERS */
 #include <errno.h>
 #include <sys/types.h>
+#include <sys/stat.h>
+#if HAVE_UNISTD_H
+#include <unistd.h>
+#endif /* HAVE_UNISTD_H */
 #include <dirent.h>
 
 #include "cerebro.h"
@@ -56,6 +60,9 @@ char *dynamic_clusterlist_modules[] = {
   NULL
 };
 int dynamic_clusterlist_modules_len = 4;
+
+#define CEREBRO_CLUSTERLIST_FILENAME_SIGNATURE "cerebro_clusterlist_"
+#define CEREBRO_CONFIG_FILENAME_SIGNATURE      "cerebro_config_"
 
 /*
  * config_module_dl_handle
@@ -460,7 +467,7 @@ cerebro_find_clusterlist_module(void)
 
   
   if (_cerebro_find_unknown_module(CEREBRO_MODULE_DIR,
-				   "cerebro_clusterlist_",
+				   CEREBRO_CLUSTERLIST_FILENAME_SIGNATURE,
 				   cerebro_load_clusterlist_module))
     goto done;
 
@@ -606,7 +613,7 @@ cerebro_find_config_module(void)
 
   
   if (_cerebro_find_unknown_module(CEREBRO_MODULE_DIR,
-				   "cerebro_config_",
+				   CEREBRO_CONFIG_FILENAME_SIGNATURE,
 				   cerebro_load_config_module))
     goto done;
 
@@ -632,8 +639,170 @@ cerebro_config_is_loaded(void)
   return 0;
 }
 
+/* 
+ * _cerebro_lookup_module_path
+ *
+ * Common function for cerebro_lookup_clusterlist_module_path
+ * and cerebro_lookup_config_module_path.
+ *
+ * Returns 1 and path in buf when the path is found, 0 if not, -1 on
+ * error
+ */
+int
+_cerebro_lookup_module_path(char *str,
+			    char *buf,
+			    unsigned int buflen,
+			    char *signature)
+{
+  struct stat statbuf;
+
+  if (!str)
+    {
+      cerebro_err_debug("%s(%s:%d): str null", 
+			__FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+
+  if (!buf)
+    {
+      cerebro_err_debug("%s(%s:%d): buf null", 
+			__FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+
+  if (!(buflen > 0))
+    {
+      cerebro_err_debug("%s(%s:%d): buflen not valid", 
+			__FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+
+  if (!signature)
+    {
+      cerebro_err_debug("%s(%s:%d): signature null", 
+			__FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+
+  memset(buf, '\0', buflen);
+
+  if (str[0] == '/')
+    {
+      /* Case A: User specified an absolute path to the module */
+      if (stat(str, &statbuf) < 0)
+	return 0;
+
+      if (strlen(str) >= buflen)
+	{
+	  cerebro_err_debug("%s(%s:%d): buflen too small: path=%s, buflen=%d", 
+			    __FILE__, __FUNCTION__, __LINE__, str, buflen);
+	  return -1;
+	}
+      strcpy(buf, str);
+      return 1;
+    }
+  else
+    {
+      /* Case B: Search for module.  When developing/debugging, search
+       * the builddir first, b/c we may be testing a new module.
+       */
+      char tempbuf[CEREBRO_MAXPATHLEN+1];
+                                                                                      
+      /* Assume the user passed in a filename, so search in the
+       * appropriate directories 
+       */
+
+#ifndef NDEBUG
+      memset(tempbuf, '\0', CEREBRO_MAXPATHLEN+1);
+      snprintf(tempbuf, CEREBRO_MAXPATHLEN, "%s/%s",
+	       CEREBRO_CONFIG_MODULE_BUILDDIR, str);
+                                                                                      
+      if (!stat(tempbuf, &statbuf))
+	goto found;
+#endif /* NDEBUG */
+
+      memset(tempbuf, '\0', CEREBRO_MAXPATHLEN+1);
+      snprintf(tempbuf, CEREBRO_MAXPATHLEN, "%s/%s",
+	       CEREBRO_MODULE_DIR, str);
+                                                                                      
+      if (!stat(tempbuf, &statbuf))
+	goto found;
+
+      /* Next assume the user passed in a name to a .la or .so file */
+
+#ifndef NDEBUG
+      memset(tempbuf, '\0', CEREBRO_MAXPATHLEN+1);
+      snprintf(tempbuf, CEREBRO_MAXPATHLEN, "%s/%s%s.la",
+	       CEREBRO_CONFIG_MODULE_BUILDDIR, signature, str);
+                                                                                      
+      if (!stat(tempbuf, &statbuf))
+	goto found;
+
+      memset(tempbuf, '\0', CEREBRO_MAXPATHLEN+1);
+      snprintf(tempbuf, CEREBRO_MAXPATHLEN, "%s/%s%s.so",
+	       CEREBRO_CONFIG_MODULE_BUILDDIR, signature, str);
+                                                                                      
+      if (!stat(tempbuf, &statbuf))
+	goto found;
+#endif /* NDEBUG */
+
+      memset(tempbuf, '\0', CEREBRO_MAXPATHLEN+1);
+      snprintf(tempbuf, CEREBRO_MAXPATHLEN, "%s/%s%s.la",
+	       CEREBRO_MODULE_DIR, signature, str);
+                                                                                      
+      if (!stat(tempbuf, &statbuf))
+	goto found;
+
+      memset(tempbuf, '\0', CEREBRO_MAXPATHLEN+1);
+      snprintf(tempbuf, CEREBRO_MAXPATHLEN, "%s/%s%s.so",
+	       CEREBRO_MODULE_DIR, signature, str);
+                                                                                      
+      if (!stat(tempbuf, &statbuf))
+	goto found;
+                                                                                      
+      return 0;
+
+ found:
+      if (strlen(tempbuf) >= buflen)
+	{
+	  cerebro_err_debug("%s(%s:%d): buflen too small: path=%s, buflen=%d", 
+			    __FILE__, __FUNCTION__, __LINE__, tempbuf, buflen);
+	  return -1;
+	}
+
+      strcpy(buf, tempbuf);
+      return 1;
+    }
+
+  /* NOT REACHED */
+  return 0;
+}
+
+int 
+cerebro_lookup_clusterlist_module_path(char *str, 
+				       char *buf, 
+				       unsigned int buflen)
+{
+  return _cerebro_lookup_module_path(str,
+				     buf,
+				     buflen,
+				     CEREBRO_CLUSTERLIST_FILENAME_SIGNATURE);
+}
+
+int 
+cerebro_lookup_config_module_path(char *str, 
+				  char *buf, 
+				  unsigned int buflen)
+{
+  return _cerebro_lookup_module_path(str,
+				     buf,
+				     buflen,
+				     CEREBRO_CONFIG_FILENAME_SIGNATURE);
+}
+
+
 char *
-cerebrod_clusterlist_module_name(void)
+cerebro_clusterlist_module_name(void)
 {
   if (!clusterlist_module_info)
     {
@@ -646,7 +815,7 @@ cerebrod_clusterlist_module_name(void)
 }
                                                                                      
 int
-cerebrod_clusterlist_parse_options(char **options)
+cerebro_clusterlist_parse_options(char **options)
 {
   if (!clusterlist_module_info)
     {
@@ -659,7 +828,7 @@ cerebrod_clusterlist_parse_options(char **options)
 }
                                                                                      
 int
-cerebrod_clusterlist_setup(void)
+cerebro_clusterlist_setup(void)
 {
   if (!clusterlist_module_info)
     {
@@ -672,7 +841,7 @@ cerebrod_clusterlist_setup(void)
 }
 
 int
-cerebrod_clusterlist_cleanup(void)
+cerebro_clusterlist_cleanup(void)
 {
   if (!clusterlist_module_info)
     {
@@ -684,7 +853,7 @@ cerebrod_clusterlist_cleanup(void)
   return ((*clusterlist_module_info->cleanup)());
 }
 int
-cerebrod_clusterlist_get_all_nodes(char **nodes, unsigned int nodeslen)
+cerebro_clusterlist_get_all_nodes(char **nodes, unsigned int nodeslen)
 {
   if (!clusterlist_module_info)
     {
@@ -697,7 +866,7 @@ cerebrod_clusterlist_get_all_nodes(char **nodes, unsigned int nodeslen)
 }
                                                                                      
 int
-cerebrod_clusterlist_numnodes(void)
+cerebro_clusterlist_numnodes(void)
 {
   if (!clusterlist_module_info)
     {
@@ -710,7 +879,7 @@ cerebrod_clusterlist_numnodes(void)
 }
                                                                                      
 int
-cerebrod_clusterlist_node_in_cluster(char *node)
+cerebro_clusterlist_node_in_cluster(char *node)
 {
   if (!clusterlist_module_info)
     {
@@ -723,7 +892,7 @@ cerebrod_clusterlist_node_in_cluster(char *node)
 }
 
 int
-cerebrod_clusterlist_get_nodename(char *node, char *buf, unsigned int buflen)
+cerebro_clusterlist_get_nodename(char *node, char *buf, unsigned int buflen)
 {
   if (!clusterlist_module_info)
     {
@@ -736,7 +905,7 @@ cerebrod_clusterlist_get_nodename(char *node, char *buf, unsigned int buflen)
 }
 
 char *
-cerebrod_config_module_name(void)
+cerebro_config_module_name(void)
 {
   if (!config_module_info)
     {
@@ -749,7 +918,7 @@ cerebrod_config_module_name(void)
 }
                                                                                      
 int
-cerebrod_config_parse_options(char **options)
+cerebro_config_parse_options(char **options)
 {
   if (!config_module_info)
     {
@@ -762,7 +931,7 @@ cerebrod_config_parse_options(char **options)
 }
                                                                                      
 int
-cerebrod_config_setup(void)
+cerebro_config_setup(void)
 {
   if (!config_module_info)
     {
@@ -775,7 +944,7 @@ cerebrod_config_setup(void)
 }
 
 int
-cerebrod_config_cleanup(void)
+cerebro_config_cleanup(void)
 {
   if (!config_module_info)
     {
@@ -787,7 +956,7 @@ cerebrod_config_cleanup(void)
   return ((*config_module_info->cleanup)());
 }
 int
-cerebrod_config_load_cerebrod_default(struct cerebrod_module_config *conf)
+cerebro_config_load_cerebrod_default(struct cerebrod_module_config *conf)
 {
   if (!config_module_info)
     {

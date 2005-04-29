@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.h,v 1.3 2005-04-29 06:53:35 achu Exp $
+ *  $Id: cerebro_module.h,v 1.4 2005-04-29 14:35:00 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_MODULE_H
@@ -102,6 +102,34 @@ int cerebro_clusterlist_is_loaded(void);
  * Return 1 if a config module has been loaded, 0 if not
  */
 int cerebro_config_is_loaded(void);
+
+/* 
+ * cerebro_lookup_clusterlist_module_path
+ *
+ * Look up a clusterlist module path based on the string given by the
+ * user.  The string can refer to a module name, filename, or full
+ * path.
+ *
+ * Returns 1 and path in buf when the path is found, 0 if not, -1 on
+ * error
+ */
+int cerebro_lookup_clusterlist_module_path(char *str, 
+					   char *buf, 
+					   unsigned int buflen);
+
+/* 
+ * cerebro_lookup_config_module_path
+ *
+ * Look up a config module path based on the string given by the
+ * user.  The string can refer to a module name, filename, or full
+ * path.
+ *
+ * Returns 1 and path in buf when the path is found, 0 if not, -1 on
+ * error
+ */
+int cerebro_lookup_config_module_path(char *str, 
+				      char *buf, 
+				      unsigned int buflen);
 
 /*
  * cerebro_clusterlist_module_name

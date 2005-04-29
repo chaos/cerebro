@@ -36,6 +36,11 @@
 
 - consistency between ret vs. rv
   - err_out vs. cleanup
+  - buf vs. buffer
+  - buflen vs. bufferlen
+  - error checking
+    - x >= y
+    - y < x
 
 - allow modules to return error codes??
 
@@ -61,3 +66,6 @@
 
 - no cerebro_module debugging?? b/c could output on ok errors?
   - a cerebro_lib_err_debug??
+
+- pthreads locking for clusterlists/config modules?
+  - probably not b/c both are read only
