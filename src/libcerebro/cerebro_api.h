@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_api.h,v 1.2 2005-04-28 23:36:23 achu Exp $
+ *  $Id: cerebro_api.h,v 1.3 2005-04-29 22:42:08 achu Exp $
 \*****************************************************************************/
  
 #ifndef _CEREBRO_API_H
@@ -29,13 +29,13 @@
 /* 
  * Cerebro loaded state flags
  *
- * CEREBRO_CONFIG_LOADED      - Indicates configuration file has been loaded
- * CEREBRO_MODULES_LOADED     - Indicates modules have been loaded
- * CEREBRO_UPDOWN_DATA_LOADED - Indicates updown data has been loaded
+ * CEREBRO_MODULE_SETUP_CALLED       - we called cerebro_module_setup
+ * CEREBRO_CLUSTERLIST_MODULE_LOADED - clusterlist module has been loaded
+ * CEREBRO_UPDOWN_DATA_LOADED        - updown data has been loaded
  */
-#define CEREBRO_CONFIG_LOADED        0x00000001
-#define CEREBRO_MODULES_LOADED       0x00000002
-#define CEREBRO_UPDOWN_DATA_LOADED   0x00000004
+#define CEREBRO_MODULE_SETUP_CALLED        0x00000001              
+#define CEREBRO_CLUSTERLIST_MODULE_LOADED  0x00000002
+#define CEREBRO_UPDOWN_DATA_LOADED         0x00000004
 
 /* 
  * struct cerebro_config
@@ -71,17 +71,10 @@ struct cerebro {
   int32_t errnum;
   int32_t loaded_state;
   struct cerebro_config config;
-#if !WITH_STATIC_MODULES
-  lt_dlhandle clusterlist_dl_handle;
-#endif /* !WITH_STATIC_MODULES */
-  struct cerebro_clusterlist_module_info *clusterlist_module_info;
-#if !WITH_STATIC_MODULES
-  lt_dlhandle config_dl_handle;
-#endif /* !WITH_STATIC_MODULES */
-  struct cerebro_config_module_info *config_module_info;
   void *updown_data;
 };
 
+#if 0
 /* 
  * cerebro_load_config
  *
@@ -99,23 +92,24 @@ int cerebro_load_config(cerebro_t handle);
  * Returns 0 on success, -1 on error
  */
 int cerebro_unload_config(cerebro_t handle);
+#endif
 
 /* 
- * cerebro_load_modules
+ * cerebro_load_clusterlist_module
  *
- * Find and load cerebro modules
+ * Find and load clusterlist module
+ *
+ * Returns 1 if clusterlist module was loaded, 0 if not, -1 on fatal error
+ */
+int cerebro_api_load_clusterlist_module(cerebro_t handle);
+
+/* 
+ * cerebro_unload_clusterlist_module
+ *
+ * Unload clusterlist module
  *
  * Returns 0 on success, -1 on error
  */
-int cerebro_load_modules(cerebro_t handle);
-
-/* 
- * cerebro_unload_modules
- *
- * Unload cerebro modules
- *
- * Returns 0 on success, -1 on error
- */
-int cerebro_unload_modules(cerebro_t handle);
+int cerebro_api_unload_clusterlist_module(cerebro_t handle);
 
 #endif /* _CEREBRO_API_H */

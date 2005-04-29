@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.h,v 1.5 2005-04-29 18:39:49 achu Exp $
+ *  $Id: cerebro_module.h,v 1.6 2005-04-29 22:42:08 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_MODULE_H
@@ -20,6 +20,13 @@
  * Returns 0 on success, -1 on error
  */
 int cerebro_module_setup(void);
+
+/* 
+ * cerebro_module_is_setup
+ *
+ * Return 1 if module lib has been initialized, 0 if not
+ */
+int cerebro_module_is_setup(void);
 
 /* 
  * cerebro_module_cleanup

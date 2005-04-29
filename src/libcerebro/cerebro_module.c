@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.c,v 1.9 2005-04-29 20:52:16 achu Exp $
+ *  $Id: cerebro_module.c,v 1.10 2005-04-29 22:42:08 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -342,6 +342,14 @@ cerebro_module_setup(void)
 #endif /* !WITH_STATIC_MODULES */
 
   cerebro_module_library_initialized = 1;
+  return 0;
+}
+
+int 
+cerebro_module_is_setup(void)
+{
+  if (cerebro_module_library_initialized)
+    return 1;
   return 0;
 }
 

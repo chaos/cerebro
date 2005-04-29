@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_updown.c,v 1.12 2005-04-29 14:36:56 achu Exp $
+ *  $Id: cerebro_updown.c,v 1.13 2005-04-29 22:42:08 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -635,6 +635,12 @@ cerebro_updown_load_data(cerebro_t handle,
         }
     }
 
+  if (!(handle->loaded_state & CEREBRO_CLUSTERLIST_MODULE_LOADED))
+    {
+      if (cerebro_load_clusterlist_module(handle) < 0)
+	goto cleanup;
+    }
+
   if (_cerebro_updown_get_updown_data(handle,
                                       updown_data,
                                       hostname,
@@ -795,7 +801,25 @@ _cerebro_updown_is_node(cerebro_t handle,
    * for now, just this
    */
   memset(buffer, '\0', CEREBRO_MAXNODENAMELEN+1);
-  strncpy(buffer, node, CEREBRO_MAXNODENAMELEN);
+  if (cerebro_clusterlist_get_nodename(node,
+				       buffer, 
+				       CEREBRO_MAXNODENAMELEN) < 0)
+    {
+      handle->errnum = CEREBRO_ERR_CLUSTERLIST_MODULE;
+      return -1;
+    }
+
+  if ((rv = cerebro_clusterlist_is_node(buffer)) < 0)
+    {
+      handle->errnum = CEREBRO_ERR_CLUSTERLIST_MODULE;
+      return -1;
+    }
+  
+  if (!rv)
+    {
+      handle->errnum = CEREBRO_ERR_NODE_NOTFOUND;
+      return -1;
+    }
 
   updown_data = (struct cerebro_updown_data *)handle->updown_data;
 
