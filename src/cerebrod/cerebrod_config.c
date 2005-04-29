@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.78 2005-04-29 18:39:49 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.79 2005-04-29 18:59:26 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -251,20 +251,17 @@ _cerebrod_cmdline_parse_check(void)
  *
  * Returns 1 on loading success, 0 on loading failure, -1 on fatal error
  */
-static int
+static void
 _cerebrod_load_alternate_configuration(void)
 {
   struct cerebrod_module_config module_conf;
 
   if (!cerebro_config_is_loaded())
-    return 0;
+    return;
 
   if (cerebro_config_setup() < 0)
-    {
-      cerebro_err_debug("%s config module: setup failed: %s", 
-                        cerebro_config_module_name(), strerror(errno));
-      return 0;
-    }
+    cerebro_err_exit("%s config module: setup failed: %s", 
+		     cerebro_config_module_name(), strerror(errno));
 
 #ifndef NDEBUG
   if (conf.debug)
@@ -272,7 +269,7 @@ _cerebrod_load_alternate_configuration(void)
       fprintf(stderr, "**************************************\n");
       fprintf(stderr, "* Cerebrod Config Configuration:\n");
       fprintf(stderr, "* -----------------------\n");
-      fprintf(stderr, "* Loaded config module: %s\n", 
+      fprintf(stderr, "* Loading alternate config from module: %s\n", 
 	      cerebro_config_module_name());
       fprintf(stderr, "**************************************\n");
     }
@@ -296,11 +293,8 @@ _cerebrod_load_alternate_configuration(void)
 
   /* Load the alternate default configuration from the configuration module */
   if (cerebro_config_load_cerebrod_default(&module_conf) < 0)
-    {
-      cerebro_err_debug("%s config module: load_cerebrod_default failed", 
-                        cerebro_config_module_name());
-      return 0;
-    }
+    cerebro_err_exit("%s config module: load_cerebrod_default failed", 
+		     cerebro_config_module_name());
 
   /* Load new defaults */
   conf.heartbeat_frequency_min = module_conf.heartbeat_frequency_min;
@@ -318,31 +312,8 @@ _cerebrod_load_alternate_configuration(void)
   conf.clusterlist_module = module_conf.clusterlist_module;
   conf.clusterlist_module_options = module_conf.clusterlist_module_options;
 
-  return 0;
+  return;
 }
-
-#if WITH_STATIC_MODULES
-/* 
- * _config_load_static_module
- *
- * load a configuration module
- *
- * - type - module type
- *
- * Returns 1 on loading success, 0 on loading failure, -1 on fatal error
- */
-static int
-_config_load_static_module(char *name)
-{
-  assert(name);
-
-  if (!(config_module_info = cerebrod_find_static_config_module(name)))
-    cerebro_err_exit("%s(%s:%d): config module '%s' name not found", 
-                     __FILE__, __FUNCTION__, __LINE__, name);
-  
-  return _cerebrod_load_alternate_configuration();
-}
-#endif /* WITH_STATIC_MODULES */
 
 /*
  * _cerebrod_config_module_setup
@@ -382,6 +353,8 @@ _cerebrod_config_module_setup(void)
 
       /* Doesn't matter if we don't find a config module */
     }
+
+  _cerebrod_load_alternate_configuration();
 }
 
 /*

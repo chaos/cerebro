@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_genders.c,v 1.6 2005-04-29 06:33:38 achu Exp $
+ *  $Id: cerebro_clusterlist_genders.c,v 1.7 2005-04-29 18:59:26 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -252,6 +252,15 @@ genders_clusterlist_get_nodename(char *node, char *buf, unsigned int buflen)
       return -1;
     }
 
+  if (!(buflen > 0))
+    {
+      cerebro_err_debug("%s(%s:%d): %s clusterlist module: "
+                        "invalid buflen parameter",
+                        GENDERS_CLUSTERLIST_MODULE_NAME,
+                        __FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+  
   /* Shorten hostname if necessary */
   if (strchr(node, '.'))
     {

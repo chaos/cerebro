@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_none.c,v 1.5 2005-04-27 18:11:35 achu Exp $
+ *  $Id: cerebro_clusterlist_none.c,v 1.6 2005-04-29 18:59:26 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -105,8 +105,32 @@ none_clusterlist_node_in_cluster(char *node)
 static int
 none_clusterlist_get_nodename(char *node, char *buf, unsigned int buflen)
 {
-  assert(node);
-  assert(buf);
+  if (!node)
+    {
+      cerebro_err_debug("%s(%s:%d): %s clusterlist module: "
+                        "invalid node parameter",
+                        NONE_CLUSTERLIST_MODULE_NAME,
+                        __FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+                                                                                        
+  if (!buf)
+    {
+      cerebro_err_debug("%s(%s:%d): %s clusterlist module: "
+                        "invalid buf parameter",
+                        NONE_CLUSTERLIST_MODULE_NAME,
+                        __FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+
+  if (!(buflen > 0))
+    {
+      cerebro_err_debug("%s(%s:%d): %s clusterlist module: "
+                        "invalid buflen parameter",
+                        NONE_CLUSTERLIST_MODULE_NAME,
+                        __FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
 
   return cerebro_clusterlist_copy_nodename(node, 
                                            buf, 

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.c,v 1.6 2005-04-29 18:39:49 achu Exp $
+ *  $Id: cerebro_module.c,v 1.7 2005-04-29 18:59:26 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -499,7 +499,6 @@ cerebro_load_clusterlist_module(char *module)
       goto cleanup;
     }
 
- found:
 #if !WITH_STATIC_MODULES
   clusterlist_module_dl_handle = clusterlist_module_dl_handle_l;
 #endif /* !WITH_STATIC_MODULES */

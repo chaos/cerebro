@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.34 2005-04-29 18:39:49 achu Exp $
+ *  $Id: cerebrod.c,v 1.35 2005-04-29 18:59:26 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -95,11 +95,13 @@ _cerebrod_post_config_initialization(void)
  * Perform cerebrod cleanup.  Will never be called.  Used as place holder
  * to indicate appropriate functions to call in the future.
  */
+#if 0
 static void
 _cerebrod_cleanup(void)
 {
   cerebro_module_cleanup();
 }
+#endif
 
 int 
 main(int argc, char **argv)
