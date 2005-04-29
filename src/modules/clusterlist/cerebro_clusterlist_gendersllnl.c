@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_gendersllnl.c,v 1.5 2005-04-28 18:47:25 achu Exp $
+ *  $Id: cerebro_clusterlist_gendersllnl.c,v 1.6 2005-04-29 06:33:38 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -16,6 +16,7 @@
 
 #include <gendersllnl.h>
 
+#include "module.h"
 #include "cerebro_defs.h"
 #include "cerebro_error.h"
 #include "cerebro_clusterlist_module.h"
@@ -57,9 +58,9 @@ gendersllnl_clusterlist_parse_options(char **options)
     }
 
   if (options)
-    cerebro_clusterlist_parse_filename(options, 
-                                       &gendersllnl_file, 
-                                       GENDERSLLNL_CLUSTERLIST_MODULE_NAME);
+    return module_parse_filename(options, 
+				 &gendersllnl_file, 
+				 GENDERSLLNL_CLUSTERLIST_MODULE_NAME);
 
   return 0;
 }

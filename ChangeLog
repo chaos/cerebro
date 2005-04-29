@@ -1,3 +1,12 @@
+2005-04-29  Albert Chu  <chu11@llnl.gov>
+
+	* Added parse_options function to config modules.
+
+	* Create new libmodule for common parse_options code between
+	  clusterlist and config modules.
+
+	* Putting module search and loading into libcerebro.
+	
 2005-04-28  Albert Chu  <chu11@llnl.gov>
 
 	* Re-worked packet unmarshalling logic.

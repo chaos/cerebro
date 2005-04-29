@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.21 2005-04-29 00:37:06 achu Exp $
+## $Id: Makefile.am,v 1.22 2005-04-29 06:33:38 achu Exp $
 ##*****************************************************************************
 
 if WITH_GNU_LD
@@ -9,6 +9,7 @@ endif
 
 noinst_HEADERS = cerebro_defs.h \
 		 cerebro_marshalling.h \
+		 cerebro_module.h \
 		 cerebro_updown.h \
 		 cerebro_updown_protocol.h \
 		 cerebro_util.h \
@@ -31,6 +32,7 @@ libcerebro_la_CFLAGS  = -D_REENTRANT \
 libcerebro_la_SOURCES = cerebro_api.c \
 			cerebro_error.c \
 			cerebro_marshalling.c \
+			cerebro_module.c \
 			cerebro_updown.c \
 			cerebro_util.c
 libcerebro_la_LDFLAGS = -version-info @LIBCEREBRO_VERSION_INFO@ \

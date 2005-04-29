@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_hostsfile.c,v 1.6 2005-04-28 18:47:25 achu Exp $
+ *  $Id: cerebro_clusterlist_hostsfile.c,v 1.7 2005-04-29 06:33:38 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -19,6 +19,7 @@
 #include <fcntl.h>
 #endif /* HAVE_FCNTL_H */
 
+#include "module.h"
 #include "cerebro_defs.h"
 #include "cerebro_error.h"
 #include "cerebro_clusterlist_module.h"
@@ -61,9 +62,9 @@ hostsfile_clusterlist_parse_options(char **options)
     }
 
   if (options)
-    return cerebro_clusterlist_parse_filename(options, 
-                                              &hostsfile_file, 
-                                              HOSTSFILE_CLUSTERLIST_MODULE_NAME);
+    return module_parse_filename(options, 
+				 &hostsfile_file, 
+				 HOSTSFILE_CLUSTERLIST_MODULE_NAME);
 
   return 0;
 }

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_module.h,v 1.5 2005-04-29 00:37:06 achu Exp $
+ *  $Id: cerebro_config_module.h,v 1.6 2005-04-29 06:33:38 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_CONFIG_MODULE_H
@@ -64,7 +64,8 @@ typedef int (*Cerebro_config_cleanup)(void);
  * Cerebro_config_load_cerebrod_default
  *
  * function prototype for config module function to alter default
- * configuration values for the cerebrod daemon
+ * configuration values for the cerebrod daemon.  Required to be
+ * defined by each config module.
  *
  * Returns 0 on success, -1 on error
  */

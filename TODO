@@ -56,3 +56,8 @@
   - reload config, module, etc. functions
 
 - config module options function
+
+- return errnos from cerebro_module library?
+
+- no cerebro_module debugging?? b/c could output on ok errors?
+  - a cerebro_lib_err_debug??

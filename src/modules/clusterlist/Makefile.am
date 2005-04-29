@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.3 2005-04-22 22:05:17 achu Exp $
+## $Id: Makefile.am,v 1.4 2005-04-29 06:33:38 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -45,10 +45,12 @@ libclusterlistmodules_la_SOURCES = $(GENDERSLLNL_STATIC_SOURCES) \
 				   cerebro_clusterlist_none.c \
 				   cerebro_clusterlist_util.c
 libclusterlistmodules_la_CFLAGS  = -I$(srcdir)/../../libcerebro \
-				   -I$(srcdir)/../../libcommon
+				   -I$(srcdir)/../../libcommon \
+				   -I$(srcdir)/../libmodule
 libclusterlistmodules_la_LDFLAGS = $(GENDERSLLNL_STATIC_LIBS) \
 				   $(GENDERS_STATIC_LIBS) \
 				   $(CLUSTERLIST_OTHER_FLAGS)
+
 cerebro_clusterlist_gendersllnl_la_SOURCES = cerebro_clusterlist_gendersllnl.c \
 					      cerebro_clusterlist_genders_util.c \
 					      cerebro_clusterlist_util.c 
@@ -56,8 +58,10 @@ cerebro_clusterlist_gendersllnl_la_LDFLAGS = $(MODULE_FLAGS) \
 					     $(GENDERSLLNL_LIBS) \
 				   	     $(CLUSTERLIST_OTHER_FLAGS)
 cerebro_clusterlist_gendersllnl_la_CFLAGS  = -I$(srcdir)/../../libcerebro \
-					      -I$(srcdir)/../../libcommon
-cerebro_clusterlist_gendersllnl_la_LIBADD  = ../../libcommon/libcommon.la
+					     -I$(srcdir)/../../libcommon \
+				   	     -I$(srcdir)/../libmodule
+cerebro_clusterlist_gendersllnl_la_LIBADD  = ../../libcommon/libcommon.la \
+					     ../libmodule/libmodule.la
 
 cerebro_clusterlist_genders_la_SOURCES = cerebro_clusterlist_genders.c \
 					  cerebro_clusterlist_genders_util.c \
@@ -66,26 +70,35 @@ cerebro_clusterlist_genders_la_LDFLAGS = $(MODULE_FLAGS) \
 					 $(GENDERS_LIBS) \
 				   	 $(CLUSTERLIST_OTHER_FLAGS)
 cerebro_clusterlist_genders_la_CFLAGS  = -I$(srcdir)/../../libcerebro \
-					  -I$(srcdir)/../../libcommon
-cerebro_clusterlist_genders_la_LIBADD  = ../../libcommon/libcommon.la
+					 -I$(srcdir)/../../libcommon \
+				   	 -I$(srcdir)/../libmodule
+cerebro_clusterlist_genders_la_LIBADD  = ../../libcommon/libcommon.la \
+					 ../libmodule/libmodule.la
 
 cerebro_clusterlist_hostsfile_la_SOURCES = cerebro_clusterlist_hostsfile.c \
 					    cerebro_clusterlist_util.c
 cerebro_clusterlist_hostsfile_la_LDFLAGS = $(MODULE_FLAGS) \
 				   	   $(CLUSTERLIST_OTHER_FLAGS)
 cerebro_clusterlist_hostsfile_la_CFLAGS  = -I$(srcdir)/../../libcerebro \
-					    -I$(srcdir)/../../libcommon
-cerebro_clusterlist_hostsfile_la_LIBADD  = ../../libcommon/libcommon.la
+					   -I$(srcdir)/../../libcommon \
+				   	   -I$(srcdir)/../libmodule
+cerebro_clusterlist_hostsfile_la_LIBADD  = ../../libcommon/libcommon.la \
+					   ../libmodule/libmodule.la
 
 cerebro_clusterlist_none_la_SOURCES = cerebro_clusterlist_none.c \
 				       cerebro_clusterlist_util.c
 cerebro_clusterlist_none_la_LDFLAGS = $(MODULE_FLAGS) \
 				      $(CLUSTERLIST_OTHER_FLAGS)
 cerebro_clusterlist_none_la_CFLAGS  = -I$(srcdir)/../../libcerebro \
-				       -I$(srcdir)/../../libcommon
-cerebro_clusterlist_none_la_LIBADD  = ../../libcommon/libcommon.la
+				      -I$(srcdir)/../../libcommon \
+				      -I$(srcdir)/../libmodule
+cerebro_clusterlist_none_la_LIBADD  = ../../libcommon/libcommon.la \
+				      ../libmodule/libmodule.la
 
 ../../libcommon/libcommon.la : force-dependency-check
+	@cd `dirname $@` && make `basename $@`
+
+../libmodule/libmodule.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
 force-dependency-check:
