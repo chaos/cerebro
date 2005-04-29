@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_none.c,v 1.6 2005-04-29 18:59:26 achu Exp $
+ *  $Id: cerebro_clusterlist_none.c,v 1.7 2005-04-29 23:39:44 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -91,7 +91,7 @@ none_clusterlist_numnodes(void)
  * none clusterlist module node in cluster function
  */
 static int
-none_clusterlist_node_in_cluster(char *node)
+none_clusterlist_node_in_cluster(const char *node)
 {
   /* Must assume it is */
   return 1;
@@ -103,7 +103,7 @@ none_clusterlist_node_in_cluster(char *node)
  * none clusterlist module get nodename function
  */
 static int
-none_clusterlist_get_nodename(char *node, char *buf, unsigned int buflen)
+none_clusterlist_get_nodename(const char *node, char *buf, unsigned int buflen)
 {
   if (!node)
     {
@@ -113,7 +113,7 @@ none_clusterlist_get_nodename(char *node, char *buf, unsigned int buflen)
                         __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
-                                                                                        
+
   if (!buf)
     {
       cerebro_err_debug("%s(%s:%d): %s clusterlist module: "

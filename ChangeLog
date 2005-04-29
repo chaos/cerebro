@@ -12,6 +12,8 @@
 	* Remove -c and -m options from cerebrod in non-debug mode.
 
 	* Support clusterlist modules in libcerebro updown library.
+
+	* Fixed various bugs.
 	
 2005-04-28  Albert Chu  <chu11@llnl.gov>
 

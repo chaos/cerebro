@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_util.c,v 1.5 2005-04-29 06:33:38 achu Exp $
+ *  $Id: cerebro_clusterlist_util.c,v 1.6 2005-04-29 23:39:44 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -19,7 +19,7 @@
 #include "wrappers.h"
 
 int 
-cerebro_clusterlist_copy_nodename(char *node, 
+cerebro_clusterlist_copy_nodename(const char *node, 
                                   char *buf, 
                                   unsigned int buflen, 
                                   char *clusterlist_module_name)

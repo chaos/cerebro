@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_hostsfile.c,v 1.8 2005-04-29 18:59:26 achu Exp $
+ *  $Id: cerebro_clusterlist_hostsfile.c,v 1.9 2005-04-29 23:39:44 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -463,7 +463,7 @@ hostsfile_clusterlist_numnodes(void)
  * hostsfile clusterlist module node in cluster function
  */
 static int
-hostsfile_clusterlist_node_in_cluster(char *node)
+hostsfile_clusterlist_node_in_cluster(const char *node)
 {
   char nodebuf[CEREBRO_MAXNODENAMELEN+1];
   char *nodePtr = NULL;
@@ -498,7 +498,7 @@ hostsfile_clusterlist_node_in_cluster(char *node)
       nodePtr = nodebuf;
     }
   else
-    nodePtr = node;
+    nodePtr = (char *)node;
 
   ret = list_find_first(hosts, (ListFindF)strcmp, nodePtr);
 
@@ -511,7 +511,7 @@ hostsfile_clusterlist_node_in_cluster(char *node)
  * hostsfile clusterlist module get nodename function
  */
 static int
-hostsfile_clusterlist_get_nodename(char *node, char *buf, unsigned int buflen)
+hostsfile_clusterlist_get_nodename(const char *node, char *buf, unsigned int buflen)
 {
   char nodebuf[CEREBRO_MAXNODENAMELEN+1];
   char *nodePtr = NULL;
@@ -563,7 +563,7 @@ hostsfile_clusterlist_get_nodename(char *node, char *buf, unsigned int buflen)
       nodePtr = nodebuf;
     }
   else
-    nodePtr = node;
+    nodePtr = (char *)node;
 
   return cerebro_clusterlist_copy_nodename(nodePtr, 
                                            buf, 

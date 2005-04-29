@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_updown.c,v 1.14 2005-04-29 22:55:06 achu Exp $
+ *  $Id: cerebro_updown.c,v 1.15 2005-04-29 23:39:44 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -796,21 +796,9 @@ _cerebro_updown_is_node(cerebro_t handle,
       return -1;
     }
 
-  /* 
-   * XXX need to check for node and handle conversion
-   *
-   * for now, just this
-   */
   memset(buffer, '\0', CEREBRO_MAXNODENAMELEN+1);
-  if (cerebro_clusterlist_get_nodename(node,
-				       buffer, 
-				       CEREBRO_MAXNODENAMELEN) < 0)
-    {
-      handle->errnum = CEREBRO_ERR_CLUSTERLIST_MODULE;
-      return -1;
-    }
-
-  if ((rv = cerebro_clusterlist_node_in_cluster(buffer)) < 0)
+  
+  if ((rv = cerebro_clusterlist_node_in_cluster(node)) < 0)
     {
       handle->errnum = CEREBRO_ERR_CLUSTERLIST_MODULE;
       return -1;
@@ -819,6 +807,14 @@ _cerebro_updown_is_node(cerebro_t handle,
   if (!rv)
     {
       handle->errnum = CEREBRO_ERR_NODE_NOTFOUND;
+      return -1;
+    }
+
+  if (cerebro_clusterlist_get_nodename(node,
+				       buffer, 
+				       CEREBRO_MAXNODENAMELEN) < 0)
+    {
+      handle->errnum = CEREBRO_ERR_CLUSTERLIST_MODULE;
       return -1;
     }
 

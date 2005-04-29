@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_gendersllnl.c,v 1.7 2005-04-29 18:59:26 achu Exp $
+ *  $Id: cerebro_clusterlist_gendersllnl.c,v 1.8 2005-04-29 23:39:44 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -183,7 +183,7 @@ gendersllnl_clusterlist_numnodes(void)
  * gendersllnl clusterlist module node in cluster function
  */
 static int
-gendersllnl_clusterlist_node_in_cluster(char *node)
+gendersllnl_clusterlist_node_in_cluster(const char *node)
 {
   char nodebuf[CEREBRO_MAXNODENAMELEN+1];
   char *nodePtr = NULL;
@@ -197,7 +197,7 @@ gendersllnl_clusterlist_node_in_cluster(char *node)
                         GENDERSLLNL_CLUSTERLIST_MODULE_NAME);
       return -1;
     }
-                                                                                        
+
   if (!node)
     {
       cerebro_err_debug("%s(%s:%d): %s clusterlist module: "
@@ -219,7 +219,7 @@ gendersllnl_clusterlist_node_in_cluster(char *node)
       nodePtr = nodebuf;
     }
   else
-    nodePtr = node;
+    nodePtr = (char *)node;
 
   if ((ret = genders_isnode_or_altnode(gendersllnl_handle, nodePtr)) < 0)
     cerebro_err_exit("%s(%s:%d): %s clusterlist module: genders_isnode: %s",
@@ -236,10 +236,11 @@ gendersllnl_clusterlist_node_in_cluster(char *node)
  * gendersllnl clusterlist module get nodename function
  */
 static int
-gendersllnl_clusterlist_get_nodename(char *node, char *buf, unsigned int buflen)
+gendersllnl_clusterlist_get_nodename(const char *node, char *buf, unsigned int buflen)
 {
   char nodebuf[CEREBRO_MAXNODENAMELEN+1];
   char *nodePtr = NULL;
+  int rv;
 
   if (!gendersllnl_handle)
     {
@@ -249,7 +250,7 @@ gendersllnl_clusterlist_get_nodename(char *node, char *buf, unsigned int buflen)
                         GENDERSLLNL_CLUSTERLIST_MODULE_NAME);
       return -1;
     }
-                                                                                        
+
   if (!node)
     {
       cerebro_err_debug("%s(%s:%d): %s clusterlist module: "
@@ -258,7 +259,7 @@ gendersllnl_clusterlist_get_nodename(char *node, char *buf, unsigned int buflen)
                         __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
-                                                                                        
+
   if (!buf)
     {
       cerebro_err_debug("%s(%s:%d): %s clusterlist module: "
@@ -289,14 +290,32 @@ gendersllnl_clusterlist_get_nodename(char *node, char *buf, unsigned int buflen)
       nodePtr = nodebuf;
     }
   else
-    nodePtr = node;
+    nodePtr = (char *)node;
 
-  if (genders_to_gendname(gendersllnl_handle, nodePtr, buf, buflen) < 0)
+  if ((rv = gendersllnl_clusterlist_node_in_cluster(nodePtr)) < 0)
     cerebro_err_exit("%s(%s:%d): %s clusterlist module: "
-                     "genders_to_gendname: %s",
+                     "gendersllnl_clusterlist_node_in_cluster: %s",
                      __FILE__, __FUNCTION__, __LINE__,
                      GENDERSLLNL_CLUSTERLIST_MODULE_NAME, 
                      genders_errormsg(gendersllnl_handle));
+
+  if (!rv)
+    {
+      return cerebro_clusterlist_copy_nodename(nodePtr, 
+                                               buf, 
+                                               buflen, 
+                                               GENDERSLLNL_CLUSTERLIST_MODULE_NAME);
+    }
+  else
+    {
+      if (genders_to_gendname(gendersllnl_handle, nodePtr, buf, buflen) < 0)
+        cerebro_err_exit("%s(%s:%d): %s clusterlist module: "
+                         "genders_to_gendname: %s",
+                         __FILE__, __FUNCTION__, __LINE__,
+                         GENDERSLLNL_CLUSTERLIST_MODULE_NAME, 
+                         genders_errormsg(gendersllnl_handle));
+    }
+
   return 0;
 }
 

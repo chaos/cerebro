@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_genders.c,v 1.7 2005-04-29 18:59:26 achu Exp $
+ *  $Id: cerebro_clusterlist_genders.c,v 1.8 2005-04-29 23:39:44 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -167,7 +167,7 @@ genders_clusterlist_numnodes(void)
  * genders clusterlist module node in cluster function
  */
 static int
-genders_clusterlist_node_in_cluster(char *node)
+genders_clusterlist_node_in_cluster(const char *node)
 {
   char nodebuf[CEREBRO_MAXNODENAMELEN+1];
   char *nodePtr = NULL;
@@ -203,7 +203,7 @@ genders_clusterlist_node_in_cluster(char *node)
       nodePtr = nodebuf;
     }
   else
-    nodePtr = node;
+    nodePtr = (char *)node;
 
   if ((ret = genders_isnode(genders_handle, nodePtr)) < 0)
     cerebro_err_exit("%s(%s:%d): %s clusterlist module: genders_isnode: %s",
@@ -220,7 +220,7 @@ genders_clusterlist_node_in_cluster(char *node)
  * genders clusterlist module get nodename function
  */
 static int
-genders_clusterlist_get_nodename(char *node, char *buf, unsigned int buflen)
+genders_clusterlist_get_nodename(const char *node, char *buf, unsigned int buflen)
 {
   char nodebuf[CEREBRO_MAXNODENAMELEN+1];
   char *nodePtr = NULL;
@@ -242,7 +242,7 @@ genders_clusterlist_get_nodename(char *node, char *buf, unsigned int buflen)
                         __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
-                                                                                        
+
   if (!buf)
     {
       cerebro_err_debug("%s(%s:%d): %s clusterlist module: "
@@ -265,7 +265,7 @@ genders_clusterlist_get_nodename(char *node, char *buf, unsigned int buflen)
   if (strchr(node, '.'))
     {
       char *p;
-                                                                                      
+
       memset(nodebuf, '\0', CEREBRO_MAXNODENAMELEN+1);
       strncpy(nodebuf, node, CEREBRO_MAXNODENAMELEN);
       p = strchr(nodebuf, '.');
@@ -273,7 +273,7 @@ genders_clusterlist_get_nodename(char *node, char *buf, unsigned int buflen)
       nodePtr = nodebuf;
     }
   else
-    nodePtr = node;
+    nodePtr = (char *)node;
 
   return cerebro_clusterlist_copy_nodename(nodePtr, 
                                            buf, 
