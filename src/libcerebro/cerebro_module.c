@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.c,v 1.2 2005-04-29 06:33:38 achu Exp $
+ *  $Id: cerebro_module.c,v 1.3 2005-04-29 06:53:35 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -614,4 +614,187 @@ cerebro_find_config_module(void)
 
  done:
   return 1;
+}
+
+int 
+cerebro_clusterlist_is_loaded(void)
+{
+  if (clusterlist_module_info)
+    return 1;
+  return 0;
+}
+
+int 
+cerebro_config_is_loaded(void)
+{
+  if (config_module_info)
+    return 1;
+  return 0;
+}
+
+char *
+cerebrod_clusterlist_module_name(void)
+{
+  if (!clusterlist_module_info)
+    {
+      cerebro_err_debug("%s(%s:%d): clusterlist_module_info not loaded",
+			__FILE__, __FUNCTION__, __LINE__);
+      return NULL;
+    }
+                                                                                     
+  return clusterlist_module_info->clusterlist_module_name;
+}
+                                                                                     
+int
+cerebrod_clusterlist_parse_options(char **options)
+{
+  if (!clusterlist_module_info)
+    {
+      cerebro_err_debug("%s(%s:%d): clusterlist_module_info not loaded",
+			__FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+  
+  return ((*clusterlist_module_info->parse_options)(options));
+}
+                                                                                     
+int
+cerebrod_clusterlist_setup(void)
+{
+  if (!clusterlist_module_info)
+    {
+      cerebro_err_debug("%s(%s:%d): clusterlist_module_info not loaded",
+			__FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+  
+  return ((*clusterlist_module_info->setup)());
+}
+
+int
+cerebrod_clusterlist_cleanup(void)
+{
+  if (!clusterlist_module_info)
+    {
+      cerebro_err_debug("%s(%s:%d): clusterlist_module_info not loaded",
+			__FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+  
+  return ((*clusterlist_module_info->cleanup)());
+}
+int
+cerebrod_clusterlist_get_all_nodes(char **nodes, unsigned int nodeslen)
+{
+  if (!clusterlist_module_info)
+    {
+      cerebro_err_debug("%s(%s:%d): clusterlist_module_info not loaded",
+			__FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+  
+  return ((*clusterlist_module_info->get_all_nodes)(nodes, nodeslen));
+}
+                                                                                     
+int
+cerebrod_clusterlist_numnodes(void)
+{
+  if (!clusterlist_module_info)
+    {
+      cerebro_err_debug("%s(%s:%d): clusterlist_module_info not loaded",
+			__FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+  
+  return ((*clusterlist_module_info->numnodes)());
+}
+                                                                                     
+int
+cerebrod_clusterlist_node_in_cluster(char *node)
+{
+  if (!clusterlist_module_info)
+    {
+      cerebro_err_debug("%s(%s:%d): clusterlist_module_info not loaded",
+			__FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+  
+  return ((*clusterlist_module_info->node_in_cluster)(node));
+}
+
+int
+cerebrod_clusterlist_get_nodename(char *node, char *buf, unsigned int buflen)
+{
+  if (!clusterlist_module_info)
+    {
+      cerebro_err_debug("%s(%s:%d): clusterlist_module_info not loaded",
+			__FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+  
+  return ((*clusterlist_module_info->get_nodename)(node, buf, buflen));
+}
+
+char *
+cerebrod_config_module_name(void)
+{
+  if (!config_module_info)
+    {
+      cerebro_err_debug("%s(%s:%d): config_module_info not loaded",
+			__FILE__, __FUNCTION__, __LINE__);
+      return NULL;
+    }
+                                                                                     
+  return config_module_info->config_module_name;
+}
+                                                                                     
+int
+cerebrod_config_parse_options(char **options)
+{
+  if (!config_module_info)
+    {
+      cerebro_err_debug("%s(%s:%d): config_module_info not loaded",
+			__FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+  
+  return ((*config_module_info->parse_options)(options));
+}
+                                                                                     
+int
+cerebrod_config_setup(void)
+{
+  if (!config_module_info)
+    {
+      cerebro_err_debug("%s(%s:%d): config_module_info not loaded",
+			__FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+  
+  return ((*config_module_info->setup)());
+}
+
+int
+cerebrod_config_cleanup(void)
+{
+  if (!config_module_info)
+    {
+      cerebro_err_debug("%s(%s:%d): config_module_info not loaded",
+			__FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+  
+  return ((*config_module_info->cleanup)());
+}
+int
+cerebrod_config_load_cerebrod_default(struct cerebrod_module_config *conf)
+{
+  if (!config_module_info)
+    {
+      cerebro_err_debug("%s(%s:%d): config_module_info not loaded",
+			__FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+  
+  return ((*config_module_info->load_cerebrod_default)(conf));
 }
