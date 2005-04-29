@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.23 2005-04-29 18:39:49 achu Exp $
+## $Id: Makefile.am,v 1.24 2005-04-29 20:52:16 achu Exp $
 ##*****************************************************************************
 
 if WITH_GNU_LD
@@ -27,7 +27,8 @@ cerebroheaders_HEADERS = cerebro.h \
 			 cerebro_clusterlist_module.h \
 			 cerebro_config_module.h
 
-cerebro_clusterlist_module_builddir=`cd $(top_builddir)/src/modules/clusterlist && pwd`cerebro_config_module_builddir=`cd $(top_builddir)/src/modules/config && pwd`
+cerebro_clusterlist_module_builddir=`cd $(top_builddir)/src/modules/clusterlist && pwd`
+cerebro_config_module_builddir=`cd $(top_builddir)/src/modules/config && pwd`
 
 lib_LTLIBRARIES       = libcerebro.la
 libcerebro_la_CFLAGS  = -D_REENTRANT \

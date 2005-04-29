@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.c,v 1.8 2005-04-29 19:09:57 achu Exp $
+ *  $Id: cerebro_module.c,v 1.9 2005-04-29 20:52:16 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -251,7 +251,7 @@ _cerebro_find_known_module(char *search_dir,
  *               module we want to try and load
  * - load_module - function to call when a module is found
  *
- * Returns 1 when a module is found, 0 when one is not.
+ * Returns 1 when a module is found, 0 when one is not, -1 on fatal error
  */
 int 
 _cerebro_find_unknown_module(char *search_dir,
@@ -539,6 +539,7 @@ cerebro_find_clusterlist_module(void)
   struct cerebro_clusterlist_module_info **ptr;
   int i = 0;
 #endif /* WITH_STATIC_MODULES */
+  int rv;
 
   if (!cerebro_module_library_initialized)
     {
@@ -551,8 +552,6 @@ cerebro_find_clusterlist_module(void)
   ptr = &static_clusterlist_modules[0];
   while (ptr[i] != NULL)
     {
-      int rv;
-                                                                                      
       if (!ptr[i]->clusterlist_module_name)
 	{
 	  cerebro_err_debug("static clusterlist module index '%d' "
@@ -569,32 +568,41 @@ cerebro_find_clusterlist_module(void)
 	}
 
       if (rv)
-	goto done;
+	goto found;
       i++;
     }
 #else  /* !WITH_STATIC_MODULES */
-  if (_cerebro_find_known_module(CEREBRO_CLUSTERLIST_MODULE_BUILDDIR,
-				 dynamic_clusterlist_modules,
-				 dynamic_clusterlist_modules_len,
-				 cerebro_load_clusterlist_module))
-    goto done;
+  if ((rv = _cerebro_find_known_module(CEREBRO_CLUSTERLIST_MODULE_BUILDDIR,
+                                       dynamic_clusterlist_modules,
+                                       dynamic_clusterlist_modules_len,
+                                       cerebro_load_clusterlist_module)) < 0)
+      return -1;
 
-  if (_cerebro_find_known_module(CEREBRO_MODULE_DIR,
-				 dynamic_clusterlist_modules,
-				 dynamic_clusterlist_modules_len,
-				 cerebro_load_clusterlist_module))
-    goto done;
+  if (rv)
+    goto found;
+
+  if ((rv = _cerebro_find_known_module(CEREBRO_MODULE_DIR,
+                                       dynamic_clusterlist_modules,
+                                       dynamic_clusterlist_modules_len,
+                                       cerebro_load_clusterlist_module)) < 0)
+    return -1;
+
+  if (rv)
+    goto found;
 
   
-  if (_cerebro_find_unknown_module(CEREBRO_MODULE_DIR,
-				   CEREBRO_CLUSTERLIST_FILENAME_SIGNATURE,
-				   cerebro_load_clusterlist_module))
-    goto done;
+  if ((rv = _cerebro_find_unknown_module(CEREBRO_MODULE_DIR,
+                                         CEREBRO_CLUSTERLIST_FILENAME_SIGNATURE,
+                                         cerebro_load_clusterlist_module)) < 0)
+    return -1;
+  
+  if (rv)
+    goto found;
 #endif /* !WITH_STATIC_MODULES */
 
   return 0;
 
- done:
+ found:
   return 1;
 }
 
@@ -749,6 +757,7 @@ cerebro_find_config_module(void)
   struct cerebro_config_module_info **ptr;
   int i = 0;
 #endif /* WITH_STATIC_MODULES */
+  int rv;
 
   if (!cerebro_module_library_initialized)
     {
@@ -761,8 +770,6 @@ cerebro_find_config_module(void)
   ptr = &static_config_modules[0];
   while (ptr[i] != NULL)
     {
-      int rv;
-
       if (!ptr[i]->config_module_name)
 	{
 	  cerebro_err_debug("static config module index '%d' "
@@ -779,32 +786,40 @@ cerebro_find_config_module(void)
 	}
 
       if (rv)
-	goto done;
+	goto found;
       i++;
     }
 #else  /* !WITH_STATIC_MODULES */
-  if (_cerebro_find_known_module(CEREBRO_CONFIG_MODULE_BUILDDIR,
-				 dynamic_config_modules,
-				 dynamic_config_modules_len,
-				 cerebro_load_config_module))
-    goto done;
+  if ((rv = _cerebro_find_known_module(CEREBRO_CONFIG_MODULE_BUILDDIR,
+                                       dynamic_config_modules,
+                                       dynamic_config_modules_len,
+                                       cerebro_load_config_module)) < 0)
+    return -1;
 
-  if (_cerebro_find_known_module(CEREBRO_MODULE_DIR,
-				 dynamic_config_modules,
-				 dynamic_config_modules_len,
-				 cerebro_load_config_module))
-    goto done;
+  if (rv)
+    goto found;
 
-  
-  if (_cerebro_find_unknown_module(CEREBRO_MODULE_DIR,
-				   CEREBRO_CONFIG_FILENAME_SIGNATURE,
-				   cerebro_load_config_module))
-    goto done;
+  if ((rv = _cerebro_find_known_module(CEREBRO_MODULE_DIR,
+                                       dynamic_config_modules,
+                                       dynamic_config_modules_len,
+                                       cerebro_load_config_module)) < 0)
+    return -1;
+
+  if (rv)
+    goto found;
+
+  if ((rv = _cerebro_find_unknown_module(CEREBRO_MODULE_DIR,
+                                         CEREBRO_CONFIG_FILENAME_SIGNATURE,
+                                         cerebro_load_config_module)) < 0)
+    return -1;
+
+  if (rv)
+    goto found;
 #endif /* !WITH_STATIC_MODULES */
 
   return 0;
 
- done:
+ found:
   return 1;
 }
 
