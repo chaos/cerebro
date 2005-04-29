@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_module.h,v 1.4 2005-04-22 21:31:04 achu Exp $
+ *  $Id: cerebro_config_module.h,v 1.5 2005-04-29 00:37:06 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_CONFIG_MODULE_H
@@ -27,6 +27,18 @@ struct cerebrod_module_config
   char *clusterlist_module;
   char **clusterlist_module_options;
 };
+
+/*
+ * Cerebro_config_parse_options
+ *
+ * function prototype for config module function to parse
+ * options.  Required to be defined by each config module.
+ *
+ * - options - array of strings.  The strings are usually key=value pairs
+ *
+ * Returns 0 on success, -1 on error
+ */
+typedef int (*Cerebro_config_parse_options)(char **options);
 
 /*
  * Cerebro_config_setup
@@ -67,6 +79,7 @@ typedef int (*Cerebro_config_load_cerebrod_default)(struct cerebrod_module_confi
 struct cerebro_config_module_info
 {
   char *config_module_name;
+  Cerebro_config_parse_options parse_options;
   Cerebro_config_setup setup;
   Cerebro_config_cleanup cleanup;
   Cerebro_config_load_cerebrod_default load_cerebrod_default;

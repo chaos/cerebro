@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.75 2005-04-28 23:36:23 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.76 2005-04-29 00:37:06 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -337,8 +337,11 @@ _cerebrod_load_alternate_configuration(void)
     return 0;
 
   if ((*config_module_info->setup)() < 0)
-    cerebro_err_exit("%s config module: setup failed: %s", 
-                     config_module_info->config_module_name, strerror(errno));
+    {
+      cerebro_err_debug("%s config module: setup failed: %s", 
+                        config_module_info->config_module_name, strerror(errno));
+      return 0;
+    }
 
 #ifndef NDEBUG
   if (conf.debug)
@@ -370,8 +373,12 @@ _cerebrod_load_alternate_configuration(void)
 
   /* Load the alternate default configuration from the configuration module */
   if ((*config_module_info->load_cerebrod_default)(&module_conf) < 0)
-    cerebro_err_exit("%s config module: load_cerebrod_default failed", 
-                     config_module_info->config_module_name);
+    {
+      cerebro_err_debug("%s config module: load_cerebrod_default failed", 
+                        config_module_info->config_module_name);
+      (*config_module_info->cleanup)();
+      return 0;
+    }
 
   /* Load new defaults */
   conf.heartbeat_frequency_min = module_conf.heartbeat_frequency_min;
@@ -432,8 +439,19 @@ _config_load_dynamic_module(char *module_path)
   config_module_info = (struct cerebro_config_module_info *)Lt_dlsym(config_module_dl_handle, "config_module_info");
 
   if (!config_module_info->config_module_name)
-    cerebro_err_exit("config module '%s' does not contain a valid name", 
-                     module_path);
+    {
+      cerebro_err_debug("config module '%s' does not contain a valid name", 
+                        module_path);
+      return 0;
+    }
+
+  if (!config_module_info->parse_options)
+    {
+      cerebro_err_debug("config module '%s' does not contain "
+                        "valid parse_options function", 
+                      module_path);
+      return 0;
+    }
 
   return _cerebrod_load_alternate_configuration();
 }

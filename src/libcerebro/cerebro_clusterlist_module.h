@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_module.h,v 1.5 2005-04-22 21:31:04 achu Exp $
+ *  $Id: cerebro_clusterlist_module.h,v 1.6 2005-04-29 00:37:06 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_CLUSTERLIST_MODULE_H
@@ -11,7 +11,7 @@
  * function prototype for clusterlist module function to parse
  * options.  Required to be defined by each config module.
  *
- * - options - string of arrays.  The strings are usually key=value pairs
+ * - options - array of strings.  The strings are usually key=value pairs
  *
  * Returns 0 on success, -1 on error
  */
