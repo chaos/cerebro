@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.h,v 1.36 2005-04-29 17:12:04 achu Exp $
+ *  $Id: cerebrod_config.h,v 1.37 2005-04-30 17:09:10 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_CONFIG_H
@@ -18,7 +18,6 @@
  */
 
 #define CEREBROD_DEBUG_DEFAULT                        0
-#define CEREBROD_CONFIG_MODULE_DEFAULT                NULL
 #define CEREBROD_HEARTBEAT_FREQUENCY_MIN_DEFAULT      10
 #define CEREBROD_HEARTBEAT_FREQUENCY_MAX_DEFAULT      20
 #define CEREBROD_HEARTBEAT_SOURCE_PORT_DEFAULT        8850
@@ -49,7 +48,6 @@ struct cerebrod_config
   int debug;
 #endif /* NDEBUG */
   char *config_file;
-  char *config_module;
 
   /* Set by the user in the configuration file */
   unsigned int heartbeat_frequency_min;
@@ -68,9 +66,6 @@ struct cerebrod_config
   int updown_server;
   unsigned int updown_server_port;
 
-  char *clusterlist_module;
-  char **clusterlist_module_options;
-
 #ifndef NDEBUG
   int speak_debug;
   int listen_debug;
@@ -84,11 +79,6 @@ struct cerebrod_config
   struct in_addr heartbeat_destination_ip_in_addr;
   struct in_addr heartbeat_network_interface_in_addr;
   int heartbeat_interface_index;
-
-#if !WITH_STATIC_MODULES
-  char *config_module_file;
-  char *clusterlist_module_file;
-#endif /* !WITH_STATIC_MODULES */
 };
 
 /*

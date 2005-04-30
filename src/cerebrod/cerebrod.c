@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.36 2005-04-30 16:10:49 achu Exp $
+ *  $Id: cerebrod.c,v 1.37 2005-04-30 17:09:10 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -77,13 +77,6 @@ _cerebrod_post_config_initialization(void)
 
   if (cerebrod_clusterlist_module_found)
     {
-      if (conf.clusterlist_module_options)
-	{
-	  if (cerebro_clusterlist_parse_options(conf.clusterlist_module_options) < 0)
-	    cerebro_err_exit("%s(%s:%d): cerebro_clusterlist_parse_options",
-			     __FILE__, __FUNCTION__, __LINE__);
-	}
-      
       if (cerebro_clusterlist_setup() < 0)
 	cerebro_err_exit("%s(%s:%d): cerebro_clusterlist_setup",
 			 __FILE__, __FUNCTION__, __LINE__);

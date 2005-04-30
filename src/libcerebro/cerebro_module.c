@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.c,v 1.12 2005-04-30 16:10:49 achu Exp $
+ *  $Id: cerebro_module.c,v 1.13 2005-04-30 17:09:10 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -448,14 +448,6 @@ cerebro_load_clusterlist_module(char *module)
       goto cleanup;
     }
 
-  if (!clusterlist_module_info_l->parse_options)
-    {
-      cerebro_err_debug("clusterlist module '%s' does not contain "
-                        "valid parse_options function",
-                        clusterlist_module_info_l->clusterlist_module_name);
-      goto cleanup;
-    }
-
   if (!clusterlist_module_info_l->setup)
     {
       cerebro_err_debug("clusterlist module '%s' does not contain "
@@ -690,14 +682,6 @@ cerebro_load_config_module(char *module)
       goto cleanup;
     }
 
-  if (!config_module_info_l->parse_options)
-    {
-      cerebro_err_debug("config module '%s' does not contain "
-                        "valid parse_options function",
-                        config_module_info_l->config_module_name);
-      goto cleanup;
-    }
-
   if (!config_module_info_l->setup)
     {
       cerebro_err_debug("config module '%s' does not contain "
@@ -844,229 +828,6 @@ cerebro_config_is_loaded(void)
   return 0;
 }
 
-#if WITH_STATIC_MODULES
-int 
-cerebro_lookup_clusterlist_module(char *module)
-{
-  struct cerebro_clusterlist_module_info **ptr;
-  int i = 0;
-
-  if (!module)
-    {
-      cerebro_err_debug("%s(%s:%d): module null", 
-			__FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
-
-  ptr = &static_clusterlist_modules[0];
-  while (ptr[i] != NULL)
-    {
-      if (!ptr[i]->clusterlist_module_name)
-        {
-          cerebro_err_debug("static clusterlist module index '%d' "
-                            "does not contain name", i);
-          continue;
-        }
-      if (!strcmp(ptr[i]->clusterlist_module_name, module))
-        return 1;
-      i++;
-    }
-
-  return 0;
-}
-
-int 
-cerebro_lookup_config_module(char *module)
-{
- struct cerebro_config_module_info **ptr;
-  int i = 0;
-
-  if (!module)
-    {
-      cerebro_err_debug("%s(%s:%d): module null", 
-			__FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
-
-  ptr = &static_config_modules[0];
-  while (ptr[i] != NULL)
-    {
-      if (!ptr[i]->config_module_name)
-        {
-          cerebro_err_debug("static config module index '%d' "
-                            "does not contain name", i);
-          continue;
-        }
-      if (!strcmp(ptr[i]->config_module_name, module))
-        return 1;
-      i++;
-    }
-
-  return 0;
-}
-#else  /* !WITH_STATIC_MODULES */
-/* 
- * _cerebro_lookup_module_path
- *
- * Common function for cerebro_lookup_clusterlist_module_path
- * and cerebro_lookup_config_module_path.
- *
- * Returns 1 and path in buf when the path is found, 0 if not, -1 on
- * error
- */
-int
-_cerebro_lookup_module_path(char *str,
-			    char *buf,
-			    unsigned int buflen,
-			    char *signature)
-{
-  struct stat statbuf;
-
-  if (!str)
-    {
-      cerebro_err_debug("%s(%s:%d): str null", 
-			__FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
-
-  if (!buf)
-    {
-      cerebro_err_debug("%s(%s:%d): buf null", 
-			__FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
-
-  if (!(buflen > 0))
-    {
-      cerebro_err_debug("%s(%s:%d): buflen not valid", 
-			__FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
-
-  if (!signature)
-    {
-      cerebro_err_debug("%s(%s:%d): signature null", 
-			__FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
-
-  memset(buf, '\0', buflen);
-
-  if (str[0] == '/')
-    {
-      /* Case A: User specified an absolute path to the module */
-      if (stat(str, &statbuf) < 0)
-	return 0;
-
-      if (strlen(str) >= buflen)
-	{
-	  cerebro_err_debug("%s(%s:%d): buflen too small: path=%s, buflen=%d", 
-			    __FILE__, __FUNCTION__, __LINE__, str, buflen);
-	  return -1;
-	}
-      strcpy(buf, str);
-      return 1;
-    }
-  else
-    {
-      /* Case B: Search for module.  When developing/debugging, search
-       * the builddir first, b/c we may be testing a new module.
-       */
-      char tempbuf[CEREBRO_MAXPATHLEN+1];
-                                                                                      
-      /* Assume the user passed in a filename, so search in the
-       * appropriate directories 
-       */
-
-#ifndef NDEBUG
-      memset(tempbuf, '\0', CEREBRO_MAXPATHLEN+1);
-      snprintf(tempbuf, CEREBRO_MAXPATHLEN, "%s/%s",
-	       CEREBRO_CONFIG_MODULE_BUILDDIR, str);
-                                                                                      
-      if (!stat(tempbuf, &statbuf))
-	goto found;
-#endif /* NDEBUG */
-
-      memset(tempbuf, '\0', CEREBRO_MAXPATHLEN+1);
-      snprintf(tempbuf, CEREBRO_MAXPATHLEN, "%s/%s",
-	       CEREBRO_MODULE_DIR, str);
-                                                                                      
-      if (!stat(tempbuf, &statbuf))
-	goto found;
-
-      /* Next assume the user passed in a name to a .la or .so file */
-
-#ifndef NDEBUG
-      memset(tempbuf, '\0', CEREBRO_MAXPATHLEN+1);
-      snprintf(tempbuf, CEREBRO_MAXPATHLEN, "%s/%s%s.la",
-	       CEREBRO_CONFIG_MODULE_BUILDDIR, signature, str);
-                                                                                      
-      if (!stat(tempbuf, &statbuf))
-	goto found;
-
-      memset(tempbuf, '\0', CEREBRO_MAXPATHLEN+1);
-      snprintf(tempbuf, CEREBRO_MAXPATHLEN, "%s/%s%s.so",
-	       CEREBRO_CONFIG_MODULE_BUILDDIR, signature, str);
-                                                                                      
-      if (!stat(tempbuf, &statbuf))
-	goto found;
-#endif /* NDEBUG */
-
-      memset(tempbuf, '\0', CEREBRO_MAXPATHLEN+1);
-      snprintf(tempbuf, CEREBRO_MAXPATHLEN, "%s/%s%s.la",
-	       CEREBRO_MODULE_DIR, signature, str);
-                                                                                      
-      if (!stat(tempbuf, &statbuf))
-	goto found;
-
-      memset(tempbuf, '\0', CEREBRO_MAXPATHLEN+1);
-      snprintf(tempbuf, CEREBRO_MAXPATHLEN, "%s/%s%s.so",
-	       CEREBRO_MODULE_DIR, signature, str);
-                                                                                      
-      if (!stat(tempbuf, &statbuf))
-	goto found;
-                                                                                      
-      return 0;
-
- found:
-      if (strlen(tempbuf) >= buflen)
-	{
-	  cerebro_err_debug("%s(%s:%d): buflen too small: path=%s, buflen=%d", 
-			    __FILE__, __FUNCTION__, __LINE__, tempbuf, buflen);
-	  return -1;
-	}
-
-      strcpy(buf, tempbuf);
-      return 1;
-    }
-
-  /* NOT REACHED */
-  return 0;
-}
-
-int 
-cerebro_lookup_clusterlist_module_path(char *str, 
-				       char *buf, 
-				       unsigned int buflen)
-{
-  return _cerebro_lookup_module_path(str,
-				     buf,
-				     buflen,
-				     CEREBRO_CLUSTERLIST_FILENAME_SIGNATURE);
-}
-
-int 
-cerebro_lookup_config_module_path(char *str, 
-				  char *buf, 
-				  unsigned int buflen)
-{
-  return _cerebro_lookup_module_path(str,
-				     buf,
-				     buflen,
-				     CEREBRO_CONFIG_FILENAME_SIGNATURE);
-}
-#endif /* !WITH_STATIC_MODULES */
-
 char *
 cerebro_clusterlist_module_name(void)
 {
@@ -1078,19 +839,6 @@ cerebro_clusterlist_module_name(void)
     }
 
   return clusterlist_module_info->clusterlist_module_name;
-}
-
-int
-cerebro_clusterlist_parse_options(char **options)
-{
-  if (!clusterlist_module_info)
-    {
-      cerebro_err_debug("%s(%s:%d): clusterlist_module_info not loaded",
-			__FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
-  
-  return ((*clusterlist_module_info->parse_options)(options));
 }
 
 int
@@ -1181,19 +929,6 @@ cerebro_config_module_name(void)
     }
                                                                                      
   return config_module_info->config_module_name;
-}
-                                                                                     
-int
-cerebro_config_parse_options(char **options)
-{
-  if (!config_module_info)
-    {
-      cerebro_err_debug("%s(%s:%d): config_module_info not loaded",
-			__FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
-  
-  return ((*config_module_info->parse_options)(options));
 }
                                                                                      
 int

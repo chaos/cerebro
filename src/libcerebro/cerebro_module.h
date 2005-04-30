@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.h,v 1.7 2005-04-29 23:39:44 achu Exp $
+ *  $Id: cerebro_module.h,v 1.8 2005-04-30 17:09:10 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_MODULE_H
@@ -109,68 +109,13 @@ int cerebro_clusterlist_is_loaded(void);
  */
 int cerebro_config_is_loaded(void);
 
-#if WITH_STATIC_MODULES
-/* 
- * cerebro_lookup_clusterlist_module
- *
- * Lookup to see if the clusterlist module exists
- *
- * Returns 1 if found, 0 if not, -1 on error
- */
-int cerebro_lookup_clusterlist_module(char *module);
-
-/* 
- * cerebro_lookup_config_module
- *
- * Lookup to see if the config module exists
- *
- * Returns 1 if found, 0 if not, -1 on error
- */
-int cerebro_lookup_config_module(char *module);
-#else /* !WITH_STATIC_MODULES */
-/* 
- * cerebro_lookup_clusterlist_module_path
- *
- * Look up a clusterlist module path based on the string given by the
- * user.  The string can refer to a module name, filename, or full
- * path.
- *
- * Returns 1 and path in buf when the path is found, 0 if not, -1 on
- * error
- */
-int cerebro_lookup_clusterlist_module_path(char *str, 
-					   char *buf, 
-					   unsigned int buflen);
-
-/* 
- * cerebro_lookup_config_module_path
- *
- * Look up a config module path based on the string given by the
- * user.  The string can refer to a module name, filename, or full
- * path.
- *
- * Returns 1 and path in buf when the path is found, 0 if not, -1 on
- * error
- */
-int cerebro_lookup_config_module_path(char *str, 
-				      char *buf, 
-				      unsigned int buflen);
-#endif /* !WITH_STATIC_MODULES */
-
 /*
  * cerebro_clusterlist_module_name
  *
  * Return clusterlist module name
  */
 char *cerebro_clusterlist_module_name(void);
-                                                                                     
-/*
- * cerebro_clusterlist_parse_options
- *
- * call clusterlist module parse options function
- */
-int cerebro_clusterlist_parse_options(char **options);
-                                                                                     
+
 /*
  * cerebro_clusterlist_setup
  *
@@ -219,13 +164,6 @@ int cerebro_clusterlist_get_nodename(const char *node, char *buf, unsigned int b
  * Return config module name
  */
 char *cerebro_config_module_name(void);
-                                                                                     
-/*
- * cerebro_config_parse_options
- *
- * call config module parse options function
- */
-int cerebro_config_parse_options(char **options);
                                                                                      
 /*
  * cerebro_config_setup

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_api.c,v 1.5 2005-04-30 16:10:49 achu Exp $
+ *  $Id: cerebro_api.c,v 1.6 2005-04-30 17:09:10 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -248,12 +248,6 @@ _cerebro_load_config(cerebro_t handle, struct cerebro_config *config)
 {
   struct conffile_option options[] =
     {
-      {"clusterlist_module", CONFFILE_OPTION_STRING, -1,
-       _cb_string, 1, 0, &(config->clusterlist_module_flag),
-       &(config->clusterlist_module), 0},
-      {"clusterlist_module_options", CONFFILE_OPTION_LIST_STRING, -1,
-       _cb_string_array, 1, 0, &(config->clusterlist_module_options_flag),
-       &(config->clusterlist_module_options), 0},
       {"updown_hostnames", CONFFILE_OPTION_LIST_STRING, -1,
        _cb_string_array, 1, 0, &(config->updown_hostnames_flag),
        &(config->updown_hostnames), 0},
@@ -294,18 +288,6 @@ _cerebro_load_config(cerebro_t handle, struct cerebro_config *config)
 
  cleanup:
   conffile_handle_destroy(cf);
-  if (config->clusterlist_module_flag && config->clusterlist_module)
-    free(config->clusterlist_module);
-         
-  if (config->clusterlist_module_options_flag && 
-      config->clusterlist_module_options)
-    {
-      int i = 0;
-      
-      while (config->clusterlist_module_options[i])
-        free(config->clusterlist_module_options[i]);
-      free(config->clusterlist_module_options);
-    }
 
   if (config->updown_hostnames_flag && config->updown_hostnames)
     {
@@ -349,18 +331,6 @@ cerebro_unload_config(cerebro_t handle)
 
   config = &(handle->config);
 
-  if (config->clusterlist_module_flag && config->clusterlist_module)
-    free(config->clusterlist_module);
-         
-  if (config->clusterlist_module_options_flag && config->clusterlist_module_options)
-    {
-      int i = 0;
-      
-      while (config->clusterlist_module_options[i])
-        free(config->clusterlist_module_options[i]);
-      free(config->clusterlist_module_options);
-    }
-
   if (config->updown_hostnames_flag && config->updown_hostnames)
     {
       int i = 0;
@@ -370,10 +340,6 @@ cerebro_unload_config(cerebro_t handle)
       free(config->updown_hostnames);
     }
 
-  config->clusterlist_module = NULL;
-  config->clusterlist_module_flag = 0;
-  config->clusterlist_module_options = NULL;
-  config->clusterlist_module_options_flag = 0;
   config->updown_hostnames = NULL;
   config->updown_hostnames_flag = 0;
   config->updown_port = 0;

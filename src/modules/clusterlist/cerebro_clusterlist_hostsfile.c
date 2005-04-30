@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_hostsfile.c,v 1.9 2005-04-29 23:39:44 achu Exp $
+ *  $Id: cerebro_clusterlist_hostsfile.c,v 1.10 2005-04-30 17:09:10 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -19,7 +19,6 @@
 #include <fcntl.h>
 #endif /* HAVE_FCNTL_H */
 
-#include "module.h"
 #include "cerebro_defs.h"
 #include "cerebro_error.h"
 #include "cerebro_clusterlist_module.h"
@@ -44,30 +43,6 @@ static List hosts = NULL;
  * hostsfile database
  */
 static char *hostsfile_file = NULL;
-
-/* 
- * hostsfile_clusterlist_parse_options
- *
- * parse options for the hostsfile clusterlist module
- */
-static int
-hostsfile_clusterlist_parse_options(char **options)
-{
-  if (hosts)
-    {
-      cerebro_err_debug("%s(%s:%d): %s clusterlist module: hosts non-null", 
-                        __FILE__, __FUNCTION__, __LINE__,
-                        HOSTSFILE_CLUSTERLIST_MODULE_NAME);
-      return -1;
-    }
-
-  if (options)
-    return module_parse_filename(options, 
-				 &hostsfile_file, 
-				 HOSTSFILE_CLUSTERLIST_MODULE_NAME);
-
-  return 0;
-}
 
 /* 
  * _readline
@@ -578,7 +553,6 @@ struct cerebro_clusterlist_module_info clusterlist_module_info =
 #endif /* !WITH_STATIC_MODULES */
   {
     HOSTSFILE_CLUSTERLIST_MODULE_NAME,
-    &hostsfile_clusterlist_parse_options,
     &hostsfile_clusterlist_setup,
     &hostsfile_clusterlist_cleanup,
     &hostsfile_clusterlist_get_all_nodes,

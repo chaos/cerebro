@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_gendersllnl.c,v 1.3 2005-04-29 06:33:38 achu Exp $
+ *  $Id: cerebro_config_gendersllnl.c,v 1.4 2005-04-30 17:09:10 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -19,7 +19,6 @@
 
 #include <gendersllnl.h>
 
-#include "module.h"
 #include "cerebro_defs.h"
 #include "cerebro_error.h"
 #include "cerebro_config_module.h"
@@ -48,31 +47,6 @@ static char *gendersllnl_file = NULL;
  * Store private management network ip address
  */
 static char gendersllnl_heartbeat_network_interface[INET_ADDRSTRLEN+1];
-
-/*
- * gendersllnl_config_parse_options
- *
- * parse options for the gendersllnl config module
- */
-static int
-gendersllnl_config_parse_options(char **options)
-{
-  if (gendersllnl_handle)
-    {
-      cerebro_err_debug("%s(%s:%d): %s config module: "
-                        "gendersllnl_handle non-null",
-                        __FILE__, __FUNCTION__, __LINE__,
-                        GENDERSLLNL_CONFIG_MODULE_NAME);
-      return -1;
-    }
- 
-  if (options)
-    module_parse_filename(options,
-			  &gendersllnl_file,
-			  GENDERSLLNL_CONFIG_MODULE_NAME);
-
-  return 0;
-}
 
 /*
  * gendersllnl_config_setup
@@ -267,7 +241,6 @@ struct cerebro_config_module_info config_module_info =
 #endif /* !WITH_STATIC_MODULES */
   {
     GENDERSLLNL_CONFIG_MODULE_NAME,
-    &gendersllnl_config_parse_options,
     &gendersllnl_config_setup,
     &gendersllnl_config_cleanup,
     &gendersllnl_config_load_default,

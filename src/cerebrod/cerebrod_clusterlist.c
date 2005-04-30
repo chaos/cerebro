@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist.c,v 1.30 2005-04-30 16:10:49 achu Exp $
+ *  $Id: cerebrod_clusterlist.c,v 1.31 2005-04-30 17:09:10 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -23,7 +23,6 @@
 #include "cerebrod.h"
 #include "cerebrod_clusterlist.h"
 #include "cerebrod_config.h"
-#include "cerebrod_util.h"
 #include "wrappers.h"
 
 extern struct cerebrod_config conf;
@@ -33,37 +32,14 @@ int cerebrod_clusterlist_module_found = 0;
 int
 cerebrod_clusterlist_module_setup(void)
 {
-  char *module;
+  int rv;
 
-#if WITH_STATIC_MODULES
-  module = conf.clusterlist_module;
-#else /* !WITH_STATIC_MODULES */
-  module = conf.clusterlist_module_file;
-#endif /* !WITH_STATIC_MODULES */
+  if ((rv = cerebro_find_clusterlist_module()) < 0)
+    cerebro_err_exit("%s(%s:%d): cerebro_find_clusterlist_module: %s",
+		     __FILE__, __FUNCTION__, __LINE__, strerror(errno));
 
-  if (module)
-    {
-      int rv;
-
-      if ((rv = cerebro_load_clusterlist_module(module)) < 0)
-        cerebro_err_exit("%s(%s:%d): cerebro_load_clusterlist_module: %s",
-                         __FILE__, __FUNCTION__, __LINE__, strerror(errno));
-
-      if (!rv)
-	cerebro_err_exit("clusterlist module '%s' could not be loaded", 
-			 module);
-    }
-  else
-    {
-      int rv;
-
-      if ((rv = cerebro_find_clusterlist_module()) < 0)
-	cerebro_err_exit("%s(%s:%d): cerebro_find_clusterlist_module: %s",
-                         __FILE__, __FUNCTION__, __LINE__, strerror(errno));
-
-      if (rv)
-	cerebrod_clusterlist_module_found++;
-    }
+  if (rv)
+    cerebrod_clusterlist_module_found++;
 
 #ifndef NDEBUG
   if (conf.debug)

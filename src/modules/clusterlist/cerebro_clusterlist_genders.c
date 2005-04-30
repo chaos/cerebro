@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_genders.c,v 1.8 2005-04-29 23:39:44 achu Exp $
+ *  $Id: cerebro_clusterlist_genders.c,v 1.9 2005-04-30 17:09:10 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -15,7 +15,6 @@
 
 #include <genders.h>
 
-#include "module.h"
 #include "cerebro_defs.h"
 #include "cerebro_error.h"
 #include "cerebro_clusterlist_module.h"
@@ -38,31 +37,6 @@ static genders_t genders_handle = NULL;
  * genders database
  */
 static char *genders_file = NULL;
-
-/* 
- * genders_clusterlist_parse_options
- *
- * parse options for the genders clusterlist module
- */
-static int
-genders_clusterlist_parse_options(char **options)
-{
-  if (genders_handle)
-    {
-      cerebro_err_debug("%s(%s:%d): %s clusterlist module: "
-                        "genders_handle non-null",
-                        __FILE__, __FUNCTION__, __LINE__,
-                        GENDERS_CLUSTERLIST_MODULE_NAME);
-      return -1;
-    }
-
-  if (options)
-    return module_parse_filename(options,
-				 &genders_file,
-				 GENDERS_CLUSTERLIST_MODULE_NAME);
-
-  return 0;
-}
 
 /* 
  * genders_clusterlist_setup
@@ -288,7 +262,6 @@ struct cerebro_clusterlist_module_info clusterlist_module_info =
 #endif /* !WITH_STATIC_MODULES */
   {
     GENDERS_CLUSTERLIST_MODULE_NAME,
-    &genders_clusterlist_parse_options,
     &genders_clusterlist_setup,
     &genders_clusterlist_cleanup,
     &genders_clusterlist_get_all_nodes,

@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebrod.8.in,v 1.14 2005-04-30 16:28:32 achu Exp $
+\."$Id: cerebrod.8.in,v 1.15 2005-04-30 17:09:10 achu Exp $
 \."#############################################################################
 .TH cerebrod 8 "May 2005" "cerebrod @VERSION@" cerebrod
 .SH "NAME"
@@ -25,9 +25,6 @@ Output version
 .TP
 .B  -c, --config-file
 Specify alternate configuration file
-.TP
-.B  -m, --config-module
-Specify configuration module
 .TP
 .B  -d, --debug
 Turn on debugging and run daemon in foreground
@@ -110,13 +107,6 @@ will search for other configuration modules.
 
 It is not necessary for a configuration module to be found and loaded.
 
-.if @MANPAGE_DEBUG@ \{
-A configuration module can also be specified on the command line with
-the
-.I -m 
-option.
-\}
-
 .if !@MANPAGE_STATIC_MODULES@ \{
 For more information on writing 
 .B cerebrod
@@ -137,16 +127,7 @@ nodes of the cluster if there is no knowledge of what all of the
 nodes in the cluster actually are.
 
 The list of cluster nodes can be specified in several formats by using
-one of a number of clusterlist modules.  Clusterlist modules can
-be selected using the
-.I clusterlist_module
-configuration option in the
-.B cerebrod
-configuration file.
-Configurable options can be passed to the clusterlist modules through the
-.I clusterlist_module_options
-configuration file option.  The options are typically listed as
-key=value pairs.
+one of a number of clusterlist modules.  
 
 The following config modules
 are distributed by
@@ -188,7 +169,7 @@ will search for other clusterlist modules.
 
 It is not necessary for a configuration module to be found and loaded.
 .B Cerebrod
-will simply not use a clusterlist module.
+will simply not use a clusterlist module if one cannot be found.
 
 .if !@MANPAGE_STATIC_MODULES@ \{
 For more information on writing 

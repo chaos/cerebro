@@ -1,21 +1,9 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_module.h,v 1.7 2005-04-29 23:39:44 achu Exp $
+ *  $Id: cerebro_clusterlist_module.h,v 1.8 2005-04-30 17:09:10 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_CLUSTERLIST_MODULE_H
 #define _CEREBRO_CLUSTERLIST_MODULE_H
-
-/*
- * Cerebro_clusterlist_parse_options
- *
- * function prototype for clusterlist module function to parse
- * options.  Required to be defined by each config module.
- *
- * - options - array of strings.  The strings are usually key=value pairs
- *
- * Returns 0 on success, -1 on error
- */
-typedef int (*Cerebro_clusterlist_parse_options)(char **options);
 
 /*
  * Cerebro_clusterlist_setup
@@ -107,7 +95,6 @@ typedef int (*Cerebro_clusterlist_get_nodename)(const char *node,
 struct cerebro_clusterlist_module_info
 {
   char *clusterlist_module_name;
-  Cerebro_clusterlist_parse_options parse_options;
   Cerebro_clusterlist_setup setup;
   Cerebro_clusterlist_cleanup cleanup;
   Cerebro_clusterlist_get_all_nodes get_all_nodes;

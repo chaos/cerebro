@@ -1,7 +1,7 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.2 2005-04-29 06:33:38 achu Exp $
+## $Id: Makefile.am,v 1.3 2005-04-30 17:09:10 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
 
-SUBDIRS = clusterlist config libmodule
+SUBDIRS = clusterlist config

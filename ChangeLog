@@ -4,6 +4,10 @@
 
 	* Reworked cerebro lib and cerebrod daemon to assume none module
 	behavior when a clusterlist module is not loaded.
+
+	* Remove clusterlist and config configuration command line options
+	and configuration file options.  Now modules are searched for and
+	that's it.
 	
 2005-04-29  Albert Chu  <chu11@llnl.gov>
 

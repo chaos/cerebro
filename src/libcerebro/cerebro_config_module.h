@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_module.h,v 1.6 2005-04-29 06:33:38 achu Exp $
+ *  $Id: cerebro_config_module.h,v 1.7 2005-04-30 17:09:10 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_CONFIG_MODULE_H
@@ -24,21 +24,7 @@ struct cerebrod_module_config
   int listen_threads;
   int updown_server;
   int updown_server_port;
-  char *clusterlist_module;
-  char **clusterlist_module_options;
 };
-
-/*
- * Cerebro_config_parse_options
- *
- * function prototype for config module function to parse
- * options.  Required to be defined by each config module.
- *
- * - options - array of strings.  The strings are usually key=value pairs
- *
- * Returns 0 on success, -1 on error
- */
-typedef int (*Cerebro_config_parse_options)(char **options);
 
 /*
  * Cerebro_config_setup
@@ -80,7 +66,6 @@ typedef int (*Cerebro_config_load_cerebrod_default)(struct cerebrod_module_confi
 struct cerebro_config_module_info
 {
   char *config_module_name;
-  Cerebro_config_parse_options parse_options;
   Cerebro_config_setup setup;
   Cerebro_config_cleanup cleanup;
   Cerebro_config_load_cerebrod_default load_cerebrod_default;

@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.7 2005-04-29 21:09:24 achu Exp $
+## $Id: Makefile.am,v 1.8 2005-04-30 17:09:10 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -26,8 +26,7 @@ MODULE_FLAGS = -module -avoid-version
 
 libconfigmodules_la_SOURCES = $(GENDERSLLNL_STATIC_SOURCES)
 libconfigmodules_la_CFLAGS  = -I$(srcdir)/../../libcerebro \
-                              -I$(srcdir)/../../libcommon \
-			      -I$(srcdir)/../libmodule
+                              -I$(srcdir)/../../libcommon
 libconfigmodules_la_LDFLAGS = $(GENDERSLLNL_STATIC_LIBS) \
 			      $(CONFIG_OTHER_FLAGS)
 
@@ -36,15 +35,10 @@ cerebro_config_gendersllnl_la_LDFLAGS = $(MODULE_FLAGS) \
 				 	$(GENDERSLLNL_LIBS) \
 				 	$(CONFIG_OTHER_FLAGS)
 cerebro_config_gendersllnl_la_CFLAGS  = -I$(srcdir)/../../libcerebro \
-					-I$(srcdir)/../../libcommon \
-					-I$(srcdir)/../libmodule
-cerebro_config_gendersllnl_la_LIBADD  = ../../libcommon/libcommon.la \
-					../libmodule/libmodule.la
+					-I$(srcdir)/../../libcommon
+cerebro_config_gendersllnl_la_LIBADD  = ../../libcommon/libcommon.la
 
 ../../libcommon/libcommon.la : force-dependency-check
-	@cd `dirname $@` && make `basename $@`
-
-../libmodule/libmodule.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
 force-dependency-check:
