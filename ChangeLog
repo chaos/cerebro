@@ -8,6 +8,8 @@
 	* Remove clusterlist and config configuration command line options
 	and configuration file options.  Now modules are searched for and
 	that's it.
+
+	* Make hostsfile module configurable at compile time.
 	
 2005-04-29  Albert Chu  <chu11@llnl.gov>
 

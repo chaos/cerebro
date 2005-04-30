@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.24 2005-04-30 17:09:10 achu Exp $
+## $Id: configure.ac,v 1.25 2005-04-30 17:45:48 achu Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -78,21 +78,23 @@ AC_STATIC_MODULES
 AM_CONDITIONAL(WITH_STATIC_MODULES, [test "$ac_with_static_modules" = "yes"])
 
 #
-# Check for new default hostsfile
+# Check for gendersllnl modules
 #
-AC_HOSTSFILE
+AC_GENDERSLLNL
+AM_CONDITIONAL(WITH_GENDERSLLNL, [test "$ac_with_gendersllnl" = "yes"])
 
 #
-# Check for genders
+# Check for genders modules
 #
 AC_GENDERS
 AM_CONDITIONAL(WITH_GENDERS, [test "$ac_with_genders" = "yes"])
 
 #
-# Check for gendersllnl
+# Check for hostsfile modules
 #
-AC_GENDERSLLNL
-AM_CONDITIONAL(WITH_GENDERSLLNL, [test "$ac_with_gendersllnl" = "yes"])
+AC_HOSTSFILE
+AC_HOSTSFILE_PATH
+AM_CONDITIONAL(WITH_HOSTSFILE, [test "$ac_with_hostsfile" = "yes"])
 
 ##
 # Checks for typedefs, structures, and compiler characteristics.

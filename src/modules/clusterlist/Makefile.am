@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.8 2005-04-30 17:09:10 achu Exp $
+## $Id: Makefile.am,v 1.9 2005-04-30 17:45:48 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -17,6 +17,7 @@ GENDERSLLNL_CLUSTERLIST_MODULE = cerebro_clusterlist_gendersllnl.la
 GENDERSLLNL_STATIC_SOURCES = cerebro_clusterlist_gendersllnl.c
 GENDERS_STATIC_UTIL_SOURCES = cerebro_clusterlist_genders_util.c
 GENDERSLLNL_STATIC_LIBS = $(GENDERSLLNL_LIBS)
+CLUSTERLIST_UTIL_SOURCES = cerebro_clusterlist_util.c
 endif
 
 if WITH_GENDERS
@@ -24,6 +25,13 @@ GENDERS_CLUSTERLIST_MODULE = cerebro_clusterlist_genders.la
 GENDERS_STATIC_SOURCES = cerebro_clusterlist_genders.c
 GENDERS_STATIC_UTIL_SOURCES = cerebro_clusterlist_genders_util.c
 GENDERS_STATIC_LIBS = $(GENDERS_LIBS)
+CLUSTERLIST_UTIL_SOURCES = cerebro_clusterlist_util.c
+endif
+
+if WITH_HOSTSFILE
+HOSTSFILE_CLUSTERLIST_MODULE = cerebro_clusterlist_hostsfile.la
+HOSTSFILE_STATIC_SOURCES = cerebro_clusterlist_hostsfile.c
+CLUSTERLIST_UTIL_SOURCES = cerebro_clusterlist_util.c
 endif
 
 if WITH_STATIC_MODULES
@@ -32,7 +40,7 @@ else
 modulelibdir = $(CEREBRO_MODULE_DIR)
 modulelib_LTLIBRARIES = $(GENDERSLLNL_CLUSTERLIST_MODULE) \
 		        $(GENDERS_CLUSTERLIST_MODULE) \
-		        cerebro_clusterlist_hostsfile.la
+		        $(HOSTSFILE_CLUSTERLIST_MODULE)
 endif
 
 MODULE_FLAGS = -module -avoid-version
@@ -40,8 +48,8 @@ MODULE_FLAGS = -module -avoid-version
 libclusterlistmodules_la_SOURCES = $(GENDERSLLNL_STATIC_SOURCES) \
 				   $(GENDERS_STATIC_SOURCES) \
 				   $(GENDERS_STATIC_UTIL_SOURCES) \
-				   cerebro_clusterlist_hostsfile.c \
-				   cerebro_clusterlist_util.c
+				   $(HOSTSFILE_STATIC_SOURCES) \
+				   $(CLUSTERLIST_UTIL_SOURCES)
 libclusterlistmodules_la_CFLAGS  = -I$(srcdir)/../../libcerebro \
 				   -I$(srcdir)/../../libcommon
 libclusterlistmodules_la_LDFLAGS = $(GENDERSLLNL_STATIC_LIBS) \

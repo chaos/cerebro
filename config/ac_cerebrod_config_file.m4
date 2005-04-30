@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: ac_cerebrod_config_file.m4,v 1.1 2005-03-20 19:35:49 achu Exp $
+## $Id: ac_cerebrod_config_file.m4,v 1.2 2005-04-30 17:45:48 achu Exp $
 ##*****************************************************************************
 
 AC_DEFUN([AC_CEREBROD_CONFIG_FILE],
@@ -10,7 +10,7 @@ AC_DEFUN([AC_CEREBROD_CONFIG_FILE],
     [ case "$withval" in
         no)  CEREBROD_CONFIG_FILE_DEFAULT=/etc/cerebro/cerebrod.conf ;;
         yes) CEREBROD_CONFIG_FILE_DEFAULT=/etc/cerebro/cerebrod.conf ;;
-        *)   CEREBROD_CONFIG_FILE_DEFAULT=$withval 
+        *)   CEREBROD_CONFIG_FILE_DEFAULT=$withval ;;
       esac
     ]
   )
