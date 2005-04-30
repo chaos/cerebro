@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebrod.8.in,v 1.13 2005-04-29 17:12:04 achu Exp $
+\."$Id: cerebrod.8.in,v 1.14 2005-04-30 16:28:32 achu Exp $
 \."#############################################################################
 .TH cerebrod 8 "May 2005" "cerebrod @VERSION@" cerebrod
 .SH "NAME"
@@ -171,8 +171,6 @@ separate line.  Can be passed a filename=value option to specify an
 non-default hostsfile database location.  The default hostsfile is
 located at @CEREBRO_CLUSTERLIST_HOSTSFILE_DEFAULT@.
 
-none - Do not use a cluster list.
-
 .ie @MANPAGE_STATIC_MODULES@ \{
 When a clusterlist module is not specified, the above clusterlist
 modules are searched for by
@@ -187,6 +185,10 @@ If none of the above are found,
 .B cerebrod
 will search for other clusterlist modules.
 \}
+
+It is not necessary for a configuration module to be found and loaded.
+.B Cerebrod
+will simply not use a clusterlist module.
 
 .if !@MANPAGE_STATIC_MODULES@ \{
 For more information on writing 
