@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.6 2005-04-29 21:09:24 achu Exp $
+## $Id: Makefile.am,v 1.7 2005-04-30 16:10:49 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -32,8 +32,7 @@ else
 modulelibdir = $(CEREBRO_MODULE_DIR)
 modulelib_LTLIBRARIES = $(GENDERSLLNL_CLUSTERLIST_MODULE) \
 		        $(GENDERS_CLUSTERLIST_MODULE) \
-		        cerebro_clusterlist_hostsfile.la \
-		        cerebro_clusterlist_none.la
+		        cerebro_clusterlist_hostsfile.la
 endif
 
 MODULE_FLAGS = -module -avoid-version
@@ -42,7 +41,6 @@ libclusterlistmodules_la_SOURCES = $(GENDERSLLNL_STATIC_SOURCES) \
 				   $(GENDERS_STATIC_SOURCES) \
 				   $(GENDERS_STATIC_UTIL_SOURCES) \
 				   cerebro_clusterlist_hostsfile.c \
-				   cerebro_clusterlist_none.c \
 				   cerebro_clusterlist_util.c
 libclusterlistmodules_la_CFLAGS  = -I$(srcdir)/../../libcerebro \
 				   -I$(srcdir)/../../libcommon \
@@ -84,16 +82,6 @@ cerebro_clusterlist_hostsfile_la_CFLAGS  = -I$(srcdir)/../../libcerebro \
 				   	   -I$(srcdir)/../libmodule
 cerebro_clusterlist_hostsfile_la_LIBADD  = ../../libcommon/libcommon.la \
 					   ../libmodule/libmodule.la
-
-cerebro_clusterlist_none_la_SOURCES = cerebro_clusterlist_none.c \
-				       cerebro_clusterlist_util.c
-cerebro_clusterlist_none_la_LDFLAGS = $(MODULE_FLAGS) \
-				      $(CLUSTERLIST_OTHER_FLAGS)
-cerebro_clusterlist_none_la_CFLAGS  = -I$(srcdir)/../../libcerebro \
-				      -I$(srcdir)/../../libcommon \
-				      -I$(srcdir)/../libmodule
-cerebro_clusterlist_none_la_LIBADD  = ../../libcommon/libcommon.la \
-				      ../libmodule/libmodule.la
 
 ../../libcommon/libcommon.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.47 2005-04-29 17:12:04 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.48 2005-04-30 16:10:49 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -37,6 +37,7 @@
 #define CEREBROD_LISTENER_REHASH_LIMIT        (cluster_data_hash_size*2)
 
 extern struct cerebrod_config conf;
+extern int cerebrod_clusterlist_module_found;
 #ifndef NDEBUG
 extern pthread_mutex_t debug_output_mutex;
 #endif /* NDEBUG */
@@ -59,7 +60,7 @@ pthread_mutex_t cerebrod_listener_initialization_complete_lock = PTHREAD_MUTEX_I
  *
  * listener file descriptor and lock to protect concurrent access
  */
-int listener_fd;
+int listener_fd = 0;
 pthread_mutex_t listener_fd_lock = PTHREAD_MUTEX_INITIALIZER;
 
 /*
@@ -72,8 +73,8 @@ pthread_mutex_t listener_fd_lock = PTHREAD_MUTEX_INITIALIZER;
  * lock to protect concurrent access
  */
 hash_t cluster_data_hash = NULL;
-int cluster_data_hash_numnodes;
-int cluster_data_hash_size;
+int cluster_data_hash_numnodes = 0;
+int cluster_data_hash_size = 0;
 pthread_mutex_t cluster_data_hash_lock = PTHREAD_MUTEX_INITIALIZER;
 
 /* 
@@ -169,11 +170,14 @@ _cerebrod_listener_initialize(void)
   /* If a clusterlist is found/used, use the numnodes count as the 
    * initializing hash size. 
    */
-  if ((cluster_data_hash_size = cerebro_clusterlist_numnodes()) < 0)
-    cerebro_err_exit("%s(%s:%d): cerebro_clusterlist_numnodes",
-                     __FILE__, __FUNCTION__, __LINE__);
+  if (cerebrod_clusterlist_module_found)
+    {
+      if ((cluster_data_hash_size = cerebro_clusterlist_numnodes()) < 0)
+	cerebro_err_exit("%s(%s:%d): cerebro_clusterlist_numnodes",
+			 __FILE__, __FUNCTION__, __LINE__);
+    }
   
-  if (!cluster_data_hash_size)
+  if (cluster_data_hash_size <= 0) 
     cluster_data_hash_size = CEREBROD_LISTENER_HASH_SIZE_DEFAULT;
 
   cluster_data_hash_numnodes = 0;
@@ -451,32 +455,43 @@ cerebrod_listener(void *arg)
 	  continue;
 	}
       
-      if ((rv = cerebro_clusterlist_node_in_cluster(hb.nodename)) < 0)
-        cerebro_err_exit("%s(%s:%d): cerebro_clusterlist_node_in_cluster: %s",
-                         __FILE__, __FUNCTION__, __LINE__, hb.nodename);
+      /* No clusterlist module?  Then we assume this packet is in the cluster */
+      if (cerebrod_clusterlist_module_found)
+	{
+	  if ((rv = cerebro_clusterlist_node_in_cluster(hb.nodename)) < 0)
+	    cerebro_err_exit("%s(%s:%d): cerebro_clusterlist_node_in_cluster: %s",
+			     __FILE__, __FUNCTION__, __LINE__, hb.nodename);
       
-      if (!rv)
-        {
-          cerebro_err_debug("%s(%s:%d): received non-cluster packet from: %s",
-                            __FILE__, __FUNCTION__, __LINE__,
-                            hb.nodename);
-          continue;
-        }
+	  if (!rv)
+	    {
+	      cerebro_err_debug("%s(%s:%d): received non-cluster packet from: %s",
+				__FILE__, __FUNCTION__, __LINE__,
+				hb.nodename);
+	      continue;
+	    }
+	}
       
-      /* Guarantee truncation */
+      /* Guarantee ending '\0' character */
       memset(nodename_buf, '\0', CEREBRO_MAXNODENAMELEN+1);
       memcpy(nodename_buf, hb.nodename, CEREBRO_MAXNODENAMELEN);
 
       memset(nodename_key, '\0', CEREBRO_MAXNODENAMELEN+1);
-      if (cerebro_clusterlist_get_nodename(nodename_buf,
-					   nodename_key, 
-					   CEREBRO_MAXNODENAMELEN+1) < 0)
-        {
-          cerebro_err_debug("%s(%s:%d): cerebro_clusterlist_get_nodename: %s",
-                            __FILE__, __FUNCTION__, __LINE__,
-                            hb.nodename);
-          continue;
-        }
+
+      /* No clusterlist module?  Then we just use whatever hostname is given to us */
+      if (cerebrod_clusterlist_module_found)
+	{
+	  if (cerebro_clusterlist_get_nodename(nodename_buf,
+					       nodename_key, 
+					       CEREBRO_MAXNODENAMELEN+1) < 0)
+	    {
+	      cerebro_err_debug("%s(%s:%d): cerebro_clusterlist_get_nodename: %s",
+				__FILE__, __FUNCTION__, __LINE__,
+				hb.nodename);
+	      continue;
+	    }
+	}
+      else
+	memcpy(nodename_key, nodename_buf, CEREBRO_MAXNODENAMELEN);
 
       Pthread_mutex_lock(&cluster_data_hash_lock);
       nd = Hash_find(cluster_data_hash, nodename_key);

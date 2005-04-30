@@ -1,3 +1,10 @@
+2005-04-30  Albert Chu  <chu11@llnl.gov>
+
+	* Removed none module.
+
+	* Reworked cerebro lib and cerebrod daemon to assume none module
+	behavior when a clusterlist module is not loaded.
+	
 2005-04-29  Albert Chu  <chu11@llnl.gov>
 
 	* Added parse_options function to config modules.

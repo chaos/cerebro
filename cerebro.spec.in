@@ -63,8 +63,6 @@ DESTDIR="$RPM_BUILD_ROOT" make install
 %{_includedir}/*
 %if %{?_with_chaos:1}%{!?_with_chaos:0}
 %{_libdir}/cerebro/*
-%else
-%{_libdir}/cerebro/*none.*
 %endif
 %{_libdir}/libcerebro.*
 %{_mandir}/*

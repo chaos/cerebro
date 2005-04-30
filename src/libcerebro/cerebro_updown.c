@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_updown.c,v 1.15 2005-04-29 23:39:44 achu Exp $
+ *  $Id: cerebro_updown.c,v 1.16 2005-04-30 16:10:49 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -796,27 +796,44 @@ _cerebro_updown_is_node(cerebro_t handle,
       return -1;
     }
 
-  memset(buffer, '\0', CEREBRO_MAXNODENAMELEN+1);
-  
-  if ((rv = cerebro_clusterlist_node_in_cluster(node)) < 0)
+  /* Clusterlist module may have not been found */
+  if (handle->loaded_state & CEREBRO_CLUSTERLIST_MODULE_LOADED)
     {
-      handle->errnum = CEREBRO_ERR_CLUSTERLIST_MODULE;
-      return -1;
-    }
-  
-  if (!rv)
-    {
-      handle->errnum = CEREBRO_ERR_NODE_NOTFOUND;
-      return -1;
-    }
+      if ((rv = cerebro_clusterlist_node_in_cluster(node)) < 0)
+	{
+	  handle->errnum = CEREBRO_ERR_CLUSTERLIST_MODULE;
+	  return -1;
+	}
 
-  if (cerebro_clusterlist_get_nodename(node,
-				       buffer, 
-				       CEREBRO_MAXNODENAMELEN) < 0)
-    {
-      handle->errnum = CEREBRO_ERR_CLUSTERLIST_MODULE;
-      return -1;
+      if (!rv)
+	{
+	  handle->errnum = CEREBRO_ERR_NODE_NOTFOUND;
+	  return -1;
+	}
+
+      memset(buffer, '\0', CEREBRO_MAXNODENAMELEN+1);
+      
+      if (cerebro_clusterlist_get_nodename(node,
+					   buffer, 
+					   CEREBRO_MAXNODENAMELEN) < 0)
+	{
+	  handle->errnum = CEREBRO_ERR_CLUSTERLIST_MODULE;
+	  return -1;
+	}
     }
+  else
+    {
+      /* If there is no clusterlist module, this is the best we can
+       * do 
+       */
+      if (hostlist_find(updown_data->up_nodes, node) < 0
+	  && hostlist_find(updown_data->down_nodes, node) < 0)
+	{
+	  handle->errnum = CEREBRO_ERR_NODE_NOTFOUND;
+	  return -1;
+	}
+    }
+  
 
   updown_data = (struct cerebro_updown_data *)handle->updown_data;
 

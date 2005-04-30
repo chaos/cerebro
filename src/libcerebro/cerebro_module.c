@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.c,v 1.11 2005-04-29 23:39:44 achu Exp $
+ *  $Id: cerebro_module.c,v 1.12 2005-04-30 16:10:49 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -44,7 +44,6 @@ extern struct cerebro_clusterlist_module_info genders_clusterlist_module_info;
 #endif /* WITH_GENDERS */
 
 extern struct cerebro_clusterlist_module_info hostsfile_clusterlist_module_info;
-extern struct cerebro_clusterlist_module_info none_clusterlist_module_info;
 
 /*
  * static_config_modules
@@ -74,7 +73,6 @@ struct cerebro_clusterlist_module_info *static_clusterlist_modules[] =
     &genders_clusterlist_module_info,
 #endif /* WITH_GENDERS */
     &hostsfile_clusterlist_module_info,
-    &none_clusterlist_module_info,
     NULL
   };
 
@@ -102,7 +100,6 @@ static lt_dlhandle config_module_dl_handle = NULL;
 char *dynamic_clusterlist_modules[] = {
   "cerebro_clusterlist_gendersllnl.la",
   "cerebro_clusterlist_genders.la",
-  "cerebro_clusterlist_none.la",
   "cerebro_clusterlist_hostsfile.la",
   NULL
 };
@@ -1079,10 +1076,10 @@ cerebro_clusterlist_module_name(void)
 			__FILE__, __FUNCTION__, __LINE__);
       return NULL;
     }
-                                                                                     
+
   return clusterlist_module_info->clusterlist_module_name;
 }
-                                                                                     
+
 int
 cerebro_clusterlist_parse_options(char **options)
 {
@@ -1095,7 +1092,7 @@ cerebro_clusterlist_parse_options(char **options)
   
   return ((*clusterlist_module_info->parse_options)(options));
 }
-                                                                                     
+
 int
 cerebro_clusterlist_setup(void)
 {
@@ -1133,7 +1130,7 @@ cerebro_clusterlist_get_all_nodes(char **nodes, unsigned int nodeslen)
   
   return ((*clusterlist_module_info->get_all_nodes)(nodes, nodeslen));
 }
-                                                                                     
+
 int
 cerebro_clusterlist_numnodes(void)
 {
@@ -1146,7 +1143,7 @@ cerebro_clusterlist_numnodes(void)
   
   return ((*clusterlist_module_info->numnodes)());
 }
-                                                                                     
+
 int
 cerebro_clusterlist_node_in_cluster(const char *node)
 {

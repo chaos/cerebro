@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_api.c,v 1.4 2005-04-29 23:39:44 achu Exp $
+ *  $Id: cerebro_api.c,v 1.5 2005-04-30 16:10:49 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -393,6 +393,7 @@ int
 cerebro_api_load_clusterlist_module(cerebro_t handle)
 {
   int rv;
+  int module_setup_called = 0;
 
   if (cerebro_handle_check(handle) < 0)
     return -1;
@@ -402,31 +403,40 @@ cerebro_api_load_clusterlist_module(cerebro_t handle)
       if (cerebro_module_setup() < 0)
 	{
 	  handle->errnum = CEREBRO_ERR_CLUSTERLIST_MODULE;
-	  return -1;
+	  goto cleanup;
 	}
+      module_setup_called++;
       handle->loaded_state |= CEREBRO_MODULE_SETUP_CALLED;
     }
 
   /* XXX search based on config file */
-  if (cerebro_find_clusterlist_module() < 0)
+  if ((rv = cerebro_find_clusterlist_module()) < 0)
     {
       handle->errnum = CEREBRO_ERR_CLUSTERLIST_MODULE;
-      return -1;
+      goto cleanup;
     }
-
-  if ((rv = cerebro_clusterlist_is_loaded()))
-    handle->loaded_state |= CEREBRO_CLUSTERLIST_MODULE_LOADED;
 
   if (rv)
     {
       if (cerebro_clusterlist_setup() < 0)
         {
           handle->errnum = CEREBRO_ERR_CLUSTERLIST_MODULE;
-          return -1;
+	  goto cleanup;
         }
     }
 
+  if ((rv = cerebro_clusterlist_is_loaded()))
+    handle->loaded_state |= CEREBRO_CLUSTERLIST_MODULE_LOADED;
+
+  if (module_setup_called)
+    handle->loaded_state |= CEREBRO_MODULE_SETUP_CALLED;
+
   return rv;
+ cleanup:
+  if (module_setup_called)
+    cerebro_module_cleanup();
+  
+  return -1;
 }
 
 int 

@@ -7,6 +7,7 @@
 - test
    - fd leaking
    - mem-leaking
+   - none module works if no clusterlist modules found
 
 - to GPL
   - on all headers
@@ -77,3 +78,5 @@
   - cerebro_config_setup - hmmmm
 
 - .h file order consistency
+
+- code style of always calling "cerebro_clusterlist_is_loaded" to check between none vs. clusterlist module ... is there a better way?? hide in the library??
