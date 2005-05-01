@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist.c,v 1.31 2005-04-30 17:09:10 achu Exp $
+ *  $Id: cerebrod_clusterlist.c,v 1.32 2005-05-01 16:49:59 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -27,19 +27,12 @@
 
 extern struct cerebrod_config conf;
 
-int cerebrod_clusterlist_module_found = 0;
-
 int
 cerebrod_clusterlist_module_setup(void)
 {
-  int rv;
-
-  if ((rv = cerebro_find_clusterlist_module()) < 0)
-    cerebro_err_exit("%s(%s:%d): cerebro_find_clusterlist_module: %s",
+  if (cerebro_load_clusterlist_module())
+    cerebro_err_exit("%s(%s:%d): cerebro_load_clusterlist_module: %s",
 		     __FILE__, __FUNCTION__, __LINE__, strerror(errno));
-
-  if (rv)
-    cerebrod_clusterlist_module_found++;
 
 #ifndef NDEBUG
   if (conf.debug)
@@ -47,11 +40,8 @@ cerebrod_clusterlist_module_setup(void)
       fprintf(stderr, "**************************************\n");
       fprintf(stderr, "* Cerebro Clusterlist Configuration:\n");
       fprintf(stderr, "* -----------------------\n");
-      if (cerebrod_clusterlist_module_found)
-	fprintf(stderr, "* Loaded clusterlist module: %s\n", 
-		cerebro_clusterlist_module_name());
-      else
-	fprintf(stderr, "* No clusterlist module found\n");
+      fprintf(stderr, "* Loaded clusterlist module: %s\n", 
+	      cerebro_clusterlist_module_name());
       fprintf(stderr, "**************************************\n");
     }
 #endif /* NDEBUG */

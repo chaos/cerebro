@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_updown.c,v 1.16 2005-04-30 16:10:49 achu Exp $
+ *  $Id: cerebro_updown.c,v 1.17 2005-05-01 16:49:59 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -636,7 +636,7 @@ cerebro_updown_load_data(cerebro_t handle,
         }
     }
 
-  if (!(handle->loaded_state & CEREBRO_CLUSTERLIST_MODULE_LOADED))
+  if (!(handle->loaded_state & CEREBRO_CLUSTERLIST_MODULE_FOUND))
     {
       if (cerebro_api_load_clusterlist_module(handle) < 0)
 	goto cleanup;
@@ -796,8 +796,10 @@ _cerebro_updown_is_node(cerebro_t handle,
       return -1;
     }
 
-  /* Clusterlist module may have not been found */
-  if (handle->loaded_state & CEREBRO_CLUSTERLIST_MODULE_LOADED)
+  /* Special case: We can do better than the clusterlist module
+   * default for cerebro_clusterlist_node_in_cluster.
+   */
+  if (handle->loaded_state & CEREBRO_CLUSTERLIST_MODULE_FOUND)
     {
       if ((rv = cerebro_clusterlist_node_in_cluster(node)) < 0)
 	{
@@ -823,9 +825,6 @@ _cerebro_updown_is_node(cerebro_t handle,
     }
   else
     {
-      /* If there is no clusterlist module, this is the best we can
-       * do 
-       */
       if (hostlist_find(updown_data->up_nodes, node) < 0
 	  && hostlist_find(updown_data->down_nodes, node) < 0)
 	{

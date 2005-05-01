@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.c,v 1.39 2005-04-30 16:10:49 achu Exp $
+ *  $Id: cerebrod_updown.c,v 1.40 2005-05-01 16:49:59 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -39,7 +39,6 @@
 #define CEREBROD_UPDOWN_REHASH_LIMIT                   (updown_node_data_index_size*2)
 
 extern struct cerebrod_config conf;
-extern int cerebrod_clusterlist_module_found;
 #ifndef NDEBUG
 extern pthread_mutex_t debug_output_mutex;
 #endif /* NDEBUG */
@@ -194,12 +193,9 @@ _cerebrod_updown_initialize(void)
     cerebro_err_exit("%s(%s:%d): updown_fd setup failed",
                      __FILE__, __FUNCTION__, __LINE__);
 
-  if (cerebrod_clusterlist_module_found)
-    {
-      if ((numnodes = cerebro_clusterlist_numnodes()) < 0)
-	cerebro_err_exit("%s(%s:%d): cerebro_clusterlist_numnodes",
-			 __FILE__, __FUNCTION__, __LINE__);
-    }
+  if ((numnodes = cerebro_clusterlist_numnodes()) < 0)
+    cerebro_err_exit("%s(%s:%d): cerebro_clusterlist_numnodes",
+		     __FILE__, __FUNCTION__, __LINE__);
 
   if (numnodes > 0)
     {

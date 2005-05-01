@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.37 2005-04-30 17:09:10 achu Exp $
+ *  $Id: cerebrod.c,v 1.38 2005-05-01 16:49:59 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -38,7 +38,6 @@ pthread_mutex_t debug_output_mutex = PTHREAD_MUTEX_INITIALIZER;
 #endif /* NDEBUG */
 
 extern struct cerebrod_config conf;
-extern int cerebrod_clusterlist_module_found;
 
 extern int cerebrod_listener_initialization_complete;
 extern pthread_cond_t cerebrod_listener_initialization_complete_cond;
@@ -75,12 +74,9 @@ _cerebrod_post_config_initialization(void)
     cerebro_err_exit("%s(%s:%d): cerebrod_clusterlist_module_setup",
                      __FILE__, __FUNCTION__, __LINE__);
 
-  if (cerebrod_clusterlist_module_found)
-    {
-      if (cerebro_clusterlist_setup() < 0)
-	cerebro_err_exit("%s(%s:%d): cerebro_clusterlist_setup",
-			 __FILE__, __FUNCTION__, __LINE__);
-    }
+  if (cerebro_clusterlist_setup() < 0)
+    cerebro_err_exit("%s(%s:%d): cerebro_clusterlist_setup",
+		     __FILE__, __FUNCTION__, __LINE__);
 
   if (conf.updown_server)
     Signal(SIGPIPE, SIG_IGN);

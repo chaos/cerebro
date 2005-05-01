@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_gendersllnl.c,v 1.4 2005-04-30 17:09:10 achu Exp $
+ *  $Id: cerebro_config_gendersllnl.c,v 1.5 2005-05-01 16:49:59 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -136,15 +136,16 @@ gendersllnl_config_cleanup(void)
 }
 
 /* 
- * gendersllnl_config_load_default
+ * gendersllnl_config_load_cerebrod_default
  *
- * alter default module specifically for use on LLNL clusters 'mgmt'
- * nodes listen and speak, while compute nodes only speak.
+ * alter default module specifically for use on LLNL clusters. 'mgmt'
+ * nodes listen and speak, while compute nodes only speak.  We always
+ * speak out of the private management network interface.
  *
  * Returns 0 on success, -1 on error
  */
 int
-gendersllnl_config_load_default(struct cerebrod_module_config *conf)
+gendersllnl_config_load_cerebrod_default(struct cerebrod_module_config *conf)
 {
   char altnamebuf[CEREBRO_MAXNODENAMELEN+1];
   int ret;
@@ -243,5 +244,5 @@ struct cerebro_config_module_info config_module_info =
     GENDERSLLNL_CONFIG_MODULE_NAME,
     &gendersllnl_config_setup,
     &gendersllnl_config_cleanup,
-    &gendersllnl_config_load_default,
+    &gendersllnl_config_load_cerebrod_default,
   };

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.h,v 1.8 2005-04-30 17:09:10 achu Exp $
+ *  $Id: cerebro_module.h,v 1.9 2005-05-01 16:49:59 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_MODULE_H
@@ -40,13 +40,12 @@ int cerebro_module_cleanup(void);
 /*
  * cerebro_load_clusterlist_module
  *
- * If compiled statically, load the clusterlist module specified by the module name.
+ * Find and load the clusterlist module.  If none is found, cerebro
+ * library will assume a default clusterlist module.
  * 
- * If compiled dynamically, load the clusterlist module specified by the module path.
- *
- * Returns 1 if module is loaded, 0 if it isn't, -1 on fatal error
+ * Returns 1 if module is found and loaded, 0 if it isn't, -1 on fatal error
  */
-int cerebro_load_clusterlist_module(char *module);
+int cerebro_load_clusterlist_module(void);
 
 /*
  * cerebro_unload_clusterlist_module
@@ -58,24 +57,14 @@ int cerebro_load_clusterlist_module(char *module);
 int cerebro_unload_clusterlist_module(void);
 
 /*
- * cerebro_find_clusterlist_module
- *
- * find a clusterlist module from a list of modules
- *
- * Returns 1 if a module is found, 0 if one is not, -1 on error
- */
-int cerebro_find_clusterlist_module(void);
-
-/*
  * cerebro_load_config_module
  *
- * If compiled statically, load the config module specified by the module name.
+ * Find and load the config module.  If none is found, cerebro
+ * library will assume a default config module.
  * 
- * If compiled dynamically, load the config module specified by the module path.
- *
- * Returns 1 if module is loaded, 0 if it isn't, -1 on fatal error
+ * Returns 1 if module is found and loaded, 0 if it isn't, -1 on fatal error
  */
-int cerebro_load_config_module(char *module);
+int cerebro_load_config_module(void);
 
 /*
  * cerebro_unload_config_module
@@ -85,15 +74,6 @@ int cerebro_load_config_module(char *module);
  * Returns 0 on success, -1 on error
  */
 int cerebro_unload_config_module(void);
-
-/*
- * cerebro_find_config_module
- *
- * find a config module from a list of modules
- *
- * Returns 1 if a module is found, 0 if one is not, -1 on error
- */
-int cerebro_find_config_module(void);
 
 /* 
  * cerebro_clusterlist_is_loaded
@@ -108,6 +88,20 @@ int cerebro_clusterlist_is_loaded(void);
  * Return 1 if a config module has been loaded, 0 if not
  */
 int cerebro_config_is_loaded(void);
+
+/* 
+ * cerebro_clusterlist_found
+ * 
+ * Return 1 if a clusterlist module was found, 0 if we are using the default
+ */
+int cerebro_clusterlist_found(void);
+
+/* 
+ * cerebro_config_found
+ * 
+ * Return 1 if a config module module was found, 0 if we are using the default
+ */
+int cerebro_config_found(void);
 
 /*
  * cerebro_clusterlist_module_name

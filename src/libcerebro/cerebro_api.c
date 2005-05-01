@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_api.c,v 1.6 2005-04-30 17:09:10 achu Exp $
+ *  $Id: cerebro_api.c,v 1.7 2005-05-01 16:49:59 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -85,12 +85,12 @@ cerebro_handle_destroy(cerebro_t handle)
     }
 #endif
 
-  if (handle->loaded_state & CEREBRO_CLUSTERLIST_MODULE_LOADED)
+  if (handle->loaded_state & CEREBRO_CLUSTERLIST_MODULE_FOUND)
     {
       if (cerebro_api_unload_clusterlist_module(handle) < 0)
         return -1;
       
-      if (handle->loaded_state & CEREBRO_CLUSTERLIST_MODULE_LOADED)
+      if (handle->loaded_state & CEREBRO_CLUSTERLIST_MODULE_FOUND)
         {
           handle->errnum = CEREBRO_ERR_INTERNAL;
           return -1;
@@ -375,8 +375,7 @@ cerebro_api_load_clusterlist_module(cerebro_t handle)
       handle->loaded_state |= CEREBRO_MODULE_SETUP_CALLED;
     }
 
-  /* XXX search based on config file */
-  if ((rv = cerebro_find_clusterlist_module()) < 0)
+  if ((rv = cerebro_load_clusterlist_module()) < 0)
     {
       handle->errnum = CEREBRO_ERR_CLUSTERLIST_MODULE;
       goto cleanup;
@@ -391,8 +390,8 @@ cerebro_api_load_clusterlist_module(cerebro_t handle)
         }
     }
 
-  if ((rv = cerebro_clusterlist_is_loaded()))
-    handle->loaded_state |= CEREBRO_CLUSTERLIST_MODULE_LOADED;
+  if (rv)
+    handle->loaded_state |= CEREBRO_CLUSTERLIST_MODULE_FOUND;
 
   if (module_setup_called)
     handle->loaded_state |= CEREBRO_MODULE_SETUP_CALLED;
@@ -411,7 +410,7 @@ cerebro_api_unload_clusterlist_module(cerebro_t handle)
   if (cerebro_handle_check(handle) < 0)
     return -1;
 
-  if (handle->loaded_state & CEREBRO_CLUSTERLIST_MODULE_LOADED)
+  if (handle->loaded_state & CEREBRO_CLUSTERLIST_MODULE_FOUND)
     {
       if (cerebro_clusterlist_cleanup() < 0)
         {
@@ -426,7 +425,7 @@ cerebro_api_unload_clusterlist_module(cerebro_t handle)
 	}
     }
 
-  handle->loaded_state &= ~CEREBRO_CLUSTERLIST_MODULE_LOADED;
+  handle->loaded_state &= ~CEREBRO_CLUSTERLIST_MODULE_FOUND;
   handle->errnum = CEREBRO_ERR_SUCCESS;
   return 0;
 }

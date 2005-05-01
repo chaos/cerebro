@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_api.h,v 1.3 2005-04-29 22:42:08 achu Exp $
+ *  $Id: cerebro_api.h,v 1.4 2005-05-01 16:49:59 achu Exp $
 \*****************************************************************************/
  
 #ifndef _CEREBRO_API_H
@@ -30,11 +30,11 @@
  * Cerebro loaded state flags
  *
  * CEREBRO_MODULE_SETUP_CALLED       - we called cerebro_module_setup
- * CEREBRO_CLUSTERLIST_MODULE_LOADED - clusterlist module has been loaded
+ * CEREBRO_CLUSTERLIST_MODULE_FOUND  - clusterlist module has been found
  * CEREBRO_UPDOWN_DATA_LOADED        - updown data has been loaded
  */
 #define CEREBRO_MODULE_SETUP_CALLED        0x00000001              
-#define CEREBRO_CLUSTERLIST_MODULE_LOADED  0x00000002
+#define CEREBRO_CLUSTERLIST_MODULE_FOUND   0x00000002
 #define CEREBRO_UPDOWN_DATA_LOADED         0x00000004
 
 /* 

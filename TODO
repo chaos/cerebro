@@ -43,6 +43,7 @@
     - x >= y
     - y < x
   - naming convention, begin with _cerebro or not
+  - buflen checks -1 vs. +1 checks
 
 - allow modules to return error codes??
 
@@ -80,3 +81,5 @@
 - .h file order consistency
 
 - code style of always calling "cerebro_clusterlist_is_loaded" to check between none vs. clusterlist module ... is there a better way?? hide in the library??
+
+

@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.26 2005-04-30 17:09:10 achu Exp $
+## $Id: Makefile.am,v 1.27 2005-05-01 16:49:59 achu Exp $
 ##*****************************************************************************
 
 if WITH_GNU_LD
@@ -39,6 +39,7 @@ libcerebro_la_SOURCES = cerebro_api.c \
 			cerebro_error.c \
 			cerebro_marshalling.c \
 			cerebro_module.c \
+			cerebro_module_default.c \
 			cerebro_updown.c \
 			cerebro_util.c
 libcerebro_la_LDFLAGS = -version-info @LIBCEREBRO_VERSION_INFO@ \

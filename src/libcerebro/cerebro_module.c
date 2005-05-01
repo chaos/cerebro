@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.c,v 1.13 2005-04-30 17:09:10 achu Exp $
+ *  $Id: cerebro_module.c,v 1.14 2005-05-01 16:49:59 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -105,6 +105,18 @@ char *dynamic_clusterlist_modules[] = {
 };
 int dynamic_clusterlist_modules_len = 4;
 
+/*
+ * dynamic_config_modules
+ * dynamic_config_modules_len
+ *
+ * dynamic configuration modules to search for by default
+ */
+char *dynamic_config_modules[] = {
+  "cerebro_config_gendersllnl.la",
+  NULL
+};
+int dynamic_config_modules_len = 1;
+
 #define CEREBRO_CLUSTERLIST_FILENAME_SIGNATURE "cerebro_clusterlist_"
 #define CEREBRO_CONFIG_FILENAME_SIGNATURE      "cerebro_config_"
 
@@ -117,6 +129,16 @@ int dynamic_clusterlist_modules_len = 4;
  */
 static struct cerebro_clusterlist_module_info *clusterlist_module_info = NULL;
 
+/* 
+ * clusterlist_module_found
+ *
+ * Flag indicates if a clusterlist module was found, or if the default
+ * is used
+ */
+static int clusterlist_module_found = 0;
+
+extern struct cerebro_clusterlist_module_info default_clusterlist_module_info;
+
 /*
  * config_module_info
  *
@@ -124,17 +146,15 @@ static struct cerebro_clusterlist_module_info *clusterlist_module_info = NULL;
  */
 static struct cerebro_config_module_info *config_module_info = NULL;
 
-/*
- * dynamic_config_modules
- * dynamic_config_modules_len
+/* 
+ * config_module_found
  *
- * dynamic configuration modules to search for by default
+ * Flag indicates if a config module was found, or if the default
+ * is used
  */
-char *dynamic_config_modules[] = {
-  "cerebro_config_gendersllnl.la",
-  NULL
-};
-int dynamic_config_modules_len = 1;
+static int config_module_found = 0;
+
+extern struct cerebro_config_module_info default_config_module_info;
 
 #if !WITH_STATIC_MODULES 
 /*
@@ -369,8 +389,17 @@ cerebro_module_cleanup(void)
   return 0;
 }
 
-int
-cerebro_load_clusterlist_module(char *module)
+/* 
+ * _cerebro_load_clusterlist_module
+ *
+ * If compiled statically, attempt to load the module specified by the module name.
+ *
+ * If compiled dynamically, attempt to load the module specifiec by the module_path.
+ *
+ * Return 1 is module is loaded, 0 if not, -1 on fatal error
+ */
+static int
+_cerebro_load_clusterlist_module(char *module)
 {
 #if WITH_STATIC_MODULES
   struct cerebro_clusterlist_module_info **ptr;
@@ -510,27 +539,8 @@ cerebro_load_clusterlist_module(char *module)
   return 0;
 }
 
-int
-cerebro_unload_clusterlist_module(void)
-{
-  if (!cerebro_module_library_initialized)
-    {
-      cerebro_err_debug("%s(%s:%d): cerebro_module_library uninitialized", 
-			__FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
-  
-#if !WITH_STATIC_MODULES
-  if (clusterlist_module_dl_handle)
-    lt_dlclose(clusterlist_module_dl_handle);
-  clusterlist_module_dl_handle = NULL;
-#endif /* !WITH_STATIC_MODULES */
-  clusterlist_module_info = NULL;
-  return 0;
-}
-
 int 
-cerebro_find_clusterlist_module(void)
+cerebro_load_clusterlist_module(void)
 {
 #if WITH_STATIC_MODULES
   struct cerebro_clusterlist_module_info **ptr;
@@ -556,9 +566,9 @@ cerebro_find_clusterlist_module(void)
 	  continue;
 	}
                                                                                       
-      if ((rv = cerebro_load_clusterlist_module(ptr[i]->clusterlist_module_name)) < 0)
+      if ((rv = _cerebro_load_clusterlist_module(ptr[i]->clusterlist_module_name)) < 0)
 	{
-	  cerebro_err_debug("%s(%s:%d): cerebro_load_clusterlist_module: %s",
+	  cerebro_err_debug("%s(%s:%d): _cerebro_load_clusterlist_module: %s",
 			    __FILE__, __FUNCTION__, __LINE__,
 			    strerror(errno));
 	  return -1;
@@ -572,7 +582,7 @@ cerebro_find_clusterlist_module(void)
   if ((rv = _cerebro_find_known_module(CEREBRO_CLUSTERLIST_MODULE_BUILDDIR,
                                        dynamic_clusterlist_modules,
                                        dynamic_clusterlist_modules_len,
-                                       cerebro_load_clusterlist_module)) < 0)
+                                       _cerebro_load_clusterlist_module)) < 0)
       return -1;
 
   if (rv)
@@ -581,7 +591,7 @@ cerebro_find_clusterlist_module(void)
   if ((rv = _cerebro_find_known_module(CEREBRO_MODULE_DIR,
                                        dynamic_clusterlist_modules,
                                        dynamic_clusterlist_modules_len,
-                                       cerebro_load_clusterlist_module)) < 0)
+                                       _cerebro_load_clusterlist_module)) < 0)
     return -1;
 
   if (rv)
@@ -590,21 +600,52 @@ cerebro_find_clusterlist_module(void)
   
   if ((rv = _cerebro_find_unknown_module(CEREBRO_MODULE_DIR,
                                          CEREBRO_CLUSTERLIST_FILENAME_SIGNATURE,
-                                         cerebro_load_clusterlist_module)) < 0)
+                                         _cerebro_load_clusterlist_module)) < 0)
     return -1;
   
   if (rv)
     goto found;
 #endif /* !WITH_STATIC_MODULES */
 
+  clusterlist_module_info = &default_clusterlist_module_info;
   return 0;
 
  found:
+  clusterlist_module_found++;
   return 1;
 }
 
-int 
-cerebro_load_config_module(char *module)
+int
+cerebro_unload_clusterlist_module(void)
+{
+  if (!cerebro_module_library_initialized)
+    {
+      cerebro_err_debug("%s(%s:%d): cerebro_module_library uninitialized", 
+			__FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+  
+#if !WITH_STATIC_MODULES
+  if (clusterlist_module_dl_handle)
+    lt_dlclose(clusterlist_module_dl_handle);
+  clusterlist_module_dl_handle = NULL;
+#endif /* !WITH_STATIC_MODULES */
+  clusterlist_module_info = NULL;
+  clusterlist_module_found = 0;
+  return 0;
+}
+
+/* 
+ * _cerebro_load_config_module
+ *
+ * If compiled statically, attempt to load the module specified by the module name.
+ *
+ * If compiled dynamically, attempt to load the module specifiec by the module_path.
+ *
+ * Return 1 is module is loaded, 0 if not, -1 on fatal error
+ */
+static int 
+_cerebro_load_config_module(char *module)
 {
 #if WITH_STATIC_MODULES
   struct cerebro_config_module_info **ptr;
@@ -720,27 +761,8 @@ cerebro_load_config_module(char *module)
   return 0;
 }
 
-int
-cerebro_unload_config_module(void)
-{
-  if (!cerebro_module_library_initialized)
-    {
-      cerebro_err_debug("%s(%s:%d): cerebro_module_library uninitialized", 
-			__FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
-
-#if !WITH_STATIC_MODULES
-  if (config_module_dl_handle)
-    lt_dlclose(config_module_dl_handle);
-  config_module_dl_handle = NULL;
-#endif /* !WITH_STATIC_MODULES */
-  config_module_info = NULL;
-  return 0;
-}
-
 int 
-cerebro_find_config_module(void)
+cerebro_load_config_module(void)
 {
 #if WITH_STATIC_MODULES
   struct cerebro_config_module_info **ptr;
@@ -766,9 +788,9 @@ cerebro_find_config_module(void)
 	  continue;
 	}
 
-      if ((rv = cerebro_load_config_module(ptr[i]->config_module_name)) < 0)
+      if ((rv = _cerebro_load_config_module(ptr[i]->config_module_name)) < 0)
 	{
-	  cerebro_err_debug("%s(%s:%d): cerebro_load_config_module: %s",
+	  cerebro_err_debug("%s(%s:%d): _cerebro_load_config_module: %s",
 			    __FILE__, __FUNCTION__, __LINE__,
 			    strerror(errno));
 	  return -1;
@@ -782,7 +804,7 @@ cerebro_find_config_module(void)
   if ((rv = _cerebro_find_known_module(CEREBRO_CONFIG_MODULE_BUILDDIR,
                                        dynamic_config_modules,
                                        dynamic_config_modules_len,
-                                       cerebro_load_config_module)) < 0)
+                                       _cerebro_load_config_module)) < 0)
     return -1;
 
   if (rv)
@@ -791,7 +813,7 @@ cerebro_find_config_module(void)
   if ((rv = _cerebro_find_known_module(CEREBRO_MODULE_DIR,
                                        dynamic_config_modules,
                                        dynamic_config_modules_len,
-                                       cerebro_load_config_module)) < 0)
+                                       _cerebro_load_config_module)) < 0)
     return -1;
 
   if (rv)
@@ -799,17 +821,39 @@ cerebro_find_config_module(void)
 
   if ((rv = _cerebro_find_unknown_module(CEREBRO_MODULE_DIR,
                                          CEREBRO_CONFIG_FILENAME_SIGNATURE,
-                                         cerebro_load_config_module)) < 0)
+                                         _cerebro_load_config_module)) < 0)
     return -1;
 
   if (rv)
     goto found;
 #endif /* !WITH_STATIC_MODULES */
 
+  config_module_info = &default_config_module_info;
   return 0;
 
  found:
+  config_module_found++;
   return 1;
+}
+
+int
+cerebro_unload_config_module(void)
+{
+  if (!cerebro_module_library_initialized)
+    {
+      cerebro_err_debug("%s(%s:%d): cerebro_module_library uninitialized", 
+			__FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+
+#if !WITH_STATIC_MODULES
+  if (config_module_dl_handle)
+    lt_dlclose(config_module_dl_handle);
+  config_module_dl_handle = NULL;
+#endif /* !WITH_STATIC_MODULES */
+  config_module_info = NULL;
+  config_module_found = 0;
+  return 0;
 }
 
 int 
@@ -824,6 +868,22 @@ int
 cerebro_config_is_loaded(void)
 {
   if (config_module_info)
+    return 1;
+  return 0;
+}
+
+int 
+cerebro_clusterlist_found(void)
+{
+  if (clusterlist_module_found)
+    return 1;
+  return 0;
+}
+
+int 
+cerebro_config_found(void)
+{
+  if (config_module_found)
     return 1;
   return 0;
 }

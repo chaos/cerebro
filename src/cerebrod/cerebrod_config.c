@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.80 2005-04-30 17:09:10 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.81 2005-05-01 16:49:59 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -214,7 +214,7 @@ _cerebrod_load_alternate_configuration(void)
 {
   struct cerebrod_module_config module_conf;
 
-  if (!cerebro_config_is_loaded())
+  if (!cerebro_config_found())
     return;
 
   if (cerebro_config_setup() < 0)
@@ -278,7 +278,7 @@ _cerebrod_load_alternate_configuration(void)
 static void
 _cerebrod_config_module_setup(void)
 {
-  if (cerebro_find_config_module() < 0)
+  if (cerebro_load_config_module() < 0)
     cerebro_err_exit("%s(%s:%d): cerebro_find_config_module: %s",
 		     __FILE__, __FUNCTION__, __LINE__, strerror(errno));
   
