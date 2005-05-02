@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_updown.c,v 1.17 2005-05-01 16:49:59 achu Exp $
+ *  $Id: cerebro_updown.c,v 1.18 2005-05-02 18:19:25 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -596,18 +596,6 @@ cerebro_updown_load_data(cerebro_t handle,
       goto cleanup;
     }
 
-  if (!hostname)
-    hostname = "localhost";
-
-  if (!port)
-    port = CEREBRO_UPDOWN_SERVER_PORT;
-
-  if (!timeout_len)
-    timeout_len = CEREBRO_UPDOWN_TIMEOUT_LEN_DEFAULT;
-
-  if (!flags)
-    flags = CEREBRO_UPDOWN_UP_AND_DOWN_NODES;
-    
   if (!(updown_data = (struct cerebro_updown_data *)malloc(sizeof(struct cerebro_updown_data))))
     {
       handle->errnum = CEREBRO_ERR_OUTMEM;
@@ -636,19 +624,86 @@ cerebro_updown_load_data(cerebro_t handle,
         }
     }
 
+  if (!(handle->loaded_state & CEREBRO_CONFIG_FILE_LOADED))
+    {
+      if (cerebro_api_load_config_file(handle) < 0)
+	goto cleanup;
+    }
+
   if (!(handle->loaded_state & CEREBRO_CLUSTERLIST_MODULE_FOUND))
     {
       if (cerebro_api_load_clusterlist_module(handle) < 0)
 	goto cleanup;
     }
 
-  if (_cerebro_updown_get_updown_data(handle,
-                                      updown_data,
-                                      hostname,
-                                      port,
-                                      timeout_len,
-                                      flags) < 0)
-    goto cleanup;
+  if (!port)
+    {
+      if (handle->config_file_data.cerebro_updown_port_flag)
+	port = handle->config_file_data.cerebro_updown_port;
+      else
+	port = CEREBRO_UPDOWN_SERVER_PORT;
+    }
+
+  if (!timeout_len)
+    {
+      if (handle->config_file_data.cerebro_updown_timeout_len_flag)
+	timeout_len = handle->config_file_data.cerebro_updown_timeout_len;
+      else
+	timeout_len = CEREBRO_UPDOWN_TIMEOUT_LEN_DEFAULT;
+    }
+
+  if (!flags)
+    {
+      if (handle->config_file_data.cerebro_updown_flags_flag)
+	flags = handle->config_file_data.cerebro_updown_flags;
+      else
+	flags = CEREBRO_UPDOWN_UP_AND_DOWN_NODES;
+    }
+  
+  if (!hostname)
+    {
+      if (handle->config_file_data.cerebro_updown_hostnames_flag)
+	{
+	  int rv, i;
+
+	  for (i = 0; i < handle->config_file_data.cerebro_updown_hostnames_len; i++)
+	    {
+	      if ((rv = _cerebro_updown_get_updown_data(handle,
+							updown_data,
+							"localhost",
+							port,
+							timeout_len,
+							flags)) < 0)
+		continue;
+	      break;
+	    }
+	  
+	  if (rv < 0)
+	    goto cleanup;
+	}
+      else
+	{
+	  if (_cerebro_updown_get_updown_data(handle,
+					      updown_data,
+					      "localhost",
+					      port,
+					      timeout_len,
+					      flags) < 0)
+	    goto cleanup;
+	}
+    }
+  else
+    {
+      if (_cerebro_updown_get_updown_data(handle,
+					  updown_data,
+					  hostname,
+					  port,
+					  timeout_len,
+					  flags) < 0)
+	goto cleanup;
+    }
+
+
 
   if (handle->loaded_state & CEREBRO_UPDOWN_DATA_LOADED)
     {

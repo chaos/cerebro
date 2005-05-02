@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.8 2005-04-29 22:42:08 achu Exp $
+ *  $Id: cerebro.h,v 1.9 2005-05-02 18:19:25 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_H
@@ -21,7 +21,7 @@
 #define CEREBRO_ERR_OVERFLOW             13
 #define CEREBRO_ERR_NODE_NOTFOUND        14
 #define CEREBRO_ERR_OUTMEM               15 
-#define CEREBRO_ERR_CONFIG               16
+#define CEREBRO_ERR_CONFIG_FILE          16
 #define CEREBRO_ERR_CLUSTERLIST_MODULE   17
 #define CEREBRO_ERR_CONFIG_MODULE        18
 #define CEREBRO_ERR_INTERNAL             19

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config.c,v 1.1 2005-05-02 17:50:34 achu Exp $
+ *  $Id: cerebro_config.c,v 1.2 2005-05-02 18:19:25 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -209,7 +209,8 @@ _cerebro_load_config_file(const char *config_file,
 	  && conffile_errnum(cf) == CONFFILE_ERR_EXIST)
 	goto out;
 
-      conffile_errmsg(cf, buf, buflen);
+      if (buf)
+	conffile_errmsg(cf, buf, buflen);
       goto cleanup;
     }
   
@@ -243,14 +244,7 @@ cerebro_load_config_file(const char *config_file,
       return -1;
     }
  
-  if (!buf)
-    {
-      cerebro_err_debug("%s(%s:%d): buf null",
-                        __FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
- 
-  if (!(buflen > 0))
+  if (buf && !(buflen > 0))
     {
       cerebro_err_debug("%s(%s:%d): buflen not valid",
                         __FILE__, __FUNCTION__, __LINE__);

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_api.h,v 1.4 2005-05-01 16:49:59 achu Exp $
+ *  $Id: cerebro_api.h,v 1.5 2005-05-02 18:19:25 achu Exp $
 \*****************************************************************************/
  
 #ifndef _CEREBRO_API_H
@@ -13,6 +13,7 @@
 
 #include "cerebro_defs.h"
 #include "cerebro_clusterlist_module.h"
+#include "cerebro_config.h"
 #include "cerebro_config_module.h"
 
 #if !WITH_STATIC_MODULES
@@ -34,32 +35,9 @@
  * CEREBRO_UPDOWN_DATA_LOADED        - updown data has been loaded
  */
 #define CEREBRO_MODULE_SETUP_CALLED        0x00000001              
-#define CEREBRO_CLUSTERLIST_MODULE_FOUND   0x00000002
-#define CEREBRO_UPDOWN_DATA_LOADED         0x00000004
-
-/* 
- * struct cerebro_config
- *
- * Store all possible cerebro configuration information
- */
-struct cerebro_config
-{
-  char *clusterlist_module;
-  int clusterlist_module_flag;
-  char **clusterlist_module_options;
-  int clusterlist_module_options_flag;
-  char *config_module;
-  int config_module_flag;
-
-  char **updown_hostnames;
-  int updown_hostnames_flag;
-  unsigned int updown_port;
-  int updown_port_flag;
-  unsigned int updown_timeout_len;
-  int updown_timeout_len_flag;
-  int updown_flags;
-  int updown_flags_flag;
-};
+#define CEREBRO_CONFIG_FILE_LOADED         0x00000002
+#define CEREBRO_CLUSTERLIST_MODULE_FOUND   0x00000004
+#define CEREBRO_UPDOWN_DATA_LOADED         0x00000008
 
 /* 
  * struct cerebro
@@ -70,29 +48,27 @@ struct cerebro {
   int32_t magic;
   int32_t errnum;
   int32_t loaded_state;
-  struct cerebro_config config;
+  struct cerebro_config config_file_data;
   void *updown_data;
 };
 
-#if 0
 /* 
- * cerebro_load_config
+ * cerebro_api_load_config
  *
- * Read and load information from the cerebro configuration file
+ * Read and load config file data
  *
  * Returns 0 on success, -1 on error
  */
-int cerebro_load_config(cerebro_t handle);
+int cerebro_api_load_config_file(cerebro_t handle);
 
 /* 
- * cerebro_load_config
+ * cerebro_api_load_config
  *
- * Unload configuration info
+ * Unload config file info
  *
  * Returns 0 on success, -1 on error
  */
-int cerebro_unload_config(cerebro_t handle);
-#endif
+int cerebro_api_unload_config_file(cerebro_t handle);
 
 /* 
  * cerebro_load_clusterlist_module

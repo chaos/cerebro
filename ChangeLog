@@ -1,3 +1,9 @@
+2005-05-02  Albert Chu  <chu11@llnl.gov>
+
+	* Add config file funcs into libcerebro.
+
+	* Work config file loading/unloading into libcerebro updown library.
+	
 2005-05-01  Albert Chu  <chu11@llnl.gov>
 
 	* Rework cerebro lib and cerebrod daemon to use default module so

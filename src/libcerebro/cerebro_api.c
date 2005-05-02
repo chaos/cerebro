@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_api.c,v 1.7 2005-05-01 16:49:59 achu Exp $
+ *  $Id: cerebro_api.c,v 1.8 2005-05-02 18:19:25 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -14,6 +14,7 @@
 
 #include "cerebro.h"
 #include "cerebro_api.h"
+#include "cerebro_config.h"
 #include "cerebro_module.h"
 #include "cerebro_util.h"
 #include "cerebro_updown.h"
@@ -58,7 +59,7 @@ cerebro_handle_create(void)
   handle->magic = CEREBRO_MAGIC_NUMBER;
   handle->errnum = CEREBRO_ERR_SUCCESS;
   handle->loaded_state = 0;
-  memset(&(handle->config), '\0', sizeof(struct cerebro_config));
+  memset(&(handle->config_file_data), '\0', sizeof(struct cerebro_config));
   handle->updown_data = NULL;
 
  cleanup:
@@ -71,19 +72,17 @@ cerebro_handle_destroy(cerebro_t handle)
   if (cerebro_handle_check(handle) < 0)
     return -1;
 
-#if 0
-  if (handle->loaded_state & CEREBRO_CONFIG_LOADED)
+  if (handle->loaded_state & CEREBRO_CONFIG_FILE_LOADED)
     {
-      if (cerebro_unload_config(handle) < 0)
-        return -1;
-      
-      if (handle->loaded_state & CEREBRO_CONFIG_LOADED)
+      if (cerebro_api_unload_config_file(handle) < 0)
+	return -1;
+
+      if (handle->loaded_state & CEREBRO_CONFIG_FILE_LOADED)
         {
           handle->errnum = CEREBRO_ERR_INTERNAL;
           return -1;
         }
     }
-#endif
 
   if (handle->loaded_state & CEREBRO_CLUSTERLIST_MODULE_FOUND)
     {
@@ -158,202 +157,44 @@ cerebro_perror(cerebro_t handle, const char *msg)
     fprintf(stderr, "%s: %s\n", msg, errormsg);
 }
 
-#if 0
-/*
- * _cb_string
- *
- * conffile callback function that parses and stores a string
- *
- * Returns 0 on success, -1 on error
- */
-static int
-_cb_string(conffile_t cf, struct conffile_data *data,
-           char *optionname, int option_type, void *option_ptr,
-           int option_data, void *app_ptr, int app_data)
-{
-  if (option_ptr == NULL)
-    {
-      conffile_seterrnum(cf, CONFFILE_ERR_PARAMETERS);
-      return -1;
-    }
-                                                                                      
-  if (!(*((char **)option_ptr) = strdup(data->string)))
-    {
-      conffile_seterrnum(cf, CONFFILE_ERR_OUTMEM);
-      return -1;
-    }
-
-  return 0;
-}
-
-/*
- * _cb_string_array
- *
- * conffile callback function that parses and stores an array of
- * strings
- *
- * Returns 0 on success, -1 on error
- */
-static int
-_cb_string_array(conffile_t cf, struct conffile_data *data,
-                 char *optionname, int option_type, void *option_ptr,
-                 int option_data, void *app_ptr, int app_data)
-{
-  if (option_ptr == NULL)
-    {
-      conffile_seterrnum(cf, CONFFILE_ERR_PARAMETERS);
-      return -1;
-    }
-
-  if (data->stringlist_len > 0)
-    {
-      char ***p = (char ***)option_ptr;
-      int i;
-
-      if (!(*p = (char **)malloc(sizeof(char *) * (data->stringlist_len + 1))))
-        {
-          conffile_seterrnum(cf, CONFFILE_ERR_OUTMEM);
-          return -1;
-        }
-
-      for (i = 0; i < data->stringlist_len; i++)
-        {
-          if (!((*p)[i] = strdup(data->stringlist[i])))
-            {
-              int j;
-              
-              for (j = 0; j < i; j++)
-                free((*p)[j]);
-              free(*p);
-
-              conffile_seterrnum(cf, CONFFILE_ERR_OUTMEM);
-              return -1;
-            }
-        }
-      (*p)[i] = NULL;
-    }
-
-  return 0;
-}
-
-/* 
- * _cerebro_load_config
- *
- * Read and load configuration data
- *
- * Returns 0 on success, -1 on error
- */
-static int
-_cerebro_load_config(cerebro_t handle, struct cerebro_config *config)
-{
-  struct conffile_option options[] =
-    {
-      {"updown_hostnames", CONFFILE_OPTION_LIST_STRING, -1,
-       _cb_string_array, 1, 0, &(config->updown_hostnames_flag),
-       &(config->updown_hostnames), 0},
-      {"updown_port", CONFFILE_OPTION_INT, -1,
-       conffile_int, 1, 0, &(config->updown_port_flag),
-       &(config->updown_port), 0},
-      {"updown_timeout_len", CONFFILE_OPTION_INT, -1,
-       conffile_int, 1, 0, &(config->updown_timeout_len_flag),
-       &(config->updown_timeout_len), 0},
-      {"updown_flags", CONFFILE_OPTION_INT, -1,
-       conffile_int, 1, 0, &(config->updown_flags_flag),
-       &(config->updown_flags), 0},
-    };
-  conffile_t cf = NULL;
-  int num;
-
-  if (!(cf = conffile_handle_create()))
-    {
-      handle->errnum = CEREBRO_ERR_CONFIG;
-      goto cleanup;
-    }
-                                                                                      
-  memset(config, '\0', sizeof(struct cerebro_config));
-
-  num = sizeof(options)/sizeof(struct conffile_option);
-  if (conffile_parse(cf, CEREBRO_CONFIG_FILE_DEFAULT, options, num, NULL, 0, 0) < 0)
-    {
-      /* Its not an error if the default configuration file doesn't exist */
-      if (conffile_errnum(cf) != CONFFILE_ERR_EXIST)
-        {
-          handle->errnum = CEREBRO_ERR_CONFIG;
-          goto cleanup;
-        }
-    }
-  
-  conffile_handle_destroy(cf);
-  return 0;
-
- cleanup:
-  conffile_handle_destroy(cf);
-
-  if (config->updown_hostnames_flag && config->updown_hostnames)
-    {
-      int i = 0;
-      
-      while (config->updown_hostnames[i])
-        free(config->updown_hostnames[i]);
-      free(config->updown_hostnames);
-    }
-  memset(config, '\0', sizeof(struct cerebro_config));
-  return -1;
-}
-
 int 
-cerebro_load_config(cerebro_t handle)
+cerebro_api_load_config_file(cerebro_t handle)
 {
   if (cerebro_handle_check(handle) < 0)
     return -1;
 
-  if (handle->loaded_state & CEREBRO_CONFIG_LOADED)
+  if (handle->loaded_state & CEREBRO_CONFIG_FILE_LOADED)
     {
       handle->errnum = CEREBRO_ERR_SUCCESS;
       return 0;
     }
   
-  if (_cerebro_load_config(handle, &(handle->config)) < 0)
-    return -1;
+  if (cerebro_load_config_file(NULL, 
+			       &(handle->config_file_data),
+			       NULL,
+			       0) < 0)
+    {
+      handle->errnum = CEREBRO_ERR_CONFIG_FILE;
+      return -1;
+    }
 
-  handle->loaded_state |= CEREBRO_CONFIG_LOADED;
+  handle->loaded_state |= CEREBRO_CONFIG_FILE_LOADED;
   handle->errnum = CEREBRO_ERR_SUCCESS;
   return 0;
 }
 
 int 
-cerebro_unload_config(cerebro_t handle)
+cerebro_api_unload_config_file(cerebro_t handle)
 {
-  struct cerebro_config *config;
-
   if (cerebro_handle_check(handle) < 0)
     return -1;
 
-  config = &(handle->config);
-
-  if (config->updown_hostnames_flag && config->updown_hostnames)
-    {
-      int i = 0;
-      
-      while (config->updown_hostnames[i])
-        free(config->updown_hostnames[i]);
-      free(config->updown_hostnames);
-    }
-
-  config->updown_hostnames = NULL;
-  config->updown_hostnames_flag = 0;
-  config->updown_port = 0;
-  config->updown_port_flag = 0;
-  config->updown_timeout_len = 0;
-  config->updown_timeout_len_flag = 0;
-  config->updown_flags = 0;
-  config->updown_flags_flag = 0;
-
-  handle->loaded_state &= ~CEREBRO_MODULES_LOADED;
+  memset(&(handle->config_file_data), '\0', sizeof(struct cerebro_config));
+  
+  handle->loaded_state &= ~CEREBRO_CONFIG_FILE_LOADED;
   handle->errnum = CEREBRO_ERR_SUCCESS;
   return 0;
 }
-#endif
 
 int 
 cerebro_api_load_clusterlist_module(cerebro_t handle)
