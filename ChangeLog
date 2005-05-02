@@ -5,6 +5,11 @@
 	* Work config file loading/unloading into libcerebro updown library.
 	
 	* Work config file funcs in cerebrod.
+
+	* Renamed cerebrod.conf.5.in to cerebro.conf.5.in.  Re-work for
+	new configuration options and generalize for all of cerebro.
+
+	* Manpage cleanup.
 	
 2005-05-01  Albert Chu  <chu11@llnl.gov>
 

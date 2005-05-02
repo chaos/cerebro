@@ -1,39 +1,49 @@
 \."#############################################################################
-\."$Id: cerebrod.conf.5.in,v 1.9 2005-04-29 17:12:04 achu Exp $
+\."$Id: cerebro.conf.5.in,v 1.1 2005-05-02 20:42:25 achu Exp $
 \."#############################################################################
-.TH cerebrod.conf 5 "May 2005" "cerebrod.conf @VERSION@" "cerebrod.conf"
+.TH cerebro.conf 5 "May 2005" "cerebro.conf @VERSION@" "cerebro.conf"
 .SH "NAME"
-cerebrod.conf \- cerebrod configuration file
+cerebro.conf \- cerebro configuration file
 .SH "DESCRIPTION"
 The 
-.B cerebrod
+.B cerebro
 configuration file configures the features and behavior of the
+.B libcerebro
+library and the
 .B cerebrod
-daemon.  The configuration ultimately affects the utility of
-the
+daemon.  The configuration ultimately affects the utility and behavior
+of the
 .B Cerebro
 suite of tools and libraries.
 
-The default configuration file loaded by
-.B cerebrod
-is @CEREBROD_CONFIG_FILE_DEFAULT@. 
-.if @MANPAGE_DEBUG@ \{
-An alternate configuration file can be specified on the command line
-with the
-.I -c
-option.
-\}
+The default configuration file loaded is @CEREBRO_CONFIG_FILE_DEFAULT@. 
 
-.SH "CONFIGURATION OPTIONS"
-The following are a list of configuration options that can be
-specified in the configuration file.  Each configuration option must
-be listed on a separate line.  Arguments for an option are separated
-by any amount of whitespace.  Multiple arguments are also separated by
-whitespace.  Comments can be marked by using the pound sign ("#")
-character, and lines can be continued on the next using backslash
-("\\").
+The configuration options that can be specified in the configuration
+file are listed below into appropriate sections.  Each configuration
+option must be listed on a separate line.  Arguments for an option are
+separated by any amount of whitespace.  Multiple arguments are also
+separated by whitespace.  Comments can be marked by using the pound
+sign ("#") character, and lines can be continued on the next using
+backslash ("\\").
+
+.SH "CEREBRO CONFIGURATION OPTIONS"
 .TP
-.I heartbeat_frequency ( sec | sec_min sec_max )
+.I cerebro_updown_hostnames host1 host2 host3 ...
+Specify the hostnames the libcerebro updown API should attempt to connect to.
+.TP
+.I cerebro_updown_port num
+Specify the port the libcerebro updown API should attempt to connect to.
+.TP
+.I cerebro_updown_timeout_len num
+Specify the timeout length the libcerebro updown API should use to
+evaluate up vs. down nodes.
+.TP
+.I cerebro_updown_flags num
+Specify the flags the libcerebro updown API should use by default.
+
+.SH "CEREBROD CONFIGURATION OPTIONS"
+.TP
+.I cerebrod_heartbeat_frequency ( sec | sec_min sec_max )
 Specify the frequency at which the the
 .B cerebrod
 daemon sends out heartbeat packets containing 
@@ -45,22 +55,22 @@ within that range is selected for every heartbeat packet sent.  The
 default value is a minimum frequency of 10 seconds and a maximum
 frequency of 20 seconds.
 .TP
-.I heartbeat_source_port num 
+.I cerebrod_heartbeat_source_port num 
 Specify the source port that heartbeat packets should be sent from.
 This should be different than the destination port specified below.
 The default source port is 8851.
 .TP
-.I heartbeat_destination_port num 
+.I cerebrod_heartbeat_destination_port num 
 Specify the destination port that heartbeat packets should be sent to.
 This should be different than the source port specified above.  The
 default destination port is 8850.
 .TP
-.I heartbeat_destination_ip ip_address
+.I cerebrod_heartbeat_destination_ip ip_address
 Specify the destination ip address that heartbeat packets should be
 sent to.  The destination ip address may be either a singlecast or
 multicast address. The default destination IP address is 239.2.11.72.
 .TP
-.I heartbeat_network_interface (network_interface | ip_address | subnet)
+.I cerebrod_heartbeat_network_interface (network_interface | ip_address | subnet)
 Specify the network interface heartbeat packets should be sent out of.
 The network interface can be specified as a network interface (i.e.
 eth0), an ip address (i.e. 192.168.1.1) or a subnet using CIDR
@@ -73,18 +83,18 @@ machine running
 contains multiple network interfaces, it would be recommended that the
 appropriate network interface be configured.
 .TP
-.I heartbeat_ttl num
+.I cerebrod_heartbeat_ttl num
 Specify the heartbeat packet time to live parameter.  This parameter
 is only used if the heartbeat destination ip address is a multicast ip
 address.  The default ttl is 1.
 .TP
-.I speak ( on | off )
+.I cerebrod_speak ( on | off )
 Specify if the
 .B cerebrod
 daemon should send out packets or not.  Generally speaking, this should
 always be turned on.  The default configuration turns this option on.
 .TP
-.I listen ( on | off )
+.I cerebrod_listen ( on | off )
 Specify if the
 .B cerebrod
 daemon should receive packets or not.  Generally speaking, this option
@@ -94,113 +104,43 @@ a few of the machines should be responsible for collecting the
 data so that computational power of the cluster as a whole isn't lost.
 The default configuration turns this option on.
 .TP
-.I listen_threads num
+.I cerebrod_listen_threads num
 Specify the number of listening threads the 
 .B cerebrod
 listener server should execute.  The default executes 2 threads.
 .TP
-.I updown_server ( on | off )
+.I cerebrod_updown_server ( on | off )
 Specify if the
 .B cerebrod
 daemon should turn on the updown server.  The updown server can send
 be various tools and libraries to determine the up and down nodes
 in the cluster.  Generally speaking, this option should be turned on
 if the 
-.I listen
+.I cerebrod_listen
 option is turned on.  If the 
-.I listen
+.I cerebrod_listen
 option is turned off, the updown_server will not be started.  The default
 turns this option on as long as the 
-.I listen
+.I cerebrod_listen
 option is turned on.
 .TP
-.I updown_server_port num
+.I cerebrod_updown_server_port num
 Specify the updown server port.  The default server port is 8852.
-.TP
-.ie @MANPAGE_STATIC_MODULES@ \{
-.I clusterlist_module name
-Specify the clusterlist module name to be loaded for parsing a
-list/database of cluster nodes.
-\}
-.el \{
-.I clusterlist_module ( name | filename | path )
-Specify the clusterlist module to be loaded for parsing a
-list/database of cluster nodes.  The name, filename, or full filename path
-to the clusterlist module can be specified.  
-\}
-
-The following clusterlist modules
-are available to
-.B cerebrod
-by default:
- 
-.if @MANPAGE_GENDERSLLNL@ \{
-gendersllnl
- 
-\}
- 
-.if @MANPAGE_GENDERS@ \{
-genders
- 
-\}
- 
-hostsfile
- 
-none
-
-.ie @MANPAGE_STATIC_MODULES@ \{
-When this option is not configured, the above clusterlist modules are
-searched for by
-.B cerebrod
-in the above order.
-\}
-.el \{
-Clusterlist modules are
-searched for in the
-.B Cerebro
-package library directory, @CEREBROD_MODULE_DIR@, in the above order.
-If none of the above are found,
-.B cerebrod
-will search for other clusterlist modules.
-\}
-.TP
-.I clusterlist_module_options str
-Specify arguments to pass to the clusterlist_module.  The arguments
-are typically passed as key=value pairs, although the
-clusterlist module is free to parse arguments however it wishes.
-
-The following parse options are currently supported by the default
-clusterlist modules:
-
-.if @MANPAGE_GENDERSLLNL@ \{
-gendersllnl: filename=<file> - Specify the path to the genders database.
- 
-\}
- 
-.if @MANPAGE_GENDERS@ \{
-genders: filename=<file> - Specify the path to the genders database.
- 
-\}
- 
-hostsfile: filename=<file> - Specify the path to the hostsfile database.
-
-By default, no options are passed to the clusterlist module loaded.
-
 .if @MANPAGE_DEBUG@ \{
 .TP
-.I speak_debug ( on | off )
+.I cerebrod_speak_debug ( on | off )
 Turn on speak debugging.  Requires that debugging be turned on from
 the command line with the
 .I -d
 option.  This option is turned off by default.
 .TP
-.I listen_debug ( on | off )
+.I cerebrod_listen_debug ( on | off )
 Turn on listen debugging.  Requires that debugging be turned on from
 the command line with the
 .I -d
 option.  This option is turned off by default.
 .TP
-.I updown_server_debug ( on | off )
+.I cerebrod_updown_server_debug ( on | off )
 Turn on updown server debugging.  Requires that debugging be turned on
 from the command line with the
 .I -d

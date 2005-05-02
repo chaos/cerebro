@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebrod.8.in,v 1.15 2005-04-30 17:09:10 achu Exp $
+\."$Id: cerebrod.8.in,v 1.16 2005-05-02 20:42:25 achu Exp $
 \."#############################################################################
 .TH cerebrod 8 "May 2005" "cerebrod @VERSION@" cerebrod
 .SH "NAME"
@@ -45,7 +45,7 @@ as a whole.
 
 The default configuration file loaded by 
 .B cerebrod
-is @CEREBROD_CONFIG_FILE_DEFAULT@.  
+is @CEREBRO_CONFIG_FILE_DEFAULT@.  
 .if @MANPAGE_DEBUG@ \{
 An alternate configuration file
 can be specified on the command line with the
@@ -55,7 +55,7 @@ option.
 
 Specific details of the configurable features and
 configurable options can be found in the
-.B cerebrod.conf(5)
+.B cerebro.conf(5)
 manpage.  
 
 .SH "CONFIGURATION MODULE"
@@ -178,7 +178,7 @@ clusterlist modules see XXX.
 \}
 
 .SH "FILES"
-@CEREBROD_CONFIG_FILE_DEFAULT@
+@CEREBRO_CONFIG_FILE_DEFAULT@
 
 @CEREBRO_CLUSTERLIST_HOSTSFILE_DEFAULT@
 
@@ -186,4 +186,4 @@ clusterlist modules see XXX.
 .SH "ORIGIN"
 Developed by Albert Chu <chu11@llnl.gov> on LLNL's Linux clusters.
 .SH "SEE ALSO"
-cerebrod(1), cerebrod.conf(5)
+cerebrod(1), cerebro.conf(5)

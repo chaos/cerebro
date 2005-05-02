@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_updown.c,v 1.18 2005-05-02 18:19:25 achu Exp $
+ *  $Id: cerebro_updown.c,v 1.19 2005-05-02 20:42:25 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -639,7 +639,14 @@ cerebro_updown_load_data(cerebro_t handle,
   if (!port)
     {
       if (handle->config_file_data.cerebro_updown_port_flag)
-	port = handle->config_file_data.cerebro_updown_port;
+	{
+	  if (!handle->config_file_data.cerebro_updown_port)
+	    {
+	      handle->errnum = CEREBRO_ERR_CONFIG_FILE;
+	      goto cleanup;
+	    }
+	  port = handle->config_file_data.cerebro_updown_port;
+	}
       else
 	port = CEREBRO_UPDOWN_SERVER_PORT;
     }
@@ -647,7 +654,14 @@ cerebro_updown_load_data(cerebro_t handle,
   if (!timeout_len)
     {
       if (handle->config_file_data.cerebro_updown_timeout_len_flag)
-	timeout_len = handle->config_file_data.cerebro_updown_timeout_len;
+	{
+	  if (!handle->config_file_data.cerebro_updown_timeout_len)
+	    {
+	      handle->errnum = CEREBRO_ERR_CONFIG_FILE;
+	      goto cleanup;
+	    }
+	  timeout_len = handle->config_file_data.cerebro_updown_timeout_len;
+	}
       else
 	timeout_len = CEREBRO_UPDOWN_TIMEOUT_LEN_DEFAULT;
     }
@@ -655,7 +669,17 @@ cerebro_updown_load_data(cerebro_t handle,
   if (!flags)
     {
       if (handle->config_file_data.cerebro_updown_flags_flag)
-	flags = handle->config_file_data.cerebro_updown_flags;
+	{
+	  if (handle->config_file_data.cerebro_updown_flags != CEREBRO_UPDOWN_UP_NODES
+	      && handle->config_file_data.cerebro_updown_flags != CEREBRO_UPDOWN_DOWN_NODES
+	      && handle->config_file_data.cerebro_updown_flags != CEREBRO_UPDOWN_UP_AND_DOWN_NODES)
+
+	    {
+	      handle->errnum = CEREBRO_ERR_CONFIG_FILE;
+	      goto cleanup;
+	    }
+	  flags = handle->config_file_data.cerebro_updown_flags;
+	}
       else
 	flags = CEREBRO_UPDOWN_UP_AND_DOWN_NODES;
     }
