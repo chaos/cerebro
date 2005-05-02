@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config.c,v 1.2 2005-05-02 18:19:25 achu Exp $
+ *  $Id: cerebro_config.c,v 1.3 2005-05-02 20:03:32 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -195,7 +195,10 @@ _cerebro_load_config_file(const char *config_file,
   int num;
   
   if (!(cf = conffile_handle_create()))
-    goto cleanup;
+    {
+      /* XXX return err string */
+      goto cleanup;
+    }
   
   if (!config_file)
     config_file = CEREBRO_CONFIG_FILE_DEFAULT;

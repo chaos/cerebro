@@ -84,3 +84,6 @@
 
 - generic err message in cerebro_t handle?
   - i.e. for conffile
+
+- Strduping for cerebrod config file conf stuff?
+  - probably shouldn't, should make static size

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.81 2005-05-01 16:49:59 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.82 2005-05-02 20:03:32 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -28,12 +28,13 @@
 #include <sys/param.h>
 
 #include "cerebro_error.h"
+#include "cerebro_config.h"
 #include "cerebro_config_module.h"
 #include "cerebro_module.h"
 
+#include "cerebrod.h"
 #include "cerebrod_config.h"
 #include "cerebrod_util.h"
-#include "conffile.h"
 #include "wrappers.h"
 
 #define MULTICAST_CLASS_MIN 224
@@ -114,12 +115,12 @@ _version(void)
 }
 
 /* 
- * _cerebrod_cmdline_parse
+ * _cerebrod_cmdline
  *
  * parse command line options
  */
 static void
-_cerebrod_cmdline_parse(int argc, char **argv)
+_cerebrod_cmdline(int argc, char **argv)
 { 
   char c;
   char options[100];
@@ -177,12 +178,12 @@ _cerebrod_cmdline_parse(int argc, char **argv)
 }
 
 /* 
- * _cerebrod_cmdline_parse_check:
+ * _cerebrod_cmdline_check:
  *
  * check validity of command line parameters
  */
 static void
-_cerebrod_cmdline_parse_check(void)
+_cerebrod_cmdline_check(void)
 {
   /* Check if the configuration file exists */
   if (conf.config_file)
@@ -272,8 +273,7 @@ _cerebrod_load_alternate_configuration(void)
 /*
  * _cerebrod_config_module_setup
  *
- * load configuration module.  search for configuration module to load
- * if necessary
+ * load configuration module.
  */
 static void
 _cerebrod_config_module_setup(void)
@@ -286,156 +286,59 @@ _cerebrod_config_module_setup(void)
 }
 
 /*
- * _cb_heartbeat_freq
- *
- * conffile callback function that parses and stores heartbeat
- * configuration data
- *
- * Returns 0 on success, -1 on error
- */
-static int
-_cb_heartbeat_freq(conffile_t cf, struct conffile_data *data,
-                   char *optionname, int option_type, void *option_ptr,
-                   int option_data, void *app_ptr, int app_data)
-{
-  if (data->intlist_len == 1)
-    {
-      conf.heartbeat_frequency_min = data->intlist[0];
-      conf.heartbeat_frequency_max = 0;
-    }
-  else if (data->intlist_len == 2)
-    {
-      if (data->intlist[0] > data->intlist[1])
-	{
-	  conffile_seterrnum(cf, CONFFILE_ERR_PARAMETERS);
-	  return -1;
-	}
-      conf.heartbeat_frequency_min = data->intlist[0];
-      conf.heartbeat_frequency_max = data->intlist[1];
-    }
-  else
-    {
-      conffile_seterrnum(cf, CONFFILE_ERR_PARSE_OVERFLOW_ARGLEN);
-      return -1;
-    }
-
-  return 0;
-}
-
-/*
- * _cb_stringptr
- *
- * conffile callback function that parses and stores a string
- *
- * Returns 0 on success, -1 on error
- */
-static int
-_cb_stringptr(conffile_t cf, struct conffile_data *data,
-              char *optionname, int option_type, void *option_ptr,
-              int option_data, void *app_ptr, int app_data)
-{
-  if (option_ptr == NULL)
-    {
-      conffile_seterrnum(cf, CONFFILE_ERR_PARAMETERS);
-      return -1;
-    }
-
-  *((char **)option_ptr) = Strdup(data->string);
-  return 0;
-}
-
-/*
- * _cerebrod_config_parse
+ * _cerebrod_config_file_setup
  * 
- * Using the conffile configuration file parsing library, parse the cerebrod
- * configuration file.
+ * Read and load the config file
  */
 static void
-_cerebrod_config_parse(void)
+_cerebrod_config_file_setup(void)
 {
-  int heartbeat_frequency_flag, heartbeat_source_port_flag, 
-    heartbeat_destination_port_flag, heartbeat_destination_ip_flag, 
-    heartbeat_network_interface_flag, heartbeat_ttl_flag, speak_flag, 
-    listen_flag, listen_threads_flag, updown_server_flag, 
-    updown_server_port_flag;
-#ifndef NDEBUG    
-  int speak_debug_flag, listen_debug_flag, updown_server_debug_flag;
-#endif /* NDEBUG */
+  struct cerebro_config cerebro_conf;
+  char buffer[CEREBROD_STRING_BUFLEN];
+  
+  if (cerebro_load_config_file(conf.config_file,
+			       &cerebro_conf,
+			       buffer,
+			       CEREBROD_STRING_BUFLEN) < 0)
+    cerebro_err_exit("config file error: %s", buffer);
 
-  struct conffile_option options[] =
+  if (cerebro_conf.cerebrod_heartbeat_frequency_flag)
     {
-      {"heartbeat_frequency", CONFFILE_OPTION_LIST_INT, -1, 
-       _cb_heartbeat_freq, 1, 0, &heartbeat_frequency_flag, 
-       NULL, 0},
-      {"heartbeat_source_port", CONFFILE_OPTION_INT, -1, 
-       conffile_int, 1, 0, &heartbeat_source_port_flag, 
-       &(conf.heartbeat_source_port), 0},
-      {"heartbeat_destination_port", CONFFILE_OPTION_INT, -1, 
-       conffile_int, 1, 0, &heartbeat_destination_port_flag, 
-       &(conf.heartbeat_destination_port), 0},
-      {"heartbeat_destination_ip", CONFFILE_OPTION_STRING, -1, 
-       _cb_stringptr, 1, 0, &heartbeat_destination_ip_flag, 
-       &(conf.heartbeat_destination_ip), 0},
-      {"heartbeat_network_interface", CONFFILE_OPTION_STRING, -1, 
-       _cb_stringptr, 1, 0, &heartbeat_network_interface_flag, 
-       &(conf.heartbeat_network_interface), 0},
-      {"heartbeat_ttl", CONFFILE_OPTION_INT, -1, 
-       conffile_int, 1, 0, &heartbeat_ttl_flag, 
-       &(conf.heartbeat_ttl), 0},
-      {"speak", CONFFILE_OPTION_BOOL, -1, 
-       conffile_bool, 1, 0, &speak_flag, 
-       &conf.speak, 0},
-      {"listen", CONFFILE_OPTION_BOOL, -1, 
-       conffile_bool, 1, 0, &listen_flag, 
-       &conf.listen, 0},
-      {"listen_threads", CONFFILE_OPTION_INT, -1, 
-       conffile_int, 1, 0, &listen_threads_flag, 
-       &(conf.listen_threads), 0},
-      {"updown_server", CONFFILE_OPTION_BOOL, -1, 
-       conffile_bool, 1, 0, &updown_server_flag, 
-       &conf.updown_server, 0},
-      {"updown_server_port", CONFFILE_OPTION_INT, -1, 
-       conffile_int, 1, 0, &updown_server_port_flag, 
-       &(conf.updown_server_port), 0},
-#ifndef NDEBUG    
-      {"speak_debug", CONFFILE_OPTION_BOOL, -1, 
-       conffile_bool, 1, 0, &speak_debug_flag, 
-       &conf.speak_debug, 0},
-      {"listen_debug", CONFFILE_OPTION_BOOL, -1, 
-       conffile_bool, 1, 0, &listen_debug_flag, 
-       &conf.listen_debug, 0},
-      {"updown_server_debug", CONFFILE_OPTION_BOOL, -1, 
-       conffile_bool, 1, 0, &updown_server_debug_flag, 
-       &conf.updown_server_debug, 0},
-#endif /* NDEBUG */
-    };
-  conffile_t cf = NULL;
-  int num;
-    
-  if (!(cf = conffile_handle_create())) 
-    cerebro_err_exit("%s(%s:%d): failed to create handle",
-                     __FILE__, __FUNCTION__, __LINE__);
-    
-  num = sizeof(options)/sizeof(struct conffile_option);
-  if (conffile_parse(cf, conf.config_file, options, num, NULL, 0, 0) < 0)
-    {
-      /* Its not an error if the default configuration file doesn't exist */
-
-      if (conffile_errnum(cf) == CONFFILE_ERR_EXIST
-          && strcmp(conf.config_file, CEREBROD_CONFIG_FILE_DEFAULT) != 0)
-        cerebro_err_exit("configuration file '%s' not found", 
-                         conf.config_file);
-
-      if (conffile_errnum(cf) != CONFFILE_ERR_EXIST)
-        {
-          char buf[CONFFILE_MAX_ERRMSGLEN];
-          if (conffile_errmsg(cf, buf, CONFFILE_MAX_ERRMSGLEN) < 0)
-            cerebro_err_exit("conffile_parse: errnum = %d", 
-                             conffile_errnum(cf));
-          cerebro_err_exit("config file error: %s", buf);
-        }
+      conf.heartbeat_frequency_min = cerebro_conf.cerebrod_heartbeat_frequency_min;
+      conf.heartbeat_frequency_max = cerebro_conf.cerebrod_heartbeat_frequency_max;
     }
-  conffile_handle_destroy(cf);
+  if (cerebro_conf.cerebrod_heartbeat_source_port_flag)
+    conf.heartbeat_source_port = cerebro_conf.cerebrod_heartbeat_source_port;
+  if (cerebro_conf.cerebrod_heartbeat_destination_port_flag)
+    conf.heartbeat_destination_port = cerebro_conf.cerebrod_heartbeat_destination_port;
+
+  if (cerebro_conf.cerebrod_heartbeat_destination_ip_flag)
+    conf.heartbeat_destination_ip = Strdup(cerebro_conf.cerebrod_heartbeat_destination_ip);
+
+  if (cerebro_conf.cerebrod_heartbeat_network_interface_flag)
+    conf.heartbeat_network_interface = Strdup(cerebro_conf.cerebrod_heartbeat_network_interface);
+
+  if (cerebro_conf.cerebrod_heartbeat_ttl_flag)
+    conf.heartbeat_ttl = cerebro_conf.cerebrod_heartbeat_ttl;
+  if (cerebro_conf.cerebrod_speak_flag)
+    conf.speak = cerebro_conf.cerebrod_speak;
+  if (cerebro_conf.cerebrod_listen_flag)
+    conf.listen = cerebro_conf.cerebrod_listen;
+  if (cerebro_conf.cerebrod_listen_threads_flag)
+    conf.listen_threads = cerebro_conf.cerebrod_listen_threads;
+  if (cerebro_conf.cerebrod_updown_server_flag)
+    conf.updown_server = cerebro_conf.cerebrod_updown_server;
+  if (cerebro_conf.cerebrod_updown_server_port_flag)
+    conf.updown_server_port = cerebro_conf.cerebrod_updown_server_port;
+#ifndef NDEBUG
+  if (cerebro_conf.cerebrod_speak_debug_flag)
+    conf.speak_debug = cerebro_conf.cerebrod_speak_debug;
+  if (cerebro_conf.cerebrod_listen_debug_flag)
+    conf.listen_debug = cerebro_conf.cerebrod_listen_debug;
+  if (cerebro_conf.cerebrod_updown_server_debug_flag)
+    conf.updown_server_debug = cerebro_conf.cerebrod_updown_server_debug;
+#endif /* NDEBUG */
+
 }
 
 /*
@@ -1066,10 +969,10 @@ cerebrod_config_setup(int argc, char **argv)
   assert(argv);
 
   _cerebrod_config_default();
-  _cerebrod_cmdline_parse(argc, argv);
-  _cerebrod_cmdline_parse_check();
+  _cerebrod_cmdline(argc, argv);
+  _cerebrod_cmdline_check();
   _cerebrod_config_module_setup();
-  _cerebrod_config_parse();
+  _cerebrod_config_file_setup();
   _cerebrod_pre_calculate_configuration_config_check();
   _cerebrod_calculate_configuration();
   _cerebrod_post_calculate_configuration_config_check();
