@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro.conf.5.in,v 1.1 2005-05-02 20:42:25 achu Exp $
+\."$Id: cerebro.conf.5.in,v 1.2 2005-05-02 21:26:46 achu Exp $
 \."#############################################################################
 .TH cerebro.conf 5 "May 2005" "cerebro.conf @VERSION@" "cerebro.conf"
 .SH "NAME"
@@ -29,18 +29,20 @@ backslash ("\\").
 .SH "CEREBRO CONFIGURATION OPTIONS"
 .TP
 .I cerebro_updown_hostnames host1 host2 host3 ...
-Specify the hostnames the libcerebro updown API should attempt to connect to.
+Specify alternate default hostnames the libcerebro updown API should
+attempt to connect to.
 .TP
 .I cerebro_updown_port num
-Specify the port the libcerebro updown API should attempt to connect to.
+Specify the alternate default port the libcerebro updown API should
+attempt to connect to.
 .TP
 .I cerebro_updown_timeout_len num
-Specify the timeout length the libcerebro updown API should use to
-evaluate up vs. down nodes.
+Specify the alternate default timeout length the libcerebro updown API
+should use to evaluate up vs. down nodes.
 .TP
 .I cerebro_updown_flags num
-Specify the flags the libcerebro updown API should use by default.
-
+Specify the alternateu default flags the libcerebro updown API should
+use by default.
 .SH "CEREBROD CONFIGURATION OPTIONS"
 .TP
 .I cerebrod_heartbeat_frequency ( sec | sec_min sec_max )
