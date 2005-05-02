@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.27 2005-05-01 16:49:59 achu Exp $
+## $Id: Makefile.am,v 1.28 2005-05-02 17:50:34 achu Exp $
 ##*****************************************************************************
 
 if WITH_GNU_LD
@@ -12,7 +12,8 @@ STATIC_MODULE_LIBS = ../modules/clusterlist/libclusterlistmodules.la \
 		     ../modules/config/libconfigmodules.la
 endif
 
-noinst_HEADERS = cerebro_defs.h \
+noinst_HEADERS = cerebro_config.h \
+		 cerebro_defs.h \
 		 cerebro_marshalling.h \
 		 cerebro_module.h \
 		 cerebro_updown.h \
@@ -36,6 +37,7 @@ libcerebro_la_CFLAGS  = -D_REENTRANT \
 			-DCEREBRO_CONFIG_MODULE_BUILDDIR=\"$(cerebro_config_module_builddir)\" \
 			-I$(srcdir)/../libcommon
 libcerebro_la_SOURCES = cerebro_api.c \
+			cerebro_config.c \
 			cerebro_error.c \
 			cerebro_marshalling.c \
 			cerebro_module.c \

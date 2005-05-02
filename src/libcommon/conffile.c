@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: conffile.c,v 1.5 2005-04-20 21:23:52 achu Exp $
+ *  $Id: conffile.c,v 1.6 2005-05-02 17:50:34 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2003 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -201,7 +201,7 @@ conffile_seterrnum(conffile_t cf, int errnum)
 
 static int
 _setup(conffile_t cf,
-       char *filename,
+       const char *filename,
        struct conffile_option *options,
        int options_len,
        void *app_ptr,
@@ -506,6 +506,8 @@ _parseline(conffile_t cf, char *linebuf, int linebuflen)
     }
 
     if (option == NULL) {
+        if (cf->flags & CONFFILE_FLAG_OPTION_IGNORE_UNKNOWN)
+	    return 0;
         cf->errnum = CONFFILE_ERR_PARSE_OPTION_UNKNOWN;
         return -1;
     }
@@ -669,14 +671,14 @@ _parseline(conffile_t cf, char *linebuf, int linebuflen)
 
 int
 conffile_parse(conffile_t cf,
-               char *filename,
+               const char *filename,
                struct conffile_option *options,
                int options_len,
                void *app_ptr,
                int app_data,
                int flags)
 {
-    int i, j, len = 0, retval = -1;
+    int i, j, temp, len = 0, retval = -1;
     char linebuf[CONFFILE_MAX_LINELEN];
 
     if (cf == NULL || cf->magic != CONFFILE_MAGIC)
@@ -720,6 +722,15 @@ conffile_parse(conffile_t cf,
                 return -1;
             }
         }
+    }
+
+    /* Ensure flags are appropriate */
+    temp = flags;
+    temp &= ~CONFFILE_FLAG_OPTION_CASESENSITIVE;
+    temp &= ~CONFFILE_FLAG_OPTION_IGNORE_UNKNOWN;
+    if (temp) {
+        cf->errnum = CONFFILE_ERR_PARAMETERS;
+        return -1;
     }
 
     if (_setup(cf, filename, options, options_len, app_ptr, app_data, flags) < 0)

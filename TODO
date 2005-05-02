@@ -82,4 +82,5 @@
 
 - code style of always calling "cerebro_clusterlist_is_loaded" to check between none vs. clusterlist module ... is there a better way?? hide in the library??
 
-
+- generic err message in cerebro_t handle?
+  - i.e. for conffile
