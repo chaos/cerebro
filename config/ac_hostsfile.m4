@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: ac_hostsfile.m4,v 1.4 2005-04-30 17:45:48 achu Exp $
+## $Id: ac_hostsfile.m4,v 1.5 2005-05-02 21:44:34 achu Exp $
 ##*****************************************************************************
 
 AC_DEFUN([AC_HOSTSFILE],
@@ -33,13 +33,13 @@ AC_DEFUN([AC_HOSTSFILE_PATH],
   AC_ARG_WITH([hostsfile-path],
     AC_HELP_STRING([--with-hostsfile-path=PATH], [Specify default hostsfile clusterlist path]),
     [ case "$withval" in
-        no)  CEREBRO_CLUSTERLIST_HOSTSFILE_DEFAULT=/etc/cerebro/hostsfile ;;
-        yes) CEREBRO_CLUSTERLIST_HOSTSFILE_DEFAULT=/etc/cerebro/hostsfile ;;
+        no)  CEREBRO_CLUSTERLIST_HOSTSFILE_DEFAULT=/etc/hostsfile ;;
+        yes) CEREBRO_CLUSTERLIST_HOSTSFILE_DEFAULT=/etc/hostsfile ;;
         *)   CEREBRO_CLUSTERLIST_HOSTSFILE_DEFAULT=$withval ;;
       esac
     ]
   )
-  AC_MSG_RESULT([${CEREBRO_CLUSTERLIST_HOSTSFILE_DEFAULT=/etc/cerebro/hostsfile}])
+  AC_MSG_RESULT([${CEREBRO_CLUSTERLIST_HOSTSFILE_DEFAULT=/etc/hostsfile}])
 
   AC_DEFINE_UNQUOTED([CEREBRO_CLUSTERLIST_HOSTSFILE_DEFAULT], 
                      ["$CEREBRO_CLUSTERLIST_HOSTSFILE_DEFAULT"], 
