@@ -61,9 +61,6 @@
 
 - all debug/err_exit funcs, calling errormsg(), strerror(), etc. correctly?
 
-- naming of module funcs
-  - cerebro_config_setup - hmmmm
-
 - .h file order consistency
 
 - generic err message in cerebro_t handle?
