@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module_default.c,v 1.1 2005-05-01 16:49:59 achu Exp $
+ *  $Id: cerebro_module_default.c,v 1.2 2005-05-03 21:47:39 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -129,7 +129,7 @@ default_config_cleanup(void)
 }
 
 int
-default_config_load_cerebrod_default(struct cerebrod_module_config *conf)
+default_config_load_default(struct cerebro_config *conf)
 {
   return 0;
 }
@@ -139,5 +139,5 @@ struct cerebro_config_module_info default_config_module_info =
     DEFAULT_CONFIG_MODULE_NAME,
     &default_config_setup,
     &default_config_cleanup,
-    &default_config_load_cerebrod_default,
+    &default_config_load_default,
   };

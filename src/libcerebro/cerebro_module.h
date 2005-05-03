@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.h,v 1.9 2005-05-01 16:49:59 achu Exp $
+ *  $Id: cerebro_module.h,v 1.10 2005-05-03 21:47:39 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_MODULE_H
@@ -43,7 +43,8 @@ int cerebro_module_cleanup(void);
  * Find and load the clusterlist module.  If none is found, cerebro
  * library will assume a default clusterlist module.
  * 
- * Returns 1 if module is found and loaded, 0 if it isn't, -1 on fatal error
+ * Returns 1 if module is found and loaded, 0 if one isn't found and
+ * the default is loaded, -1 on fatal error
  */
 int cerebro_load_clusterlist_module(void);
 
@@ -62,7 +63,8 @@ int cerebro_unload_clusterlist_module(void);
  * Find and load the config module.  If none is found, cerebro
  * library will assume a default config module.
  * 
- * Returns 1 if module is found and loaded, 0 if it isn't, -1 on fatal error
+ * Returns 1 if module is found and loaded, 0 if one isn't found and
+ * the default is loaded, -1 on fatal error
  */
 int cerebro_load_config_module(void);
 
@@ -174,10 +176,10 @@ int cerebro_config_setup(void);
 int cerebro_config_cleanup(void);
                                                                                      
 /*
- * cerebro_config_load_cerebrod_default
+ * cerebro_config_load_default
  *
  * call config module get all nodes function
  */
-int cerebro_config_load_cerebrod_default(struct cerebrod_module_config *conf);
+int cerebro_config_load_default(struct cerebro_config *conf);
 
 #endif /* _CEREBRO_MODULE_H */

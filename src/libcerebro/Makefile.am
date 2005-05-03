@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.28 2005-05-02 17:50:34 achu Exp $
+## $Id: Makefile.am,v 1.29 2005-05-03 21:47:39 achu Exp $
 ##*****************************************************************************
 
 if WITH_GNU_LD
@@ -13,7 +13,6 @@ STATIC_MODULE_LIBS = ../modules/clusterlist/libclusterlistmodules.la \
 endif
 
 noinst_HEADERS = cerebro_config.h \
-		 cerebro_defs.h \
 		 cerebro_marshalling.h \
 		 cerebro_module.h \
 		 cerebro_updown.h \
@@ -24,6 +23,7 @@ noinst_HEADERS = cerebro_config.h \
 cerebroheadersdir = $(includedir)/cerebro
 
 cerebroheaders_HEADERS = cerebro.h \
+		 	 cerebro_defs.h \
 			 cerebro_error.h \
 			 cerebro_clusterlist_module.h \
 			 cerebro_config_module.h

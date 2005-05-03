@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_gendersllnl.c,v 1.5 2005-05-01 16:49:59 achu Exp $
+ *  $Id: cerebro_config_gendersllnl.c,v 1.6 2005-05-03 21:47:39 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -40,13 +40,6 @@ static genders_t gendersllnl_handle = NULL;
  * gendersllnl database
  */
 static char *gendersllnl_file = NULL;
-
-/* 
- * gendersllnl_heartbeat_network_interface
- *
- * Store private management network ip address
- */
-static char gendersllnl_heartbeat_network_interface[INET_ADDRSTRLEN+1];
 
 /*
  * gendersllnl_config_setup
@@ -104,7 +97,7 @@ gendersllnl_config_setup(void)
   return -1;
 
 }
-                                                                                        
+
 /*
  * gendersllnl_config_cleanup
  *
@@ -136,19 +129,20 @@ gendersllnl_config_cleanup(void)
 }
 
 /* 
- * gendersllnl_config_load_cerebrod_default
+ * gendersllnl_config_load_default
  *
  * alter default module specifically for use on LLNL clusters. 'mgmt'
  * nodes listen and speak, while compute nodes only speak.  We always
- * speak out of the private management network interface.
+ * speak out of the private management network interface.  Non-mgmt
+ * nodes connect to mgmt nodes to receive updown data.
  *
  * Returns 0 on success, -1 on error
  */
 int
-gendersllnl_config_load_cerebrod_default(struct cerebrod_module_config *conf)
+gendersllnl_config_load_default(struct cerebro_config *conf)
 {
   char altnamebuf[CEREBRO_MAXNODENAMELEN+1];
-  int ret;
+  int is_mgmt, ret;
 
   if (!gendersllnl_handle)
     {
@@ -168,25 +162,75 @@ gendersllnl_config_load_cerebrod_default(struct cerebrod_module_config *conf)
       return -1;
     }
 
-  if ((ret = genders_testattr(gendersllnl_handle, NULL, "mgmt", NULL, 0)) < 0)
+  if ((is_mgmt = genders_testattr(gendersllnl_handle, NULL, "mgmt", NULL, 0)) < 0)
     {
       cerebro_err_debug("%s(%s:%d): genders_testattr: %s", 
                         __FILE__, __FUNCTION__, __LINE__,
                         genders_errormsg(gendersllnl_handle));
       return -1;
     }
-      
-  if (ret)
+  
+  if (is_mgmt)
     {
-      conf->speak = 1;
-      conf->listen = 1;
-      conf->updown_server = 1;
+      conf->cerebrod_speak = 1;
+      conf->cerebrod_speak_flag++;
+      conf->cerebrod_listen = 1;
+      conf->cerebrod_listen_flag++;
+      conf->cerebrod_updown_server = 1;
+      conf->cerebrod_updown_server_flag++;
     }
   else
     {
-      conf->speak = 1;
-      conf->listen = 0;
-      conf->updown_server = 0;
+      char **nodelist = NULL;
+      int i, nodelist_len, mgmt_len;
+
+      conf->cerebrod_speak = 1;
+      conf->cerebrod_speak_flag++;
+      conf->cerebrod_listen = 0;
+      conf->cerebrod_listen_flag++;
+      conf->cerebrod_updown_server = 0;
+      conf->cerebrod_updown_server_flag++;
+
+      if ((nodelist_len = genders_nodelist_create(gendersllnl_handle, &nodelist)) < 0)
+	{
+	  cerebro_err_debug("%s(%s:%d): genders_nodelist_create: %s",
+			    __FILE__, __FUNCTION__, __LINE__,
+			    genders_errormsg(gendersllnl_handle));
+	  return -1;
+	}
+      
+      if ((mgmt_len = genders_getnodes(gendersllnl_handle,
+				       nodelist,
+				       nodelist_len,
+				       "mgmt",
+				       NULL)) < 0)
+	{
+	  cerebro_err_debug("%s(%s:%d): genders_getnodes: %s",
+			    __FILE__, __FUNCTION__, __LINE__,
+			    genders_errormsg(gendersllnl_handle));
+	  genders_nodelist_destroy(gendersllnl_handle, nodelist);      
+	  return -1;
+	}
+
+      if (mgmt_len > CEREBRO_CONFIG_UPDOWN_HOSTNAMES_MAX)
+	mgmt_len = CEREBRO_CONFIG_UPDOWN_HOSTNAMES_MAX;
+
+      for (i = 0 ; i < mgmt_len; i++)
+	{
+	  if (strlen(nodelist[i]) > CEREBRO_MAXNODENAMELEN)
+	    {
+	      cerebro_err_debug("%s(%s:%d): genders_getnodes: %s",
+				__FILE__, __FUNCTION__, __LINE__,
+				genders_errormsg(gendersllnl_handle));
+	      genders_nodelist_destroy(gendersllnl_handle, nodelist);      
+	      return -1;
+	    }
+	  strcpy(conf->cerebro_updown_hostnames[i], nodelist[i]);
+	}
+      conf->cerebro_updown_hostnames_len = mgmt_len;
+      conf->cerebro_updown_hostnames_flag++;
+      
+      genders_nodelist_destroy(gendersllnl_handle, nodelist);      
     }
 
   memset(altnamebuf, '\0', CEREBRO_MAXNODENAMELEN+1);
@@ -204,6 +248,7 @@ gendersllnl_config_load_cerebrod_default(struct cerebrod_module_config *conf)
 
   if (ret)
     {
+      char heartbeat_network_interface[INET_ADDRSTRLEN+1];
       struct hostent *h = NULL;
       struct in_addr in;
 
@@ -217,10 +262,10 @@ gendersllnl_config_load_cerebrod_default(struct cerebrod_module_config *conf)
 
       in = *((struct in_addr *)h->h_addr);
 
-      memset(gendersllnl_heartbeat_network_interface, '\0', INET_ADDRSTRLEN+1);
+      memset(heartbeat_network_interface, '\0', INET_ADDRSTRLEN+1);
       if (!inet_ntop(AF_INET, 
                      &in, 
-                     gendersllnl_heartbeat_network_interface,
+                     heartbeat_network_interface,
                      INET_ADDRSTRLEN+1))
         {
           cerebro_err_debug("%s(%s:%d): inet_ntop: %s",
@@ -228,8 +273,10 @@ gendersllnl_config_load_cerebrod_default(struct cerebrod_module_config *conf)
                             strerror(errno));
           return -1;
         }
-
-      conf->heartbeat_network_interface = gendersllnl_heartbeat_network_interface;
+     
+      memset(conf->cerebrod_heartbeat_network_interface, '\0', CEREBRO_MAXNETWORKINTERFACE+1);
+      strncpy(conf->cerebrod_heartbeat_network_interface, heartbeat_network_interface, CEREBRO_MAXNETWORKINTERFACE);
+      conf->cerebrod_heartbeat_network_interface_flag++;
     }
 
   return 0;
@@ -244,5 +291,5 @@ struct cerebro_config_module_info config_module_info =
     GENDERSLLNL_CONFIG_MODULE_NAME,
     &gendersllnl_config_setup,
     &gendersllnl_config_cleanup,
-    &gendersllnl_config_load_cerebrod_default,
+    &gendersllnl_config_load_default,
   };

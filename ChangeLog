@@ -1,3 +1,9 @@
+2005-05-03  Albert Chu  <chu11@llnl.gov>
+
+	* Rework config file and config module into one load_config
+	libcerebro call.  Rework libcerebro and cerebrod around this new
+	API.
+	
 2005-05-02  Albert Chu  <chu11@llnl.gov>
 
 	* Add config file funcs into libcerebro.

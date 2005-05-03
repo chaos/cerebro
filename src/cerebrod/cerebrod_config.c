@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.82 2005-05-02 20:03:32 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.83 2005-05-03 21:47:39 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -41,6 +41,11 @@
 #define MULTICAST_CLASS_MAX 239
 #define IPADDR_BITS          32   
 #define IPADDR6_BITS        128
+
+#ifndef NDEBUG
+extern char *cerebro_config_debug_config_file;
+extern int cerebro_config_debug_output;
+#endif /* NDEBUG */
 
 /* 
  * conf
@@ -204,16 +209,16 @@ _cerebrod_cmdline_check(void)
 }
 
 /* 
- * _cerebrod_load_alternate_configuration
+ * _cerebrod_load_alternate_config
  *
  * Check parameters and load the actual alternate configuration
  *
  * Returns 1 on loading success, 0 on loading failure, -1 on fatal error
  */
 static void
-_cerebrod_load_alternate_configuration(void)
+_cerebrod_load_alternate_config(struct cerebro_config *conf_l)
 {
-  struct cerebrod_module_config module_conf;
+  assert(conf_l);
 
   if (!cerebro_config_found())
     return;
@@ -234,121 +239,76 @@ _cerebrod_load_alternate_configuration(void)
     }
 #endif /* NDEBUG */
 
-  /* Initialize module_conf with current defaults */
-  module_conf.heartbeat_frequency_min = conf.heartbeat_frequency_min;
-  module_conf.heartbeat_frequency_max = conf.heartbeat_frequency_max;
-  module_conf.heartbeat_source_port = conf.heartbeat_source_port;
-  module_conf.heartbeat_destination_port = conf.heartbeat_destination_port;
-  module_conf.heartbeat_destination_ip = conf.heartbeat_destination_ip;
-  module_conf.heartbeat_network_interface = conf.heartbeat_network_interface;
-  module_conf.heartbeat_ttl = conf.heartbeat_ttl;
-  module_conf.speak = conf.speak;
-  module_conf.listen = conf.listen;
-  module_conf.listen_threads = conf.listen_threads;
-  module_conf.updown_server = conf.updown_server;
-  module_conf.updown_server_port = conf.updown_server_port;
-
   /* Load the alternate default configuration from the configuration module */
-  if (cerebro_config_load_cerebrod_default(&module_conf) < 0)
+  if (cerebro_config_load_default(conf_l) < 0)
     cerebro_err_exit("%s config module: load_cerebrod_default failed", 
 		     cerebro_config_module_name());
-
-  /* Load new defaults */
-  conf.heartbeat_frequency_min = module_conf.heartbeat_frequency_min;
-  conf.heartbeat_frequency_max = module_conf.heartbeat_frequency_max;
-  conf.heartbeat_source_port = module_conf.heartbeat_source_port;
-  conf.heartbeat_destination_port = module_conf.heartbeat_destination_port;
-  conf.heartbeat_destination_ip = module_conf.heartbeat_destination_ip;
-  conf.heartbeat_network_interface = module_conf.heartbeat_network_interface;
-  conf.heartbeat_ttl = module_conf.heartbeat_ttl;
-  conf.speak = module_conf.speak;
-  conf.listen = module_conf.listen;
-  conf.listen_threads = module_conf.listen_threads;
-  conf.updown_server = module_conf.updown_server;
-  conf.updown_server_port = module_conf.updown_server_port;
 
   return;
 }
 
 /*
- * _cerebrod_config_module_setup
+ * _cerebrod_config_setup
  *
  * load configuration module.
  */
 static void
-_cerebrod_config_module_setup(void)
+_cerebrod_config_setup(void)
 {
-  if (cerebro_load_config_module() < 0)
+  struct cerebro_config conf_l;
+
+#ifndef NDEBUG
+  cerebro_config_debug_config_file = conf.config_file;
+  cerebro_config_debug_output = conf.debug;
+#endif /* NDEBUG */
+
+  if (cerebro_load_config(&conf_l) < 0)
     cerebro_err_exit("%s(%s:%d): cerebro_find_config_module: %s",
 		     __FILE__, __FUNCTION__, __LINE__, strerror(errno));
   
-  _cerebrod_load_alternate_configuration();
-}
-
-/*
- * _cerebrod_config_file_setup
- * 
- * Read and load the config file
- */
-static void
-_cerebrod_config_file_setup(void)
-{
-  struct cerebro_config cerebro_conf;
-  char buffer[CEREBROD_STRING_BUFLEN];
-  
-  if (cerebro_load_config_file(conf.config_file,
-			       &cerebro_conf,
-			       buffer,
-			       CEREBROD_STRING_BUFLEN) < 0)
-    cerebro_err_exit("config file error: %s", buffer);
-
-  if (cerebro_conf.cerebrod_heartbeat_frequency_flag)
+  if (conf_l.cerebrod_heartbeat_frequency_flag)
     {
-      conf.heartbeat_frequency_min = cerebro_conf.cerebrod_heartbeat_frequency_min;
-      conf.heartbeat_frequency_max = cerebro_conf.cerebrod_heartbeat_frequency_max;
+      conf.heartbeat_frequency_min = conf_l.cerebrod_heartbeat_frequency_min;
+      conf.heartbeat_frequency_max = conf_l.cerebrod_heartbeat_frequency_max;
     }
-  if (cerebro_conf.cerebrod_heartbeat_source_port_flag)
-    conf.heartbeat_source_port = cerebro_conf.cerebrod_heartbeat_source_port;
-  if (cerebro_conf.cerebrod_heartbeat_destination_port_flag)
-    conf.heartbeat_destination_port = cerebro_conf.cerebrod_heartbeat_destination_port;
-
-  if (cerebro_conf.cerebrod_heartbeat_destination_ip_flag)
-    conf.heartbeat_destination_ip = Strdup(cerebro_conf.cerebrod_heartbeat_destination_ip);
-
-  if (cerebro_conf.cerebrod_heartbeat_network_interface_flag)
-    conf.heartbeat_network_interface = Strdup(cerebro_conf.cerebrod_heartbeat_network_interface);
-
-  if (cerebro_conf.cerebrod_heartbeat_ttl_flag)
-    conf.heartbeat_ttl = cerebro_conf.cerebrod_heartbeat_ttl;
-  if (cerebro_conf.cerebrod_speak_flag)
-    conf.speak = cerebro_conf.cerebrod_speak;
-  if (cerebro_conf.cerebrod_listen_flag)
-    conf.listen = cerebro_conf.cerebrod_listen;
-  if (cerebro_conf.cerebrod_listen_threads_flag)
-    conf.listen_threads = cerebro_conf.cerebrod_listen_threads;
-  if (cerebro_conf.cerebrod_updown_server_flag)
-    conf.updown_server = cerebro_conf.cerebrod_updown_server;
-  if (cerebro_conf.cerebrod_updown_server_port_flag)
-    conf.updown_server_port = cerebro_conf.cerebrod_updown_server_port;
+  if (conf_l.cerebrod_heartbeat_source_port_flag)
+    conf.heartbeat_source_port = conf_l.cerebrod_heartbeat_source_port;
+  if (conf_l.cerebrod_heartbeat_destination_port_flag)
+    conf.heartbeat_destination_port = conf_l.cerebrod_heartbeat_destination_port;
+  if (conf_l.cerebrod_heartbeat_destination_ip_flag)
+    conf.heartbeat_destination_ip = Strdup(conf_l.cerebrod_heartbeat_destination_ip);
+  if (conf_l.cerebrod_heartbeat_network_interface_flag)
+    conf.heartbeat_network_interface = Strdup(conf_l.cerebrod_heartbeat_network_interface);
+  if (conf_l.cerebrod_heartbeat_ttl_flag)
+    conf.heartbeat_ttl = conf_l.cerebrod_heartbeat_ttl;
+  if (conf_l.cerebrod_speak_flag)
+    conf.speak = conf_l.cerebrod_speak;
+  if (conf_l.cerebrod_listen_flag)
+    conf.listen = conf_l.cerebrod_listen;
+  if (conf_l.cerebrod_listen_threads_flag)
+    conf.listen_threads = conf_l.cerebrod_listen_threads;
+  if (conf_l.cerebrod_updown_server_flag)
+    conf.updown_server = conf_l.cerebrod_updown_server;
+  if (conf_l.cerebrod_updown_server_port_flag)
+    conf.updown_server_port = conf_l.cerebrod_updown_server_port;
 #ifndef NDEBUG
-  if (cerebro_conf.cerebrod_speak_debug_flag)
-    conf.speak_debug = cerebro_conf.cerebrod_speak_debug;
-  if (cerebro_conf.cerebrod_listen_debug_flag)
-    conf.listen_debug = cerebro_conf.cerebrod_listen_debug;
-  if (cerebro_conf.cerebrod_updown_server_debug_flag)
-    conf.updown_server_debug = cerebro_conf.cerebrod_updown_server_debug;
+  if (conf_l.cerebrod_speak_debug_flag)
+    conf.speak_debug = conf_l.cerebrod_speak_debug;
+  if (conf_l.cerebrod_listen_debug_flag)
+    conf.listen_debug = conf_l.cerebrod_listen_debug;
+  if (conf_l.cerebrod_updown_server_debug_flag)
+    conf.updown_server_debug = conf_l.cerebrod_updown_server_debug;
 #endif /* NDEBUG */
-
 }
 
 /*
- * _cerebrod_pre_calculate_configuration_config_check
+ * _cerebrod_pre_calculate_config_check
  * 
  * Check configuration settings for errors before analyzing
  * configuration data.
  */
 static void
-_cerebrod_pre_calculate_configuration_config_check(void)
+_cerebrod_pre_calculate_config_check(void)
 {
   struct in_addr addr_temp;
   
@@ -837,12 +797,12 @@ _cerebrod_calculate_heartbeat_network_interface_in_addr_and_index(void)
 }
 
 /*
- * _cerebrod_calculate_configuration
+ * _cerebrod_calculate_config
  *
  * analyze and calculate configuration based on settings
  */
 static void
-_cerebrod_calculate_configuration(void)
+_cerebrod_calculate_config(void)
 {
   /* Determine if the heartbeat is single or multi casted */
   _cerebrod_calculate_multicast();
@@ -860,13 +820,13 @@ _cerebrod_calculate_configuration(void)
 }
 
 /*
- * _cerebrod_post_calculate_configuration_config_check
+ * _cerebrod_post_calculate_config_check
  * 
  * Check configuration settings for errors after configuration data
  * has been analyzed.
  */
 static void
-_cerebrod_post_calculate_configuration_config_check(void)
+_cerebrod_post_calculate_config_check(void)
 {
   if (!conf.multicast && conf.listen)
     {
@@ -971,11 +931,10 @@ cerebrod_config_setup(int argc, char **argv)
   _cerebrod_config_default();
   _cerebrod_cmdline(argc, argv);
   _cerebrod_cmdline_check();
-  _cerebrod_config_module_setup();
-  _cerebrod_config_file_setup();
-  _cerebrod_pre_calculate_configuration_config_check();
-  _cerebrod_calculate_configuration();
-  _cerebrod_post_calculate_configuration_config_check();
+  _cerebrod_config_setup();
+  _cerebrod_pre_calculate_config_check();
+  _cerebrod_calculate_config();
+  _cerebrod_post_calculate_config_check();
   _cerebrod_config_dump();
 }
 

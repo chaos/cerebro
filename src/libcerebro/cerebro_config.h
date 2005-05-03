@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config.h,v 1.1 2005-05-02 17:50:34 achu Exp $
+ *  $Id: cerebro_config.h,v 1.2 2005-05-03 21:47:39 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_CONFIG_H
@@ -70,16 +70,13 @@ struct cerebro_config
 };
 
 /* 
- * cerebro_load_config_file
+ * cerebro_load_config
  *
- * Parse the cerebro config file library and load its contents
+ * Load the cerebro config module and parse the cerebro config file
+ * library and load its contents.
  *
- * Returns data in structure and 0 on success, -1 on error and error
- * msg in the buffer.
+ * Returns data in structure and 0 on success, -1 on error
  */
-int cerebro_load_config_file(const char *config_file,
-			     struct cerebro_config *conf,
-			     char *buf,
-			     unsigned int buflen);
+int cerebro_load_config(struct cerebro_config *conf);
 
 #endif /* _CEREBRO_CONFIG_H */

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.c,v 1.14 2005-05-01 16:49:59 achu Exp $
+ *  $Id: cerebro_module.c,v 1.15 2005-05-03 21:47:39 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -43,7 +43,9 @@ extern struct cerebro_clusterlist_module_info gendersllnl_clusterlist_module_inf
 extern struct cerebro_clusterlist_module_info genders_clusterlist_module_info;
 #endif /* WITH_GENDERS */
 
+#if WITH_HOSTSFILE
 extern struct cerebro_clusterlist_module_info hostsfile_clusterlist_module_info;
+#endif /* WITH_HOSTSFILE */
 
 /*
  * static_config_modules
@@ -72,7 +74,9 @@ struct cerebro_clusterlist_module_info *static_clusterlist_modules[] =
 #if WITH_GENDERS
     &genders_clusterlist_module_info,
 #endif /* WITH_GENDERS */
+#if WITH_HOSTSFILE
     &hostsfile_clusterlist_module_info,
+#endif /* WITH_HOSTSFILE */
     NULL
   };
 
@@ -739,10 +743,10 @@ _cerebro_load_config_module(char *module)
       goto cleanup;
     }
 
-  if (!config_module_info_l->load_cerebrod_default)
+  if (!config_module_info_l->load_default)
     {
       cerebro_err_debug("config module '%s' does not contain "
-                        "valid load_cerebrod_default function",
+                        "valid load_default function",
                         config_module_info_l->config_module_name);
       goto cleanup;
     }
@@ -1017,7 +1021,7 @@ cerebro_config_cleanup(void)
   return ((*config_module_info->cleanup)());
 }
 int
-cerebro_config_load_cerebrod_default(struct cerebrod_module_config *conf)
+cerebro_config_load_default(struct cerebro_config *conf)
 {
   if (!config_module_info)
     {
@@ -1026,5 +1030,5 @@ cerebro_config_load_cerebrod_default(struct cerebrod_module_config *conf)
       return -1;
     }
   
-  return ((*config_module_info->load_cerebrod_default)(conf));
+  return ((*config_module_info->load_default)(conf));
 }

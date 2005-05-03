@@ -47,12 +47,7 @@
 
 - allow modules to return error codes??
 
-- global config file??
-  - need library func to ignore appropriate options
-
 - clusterlist/config modules for libcerebro
-
-- module search/loading funcs in libcerebro
 
 - libcerebro_common
   - for marshalling for example
@@ -62,10 +57,6 @@
 
 - set configfile, module, etc. functions
   - reload config, module, etc. functions
-
-- config module options function
-
-- return errnos from cerebro_module library?
 
 - no cerebro_module debugging?? b/c could output on ok errors?
   - a cerebro_lib_err_debug??
@@ -80,10 +71,11 @@
 
 - .h file order consistency
 
-- code style of always calling "cerebro_clusterlist_is_loaded" to check between none vs. clusterlist module ... is there a better way?? hide in the library??
-
 - generic err message in cerebro_t handle?
   - i.e. for conffile
 
-- Strduping for cerebrod config file conf stuff?
-  - probably shouldn't, should make static size
+- instead of cerebro_defs.h cerebro_constants.h or something?
+
+- do build trick for header files like freeipmi
+
+- config_is_setup? and equiv funcs?

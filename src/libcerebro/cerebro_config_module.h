@@ -1,30 +1,11 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_module.h,v 1.7 2005-04-30 17:09:10 achu Exp $
+ *  $Id: cerebro_config_module.h,v 1.8 2005-05-03 21:47:39 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_CONFIG_MODULE_H
 #define _CEREBRO_CONFIG_MODULE_H
 
-/*  
- * struct cerebrod_module_config
- *
- * passed to config module to load alternate default values
- */
-struct cerebrod_module_config
-{
-  unsigned int heartbeat_frequency_min;
-  unsigned int heartbeat_frequency_max;
-  int heartbeat_source_port;
-  int heartbeat_destination_port;
-  char *heartbeat_destination_ip;
-  char *heartbeat_network_interface;
-  int heartbeat_ttl;
-  int speak;
-  int listen;
-  int listen_threads;
-  int updown_server;
-  int updown_server_port;
-};
+#include "cerebro_config.h"
 
 /*
  * Cerebro_config_setup
@@ -47,15 +28,15 @@ typedef int (*Cerebro_config_setup)(void);
 typedef int (*Cerebro_config_cleanup)(void);
 
 /*
- * Cerebro_config_load_cerebrod_default
+ * Cerebro_config_default
  *
  * function prototype for config module function to alter default
- * configuration values for the cerebrod daemon.  Required to be
- * defined by each config module.
+ * cerebro configuration values.  Required to be defined by each
+ * config module.
  *
  * Returns 0 on success, -1 on error
  */
-typedef int (*Cerebro_config_load_cerebrod_default)(struct cerebrod_module_config *conf);
+typedef int (*Cerebro_config_load_default)(struct cerebro_config *conf);
 
 /*
  * struct cerebro_config_module_info 
@@ -68,7 +49,7 @@ struct cerebro_config_module_info
   char *config_module_name;
   Cerebro_config_setup setup;
   Cerebro_config_cleanup cleanup;
-  Cerebro_config_load_cerebrod_default load_cerebrod_default;
+  Cerebro_config_load_default load_default;
 };
 
 #endif /* _CEREBRO_CONFIG_MODULE_H */

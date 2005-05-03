@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_updown.c,v 1.19 2005-05-02 20:42:25 achu Exp $
+ *  $Id: cerebro_updown.c,v 1.20 2005-05-03 21:47:39 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -624,28 +624,28 @@ cerebro_updown_load_data(cerebro_t handle,
         }
     }
 
-  if (!(handle->loaded_state & CEREBRO_CONFIG_FILE_LOADED))
-    {
-      if (cerebro_api_load_config_file(handle) < 0)
-	goto cleanup;
-    }
-
-  if (!(handle->loaded_state & CEREBRO_CLUSTERLIST_MODULE_FOUND))
+  if (!(handle->loaded_state & CEREBRO_CLUSTERLIST_MODULE_LOADED))
     {
       if (cerebro_api_load_clusterlist_module(handle) < 0)
 	goto cleanup;
     }
 
+  if (!(handle->loaded_state & CEREBRO_CONFIG_LOADED))
+    {
+      if (cerebro_api_load_config(handle) < 0)
+	goto cleanup;
+    }
+
   if (!port)
     {
-      if (handle->config_file_data.cerebro_updown_port_flag)
+      if (handle->config_data.cerebro_updown_port_flag)
 	{
-	  if (!handle->config_file_data.cerebro_updown_port)
+	  if (!handle->config_data.cerebro_updown_port)
 	    {
 	      handle->errnum = CEREBRO_ERR_CONFIG_FILE;
 	      goto cleanup;
 	    }
-	  port = handle->config_file_data.cerebro_updown_port;
+	  port = handle->config_data.cerebro_updown_port;
 	}
       else
 	port = CEREBRO_UPDOWN_SERVER_PORT;
@@ -653,14 +653,14 @@ cerebro_updown_load_data(cerebro_t handle,
 
   if (!timeout_len)
     {
-      if (handle->config_file_data.cerebro_updown_timeout_len_flag)
+      if (handle->config_data.cerebro_updown_timeout_len_flag)
 	{
-	  if (!handle->config_file_data.cerebro_updown_timeout_len)
+	  if (!handle->config_data.cerebro_updown_timeout_len)
 	    {
 	      handle->errnum = CEREBRO_ERR_CONFIG_FILE;
 	      goto cleanup;
 	    }
-	  timeout_len = handle->config_file_data.cerebro_updown_timeout_len;
+	  timeout_len = handle->config_data.cerebro_updown_timeout_len;
 	}
       else
 	timeout_len = CEREBRO_UPDOWN_TIMEOUT_LEN_DEFAULT;
@@ -668,17 +668,17 @@ cerebro_updown_load_data(cerebro_t handle,
 
   if (!flags)
     {
-      if (handle->config_file_data.cerebro_updown_flags_flag)
+      if (handle->config_data.cerebro_updown_flags_flag)
 	{
-	  if (handle->config_file_data.cerebro_updown_flags != CEREBRO_UPDOWN_UP_NODES
-	      && handle->config_file_data.cerebro_updown_flags != CEREBRO_UPDOWN_DOWN_NODES
-	      && handle->config_file_data.cerebro_updown_flags != CEREBRO_UPDOWN_UP_AND_DOWN_NODES)
+	  if (handle->config_data.cerebro_updown_flags != CEREBRO_UPDOWN_UP_NODES
+	      && handle->config_data.cerebro_updown_flags != CEREBRO_UPDOWN_DOWN_NODES
+	      && handle->config_data.cerebro_updown_flags != CEREBRO_UPDOWN_UP_AND_DOWN_NODES)
 
 	    {
 	      handle->errnum = CEREBRO_ERR_CONFIG_FILE;
 	      goto cleanup;
 	    }
-	  flags = handle->config_file_data.cerebro_updown_flags;
+	  flags = handle->config_data.cerebro_updown_flags;
 	}
       else
 	flags = CEREBRO_UPDOWN_UP_AND_DOWN_NODES;
@@ -686,11 +686,11 @@ cerebro_updown_load_data(cerebro_t handle,
   
   if (!hostname)
     {
-      if (handle->config_file_data.cerebro_updown_hostnames_flag)
+      if (handle->config_data.cerebro_updown_hostnames_flag)
 	{
 	  int rv, i;
 
-	  for (i = 0; i < handle->config_file_data.cerebro_updown_hostnames_len; i++)
+	  for (i = 0; i < handle->config_data.cerebro_updown_hostnames_len; i++)
 	    {
 	      if ((rv = _cerebro_updown_get_updown_data(handle,
 							updown_data,
@@ -875,10 +875,11 @@ _cerebro_updown_is_node(cerebro_t handle,
       return -1;
     }
 
-  /* Special case: We can do better than the clusterlist module
-   * default for cerebro_clusterlist_node_in_cluster.
+  /* Special case: In this situation we can do better than the
+   * clusterlist module default for cerebro_clusterlist_node_in_cluster.
    */
-  if (handle->loaded_state & CEREBRO_CLUSTERLIST_MODULE_FOUND)
+  if (handle->loaded_state & CEREBRO_CLUSTERLIST_MODULE_LOADED
+      && cerebro_clusterlist_found())
     {
       if ((rv = cerebro_clusterlist_node_in_cluster(node)) < 0)
 	{
