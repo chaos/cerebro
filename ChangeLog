@@ -3,6 +3,8 @@
 	* Rework config file and config module into one load_config
 	libcerebro call.  Rework libcerebro and cerebrod around this new
 	API.
+
+	* Library cleanup through various function renames.
 	
 2005-05-02  Albert Chu  <chu11@llnl.gov>
 

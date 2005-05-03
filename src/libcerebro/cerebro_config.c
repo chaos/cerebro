@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config.c,v 1.4 2005-05-03 21:47:39 achu Exp $
+ *  $Id: cerebro_config.c,v 1.5 2005-05-03 22:46:34 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -25,20 +25,20 @@ int cerebro_config_debug_output = 0;
 #endif /* NDEBUG */
 
 /* 
- * _cerebro_load_config_module
+ * _cerebro_config_load_config_module
  *
  * Find and load config module
  *
  * Returns data in structure and 0 on success, -1 on error
  */
 static int
-_cerebro_load_config_module(struct cerebro_config *conf)
+_cerebro_config_load_config_module(struct cerebro_config *conf)
 {
   int load_config_module_called = 0;
   int module_setup_called = 0;
   int rv = -1;
 
-  if (!cerebro_config_is_loaded())
+  if (!cerebro_module_config_module_is_loaded())
     {
       if (!cerebro_module_is_setup())
 	{
@@ -51,14 +51,14 @@ _cerebro_load_config_module(struct cerebro_config *conf)
 	  module_setup_called++;
 	}
       
-      if (cerebro_load_config_module() < 0)
+      if (cerebro_module_load_config_module() < 0)
 	{
 	  cerebro_err_debug("%s(%s:%d): cerebro_load_config_module",
 			    __FILE__, __FUNCTION__, __LINE__);
 	  goto cleanup;
 	}
 
-      if (cerebro_config_setup() < 0)
+      if (cerebro_config_module_setup() < 0)
 	{
 	  cerebro_err_debug("%s(%s:%d): cerebro_config_setup",
 			    __FILE__, __FUNCTION__, __LINE__);
@@ -80,7 +80,7 @@ _cerebro_load_config_module(struct cerebro_config *conf)
     }
 #endif  /* NDEBUG */
 
-  if (cerebro_config_load_default(conf) < 0)
+  if (cerebro_config_module_load_default(conf) < 0)
     {
       cerebro_err_debug("%s(%s:%d): cerebro_config_load_default",
 			__FILE__, __FUNCTION__, __LINE__);
@@ -92,8 +92,8 @@ _cerebro_load_config_module(struct cerebro_config *conf)
  cleanup:
   if (load_config_module_called)
     {
-      cerebro_config_cleanup();
-      cerebro_unload_config_module();
+      cerebro_config_module_cleanup();
+      cerebro_module_unload_config_module();
     }
   if (module_setup_called)
     cerebro_module_cleanup();
@@ -196,14 +196,14 @@ _cb_cerebro_updown_hostnames(conffile_t cf, struct conffile_data *data,
 }
 
 /* 
- * _cerebro_load_config_file
+ * _cerebro_config_load_config_file
  *
  * Read and load configuration file
  *
  * Returns data in structure and 0 on success, -1 on error
  */
 static int
-_cerebro_load_config_file(struct cerebro_config *conf)
+_cerebro_config_load_config_file(struct cerebro_config *conf)
 {
   char *config_file = NULL;
 
@@ -325,7 +325,7 @@ _cerebro_load_config_file(struct cerebro_config *conf)
 }
 
 int 
-cerebro_load_config(struct cerebro_config *conf)
+cerebro_config_load(struct cerebro_config *conf)
 {
   struct cerebro_config mod_conf; 
   struct cerebro_config file_conf;
@@ -342,10 +342,10 @@ cerebro_load_config(struct cerebro_config *conf)
   memset(&mod_conf, '\0', sizeof(struct cerebro_config));
   memset(&file_conf, '\0', sizeof(struct cerebro_config));
 
-  if (_cerebro_load_config_module(&mod_conf) < 0)
+  if (_cerebro_config_load_config_module(&mod_conf) < 0)
     return -1;
 
-  if (_cerebro_load_config_file(&file_conf) < 0)
+  if (_cerebro_config_load_config_file(&file_conf) < 0)
     return -1;
 
   /* 

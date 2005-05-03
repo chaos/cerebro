@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.c,v 1.40 2005-05-01 16:49:59 achu Exp $
+ *  $Id: cerebrod_updown.c,v 1.41 2005-05-03 22:46:34 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -193,8 +193,8 @@ _cerebrod_updown_initialize(void)
     cerebro_err_exit("%s(%s:%d): updown_fd setup failed",
                      __FILE__, __FUNCTION__, __LINE__);
 
-  if ((numnodes = cerebro_clusterlist_numnodes()) < 0)
-    cerebro_err_exit("%s(%s:%d): cerebro_clusterlist_numnodes",
+  if ((numnodes = cerebro_clusterlist_module_numnodes()) < 0)
+    cerebro_err_exit("%s(%s:%d): cerebro_clusterlist_module_numnodes",
 		     __FILE__, __FUNCTION__, __LINE__);
 
   if (numnodes > 0)
@@ -226,8 +226,8 @@ _cerebrod_updown_initialize(void)
 
       nodes = (char **)Malloc(sizeof(char *) * numnodes);
 
-      if (cerebro_clusterlist_get_all_nodes(nodes, numnodes) < 0)
-        cerebro_err_exit("%s(%s:%d): cerebro_clusterlist_get_all_nodes",
+      if (cerebro_clusterlist_module_get_all_nodes(nodes, numnodes) < 0)
+        cerebro_err_exit("%s(%s:%d): cerebro_clusterlist_module_get_all_nodes",
                          __FILE__, __FUNCTION__, __LINE__);
 
       for (i = 0; i < numnodes; i++)

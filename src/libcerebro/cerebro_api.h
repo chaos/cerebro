@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_api.h,v 1.6 2005-05-03 21:47:39 achu Exp $
+ *  $Id: cerebro_api.h,v 1.7 2005-05-03 22:46:34 achu Exp $
 \*****************************************************************************/
  
 #ifndef _CEREBRO_API_H
@@ -49,13 +49,13 @@ struct cerebro {
 };
 
 /* 
- * cerebro_api_load_config
+ * cerebro_load_config
  *
  * Read and load config file data
  *
  * Returns 0 on success, -1 on error
  */
-int cerebro_api_load_config(cerebro_t handle);
+int cerebro_load_config(cerebro_t handle);
 
 /* 
  * cerebro_api_load_config
@@ -64,7 +64,7 @@ int cerebro_api_load_config(cerebro_t handle);
  *
  * Returns 0 on success, -1 on error
  */
-int cerebro_api_unload_config(cerebro_t handle);
+int cerebro_unload_config(cerebro_t handle);
 
 /* 
  * cerebro_load_clusterlist_module
@@ -73,7 +73,7 @@ int cerebro_api_unload_config(cerebro_t handle);
  *
  * Returns 1 if clusterlist module was loaded, 0 if not, -1 on fatal error
  */
-int cerebro_api_load_clusterlist_module(cerebro_t handle);
+int cerebro_load_clusterlist_module(cerebro_t handle);
 
 /* 
  * cerebro_unload_clusterlist_module
@@ -82,6 +82,6 @@ int cerebro_api_load_clusterlist_module(cerebro_t handle);
  *
  * Returns 0 on success, -1 on error
  */
-int cerebro_api_unload_clusterlist_module(cerebro_t handle);
+int cerebro_unload_clusterlist_module(cerebro_t handle);
 
 #endif /* _CEREBRO_API_H */

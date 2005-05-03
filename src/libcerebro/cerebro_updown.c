@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_updown.c,v 1.20 2005-05-03 21:47:39 achu Exp $
+ *  $Id: cerebro_updown.c,v 1.21 2005-05-03 22:46:34 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -626,13 +626,13 @@ cerebro_updown_load_data(cerebro_t handle,
 
   if (!(handle->loaded_state & CEREBRO_CLUSTERLIST_MODULE_LOADED))
     {
-      if (cerebro_api_load_clusterlist_module(handle) < 0)
+      if (cerebro_load_clusterlist_module(handle) < 0)
 	goto cleanup;
     }
 
   if (!(handle->loaded_state & CEREBRO_CONFIG_LOADED))
     {
-      if (cerebro_api_load_config(handle) < 0)
+      if (cerebro_load_config(handle) < 0)
 	goto cleanup;
     }
 
@@ -879,9 +879,9 @@ _cerebro_updown_is_node(cerebro_t handle,
    * clusterlist module default for cerebro_clusterlist_node_in_cluster.
    */
   if (handle->loaded_state & CEREBRO_CLUSTERLIST_MODULE_LOADED
-      && cerebro_clusterlist_found())
+      && cerebro_module_clusterlist_module_found())
     {
-      if ((rv = cerebro_clusterlist_node_in_cluster(node)) < 0)
+      if ((rv = cerebro_clusterlist_module_node_in_cluster(node)) < 0)
 	{
 	  handle->errnum = CEREBRO_ERR_CLUSTERLIST_MODULE;
 	  return -1;
@@ -895,9 +895,9 @@ _cerebro_updown_is_node(cerebro_t handle,
 
       memset(buffer, '\0', CEREBRO_MAXNODENAMELEN+1);
       
-      if (cerebro_clusterlist_get_nodename(node,
-					   buffer, 
-					   CEREBRO_MAXNODENAMELEN) < 0)
+      if (cerebro_clusterlist_module_get_nodename(node,
+						  buffer, 
+						  CEREBRO_MAXNODENAMELEN) < 0)
 	{
 	  handle->errnum = CEREBRO_ERR_CLUSTERLIST_MODULE;
 	  return -1;

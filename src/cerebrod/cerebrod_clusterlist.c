@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist.c,v 1.32 2005-05-01 16:49:59 achu Exp $
+ *  $Id: cerebrod_clusterlist.c,v 1.33 2005-05-03 22:46:34 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -30,9 +30,13 @@ extern struct cerebrod_config conf;
 int
 cerebrod_clusterlist_module_setup(void)
 {
-  if (cerebro_load_clusterlist_module())
-    cerebro_err_exit("%s(%s:%d): cerebro_load_clusterlist_module: %s",
+  if (cerebro_module_load_clusterlist_module())
+    cerebro_err_exit("%s(%s:%d): cerebro_module_load_clusterlist_module: %s",
 		     __FILE__, __FUNCTION__, __LINE__, strerror(errno));
+
+  if (cerebro_clusterlist_module_setup() < 0)
+    cerebro_err_exit("%s(%s:%d): cerebro_clusterlist_module_setup",
+		     __FILE__, __FUNCTION__, __LINE__);
 
 #ifndef NDEBUG
   if (conf.debug)

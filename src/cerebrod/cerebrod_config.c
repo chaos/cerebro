@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.83 2005-05-03 21:47:39 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.84 2005-05-03 22:46:34 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -208,45 +208,6 @@ _cerebrod_cmdline_check(void)
   return;
 }
 
-/* 
- * _cerebrod_load_alternate_config
- *
- * Check parameters and load the actual alternate configuration
- *
- * Returns 1 on loading success, 0 on loading failure, -1 on fatal error
- */
-static void
-_cerebrod_load_alternate_config(struct cerebro_config *conf_l)
-{
-  assert(conf_l);
-
-  if (!cerebro_config_found())
-    return;
-
-  if (cerebro_config_setup() < 0)
-    cerebro_err_exit("%s config module: setup failed: %s", 
-		     cerebro_config_module_name(), strerror(errno));
-
-#ifndef NDEBUG
-  if (conf.debug)
-    {
-      fprintf(stderr, "**************************************\n");
-      fprintf(stderr, "* Cerebrod Config Configuration:\n");
-      fprintf(stderr, "* -----------------------\n");
-      fprintf(stderr, "* Loading alternate config from module: %s\n", 
-	      cerebro_config_module_name());
-      fprintf(stderr, "**************************************\n");
-    }
-#endif /* NDEBUG */
-
-  /* Load the alternate default configuration from the configuration module */
-  if (cerebro_config_load_default(conf_l) < 0)
-    cerebro_err_exit("%s config module: load_cerebrod_default failed", 
-		     cerebro_config_module_name());
-
-  return;
-}
-
 /*
  * _cerebrod_config_setup
  *
@@ -262,7 +223,7 @@ _cerebrod_config_setup(void)
   cerebro_config_debug_output = conf.debug;
 #endif /* NDEBUG */
 
-  if (cerebro_load_config(&conf_l) < 0)
+  if (cerebro_config_load(&conf_l) < 0)
     cerebro_err_exit("%s(%s:%d): cerebro_find_config_module: %s",
 		     __FILE__, __FUNCTION__, __LINE__, strerror(errno));
   

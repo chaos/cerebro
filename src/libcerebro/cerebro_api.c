@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_api.c,v 1.9 2005-05-03 21:47:39 achu Exp $
+ *  $Id: cerebro_api.c,v 1.10 2005-05-03 22:46:34 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -74,7 +74,7 @@ cerebro_handle_destroy(cerebro_t handle)
 
   if (handle->loaded_state & CEREBRO_CONFIG_LOADED)
     {
-      if (cerebro_api_unload_config(handle) < 0)
+      if (cerebro_unload_config(handle) < 0)
 	return -1;
 
       if (handle->loaded_state & CEREBRO_CONFIG_LOADED)
@@ -86,7 +86,7 @@ cerebro_handle_destroy(cerebro_t handle)
 
   if (handle->loaded_state & CEREBRO_CLUSTERLIST_MODULE_LOADED)
     {
-      if (cerebro_api_unload_clusterlist_module(handle) < 0)
+      if (cerebro_unload_clusterlist_module(handle) < 0)
         return -1;
       
       if (handle->loaded_state & CEREBRO_CLUSTERLIST_MODULE_LOADED)
@@ -158,7 +158,7 @@ cerebro_perror(cerebro_t handle, const char *msg)
 }
 
 int 
-cerebro_api_load_config(cerebro_t handle)
+cerebro_load_config(cerebro_t handle)
 {
   if (cerebro_handle_check(handle) < 0)
     return -1;
@@ -169,7 +169,7 @@ cerebro_api_load_config(cerebro_t handle)
       return 0;
     }
   
-  if (cerebro_load_config(&(handle->config_data)) < 0)
+  if (cerebro_config_load(&(handle->config_data)) < 0)
     {
       handle->errnum = CEREBRO_ERR_CONFIG_FILE;
       return -1;
@@ -181,7 +181,7 @@ cerebro_api_load_config(cerebro_t handle)
 }
 
 int 
-cerebro_api_unload_config(cerebro_t handle)
+cerebro_unload_config(cerebro_t handle)
 {
   if (cerebro_handle_check(handle) < 0)
     return -1;
@@ -194,7 +194,7 @@ cerebro_api_unload_config(cerebro_t handle)
 }
 
 int 
-cerebro_api_load_clusterlist_module(cerebro_t handle)
+cerebro_load_clusterlist_module(cerebro_t handle)
 {
   int module_setup_called = 0;
   int rv;
@@ -211,13 +211,13 @@ cerebro_api_load_clusterlist_module(cerebro_t handle)
 	}
     }
 
-  if (cerebro_load_clusterlist_module() < 0)
+  if (cerebro_module_load_clusterlist_module() < 0)
     {
       handle->errnum = CEREBRO_ERR_CLUSTERLIST_MODULE;
       goto cleanup;
     }
   
-  if (cerebro_clusterlist_setup() < 0)
+  if (cerebro_clusterlist_module_setup() < 0)
     {
       handle->errnum = CEREBRO_ERR_CLUSTERLIST_MODULE;
       goto cleanup;
@@ -236,20 +236,20 @@ cerebro_api_load_clusterlist_module(cerebro_t handle)
 }
 
 int 
-cerebro_api_unload_clusterlist_module(cerebro_t handle)
+cerebro_unload_clusterlist_module(cerebro_t handle)
 {
   if (cerebro_handle_check(handle) < 0)
     return -1;
 
   if (handle->loaded_state & CEREBRO_CLUSTERLIST_MODULE_LOADED)
     {
-      if (cerebro_clusterlist_cleanup() < 0)
+      if (cerebro_clusterlist_module_cleanup() < 0)
         {
 	  handle->errnum = CEREBRO_ERR_CLUSTERLIST_MODULE;
 	  return -1;
         }
-
-      if (cerebro_unload_clusterlist_module() < 0)
+      
+      if (cerebro_module_unload_clusterlist_module() < 0)
 	{
 	  handle->errnum = CEREBRO_ERR_CLUSTERLIST_MODULE;
 	  return -1;

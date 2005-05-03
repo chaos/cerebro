@@ -26,9 +26,6 @@
 
 - code review to reduce memory footprint
 
-- config module stuff for libcerebro load_data functions, like nodeupdown? 
-  - config file too?
-
 - reorg cerebro err codes
 
 - debug messages in cerebro/updown library
@@ -46,8 +43,6 @@
   - buflen checks -1 vs. +1 checks
 
 - allow modules to return error codes??
-
-- clusterlist/config modules for libcerebro
 
 - libcerebro_common
   - for marshalling for example

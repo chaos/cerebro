@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_error.h,v 1.1 2005-04-21 22:00:33 achu Exp $
+ *  $Id: cerebro_error.h,v 1.2 2005-05-03 22:46:34 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_ERROR_H
@@ -7,9 +7,9 @@
 
 #include <pthread.h>
 
-#define CEREBRO_ERROR_STDOUT 0x0001
-#define CEREBRO_ERROR_STDERR 0x0002
-#define CEREBRO_ERROR_SYSLOG 0x0004
+#define CEREBRO_ERROR_STDOUT  0x0001
+#define CEREBRO_ERROR_STDERR  0x0002
+#define CEREBRO_ERROR_SYSLOG  0x0004
 
 /*  
  * cerebro_err_init
