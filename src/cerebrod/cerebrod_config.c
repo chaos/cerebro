@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.84 2005-05-03 22:46:34 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.85 2005-05-03 23:41:40 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -44,7 +44,6 @@
 
 #ifndef NDEBUG
 extern char *cerebro_config_debug_config_file;
-extern int cerebro_config_debug_output;
 #endif /* NDEBUG */
 
 /* 
@@ -220,7 +219,6 @@ _cerebrod_config_setup(void)
 
 #ifndef NDEBUG
   cerebro_config_debug_config_file = conf.config_file;
-  cerebro_config_debug_output = conf.debug;
 #endif /* NDEBUG */
 
   if (cerebro_config_load(&conf_l) < 0)

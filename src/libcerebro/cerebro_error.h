@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_error.h,v 1.2 2005-05-03 22:46:34 achu Exp $
+ *  $Id: cerebro_error.h,v 1.3 2005-05-03 23:41:40 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_ERROR_H
@@ -10,6 +10,8 @@
 #define CEREBRO_ERROR_STDOUT  0x0001
 #define CEREBRO_ERROR_STDERR  0x0002
 #define CEREBRO_ERROR_SYSLOG  0x0004
+#define CEREBRO_ERROR_LIB     0x0008
+#define CEREBRO_ERROR_MODULE  0x0010
 
 /*  
  * cerebro_err_init
@@ -44,26 +46,35 @@ void cerebro_err_set_flags(int flags);
  * cerebro_err_debug
  *
  * Calls err_debug() with appropriately locks.  Should not be called
- * if debug_output_mutex is already held.  In that situation, fprintf()
- * should simply be called.
+ * if debug_output_mutex is already held.  In that situation,
+ * fprintf() should simply be called.
  */
 void cerebro_err_debug(const char *fmt, ...);
+
+/* 
+ * cerebro_err_debug_lib
+ *
+ * Calls err_debug() with appropriately locks and if CEREBRO_ERROR_LIB
+ * is set.  Should not be called if mutex is already held.  In that
+ * situation, fprintf() should simply be called.
+ */
+void cerebro_err_debug_lib(const char *fmt, ...);
 
 /* 
  * cerebro_err_output
  *
  * Calls err_output() with appropriately locks.  Should not be called
- * if debug_output_mutex is already held.  In that situation, fprintf()
- * should simply be called.
+ * if mutex is already held.  In that situation, fprintf() should
+ * simply be called.
  */
 void cerebro_err_output(const char *fmt, ...);
 
 /* 
  * cerebro_err_exit
  *
- * Calls err_exit() with appropriately locks.  Should not be called
- * if debug_output_mutex is already held.  In that situation, fprintf()
- * and exit() should simply be called.
+ * Calls err_exit() with appropriately locks.  Should not be called if
+ * mutex is already held.  In that situation, fprintf() and exit()
+ * should simply be called.
  */
 void cerebro_err_exit(const char *fmt, ...);
 

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_updown_protocol.h,v 1.13 2005-04-28 18:08:27 achu Exp $
+ *  $Id: cerebro_updown_protocol.h,v 1.14 2005-05-03 23:41:40 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_UPDOWN_PROTOCOL_H
@@ -28,10 +28,16 @@
  * - On version incompatability errors in which an older version does
  *   not exist and invalid packet format errors, an eight byte packet
  *   containing only the version and error code will be the response.
+ *
+ * Notes:
+ * - Require a smaller timeout len for the server than the client, 
+ *   so the server can respond to the client with a meaningful error
+ *   message.
  */
 
 #define CEREBRO_UPDOWN_PROTOCOL_VERSION                    1
-#define CEREBRO_UPDOWN_PROTOCOL_TIMEOUT_LEN                5
+#define CEREBRO_UPDOWN_PROTOCOL_SERVER_TIMEOUT_LEN         3
+#define CEREBRO_UPDOWN_PROTOCOL_CLIENT_TIMEOUT_LEN         5
 #define CEREBRO_UPDOWN_PROTOCOL_CONNECT_TIMEOUT_LEN        5
 
 #define CEREBRO_UPDOWN_PROTOCOL_ERR_SUCCESS                0

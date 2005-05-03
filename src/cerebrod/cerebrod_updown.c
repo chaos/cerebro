@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.c,v 1.41 2005-05-03 22:46:34 achu Exp $
+ *  $Id: cerebrod_updown.c,v 1.42 2005-05-03 23:41:40 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -465,7 +465,7 @@ _cerebrod_updown_receive_request(int client_fd,
     {
       fd_set rfds;
       struct timeval tv;
-      tv.tv_sec = CEREBRO_UPDOWN_PROTOCOL_TIMEOUT_LEN;
+      tv.tv_sec = CEREBRO_UPDOWN_PROTOCOL_SERVER_TIMEOUT_LEN;
       tv.tv_usec = 0;
       
       FD_ZERO(&rfds);

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_updown.c,v 1.21 2005-05-03 22:46:34 achu Exp $
+ *  $Id: cerebro_updown.c,v 1.22 2005-05-03 23:41:40 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -26,9 +26,11 @@
 #if HAVE_UNISTD_H
 #include <unistd.h>
 #endif /* HAVE_UNISTD_H */
+#include <errno.h>
 
 #include "cerebro.h"
 #include "cerebro_api.h"
+#include "cerebro_error.h"
 #include "cerebro_module.h"
 #include "cerebro_util.h"
 #include "cerebro_updown.h"
@@ -181,6 +183,8 @@ _cerebro_updown_request_marshall(cerebro_t handle,
 #ifndef NDEBUG
   if (!buffer || bufferlen < CEREBRO_UPDOWN_REQUEST_LEN)
     {
+      cerebro_err_debug_lib("%s(%s:%d): invalid parameters",
+			    __FILE__, __FUNCTION__, __LINE__);
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
@@ -192,6 +196,9 @@ _cerebro_updown_request_marshall(cerebro_t handle,
                                     buffer + c, 
                                     bufferlen - c)) < 0)
     {
+      cerebro_err_debug_lib("%s(%s:%d): cerebro_marshall_int32: %s",
+			    __FILE__, __FUNCTION__, __LINE__,
+			    strerror(errno));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
@@ -201,6 +208,9 @@ _cerebro_updown_request_marshall(cerebro_t handle,
                                      buffer + c, 
                                      bufferlen - c)) < 0)
     {
+      cerebro_err_debug_lib("%s(%s:%d): cerebro_marshall_uint32: %s",
+			    __FILE__, __FUNCTION__, __LINE__,
+			    strerror(errno));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
@@ -210,6 +220,9 @@ _cerebro_updown_request_marshall(cerebro_t handle,
                                      buffer + c, 
                                      bufferlen - c)) < 0)
     {
+      cerebro_err_debug_lib("%s(%s:%d): cerebro_marshall_uint32: %s",
+			    __FILE__, __FUNCTION__, __LINE__,
+			    strerror(errno));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
@@ -236,6 +249,8 @@ _cerebro_updown_response_unmarshall(cerebro_t handle,
 #ifndef NDEBUG
   if (!buffer)
     {
+      cerebro_err_debug_lib("%s(%s:%d): invalid parameters",
+			    __FILE__, __FUNCTION__, __LINE__);
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
@@ -245,6 +260,9 @@ _cerebro_updown_response_unmarshall(cerebro_t handle,
                                       buffer + c,
                                       bufferlen - c)) < 0)
     {
+      cerebro_err_debug_lib("%s(%s:%d): cerebro_unmarshall_int32: %s",
+			    __FILE__, __FUNCTION__, __LINE__,
+			    strerror(errno));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
@@ -257,6 +275,9 @@ _cerebro_updown_response_unmarshall(cerebro_t handle,
                                        buffer + c,
                                        bufferlen - c)) < 0)
     {
+      cerebro_err_debug_lib("%s(%s:%d): cerebro_unmarshall_uint32: %s",
+			    __FILE__, __FUNCTION__, __LINE__,
+			    strerror(errno));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
@@ -269,6 +290,9 @@ _cerebro_updown_response_unmarshall(cerebro_t handle,
                                       buffer + c,
                                       bufferlen - c)) < 0)
     {
+      cerebro_err_debug_lib("%s(%s:%d): cerebro_unmarshall_uint8: %s",
+			    __FILE__, __FUNCTION__, __LINE__,
+			    strerror(errno));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
@@ -282,6 +306,9 @@ _cerebro_updown_response_unmarshall(cerebro_t handle,
                                        buffer + c,
                                        bufferlen - c)) < 0)
     {
+      cerebro_err_debug_lib("%s(%s:%d): cerebro_unmarshall_buffer: %s",
+			    __FILE__, __FUNCTION__, __LINE__,
+			    strerror(errno));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
@@ -294,6 +321,9 @@ _cerebro_updown_response_unmarshall(cerebro_t handle,
                                       buffer + c,
                                       bufferlen - c)) < 0)
     {
+      cerebro_err_debug_lib("%s(%s:%d): cerebro_unmarshall_uint8: %s",
+			    __FILE__, __FUNCTION__, __LINE__,
+			    strerror(errno));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
@@ -333,6 +363,9 @@ _cerebro_updown_send_request(cerebro_t handle,
 
   if (fd_write_n(fd, buffer, req_len) < 0)
     {
+      cerebro_err_debug_lib("%s(%s:%d): fd_write_n: %s",
+			    __FILE__, __FUNCTION__, __LINE__,
+			    strerror(errno));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
@@ -361,7 +394,7 @@ _cerebro_updown_receive_a_response(cerebro_t handle,
     {
       fd_set rfds;
       struct timeval tv;
-      tv.tv_sec = CEREBRO_UPDOWN_PROTOCOL_TIMEOUT_LEN;
+      tv.tv_sec = CEREBRO_UPDOWN_PROTOCOL_CLIENT_TIMEOUT_LEN;
       tv.tv_usec = 0;
 
       FD_ZERO(&rfds);
@@ -369,6 +402,9 @@ _cerebro_updown_receive_a_response(cerebro_t handle,
 
       if ((rv = select(fd + 1, &rfds, NULL, NULL, &tv)) < 0)
         {
+	  cerebro_err_debug_lib("%s(%s:%d): select: %s",
+				__FILE__, __FUNCTION__, __LINE__,
+				strerror(errno));
           handle->errnum = CEREBRO_ERR_INTERNAL;
           goto cleanup;
         }
@@ -404,6 +440,9 @@ _cerebro_updown_receive_a_response(cerebro_t handle,
                         buffer + bytes_read,
                         CEREBRO_UPDOWN_RESPONSE_LEN - bytes_read)) < 0)
             {
+	      cerebro_err_debug_lib("%s(%s:%d): read: %s",
+				    __FILE__, __FUNCTION__, __LINE__,
+				    strerror(errno));
               handle->errnum = CEREBRO_ERR_INTERNAL;
               goto cleanup;
             }
@@ -419,6 +458,8 @@ _cerebro_updown_receive_a_response(cerebro_t handle,
         }
       else
         {
+	  cerebro_err_debug_lib("%s(%s:%d): select returned bad data",
+				__FILE__, __FUNCTION__, __LINE__);
           handle->errnum = CEREBRO_ERR_INTERNAL;
           goto cleanup;
         }
@@ -514,6 +555,9 @@ _cerebro_updown_receive_responses(cerebro_t handle,
         {
           if (!hostlist_push(updown_data->up_nodes, res.nodename))
             {
+	      cerebro_err_debug_lib("%s(%s:%d): hostlist_push: %s",
+				    __FILE__, __FUNCTION__, __LINE__, 
+				    strerror(errno));
               handle->errnum = CEREBRO_ERR_INTERNAL;
               goto cleanup;
             }
@@ -522,6 +566,9 @@ _cerebro_updown_receive_responses(cerebro_t handle,
         {
           if (!hostlist_push(updown_data->down_nodes, res.nodename))
             {
+	      cerebro_err_debug_lib("%s(%s:%d): hostlist_push: %s",
+				    __FILE__, __FUNCTION__, __LINE__, 
+				    strerror(errno));
               handle->errnum = CEREBRO_ERR_INTERNAL;
               goto cleanup;
             }
@@ -912,7 +959,6 @@ _cerebro_updown_is_node(cerebro_t handle,
 	  return -1;
 	}
     }
-  
 
   updown_data = (struct cerebro_updown_data *)handle->updown_data;
 

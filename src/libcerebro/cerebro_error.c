@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_error.c,v 1.3 2005-04-28 21:33:38 achu Exp $
+ *  $Id: cerebro_error.c,v 1.4 2005-05-03 23:41:40 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -30,6 +30,8 @@ static pthread_mutex_t *error_output_mutex = NULL;
 
 static int cerebro_err_initialized = 0;
 
+static int cerebro_flags = 0;
+
 void 
 cerebro_err_init(char *prog)
 {
@@ -49,18 +51,6 @@ cerebro_err_register_mutex(pthread_mutex_t *mutex)
 int 
 cerebro_err_get_flags(void)
 {
-  int flags = 0;
-  int cerebro_flags = 0;
-
-  flags = err_get_flags();
-
-  if (flags & ERROR_STDOUT)
-    cerebro_flags |= CEREBRO_ERROR_STDOUT;
-  if (flags & ERROR_STDERR)
-    cerebro_flags |= CEREBRO_ERROR_STDERR;
-  if (flags & ERROR_SYSLOG)
-    cerebro_flags |= CEREBRO_ERROR_SYSLOG;
-  
   return cerebro_flags;
 }
 
@@ -69,11 +59,13 @@ cerebro_err_set_flags(int flags)
 {
   int err_flags = 0;
 
-  if (flags & CEREBRO_ERROR_STDOUT)
+  cerebro_flags = flags;
+
+  if (cerebro_flags & CEREBRO_ERROR_STDOUT)
     err_flags |= ERROR_STDOUT;
-  if (flags & CEREBRO_ERROR_STDERR)
+  if (cerebro_flags & CEREBRO_ERROR_STDERR)
     err_flags |= ERROR_STDERR;
-  if (flags & CEREBRO_ERROR_SYSLOG)
+  if (cerebro_flags & CEREBRO_ERROR_SYSLOG)
     err_flags |= ERROR_SYSLOG;
 
   err_set_flags(err_flags);
@@ -90,6 +82,72 @@ cerebro_err_debug(const char *fmt, ...)
     return; 
 
   if (!fmt)
+    return;
+
+  va_start(ap, fmt);
+  vsnprintf(buffer, CEREBRO_ERROR_STRING_BUFLEN, fmt, ap);
+  va_end(ap);
+
+  flags = cerebro_err_get_flags();
+  if (error_output_mutex
+      && ((flags & CEREBRO_ERROR_STDOUT)
+          || (flags & CEREBRO_ERROR_STDERR)))
+    {
+      Pthread_mutex_lock(error_output_mutex);
+      err_debug(buffer);
+      Pthread_mutex_unlock(error_output_mutex);
+    }
+  else
+    err_debug(buffer);
+}
+
+void 
+cerebro_err_debug_lib(const char *fmt, ...)
+{
+  char buffer[CEREBRO_ERROR_STRING_BUFLEN];
+  int flags;
+  va_list ap;
+
+  if (!cerebro_err_initialized)
+    return; 
+
+  if (!fmt)
+    return;
+
+  if (cerebro_flags & CEREBRO_ERROR_LIB)
+    return;
+
+  va_start(ap, fmt);
+  vsnprintf(buffer, CEREBRO_ERROR_STRING_BUFLEN, fmt, ap);
+  va_end(ap);
+
+  flags = cerebro_err_get_flags();
+  if (error_output_mutex
+      && ((flags & CEREBRO_ERROR_STDOUT)
+          || (flags & CEREBRO_ERROR_STDERR)))
+    {
+      Pthread_mutex_lock(error_output_mutex);
+      err_debug(buffer);
+      Pthread_mutex_unlock(error_output_mutex);
+    }
+  else
+    err_debug(buffer);
+}
+
+void 
+cerebro_err_debug_module(const char *fmt, ...)
+{
+  char buffer[CEREBRO_ERROR_STRING_BUFLEN];
+  int flags;
+  va_list ap;
+
+  if (!cerebro_err_initialized)
+    return; 
+
+  if (!fmt)
+    return;
+
+  if (cerebro_flags & CEREBRO_ERROR_MODULE)
     return;
 
   va_start(ap, fmt);

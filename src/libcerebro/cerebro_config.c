@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config.c,v 1.5 2005-05-03 22:46:34 achu Exp $
+ *  $Id: cerebro_config.c,v 1.6 2005-05-03 23:41:40 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -20,8 +20,6 @@
 
 #ifndef NDEBUG
 char *cerebro_config_debug_config_file = NULL;
-
-int cerebro_config_debug_output = 0;
 #endif /* NDEBUG */
 
 /* 
@@ -44,8 +42,8 @@ _cerebro_config_load_config_module(struct cerebro_config *conf)
 	{
 	  if (cerebro_module_setup() < 0)
 	    {
-	      cerebro_err_debug("%s(%s:%d): cerebro_module_setup",
-				__FILE__, __FUNCTION__, __LINE__);
+	      cerebro_err_debug_lib("%s(%s:%d): cerebro_module_setup",
+				    __FILE__, __FUNCTION__, __LINE__);
 	      goto cleanup;
 	    }
 	  module_setup_called++;
@@ -53,37 +51,32 @@ _cerebro_config_load_config_module(struct cerebro_config *conf)
       
       if (cerebro_module_load_config_module() < 0)
 	{
-	  cerebro_err_debug("%s(%s:%d): cerebro_load_config_module",
-			    __FILE__, __FUNCTION__, __LINE__);
+	  cerebro_err_debug_lib("%s(%s:%d): cerebro_load_config_module",
+				__FILE__, __FUNCTION__, __LINE__);
 	  goto cleanup;
 	}
 
       if (cerebro_config_module_setup() < 0)
 	{
-	  cerebro_err_debug("%s(%s:%d): cerebro_config_setup",
-			    __FILE__, __FUNCTION__, __LINE__);
+	  cerebro_err_debug_lib("%s(%s:%d): cerebro_config_setup",
+				__FILE__, __FUNCTION__, __LINE__);
 	  goto cleanup;
 	}
 
       load_config_module_called++;
     }
 
-#ifndef NDEBUG
-  if (cerebro_config_debug_output)
-    {
-      fprintf(stderr, "**************************************\n");
-      fprintf(stderr, "* Cerebro Config Configuration:\n");
-      fprintf(stderr, "* -----------------------\n");
-      fprintf(stderr, "* Loading config from module: %s\n",
-              cerebro_config_module_name());
-      fprintf(stderr, "**************************************\n");
-    }
-#endif  /* NDEBUG */
+  cerebro_err_debug_lib("**************************************");
+  cerebro_err_debug_lib("* Cerebro Config Configuration:");
+  cerebro_err_debug_lib("* -----------------------");
+  cerebro_err_debug_lib("* Loading config from module: %s",
+			cerebro_config_module_name());
+  cerebro_err_debug_lib("**************************************");
 
   if (cerebro_config_module_load_default(conf) < 0)
     {
-      cerebro_err_debug("%s(%s:%d): cerebro_config_load_default",
-			__FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug_lib("%s(%s:%d): cerebro_config_load_default",
+			    __FILE__, __FUNCTION__, __LINE__);
       goto cleanup;
     }
 
@@ -277,8 +270,8 @@ _cerebro_config_load_config_file(struct cerebro_config *conf)
   
   if (!(cf = conffile_handle_create()))
     {
-      cerebro_err_debug("%s(%s:%d): conffile_handle_create: %s",
-                        __FILE__, __FUNCTION__, __LINE__, strerror(errno));
+      cerebro_err_debug_lib("%s(%s:%d): conffile_handle_create",
+			    __FILE__, __FUNCTION__, __LINE__);
       goto cleanup;
     }
   
@@ -303,13 +296,13 @@ _cerebro_config_load_config_file(struct cerebro_config *conf)
 	goto out;
 
       if (conffile_errmsg(cf, buf, CONFFILE_MAX_ERRMSGLEN) < 0)
-	cerebro_err_debug("%s(%s:%d): conffile_parse: %d", 
-			  __FILE__, __FUNCTION__, __LINE__,
-			  conffile_errnum(cf));
+	cerebro_err_debug_lib("%s(%s:%d): conffile_parse: %d", 
+			      __FILE__, __FUNCTION__, __LINE__,
+			      conffile_errnum(cf));
       else
-	cerebro_err_debug("%s(%s:%d): conffile_parse: %s", 
-			  __FILE__, __FUNCTION__, __LINE__,
-			  buf);
+	cerebro_err_debug_lib("%s(%s:%d): conffile_parse: %s", 
+			      __FILE__, __FUNCTION__, __LINE__,
+			      buf);
 	
       goto cleanup;
     }
@@ -333,8 +326,8 @@ cerebro_config_load(struct cerebro_config *conf)
 
   if (!conf)
     {
-      cerebro_err_debug("%s(%s:%d): conf null",
-                        __FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug_lib("%s(%s:%d): conf null",
+			    __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 

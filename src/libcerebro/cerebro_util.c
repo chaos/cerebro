@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_util.c,v 1.5 2005-04-28 20:49:59 achu Exp $
+ *  $Id: cerebro_util.c,v 1.6 2005-05-03 23:41:40 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -58,6 +58,9 @@ cerebro_low_timeout_connect(cerebro_t handle,
  
   if ((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
+      cerebro_err_debug_lib("%s(%s:%d): socket: %s",
+			    __FILE__, __FUNCTION__, __LINE__, 
+			    strerror(errno));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       goto cleanup;
     }
@@ -69,12 +72,18 @@ cerebro_low_timeout_connect(cerebro_t handle,
 
   if ((old_flags = fcntl(fd, F_GETFL, 0)) < 0)
     {
+      cerebro_err_debug_lib("%s(%s:%d): fcntl: %s",
+			    __FILE__, __FUNCTION__, __LINE__, 
+			    strerror(errno));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       goto cleanup;
     }
    
   if (fcntl(fd, F_SETFL, old_flags | O_NONBLOCK) < 0)
     {
+      cerebro_err_debug_lib("%s(%s:%d): fcntl: %s",
+			    __FILE__, __FUNCTION__, __LINE__, 
+			    strerror(errno));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       goto cleanup;
     }
@@ -100,8 +109,11 @@ cerebro_low_timeout_connect(cerebro_t handle,
       tval.tv_usec = 0;
        
       if ((ret = select(fd+1, &rset, &wset, NULL, &tval)) < 0)
-        {
-          handle->errnum = CEREBRO_ERR_INTERNAL;
+        { 
+	  cerebro_err_debug_lib("%s(%s:%d): select: %s",
+				__FILE__, __FUNCTION__, __LINE__, 
+				strerror(errno));
+	  handle->errnum = CEREBRO_ERR_INTERNAL;
           goto cleanup;
         }
  
@@ -120,6 +132,9 @@ cerebro_low_timeout_connect(cerebro_t handle,
                
               if (getsockopt(fd, SOL_SOCKET, SO_ERROR, &error, &len) < 0)
                 {
+		  cerebro_err_debug_lib("%s(%s:%d): getsockopt: %s",
+					__FILE__, __FUNCTION__, __LINE__, 
+					strerror(errno));
                   handle->errnum = CEREBRO_ERR_INTERNAL;
                   goto cleanup;
                 }
@@ -134,6 +149,8 @@ cerebro_low_timeout_connect(cerebro_t handle,
             }
           else
             {
+	      cerebro_err_debug_lib("%s(%s:%d): select returned bad data",
+				    __FILE__, __FUNCTION__, __LINE__);
               handle->errnum = CEREBRO_ERR_INTERNAL;
               goto cleanup;
             }

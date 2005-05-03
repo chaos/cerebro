@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.c,v 1.16 2005-05-03 22:46:34 achu Exp $
+ *  $Id: cerebro_module.c,v 1.17 2005-05-03 23:41:40 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -60,7 +60,7 @@ struct cerebro_config_module_info *static_config_modules[] =
 #endif /* WITH_GENDERSLLNL */
     NULL
   };
-                                                                                      
+
 /*
  * static_clusterlist_modules
  *
@@ -195,29 +195,29 @@ _cerebro_find_known_module(char *search_dir,
                                                                                      
   if (!search_dir)
     {
-      cerebro_err_debug("%s(%s:%d): search_dir null", 
-			__FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug_lib("%s(%s:%d): search_dir null", 
+			    __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
   if (!modules_list)
     {
-      cerebro_err_debug("%s(%s:%d): modules_list null", 
-			__FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug_lib("%s(%s:%d): modules_list null", 
+			    __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
   if (!(modules_list_len > 0))
     {
-      cerebro_err_debug("%s(%s:%d): modules_list_len not valid",
-			__FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug_lib("%s(%s:%d): modules_list_len not valid",
+			    __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
   
   if (!load_module)
     {
-      cerebro_err_debug("%s(%s:%d): load_module null", 
-			__FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug_lib("%s(%s:%d): load_module null", 
+			    __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
@@ -241,9 +241,8 @@ _cerebro_find_known_module(char *search_dir,
 
               if ((ret = load_module(filebuf)) < 0)
 		{
-		  cerebro_err_debug("%s(%s:%d): load_module: %s",
-				    __FILE__, __FUNCTION__, __LINE__,
-				    strerror(errno));
+		  cerebro_err_debug_lib("%s(%s:%d): load_module",
+					__FILE__, __FUNCTION__, __LINE__);
 		  return -1;
 		}
 
@@ -285,22 +284,22 @@ _cerebro_find_unknown_module(char *search_dir,
 
   if (!search_dir)
     {
-      cerebro_err_debug("%s(%s:%d): search_dir null", 
-			__FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug_lib("%s(%s:%d): search_dir null", 
+			    __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
   if (!signature)
     {
-      cerebro_err_debug("%s(%s:%d): signature null", 
-			__FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug_lib("%s(%s:%d): signature null", 
+			    __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
  
   if (!load_module)
     {
-      cerebro_err_debug("%s(%s:%d): load_module null", 
-			__FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug_lib("%s(%s:%d): load_module null", 
+			    __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
@@ -330,9 +329,8 @@ _cerebro_find_unknown_module(char *search_dir,
 
           if ((ret = load_module(filebuf)) < 0)
 	    {
-	      cerebro_err_debug("%s(%s:%d): load_module: %s",
-				__FILE__, __FUNCTION__, __LINE__,
-				strerror(errno));
+	      cerebro_err_debug_lib("%s(%s:%d): load_module",
+				    __FILE__, __FUNCTION__, __LINE__);
 	      return -1;
 	    }
 
@@ -356,8 +354,9 @@ cerebro_module_setup(void)
 #if !WITH_STATIC_MODULES
   if (lt_dlinit() != 0)
     {
-      cerebro_err_debug("%s(%s:%d): lt_dlinit: %s", 
-			__FILE__, __FUNCTION__, __LINE__, lt_dlerror());
+      cerebro_err_debug_lib("%s(%s:%d): lt_dlinit: %s", 
+			    __FILE__, __FUNCTION__, __LINE__, 
+			    lt_dlerror());
       return -1;
     }
 #endif /* !WITH_STATIC_MODULES */
@@ -383,8 +382,9 @@ cerebro_module_cleanup(void)
 #if !WITH_STATIC_MODULES
   if (lt_dlexit() != 0)
     {
-      cerebro_err_debug("%s(%s:%d): lt_dlexit: %s", 
-			__FILE__, __FUNCTION__, __LINE__, lt_dlerror());
+      cerebro_err_debug_lib("%s(%s:%d): lt_dlexit: %s", 
+			    __FILE__, __FUNCTION__, __LINE__, 
+			    lt_dlerror());
       return -1;
     }
 #endif /* !WITH_STATIC_MODULES */
@@ -415,22 +415,22 @@ _cerebro_module_load_clusterlist_module(char *module)
 
   if (!cerebro_module_library_is_setup)
     {
-      cerebro_err_debug("%s(%s:%d): cerebro_module_library uninitialized", 
-			__FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug_lib("%s(%s:%d): cerebro_module_library uninitialized", 
+			    __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
   if (!module)
     {
-      cerebro_err_debug("%s(%s:%d): module null", 
-			__FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug_lib("%s(%s:%d): module null", 
+			    __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
   if (clusterlist_module_info)
     {
-      cerebro_err_debug("%s(%s:%d): clusterlist module already loaded", 
-			__FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug_lib("%s(%s:%d): clusterlist module already loaded", 
+			    __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
   
@@ -440,8 +440,8 @@ _cerebro_module_load_clusterlist_module(char *module)
     {      
       if (!ptr[i]->clusterlist_module_name)
 	{
-	  cerebro_err_debug("static clusterlist module index '%d' "
-			    "does not contain name", i);
+	  cerebro_err_debug_lib("%s(%s:%d): clusterlist_module_name null: %d",
+				__FILE__, __FUNCTION__, __LINE__, i);
 	  continue;
 	}
       if (!strcmp(ptr[i]->clusterlist_module_name, module))
@@ -457,8 +457,9 @@ _cerebro_module_load_clusterlist_module(char *module)
 #else  /* !WITH_STATIC_MODULES */
   if (!(clusterlist_module_dl_handle_l = lt_dlopen(module)))
     {
-      cerebro_err_debug("clusterlist module '%s': lt_dlopen: %s",
-                        lt_dlerror());
+      cerebro_err_debug_lib("%s(%s:%d): lt_dlopen: module=%s, %s",
+			    __FILE__, __FUNCTION__, __LINE__,
+			    module, lt_dlerror());
       goto cleanup;
     }
 
@@ -469,63 +470,65 @@ _cerebro_module_load_clusterlist_module(char *module)
     {
       const char *err = lt_dlerror();
       if (err != NULL)
-	cerebro_err_debug("clusterlist module '%s': lt_dlsym: %s", err);
+	cerebro_err_debug_lib("%s(%s:%d): lt_dlsym: module=%s, %s",
+			      __FILE__, __FUNCTION__, __LINE__,
+			      module, err);
       goto cleanup;
     }
 #endif /* !WITH_STATIC_MODULES */
 
   if (!clusterlist_module_info_l->clusterlist_module_name)
     {
-      cerebro_err_debug("clusterlist module '%s' does not contain a valid name",
-                        clusterlist_module_info_l->clusterlist_module_name);
+      cerebro_err_debug_lib("clusterlist module '%s' does not contain a valid name",
+			    clusterlist_module_info_l->clusterlist_module_name);
       goto cleanup;
     }
 
   if (!clusterlist_module_info_l->setup)
     {
-      cerebro_err_debug("clusterlist module '%s' does not contain "
-                        "valid setup function",
-                        clusterlist_module_info_l->clusterlist_module_name);
+      cerebro_err_debug_lib("clusterlist module '%s' does not contain "
+			    "valid setup function",
+			    clusterlist_module_info_l->clusterlist_module_name);
       goto cleanup;
     }
 
   if (!clusterlist_module_info_l->cleanup)
     {
-      cerebro_err_debug("clusterlist module '%s' does not contain "
-                        "valid cleanup function",
-                        clusterlist_module_info_l->clusterlist_module_name);
+      cerebro_err_debug_lib("clusterlist module '%s' does not contain "
+			    "valid cleanup function",
+			    clusterlist_module_info_l->clusterlist_module_name);
       goto cleanup;
     }
 
   if (!clusterlist_module_info_l->get_all_nodes)
     {
-      cerebro_err_debug("clusterlist module '%s' does not contain "
-                        "valid get_all_nodes function",
-                        clusterlist_module_info_l->clusterlist_module_name);
+      cerebro_err_debug_lib("clusterlist module '%s' does not contain "
+			    "valid get_all_nodes function",
+			    clusterlist_module_info_l->clusterlist_module_name);
       goto cleanup;
     }
 
   if (!clusterlist_module_info_l->numnodes)
     {
-      cerebro_err_debug("clusterlist module '%s' does not contain "
-                        "valid numnodes function",
-                        clusterlist_module_info_l->clusterlist_module_name);
+      cerebro_err_debug_lib("clusterlist module '%s' does not contain "
+			    "valid numnodes function",
+			    clusterlist_module_info_l->clusterlist_module_name);
       goto cleanup;
     }
 
   if (!clusterlist_module_info_l->node_in_cluster)
     {
-      cerebro_err_debug("clusterlist module '%s' does not contain "
-                        "valid node_in_cluster function",
-                        clusterlist_module_info_l->clusterlist_module_name);
+      cerebro_err_debug_lib("clusterlist module '%s' does not contain "
+			    "valid node_in_cluster function",
+			    clusterlist_module_info_l->clusterlist_module_name);
       goto cleanup;
     }
 
   if (!clusterlist_module_info_l->get_nodename)
     {
-      cerebro_err_debug("clusterlist module '%s' does not contain "
-                        "valid get_nodename function",
-                        clusterlist_module_info_l->clusterlist_module_name);
+      cerebro_err_debug_lib("clusterlist module '%s' does not contain "
+			    "valid get_nodename function",
+			    clusterlist_module_info_l->clusterlist_module_name);
       goto cleanup;
     }
 
@@ -554,8 +557,8 @@ cerebro_module_load_clusterlist_module(void)
 
   if (!cerebro_module_library_is_setup)
     {
-      cerebro_err_debug("%s(%s:%d): cerebro_module_library uninitialized", 
-			__FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug_lib("%s(%s:%d): cerebro_module_library uninitialized", 
+			    __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
@@ -565,18 +568,13 @@ cerebro_module_load_clusterlist_module(void)
     {
       if (!ptr[i]->clusterlist_module_name)
 	{
-	  cerebro_err_debug("static clusterlist module index '%d' "
-			    "does not contain name", i);
+	  cerebro_err_debug_lib("%s(%s:%d): clusterlist_module_name null: %d",
+				__FILE__, __FUNCTION__, __LINE__, i);
 	  continue;
 	}
-                                                                                      
+
       if ((rv = _cerebro_module_load_clusterlist_module(ptr[i]->clusterlist_module_name)) < 0)
-	{
-	  cerebro_err_debug("%s(%s:%d): _cerebro_module_load_clusterlist_module: %s",
-			    __FILE__, __FUNCTION__, __LINE__,
-			    strerror(errno));
 	  return -1;
-	}
 
       if (rv)
 	goto found;
@@ -624,8 +622,8 @@ cerebro_module_unload_clusterlist_module(void)
 {
   if (!cerebro_module_library_is_setup)
     {
-      cerebro_err_debug("%s(%s:%d): cerebro_module_library uninitialized", 
-			__FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug_lib("%s(%s:%d): cerebro_module_library uninitialized", 
+			    __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
   
@@ -661,22 +659,22 @@ _cerebro_module_load_config_module(char *module)
 
   if (!cerebro_module_library_is_setup)
     {
-      cerebro_err_debug("%s(%s:%d): cerebro_module_library uninitialized", 
-			__FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug_lib("%s(%s:%d): cerebro_module_library uninitialized", 
+			    __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
   if (!module)
     {
-      cerebro_err_debug("%s(%s:%d): module null", 
-			__FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug_lib("%s(%s:%d): module null", 
+			    __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
   if (config_module_info)
     {
-      cerebro_err_debug("%s(%s:%d): config module already loaded", 
-			__FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug_lib("%s(%s:%d): config module already loaded", 
+			    __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
   
@@ -686,8 +684,8 @@ _cerebro_module_load_config_module(char *module)
     {      
       if (!ptr[i]->config_module_name)
 	{
-	  cerebro_err_debug("static config module index '%d' "
-			    "does not contain name", i);
+	  cerebro_err_debug_lib("%s(%s:%d): config_module_name null",
+				__FILE__, __FUNCTION__, __LINE__);
 	  continue;
 	}
       if (!strcmp(ptr[i]->config_module_name, module))
@@ -703,8 +701,9 @@ _cerebro_module_load_config_module(char *module)
 #else  /* !WITH_STATIC_MODULES */
   if (!(config_module_dl_handle_l = lt_dlopen(module)))
     {
-      cerebro_err_debug("config module '%s': lt_dlopen: %s",
-                        lt_dlerror());
+      cerebro_err_debug_lib("%s(%s:%d): lt_dlopen: module=%s, %s",
+			    __FILE__, __FUNCTION__, __LINE__,
+			    module, lt_dlerror());
       goto cleanup;
     }
 
@@ -715,39 +714,41 @@ _cerebro_module_load_config_module(char *module)
     {
       const char *err = lt_dlerror();
       if (err != NULL)
-	cerebro_err_debug("config module '%s': lt_dlsym: %s", err);
+	cerebro_err_debug_lib("%s(%s:%d): lt_dlsym: module=%s, %s",
+			      __FILE__, __FUNCTION__, __LINE__,
+			      module, err);
       goto cleanup;
     }
 #endif /* !WITH_STATIC_MODULES */
 
   if (!config_module_info_l->config_module_name)
     {
-      cerebro_err_debug("config module '%s' does not contain a valid name",
-                        config_module_info_l->config_module_name);
+      cerebro_err_debug_lib("config module '%s' does not contain a valid name",
+			    config_module_info_l->config_module_name);
       goto cleanup;
     }
 
   if (!config_module_info_l->setup)
     {
-      cerebro_err_debug("config module '%s' does not contain "
-                        "valid setup function",
-                        config_module_info_l->config_module_name);
+      cerebro_err_debug_lib("config module '%s' does not contain "
+			    "valid setup function",
+			    config_module_info_l->config_module_name);
       goto cleanup;
     }
 
   if (!config_module_info_l->cleanup)
     {
-      cerebro_err_debug("config module '%s' does not contain "
-                        "valid cleanup function",
-                        config_module_info_l->config_module_name);
+      cerebro_err_debug_lib("config module '%s' does not contain "
+			    "valid cleanup function",
+			    config_module_info_l->config_module_name);
       goto cleanup;
     }
 
   if (!config_module_info_l->load_default)
     {
-      cerebro_err_debug("config module '%s' does not contain "
-                        "valid load_default function",
-                        config_module_info_l->config_module_name);
+      cerebro_err_debug_lib("config module '%s' does not contain "
+			    "valid load_default function",
+			    config_module_info_l->config_module_name);
       goto cleanup;
     }
 
@@ -776,8 +777,8 @@ cerebro_module_load_config_module(void)
 
   if (!cerebro_module_library_is_setup)
     {
-      cerebro_err_debug("%s(%s:%d): cerebro_module_library uninitialized", 
-			__FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug_lib("%s(%s:%d): cerebro_module_library uninitialized", 
+			    __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
@@ -787,18 +788,13 @@ cerebro_module_load_config_module(void)
     {
       if (!ptr[i]->config_module_name)
 	{
-	  cerebro_err_debug("static config module index '%d' "
-			    "does not contain name", i);
+	  cerebro_err_debug_lib("%s(%s:%d): config_module_name null",
+				__FILE__, __FUNCTION__, __LINE__);
 	  continue;
 	}
 
       if ((rv = _cerebro_module_load_config_module(ptr[i]->config_module_name)) < 0)
-	{
-	  cerebro_err_debug("%s(%s:%d): _cerebro_module_load_config_module: %s",
-			    __FILE__, __FUNCTION__, __LINE__,
-			    strerror(errno));
 	  return -1;
-	}
 
       if (rv)
 	goto found;
@@ -845,8 +841,8 @@ cerebro_module_unload_config_module(void)
 {
   if (!cerebro_module_library_is_setup)
     {
-      cerebro_err_debug("%s(%s:%d): cerebro_module_library uninitialized", 
-			__FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug_lib("%s(%s:%d): cerebro_module_library uninitialized", 
+			    __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
@@ -897,8 +893,8 @@ cerebro_clusterlist_module_name(void)
 {
   if (!clusterlist_module_info)
     {
-      cerebro_err_debug("%s(%s:%d): clusterlist_module_info not loaded",
-			__FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug_lib("%s(%s:%d): clusterlist_module_info null",
+			    __FILE__, __FUNCTION__, __LINE__);
       return NULL;
     }
 
@@ -910,8 +906,8 @@ cerebro_clusterlist_module_setup(void)
 {
   if (!clusterlist_module_info)
     {
-      cerebro_err_debug("%s(%s:%d): clusterlist_module_info not loaded",
-			__FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug_lib("%s(%s:%d): clusterlist_module_info null",
+			    __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
   
@@ -923,8 +919,8 @@ cerebro_clusterlist_module_cleanup(void)
 {
   if (!clusterlist_module_info)
     {
-      cerebro_err_debug("%s(%s:%d): clusterlist_module_info not loaded",
-			__FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug_lib("%s(%s:%d): clusterlist_module_info null",
+			    __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
   
@@ -935,8 +931,8 @@ cerebro_clusterlist_module_get_all_nodes(char **nodes, unsigned int nodeslen)
 {
   if (!clusterlist_module_info)
     {
-      cerebro_err_debug("%s(%s:%d): clusterlist_module_info not loaded",
-			__FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug_lib("%s(%s:%d): clusterlist_module_info null",
+			    __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
   
@@ -948,8 +944,8 @@ cerebro_clusterlist_module_numnodes(void)
 {
   if (!clusterlist_module_info)
     {
-      cerebro_err_debug("%s(%s:%d): clusterlist_module_info not loaded",
-			__FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug_lib("%s(%s:%d): clusterlist_module_info null",
+			    __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
   
@@ -961,8 +957,8 @@ cerebro_clusterlist_module_node_in_cluster(const char *node)
 {
   if (!clusterlist_module_info)
     {
-      cerebro_err_debug("%s(%s:%d): clusterlist_module_info not loaded",
-			__FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug_lib("%s(%s:%d): clusterlist_module_info null",
+			    __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
   
@@ -974,8 +970,8 @@ cerebro_clusterlist_module_get_nodename(const char *node, char *buf, unsigned in
 {
   if (!clusterlist_module_info)
     {
-      cerebro_err_debug("%s(%s:%d): clusterlist_module_info not loaded",
-			__FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug_lib("%s(%s:%d): clusterlist_module_info null",
+			    __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
   
@@ -987,8 +983,8 @@ cerebro_config_module_name(void)
 {
   if (!config_module_info)
     {
-      cerebro_err_debug("%s(%s:%d): config_module_info not loaded",
-			__FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug_lib("%s(%s:%d): config_module_info null",
+			    __FILE__, __FUNCTION__, __LINE__);
       return NULL;
     }
                                                                                      
@@ -1000,8 +996,8 @@ cerebro_config_module_setup(void)
 {
   if (!config_module_info)
     {
-      cerebro_err_debug("%s(%s:%d): config_module_info not loaded",
-			__FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug_lib("%s(%s:%d): config_module_info null",
+			    __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
   
@@ -1013,8 +1009,8 @@ cerebro_config_module_cleanup(void)
 {
   if (!config_module_info)
     {
-      cerebro_err_debug("%s(%s:%d): config_module_info not loaded",
-			__FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug_lib("%s(%s:%d): config_module_info null",
+			    __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
   
@@ -1025,8 +1021,8 @@ cerebro_config_module_load_default(struct cerebro_config *conf)
 {
   if (!config_module_info)
     {
-      cerebro_err_debug("%s(%s:%d): config_module_info not loaded",
-			__FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug_lib("%s(%s:%d): config_module_info null",
+			    __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
   
