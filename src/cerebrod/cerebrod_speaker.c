@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.25 2005-05-04 17:24:05 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.26 2005-05-04 17:43:26 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -189,41 +189,41 @@ _cerebrod_speaker_heartbeat_marshall(struct cerebrod_heartbeat *hb,
                                      char *buf,
                                      unsigned int buflen)
 {
-  int ret, c = 0;
-                                                                                      
+  int rv, c = 0;
+
   assert(hb);
   assert(buf);
   assert(buflen >= CEREBROD_HEARTBEAT_LEN);
   
   memset(buf, '\0', buflen);
-  if ((ret = cerebro_marshall_int32(hb->version,
-                                    buf + c,
-                                    buflen - c)) < 0)
+  if ((rv = cerebro_marshall_int32(hb->version,
+				   buf + c,
+				   buflen - c)) < 0)
     cerebro_err_exit("%s(%s:%d): cerebro_marshall_int32",
                      __FILE__, __FUNCTION__, __LINE__);
-  c += ret;
+  c += rv;
   
-  if ((ret = cerebro_marshall_buffer(hb->nodename,
-                                     sizeof(hb->nodename),
-                                     buf + c,
-                                     buflen - c)) < 0)
+  if ((rv = cerebro_marshall_buffer(hb->nodename,
+				    sizeof(hb->nodename),
+				    buf + c,
+				    buflen - c)) < 0)
     cerebro_err_exit("%s(%s:%d): cerebro_marshall_buffer",
                      __FILE__, __FUNCTION__, __LINE__);
-  c += ret;
+  c += rv;
   
-  if ((ret = cerebro_marshall_uint32(hb->starttime,
-                                     buf + c,
-                                     buflen - c)) < 0)
+  if ((rv = cerebro_marshall_uint32(hb->starttime,
+				    buf + c,
+				    buflen - c)) < 0)
     cerebro_err_exit("%s(%s:%d): cerebro_marshall_uint32",
                      __FILE__, __FUNCTION__, __LINE__);
-  c += ret;
+  c += rv;
   
-  if ((ret = cerebro_marshall_uint32(hb->boottime,
-                                     buf + c,
-                                     buflen - c)) < 0)
+  if ((rv = cerebro_marshall_uint32(hb->boottime,
+				    buf + c,
+				    buflen - c)) < 0)
     cerebro_err_exit("%s(%s:%d): cerebro_marshall_uint32",
                      __FILE__, __FUNCTION__, __LINE__);
-  c += ret;
+  c += rv;
   
   return c;
 }

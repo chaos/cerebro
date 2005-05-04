@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_util.c,v 1.8 2005-05-04 01:15:30 achu Exp $
+ *  $Id: cerebro_util.c,v 1.9 2005-05-04 17:43:26 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -44,7 +44,7 @@ cerebro_low_timeout_connect(cerebro_t handle,
                             int port,
                             int connect_timeout)
 {
-  int ret, old_flags, fd = -1;
+  int rv, old_flags, fd = -1;
   struct sockaddr_in servaddr;
   struct hostent *hptr;
  
@@ -89,15 +89,15 @@ cerebro_low_timeout_connect(cerebro_t handle,
       goto cleanup;
     }
    
-  ret = connect(fd,
-                (struct sockaddr *)&servaddr,
-                sizeof(struct sockaddr_in));
-  if (ret < 0 && errno != EINPROGRESS)
+  rv = connect(fd,
+	       (struct sockaddr *)&servaddr,
+	       sizeof(struct sockaddr_in));
+  if (rv < 0 && errno != EINPROGRESS)
     {
       handle->errnum = CEREBRO_ERR_CONNECT;
       goto cleanup;
     }
-  else if (ret < 0 && errno == EINPROGRESS)
+  else if (rv < 0 && errno == EINPROGRESS)
     {
       fd_set rset, wset;
       struct timeval tval;
@@ -109,7 +109,7 @@ cerebro_low_timeout_connect(cerebro_t handle,
       tval.tv_sec = connect_timeout;
       tval.tv_usec = 0;
        
-      if ((ret = select(fd+1, &rset, &wset, NULL, &tval)) < 0)
+      if ((rv = select(fd+1, &rset, &wset, NULL, &tval)) < 0)
         { 
 	  cerebro_err_debug_lib("%s(%s:%d): select: %s",
 				__FILE__, __FUNCTION__, __LINE__, 
@@ -118,7 +118,7 @@ cerebro_low_timeout_connect(cerebro_t handle,
           goto cleanup;
         }
  
-      if (!ret)
+      if (!rv)
         {
           handle->errnum = CEREBRO_ERR_CONNECT_TIMEOUT;
           goto cleanup;
@@ -139,7 +139,7 @@ cerebro_low_timeout_connect(cerebro_t handle,
                   handle->errnum = CEREBRO_ERR_INTERNAL;
                   goto cleanup;
                 }
-         
+	      
               if (error != 0)
                 {
                   errno = error;

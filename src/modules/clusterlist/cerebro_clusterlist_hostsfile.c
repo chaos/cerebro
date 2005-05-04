@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_hostsfile.c,v 1.13 2005-05-04 17:24:05 achu Exp $
+ *  $Id: cerebro_clusterlist_hostsfile.c,v 1.14 2005-05-04 17:43:26 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -51,7 +51,7 @@ static List hosts = NULL;
 static int
 _readline(int fd, char *buf, int buflen)
 {
-  int ret;
+  int rv;
 
   if (!buf)
     {
@@ -61,7 +61,7 @@ _readline(int fd, char *buf, int buflen)
       return -1;
     }
 
-  if ((ret = fd_read_line(fd, buf, buflen)) < 0)
+  if ((rv = fd_read_line(fd, buf, buflen)) < 0)
     {
       cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: fd_read_line: %s", 
 			       __FILE__, __FUNCTION__, __LINE__,
@@ -70,7 +70,7 @@ _readline(int fd, char *buf, int buflen)
     }
   
   /* buflen - 1 b/c fd_read_line guarantees null termination */
-  if (ret >= (buflen-1))
+  if (rv >= (buflen-1))
     {
       cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: "
 			       "fd_read_line: line truncation",
@@ -79,7 +79,7 @@ _readline(int fd, char *buf, int buflen)
       return -1;
     }
 
-  return ret;
+  return rv;
 }
 
 /* 
@@ -95,7 +95,7 @@ _readline(int fd, char *buf, int buflen)
 static int
 _remove_comments(char *buf, int buflen)
 {
-  int i, comment_flag, retlen;
+  int i, comment_flag, rvlen;
 
   if (!buf)
     {
@@ -110,25 +110,25 @@ _remove_comments(char *buf, int buflen)
 
   i = 0;
   comment_flag = 0;
-  retlen = buflen;
+  rvlen = buflen;
   while (i < buflen)
     {
       if (comment_flag)
         {
           buf[i] = '\0';
-          retlen--;
+          rvlen--;
         }
 
       if (buf[i] == '#')
         {
           buf[i] = '\0';
           comment_flag++;
-          retlen--;
+          rvlen--;
         }
       i++;
     }
 
-  return retlen;
+  return rvlen;
 }
 
 /* 
@@ -430,7 +430,7 @@ hostsfile_clusterlist_node_in_cluster(const char *node)
 {
   char nodebuf[CEREBRO_MAXNODENAMELEN+1];
   char *nodePtr = NULL;
-  void *ret;
+  void *ptr;
 
   if (!hosts)
     {
@@ -463,9 +463,9 @@ hostsfile_clusterlist_node_in_cluster(const char *node)
   else
     nodePtr = (char *)node;
 
-  ret = list_find_first(hosts, (ListFindF)strcmp, nodePtr);
+  ptr = list_find_first(hosts, (ListFindF)strcmp, nodePtr);
 
-  return ((ret) ? 1: 0);
+  return ((ptr) ? 1: 0);
 }
 
 /*

@@ -13,10 +13,13 @@ Testing
 Cleanup
 - reorg cerebro err codes
 - .h file order consistency
-- consistency between ret vs. rv
-  - buf vs. buffer
-  - naming convention, begin with _cerebro or not
-  - 80 columns
+- buf vs. buffer
+- rv
+  - retval for an actual return value
+  - ptr, temp, etc. for something temporarily read
+- naming convention, begin with _cerebro or not
+- 80 columns
+- still legit comments
 
 Audit
 - code review to reduce memory footprint

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_heartbeat.c,v 1.21 2005-04-26 17:31:35 achu Exp $
+ *  $Id: cerebrod_heartbeat.c,v 1.22 2005-05-04 17:43:26 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -33,10 +33,10 @@ cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb)
 
   if (conf.debug)
     {
-      int ret;
+      int rv;
 
-      ret = Pthread_mutex_trylock(&debug_output_mutex);
-      if (ret != EBUSY)
+      rv = Pthread_mutex_trylock(&debug_output_mutex);
+      if (rv != EBUSY)
 	{
 	  fprintf(stderr, "cerebrod_heartbeat_dump: "
 		  "debug_output_mutex not locked");

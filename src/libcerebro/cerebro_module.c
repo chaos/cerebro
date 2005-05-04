@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.c,v 1.19 2005-05-04 17:24:05 achu Exp $
+ *  $Id: cerebro_module.c,v 1.20 2005-05-04 17:43:26 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -233,16 +233,16 @@ _cerebro_find_known_module(char *search_dir,
           if (!strcmp(dirent->d_name, modules_list[i]))
             {
               char filebuf[CEREBRO_MAXPATHLEN+1];
-              int ret;
+              int rv;
 
               memset(filebuf, '\0', CEREBRO_MAXPATHLEN+1);
               snprintf(filebuf, CEREBRO_MAXPATHLEN, "%s/%s",
                        search_dir, modules_list[i]);
 
-              if ((ret = load_module(filebuf)) < 0)
+              if ((rv = load_module(filebuf)) < 0)
 		return -1;
 
-              if (ret)
+              if (rv)
                 {
                   found++;
                   goto out;
@@ -309,7 +309,7 @@ _cerebro_find_unknown_module(char *search_dir,
       if (ptr && ptr == &dirent->d_name[0])
         {
           char filebuf[CEREBRO_MAXPATHLEN+1];
-          int ret;
+          int rv;
 
           /*
            * Don't bother trying to load this file unless its a shared
@@ -323,10 +323,10 @@ _cerebro_find_unknown_module(char *search_dir,
           snprintf(filebuf, CEREBRO_MAXPATHLEN, "%s/%s",
                    search_dir, dirent->d_name);
 
-          if ((ret = load_module(filebuf)) < 0)
+          if ((rv = load_module(filebuf)) < 0)
 	    return -1;
 
-          if (ret)
+          if (rv)
             {
               found++;
               goto out;

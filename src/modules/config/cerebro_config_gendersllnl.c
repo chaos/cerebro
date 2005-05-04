@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_gendersllnl.c,v 1.9 2005-05-04 17:24:05 achu Exp $
+ *  $Id: cerebro_config_gendersllnl.c,v 1.10 2005-05-04 17:43:26 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -135,7 +135,7 @@ int
 gendersllnl_config_load_default(struct cerebro_config *conf)
 {
   char altnamebuf[CEREBRO_MAXNODENAMELEN+1];
-  int is_mgmt, ret;
+  int is_mgmt, rv;
 
   if (!gendersllnl_handle)
     {
@@ -227,11 +227,11 @@ gendersllnl_config_load_default(struct cerebro_config *conf)
     }
 
   memset(altnamebuf, '\0', CEREBRO_MAXNODENAMELEN+1);
-  if ((ret = genders_testattr(gendersllnl_handle, 
-                              NULL, 
-                              GENDERS_ALTNAME_ATTRIBUTE,
-                              altnamebuf,
-                              CEREBRO_MAXNODENAMELEN)) < 0)
+  if ((rv = genders_testattr(gendersllnl_handle, 
+			     NULL, 
+			     GENDERS_ALTNAME_ATTRIBUTE,
+			     altnamebuf,
+			     CEREBRO_MAXNODENAMELEN)) < 0)
     {
       cerebro_err_debug_module("%s(%s:%d): genders_testattr: %s",
 			       __FILE__, __FUNCTION__, __LINE__,
@@ -239,12 +239,12 @@ gendersllnl_config_load_default(struct cerebro_config *conf)
       return -1;
     }
 
-  if (ret)
+  if (rv)
     {
       char heartbeat_network_interface[INET_ADDRSTRLEN+1];
       struct hostent *h = NULL;
       struct in_addr in;
-
+      
       if (!(h = gethostbyname(altnamebuf)))
         {
           cerebro_err_debug_module("%s(%s:%d): gethostbyname: %s",
@@ -252,9 +252,9 @@ gendersllnl_config_load_default(struct cerebro_config *conf)
 				   hstrerror(h_errno));
           return -1;
         }
-
+      
       in = *((struct in_addr *)h->h_addr);
-
+      
       memset(heartbeat_network_interface, '\0', INET_ADDRSTRLEN+1);
       if (!inet_ntop(AF_INET, 
                      &in, 

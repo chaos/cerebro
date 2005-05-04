@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_data.c,v 1.8 2005-05-04 17:24:05 achu Exp $
+ *  $Id: cerebrod_data.c,v 1.9 2005-05-04 17:43:26 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -81,7 +81,7 @@ _cerebrod_cache_boottime(void)
   int fd, len;
   char *bootvalptr, *endptr, *tempptr;
   char buf[CEREBROD_BOOTTIME_BUFLEN];
-  long int ret;
+  long int bootval;
 
   assert(!cerebrod_boottime);
 
@@ -106,15 +106,15 @@ _cerebrod_cache_boottime(void)
                      __FILE__, __FUNCTION__, __LINE__);
 
   errno = 0;
-  ret = (u_int32_t)strtol(bootvalptr, &endptr, 10);
-  if ((ret == LONG_MIN || ret == LONG_MAX) && errno == ERANGE)
+  bootval = (u_int32_t)strtol(bootvalptr, &endptr, 10);
+  if ((bootval == LONG_MIN || bootval == LONG_MAX) && errno == ERANGE)
     cerebro_err_exit("%s(%s:%d): boottime out of range",
                      __FILE__, __FUNCTION__, __LINE__);
   if ((bootvalptr + strlen(bootvalptr)) != endptr)
     cerebro_err_exit("%s(%s:%d): boottime value parse error",
                      __FILE__, __FUNCTION__, __LINE__);
 
-  cerebrod_boottime = (u_int32_t)ret;
+  cerebrod_boottime = (u_int32_t)bootval;
 }
 
 /*

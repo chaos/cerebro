@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_genders_util.c,v 1.7 2005-05-04 01:15:30 achu Exp $
+ *  $Id: cerebro_clusterlist_genders_util.c,v 1.8 2005-05-04 17:43:26 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -205,7 +205,7 @@ int
 cerebro_clusterlist_genders_numnodes(genders_t handle, 
                                      char *clusterlist_module_name)
 {
-  int ret;
+  int rv;
 
   if (!handle)
     {
@@ -224,7 +224,7 @@ cerebro_clusterlist_genders_numnodes(genders_t handle,
       return -1;
     }
 
-  if ((ret = genders_getnumnodes(handle)) < 0)
+  if ((rv = genders_getnumnodes(handle)) < 0)
     {
       cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: "
 			       "genders_getnumnodes: %s",
@@ -233,5 +233,5 @@ cerebro_clusterlist_genders_numnodes(genders_t handle,
       return -1;
     }
 
-  return ret;
+  return rv;
 }
