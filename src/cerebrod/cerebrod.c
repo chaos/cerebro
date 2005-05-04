@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.42 2005-05-04 18:23:37 achu Exp $
+ *  $Id: cerebrod.c,v 1.43 2005-05-04 23:54:06 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -46,6 +46,31 @@ extern pthread_mutex_t cerebrod_listener_initialization_complete_lock;
 extern int cerebrod_updown_initialization_complete;
 extern pthread_cond_t cerebrod_updown_initialization_complete_cond;
 extern pthread_mutex_t cerebrod_updown_initialization_complete_lock;
+
+#ifndef NDEBUG
+/* 
+ * _cerebrod_err_lock
+ *
+ * Locking function for cerebro error lib
+ */
+static void
+_cerebrod_err_lock(void)
+{
+  Pthread_mutex_lock(&debug_output_mutex);
+}
+
+/* 
+ * _cerebrod_err_unlock
+ *
+ * Unlock function for cerebro error lib
+ */
+static void
+_cerebrod_err_unlock(void)
+{
+  Pthread_mutex_unlock(&debug_output_mutex);
+}
+#endif /* NDEBUG */
+
 
 /* 
  * _cerebrod_pre_config_initialization
@@ -126,7 +151,8 @@ main(int argc, char **argv)
     }
   else
     {
-      cerebro_err_register_mutex(&debug_output_mutex);
+      cerebro_err_register_locking(&_cerebrod_err_lock,
+				   &_cerebrod_err_unlock);
       cerebro_err_set_flags(CEREBRO_ERROR_STDERR 
 			    | CEREBRO_ERROR_LIB
 			    | CEREBRO_ERROR_MODULE);

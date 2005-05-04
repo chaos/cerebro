@@ -19,7 +19,6 @@ Portability
 - Non-pthreads support
 
 Design
-- Can't have anything pthreads related in lib?
 
 Later Design
 - move listener hash into status hash 

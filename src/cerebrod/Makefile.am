@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.37 2005-04-29 18:39:49 achu Exp $
+## $Id: Makefile.am,v 1.38 2005-05-04 23:54:06 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -33,7 +33,8 @@ cerebrod_SOURCES = cerebrod.c \
 cerebrod_CFLAGS  = -I$(srcdir)/../libcerebro \
 		   -I$(srcdir)/../libcommon
 cerebrod_LDADD   = ../libcerebro/libcerebro.la \
-		   ../libcommon/libcommon.la
+		   ../libcommon/libcommon.la \
+		   ../libcommon/libwrappers.la
 
 ../libcerebro/libcerebro.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
@@ -41,10 +42,7 @@ cerebrod_LDADD   = ../libcerebro/libcerebro.la \
 ../libcommon/libcommon.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
-../modules/clusterlist/libclusterlistmodules.la: force-dependency-check
-	@cd `dirname $@` && make `basename $@`
-
-../modules/config/libconfigmodules.la: force-dependency-check
+../libcommon/libwrappers.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
 force-dependency-check:

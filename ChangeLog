@@ -2,6 +2,8 @@
 
 	* Major code cleanup in preparation for beta release.
 
+	* Rework so libcerebro doesn't export pthread functions.
+
 	* Begin writing manpages.
 	
 2005-05-03  Albert Chu  <chu11@llnl.gov>

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_updown.c,v 1.28 2005-05-04 22:21:33 achu Exp $
+ *  $Id: cerebro_updown.c,v 1.29 2005-05-04 23:54:06 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -724,7 +724,7 @@ cerebro_updown_load_data(cerebro_t handle,
     {
       if (handle->config_data.cerebro_updown_hostnames_flag)
 	{
-	  int rv, i;
+	  int i, rv = -1;
 
 	  for (i = 0; i < handle->config_data.cerebro_updown_hostnames_len; i++)
 	    {
@@ -911,6 +911,8 @@ _cerebro_updown_is_node(cerebro_t handle,
       return -1;
     }
 
+  updown_data = (struct cerebro_updown_data *)handle->updown_data;
+
   /* Special case: In this situation we can do better than the
    * clusterlist module default for cerebro_clusterlist_node_in_cluster.
    */
@@ -948,8 +950,6 @@ _cerebro_updown_is_node(cerebro_t handle,
 	  return -1;
 	}
     }
-
-  updown_data = (struct cerebro_updown_data *)handle->updown_data;
 
   if (up_down_flag == CEREBRO_UPDOWN_UP_NODES)
     hl = updown_data->up_nodes;

@@ -1,17 +1,31 @@
 /*****************************************************************************\
- *  $Id: cerebro_error.h,v 1.4 2005-05-04 01:15:30 achu Exp $
+ *  $Id: cerebro_error.h,v 1.5 2005-05-04 23:54:06 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_ERROR_H
 #define _CEREBRO_ERROR_H
-
-#include <pthread.h>
 
 #define CEREBRO_ERROR_STDOUT  0x0001
 #define CEREBRO_ERROR_STDERR  0x0002
 #define CEREBRO_ERROR_SYSLOG  0x0004
 #define CEREBRO_ERROR_LIB     0x0008
 #define CEREBRO_ERROR_MODULE  0x0010
+
+/*
+ * Cerebro_err_lock
+ *
+ * function prototype for error lib to call before output of
+ * a message to stderr or stdout.
+ */
+typedef void (*Cerebro_err_lock)(void);
+
+/*
+ * Cerebro_err_unlock
+ *
+ * function prototype for error lib to call after output of
+ * a message to stderr or stdout.
+ */
+typedef void (*Cerebro_err_unlock)(void);
 
 /*  
  * cerebro_err_init
@@ -21,12 +35,14 @@
 void cerebro_err_init(char *prog);
 
 /* 
- * cerebro_err_register_mutex
+ * cerebro_err_register_locking
  *
- * Register a mutex with the cerebro error lib.  All error outputs to
- * stderr or stdout will require this mutex before output.
+ * Register locking functions with the cerebro error lib.  All error
+ * outputs to stderr or stdout will require the locks to be held
+ * 
  */
-void cerebro_err_register_mutex(pthread_mutex_t *mutex);
+void cerebro_err_register_locking(Cerebro_err_lock lock,
+				  Cerebro_err_unlock unlock);
 
 /*
  * cerebro_err_get_flags

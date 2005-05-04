@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_error.c,v 1.5 2005-05-04 18:23:37 achu Exp $
+ *  $Id: cerebro_error.c,v 1.6 2005-05-04 23:54:06 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -13,22 +13,17 @@
 #include <stdarg.h>
 #endif /* STDC_HEADERS */
 #include <errno.h>
-#if HAVE_PTHREAD_H
-#include <pthread.h>
-#endif /* HAVE_PTHREAD_H */
 
 #include "cerebro_error.h"
 #include "error.h"
-#include "wrappers.h"
 
 #define CEREBRO_ERROR_STRING_BUFLEN 1024
 
 /*  
- * error_output_mutex
- *
  * If set, requires locking before output of stdout or stderr messages
  */
-static pthread_mutex_t *error_output_mutex = NULL;
+static Cerebro_err_lock cerebro_err_lock = NULL;
+static Cerebro_err_unlock cerebro_err_unlock = NULL;
 
 static int cerebro_err_initialized = 0;
 
@@ -45,9 +40,14 @@ cerebro_err_init(char *prog)
 }
 
 void 
-cerebro_err_register_mutex(pthread_mutex_t *mutex)
+cerebro_err_register_locking(Cerebro_err_lock lock,
+			     Cerebro_err_unlock unlock)
 {
-  error_output_mutex = mutex;
+  if (!lock || !unlock)
+    return;
+
+  cerebro_err_lock = lock;
+  cerebro_err_unlock = unlock;
 }
 
 int 
@@ -91,13 +91,15 @@ cerebro_err_debug(const char *fmt, ...)
   va_end(ap);
 
   flags = cerebro_err_get_flags();
-  if (error_output_mutex
-      && ((flags & CEREBRO_ERROR_STDOUT)
-          || (flags & CEREBRO_ERROR_STDERR)))
+  if ((cerebro_err_lock 
+       && cerebro_err_unlock)
+      && 
+      ((flags & CEREBRO_ERROR_STDOUT)
+       || (flags & CEREBRO_ERROR_STDERR)))
     {
-      Pthread_mutex_lock(error_output_mutex);
+      (*cerebro_err_lock)();
       err_debug(buffer);
-      Pthread_mutex_unlock(error_output_mutex);
+      (*cerebro_err_unlock)();
     }
   else
     err_debug(buffer);
@@ -124,13 +126,15 @@ cerebro_err_debug_lib(const char *fmt, ...)
   va_end(ap);
 
   flags = cerebro_err_get_flags();
-  if (error_output_mutex
-      && ((flags & CEREBRO_ERROR_STDOUT)
-          || (flags & CEREBRO_ERROR_STDERR)))
+  if ((cerebro_err_lock 
+       && cerebro_err_unlock)
+      && 
+      ((flags & CEREBRO_ERROR_STDOUT)
+       || (flags & CEREBRO_ERROR_STDERR)))
     {
-      Pthread_mutex_lock(error_output_mutex);
+      (*cerebro_err_lock)();
       err_debug(buffer);
-      Pthread_mutex_unlock(error_output_mutex);
+      (*cerebro_err_unlock)();
     }
   else
     err_debug(buffer);
@@ -157,13 +161,15 @@ cerebro_err_debug_module(const char *fmt, ...)
   va_end(ap);
 
   flags = cerebro_err_get_flags();
-  if (error_output_mutex
-      && ((flags & CEREBRO_ERROR_STDOUT)
-          || (flags & CEREBRO_ERROR_STDERR)))
+  if ((cerebro_err_lock 
+       && cerebro_err_unlock)
+      && 
+      ((flags & CEREBRO_ERROR_STDOUT)
+       || (flags & CEREBRO_ERROR_STDERR)))
     {
-      Pthread_mutex_lock(error_output_mutex);
+      (*cerebro_err_lock)();
       err_debug(buffer);
-      Pthread_mutex_unlock(error_output_mutex);
+      (*cerebro_err_unlock)();
     }
   else
     err_debug(buffer);
@@ -187,13 +193,15 @@ cerebro_err_output(const char *fmt, ...)
   va_end(ap);
 
   flags = cerebro_err_get_flags();
-  if (error_output_mutex
-      && ((flags & CEREBRO_ERROR_STDOUT)
-          || (flags & CEREBRO_ERROR_STDERR)))
+  if ((cerebro_err_lock 
+       && cerebro_err_unlock)
+      && 
+      ((flags & CEREBRO_ERROR_STDOUT)
+       || (flags & CEREBRO_ERROR_STDERR)))
     {
-      Pthread_mutex_lock(error_output_mutex);
+      (*cerebro_err_lock)();
       err_output(buffer);
-      Pthread_mutex_unlock(error_output_mutex);
+      (*cerebro_err_unlock)();
     }
   else
     err_output(buffer);
@@ -217,14 +225,16 @@ cerebro_err_exit(const char *fmt, ...)
   va_end(ap);
 
   flags = cerebro_err_get_flags();
-  if (error_output_mutex
-      && ((flags & CEREBRO_ERROR_STDOUT)
-          || (flags & CEREBRO_ERROR_STDERR)))
+  if ((cerebro_err_lock 
+       && cerebro_err_unlock)
+      && 
+      ((flags & CEREBRO_ERROR_STDOUT)
+       || (flags & CEREBRO_ERROR_STDERR)))
     {
-      Pthread_mutex_lock(error_output_mutex);
+      (*cerebro_err_lock)();
       err_exit(buffer);
       /* NOT REACHED */
-      Pthread_mutex_unlock(error_output_mutex);
+      (*cerebro_err_unlock)();
     }
   else
     err_exit(buffer);
