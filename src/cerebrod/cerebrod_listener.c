@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.50 2005-05-03 22:46:34 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.51 2005-05-04 00:45:24 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -206,9 +206,8 @@ _cerebrod_listener_heartbeat_unmarshall(struct cerebrod_heartbeat *hb,
   if ((ret = cerebro_unmarshall_int32(&(hb->version),
                                       buffer + c,
                                       bufferlen - c)) < 0)
-    cerebro_err_exit("%s(%s:%d): cerebro_unmarshall_int32: %s",
-                       __FILE__, __FUNCTION__, __LINE__,
-                       strerror(errno));
+    cerebro_err_exit("%s(%s:%d): cerebro_unmarshall_int32",
+                       __FILE__, __FUNCTION__, __LINE__);
   if (!ret)
     return c;
 
@@ -218,9 +217,8 @@ _cerebrod_listener_heartbeat_unmarshall(struct cerebrod_heartbeat *hb,
                                        sizeof(hb->nodename),
                                        buffer + c,
                                        bufferlen - c)) < 0)
-    cerebro_err_exit("%s(%s:%d): cerebro_unmarshall_buffer: %s",
-                     __FILE__, __FUNCTION__, __LINE__,
-                     strerror(errno));
+    cerebro_err_exit("%s(%s:%d): cerebro_unmarshall_buffer",
+                     __FILE__, __FUNCTION__, __LINE__);
   if (!ret)
     return c;
 
@@ -229,9 +227,8 @@ _cerebrod_listener_heartbeat_unmarshall(struct cerebrod_heartbeat *hb,
   if ((ret = cerebro_unmarshall_uint32(&(hb->starttime),
                                        buffer + c,
                                        bufferlen - c)) < 0)
-    cerebro_err_exit("%s(%s:%d): cerebro_unmarshall_uint32: %s",
-                     __FILE__, __FUNCTION__, __LINE__,
-                     strerror(errno));
+    cerebro_err_exit("%s(%s:%d): cerebro_unmarshall_uint32",
+                     __FILE__, __FUNCTION__, __LINE__);
   if (!ret)
     return c;
 
@@ -240,15 +237,12 @@ _cerebrod_listener_heartbeat_unmarshall(struct cerebrod_heartbeat *hb,
   if ((ret = cerebro_unmarshall_uint32(&(hb->boottime),
                                        buffer + c,
                                        bufferlen - c)) < 0)
-    cerebro_err_exit("%s(%s:%d): cerebro_unmarshall_uint32: %s",
-                     __FILE__, __FUNCTION__, __LINE__,
-                     strerror(errno));
+    cerebro_err_exit("%s(%s:%d): cerebro_unmarshall_uint32",
+                     __FILE__, __FUNCTION__, __LINE__);
   if (!ret)
     return c;
 
   c += ret;
-
-
 
   return c;
 }

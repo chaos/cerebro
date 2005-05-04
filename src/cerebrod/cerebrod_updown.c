@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.c,v 1.42 2005-05-03 23:41:40 achu Exp $
+ *  $Id: cerebrod_updown.c,v 1.43 2005-05-04 00:45:24 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -279,9 +279,8 @@ _cerebrod_updown_response_marshall(struct cerebro_updown_response *res,
 				    buffer + c, 
 				    bufferlen - c)) < 0)
     {
-      cerebro_err_debug("%s(%s:%d): cerebro_marshall_int32: %s",
-                        __FILE__, __FUNCTION__, __LINE__,
-                        strerror(errno));
+      cerebro_err_debug("%s(%s:%d): cerebro_marshall_int32",
+                        __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
   c += ret;
@@ -290,9 +289,8 @@ _cerebrod_updown_response_marshall(struct cerebro_updown_response *res,
 				     buffer + c, 
 				     bufferlen - c)) < 0)
     {
-      cerebro_err_debug("%s(%s:%d): cerebro_marshall_uint32: %s",
-                        __FILE__, __FUNCTION__, __LINE__,
-                        strerror(errno));
+      cerebro_err_debug("%s(%s:%d): cerebro_marshall_uint32",
+                        __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
   c += ret;
@@ -301,9 +299,8 @@ _cerebrod_updown_response_marshall(struct cerebro_updown_response *res,
 				    buffer + c, 
 				    bufferlen - c)) < 0)
     {
-      cerebro_err_debug("%s(%s:%d): cerebro_marshall_uint8: %s",
-                        __FILE__, __FUNCTION__, __LINE__,
-                        strerror(errno));
+      cerebro_err_debug("%s(%s:%d): cerebro_marshall_uint8",
+                        __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
   c += ret;
@@ -312,9 +309,8 @@ _cerebrod_updown_response_marshall(struct cerebro_updown_response *res,
                                      sizeof(res->nodename),
                                      buffer + c,
                                      bufferlen - c)) < 0)
-    cerebro_err_exit("%s(%s:%d): cerebro_marshall_buffer: %s",
-                     __FILE__, __FUNCTION__, __LINE__,
-                     strerror(errno));
+    cerebro_err_exit("%s(%s:%d): cerebro_marshall_buffer",
+                     __FILE__, __FUNCTION__, __LINE__);
   c += ret;
 
 
@@ -322,9 +318,8 @@ _cerebrod_updown_response_marshall(struct cerebro_updown_response *res,
 				    buffer + c, 
 				    bufferlen - c)) < 0)
     {
-      cerebro_err_debug("%s(%s:%d): cerebro_marshall_uint8: %s",
-                        __FILE__, __FUNCTION__, __LINE__,
-                        strerror(errno));
+      cerebro_err_debug("%s(%s:%d): cerebro_marshall_uint8",
+                        __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
   c += ret;
@@ -355,9 +350,8 @@ _cerebrod_updown_err_response_marshall(struct cerebro_updown_err_response *err_r
 				    buffer + c, 
 				    bufferlen - c)) < 0)
     {
-      cerebro_err_debug("%s(%s:%d): cerebro_marshall_int32: %s",
-                        __FILE__, __FUNCTION__, __LINE__,
-                        strerror(errno));
+      cerebro_err_debug("%s(%s:%d): cerebro_marshall_int32",
+                        __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
   c += ret;
@@ -366,9 +360,8 @@ _cerebrod_updown_err_response_marshall(struct cerebro_updown_err_response *err_r
 				     buffer + c, 
 				     bufferlen - c)) < 0)
     {
-      cerebro_err_debug("%s(%s:%d): cerebro_marshall_uint32: %s",
-                        __FILE__, __FUNCTION__, __LINE__,
-                        strerror(errno));
+      cerebro_err_debug("%s(%s:%d): cerebro_marshall_uint32",
+                        __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
   c += ret;
@@ -396,9 +389,8 @@ _cerebrod_updown_request_unmarshall(struct cerebro_updown_request *req,
 				      buffer + c, 
 				      bufferlen - c)) < 0)
     {
-      cerebro_err_debug("%s(%s:%d): cerebro_unmarshall_int32: %s",
-                        __FILE__, __FUNCTION__, __LINE__,
-                        strerror(errno));
+      cerebro_err_debug("%s(%s:%d): cerebro_unmarshall_int32",
+                        __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
@@ -411,9 +403,8 @@ _cerebrod_updown_request_unmarshall(struct cerebro_updown_request *req,
 				       buffer + c, 
 				       bufferlen - c)) < 0)
     {
-      cerebro_err_debug("%s(%s:%d): cerebro_unmarshall_uint32: %s",
-                        __FILE__, __FUNCTION__, __LINE__,
-                        strerror(errno));
+      cerebro_err_debug("%s(%s:%d): cerebro_unmarshall_uint32",
+                        __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
@@ -426,9 +417,8 @@ _cerebrod_updown_request_unmarshall(struct cerebro_updown_request *req,
 				       buffer + c, 
 				       bufferlen - c)) < 0)
     {
-      cerebro_err_debug("%s(%s:%d): cerebro_unmarshall_uint32: %s",
-                        __FILE__, __FUNCTION__, __LINE__,
-                        strerror(errno));
+      cerebro_err_debug("%s(%s:%d): cerebro_unmarshall_uint32",
+                        __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.23 2005-04-26 17:31:35 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.24 2005-05-04 00:45:24 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -198,34 +198,30 @@ _cerebrod_speaker_heartbeat_marshall(struct cerebrod_heartbeat *hb,
   if ((ret = cerebro_marshall_int32(hb->version,
                                     buffer + c,
                                     bufferlen - c)) < 0)
-    cerebro_err_exit("%s(%s:%d): cerebro_marshall_int32: %s",
-                     __FILE__, __FUNCTION__, __LINE__,
-                     strerror(errno));
+    cerebro_err_exit("%s(%s:%d): cerebro_marshall_int32",
+                     __FILE__, __FUNCTION__, __LINE__);
   c += ret;
   
   if ((ret = cerebro_marshall_buffer(hb->nodename,
                                      sizeof(hb->nodename),
                                      buffer + c,
                                      bufferlen - c)) < 0)
-    cerebro_err_exit("%s(%s:%d): cerebro_marshall_buffer: %s",
-                     __FILE__, __FUNCTION__, __LINE__,
-                     strerror(errno));
+    cerebro_err_exit("%s(%s:%d): cerebro_marshall_buffer",
+                     __FILE__, __FUNCTION__, __LINE__);
   c += ret;
   
   if ((ret = cerebro_marshall_uint32(hb->starttime,
                                      buffer + c,
                                      bufferlen - c)) < 0)
-    cerebro_err_exit("%s(%s:%d): cerebro_marshall_uint32: %s",
-                     __FILE__, __FUNCTION__, __LINE__,
-                     strerror(errno));
+    cerebro_err_exit("%s(%s:%d): cerebro_marshall_uint32",
+                     __FILE__, __FUNCTION__, __LINE__);
   c += ret;
   
   if ((ret = cerebro_marshall_uint32(hb->boottime,
                                      buffer + c,
                                      bufferlen - c)) < 0)
-    cerebro_err_exit("%s(%s:%d): cerebro_marshall_uint32: %s",
-                     __FILE__, __FUNCTION__, __LINE__,
-                     strerror(errno));
+    cerebro_err_exit("%s(%s:%d): cerebro_marshall_uint32",
+                     __FILE__, __FUNCTION__, __LINE__);
   c += ret;
   
   return c;
