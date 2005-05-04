@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module_default.c,v 1.3 2005-05-04 00:22:39 achu Exp $
+ *  $Id: cerebro_module_default.c,v 1.4 2005-05-04 17:24:05 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -20,7 +20,7 @@
 #include <dirent.h>
 
 #include "cerebro.h"
-#include "cerebro_defs.h"
+#include "cerebro_constants.h"
 #include "cerebro_error.h"
 #include "cerebro_module.h"
 #include "ltdl.h"
@@ -66,7 +66,7 @@ default_clusterlist_get_nodename(const char *node, char *buf, unsigned int bufle
   if (!node)
     {
       cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: "
-			       "invalid node parameter",
+			       "node null",
 			       DEFAULT_CLUSTERLIST_MODULE_NAME,
 			       __FILE__, __FUNCTION__, __LINE__);
       return -1;
@@ -75,16 +75,16 @@ default_clusterlist_get_nodename(const char *node, char *buf, unsigned int bufle
   if (!buf)
     {
       cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: "
-			       "invalid buf parameter",
+			       "buf null",
 			       DEFAULT_CLUSTERLIST_MODULE_NAME,
 			       __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
-  if (!(buflen > 0))
+  if (!buflen)
     {
       cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: "
-			       "invalid buflen parameter",
+			       "buflen invalid",
 			       DEFAULT_CLUSTERLIST_MODULE_NAME,
 			       __FILE__, __FUNCTION__, __LINE__);
       return -1;

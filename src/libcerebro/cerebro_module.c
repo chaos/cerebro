@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.c,v 1.18 2005-05-04 00:20:55 achu Exp $
+ *  $Id: cerebro_module.c,v 1.19 2005-05-04 17:24:05 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -20,7 +20,7 @@
 #include <dirent.h>
 
 #include "cerebro.h"
-#include "cerebro_defs.h"
+#include "cerebro_constants.h"
 #include "cerebro_error.h"
 #include "cerebro_module.h"
 #include "ltdl.h"
@@ -245,14 +245,14 @@ _cerebro_find_known_module(char *search_dir,
               if (ret)
                 {
                   found++;
-                  goto done;
+                  goto out;
                 }
             }
         }
       rewinddir(dir);
     }
 
- done:
+ out:
   closedir(dir);
   return (found) ? 1 : 0;
 }
@@ -329,12 +329,12 @@ _cerebro_find_unknown_module(char *search_dir,
           if (ret)
             {
               found++;
-              goto done;
+              goto out;
             }
         }
     }
 
- done:
+ out:
   closedir(dir);
   return (found) ? 1 : 0;
 }
@@ -428,7 +428,7 @@ _cerebro_module_load_clusterlist_module(char *module)
   
 #if WITH_STATIC_MODULES
   ptr = &static_clusterlist_modules[0];
-  while (ptr[i] != NULL)
+  while (ptr[i])
     {      
       if (!ptr[i]->clusterlist_module_name)
 	{
@@ -461,7 +461,7 @@ _cerebro_module_load_clusterlist_module(char *module)
   if (!(clusterlist_module_info_l = lt_dlsym(clusterlist_module_dl_handle_l, "clusterlist_module_info")))
     {
       const char *err = lt_dlerror();
-      if (err != NULL)
+      if (err)
 	cerebro_err_debug_lib("%s(%s:%d): lt_dlsym: module=%s, %s",
 			      __FILE__, __FUNCTION__, __LINE__,
 			      module, err);
@@ -556,7 +556,7 @@ cerebro_module_load_clusterlist_module(void)
 
 #if WITH_STATIC_MODULES
   ptr = &static_clusterlist_modules[0];
-  while (ptr[i] != NULL)
+  while (ptr[i])
     {
       if (!ptr[i]->clusterlist_module_name)
 	{
@@ -672,7 +672,7 @@ _cerebro_module_load_config_module(char *module)
   
 #if WITH_STATIC_MODULES
   ptr = &static_config_modules[0];
-  while (ptr[i] != NULL)
+  while (ptr[i])
     {      
       if (!ptr[i]->config_module_name)
 	{
@@ -705,7 +705,7 @@ _cerebro_module_load_config_module(char *module)
   if (!(config_module_info_l = lt_dlsym(config_module_dl_handle_l, "config_module_info")))
     {
       const char *err = lt_dlerror();
-      if (err != NULL)
+      if (err)
 	cerebro_err_debug_lib("%s(%s:%d): lt_dlsym: module=%s, %s",
 			      __FILE__, __FUNCTION__, __LINE__,
 			      module, err);
@@ -776,7 +776,7 @@ cerebro_module_load_config_module(void)
 
 #if WITH_STATIC_MODULES
   ptr = &static_config_modules[0];
-  while (ptr[i] != NULL)
+  while (ptr[i])
     {
       if (!ptr[i]->config_module_name)
 	{

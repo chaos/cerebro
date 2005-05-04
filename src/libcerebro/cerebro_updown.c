@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_updown.c,v 1.23 2005-05-04 00:20:55 achu Exp $
+ *  $Id: cerebro_updown.c,v 1.24 2005-05-04 17:24:05 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -178,23 +178,23 @@ _cerebro_updown_init_request(cerebro_t handle,
 static int
 _cerebro_updown_request_marshall(cerebro_t handle,
                                  struct cerebro_updown_request *req,
-                                 char *buffer,
-                                 int bufferlen)
+                                 char *buf,
+                                 unsigned int buflen)
 {
   int ret, c = 0;
 
 #ifndef NDEBUG
-  if (!buffer)
+  if (!buf)
     {
-      cerebro_err_debug_lib("%s(%s:%d): buffer null",
+      cerebro_err_debug_lib("%s(%s:%d): buf null",
 			    __FILE__, __FUNCTION__, __LINE__);
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
 
-  if (bufferlen < CEREBRO_UPDOWN_REQUEST_LEN)
+  if (buflen < CEREBRO_UPDOWN_REQUEST_LEN)
     {
-      cerebro_err_debug_lib("%s(%s:%d): bufferlen invalid",
+      cerebro_err_debug_lib("%s(%s:%d): buflen invalid",
 			    __FILE__, __FUNCTION__, __LINE__);
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
@@ -202,11 +202,11 @@ _cerebro_updown_request_marshall(cerebro_t handle,
 
 #endif /* NDEBUG */
 
-  memset(buffer, '\0', bufferlen);
+  memset(buf, '\0', buflen);
 
   if ((ret = cerebro_marshall_int32(req->version,
-                                    buffer + c, 
-                                    bufferlen - c)) < 0)
+                                    buf + c, 
+                                    buflen - c)) < 0)
     {
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
@@ -214,8 +214,8 @@ _cerebro_updown_request_marshall(cerebro_t handle,
   c += ret;
 
   if ((ret = cerebro_marshall_uint32(req->updown_request,
-                                     buffer + c, 
-                                     bufferlen - c)) < 0)
+                                     buf + c, 
+                                     buflen - c)) < 0)
     {
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
@@ -223,8 +223,8 @@ _cerebro_updown_request_marshall(cerebro_t handle,
   c += ret;
 
   if ((ret = cerebro_marshall_uint32(req->timeout_len,
-                                     buffer + c, 
-                                     bufferlen - c)) < 0)
+                                     buf + c, 
+                                     buflen - c)) < 0)
     {
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
@@ -244,15 +244,15 @@ _cerebro_updown_request_marshall(cerebro_t handle,
 static int
 _cerebro_updown_response_unmarshall(cerebro_t handle,
                                     struct cerebro_updown_response *res,
-                                    char *buffer,
-                                    int bufferlen)
+                                    const char *buf,
+                                    unsigned int buflen)
 {
   int ret, c = 0;
 
 #ifndef NDEBUG
-  if (!buffer)
+  if (!buf)
     {
-      cerebro_err_debug_lib("%s(%s:%d): buffer null",
+      cerebro_err_debug_lib("%s(%s:%d): buf null",
 			    __FILE__, __FUNCTION__, __LINE__);
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
@@ -260,8 +260,8 @@ _cerebro_updown_response_unmarshall(cerebro_t handle,
 #endif /* NDEBUG */
 
   if ((ret = cerebro_unmarshall_int32(&(res->version),
-                                      buffer + c,
-                                      bufferlen - c)) < 0)
+                                      buf + c,
+                                      buflen - c)) < 0)
     {
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
@@ -272,8 +272,8 @@ _cerebro_updown_response_unmarshall(cerebro_t handle,
   c += ret;
 
   if ((ret = cerebro_unmarshall_uint32(&(res->updown_err_code),
-                                       buffer + c,
-                                       bufferlen - c)) < 0)
+                                       buf + c,
+                                       buflen - c)) < 0)
     {
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
@@ -284,8 +284,8 @@ _cerebro_updown_response_unmarshall(cerebro_t handle,
   c += ret;
 
   if ((ret = cerebro_unmarshall_uint8(&(res->end_of_responses),
-                                      buffer + c,
-                                      bufferlen - c)) < 0)
+                                      buf + c,
+                                      buflen - c)) < 0)
     {
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
@@ -297,8 +297,8 @@ _cerebro_updown_response_unmarshall(cerebro_t handle,
 
   if ((ret = cerebro_unmarshall_buffer(res->nodename,
                                        sizeof(res->nodename),
-                                       buffer + c,
-                                       bufferlen - c)) < 0)
+                                       buf + c,
+                                       buflen - c)) < 0)
     {
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
@@ -309,8 +309,8 @@ _cerebro_updown_response_unmarshall(cerebro_t handle,
   c += ret;
 
   if ((ret = cerebro_unmarshall_uint8(&(res->updown_state),
-                                      buffer + c,
-                                      bufferlen - c)) < 0)
+                                      buf + c,
+                                      buflen - c)) < 0)
     {
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
@@ -337,7 +337,7 @@ _cerebro_updown_send_request(cerebro_t handle,
                              int flags)
 {
   struct cerebro_updown_request req;
-  char buffer[CEREBRO_PACKET_BUFLEN];
+  char buf[CEREBRO_PACKET_BUFLEN];
   int req_len;
 
   if (_cerebro_updown_init_request(handle, &req, timeout_len, flags) < 0)
@@ -345,11 +345,11 @@ _cerebro_updown_send_request(cerebro_t handle,
   
   if ((req_len = _cerebro_updown_request_marshall(handle,
                                                   &req,
-                                                  buffer,
+                                                  buf,
                                                   CEREBRO_PACKET_BUFLEN)) < 0)
     return -1;
 
-  if (fd_write_n(fd, buffer, req_len) < 0)
+  if (fd_write_n(fd, buf, req_len) < 0)
     {
       cerebro_err_debug_lib("%s(%s:%d): fd_write_n: %s",
 			    __FILE__, __FUNCTION__, __LINE__,
@@ -375,9 +375,9 @@ _cerebro_updown_receive_a_response(cerebro_t handle,
                                    struct cerebro_updown_response *res)
 {
   int rv, bytes_read = 0;
-  char buffer[CEREBRO_PACKET_BUFLEN];
+  char buf[CEREBRO_PACKET_BUFLEN];
 
-  memset(buffer, '\0', CEREBRO_PACKET_BUFLEN);
+  memset(buf, '\0', CEREBRO_PACKET_BUFLEN);
   while (bytes_read < CEREBRO_UPDOWN_RESPONSE_LEN)
     {
       fd_set rfds;
@@ -425,7 +425,7 @@ _cerebro_updown_receive_a_response(cerebro_t handle,
            * smaller packet.
            */
           if ((n = read(fd,
-                        buffer + bytes_read,
+                        buf + bytes_read,
                         CEREBRO_UPDOWN_RESPONSE_LEN - bytes_read)) < 0)
             {
 	      cerebro_err_debug_lib("%s(%s:%d): read: %s",
@@ -456,7 +456,7 @@ _cerebro_updown_receive_a_response(cerebro_t handle,
  unmarshall_received:
   if ((rv = _cerebro_updown_response_unmarshall(handle, 
                                                 res, 
-                                                buffer, 
+                                                buf, 
                                                 bytes_read)) < 0)
     goto cleanup;
 
@@ -842,7 +842,7 @@ _cerebro_updown_get_nodes(cerebro_t handle,
   if (_cerebro_updown_data_loaded_check(handle) < 0)
     return -1;
 
-  if (!buf || buflen <= 0)
+  if (!buf || !buflen)
     {
       handle->errnum = CEREBRO_ERR_PARAMETERS;
       return -1;
@@ -897,7 +897,7 @@ _cerebro_updown_is_node(cerebro_t handle,
                         int up_down_flag)
 {
   struct cerebro_updown_data *updown_data;
-  char buffer[CEREBRO_MAXNODENAMELEN+1];
+  char buf[CEREBRO_MAXNODENAMELEN+1];
   hostlist_t hl;
   int rv, ret;
 
@@ -928,10 +928,10 @@ _cerebro_updown_is_node(cerebro_t handle,
 	  return -1;
 	}
 
-      memset(buffer, '\0', CEREBRO_MAXNODENAMELEN+1);
+      memset(buf, '\0', CEREBRO_MAXNODENAMELEN+1);
       
       if (cerebro_clusterlist_module_get_nodename(node,
-						  buffer, 
+						  buf, 
 						  CEREBRO_MAXNODENAMELEN) < 0)
 	{
 	  handle->errnum = CEREBRO_ERR_CLUSTERLIST_MODULE;
@@ -961,7 +961,7 @@ _cerebro_updown_is_node(cerebro_t handle,
       return -1;
     }
 
-  rv = hostlist_find(hl, buffer);
+  rv = hostlist_find(hl, buf);
  
   if (rv != -1)
     ret = 1;

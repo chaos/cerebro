@@ -1,9 +1,9 @@
 /*****************************************************************************\
- *  $Id: cerebro_defs.h,v 1.8 2005-05-02 17:50:34 achu Exp $
+ *  $Id: cerebro_constants.h,v 1.1 2005-05-04 17:24:05 achu Exp $
 \*****************************************************************************/
  
-#ifndef _CEREBRO_DEFS_H
-#define _CEREBRO_DEFS_H
+#ifndef _CEREBRO_CONSTANTS_H
+#define _CEREBRO_CONSTANTS_H
 
 /* Do not use MAXHOSTNAMELEN defined (typically) in sys/param.h.  We
  * do not want the possibility that other machines may have a
@@ -20,4 +20,4 @@
 
 #define CEREBRO_MAXNETWORKINTERFACE 128
 
-#endif /* _CEREBRO_DEFS_H */
+#endif /* _CEREBRO_CONSTANTS_H */

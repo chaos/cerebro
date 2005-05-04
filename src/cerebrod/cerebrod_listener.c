@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.51 2005-05-04 00:45:24 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.52 2005-05-04 17:24:05 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -18,7 +18,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
-#include "cerebro_defs.h"
+#include "cerebro_constants.h"
 #include "cerebro_error.h"
 #include "cerebro_marshalling.h"
 #include "cerebro_module.h"
@@ -158,7 +158,7 @@ _cerebrod_listener_initialize(void)
 {
   Pthread_mutex_lock(&cerebrod_listener_initialization_complete_lock);
   if (cerebrod_listener_initialization_complete)
-    goto done;
+    goto out;
 
   Pthread_mutex_lock(&listener_fd_lock);
   if ((listener_fd = _cerebrod_listener_create_and_setup_socket()) < 0)
@@ -181,7 +181,7 @@ _cerebrod_listener_initialize(void)
 				  (hash_del_f)_Free);
   cerebrod_listener_initialization_complete++;
   Pthread_cond_signal(&cerebrod_listener_initialization_complete_cond);
- done:
+ out:
   Pthread_mutex_unlock(&cerebrod_listener_initialization_complete_lock);
 }
 
@@ -194,39 +194,40 @@ _cerebrod_listener_initialize(void)
  */
 int
 _cerebrod_listener_heartbeat_unmarshall(struct cerebrod_heartbeat *hb,
-                                        char *buffer,
-                                        int bufferlen)
+                                        const char *buf,
+                                        unsigned int buflen)
 {
   int ret, c = 0;
 
-  assert(hb && buffer && bufferlen >= 0);
+  assert(hb);
+  assert(buf);
   
   memset(hb, '\0', sizeof(struct cerebrod_heartbeat));
-
+  
   if ((ret = cerebro_unmarshall_int32(&(hb->version),
-                                      buffer + c,
-                                      bufferlen - c)) < 0)
+                                      buf + c,
+                                      buflen - c)) < 0)
     cerebro_err_exit("%s(%s:%d): cerebro_unmarshall_int32",
-                       __FILE__, __FUNCTION__, __LINE__);
+		     __FILE__, __FUNCTION__, __LINE__);
   if (!ret)
     return c;
-
+  
   c += ret;
 
   if ((ret = cerebro_unmarshall_buffer(hb->nodename,
                                        sizeof(hb->nodename),
-                                       buffer + c,
-                                       bufferlen - c)) < 0)
+                                       buf + c,
+                                       buflen - c)) < 0)
     cerebro_err_exit("%s(%s:%d): cerebro_unmarshall_buffer",
                      __FILE__, __FUNCTION__, __LINE__);
   if (!ret)
     return c;
-
+  
   c += ret;
   
   if ((ret = cerebro_unmarshall_uint32(&(hb->starttime),
-                                       buffer + c,
-                                       bufferlen - c)) < 0)
+                                       buf + c,
+                                       buflen - c)) < 0)
     cerebro_err_exit("%s(%s:%d): cerebro_unmarshall_uint32",
                      __FILE__, __FUNCTION__, __LINE__);
   if (!ret)
@@ -235,8 +236,8 @@ _cerebrod_listener_heartbeat_unmarshall(struct cerebrod_heartbeat *hb,
   c += ret;
 
   if ((ret = cerebro_unmarshall_uint32(&(hb->boottime),
-                                       buffer + c,
-                                       bufferlen - c)) < 0)
+                                       buf + c,
+                                       buflen - c)) < 0)
     cerebro_err_exit("%s(%s:%d): cerebro_unmarshall_uint32",
                      __FILE__, __FUNCTION__, __LINE__);
   if (!ret)
@@ -293,7 +294,8 @@ _cerebrod_listener_dump_cluster_node_data_item(void *data,
 {
   struct cerebrod_node_data *nd;
 
-  assert(data && key);
+  assert(data);
+  assert(key);
 
   nd = (struct cerebrod_node_data *)data;
 
@@ -427,7 +429,7 @@ cerebrod_listener(void *arg)
 
       if (hblen != CEREBROD_HEARTBEAT_LEN)
         {
-          cerebro_err_debug("%s(%s:%d): received buffer length "
+          cerebro_err_debug("%s(%s:%d): received buf length "
                             "unexpected size: expect %d, hblen %d",
                             __FILE__, __FUNCTION__, __LINE__,
                             CEREBROD_HEARTBEAT_LEN, hblen);

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_data.c,v 1.7 2005-04-26 17:04:29 achu Exp $
+ *  $Id: cerebrod_data.c,v 1.8 2005-05-04 17:24:05 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -16,7 +16,7 @@
 #include <assert.h>
 #include <errno.h>
 
-#include "cerebro_defs.h"
+#include "cerebro_constants.h"
 #include "cerebro_error.h"
 
 #include "cerebrod_data.h"
@@ -158,7 +158,7 @@ cerebrod_get_boottime(void)
 void
 cerebrod_get_nodename(char *buf, unsigned int len)
 {
-  assert(buf && len > 0);
+  assert(buf);
   assert(len > cerebrod_nodename_len);
   
   memcpy(buf, cerebrod_nodename, cerebrod_nodename_len);

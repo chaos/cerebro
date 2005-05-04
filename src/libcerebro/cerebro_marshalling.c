@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_marshalling.c,v 1.6 2005-05-04 01:15:30 achu Exp $
+ *  $Id: cerebro_marshalling.c,v 1.7 2005-05-04 17:24:05 achu Exp $
 \*****************************************************************************/
  
 #if HAVE_CONFIG_H
@@ -18,97 +18,7 @@
 #include "cerebro_error.h"
 
 int
-cerebro_marshall_int8(int8_t val, char *buffer, int bufferlen)
-{
-  if (!buffer)
-    {
-      cerebro_err_debug_lib("%s(%s:%d): buffer null",
-			    __FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
-
-  if (bufferlen < sizeof(int8_t))
-    {
-      cerebro_err_debug_lib("%s(%s:%d): bufferlen invalid",
-			    __FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
-
-  memcpy(buffer, (void *)&val, sizeof(int8_t));
-  return sizeof(int8_t);
-}
-
-int
-cerebro_marshall_int32(int32_t val, char *buffer, int bufferlen)
-{
-  int32_t temp;
-
-  if (!buffer)
-    {
-      cerebro_err_debug_lib("%s(%s:%d): buffer null",
-			    __FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
-
-  if (bufferlen < sizeof(int32_t))
-    {
-      cerebro_err_debug_lib("%s(%s:%d): bufferlen invalid",
-			    __FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
-
-  temp = htonl(val);
-  memcpy(buffer, (void *)&temp, sizeof(temp));
-  return sizeof(temp);
-}
-
-int
-cerebro_marshall_uint8(u_int8_t val, char *buffer, int bufferlen)
-{
-  if (!buffer)
-    {
-      cerebro_err_debug_lib("%s(%s:%d): buffer null",
-			    __FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
-
-  if (bufferlen < sizeof(u_int8_t))
-    {
-      cerebro_err_debug_lib("%s(%s:%d): bufferlen invalid",
-			    __FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
-
-  memcpy(buffer, (void *)&val, sizeof(u_int8_t));
-  return sizeof(u_int8_t);
-}
-
-int
-cerebro_marshall_uint32(u_int32_t val, char *buffer, int bufferlen)
-{
-  u_int32_t temp;
-
-  if (!buffer)
-    {
-      cerebro_err_debug_lib("%s(%s:%d): buffer null",
-			    __FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
-
-  if (bufferlen < sizeof(u_int32_t))
-    {
-      cerebro_err_debug_lib("%s(%s:%d): bufferlen invalid",
-			    __FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
-
-  temp = htonl(val);
-  memcpy(buffer, (void *)&temp, sizeof(temp));
-  return sizeof(temp);
-}
-
-int
-cerebro_marshall_buffer(char *buf, int buflen, char *buffer, int bufferlen)
+cerebro_marshall_int8(int8_t val, char *buf, unsigned int buflen)
 {
   if (!buf)
     {
@@ -117,33 +27,88 @@ cerebro_marshall_buffer(char *buf, int buflen, char *buffer, int bufferlen)
       return -1;
     }
 
-  if (buflen <= 0)
+  if (buflen < sizeof(int8_t))
     {
       cerebro_err_debug_lib("%s(%s:%d): buflen invalid",
 			    __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
-  if (!buffer)
-    {
-      cerebro_err_debug_lib("%s(%s:%d): buffer null",
-			    __FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
-
-  if (bufferlen < buflen)
-    {
-      cerebro_err_debug_lib("%s(%s:%d): bufferlen invalid",
-			    __FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
-
-  memcpy(buffer, buf, buflen);
-  return buflen;
+  memcpy(buf, (void *)&val, sizeof(int8_t));
+  return sizeof(int8_t);
 }
 
 int
-cerebro_unmarshall_int8(int8_t *val, char *buffer, int bufferlen)
+cerebro_marshall_int32(int32_t val, char *buf, unsigned int buflen)
+{
+  int32_t temp;
+
+  if (!buf)
+    {
+      cerebro_err_debug_lib("%s(%s:%d): buf null",
+			    __FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+
+  if (buflen < sizeof(int32_t))
+    {
+      cerebro_err_debug_lib("%s(%s:%d): buflen invalid",
+			    __FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+
+  temp = htonl(val);
+  memcpy(buf, (void *)&temp, sizeof(int32_t));
+  return sizeof(temp);
+}
+
+int
+cerebro_marshall_uint8(u_int8_t val, char *buf, unsigned int buflen)
+{
+  if (!buf)
+    {
+      cerebro_err_debug_lib("%s(%s:%d): buf null",
+			    __FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+
+  if (buflen < sizeof(u_int8_t))
+    {
+      cerebro_err_debug_lib("%s(%s:%d): buflen invalid",
+			    __FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+
+  memcpy(buf, (void *)&val, sizeof(u_int8_t));
+  return sizeof(u_int8_t);
+}
+
+int
+cerebro_marshall_uint32(u_int32_t val, char *buf, unsigned int buflen)
+{
+  u_int32_t temp;
+
+  if (!buf)
+    {
+      cerebro_err_debug_lib("%s(%s:%d): buf null",
+			    __FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+
+  if (buflen < sizeof(u_int32_t))
+    {
+      cerebro_err_debug_lib("%s(%s:%d): buflen invalid",
+			    __FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+
+  temp = htonl(val);
+  memcpy(buf, (void *)&temp, sizeof(u_int32_t));
+  return sizeof(u_int32_t);
+}
+
+int
+cerebro_marshall_buffer(const char *val, unsigned int vallen, char *buf, unsigned int buflen)
 {
   if (!val)
     {
@@ -152,23 +117,58 @@ cerebro_unmarshall_int8(int8_t *val, char *buffer, int bufferlen)
       return -1;
     }
 
-  if (!buffer)
+  if (!vallen)
     {
-      cerebro_err_debug_lib("%s(%s:%d): buffer null",
+      cerebro_err_debug_lib("%s(%s:%d): vallen invalid",
 			    __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
-  if (bufferlen >= sizeof(int8_t))
+  if (!buf)
     {
-      memcpy((void *)val, buffer, sizeof(int8_t));
+      cerebro_err_debug_lib("%s(%s:%d): buf null",
+			    __FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+
+  if (buflen < vallen)
+    {
+      cerebro_err_debug_lib("%s(%s:%d): buflen invalid",
+			    __FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+
+  memcpy(buf, val, vallen);
+  return vallen;
+}
+
+int
+cerebro_unmarshall_int8(int8_t *val, const char *buf, unsigned int buflen)
+{
+  if (!val)
+    {
+      cerebro_err_debug_lib("%s(%s:%d): val null",
+			    __FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+
+  if (!buf)
+    {
+      cerebro_err_debug_lib("%s(%s:%d): buf null",
+			    __FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+
+  if (buflen >= sizeof(int8_t))
+    {
+      memcpy((void *)val, buf, sizeof(int8_t));
       return sizeof(int8_t);
     }
   return 0;
 }
 
 int
-cerebro_unmarshall_int32(int32_t *val, char *buffer, int bufferlen)
+cerebro_unmarshall_int32(int32_t *val, const char *buf, unsigned int buflen)
 {
   int32_t temp;
 
@@ -179,24 +179,24 @@ cerebro_unmarshall_int32(int32_t *val, char *buffer, int bufferlen)
       return -1;
     }
 
-  if (!buffer)
+  if (!buf)
     {
-      cerebro_err_debug_lib("%s(%s:%d): buffer null",
+      cerebro_err_debug_lib("%s(%s:%d): buf null",
 			    __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
-  if (bufferlen >= sizeof(temp))
+  if (buflen >= sizeof(int32_t))
     {
-      memcpy((void *)&temp, buffer, sizeof(temp));
+      memcpy((void *)&temp, buf, sizeof(int32_t));
       *val = ntohl(temp);
-      return sizeof(temp);
+      return sizeof(int32_t);
     }
   return 0;
 }
 
 int
-cerebro_unmarshall_uint8(u_int8_t *val, char *buffer, int bufferlen)
+cerebro_unmarshall_uint8(u_int8_t *val, const char *buf, unsigned int buflen)
 {
   if (!val)
     {
@@ -205,23 +205,23 @@ cerebro_unmarshall_uint8(u_int8_t *val, char *buffer, int bufferlen)
       return -1;
     }
 
-  if (!buffer)
+  if (!buf)
     {
-      cerebro_err_debug_lib("%s(%s:%d): buffer null",
+      cerebro_err_debug_lib("%s(%s:%d): buf null",
 			    __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
-  if (bufferlen >= sizeof(u_int8_t))
+  if (buflen >= sizeof(u_int8_t))
     {
-      memcpy((void *)val, buffer, sizeof(u_int8_t));
+      memcpy((void *)val, buf, sizeof(u_int8_t));
       return sizeof(u_int8_t);
     }
   return 0;
 }
 
 int
-cerebro_unmarshall_uint32(u_int32_t *val, char *buffer, int bufferlen)
+cerebro_unmarshall_uint32(u_int32_t *val, const char *buf, unsigned int buflen)
 {
   u_int32_t temp;
 
@@ -232,25 +232,6 @@ cerebro_unmarshall_uint32(u_int32_t *val, char *buffer, int bufferlen)
       return -1;
     }
 
-  if (!buffer)
-    {
-      cerebro_err_debug_lib("%s(%s:%d): buffer null",
-			    __FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
-
-  if (bufferlen >= sizeof(temp))
-    {
-      memcpy((void *)&temp, buffer, sizeof(temp));
-      *val = ntohl(temp);
-      return sizeof(temp);
-    }
-  return 0;
-}
-
-int
-cerebro_unmarshall_buffer(char *buf, int buflen, char *buffer, int bufferlen)
-{
   if (!buf)
     {
       cerebro_err_debug_lib("%s(%s:%d): buf null",
@@ -258,25 +239,43 @@ cerebro_unmarshall_buffer(char *buf, int buflen, char *buffer, int bufferlen)
       return -1;
     }
 
-  if (!buffer)
+  if (buflen >= sizeof(u_int32_t))
     {
-      cerebro_err_debug_lib("%s(%s:%d): buffer null",
+      memcpy((void *)&temp, buf, sizeof(u_int32_t));
+      *val = ntohl(temp);
+      return sizeof(u_int32_t);
+    }
+  return 0;
+}
+
+int
+cerebro_unmarshall_buffer(char *val, unsigned int vallen, const char *buf, unsigned int buflen)
+{
+  if (!val)
+    {
+      cerebro_err_debug_lib("%s(%s:%d): val null",
 			    __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
-
-  if (buflen <= 0)
+  if (!vallen)
     {
-      cerebro_err_debug_lib("%s(%s:%d): buflen invalid",
+      cerebro_err_debug_lib("%s(%s:%d): vallen invalid",
 			    __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
-  if (bufferlen >= buflen)
+  if (!buf)
     {
-      memcpy(buf, buffer, buflen);
-      return buflen;
+      cerebro_err_debug_lib("%s(%s:%d): buf null",
+			    __FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+
+  if (buflen >= vallen)
+    {
+      memcpy(val, buf, vallen);
+      return vallen;
     }
   return 0;
 }

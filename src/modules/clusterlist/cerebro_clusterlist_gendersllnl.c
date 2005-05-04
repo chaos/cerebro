@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_gendersllnl.c,v 1.11 2005-05-04 01:15:30 achu Exp $
+ *  $Id: cerebro_clusterlist_gendersllnl.c,v 1.12 2005-05-04 17:24:05 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -16,7 +16,7 @@
 
 #include <gendersllnl.h>
 
-#include "cerebro_defs.h"
+#include "cerebro_constants.h"
 #include "cerebro_error.h"
 #include "cerebro_clusterlist_module.h"
 #include "cerebro_clusterlist_genders_util.h"
@@ -238,7 +238,7 @@ gendersllnl_clusterlist_get_nodename(const char *node, char *buf, unsigned int b
       return -1;
     }
 
-  if (!(buflen > 0))
+  if (!buflen)
     {
       cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: "
 			       "buflen invalid",

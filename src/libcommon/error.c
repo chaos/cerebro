@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: error.c,v 1.7 2005-04-21 22:00:33 achu Exp $
+ *  $Id: error.c,v 1.8 2005-05-04 17:24:05 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -30,7 +30,7 @@ err_init(char *prog)
 int 
 err_get_flags(void)
 {
-  assert(err_prog != NULL);
+  assert(err_prog);
 
   return err_flags;
 }
@@ -38,7 +38,7 @@ err_get_flags(void)
 void 
 err_set_flags(int flags)
 {
-  assert(err_prog != NULL);
+  assert(err_prog);
 
   err_flags = flags;
 }
@@ -48,7 +48,7 @@ _err(int syslog_level, const char *fmt, va_list ap)
 {
   char buf[ERROR_BUFLEN];
 
-  assert(err_prog != NULL);
+  assert(err_prog);
 
   vsnprintf(buf, ERROR_BUFLEN, fmt, ap);
   if (err_flags & ERROR_STDOUT)
@@ -64,7 +64,7 @@ err_debug(const char *fmt, ...)
 {
   va_list ap;
 
-  assert(err_prog != NULL);
+  assert(err_prog);
 
   va_start(ap, fmt);
   _err(LOG_DEBUG, fmt, ap);
@@ -76,7 +76,7 @@ err_output(const char *fmt, ...)
 {
   va_list ap;
 
-  assert(err_prog != NULL);
+  assert(err_prog);
 
   va_start(ap, fmt);
   _err(LOG_ERR, fmt, ap);
@@ -88,7 +88,7 @@ err_exit(const char *fmt, ...)
 {
   va_list ap;
 
-  assert(err_prog != NULL);
+  assert(err_prog);
 
   va_start(ap, fmt);
   _err(LOG_ERR, fmt, ap);

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_hostsfile.c,v 1.12 2005-05-04 01:15:30 achu Exp $
+ *  $Id: cerebro_clusterlist_hostsfile.c,v 1.13 2005-05-04 17:24:05 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -19,7 +19,7 @@
 #include <fcntl.h>
 #endif /* HAVE_FCNTL_H */
 
-#include "cerebro_defs.h"
+#include "cerebro_constants.h"
 #include "cerebro_error.h"
 #include "cerebro_clusterlist_module.h"
 #include "cerebro_clusterlist_util.h"
@@ -105,7 +105,7 @@ _remove_comments(char *buf, int buflen)
       return -1;
     }
 
-  if (strchr(buf, '#') == NULL)
+  if (!strchr(buf, '#'))
     return buflen;
 
   i = 0;
@@ -234,13 +234,13 @@ hostsfile_clusterlist_setup(void)
       char *hostPtr;
       char *str;
 
-      if ((len = _remove_comments(buf, len)) == 0)
+      if (!(len = _remove_comments(buf, len)))
         continue;
 
       if (len < 0)
         goto cleanup;
 
-      if ((len = _remove_trailing_whitespace(buf, len)) == 0)
+      if (!(len = _remove_trailing_whitespace(buf, len)))
         continue;
 
       if (len < 0)
@@ -505,7 +505,7 @@ hostsfile_clusterlist_get_nodename(const char *node, char *buf, unsigned int buf
       return -1;
     }
 
-  if (!(buflen > 0))
+  if (!buflen)
     {
       cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: "
 			       "buflen invalid",

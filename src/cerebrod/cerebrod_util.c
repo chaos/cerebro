@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_util.c,v 1.10 2005-04-21 22:00:33 achu Exp $
+ *  $Id: cerebrod_util.c,v 1.11 2005-05-04 17:24:05 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -32,7 +32,9 @@ _hash_reinsert(void *data, const void *key, void *arg)
 {
   hash_t newhash;
 
-  assert(data && key && arg);
+  assert(data);
+  assert(key);
+  assert(arg);
 
   newhash = *((hash_t *)arg);
   Hash_insert(newhash, key, data);

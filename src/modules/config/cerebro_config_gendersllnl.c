@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_gendersllnl.c,v 1.8 2005-05-04 01:15:30 achu Exp $
+ *  $Id: cerebro_config_gendersllnl.c,v 1.9 2005-05-04 17:24:05 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -19,7 +19,7 @@
 
 #include <gendersllnl.h>
 
-#include "cerebro_defs.h"
+#include "cerebro_constants.h"
 #include "cerebro_error.h"
 #include "cerebro_config_module.h"
 

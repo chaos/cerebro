@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config.c,v 1.8 2005-05-04 00:20:55 achu Exp $
+ *  $Id: cerebro_config.c,v 1.9 2005-05-04 17:24:05 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -85,7 +85,7 @@ _cb_cerebrod_heartbeat_freq(conffile_t cf, struct conffile_data *data,
 {
   struct cerebro_config *conf;
 
-  if (option_ptr == NULL)
+  if (!option_ptr)
     {
       conffile_seterrnum(cf, CONFFILE_ERR_PARAMETERS);
       return -1;
@@ -131,7 +131,7 @@ _cb_cerebro_updown_hostnames(conffile_t cf, struct conffile_data *data,
 {
   struct cerebro_config *conf;
 
-  if (option_ptr == NULL)
+  if (!option_ptr)
     {
       conffile_seterrnum(cf, CONFFILE_ERR_PARAMETERS);
       return -1;

@@ -1,57 +1,55 @@
+Documention
+
 - README description
-  - cerebro.1 manpage
-- IPv6
-- Non-pthreads support?
-- remove hash/list buffering in list.c hash.c?
-
-- test
-   - fd leaking
-   - mem-leaking
-   - none module works if no clusterlist modules found
-
-- to GPL
-  - on all headers
-  - on manpage ORIGINS
-
-- signals to daemon to log/unlog debug info?
-
+- cerebro.1 manpage
 - doc for writing modules
+- cerebro api manpages
 
+Testing
+- fd leaking
+- mem-leaking
+- none module works if no clusterlist modules found
+
+Cleanup
+- reorg cerebro err codes
+- .h file order consistency
+- consistency between ret vs. rv
+  - buf vs. buffer
+  - naming convention, begin with _cerebro or not
+  - 80 columns
+
+Audit
+- code review to reduce memory footprint
 - maps confine only "cerebro_" instead of "cerebro*"
   - be more restrictive in general, don't just do cerebro*
   - or just specifically list the ones that should be exported
 
-- strerror_r and errormsg_r funcs?
-  - only if determined necessary at some point
+Portability
+- IPv6
+- Non-pthreads support
 
-- code review to reduce memory footprint
+Design
+- strerror_r and errormsg_r funcs
+- libcerebro set configfile, module, etc. functions
+- generic err message in cerebro_t handle, i.e for conffile errors
+- config_is_setup and and equivalent functions
+- pthreads locking for clusterlists/config modules?? (they are read only)
 
-- reorg cerebro err codes
+Before distribution
+- do .h trick for header files like freeipmi
 
-- consistency between ret vs. rv
-  - err_out vs. cleanup
-  - buf vs. buffer
-  - buflen vs. bufferlen
-  - error checking
-    - x >= y
-    - y < x
-  - naming convention, begin with _cerebro or not
-  - buflen checks -1 vs. +1 checks
-  - NULL vs !
+Debugging
+- signals to daemon to log/unlog debug info?
 
-- set configfile, module, etc. functions
-  - reload config, module, etc. functions
+GPL
+- do it
+- place header on all headers
+- place on all c files
+- note on manpage ORIGINS
 
-- pthreads locking for clusterlists/config modules?
-  - probably not b/c both are read only
+Misc
+- remove hash/list buffering in list.c hash.c?
 
-- .h file order consistency
 
-- generic err message in cerebro_t handle?
-  - i.e. for conffile
 
-- instead of cerebro_defs.h cerebro_constants.h or something?
 
-- do build trick for header files like freeipmi
-
-- config_is_setup? and equiv funcs?

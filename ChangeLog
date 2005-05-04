@@ -1,3 +1,7 @@
+2005-05-04  Albert Chu  <chu11@llnl.gov>
+
+	* Various code cleanup.
+	
 2005-05-03  Albert Chu  <chu11@llnl.gov>
 
 	* Rework config file and config module into one load_config

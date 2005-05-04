@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_util.c,v 1.7 2005-05-04 00:41:24 achu Exp $
+ *  $Id: cerebro_clusterlist_util.c,v 1.8 2005-05-04 17:24:05 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -42,7 +42,7 @@ cerebro_clusterlist_copy_nodename(const char *node,
       return -1;
     }
 
-  if (buflen <= 0)
+  if (!buflen)
     {
       cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: buflen invalid",
 			       __FILE__, __FUNCTION__, __LINE__,
@@ -60,7 +60,6 @@ cerebro_clusterlist_copy_nodename(const char *node,
     }
 
   len = strlen(node);
-
   if ((len + 1) > buflen)
     {
       cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: "
