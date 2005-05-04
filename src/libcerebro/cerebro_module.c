@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.c,v 1.17 2005-05-03 23:41:40 achu Exp $
+ *  $Id: cerebro_module.c,v 1.18 2005-05-04 00:20:55 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -240,11 +240,7 @@ _cerebro_find_known_module(char *search_dir,
                        search_dir, modules_list[i]);
 
               if ((ret = load_module(filebuf)) < 0)
-		{
-		  cerebro_err_debug_lib("%s(%s:%d): load_module",
-					__FILE__, __FUNCTION__, __LINE__);
-		  return -1;
-		}
+		return -1;
 
               if (ret)
                 {
@@ -328,11 +324,7 @@ _cerebro_find_unknown_module(char *search_dir,
                    search_dir, dirent->d_name);
 
           if ((ret = load_module(filebuf)) < 0)
-	    {
-	      cerebro_err_debug_lib("%s(%s:%d): load_module",
-				    __FILE__, __FUNCTION__, __LINE__);
-	      return -1;
-	    }
+	    return -1;
 
           if (ret)
             {

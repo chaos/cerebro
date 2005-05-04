@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_util.c,v 1.6 2005-05-03 23:41:40 achu Exp $
+ *  $Id: cerebro_util.c,v 1.7 2005-05-04 00:20:55 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -160,6 +160,9 @@ cerebro_low_timeout_connect(cerebro_t handle,
   /* reset flags */
   if (fcntl(fd, F_SETFL, old_flags) < 0)
     {
+      cerebro_err_debug_lib("%s(%s:%d): fcntl: %s",
+			    __FILE__, __FUNCTION__, __LINE__,
+			    strerror(errno));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       goto cleanup;
     }

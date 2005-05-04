@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_api.h,v 1.7 2005-05-03 22:46:34 achu Exp $
+ *  $Id: cerebro_api.h,v 1.8 2005-05-04 00:20:55 achu Exp $
 \*****************************************************************************/
  
 #ifndef _CEREBRO_API_H
@@ -47,41 +47,5 @@ struct cerebro {
   struct cerebro_config config_data;
   void *updown_data;
 };
-
-/* 
- * cerebro_load_config
- *
- * Read and load config file data
- *
- * Returns 0 on success, -1 on error
- */
-int cerebro_load_config(cerebro_t handle);
-
-/* 
- * cerebro_api_load_config
- *
- * Unload config file info
- *
- * Returns 0 on success, -1 on error
- */
-int cerebro_unload_config(cerebro_t handle);
-
-/* 
- * cerebro_load_clusterlist_module
- *
- * Find and load clusterlist module
- *
- * Returns 1 if clusterlist module was loaded, 0 if not, -1 on fatal error
- */
-int cerebro_load_clusterlist_module(cerebro_t handle);
-
-/* 
- * cerebro_unload_clusterlist_module
- *
- * Unload clusterlist module
- *
- * Returns 0 on success, -1 on error
- */
-int cerebro_unload_clusterlist_module(cerebro_t handle);
 
 #endif /* _CEREBRO_API_H */

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module_default.c,v 1.2 2005-05-03 21:47:39 achu Exp $
+ *  $Id: cerebro_module_default.c,v 1.3 2005-05-04 00:22:39 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -65,28 +65,28 @@ default_clusterlist_get_nodename(const char *node, char *buf, unsigned int bufle
 
   if (!node)
     {
-      cerebro_err_debug("%s(%s:%d): %s clusterlist module: "
-                        "invalid node parameter",
-                        DEFAULT_CLUSTERLIST_MODULE_NAME,
-                        __FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: "
+			       "invalid node parameter",
+			       DEFAULT_CLUSTERLIST_MODULE_NAME,
+			       __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
   if (!buf)
     {
-      cerebro_err_debug("%s(%s:%d): %s clusterlist module: "
-                        "invalid buf parameter",
-                        DEFAULT_CLUSTERLIST_MODULE_NAME,
-                        __FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: "
+			       "invalid buf parameter",
+			       DEFAULT_CLUSTERLIST_MODULE_NAME,
+			       __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
   if (!(buflen > 0))
     {
-      cerebro_err_debug("%s(%s:%d): %s clusterlist module: "
-                        "invalid buflen parameter",
-                        DEFAULT_CLUSTERLIST_MODULE_NAME,
-                        __FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: "
+			       "invalid buflen parameter",
+			       DEFAULT_CLUSTERLIST_MODULE_NAME,
+			       __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
   
@@ -94,9 +94,10 @@ default_clusterlist_get_nodename(const char *node, char *buf, unsigned int bufle
  
   if ((len + 1) > buflen)
     {
-      cerebro_err_debug("%s(%s:%d): %s clusterlist module: buflen too small: %d %d",
-                        __FILE__, __FUNCTION__, __LINE__,
-                        DEFAULT_CLUSTERLIST_MODULE_NAME, len, buflen);
+      cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: "
+			       "buflen too small: %d %d",
+			       __FILE__, __FUNCTION__, __LINE__,
+			       DEFAULT_CLUSTERLIST_MODULE_NAME, len, buflen);
       return -1;
     }
  

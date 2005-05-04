@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config.c,v 1.7 2005-05-04 00:02:46 achu Exp $
+ *  $Id: cerebro_config.c,v 1.8 2005-05-04 00:20:55 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -34,27 +34,15 @@ cerebro_config_load_config_module(struct cerebro_config *conf)
       if (!cerebro_module_is_setup())
 	{
 	  if (cerebro_module_setup() < 0)
-	    {
-	      cerebro_err_debug_lib("%s(%s:%d): cerebro_module_setup",
-				    __FILE__, __FUNCTION__, __LINE__);
-	      goto cleanup;
-	    }
+	    goto cleanup;
 	  module_setup_called++;
 	}
       
       if (cerebro_module_load_config_module() < 0)
-	{
-	  cerebro_err_debug_lib("%s(%s:%d): cerebro_load_config_module",
-				__FILE__, __FUNCTION__, __LINE__);
-	  goto cleanup;
-	}
+	goto cleanup;
 
       if (cerebro_config_module_setup() < 0)
-	{
-	  cerebro_err_debug_lib("%s(%s:%d): cerebro_config_setup",
-				__FILE__, __FUNCTION__, __LINE__);
-	  goto cleanup;
-	}
+	goto cleanup;
 
       load_config_module_called++;
     }
@@ -67,11 +55,7 @@ cerebro_config_load_config_module(struct cerebro_config *conf)
   cerebro_err_debug_lib("**************************************");
 
   if (cerebro_config_module_load_default(conf) < 0)
-    {
-      cerebro_err_debug_lib("%s(%s:%d): cerebro_config_load_default",
-			    __FILE__, __FUNCTION__, __LINE__);
-      goto cleanup;
-    }
+    goto cleanup;
 
   rv = 0;
 

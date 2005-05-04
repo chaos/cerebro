@@ -4,7 +4,8 @@
 	libcerebro call.  Rework libcerebro and cerebrod around this new
 	API.
 
-	* Various library cleanup.
+	* Various library cleanup.  Function renaming, err_debug_lib,
+	error debug output cleanup and additions.
 	
 2005-05-02  Albert Chu  <chu11@llnl.gov>
 

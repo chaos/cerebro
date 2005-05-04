@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_api.c,v 1.11 2005-05-04 00:02:46 achu Exp $
+ *  $Id: cerebro_api.c,v 1.12 2005-05-04 00:20:55 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -40,9 +40,10 @@ char *cerebro_error_messages[] =
     "buffer overflow",
     "node not found",
     "out of memory",
-    "config error",
-    "clusterlist module error",
+    "config file error",
     "config module error",
+    "config input error",
+    "clusterlist module error",
     "internal error",
     "errnum out of range",
   };
