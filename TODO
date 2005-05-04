@@ -28,10 +28,6 @@
 
 - reorg cerebro err codes
 
-- debug messages in cerebro/updown library
-
-- audit, more explicive error codes in libcerebro
-
 - consistency between ret vs. rv
   - err_out vs. cleanup
   - buf vs. buffer
@@ -42,24 +38,11 @@
   - naming convention, begin with _cerebro or not
   - buflen checks -1 vs. +1 checks
 
-- allow modules to return error codes??
-
-- libcerebro_common
-  - for marshalling for example
-  - perhaps future module search functions
-
-- underscore local lib routines that shouldn't be seen by the user?
-
 - set configfile, module, etc. functions
   - reload config, module, etc. functions
 
-- no cerebro_module debugging?? b/c could output on ok errors?
-  - a cerebro_lib_err_debug??
-
 - pthreads locking for clusterlists/config modules?
   - probably not b/c both are read only
-
-- all debug/err_exit funcs, calling errormsg(), strerror(), etc. correctly?
 
 - .h file order consistency
 

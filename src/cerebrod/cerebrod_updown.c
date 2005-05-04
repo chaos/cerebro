@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.c,v 1.43 2005-05-04 00:45:24 achu Exp $
+ *  $Id: cerebrod_updown.c,v 1.44 2005-05-04 01:00:55 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -309,8 +309,11 @@ _cerebrod_updown_response_marshall(struct cerebro_updown_response *res,
                                      sizeof(res->nodename),
                                      buffer + c,
                                      bufferlen - c)) < 0)
-    cerebro_err_exit("%s(%s:%d): cerebro_marshall_buffer",
-                     __FILE__, __FUNCTION__, __LINE__);
+    {
+      cerebro_err_debug("%s(%s:%d): cerebro_marshall_buffer",
+			__FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
   c += ret;
 
 
@@ -575,9 +578,8 @@ _cerebrod_updown_send_response(int client_fd,
 						    buffer, 
 						    CEREBRO_PACKET_BUFLEN)) < 0)
     {
-      cerebro_err_debug("%s(%s:%d): _cerebrod_updown_response_marshall: %s",
-                        __FILE__, __FUNCTION__, __LINE__,
-                        strerror(errno));
+      cerebro_err_debug("%s(%s:%d): _cerebrod_updown_response_marshall",
+                        __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
@@ -613,9 +615,8 @@ _cerebrod_updown_send_err_response(int client_fd,
                                                             buffer, 
                                                             CEREBRO_PACKET_BUFLEN)) < 0)
     {
-      cerebro_err_debug("%s(%s:%d): _cerebrod_updown_err_response_marshall: %s",
-                        __FILE__, __FUNCTION__, __LINE__,
-                        strerror(errno));
+      cerebro_err_debug("%s(%s:%d): _cerebrod_updown_err_response_marshall",
+                        __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
   
@@ -838,7 +839,7 @@ _cerebrod_updown_respond_with_updown_nodes(int client_fd,
 
   if (!(node_responses = list_create((ListDelF)_Free)))
     {
-      cerebro_err_debug("%s(%s:%d): list_create failed: %s", 
+      cerebro_err_debug("%s(%s:%d): list_create: %s", 
                         __FILE__, __FUNCTION__, __LINE__,
                         strerror(errno));
       Pthread_mutex_unlock(&updown_node_data_lock);

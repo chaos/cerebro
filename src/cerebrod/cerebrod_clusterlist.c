@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist.c,v 1.33 2005-05-03 22:46:34 achu Exp $
+ *  $Id: cerebrod_clusterlist.c,v 1.34 2005-05-04 01:00:55 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -31,8 +31,8 @@ int
 cerebrod_clusterlist_module_setup(void)
 {
   if (cerebro_module_load_clusterlist_module())
-    cerebro_err_exit("%s(%s:%d): cerebro_module_load_clusterlist_module: %s",
-		     __FILE__, __FUNCTION__, __LINE__, strerror(errno));
+    cerebro_err_exit("%s(%s:%d): cerebro_module_load_clusterlist_module",
+		     __FILE__, __FUNCTION__, __LINE__);
 
   if (cerebro_clusterlist_module_setup() < 0)
     cerebro_err_exit("%s(%s:%d): cerebro_clusterlist_module_setup",
