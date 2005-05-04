@@ -38,5 +38,8 @@ GPL
 - place on all c files
 - note on manpage ORIGINS
 
+Before public release
+- untabify
+
 Misc
 - remove hash/list buffering in list.c hash.c?
