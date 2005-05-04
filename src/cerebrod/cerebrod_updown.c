@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.c,v 1.48 2005-05-04 18:23:37 achu Exp $
+ *  $Id: cerebrod_updown.c,v 1.49 2005-05-04 20:08:05 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -271,7 +271,7 @@ _cerebrod_updown_response_marshall(struct cerebro_updown_response *res,
 				   char *buf, 
                                    unsigned int buflen)
 {
-  int rv, c = 0;
+  int len, count = 0;
  
   assert(res);
   assert(buf);
@@ -279,59 +279,59 @@ _cerebrod_updown_response_marshall(struct cerebro_updown_response *res,
 
   memset(buf, '\0', buflen);
 
-  if ((rv = cerebro_marshall_int32(res->version, 
-				   buf + c, 
-				   buflen - c)) < 0)
+  if ((len = cerebro_marshall_int32(res->version, 
+				    buf + count, 
+				    buflen - count)) < 0)
     {
       cerebro_err_debug("%s(%s:%d): cerebro_marshall_int32",
                         __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
-  c += rv;
+  count += len;
  
-  if ((rv = cerebro_marshall_uint32(res->updown_err_code, 
-				    buf + c, 
-				    buflen - c)) < 0)
+  if ((len = cerebro_marshall_uint32(res->updown_err_code, 
+				     buf + count, 
+				     buflen - count)) < 0)
     {
       cerebro_err_debug("%s(%s:%d): cerebro_marshall_uint32",
                         __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
-  c += rv;
+  count += len;
 
-  if ((rv = cerebro_marshall_uint8(res->end_of_responses, 
-				   buf + c, 
-				   buflen - c)) < 0)
+  if ((len = cerebro_marshall_uint8(res->end_of_responses, 
+				    buf + count, 
+				    buflen - count)) < 0)
     {
       cerebro_err_debug("%s(%s:%d): cerebro_marshall_uint8",
                         __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
-  c += rv;
+  count += len;
 
-  if ((rv = cerebro_marshall_buffer(res->nodename,
-				    sizeof(res->nodename),
-				    buf + c,
-				    buflen - c)) < 0)
+  if ((len = cerebro_marshall_buffer(res->nodename,
+				     sizeof(res->nodename),
+				     buf + count,
+				     buflen - count)) < 0)
     {
       cerebro_err_debug("%s(%s:%d): cerebro_marshall_buffer",
 			__FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
-  c += rv;
+  count += len;
 
 
-  if ((rv = cerebro_marshall_uint8(res->updown_state, 
-				   buf + c, 
-				   buflen - c)) < 0)
+  if ((len = cerebro_marshall_uint8(res->updown_state, 
+				    buf + count, 
+				    buflen - count)) < 0)
     {
       cerebro_err_debug("%s(%s:%d): cerebro_marshall_uint8",
                         __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
-  c += rv;
+  count += len;
 
-  return c;
+  return count;
 }
 
 /*
@@ -346,7 +346,7 @@ _cerebrod_updown_err_response_marshall(struct cerebro_updown_err_response *err_r
                                        char *buf, 
                                        unsigned int buflen)
 {
-  int rv, c = 0;
+  int len, count = 0;
  
   assert(err_res);
   assert(buf);
@@ -354,27 +354,27 @@ _cerebrod_updown_err_response_marshall(struct cerebro_updown_err_response *err_r
 
   memset(buf, '\0', buflen);
 
-  if ((rv = cerebro_marshall_int32(err_res->version, 
-				   buf + c, 
-				   buflen - c)) < 0)
+  if ((len = cerebro_marshall_int32(err_res->version, 
+				    buf + count, 
+				    buflen - count)) < 0)
     {
       cerebro_err_debug("%s(%s:%d): cerebro_marshall_int32",
                         __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
-  c += rv;
+  count += len;
  
-  if ((rv = cerebro_marshall_uint32(err_res->updown_err_code, 
-				    buf + c, 
-				    buflen - c)) < 0)
+  if ((len = cerebro_marshall_uint32(err_res->updown_err_code, 
+				     buf + count, 
+				     buflen - count)) < 0)
     {
       cerebro_err_debug("%s(%s:%d): cerebro_marshall_uint32",
                         __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
-  c += rv;
+  count += len;
 
-  return c;
+  return count;
 }
 
 /*
@@ -389,54 +389,54 @@ _cerebrod_updown_request_unmarshall(struct cerebro_updown_request *req,
 				    const char *buf, 
                                     unsigned int buflen)
 {
-  int rv, c = 0;
+  int len, count = 0;
 
   assert(req);
   assert(buf);
  
-  if ((rv = cerebro_unmarshall_int32(&(req->version), 
-				     buf + c, 
-				     buflen - c)) < 0)
+  if ((len = cerebro_unmarshall_int32(&(req->version), 
+				      buf + count, 
+				      buflen - count)) < 0)
     {
       cerebro_err_debug("%s(%s:%d): cerebro_unmarshall_int32",
                         __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
-  if (!rv)
-    return c;
+  if (!len)
+    return count;
 
-  c += rv;
+  count += len;
 
-  if ((rv = cerebro_unmarshall_uint32(&(req->updown_request), 
-				      buf + c, 
-				      buflen - c)) < 0)
+  if ((len = cerebro_unmarshall_uint32(&(req->updown_request), 
+				       buf + count, 
+				       buflen - count)) < 0)
     {
       cerebro_err_debug("%s(%s:%d): cerebro_unmarshall_uint32",
                         __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
-  if (!rv)
-    return c;
+  if (!len)
+    return count;
 
-  c += rv;
+  count += len;
  
-  if ((rv = cerebro_unmarshall_uint32(&(req->timeout_len), 
-				      buf + c, 
-				      buflen - c)) < 0)
+  if ((len = cerebro_unmarshall_uint32(&(req->timeout_len), 
+				       buf + count, 
+				       buflen - count)) < 0)
     {
       cerebro_err_debug("%s(%s:%d): cerebro_unmarshall_uint32",
                         __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
-  if (!rv)
-    return c;
+  if (!len)
+    return count;
 
-  c += rv;
+  count += len;
    
-  return c;
+  return count;
 }
 
 /*
@@ -464,13 +464,15 @@ _cerebrod_updown_receive_request(int client_fd,
     {
       fd_set rfds;
       struct timeval tv;
+      int num;
+
       tv.tv_sec = CEREBRO_UPDOWN_PROTOCOL_SERVER_TIMEOUT_LEN;
       tv.tv_usec = 0;
       
       FD_ZERO(&rfds);
       FD_SET(client_fd, &rfds);
   
-      if ((rv = select(client_fd + 1, &rfds, NULL, NULL, &tv)) < 0)
+      if ((num = select(client_fd + 1, &rfds, NULL, NULL, &tv)) < 0)
 	{
 	  cerebro_err_debug("%s(%s:%d): select: %s", 
                             __FILE__, __FUNCTION__, __LINE__,
@@ -478,7 +480,7 @@ _cerebrod_updown_receive_request(int client_fd,
 	  goto cleanup;
 	}
 
-      if (!rv)
+      if (!num)
 	{
 	  /* Timed out.  If atleast some bytes were read, unmarshall
 	   * the received bytes.  Its possible we are expecting more
@@ -521,7 +523,7 @@ _cerebrod_updown_receive_request(int client_fd,
 	}
       else
 	{
-	  cerebro_err_debug("%s(%s:%d): rv != 0 but fd not set",
+	  cerebro_err_debug("%s(%s:%d): num != 0 but fd not set",
                             __FILE__, __FUNCTION__, __LINE__);
 	  goto cleanup;
 	}
@@ -1154,7 +1156,7 @@ _cerebrod_updown_dump_updown_node_data_list(void)
 #ifndef NDEBUG
   if (conf.debug && conf.updown_server_debug)
     {
-      int rv;
+      int num;
  
       Pthread_mutex_lock(&updown_node_data_lock);
       Pthread_mutex_lock(&debug_output_mutex);
@@ -1165,14 +1167,14 @@ _cerebrod_updown_dump_updown_node_data_list(void)
       fprintf(stderr, "* -----------------------\n");
       if (updown_node_data_index_numnodes > 0)
         {
-          rv = List_for_each(updown_node_data,
-                             _cerebrod_updown_dump_updown_node_data_item,
-                             NULL);
-          if (rv != updown_node_data_index_numnodes)
+          num = List_for_each(updown_node_data,
+			      _cerebrod_updown_dump_updown_node_data_item,
+			      NULL);
+          if (num != updown_node_data_index_numnodes)
 	    {
 	      fprintf(stderr, "_cerebrod_updown_dump_updown_node_data: "
-		      "invalid dump count: rv=%d numnodes=%d",
-		      rv, updown_node_data_index_numnodes);
+		      "invalid dump count: num=%d numnodes=%d",
+		      num, updown_node_data_index_numnodes);
 	      exit(1);
 	    }
         }

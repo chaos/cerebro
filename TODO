@@ -12,10 +12,6 @@ Testing
 
 Cleanup
 - reorg cerebro err codes
-- buf vs. buffer
-- rv
-  - retval for an actual return value
-  - ptr, temp, etc. for something temporarily read
 - constants - good names
 - naming convention, begin with _cerebro or not
 - 80 columns

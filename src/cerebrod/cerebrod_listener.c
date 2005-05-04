@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.54 2005-05-04 18:23:37 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.55 2005-05-04 20:08:05 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -197,55 +197,55 @@ _cerebrod_listener_heartbeat_unmarshall(struct cerebrod_heartbeat *hb,
                                         const char *buf,
                                         unsigned int buflen)
 {
-  int rv, c = 0;
+  int len, count = 0;
 
   assert(hb);
   assert(buf);
   
   memset(hb, '\0', sizeof(struct cerebrod_heartbeat));
   
-  if ((rv = cerebro_unmarshall_int32(&(hb->version),
-				     buf + c,
-				     buflen - c)) < 0)
+  if ((len = cerebro_unmarshall_int32(&(hb->version),
+				     buf + count,
+				     buflen - count)) < 0)
     cerebro_err_exit("%s(%s:%d): cerebro_unmarshall_int32",
 		     __FILE__, __FUNCTION__, __LINE__);
-  if (!rv)
-    return c;
+  if (!len)
+    return count;
   
-  c += rv;
+  count += len;
 
-  if ((rv = cerebro_unmarshall_buffer(hb->nodename,
+  if ((len = cerebro_unmarshall_buffer(hb->nodename,
 				      sizeof(hb->nodename),
-				      buf + c,
-				      buflen - c)) < 0)
+				      buf + count,
+				      buflen - count)) < 0)
     cerebro_err_exit("%s(%s:%d): cerebro_unmarshall_buffer",
                      __FILE__, __FUNCTION__, __LINE__);
-  if (!rv)
-    return c;
+  if (!len)
+    return count;
   
-  c += rv;
+  count += len;
   
-  if ((rv = cerebro_unmarshall_uint32(&(hb->starttime),
-				      buf + c,
-				      buflen - c)) < 0)
+  if ((len = cerebro_unmarshall_uint32(&(hb->starttime),
+				      buf + count,
+				      buflen - count)) < 0)
     cerebro_err_exit("%s(%s:%d): cerebro_unmarshall_uint32",
                      __FILE__, __FUNCTION__, __LINE__);
-  if (!rv)
-    return c;
+  if (!len)
+    return count;
 
-  c += rv;
+  count += len;
 
-  if ((rv = cerebro_unmarshall_uint32(&(hb->boottime),
-				      buf + c,
-				      buflen - c)) < 0)
+  if ((len = cerebro_unmarshall_uint32(&(hb->boottime),
+				      buf + count,
+				      buflen - count)) < 0)
     cerebro_err_exit("%s(%s:%d): cerebro_unmarshall_uint32",
                      __FILE__, __FUNCTION__, __LINE__);
-  if (!rv)
-    return c;
+  if (!len)
+    return count;
 
-  c += rv;
+  count += len;
 
-  return c;
+  return count;
 }
 
 
@@ -319,7 +319,7 @@ _cerebrod_listener_dump_cluster_node_data_hash(void)
 #ifndef NDEBUG
   if (conf.debug && conf.listen_debug)
     {
-      int rv;
+      int num;
 
       Pthread_mutex_lock(&cluster_data_hash_lock);
       Pthread_mutex_lock(&debug_output_mutex);
@@ -330,14 +330,14 @@ _cerebrod_listener_dump_cluster_node_data_hash(void)
       fprintf(stderr, "* -----------------------\n");
       if (cluster_data_hash_numnodes > 0)
         {          
-          rv = Hash_for_each(cluster_data_hash, 
-                             _cerebrod_listener_dump_cluster_node_data_item,
-                             NULL);
-          if (rv != cluster_data_hash_numnodes)
+          num = Hash_for_each(cluster_data_hash, 
+			      _cerebrod_listener_dump_cluster_node_data_item,
+			      NULL);
+          if (num != cluster_data_hash_numnodes)
 	    {
 	      fprintf(stderr, "_cerebrod_listener_dump_cluster_node_data_hash: "
-		      "invalid dump count: rv=%d numnodes=%d",
-		      rv, cluster_data_hash_numnodes);
+		      "invalid dump count: num=%d numnodes=%d",
+		      num, cluster_data_hash_numnodes);
 	      exit(1);
 	    }
         }
@@ -362,18 +362,18 @@ cerebrod_listener(void *arg)
     {
       struct cerebrod_heartbeat hb;
       struct cerebrod_node_data *nd;
-      char hbbuf[CEREBRO_PACKET_BUFLEN];
+      char buf[CEREBRO_PACKET_BUFLEN];
       char nodename_buf[CEREBRO_MAXNODENAMELEN+1];
       char nodename_key[CEREBRO_MAXNODENAMELEN+1];
-      int rv, hblen, cluster_data_updated_flag = 0;
-
+      int recv_len, heartbeat_len, flag, cluster_data_updated_flag = 0;
+      
       Pthread_mutex_lock(&listener_fd_lock);
-      if ((rv = recvfrom(listener_fd, 
-                         hbbuf, 
-                         CEREBRO_PACKET_BUFLEN, 
-                         0, 
-                         NULL, 
-                         NULL)) < 0)
+      if ((recv_len = recvfrom(listener_fd, 
+			       buf, 
+			       CEREBRO_PACKET_BUFLEN, 
+			       0, 
+			       NULL, 
+			       NULL)) < 0)
 	{
           /* For errnos EINVAL, EBADF, ENODEV, assume the device has
            * been temporarily brought down then back up.  For example,
@@ -417,22 +417,22 @@ cerebrod_listener(void *arg)
       Pthread_mutex_unlock(&listener_fd_lock);
 
       /* No packet read */
-      if (rv <= 0)
+      if (recv_len <= 0)
 	continue;
 
-      if ((hblen = _cerebrod_listener_heartbeat_unmarshall(&hb, 
-                                                           hbbuf, 
-                                                           rv)) < 0)
+      if ((heartbeat_len = _cerebrod_listener_heartbeat_unmarshall(&hb, 
+								   buf, 
+								   recv_len)) < 0)
 	continue;
 
       _cerebrod_listener_dump_heartbeat(&hb);
 
-      if (hblen != CEREBROD_HEARTBEAT_LEN)
+      if (heartbeat_len != CEREBROD_HEARTBEAT_LEN)
         {
           cerebro_err_debug("%s(%s:%d): received buf length "
-                            "unexpected size: expect %d, hblen %d",
+                            "unexpected size: expect %d, heartbeat_len %d",
                             __FILE__, __FUNCTION__, __LINE__,
-                            CEREBROD_HEARTBEAT_LEN, hblen);
+                            CEREBROD_HEARTBEAT_LEN, heartbeat_len);
           continue;
         }
 
@@ -445,11 +445,11 @@ cerebrod_listener(void *arg)
 	  continue;
 	}
       
-      if ((rv = cerebro_clusterlist_module_node_in_cluster(hb.nodename)) < 0)
+      if ((flag = cerebro_clusterlist_module_node_in_cluster(hb.nodename)) < 0)
 	cerebro_err_exit("%s(%s:%d): cerebro_clusterlist_module_node_in_cluster: %s",
 			 __FILE__, __FUNCTION__, __LINE__, hb.nodename);
       
-      if (!rv)
+      if (!flag)
 	{
 	  cerebro_err_debug("%s(%s:%d): received non-cluster packet from: %s",
 			    __FILE__, __FUNCTION__, __LINE__,

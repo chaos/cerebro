@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_genders.c,v 1.14 2005-05-04 18:23:37 achu Exp $
+ *  $Id: cerebro_clusterlist_genders.c,v 1.15 2005-05-04 20:08:06 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -136,7 +136,7 @@ genders_clusterlist_node_in_cluster(const char *node)
 {
   char nodebuf[CEREBRO_MAXNODENAMELEN+1];
   char *nodePtr = NULL;
-  int rv;
+  int flag;
 
   if (!genders_handle)
     {
@@ -170,16 +170,16 @@ genders_clusterlist_node_in_cluster(const char *node)
   else
     nodePtr = (char *)node;
 
-  if ((rv = genders_isnode(genders_handle, nodePtr)) < 0)
+  if ((flag = genders_isnode(genders_handle, nodePtr)) < 0)
     {
       cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: genders_isnode: %s",
-			__FILE__, __FUNCTION__, __LINE__,
-			GENDERS_CLUSTERLIST_MODULE_NAME, 
-			genders_errormsg(genders_handle));
+			       __FILE__, __FUNCTION__, __LINE__,
+			       GENDERS_CLUSTERLIST_MODULE_NAME, 
+			       genders_errormsg(genders_handle));
       return -1;
     }
 
-  return rv;
+  return flag;
 }
 
 /*

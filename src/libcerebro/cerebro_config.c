@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config.c,v 1.10 2005-05-04 18:23:37 achu Exp $
+ *  $Id: cerebro_config.c,v 1.11 2005-05-04 20:08:06 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -57,7 +57,6 @@ cerebro_config_load_config_module(struct cerebro_config *conf)
     goto cleanup;
 
   rv = 0;
-
  cleanup:
   if (load_config_module_called)
     {

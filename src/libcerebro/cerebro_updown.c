@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_updown.c,v 1.26 2005-05-04 18:23:37 achu Exp $
+ *  $Id: cerebro_updown.c,v 1.27 2005-05-04 20:08:06 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -180,7 +180,7 @@ _cerebro_updown_request_marshall(cerebro_t handle,
                                  char *buf,
                                  unsigned int buflen)
 {
-  int rv, c = 0;
+  int len, count = 0;
 
 #ifndef NDEBUG
   if (!buf)
@@ -203,34 +203,34 @@ _cerebro_updown_request_marshall(cerebro_t handle,
 
   memset(buf, '\0', buflen);
 
-  if ((rv = cerebro_marshall_int32(req->version,
-				   buf + c, 
-				   buflen - c)) < 0)
+  if ((len = cerebro_marshall_int32(req->version,
+				   buf + count, 
+				   buflen - count)) < 0)
     {
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
-  c += rv;
+  count += len;
 
-  if ((rv = cerebro_marshall_uint32(req->updown_request,
-				    buf + c, 
-				    buflen - c)) < 0)
+  if ((len = cerebro_marshall_uint32(req->updown_request,
+				    buf + count, 
+				    buflen - count)) < 0)
     {
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
-  c += rv;
+  count += len;
 
-  if ((rv = cerebro_marshall_uint32(req->timeout_len,
-				    buf + c, 
-				    buflen - c)) < 0)
+  if ((len = cerebro_marshall_uint32(req->timeout_len,
+				    buf + count, 
+				    buflen - count)) < 0)
     {
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
-  c += rv;
+  count += len;
 
-  return c;
+  return count;
 }
 
 /* 
@@ -246,7 +246,7 @@ _cerebro_updown_response_unmarshall(cerebro_t handle,
                                     const char *buf,
                                     unsigned int buflen)
 {
-  int rv, c = 0;
+  int len, count = 0;
 
 #ifndef NDEBUG
   if (!buf)
@@ -258,68 +258,68 @@ _cerebro_updown_response_unmarshall(cerebro_t handle,
     }
 #endif /* NDEBUG */
 
-  if ((rv = cerebro_unmarshall_int32(&(res->version),
-				     buf + c,
-				     buflen - c)) < 0)
+  if ((len = cerebro_unmarshall_int32(&(res->version),
+				      buf + count,
+				      buflen - count)) < 0)
     {
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
-  if (!rv)
-    return c;
+  if (!len)
+    return count;
 
-  c += rv;
+  count += len;
 
-  if ((rv = cerebro_unmarshall_uint32(&(res->updown_err_code),
-				      buf + c,
-				      buflen - c)) < 0)
+  if ((len = cerebro_unmarshall_uint32(&(res->updown_err_code),
+				       buf + count,
+				       buflen - count)) < 0)
     {
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
-  if (!rv)
-    return c;
+  if (!len)
+    return count;
 
-  c += rv;
+  count += len;
 
-  if ((rv = cerebro_unmarshall_uint8(&(res->end_of_responses),
-				     buf + c,
-				     buflen - c)) < 0)
+  if ((len = cerebro_unmarshall_uint8(&(res->end_of_responses),
+				      buf + count,
+				      buflen - count)) < 0)
     {
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
-  if (!rv)
-    return c;
+  if (!len)
+    return count;
 
-  c += rv;
+  count += len;
 
-  if ((rv = cerebro_unmarshall_buffer(res->nodename,
-				      sizeof(res->nodename),
-				      buf + c,
-				      buflen - c)) < 0)
+  if ((len = cerebro_unmarshall_buffer(res->nodename,
+				       sizeof(res->nodename),
+				       buf + count,
+				       buflen - count)) < 0)
     {
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
-  if (!rv)
-    return c;
+  if (!len)
+    return count;
 
-  c += rv;
+  count += len;
 
-  if ((rv = cerebro_unmarshall_uint8(&(res->updown_state),
-				     buf + c,
-				     buflen - c)) < 0)
+  if ((len = cerebro_unmarshall_uint8(&(res->updown_state),
+				      buf + count,
+				      buflen - count)) < 0)
     {
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
-  if (!rv)
-    return c;
+  if (!len)
+    return count;
 
-  c += rv;
+  count += len;
 
-  return c;
+  return count;
 }
 
 /* 
@@ -381,13 +381,15 @@ _cerebro_updown_receive_a_response(cerebro_t handle,
     {
       fd_set rfds;
       struct timeval tv;
+      int num;
+
       tv.tv_sec = CEREBRO_UPDOWN_PROTOCOL_CLIENT_TIMEOUT_LEN;
       tv.tv_usec = 0;
 
       FD_ZERO(&rfds);
       FD_SET(fd, &rfds);
 
-      if ((rv = select(fd + 1, &rfds, NULL, NULL, &tv)) < 0)
+      if ((num = select(fd + 1, &rfds, NULL, NULL, &tv)) < 0)
         {
 	  cerebro_err_debug_lib("%s(%s:%d): select: %s",
 				__FILE__, __FUNCTION__, __LINE__,
@@ -396,7 +398,7 @@ _cerebro_updown_receive_a_response(cerebro_t handle,
           goto cleanup;
         }
       
-      if (!rv)
+      if (!num)
         {
           /* Timed out.  If atleast some bytes were read, unmarshall
            * the received bytes.  Its possible we are expecting more

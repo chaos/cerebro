@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_hostsfile.c,v 1.14 2005-05-04 17:43:26 achu Exp $
+ *  $Id: cerebro_clusterlist_hostsfile.c,v 1.15 2005-05-04 20:08:06 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -51,7 +51,7 @@ static List hosts = NULL;
 static int
 _readline(int fd, char *buf, int buflen)
 {
-  int rv;
+  int len;
 
   if (!buf)
     {
@@ -61,7 +61,7 @@ _readline(int fd, char *buf, int buflen)
       return -1;
     }
 
-  if ((rv = fd_read_line(fd, buf, buflen)) < 0)
+  if ((len = fd_read_line(fd, buf, buflen)) < 0)
     {
       cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: fd_read_line: %s", 
 			       __FILE__, __FUNCTION__, __LINE__,
@@ -70,7 +70,7 @@ _readline(int fd, char *buf, int buflen)
     }
   
   /* buflen - 1 b/c fd_read_line guarantees null termination */
-  if (rv >= (buflen-1))
+  if (len >= (buflen-1))
     {
       cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: "
 			       "fd_read_line: line truncation",
@@ -79,7 +79,7 @@ _readline(int fd, char *buf, int buflen)
       return -1;
     }
 
-  return rv;
+  return len;
 }
 
 /* 
@@ -95,7 +95,7 @@ _readline(int fd, char *buf, int buflen)
 static int
 _remove_comments(char *buf, int buflen)
 {
-  int i, comment_flag, rvlen;
+  int i, comment_flag, lenleft;
 
   if (!buf)
     {
@@ -110,25 +110,25 @@ _remove_comments(char *buf, int buflen)
 
   i = 0;
   comment_flag = 0;
-  rvlen = buflen;
+  lenleft = buflen;
   while (i < buflen)
     {
       if (comment_flag)
         {
           buf[i] = '\0';
-          rvlen--;
+          lenleft--;
         }
 
       if (buf[i] == '#')
         {
           buf[i] = '\0';
           comment_flag++;
-          rvlen--;
+          lenleft--;
         }
       i++;
     }
 
-  return rvlen;
+  return lenleft;
 }
 
 /* 

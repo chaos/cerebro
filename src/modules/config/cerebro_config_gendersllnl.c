@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_gendersllnl.c,v 1.11 2005-05-04 18:23:37 achu Exp $
+ *  $Id: cerebro_config_gendersllnl.c,v 1.12 2005-05-04 20:08:06 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -135,7 +135,7 @@ int
 gendersllnl_config_load_default(struct cerebro_config *conf)
 {
   char altnamebuf[CEREBRO_MAXNODENAMELEN+1];
-  int is_mgmt, rv;
+  int flag;
 
   if (!gendersllnl_handle)
     {
@@ -155,7 +155,7 @@ gendersllnl_config_load_default(struct cerebro_config *conf)
       return -1;
     }
 
-  if ((is_mgmt = genders_testattr(gendersllnl_handle, NULL, "mgmt", NULL, 0)) < 0)
+  if ((flag = genders_testattr(gendersllnl_handle, NULL, "mgmt", NULL, 0)) < 0)
     {
       cerebro_err_debug_module("%s(%s:%d): genders_testattr: %s", 
 			       __FILE__, __FUNCTION__, __LINE__,
@@ -163,7 +163,7 @@ gendersllnl_config_load_default(struct cerebro_config *conf)
       return -1;
     }
   
-  if (is_mgmt)
+  if (flag)
     {
       conf->cerebrod_speak = 1;
       conf->cerebrod_speak_flag++;
@@ -227,11 +227,11 @@ gendersllnl_config_load_default(struct cerebro_config *conf)
     }
 
   memset(altnamebuf, '\0', CEREBRO_MAXNODENAMELEN+1);
-  if ((rv = genders_testattr(gendersllnl_handle, 
-			     NULL, 
-			     GENDERS_ALTNAME_ATTRIBUTE,
-			     altnamebuf,
-			     CEREBRO_MAXNODENAMELEN)) < 0)
+  if ((flag = genders_testattr(gendersllnl_handle, 
+			       NULL, 
+			       GENDERS_ALTNAME_ATTRIBUTE,
+			       altnamebuf,
+			       CEREBRO_MAXNODENAMELEN)) < 0)
     {
       cerebro_err_debug_module("%s(%s:%d): genders_testattr: %s",
 			       __FILE__, __FUNCTION__, __LINE__,
@@ -239,7 +239,7 @@ gendersllnl_config_load_default(struct cerebro_config *conf)
       return -1;
     }
 
-  if (rv)
+  if (flag)
     {
       char heartbeat_network_interface[INET_ADDRSTRLEN+1];
       struct hostent *h = NULL;

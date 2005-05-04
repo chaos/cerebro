@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.27 2005-05-04 18:23:37 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.28 2005-05-04 20:08:05 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -188,43 +188,43 @@ _cerebrod_speaker_heartbeat_marshall(struct cerebrod_heartbeat *hb,
                                      char *buf,
                                      unsigned int buflen)
 {
-  int rv, c = 0;
+  int len, count = 0;
 
   assert(hb);
   assert(buf);
   assert(buflen >= CEREBROD_HEARTBEAT_LEN);
   
   memset(buf, '\0', buflen);
-  if ((rv = cerebro_marshall_int32(hb->version,
-				   buf + c,
-				   buflen - c)) < 0)
+  if ((len = cerebro_marshall_int32(hb->version,
+				    buf + count,
+				    buflen - count)) < 0)
     cerebro_err_exit("%s(%s:%d): cerebro_marshall_int32",
                      __FILE__, __FUNCTION__, __LINE__);
-  c += rv;
+  count += len;
   
-  if ((rv = cerebro_marshall_buffer(hb->nodename,
-				    sizeof(hb->nodename),
-				    buf + c,
-				    buflen - c)) < 0)
+  if ((len = cerebro_marshall_buffer(hb->nodename,
+				     sizeof(hb->nodename),
+				     buf + count,
+				     buflen - count)) < 0)
     cerebro_err_exit("%s(%s:%d): cerebro_marshall_buffer",
                      __FILE__, __FUNCTION__, __LINE__);
-  c += rv;
+  count += len;
   
-  if ((rv = cerebro_marshall_uint32(hb->starttime,
-				    buf + c,
-				    buflen - c)) < 0)
+  if ((len = cerebro_marshall_uint32(hb->starttime,
+				     buf + count,
+				     buflen - count)) < 0)
     cerebro_err_exit("%s(%s:%d): cerebro_marshall_uint32",
                      __FILE__, __FUNCTION__, __LINE__);
-  c += rv;
+  count += len;
   
-  if ((rv = cerebro_marshall_uint32(hb->boottime,
-				    buf + c,
-				    buflen - c)) < 0)
+  if ((len = cerebro_marshall_uint32(hb->boottime,
+				     buf + count,
+				     buflen - count)) < 0)
     cerebro_err_exit("%s(%s:%d): cerebro_marshall_uint32",
                      __FILE__, __FUNCTION__, __LINE__);
-  c += rv;
+  count += len;
   
-  return c;
+  return count;
 }
 
 /* 
@@ -273,9 +273,9 @@ cerebrod_speaker(void *arg)
     {
       struct sockaddr_in heartbeat_destination_addr;
       struct cerebrod_heartbeat hb;
-      char hbbuf[CEREBRO_PACKET_BUFLEN];
-      int rv, hblen, sleep_time;
-
+      char buf[CEREBRO_PACKET_BUFLEN];
+      int send_len, heartbeat_len, sleep_time;
+      
       /* Algorithm from srand(3) manpage */
       if (conf.heartbeat_frequency_ranged)
 	sleep_time = conf.heartbeat_frequency_min + ((((double)(conf.heartbeat_frequency_max - conf.heartbeat_frequency_min))*rand())/(RAND_MAX+1.0));
@@ -284,9 +284,9 @@ cerebrod_speaker(void *arg)
 
       _cerebrod_spaker_heartbeat_init(&hb);
   
-      hblen = _cerebrod_speaker_heartbeat_marshall(&hb, 
-                                                   hbbuf, 
-                                                   CEREBRO_PACKET_BUFLEN);
+      heartbeat_len = _cerebrod_speaker_heartbeat_marshall(&hb, 
+							   buf, 
+							   CEREBRO_PACKET_BUFLEN);
 
       _cerebrod_speaker_dump_heartbeat(&hb);
       
@@ -297,14 +297,14 @@ cerebrod_speaker(void *arg)
              &conf.heartbeat_destination_ip_in_addr,
              sizeof(struct in_addr));
 
-      if ((rv = sendto(fd, 
-                       hbbuf, 
-                       hblen, 
-                       0, 
-                       (struct sockaddr *)&heartbeat_destination_addr,
-                       sizeof(struct sockaddr_in))) != hblen)
+      if ((send_len = sendto(fd, 
+			     buf, 
+			     heartbeat_len, 
+			     0, 
+			     (struct sockaddr *)&heartbeat_destination_addr,
+			     sizeof(struct sockaddr_in))) != heartbeat_len)
         {
-          if (rv < 0)
+          if (send_len < 0)
             {
               /* For errnos EINVAL, EBADF, ENODEV, assume the device has
                * been temporarily brought down then back up.  For example,
@@ -343,7 +343,7 @@ cerebrod_speaker(void *arg)
             }
           else
             cerebro_err_debug("%s(%s:%d): sendto: invalid bytes sent: %d", 
-                              __FILE__, __FUNCTION__, __LINE__, rv);
+                              __FILE__, __FUNCTION__, __LINE__, send_len);
         }
       sleep(sleep_time);
     }

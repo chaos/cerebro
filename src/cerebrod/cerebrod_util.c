@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_util.c,v 1.12 2005-05-04 18:23:37 achu Exp $
+ *  $Id: cerebrod_util.c,v 1.13 2005-05-04 20:08:05 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -60,7 +60,7 @@ cerebrod_rehash(hash_t *old_hash,
 		pthread_mutex_t *hash_mutex)
 {
   hash_t new_hash;
-  int rv;
+  int rv, num;
 
   assert(old_hash);
   assert(hash_size);
@@ -86,17 +86,17 @@ cerebrod_rehash(hash_t *old_hash,
 			 (hash_cmp_f)strcmp,
 			 (hash_del_f)_Free);
   
-  rv = Hash_for_each(*old_hash, _hash_reinsert, &new_hash);
-  if (rv != hash_num)
-    cerebro_err_exit("%s(%s:%d): invalid reinsert count: rv=%d num=%d",
+  num = Hash_for_each(*old_hash, _hash_reinsert, &new_hash);
+  if (num != hash_num)
+    cerebro_err_exit("%s(%s:%d): invalid reinsert count: num=%d hash_num=%d",
                      __FILE__, __FUNCTION__, __LINE__,
-                     rv, hash_num);
+                     num, hash_num);
 
-  rv = Hash_delete_if(*old_hash, _hash_removeall, NULL);
-  if (rv != hash_num)
-    cerebro_err_exit("%s(%s:%d): invalid removeall count: rv=%d num=%d",
+  num = Hash_delete_if(*old_hash, _hash_removeall, NULL);
+  if (num != hash_num)
+    cerebro_err_exit("%s(%s:%d): invalid removeall count: num=%d hash_num=%d",
                      __FILE__, __FUNCTION__, __LINE__,
-                     rv, hash_num);
+                     num, hash_num);
 
   Hash_destroy(*old_hash);
 
