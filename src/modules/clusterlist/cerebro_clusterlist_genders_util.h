@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_genders_util.h,v 1.3 2005-04-22 21:31:04 achu Exp $
+ *  $Id: cerebro_clusterlist_genders_util.h,v 1.4 2005-05-04 01:15:30 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_CLUSTERLIST_GENDERS_UTIL_H
@@ -11,7 +11,6 @@
  * common setup function for genders and gendersllnl setup
  */
 int cerebro_clusterlist_genders_setup(genders_t *handle, 
-                                      char *file, 
                                       char *clusterlist_module_name);
 
 /* 
@@ -20,7 +19,6 @@ int cerebro_clusterlist_genders_setup(genders_t *handle,
  * common cleanup function for genders and gendersllnl cleanup
  */
 int cerebro_clusterlist_genders_cleanup(genders_t *handle, 
-                                        char **file, 
                                         char *clusterlist_module_name);
 
 /* 

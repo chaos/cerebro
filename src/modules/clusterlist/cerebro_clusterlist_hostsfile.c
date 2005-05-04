@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_hostsfile.c,v 1.11 2005-05-04 00:41:24 achu Exp $
+ *  $Id: cerebro_clusterlist_hostsfile.c,v 1.12 2005-05-04 01:15:30 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -36,13 +36,6 @@
  * list of all hosts
  */
 static List hosts = NULL;
-
-/*  
- * hostsfile_file
- *
- * hostsfile database
- */
-static char *hostsfile_file = NULL;
 
 /* 
  * _readline
@@ -211,7 +204,7 @@ hostsfile_clusterlist_setup(void)
 {
   int len, fd = -1;
   char buf[HOSTSFILE_PARSE_BUFLEN];
-  char *file, *p;
+  char *p;
 
   if (hosts)
     {
@@ -229,15 +222,10 @@ hostsfile_clusterlist_setup(void)
       goto cleanup;
     }
 
-  if (hostsfile_file)
-    file = hostsfile_file;
-  else
-    file = CEREBRO_CLUSTERLIST_HOSTSFILE_DEFAULT;
-
-  if ((fd = open(file, O_RDONLY)) < 0)
+  if ((fd = open(CEREBRO_CLUSTERLIST_HOSTSFILE_DEFAULT, O_RDONLY)) < 0)
     {
       cerebro_err_debug_module("hostsfile clusterlist file '%s' cannot be opened: %s", 
-			       file, strerror(errno));
+			       CEREBRO_CLUSTERLIST_HOSTSFILE_DEFAULT, strerror(errno));
       goto cleanup;
     }
  
@@ -331,9 +319,7 @@ hostsfile_clusterlist_cleanup(void)
     }
 
   list_destroy(hosts);
-  free(hostsfile_file);
   hosts = NULL;
-  hostsfile_file = NULL;
 
   return 0;
 }

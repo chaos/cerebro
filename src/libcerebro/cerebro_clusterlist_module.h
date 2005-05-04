@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_module.h,v 1.8 2005-04-30 17:09:10 achu Exp $
+ *  $Id: cerebro_clusterlist_module.h,v 1.9 2005-05-04 01:15:30 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_CLUSTERLIST_MODULE_H
@@ -30,7 +30,7 @@ typedef int (*Cerebro_clusterlist_cleanup)(void);
  *
  * function prototype for clusterlist module function to get all
  * cluster nodes.  Caller is responsible for allocating a char * array
- * of appropriate length and freeing returned Strdup()'ed entries.
+ * of appropriate length and freeing returned strdup()'ed entries.
  * Required to be defined by each config module.
  *
  * - nodes - array of char * pointers

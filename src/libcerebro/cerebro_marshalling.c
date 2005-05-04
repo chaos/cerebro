@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_marshalling.c,v 1.5 2005-05-04 00:02:46 achu Exp $
+ *  $Id: cerebro_marshalling.c,v 1.6 2005-05-04 01:15:30 achu Exp $
 \*****************************************************************************/
  
 #if HAVE_CONFIG_H
@@ -14,6 +14,8 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <errno.h>
+
+#include "cerebro_error.h"
 
 int
 cerebro_marshall_int8(int8_t val, char *buffer, int bufferlen)

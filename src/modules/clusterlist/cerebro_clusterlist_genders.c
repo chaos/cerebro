@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_genders.c,v 1.10 2005-05-04 00:41:24 achu Exp $
+ *  $Id: cerebro_clusterlist_genders.c,v 1.11 2005-05-04 01:15:30 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -31,13 +31,6 @@
  */
 static genders_t genders_handle = NULL;
 
-/*  
- * genders_file
- *
- * genders database
- */
-static char *genders_file = NULL;
-
 /* 
  * genders_clusterlist_setup
  *
@@ -55,8 +48,7 @@ genders_clusterlist_setup(void)
       return 0;
     }
 
-  return cerebro_clusterlist_genders_setup(&genders_handle, 
-                                           genders_file,
+  return cerebro_clusterlist_genders_setup(&genders_handle,
                                            GENDERS_CLUSTERLIST_MODULE_NAME);
 }
 
@@ -77,8 +69,7 @@ genders_clusterlist_cleanup(void)
       return -1;
     }
 
-  return cerebro_clusterlist_genders_cleanup(&genders_handle, 
-                                             &genders_file,
+  return cerebro_clusterlist_genders_cleanup(&genders_handle,
                                              GENDERS_CLUSTERLIST_MODULE_NAME);
 }
 

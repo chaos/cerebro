@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_genders_util.c,v 1.6 2005-05-04 00:41:24 achu Exp $
+ *  $Id: cerebro_clusterlist_genders_util.c,v 1.7 2005-05-04 01:15:30 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -21,7 +21,6 @@
 
 int 
 cerebro_clusterlist_genders_setup(genders_t *handle, 
-                                  char *file, 
                                   char *clusterlist_module_name)
 {
   if (!handle)
@@ -52,24 +51,14 @@ cerebro_clusterlist_genders_setup(genders_t *handle,
       goto cleanup;
     }
 
-  if (genders_load_data(*handle, file) < 0)
+  if (genders_load_data(*handle, NULL) < 0)
     {
       if (genders_errnum(*handle) == GENDERS_ERR_OPEN)
 	{
-	  if (file)
-            {
-              cerebro_err_debug_module("%s clusterlist module: genders database '%s' "
-				       "cannot be opened", 
-				       clusterlist_module_name, file);
-              goto cleanup;
-            }
-	  else
-            {
-              cerebro_err_debug_module("%s clusterlist module: genders database '%s' "
-				       "cannot be opened", 
-				       clusterlist_module_name, GENDERS_DEFAULT_FILE);
-              goto cleanup;
-            }
+	  cerebro_err_debug_module("%s clusterlist module: genders database '%s' "
+				   "cannot be opened", 
+				   clusterlist_module_name, GENDERS_DEFAULT_FILE);
+	  goto cleanup;
 	}
       else
         {
@@ -92,20 +81,11 @@ cerebro_clusterlist_genders_setup(genders_t *handle,
 
 int
 cerebro_clusterlist_genders_cleanup(genders_t *handle, 
-                                    char **file, 
                                     char *clusterlist_module_name)
 {
   if (!handle)
     {
       cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: handle null",
-			       __FILE__, __FUNCTION__, __LINE__,
-			       clusterlist_module_name);
-      return -1;
-    }
-
-  if (!file)
-    {
-      cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: file null",
 			       __FILE__, __FUNCTION__, __LINE__,
 			       clusterlist_module_name);
       return -1;
@@ -129,9 +109,7 @@ cerebro_clusterlist_genders_cleanup(genders_t *handle,
       return -1;
     }
 
-  free(*file);
   *handle = NULL;
-  *file = NULL;
 
   return 0;
 }
@@ -197,7 +175,14 @@ cerebro_clusterlist_genders_get_all_nodes(genders_t handle,
     }
 
   for (i = 0; i < numnodes; i++)
-    nodes[i] = Strdup(nodelist[i]);
+    {
+      if (!(nodes[i] = strdup(nodelist[i])))
+	{
+	  cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: strdup: %s",
+                                   __FILE__, __FUNCTION__, __LINE__,
+                                   clusterlist_module_name, strerror(errno));
+	}
+    }
 
   if (genders_nodelist_destroy(handle, nodelist) < 0)
     {

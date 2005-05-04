@@ -37,6 +37,7 @@
     - y < x
   - naming convention, begin with _cerebro or not
   - buflen checks -1 vs. +1 checks
+  - NULL vs !
 
 - set configfile, module, etc. functions
   - reload config, module, etc. functions
@@ -54,7 +55,3 @@
 - do build trick for header files like freeipmi
 
 - config_is_setup? and equiv funcs?
-
-- no filename strdupping in modules, use static length buffers
-
-- remove Strdup from get-all_nodes in clusterlist modules

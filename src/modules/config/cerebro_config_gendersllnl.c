@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_gendersllnl.c,v 1.7 2005-05-04 00:41:24 achu Exp $
+ *  $Id: cerebro_config_gendersllnl.c,v 1.8 2005-05-04 01:15:30 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -33,13 +33,6 @@ extern int h_errno;
  * genders handle
  */
 static genders_t gendersllnl_handle = NULL;
-
-/*
- * gendersllnl_file
- *
- * gendersllnl database
- */
-static char *gendersllnl_file = NULL;
 
 /*
  * gendersllnl_config_setup

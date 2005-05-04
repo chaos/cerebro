@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_gendersllnl.c,v 1.10 2005-05-04 00:41:24 achu Exp $
+ *  $Id: cerebro_clusterlist_gendersllnl.c,v 1.11 2005-05-04 01:15:30 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -32,13 +32,6 @@
  */
 static genders_t gendersllnl_handle = NULL;
 
-/*  
- * gendersllnl_file
- *
- * gendersllnl database
- */
-static char *gendersllnl_file = NULL;
-
 /* 
  * gendersllnl_clusterlist_setup
  *
@@ -58,8 +51,7 @@ gendersllnl_clusterlist_setup(void)
       return 0;
     }
 
-  rv = cerebro_clusterlist_genders_setup(&gendersllnl_handle, 
-                                         gendersllnl_file,
+  rv = cerebro_clusterlist_genders_setup(&gendersllnl_handle,
                                          GENDERSLLNL_CLUSTERLIST_MODULE_NAME);
 
 #if HAVE_GENDERS_INDEX_ATTRVALS
@@ -93,8 +85,7 @@ gendersllnl_clusterlist_cleanup(void)
       return -1;
     }
 
-  return cerebro_clusterlist_genders_cleanup(&gendersllnl_handle, 
-                                             &gendersllnl_file,
+  return cerebro_clusterlist_genders_cleanup(&gendersllnl_handle,
                                              GENDERSLLNL_CLUSTERLIST_MODULE_NAME);
 }
 

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_util.c,v 1.7 2005-05-04 00:20:55 achu Exp $
+ *  $Id: cerebro_util.c,v 1.8 2005-05-04 01:15:30 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -27,6 +27,7 @@
 
 #include "cerebro.h"
 #include "cerebro_api.h"
+#include "cerebro_error.h"
 
 int 
 cerebro_handle_check(cerebro_t handle)

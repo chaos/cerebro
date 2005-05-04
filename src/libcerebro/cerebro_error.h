@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_error.h,v 1.3 2005-05-03 23:41:40 achu Exp $
+ *  $Id: cerebro_error.h,v 1.4 2005-05-04 01:15:30 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_ERROR_H
@@ -59,6 +59,15 @@ void cerebro_err_debug(const char *fmt, ...);
  * situation, fprintf() should simply be called.
  */
 void cerebro_err_debug_lib(const char *fmt, ...);
+
+/* 
+ * cerebro_err_debug_module
+ *
+ * Calls err_debug() with appropriately locks and if CEREBRO_ERROR_MODULE
+ * is set.  Should not be called if mutex is already held.  In that
+ * situation, fprintf() should simply be called.
+ */
+void cerebro_err_debug_module(const char *fmt, ...);
 
 /* 
  * cerebro_err_output
