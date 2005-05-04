@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_api.c,v 1.10 2005-05-03 22:46:34 achu Exp $
+ *  $Id: cerebro_api.c,v 1.11 2005-05-04 00:02:46 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -160,6 +160,9 @@ cerebro_perror(cerebro_t handle, const char *msg)
 int 
 cerebro_load_config(cerebro_t handle)
 {
+  struct cerebro_config module_conf;
+  struct cerebro_config config_file_conf;
+  
   if (cerebro_handle_check(handle) < 0)
     return -1;
 
@@ -169,9 +172,23 @@ cerebro_load_config(cerebro_t handle)
       return 0;
     }
   
-  if (cerebro_config_load(&(handle->config_data)) < 0)
+  if (cerebro_config_load_config_module(&module_conf) < 0)
     {
-      handle->errnum = CEREBRO_ERR_CONFIG_FILE;
+      handle->errnum = CEREBRO_ERR_CONFIG_MODULE;
+      return -1;
+    }
+
+  if (cerebro_config_load_config_file(&config_file_conf) < 0)
+    {
+      handle->errnum = CEREBRO_ERR_CONFIG_MODULE;
+      return -1;
+    }
+
+  if (cerebro_config_merge_cerebro_config(&(handle->config_data), 
+					  &module_conf, 
+					  &config_file_conf) < 0)
+    {
+      handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
   

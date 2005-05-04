@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config.h,v 1.3 2005-05-03 22:46:34 achu Exp $
+ *  $Id: cerebro_config.h,v 1.4 2005-05-04 00:02:46 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_CONFIG_H
@@ -70,13 +70,42 @@ struct cerebro_config
 };
 
 /* 
+ * cerebro_config_load_config_module
+ *
+ * Find and load config module
+ *
+ * Returns data in structure and 0 on success, -1 on error
+ */
+int cerebro_config_load_config_module(struct cerebro_config *conf);
+
+/* 
+ * cerebro_config_load_config_file
+ *
+ * Read and load configuration file
+ *
+ * Returns data in structure and 0 on success, -1 on error
+ */
+int cerebro_config_load_config_file(struct cerebro_config *conf);
+
+/* 
+ * cerebro_config_merge_cerebro_config
+ *
+ * Merge contents of module_conf and config_file_conf into conf.  The
+ * config file conf takes precedence.
+ */
+int cerebro_config_merge_cerebro_config(struct cerebro_config *conf,
+					struct cerebro_config *module_conf,
+					struct cerebro_config *config_file_conf);
+
+/* 
  * cerebro_config_load
  *
- * Load the cerebro config module and parse the cerebro config file
- * library and load its contents.
+ * Wrapper that calls cerebro_config_load_config_module,
+ * cerebro_config_load_config_file, and
+ * cerebro_config_merge_cerebro_config.
+ *
  *
  * Returns data in structure and 0 on success, -1 on error
  */
 int cerebro_config_load(struct cerebro_config *conf);
-
 #endif /* _CEREBRO_CONFIG_H */

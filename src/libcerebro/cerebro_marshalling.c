@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_marshalling.c,v 1.4 2005-04-28 18:08:27 achu Exp $
+ *  $Id: cerebro_marshalling.c,v 1.5 2005-05-04 00:02:46 achu Exp $
 \*****************************************************************************/
  
 #if HAVE_CONFIG_H
@@ -18,9 +18,17 @@
 int
 cerebro_marshall_int8(int8_t val, char *buffer, int bufferlen)
 {
-  if (!buffer || bufferlen < sizeof(int8_t))
+  if (!buffer)
     {
-      errno = EINVAL;
+      cerebro_err_debug_lib("%s(%s:%d): buffer null",
+			    __FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+
+  if (bufferlen < sizeof(int8_t))
+    {
+      cerebro_err_debug_lib("%s(%s:%d): bufferlen invalid",
+			    __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
@@ -33,9 +41,17 @@ cerebro_marshall_int32(int32_t val, char *buffer, int bufferlen)
 {
   int32_t temp;
 
-  if (!buffer || bufferlen < sizeof(temp))
+  if (!buffer)
     {
-      errno = EINVAL;
+      cerebro_err_debug_lib("%s(%s:%d): buffer null",
+			    __FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+
+  if (bufferlen < sizeof(int32_t))
+    {
+      cerebro_err_debug_lib("%s(%s:%d): bufferlen invalid",
+			    __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
@@ -47,9 +63,17 @@ cerebro_marshall_int32(int32_t val, char *buffer, int bufferlen)
 int
 cerebro_marshall_uint8(u_int8_t val, char *buffer, int bufferlen)
 {
-  if (!buffer || bufferlen < sizeof(u_int8_t))
+  if (!buffer)
     {
-      errno = EINVAL;
+      cerebro_err_debug_lib("%s(%s:%d): buffer null",
+			    __FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+
+  if (bufferlen < sizeof(u_int8_t))
+    {
+      cerebro_err_debug_lib("%s(%s:%d): bufferlen invalid",
+			    __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
@@ -62,9 +86,17 @@ cerebro_marshall_uint32(u_int32_t val, char *buffer, int bufferlen)
 {
   u_int32_t temp;
 
-  if (!buffer || bufferlen < sizeof(temp))
+  if (!buffer)
     {
-      errno = EINVAL;
+      cerebro_err_debug_lib("%s(%s:%d): buffer null",
+			    __FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+
+  if (bufferlen < sizeof(u_int32_t))
+    {
+      cerebro_err_debug_lib("%s(%s:%d): bufferlen invalid",
+			    __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
@@ -76,9 +108,31 @@ cerebro_marshall_uint32(u_int32_t val, char *buffer, int bufferlen)
 int
 cerebro_marshall_buffer(char *buf, int buflen, char *buffer, int bufferlen)
 {
-  if (!buf || buflen <= 0 || !buffer || bufferlen < buflen)
+  if (!buf)
     {
-      errno = EINVAL;
+      cerebro_err_debug_lib("%s(%s:%d): buf null",
+			    __FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+
+  if (buflen <= 0)
+    {
+      cerebro_err_debug_lib("%s(%s:%d): buflen invalid",
+			    __FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+
+  if (!buffer)
+    {
+      cerebro_err_debug_lib("%s(%s:%d): buffer null",
+			    __FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+
+  if (bufferlen < buflen)
+    {
+      cerebro_err_debug_lib("%s(%s:%d): bufferlen invalid",
+			    __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
@@ -89,9 +143,17 @@ cerebro_marshall_buffer(char *buf, int buflen, char *buffer, int bufferlen)
 int
 cerebro_unmarshall_int8(int8_t *val, char *buffer, int bufferlen)
 {
-  if (!val || !buffer)
+  if (!val)
     {
-      errno = EINVAL;
+      cerebro_err_debug_lib("%s(%s:%d): val null",
+			    __FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+
+  if (!buffer)
+    {
+      cerebro_err_debug_lib("%s(%s:%d): buffer null",
+			    __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
@@ -108,9 +170,17 @@ cerebro_unmarshall_int32(int32_t *val, char *buffer, int bufferlen)
 {
   int32_t temp;
 
-  if (!val || !buffer)
+  if (!val)
     {
-      errno = EINVAL;
+      cerebro_err_debug_lib("%s(%s:%d): val null",
+			    __FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+
+  if (!buffer)
+    {
+      cerebro_err_debug_lib("%s(%s:%d): buffer null",
+			    __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
@@ -126,9 +196,17 @@ cerebro_unmarshall_int32(int32_t *val, char *buffer, int bufferlen)
 int
 cerebro_unmarshall_uint8(u_int8_t *val, char *buffer, int bufferlen)
 {
-  if (!val || !buffer)
+  if (!val)
     {
-      errno = EINVAL;
+      cerebro_err_debug_lib("%s(%s:%d): val null",
+			    __FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+
+  if (!buffer)
+    {
+      cerebro_err_debug_lib("%s(%s:%d): buffer null",
+			    __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
@@ -145,9 +223,17 @@ cerebro_unmarshall_uint32(u_int32_t *val, char *buffer, int bufferlen)
 {
   u_int32_t temp;
 
-  if (!val || !buffer)
+  if (!val)
     {
-      errno = EINVAL;
+      cerebro_err_debug_lib("%s(%s:%d): val null",
+			    __FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+
+  if (!buffer)
+    {
+      cerebro_err_debug_lib("%s(%s:%d): buffer null",
+			    __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
@@ -163,9 +249,25 @@ cerebro_unmarshall_uint32(u_int32_t *val, char *buffer, int bufferlen)
 int
 cerebro_unmarshall_buffer(char *buf, int buflen, char *buffer, int bufferlen)
 {
-  if (!buf || buflen <= 0 || !buffer)
+  if (!buf)
     {
-      errno = EINVAL;
+      cerebro_err_debug_lib("%s(%s:%d): buf null",
+			    __FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+
+  if (!buffer)
+    {
+      cerebro_err_debug_lib("%s(%s:%d): buffer null",
+			    __FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+
+
+  if (buflen <= 0)
+    {
+      cerebro_err_debug_lib("%s(%s:%d): buflen invalid",
+			    __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
