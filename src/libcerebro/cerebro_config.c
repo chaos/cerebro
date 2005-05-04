@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config.c,v 1.11 2005-05-04 20:08:06 achu Exp $
+ *  $Id: cerebro_config.c,v 1.12 2005-05-04 20:11:01 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -199,10 +199,10 @@ cerebro_config_load_config_file(struct cerebro_config *conf)
        &(conf->cerebrod_heartbeat_destination_port), 0},
       {"cerebrod_heartbeat_destination_ip", CONFFILE_OPTION_STRING, -1,
        conffile_string, 1, 0, &(conf->cerebrod_heartbeat_destination_ip_flag),
-       conf->cerebrod_heartbeat_destination_ip, CEREBRO_IPADDRSTRLEN},
+       conf->cerebrod_heartbeat_destination_ip, CEREBRO_MAXIPADDRLEN},
       {"cerebrod_heartbeat_network_interface", CONFFILE_OPTION_STRING, -1,
        conffile_string, 1, 0, &(conf->cerebrod_heartbeat_network_interface_flag),
-       conf->cerebrod_heartbeat_network_interface, CEREBRO_MAXNETWORKINTERFACE},
+       conf->cerebrod_heartbeat_network_interface, CEREBRO_MAXNETWORKINTERFACELEN},
       {"cerebrod_heartbeat_ttl", CONFFILE_OPTION_INT, -1,
        conffile_int, 1, 0, &(conf->cerebrod_heartbeat_ttl_flag),
        &(conf->cerebrod_heartbeat_ttl), 0},

@@ -12,7 +12,6 @@ Testing
 
 Cleanup
 - reorg cerebro err codes
-- constants - good names
 - naming convention, begin with _cerebro or not
 - 80 columns
 - still legit comments
