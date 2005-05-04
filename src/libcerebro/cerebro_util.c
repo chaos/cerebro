@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_util.c,v 1.10 2005-05-04 18:23:37 achu Exp $
+ *  $Id: cerebro_util.c,v 1.11 2005-05-04 22:21:33 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -40,13 +40,34 @@ cerebro_handle_check(cerebro_t handle)
 int
 cerebro_low_timeout_connect(cerebro_t handle,
                             const char *hostname,
-                            int port,
-                            int connect_timeout)
+                            unsigned int port,
+                            unsigned int connect_timeout)
 {
   int rv, old_flags, fd = -1;
   struct sockaddr_in servaddr;
   struct hostent *hptr;
  
+  if (!hostname)
+    {
+      cerebro_err_debug_lib("%s(%s:%d): hostname null",
+			    __FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+
+  if (!port)
+    {
+      cerebro_err_debug_lib("%s(%s:%d): port invalid",
+			    __FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+
+  if (!connect_timeout)
+    {
+      cerebro_err_debug_lib("%s(%s:%d): connect_timeout invalid",
+			    __FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+
   /* valgrind will report a mem-leak in gethostbyname() */
   if (!(hptr = gethostbyname(hostname)))
     {

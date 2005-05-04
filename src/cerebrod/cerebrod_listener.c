@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.55 2005-05-04 20:08:05 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.56 2005-05-04 22:21:33 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -186,16 +186,16 @@ _cerebrod_listener_initialize(void)
 }
 
 /*
- * _cerebrod_listener_heartbeat_unmarshall
+ * _cerebrod_heartbeat_unmarshall
  *
  * unmarshall contents of a heartbeat packet buffer
  *
  * Returns length of data unmarshalled on success, -1 on error
  */
 int
-_cerebrod_listener_heartbeat_unmarshall(struct cerebrod_heartbeat *hb,
-                                        const char *buf,
-                                        unsigned int buflen)
+_cerebrod_heartbeat_unmarshall(struct cerebrod_heartbeat *hb,
+			       const char *buf,
+			       unsigned int buflen)
 {
   int len, count = 0;
 
@@ -250,12 +250,12 @@ _cerebrod_listener_heartbeat_unmarshall(struct cerebrod_heartbeat *hb,
 
 
 /* 
- * _cerebrod_listener_dump_heartbeat
+ * _cerebrod_heartbeat_dump
  *
  * Dump contents of heartbeat packet
  */
 static void
-_cerebrod_listener_dump_heartbeat(struct cerebrod_heartbeat *hb)
+_cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb)
 {
 #ifndef NDEBUG
   assert(hb);
@@ -420,12 +420,12 @@ cerebrod_listener(void *arg)
       if (recv_len <= 0)
 	continue;
 
-      if ((heartbeat_len = _cerebrod_listener_heartbeat_unmarshall(&hb, 
-								   buf, 
-								   recv_len)) < 0)
+      if ((heartbeat_len = _cerebrod_heartbeat_unmarshall(&hb, 
+							  buf, 
+							  recv_len)) < 0)
 	continue;
 
-      _cerebrod_listener_dump_heartbeat(&hb);
+      _cerebrod_heartbeat_dump(&hb);
 
       if (heartbeat_len != CEREBROD_HEARTBEAT_LEN)
         {

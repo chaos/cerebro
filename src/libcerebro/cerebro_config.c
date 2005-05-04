@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config.c,v 1.12 2005-05-04 20:11:01 achu Exp $
+ *  $Id: cerebro_config.c,v 1.13 2005-05-04 22:21:33 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -173,64 +173,208 @@ cerebro_config_load_config_file(struct cerebro_config *conf)
       /*
        * Libcerebro configuration
        */
-      {"cerebro_updown_hostnames", CONFFILE_OPTION_LIST_STRING, -1,
-       _cb_cerebro_updown_hostnames, 1, 0, &(conf->cerebro_updown_hostnames_flag),
-       conf, 0},
-      {"cerebro_updown_port", CONFFILE_OPTION_INT, -1,
-       conffile_int, 1, 0, &(conf->cerebro_updown_port_flag),
-       &(conf->cerebro_updown_port), 0},
-      {"cerebro_updown_timeout_len", CONFFILE_OPTION_INT, -1,
-       conffile_int, 1, 0, &(conf->cerebro_updown_timeout_len_flag),
-       &(conf->cerebro_updown_timeout_len), 0},
-      {"cerebro_updown_flags", CONFFILE_OPTION_INT, -1,
-       conffile_int, 1, 0, &(conf->cerebro_updown_flags_flag),
-       &(conf->cerebro_updown_flags), 0},
+      {
+	"cerebro_updown_hostnames", 
+	CONFFILE_OPTION_LIST_STRING, 
+	-1,
+	_cb_cerebro_updown_hostnames, 
+	1, 
+	0, 
+	&(conf->cerebro_updown_hostnames_flag), 
+	conf, 
+	0
+      },
+      {
+	"cerebro_updown_port", 
+	CONFFILE_OPTION_INT, 
+	-1,
+	conffile_int, 
+	1, 
+	0, 
+	&(conf->cerebro_updown_port_flag), 
+	&(conf->cerebro_updown_port), 
+	0
+      },
+      {
+	"cerebro_updown_timeout_len", 
+	CONFFILE_OPTION_INT, 
+	-1,
+	conffile_int, 
+	1, 
+	0, 
+	&(conf->cerebro_updown_timeout_len_flag),
+	&(conf->cerebro_updown_timeout_len), 
+	0
+      },
+      {
+	"cerebro_updown_flags", 
+	CONFFILE_OPTION_INT, 
+	-1,
+	conffile_int, 
+	1, 
+	0, 
+	&(conf->cerebro_updown_flags_flag),
+	&(conf->cerebro_updown_flags), 
+	0
+      },
       /*
        * Cerebrod configuration
        */
-      {"cerebrod_heartbeat_frequency", CONFFILE_OPTION_LIST_INT, -1,
-       _cb_cerebrod_heartbeat_freq, 1, 0, &(conf->cerebrod_heartbeat_frequency_flag),
-       conf, 0},
-      {"cerebrod_heartbeat_source_port", CONFFILE_OPTION_INT, -1,
-       conffile_int, 1, 0, &(conf->cerebrod_heartbeat_source_port_flag),
-       &(conf->cerebrod_heartbeat_source_port), 0},
-      {"cerebrod_heartbeat_destination_port", CONFFILE_OPTION_INT, -1,
-       conffile_int, 1, 0, &(conf->cerebrod_heartbeat_destination_port_flag),
-       &(conf->cerebrod_heartbeat_destination_port), 0},
-      {"cerebrod_heartbeat_destination_ip", CONFFILE_OPTION_STRING, -1,
-       conffile_string, 1, 0, &(conf->cerebrod_heartbeat_destination_ip_flag),
-       conf->cerebrod_heartbeat_destination_ip, CEREBRO_MAXIPADDRLEN},
-      {"cerebrod_heartbeat_network_interface", CONFFILE_OPTION_STRING, -1,
-       conffile_string, 1, 0, &(conf->cerebrod_heartbeat_network_interface_flag),
-       conf->cerebrod_heartbeat_network_interface, CEREBRO_MAXNETWORKINTERFACELEN},
-      {"cerebrod_heartbeat_ttl", CONFFILE_OPTION_INT, -1,
-       conffile_int, 1, 0, &(conf->cerebrod_heartbeat_ttl_flag),
-       &(conf->cerebrod_heartbeat_ttl), 0},
-      {"cerebrod_speak", CONFFILE_OPTION_BOOL, -1,
-       conffile_bool, 1, 0, &(conf->cerebrod_speak_flag),
-       &conf->cerebrod_speak, 0},
-      {"cerebrod_listen", CONFFILE_OPTION_BOOL, -1,
-       conffile_bool, 1, 0, &(conf->cerebrod_listen_flag),
-       &conf->cerebrod_listen, 0},
-      {"cerebrod_listen_threads", CONFFILE_OPTION_INT, -1,
-       conffile_int, 1, 0, &(conf->cerebrod_listen_threads_flag),
-       &(conf->cerebrod_listen_threads), 0},
-      {"cerebrod_updown_server", CONFFILE_OPTION_BOOL, -1,
-       conffile_bool, 1, 0, &(conf->cerebrod_updown_server_flag),
-       &conf->cerebrod_updown_server, 0},
-      {"cerebrod_updown_server_port", CONFFILE_OPTION_INT, -1,
-       conffile_int, 1, 0, &(conf->cerebrod_updown_server_port_flag),
-       &(conf->cerebrod_updown_server_port), 0},
+      {
+	"cerebrod_heartbeat_frequency", 
+	CONFFILE_OPTION_LIST_INT, 
+	-1,
+	_cb_cerebrod_heartbeat_freq, 
+	1, 
+	0, 
+	&(conf->cerebrod_heartbeat_frequency_flag),
+	conf, 
+	0
+      },
+      {
+	"cerebrod_heartbeat_source_port",
+	CONFFILE_OPTION_INT, 
+	-1,
+	conffile_int, 
+	1, 
+	0, 
+	&(conf->cerebrod_heartbeat_source_port_flag),
+	&(conf->cerebrod_heartbeat_source_port), 
+	0
+      },
+      {
+	"cerebrod_heartbeat_destination_port", 
+	CONFFILE_OPTION_INT, 
+	-1,
+	conffile_int, 
+	1, 
+	0, 
+	&(conf->cerebrod_heartbeat_destination_port_flag),
+	&(conf->cerebrod_heartbeat_destination_port), 
+	0
+      },
+      {
+	"cerebrod_heartbeat_destination_ip", 
+	CONFFILE_OPTION_STRING, 
+	-1,
+	conffile_string, 
+	1, 
+	0, 
+	&(conf->cerebrod_heartbeat_destination_ip_flag),
+	conf->cerebrod_heartbeat_destination_ip, 
+	CEREBRO_MAXIPADDRLEN
+      },
+      {
+	"cerebrod_heartbeat_network_interface", 
+	CONFFILE_OPTION_STRING, 
+	-1,
+	conffile_string, 
+	1, 
+	0, 
+	&(conf->cerebrod_heartbeat_network_interface_flag),
+	conf->cerebrod_heartbeat_network_interface, 
+	CEREBRO_MAXNETWORKINTERFACELEN
+      },
+      {
+	"cerebrod_heartbeat_ttl", 
+	CONFFILE_OPTION_INT, 
+	-1,
+	conffile_int, 
+	1, 
+	0, 
+	&(conf->cerebrod_heartbeat_ttl_flag),
+	&(conf->cerebrod_heartbeat_ttl), 
+	0
+      },
+      {
+	"cerebrod_speak", 
+	CONFFILE_OPTION_BOOL, 
+	-1,
+	conffile_bool, 
+	1, 
+	0, 
+	&(conf->cerebrod_speak_flag),
+	&conf->cerebrod_speak, 
+	0
+      },
+      {
+	"cerebrod_listen", 
+	CONFFILE_OPTION_BOOL, 
+	-1,
+	conffile_bool, 
+	1, 
+	0, 
+	&(conf->cerebrod_listen_flag),
+	&conf->cerebrod_listen, 
+	0
+      },
+      {
+	"cerebrod_listen_threads", 
+	CONFFILE_OPTION_INT, 
+	-1,
+	conffile_int, 
+	1, 
+	0, 
+	&(conf->cerebrod_listen_threads_flag),
+	&(conf->cerebrod_listen_threads), 
+	0
+      },
+      {
+	"cerebrod_updown_server", 
+	CONFFILE_OPTION_BOOL, 
+	-1,
+	conffile_bool, 
+	1, 
+	0, 
+	&(conf->cerebrod_updown_server_flag),
+	&conf->cerebrod_updown_server, 
+	0
+      },
+      {
+	"cerebrod_updown_server_port", 
+	CONFFILE_OPTION_INT, 
+	-1,
+	conffile_int, 
+	1, 
+	0, 
+	&(conf->cerebrod_updown_server_port_flag),
+	&(conf->cerebrod_updown_server_port), 
+	0
+      },
 #ifndef NDEBUG
-      {"cerebrod_speak_debug", CONFFILE_OPTION_BOOL, -1,
-       conffile_bool, 1, 0, &(conf->cerebrod_speak_debug_flag),
-       &conf->cerebrod_speak_debug, 0},
-      {"cerebrod_listen_debug", CONFFILE_OPTION_BOOL, -1,
-       conffile_bool, 1, 0, &(conf->cerebrod_listen_debug_flag),
-       &conf->cerebrod_listen_debug, 0},
-      {"cerebrod_updown_server_debug", CONFFILE_OPTION_BOOL, -1,
-       conffile_bool, 1, 0, &(conf->cerebrod_updown_server_debug_flag),
-       &conf->cerebrod_updown_server_debug, 0},
+      {
+	"cerebrod_speak_debug", 
+	CONFFILE_OPTION_BOOL, 
+	-1,
+	conffile_bool, 
+	1, 
+	0, 
+	&(conf->cerebrod_speak_debug_flag),
+	&conf->cerebrod_speak_debug, 
+	0
+      },
+      {
+	"cerebrod_listen_debug", 
+	CONFFILE_OPTION_BOOL, 
+	-1,
+	conffile_bool, 
+	1, 
+	0, 
+	&(conf->cerebrod_listen_debug_flag),
+	&conf->cerebrod_listen_debug, 
+	0
+      },
+      {
+	"cerebrod_updown_server_debug", 
+	CONFFILE_OPTION_BOOL, 
+	-1,
+	conffile_bool, 
+	1, 
+	0, 
+	&(conf->cerebrod_updown_server_debug_flag),
+	&conf->cerebrod_updown_server_debug, 
+	0
+      },
 #endif /* NDEBUG */
     };
   conffile_t cf = NULL;

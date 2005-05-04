@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.c,v 1.49 2005-05-04 20:08:05 achu Exp $
+ *  $Id: cerebrod_updown.c,v 1.50 2005-05-04 22:21:33 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -440,7 +440,7 @@ _cerebrod_updown_request_unmarshall(struct cerebro_updown_request *req,
 }
 
 /*
- * cerebrod_updown_receive_request
+ * _cerebrod_updown_request_receive
  *
  * Receive updown server request
  * 
@@ -448,7 +448,7 @@ _cerebrod_updown_request_unmarshall(struct cerebro_updown_request *req,
  * -1 on error
  */
 static int
-_cerebrod_updown_receive_request(int client_fd,	
+_cerebrod_updown_request_receive(int client_fd,	
 				 struct cerebro_updown_request *req)
 {
   int rv, bytes_read = 0;
@@ -566,15 +566,15 @@ _cerebrod_updown_request_dump(struct cerebro_updown_request *req)
 }
 
 /*
- * _cerebrod_updown_send_response
+ * _cerebrod_updown_response_send_one
  *
  * send a response packet to the client
  *
  * Return 0 on success, -1 on error
  */
 static int
-_cerebrod_updown_send_response(int client_fd, 
-			       struct cerebro_updown_response *res)
+_cerebrod_updown_response_send_one(int client_fd, 
+				   struct cerebro_updown_response *res)
 {
   char buf[CEREBRO_PACKET_BUFLEN];
   int res_len;
@@ -603,14 +603,14 @@ _cerebrod_updown_send_response(int client_fd,
 }
 
 /*
- * _cerebrod_updown_send_err_response
+ * _cerebrod_updown_err_response_send
  *
  * send an error response packet to the client
  *
  * Return 0 on success, -1 on error
  */
 static int
-_cerebrod_updown_send_err_response(int client_fd, 
+_cerebrod_updown_err_response_send(int client_fd, 
                                    struct cerebro_updown_err_response *err_res)
 {
   char buf[CEREBRO_PACKET_BUFLEN];
@@ -677,7 +677,7 @@ _cerebrod_updown_respond_with_error(int client_fd,
           res.updown_err_code = CEREBRO_UPDOWN_PROTOCOL_ERR_VERSION_INVALID;
           res.end_of_responses = CEREBRO_UPDOWN_PROTOCOL_IS_LAST_RESPONSE;
           
-          if (_cerebrod_updown_send_response(client_fd, &res) < 0)
+          if (_cerebrod_updown_response_send_one(client_fd, &res) < 0)
             return -1;
 
           return 0;
@@ -693,7 +693,7 @@ _cerebrod_updown_respond_with_error(int client_fd,
       err_res.version = version;
       err_res.updown_err_code = updown_err_code;
 
-      if (_cerebrod_updown_send_err_response(client_fd, &err_res) < 0)
+      if (_cerebrod_updown_err_response_send_one(client_fd, &err_res) < 0)
         return -1;
 
       return 0;
@@ -703,7 +703,7 @@ _cerebrod_updown_respond_with_error(int client_fd,
   res.updown_err_code = updown_err_code;
   res.end_of_responses = CEREBRO_UPDOWN_PROTOCOL_IS_LAST_RESPONSE;
   
-  if (_cerebrod_updown_send_response(client_fd, &res) < 0)
+  if (_cerebrod_updown_response_send_one(client_fd, &res) < 0)
     return -1;
       
   return 0;
@@ -787,14 +787,14 @@ _cerebrod_updown_evaluate_updown_state(void *x, void *arg)
 }
 
 /*
- * _cerebrod_updown_send_node_responses
+ * _cerebrod_updown_response_send_all
  *
  * respond to the updown_request with a node
  *
  * Return 0 on success, -1 on error
  */
 static int
-_cerebrod_updown_send_node_responses(void *x, void *arg)
+_cerebrod_updown_response_send_all(void *x, void *arg)
 {
   struct cerebro_updown_response *res;
   int client_fd;
@@ -805,7 +805,7 @@ _cerebrod_updown_send_node_responses(void *x, void *arg)
   res = (struct cerebro_updown_response *)x;
   client_fd = *((int *)arg);
 
-  if (_cerebrod_updown_send_response(client_fd, res) < 0)
+  if (_cerebrod_updown_response_send_one(client_fd, res) < 0)
     return -1;
 
   return 0;
@@ -883,7 +883,7 @@ _cerebrod_updown_respond_with_updown_nodes(int client_fd,
   if (List_count(node_responses))
     {
       if (list_for_each(node_responses,
-			_cerebrod_updown_send_node_responses, 
+			_cerebrod_updown_response_send_all, 
 			&client_fd) < 0)
         {
           Pthread_mutex_unlock(&updown_node_data_lock);
@@ -901,7 +901,7 @@ _cerebrod_updown_respond_with_updown_nodes(int client_fd,
   end_res.updown_err_code = CEREBRO_UPDOWN_PROTOCOL_ERR_SUCCESS;
   end_res.end_of_responses = CEREBRO_UPDOWN_PROTOCOL_IS_LAST_RESPONSE;
 
-  if (_cerebrod_updown_send_response(client_fd, &end_res) < 0)
+  if (_cerebrod_updown_response_send_one(client_fd, &end_res) < 0)
     return -1;
 
   list_destroy(node_responses);
@@ -932,7 +932,7 @@ _cerebrod_updown_service_connection(void *arg)
   client_fd = *((int *)arg);
 
   memset(&req, '\0', sizeof(struct cerebro_updown_request));
-  if ((req_len = _cerebrod_updown_receive_request(client_fd, &req)) < 0)
+  if ((req_len = _cerebrod_updown_request_receive(client_fd, &req)) < 0)
     /* At this point, there is no successfully read request, therefore
      * there is no reason to respond w/ a response and an error code.
      */
@@ -1114,7 +1114,8 @@ _cerebrod_updown_output_update(struct cerebrod_updown_node_data *ud)
  
       Pthread_mutex_lock(&debug_output_mutex);
       fprintf(stderr, "**************************************\n");
-      fprintf(stderr, "* Updown Server Update: Node=%s Last_Received=%s\n", ud->nodename, strbuf);
+      fprintf(stderr, "* Updown Server Update: Node=%s Last_Received=%s\n", 
+	      ud->nodename, strbuf);
       fprintf(stderr, "**************************************\n");
       Pthread_mutex_unlock(&debug_output_mutex);
     }

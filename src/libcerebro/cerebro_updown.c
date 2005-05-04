@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_updown.c,v 1.27 2005-05-04 20:08:06 achu Exp $
+ *  $Id: cerebro_updown.c,v 1.28 2005-05-04 22:21:33 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -53,7 +53,7 @@ struct cerebro_updown_data {
 };
 
 /* 
- * _cerebro_updown_data_check
+ * _cerebro_handle_updown_data_check
  *
  * Check for a proper updown_data handle, setting the errnum
  * appropriately if an error is found.
@@ -61,8 +61,8 @@ struct cerebro_updown_data {
  * Returns 0 on success, -1 on error
  */
 static int
-_cerebro_updown_data_check(cerebro_t handle, 
-                           struct cerebro_updown_data *updown_data)
+_cerebro_handle_updown_data_check(cerebro_t handle, 
+				  struct cerebro_updown_data *updown_data)
 {
 #ifndef NDEBUG
   if (!updown_data)
@@ -77,6 +77,34 @@ _cerebro_updown_data_check(cerebro_t handle,
       handle->errnum = CEREBRO_ERR_MAGIC_NUMBER;
       return -1;
     }
+
+  return 0;
+}
+
+/* 
+ * _cerebro_handle_updown_data_loaded_check
+ *
+ * Checks if the handle contains properly loaded updown_data data.
+ * 
+ * Returns 0 on success, -1 on error
+ */
+static int
+_cerebro_handle_updown_data_loaded_check(cerebro_t handle)
+{
+  struct cerebro_updown_data *updown_data;
+
+  if (cerebro_handle_check(handle) < 0)
+    return -1;
+
+  if (!(handle->loaded_state & CEREBRO_UPDOWN_DATA_LOADED))
+    {
+      handle->errnum = CEREBRO_ERR_NOT_LOADED;
+      return -1;
+    }
+
+  updown_data = (struct cerebro_updown_data *)handle->updown_data;
+  if (_cerebro_handle_updown_data_check(handle, updown_data) < 0)
+    return -1;
 
   return 0;
 }
@@ -111,42 +139,14 @@ _cerebro_updown_protocol_err_conversion(u_int32_t protocol_error)
 }
 
 /* 
- * _cerebro_updown_data_loaded_check
- *
- * Checks if the handle contains properly loaded updown_data data.
- * 
- * Returns 0 on success, -1 on error
- */
-static int
-_cerebro_updown_data_loaded_check(cerebro_t handle)
-{
-  struct cerebro_updown_data *updown_data;
-
-  if (cerebro_handle_check(handle) < 0)
-    return -1;
-
-  if (!(handle->loaded_state & CEREBRO_UPDOWN_DATA_LOADED))
-    {
-      handle->errnum = CEREBRO_ERR_NOT_LOADED;
-      return -1;
-    }
-
-  updown_data = (struct cerebro_updown_data *)handle->updown_data;
-  if (_cerebro_updown_data_check(handle, updown_data) < 0)
-    return -1;
-
-  return 0;
-}
-
-/* 
- * _cerebro_updown_init_request
+ * _cerebro_updown_request_init
  *
  * Initialize an updown request
  *
  * Returns 0 on success, -1 on error
  */
 static int
-_cerebro_updown_init_request(cerebro_t handle,
+_cerebro_updown_request_init(cerebro_t handle,
                              struct cerebro_updown_request *req,
                              unsigned int timeout_len,
                              int flags)
@@ -323,14 +323,14 @@ _cerebro_updown_response_unmarshall(cerebro_t handle,
 }
 
 /* 
- * _cerebro_updown_send_request
+ * _cerebro_updown_request_send
  *
  * Send the updown request
  *
  * Returns 0 on success, -1 on error
  */
 static int
-_cerebro_updown_send_request(cerebro_t handle,
+_cerebro_updown_request_send(cerebro_t handle,
                              int fd,
                              unsigned int timeout_len,
                              int flags)
@@ -339,7 +339,7 @@ _cerebro_updown_send_request(cerebro_t handle,
   char buf[CEREBRO_PACKET_BUFLEN];
   int req_len;
 
-  if (_cerebro_updown_init_request(handle, &req, timeout_len, flags) < 0)
+  if (_cerebro_updown_request_init(handle, &req, timeout_len, flags) < 0)
     return -1;
   
   if ((req_len = _cerebro_updown_request_marshall(handle,
@@ -361,7 +361,7 @@ _cerebro_updown_send_request(cerebro_t handle,
 }
 
 /* 
- * _cerebro_updown_receive_a_response
+ * _cerebro_updown_response_receive_one
  *
  * Receive a single response
  *
@@ -369,9 +369,9 @@ _cerebro_updown_send_request(cerebro_t handle,
  * success, -1 on error
  */
 static int
-_cerebro_updown_receive_a_response(cerebro_t handle,
-                                   int fd,
-                                   struct cerebro_updown_response *res)
+_cerebro_updown_response_receive_one(cerebro_t handle,
+				     int fd,
+				     struct cerebro_updown_response *res)
 {
   int rv, bytes_read = 0;
   char buf[CEREBRO_PACKET_BUFLEN];
@@ -468,26 +468,26 @@ _cerebro_updown_receive_a_response(cerebro_t handle,
 }
 
 /* 
- * _cerebro_updown_receive_responses
+ * _cerebro_updown_response_receive_all
  *
  * Receive all of the updown server responses.
  * 
  * Returns 0 on success, -1 on error
  */
 static int
-_cerebro_updown_receive_responses(cerebro_t handle,
-                                  int fd,
-                                  struct cerebro_updown_data *updown_data,
-                                  int flags)
+_cerebro_updown_response_receive_all(cerebro_t handle,
+				     int fd,
+				     struct cerebro_updown_data *updown_data,
+				     int flags)
 {
   struct cerebro_updown_response res;
   int res_len;
 
   while (1)
     {
-      if ((res_len = _cerebro_updown_receive_a_response(handle,
-                                                        fd, 
-                                                        &res)) < 0)
+      if ((res_len = _cerebro_updown_response_receive_one(handle,
+							  fd, 
+							  &res)) < 0)
         goto cleanup;
 
       if (res_len != CEREBRO_UPDOWN_RESPONSE_LEN)
@@ -502,7 +502,7 @@ _cerebro_updown_receive_responses(cerebro_t handle,
 
               if (res.updown_err_code != CEREBRO_UPDOWN_PROTOCOL_ERR_SUCCESS)
                 {
-                  handle->errnum = _cerebro_updown_protocol_err_conversion(res.updown_err_code);;
+                  handle->errnum = _cerebro_updown_protocol_err_conversion(res.updown_err_code);
                   goto cleanup;
                 }
             }
@@ -584,11 +584,11 @@ _cerebro_updown_receive_responses(cerebro_t handle,
  */
 static int
 _cerebro_updown_get_updown_data(cerebro_t handle,
-                                struct cerebro_updown_data *updown_data,
-                                const char *hostname,
-                                unsigned int port,
-                                unsigned int timeout_len,
-                                int flags)
+				struct cerebro_updown_data *updown_data,
+				const char *hostname,
+				unsigned int port,
+				unsigned int timeout_len,
+				int flags)
 {
   int fd = -1, rv = -1;
 
@@ -598,10 +598,10 @@ _cerebro_updown_get_updown_data(cerebro_t handle,
                                         CEREBRO_UPDOWN_PROTOCOL_CONNECT_TIMEOUT_LEN)) < 0)
     goto cleanup;
 
-  if (_cerebro_updown_send_request(handle, fd, timeout_len, flags) < 0)
+  if (_cerebro_updown_request_send(handle, fd, timeout_len, flags) < 0)
     goto cleanup;
 
-  if (_cerebro_updown_receive_responses(handle, fd, updown_data, flags) < 0)
+  if (_cerebro_updown_response_receive_all(handle, fd, updown_data, flags) < 0)
     goto cleanup;
   
   rv = 0;
@@ -771,7 +771,7 @@ cerebro_updown_load_data(cerebro_t handle,
 
       updown_data_temp = (struct cerebro_updown_data *)handle->updown_data;
 
-      if (_cerebro_updown_data_check(handle, updown_data_temp) < 0)
+      if (_cerebro_handle_updown_data_check(handle, updown_data_temp) < 0)
         goto cleanup;
 
       if (flags == CEREBRO_UPDOWN_UP_AND_DOWN_NODES)
@@ -840,7 +840,7 @@ _cerebro_updown_get_nodes(cerebro_t handle,
   struct cerebro_updown_data *updown_data;
   hostlist_t hl;
 
-  if (_cerebro_updown_data_loaded_check(handle) < 0)
+  if (_cerebro_handle_updown_data_loaded_check(handle) < 0)
     return -1;
 
   if (!buf || !buflen)
@@ -902,7 +902,7 @@ _cerebro_updown_is_node(cerebro_t handle,
   hostlist_t hl;
   int temp, rv;
 
-  if (_cerebro_updown_data_loaded_check(handle) < 0)
+  if (_cerebro_handle_updown_data_loaded_check(handle) < 0)
     return -1;
 
   if (!node)
@@ -999,7 +999,7 @@ _cerebro_updown_count(cerebro_t handle, int up_down_flag)
   hostlist_t hl;
   int count;
 
-  if (_cerebro_updown_data_loaded_check(handle) < 0)
+  if (_cerebro_handle_updown_data_loaded_check(handle) < 0)
     return -1;
 
   updown_data = (struct cerebro_updown_data *)handle->updown_data;
@@ -1044,7 +1044,7 @@ cerebro_updown_unload_data(cerebro_t handle)
 
       updown_data = (struct cerebro_updown_data *)handle->updown_data;
 
-      if (_cerebro_updown_data_check(handle, updown_data) < 0)
+      if (_cerebro_handle_updown_data_check(handle, updown_data) < 0)
         return -1;
 
       hostlist_destroy(updown_data->up_nodes);

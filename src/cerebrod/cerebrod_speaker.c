@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.28 2005-05-04 20:08:05 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.29 2005-05-04 22:21:33 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -161,15 +161,15 @@ _cerebrod_speaker_initialize(void)
 }
 
 /*
- * _cerebrod_spaker_heartbeat_init
+ * _cerebrod_heartbeat_init
  *
  * construct a heartbeat packet
  */
 static void
-_cerebrod_spaker_heartbeat_init(struct cerebrod_heartbeat *hb)
+_cerebrod_heartbeat_init(struct cerebrod_heartbeat *hb)
 {
   assert(hb);
-                                                                                      
+
   hb->version = CEREBROD_HEARTBEAT_PROTOCOL_VERSION;
   cerebrod_get_nodename(hb->nodename, CEREBRO_MAXNODENAMELEN);
   hb->starttime = cerebrod_get_starttime();
@@ -177,16 +177,16 @@ _cerebrod_spaker_heartbeat_init(struct cerebrod_heartbeat *hb)
 }
 
 /*
- * _cerebrod_speaker_heartbeat_marshall
+ * _cerebrod_heartbeat_marshall
  *
  * marshall contents of a heartbeat packet.
  *
  * Returns length written to buffer on success, -1 on error
  */
 int
-_cerebrod_speaker_heartbeat_marshall(struct cerebrod_heartbeat *hb,
-                                     char *buf,
-                                     unsigned int buflen)
+_cerebrod_heartbeat_marshall(struct cerebrod_heartbeat *hb,
+			     char *buf,
+			     unsigned int buflen)
 {
   int len, count = 0;
 
@@ -228,12 +228,12 @@ _cerebrod_speaker_heartbeat_marshall(struct cerebrod_heartbeat *hb,
 }
 
 /* 
- * _cerebrod_speaker_dump_heartbeat
+ * _cerebrod_heartbeat_dump
  *
  * Dump contents of heartbeat packet
  */
 static void
-_cerebrod_speaker_dump_heartbeat(struct cerebrod_heartbeat *hb)
+_cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb)
 {
 #ifndef NDEBUG
   assert(hb);
@@ -282,13 +282,13 @@ cerebrod_speaker(void *arg)
       else
 	sleep_time = conf.heartbeat_frequency_min;
 
-      _cerebrod_spaker_heartbeat_init(&hb);
+      _cerebrod_heartbeat_init(&hb);
   
-      heartbeat_len = _cerebrod_speaker_heartbeat_marshall(&hb, 
-							   buf, 
-							   CEREBRO_PACKET_BUFLEN);
+      heartbeat_len = _cerebrod_heartbeat_marshall(&hb, 
+						   buf, 
+						   CEREBRO_PACKET_BUFLEN);
 
-      _cerebrod_speaker_dump_heartbeat(&hb);
+      _cerebrod_heartbeat_dump(&hb);
       
       memset(&heartbeat_destination_addr, '\0', sizeof(struct sockaddr_in));
       heartbeat_destination_addr.sin_family = AF_INET;

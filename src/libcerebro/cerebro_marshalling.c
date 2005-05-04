@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_marshalling.c,v 1.8 2005-05-04 18:23:37 achu Exp $
+ *  $Id: cerebro_marshalling.c,v 1.9 2005-05-04 22:21:33 achu Exp $
 \*****************************************************************************/
  
 #if HAVE_CONFIG_H
@@ -107,7 +107,10 @@ cerebro_marshall_uint32(u_int32_t val, char *buf, unsigned int buflen)
 }
 
 int
-cerebro_marshall_buffer(const char *val, unsigned int vallen, char *buf, unsigned int buflen)
+cerebro_marshall_buffer(const char *val, 
+			unsigned int vallen, 
+			char *buf, 
+			unsigned int buflen)
 {
   if (!val)
     {
@@ -142,7 +145,9 @@ cerebro_marshall_buffer(const char *val, unsigned int vallen, char *buf, unsigne
 }
 
 int
-cerebro_unmarshall_int8(int8_t *val, const char *buf, unsigned int buflen)
+cerebro_unmarshall_int8(int8_t *val, 
+			const char *buf, 
+			unsigned int buflen)
 {
   if (!val)
     {
@@ -167,7 +172,9 @@ cerebro_unmarshall_int8(int8_t *val, const char *buf, unsigned int buflen)
 }
 
 int
-cerebro_unmarshall_int32(int32_t *val, const char *buf, unsigned int buflen)
+cerebro_unmarshall_int32(int32_t *val, 
+			 const char *buf, 
+			 unsigned int buflen)
 {
   int32_t temp;
 
@@ -195,7 +202,9 @@ cerebro_unmarshall_int32(int32_t *val, const char *buf, unsigned int buflen)
 }
 
 int
-cerebro_unmarshall_uint8(u_int8_t *val, const char *buf, unsigned int buflen)
+cerebro_unmarshall_uint8(u_int8_t *val, 
+			 const char *buf, 
+			 unsigned int buflen)
 {
   if (!val)
     {
@@ -220,7 +229,9 @@ cerebro_unmarshall_uint8(u_int8_t *val, const char *buf, unsigned int buflen)
 }
 
 int
-cerebro_unmarshall_uint32(u_int32_t *val, const char *buf, unsigned int buflen)
+cerebro_unmarshall_uint32(u_int32_t *val, 
+			  const char *buf, 
+			  unsigned int buflen)
 {
   u_int32_t temp;
 
@@ -248,7 +259,10 @@ cerebro_unmarshall_uint32(u_int32_t *val, const char *buf, unsigned int buflen)
 }
 
 int
-cerebro_unmarshall_buffer(char *val, unsigned int vallen, const char *buf, unsigned int buflen)
+cerebro_unmarshall_buffer(char *val, 
+			  unsigned int vallen, 
+			  const char *buf, 
+			  unsigned int buflen)
 {
   if (!val)
     {

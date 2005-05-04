@@ -10,15 +10,9 @@ Testing
 - none module works if no clusterlist modules found
 
 Cleanup
-- naming convention, begin with _cerebro or not
-- 80 columns
-- still legit comments
 
 Audit
 - code review to reduce memory footprint
-- maps confine only "cerebro_" instead of "cerebro*"
-  - be more restrictive in general, don't just do cerebro*
-  - or just specifically list the ones that should be exported
 
 Portability
 - IPv6
@@ -46,7 +40,3 @@ GPL
 
 Misc
 - remove hash/list buffering in list.c hash.c?
-
-
-
-

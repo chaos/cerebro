@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_util.h,v 1.4 2005-05-04 18:23:37 achu Exp $
+ *  $Id: cerebro_util.h,v 1.5 2005-05-04 22:21:33 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_UTIL_H
@@ -25,7 +25,7 @@ int cerebro_handle_check(cerebro_t handle);
  */
 int cerebro_low_timeout_connect(cerebro_t handle,
                                 const char *hostname,
-                                int port,
-                                int connect_timeout);
+                                unsigned int port,
+                                unsigned int connect_timeout);
 
 #endif /* _CEREBRO_UTIL_H */

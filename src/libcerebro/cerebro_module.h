@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.h,v 1.12 2005-05-04 18:23:37 achu Exp $
+ *  $Id: cerebro_module.h,v 1.13 2005-05-04 22:21:33 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_MODULE_H
@@ -127,7 +127,8 @@ int cerebro_clusterlist_module_cleanup(void);
  *
  * call clusterlist module get all nodes function
  */
-int cerebro_clusterlist_module_get_all_nodes(char **nodes, unsigned int nodeslen);
+int cerebro_clusterlist_module_get_all_nodes(char **nodes, 
+					     unsigned int nodeslen);
 
 /*
  * cerebro_clusterlist_module_numnodes
@@ -148,7 +149,9 @@ int cerebro_clusterlist_module_node_in_cluster(const char *node);
  *
  * call clusterlist module get nodename function
  */
-int cerebro_clusterlist_module_get_nodename(const char *node, char *buf, unsigned int buflen);
+int cerebro_clusterlist_module_get_nodename(const char *node, 
+					    char *buf, 
+					    unsigned int buflen);
 
 /*
  * cerebro_config_module_name
