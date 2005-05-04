@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_util.c,v 1.6 2005-04-29 23:39:44 achu Exp $
+ *  $Id: cerebro_clusterlist_util.c,v 1.7 2005-05-04 00:41:24 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -28,34 +28,34 @@ cerebro_clusterlist_copy_nodename(const char *node,
 
   if (!node)
     {
-      cerebro_err_debug("%s(%s:%d): %s clusterlist module: null node",
-                        __FILE__, __FUNCTION__, __LINE__,
-                        clusterlist_module_name);
+      cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: node null",
+			       __FILE__, __FUNCTION__, __LINE__,
+			       clusterlist_module_name);
       return -1;
     }
 
   if (!buf)
     {
-      cerebro_err_debug("%s(%s:%d): %s clusterlist module: null buf",
-                        __FILE__, __FUNCTION__, __LINE__,
-                        clusterlist_module_name);
+      cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: buf null",
+			       __FILE__, __FUNCTION__, __LINE__,
+			       clusterlist_module_name);
       return -1;
     }
 
   if (buflen <= 0)
     {
-      cerebro_err_debug("%s(%s:%d): %s clusterlist module: bad buflen",
-                        __FILE__, __FUNCTION__, __LINE__,
-                        clusterlist_module_name);
+      cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: buflen invalid",
+			       __FILE__, __FUNCTION__, __LINE__,
+			       clusterlist_module_name);
       return -1;
     }
 
   if (!clusterlist_module_name)
     {
-      cerebro_err_debug("%s(%s:%d): %s clusterlist module: null "
-                        "clusterlist_module_name",
-                        __FILE__, __FUNCTION__, __LINE__,
-                        clusterlist_module_name);
+      cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: "
+			       "clusterlist_module_name invalid",
+			       __FILE__, __FUNCTION__, __LINE__,
+			       clusterlist_module_name);
       return -1;
     }
 
@@ -63,9 +63,10 @@ cerebro_clusterlist_copy_nodename(const char *node,
 
   if ((len + 1) > buflen)
     {
-      cerebro_err_debug("%s(%s:%d): %s clusterlist module: buflen too small: %d %d", 
-                        __FILE__, __FUNCTION__, __LINE__,
-                        clusterlist_module_name, len, buflen);
+      cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: "
+			       "buflen too small: %d %d", 
+			       __FILE__, __FUNCTION__, __LINE__,
+			       clusterlist_module_name, len, buflen);
       return -1;
     }
 

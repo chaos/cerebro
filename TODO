@@ -71,3 +71,7 @@
 - do build trick for header files like freeipmi
 
 - config_is_setup? and equiv funcs?
+
+- no filename strdupping in modules, use static length buffers
+
+- remove Strdup from get-all_nodes in clusterlist modules

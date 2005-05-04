@@ -6,6 +6,9 @@
 
 	* Various library cleanup.  Function renaming, err_debug_lib,
 	error debug output cleanup and additions.
+
+	* Various module cleanup.  Use cerebro_err_debug_module function
+	instead of cerebro_err_debug.
 	
 2005-05-02  Albert Chu  <chu11@llnl.gov>
 

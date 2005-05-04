@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_gendersllnl.c,v 1.6 2005-05-03 21:47:39 achu Exp $
+ *  $Id: cerebro_config_gendersllnl.c,v 1.7 2005-05-04 00:41:24 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -51,19 +51,19 @@ gendersllnl_config_setup(void)
 {
   if (gendersllnl_handle)
     {
-      cerebro_err_debug("%s(%s:%d): %s clusterlist module: "
-                        "gendersllnl_handle non-null",
-                        GENDERSLLNL_CONFIG_MODULE_NAME,
-                        __FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: "
+			       "gendersllnl_handle non-null",
+			       GENDERSLLNL_CONFIG_MODULE_NAME,
+			       __FILE__, __FUNCTION__, __LINE__);
       return 0;
     }
 
   if (!(gendersllnl_handle = genders_handle_create()))
     {
-      cerebro_err_debug("%s(%s:%d): %s clusterlist module: "
-                        "genders_handle_create",
-                        GENDERSLLNL_CONFIG_MODULE_NAME,
-                        __FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: "
+			       "genders_handle_create",
+			       GENDERSLLNL_CONFIG_MODULE_NAME,
+			       __FILE__, __FUNCTION__, __LINE__);
       goto cleanup;
     }
  
@@ -71,19 +71,19 @@ gendersllnl_config_setup(void)
     {
       if (genders_errnum(gendersllnl_handle) == GENDERS_ERR_OPEN)
         {
-          cerebro_err_debug("%s config module: genders database '%s' "
-                            "cannot be opened",
-                            GENDERSLLNL_CONFIG_MODULE_NAME, 
-                            GENDERS_DEFAULT_FILE);
+          cerebro_err_debug_module("%s config module: genders database '%s' "
+				   "cannot be opened",
+				   GENDERSLLNL_CONFIG_MODULE_NAME, 
+				   GENDERS_DEFAULT_FILE);
           goto cleanup;
         }
       else
         {
-          cerebro_err_debug("%s(%s:%d): %s config module: "
-                            "genders_load_data: %s",
-                            __FILE__, __FUNCTION__, __LINE__,
-                            GENDERSLLNL_CONFIG_MODULE_NAME, 
-                            genders_errormsg(gendersllnl_handle));
+          cerebro_err_debug_module("%s(%s:%d): %s config module: "
+				   "genders_load_data: %s",
+				   __FILE__, __FUNCTION__, __LINE__,
+				   GENDERSLLNL_CONFIG_MODULE_NAME, 
+				   genders_errormsg(gendersllnl_handle));
           goto cleanup;
         }
     }
@@ -108,20 +108,20 @@ gendersllnl_config_cleanup(void)
 {
   if (!gendersllnl_handle)
     {
-      cerebro_err_debug("%s(%s:%d): %s clusterlist module: "
-                        "gendersllnl_handle null",
-                        GENDERSLLNL_CONFIG_MODULE_NAME,
-                        __FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: "
+			       "gendersllnl_handle null",
+			       GENDERSLLNL_CONFIG_MODULE_NAME,
+			       __FILE__, __FUNCTION__, __LINE__);
       return 0;
     }
 
   if (genders_handle_destroy(gendersllnl_handle) < 0)
     {
-      cerebro_err_debug("%s(%s:%d): %s config module: "
-                        "genders_handle_destroy: %s",
-                        __FILE__, __FUNCTION__, __LINE__,
-                        GENDERSLLNL_CONFIG_MODULE_NAME, 
-                        genders_errormsg(gendersllnl_handle));
+      cerebro_err_debug_module("%s(%s:%d): %s config module: "
+			       "genders_handle_destroy: %s",
+			       __FILE__, __FUNCTION__, __LINE__,
+			       GENDERSLLNL_CONFIG_MODULE_NAME, 
+			       genders_errormsg(gendersllnl_handle));
     }
 
   gendersllnl_handle = NULL;
@@ -146,27 +146,27 @@ gendersllnl_config_load_default(struct cerebro_config *conf)
 
   if (!gendersllnl_handle)
     {
-      cerebro_err_debug("%s(%s:%d): %s clusterlist module: "
-                        "gendersllnl_handle null",
-                        GENDERSLLNL_CONFIG_MODULE_NAME,
-                        __FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: "
+			       "gendersllnl_handle null",
+			       GENDERSLLNL_CONFIG_MODULE_NAME,
+			       __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
   if (!conf)
     {
-      cerebro_err_debug("%s(%s:%d): %s clusterlist module: "
-                        "invalid conf parameter",
-                        GENDERSLLNL_CONFIG_MODULE_NAME,
-                        __FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: "
+			       "invalid conf parameter",
+			       GENDERSLLNL_CONFIG_MODULE_NAME,
+			       __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
   if ((is_mgmt = genders_testattr(gendersllnl_handle, NULL, "mgmt", NULL, 0)) < 0)
     {
-      cerebro_err_debug("%s(%s:%d): genders_testattr: %s", 
-                        __FILE__, __FUNCTION__, __LINE__,
-                        genders_errormsg(gendersllnl_handle));
+      cerebro_err_debug_module("%s(%s:%d): genders_testattr: %s", 
+			       __FILE__, __FUNCTION__, __LINE__,
+			       genders_errormsg(gendersllnl_handle));
       return -1;
     }
   
@@ -193,9 +193,9 @@ gendersllnl_config_load_default(struct cerebro_config *conf)
 
       if ((nodelist_len = genders_nodelist_create(gendersllnl_handle, &nodelist)) < 0)
 	{
-	  cerebro_err_debug("%s(%s:%d): genders_nodelist_create: %s",
-			    __FILE__, __FUNCTION__, __LINE__,
-			    genders_errormsg(gendersllnl_handle));
+	  cerebro_err_debug_module("%s(%s:%d): genders_nodelist_create: %s",
+				   __FILE__, __FUNCTION__, __LINE__,
+				   genders_errormsg(gendersllnl_handle));
 	  return -1;
 	}
       
@@ -205,9 +205,9 @@ gendersllnl_config_load_default(struct cerebro_config *conf)
 				       "mgmt",
 				       NULL)) < 0)
 	{
-	  cerebro_err_debug("%s(%s:%d): genders_getnodes: %s",
-			    __FILE__, __FUNCTION__, __LINE__,
-			    genders_errormsg(gendersllnl_handle));
+	  cerebro_err_debug_module("%s(%s:%d): genders_getnodes: %s",
+				   __FILE__, __FUNCTION__, __LINE__,
+				   genders_errormsg(gendersllnl_handle));
 	  genders_nodelist_destroy(gendersllnl_handle, nodelist);      
 	  return -1;
 	}
@@ -219,9 +219,9 @@ gendersllnl_config_load_default(struct cerebro_config *conf)
 	{
 	  if (strlen(nodelist[i]) > CEREBRO_MAXNODENAMELEN)
 	    {
-	      cerebro_err_debug("%s(%s:%d): genders_getnodes: %s",
-				__FILE__, __FUNCTION__, __LINE__,
-				genders_errormsg(gendersllnl_handle));
+	      cerebro_err_debug_module("%s(%s:%d): genders_getnodes: %s",
+				       __FILE__, __FUNCTION__, __LINE__,
+				       genders_errormsg(gendersllnl_handle));
 	      genders_nodelist_destroy(gendersllnl_handle, nodelist);      
 	      return -1;
 	    }
@@ -240,9 +240,9 @@ gendersllnl_config_load_default(struct cerebro_config *conf)
                               altnamebuf,
                               CEREBRO_MAXNODENAMELEN)) < 0)
     {
-      cerebro_err_debug("%s(%s:%d): genders_testattr: %s",
-                        __FILE__, __FUNCTION__, __LINE__,
-                        genders_errormsg(gendersllnl_handle));
+      cerebro_err_debug_module("%s(%s:%d): genders_testattr: %s",
+			       __FILE__, __FUNCTION__, __LINE__,
+			       genders_errormsg(gendersllnl_handle));
       return -1;
     }
 
@@ -254,9 +254,9 @@ gendersllnl_config_load_default(struct cerebro_config *conf)
 
       if (!(h = gethostbyname(altnamebuf)))
         {
-          cerebro_err_debug("%s(%s:%d): gethostbyname: %s",
-                            __FILE__, __FUNCTION__, __LINE__,
-                            hstrerror(h_errno));
+          cerebro_err_debug_module("%s(%s:%d): gethostbyname: %s",
+				   __FILE__, __FUNCTION__, __LINE__,
+				   hstrerror(h_errno));
           return -1;
         }
 
@@ -268,9 +268,9 @@ gendersllnl_config_load_default(struct cerebro_config *conf)
                      heartbeat_network_interface,
                      INET_ADDRSTRLEN+1))
         {
-          cerebro_err_debug("%s(%s:%d): inet_ntop: %s",
-                            __FILE__, __FUNCTION__, __LINE__,
-                            strerror(errno));
+          cerebro_err_debug_module("%s(%s:%d): inet_ntop: %s",
+				   __FILE__, __FUNCTION__, __LINE__,
+				   strerror(errno));
           return -1;
         }
      

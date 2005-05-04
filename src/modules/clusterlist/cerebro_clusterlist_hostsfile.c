@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_hostsfile.c,v 1.10 2005-04-30 17:09:10 achu Exp $
+ *  $Id: cerebro_clusterlist_hostsfile.c,v 1.11 2005-05-04 00:41:24 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -62,27 +62,27 @@ _readline(int fd, char *buf, int buflen)
 
   if (!buf)
     {
-      cerebro_err_debug("%s(%s:%d): %s clusterlist module: null buffer", 
-                        __FILE__, __FUNCTION__, __LINE__,
-                        HOSTSFILE_CLUSTERLIST_MODULE_NAME);
+      cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: null buffer", 
+			       __FILE__, __FUNCTION__, __LINE__,
+			       HOSTSFILE_CLUSTERLIST_MODULE_NAME);
       return -1;
     }
 
   if ((ret = fd_read_line(fd, buf, buflen)) < 0)
     {
-      cerebro_err_debug("%s(%s:%d): %s clusterlist module: fd_read_line: %s", 
-                        __FILE__, __FUNCTION__, __LINE__,
-                        HOSTSFILE_CLUSTERLIST_MODULE_NAME, strerror(errno));
+      cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: fd_read_line: %s", 
+			       __FILE__, __FUNCTION__, __LINE__,
+			       HOSTSFILE_CLUSTERLIST_MODULE_NAME, strerror(errno));
       return -1;
     }
   
   /* buflen - 1 b/c fd_read_line guarantees null termination */
   if (ret >= (buflen-1))
     {
-      cerebro_err_debug("%s(%s:%d): %s clusterlist module: "
-                        "fd_read_line: line truncation",
-                        __FILE__, __FUNCTION__, __LINE__, 
-                        HOSTSFILE_CLUSTERLIST_MODULE_NAME);
+      cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: "
+			       "fd_read_line: line truncation",
+			       __FILE__, __FUNCTION__, __LINE__, 
+			       HOSTSFILE_CLUSTERLIST_MODULE_NAME);
       return -1;
     }
 
@@ -106,9 +106,9 @@ _remove_comments(char *buf, int buflen)
 
   if (!buf)
     {
-      cerebro_err_debug("%s(%s:%d): %s clusterlist module: null buffer", 
-                        __FILE__, __FUNCTION__, __LINE__,
-                        HOSTSFILE_CLUSTERLIST_MODULE_NAME);
+      cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: null buffer", 
+			       __FILE__, __FUNCTION__, __LINE__,
+			       HOSTSFILE_CLUSTERLIST_MODULE_NAME);
       return -1;
     }
 
@@ -155,9 +155,9 @@ _remove_trailing_whitespace(char *buf, int buflen)
   
   if (!buf)
     {
-      cerebro_err_debug("%s(%s:%d): %s clusterlist module: null buffer", 
-                        __FILE__, __FUNCTION__, __LINE__,
-                        HOSTSFILE_CLUSTERLIST_MODULE_NAME);
+      cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: null buffer", 
+			       __FILE__, __FUNCTION__, __LINE__,
+			       HOSTSFILE_CLUSTERLIST_MODULE_NAME);
       return -1;
     }
 
@@ -188,9 +188,9 @@ _move_past_whitespace(char *buf)
 {
   if (!buf)
     {
-      cerebro_err_debug("%s(%s:%d): %s clusterlist module: null buffer", 
-                        __FILE__, __FUNCTION__, __LINE__,
-                        HOSTSFILE_CLUSTERLIST_MODULE_NAME);
+      cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: null buffer", 
+			       __FILE__, __FUNCTION__, __LINE__,
+			       HOSTSFILE_CLUSTERLIST_MODULE_NAME);
       return NULL;
     }
 
@@ -215,17 +215,17 @@ hostsfile_clusterlist_setup(void)
 
   if (hosts)
     {
-      cerebro_err_debug("%s(%s:%d): %s clusterlist module: hosts non-null", 
-                        __FILE__, __FUNCTION__, __LINE__,
-                        HOSTSFILE_CLUSTERLIST_MODULE_NAME);
+      cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: hosts non-null", 
+			       __FILE__, __FUNCTION__, __LINE__,
+			       HOSTSFILE_CLUSTERLIST_MODULE_NAME);
       return 0;
     }
 
   if (!(hosts = list_create((ListDelF)free)))
     {
-      cerebro_err_debug("%s(%s:%d): %s clusterlist module: list_create: %s", 
-                        __FILE__, __FUNCTION__, __LINE__,
-                        HOSTSFILE_CLUSTERLIST_MODULE_NAME, strerror(errno));
+      cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: list_create: %s", 
+			       __FILE__, __FUNCTION__, __LINE__,
+			       HOSTSFILE_CLUSTERLIST_MODULE_NAME, strerror(errno));
       goto cleanup;
     }
 
@@ -236,7 +236,8 @@ hostsfile_clusterlist_setup(void)
 
   if ((fd = open(file, O_RDONLY)) < 0)
     {
-      cerebro_err_debug("hostsfile clusterlist file '%s' cannot be opened", file);
+      cerebro_err_debug_module("hostsfile clusterlist file '%s' cannot be opened: %s", 
+			       file, strerror(errno));
       goto cleanup;
     }
  
@@ -265,16 +266,16 @@ hostsfile_clusterlist_setup(void)
 
       if (strchr(hostPtr, ' ') || strchr(hostPtr, '\t'))
         {
-          cerebro_err_debug("hostsfile clusterlist parse error: "
-                            "host contains whitespace");
+          cerebro_err_debug_module("hostsfile clusterlist parse error: "
+				   "host contains whitespace");
           goto cleanup;
         }
 
       if (strlen(hostPtr) > CEREBRO_MAXNODENAMELEN)
         {
-          cerebro_err_debug("hostsfile clusterlist parse error: "
-                            "nodename '%s' exceeds maximum length", 
-                            hostPtr);
+          cerebro_err_debug_module("hostsfile clusterlist parse error: "
+				   "nodename '%s' exceeds maximum length", 
+				   hostPtr);
           goto cleanup;
         }
       
@@ -284,17 +285,17 @@ hostsfile_clusterlist_setup(void)
 
       if (!(str = strdup(hostPtr)))
         {
-          cerebro_err_debug("%s(%s:%d): %s clusterlist module: strdup: %s", 
-                            __FILE__, __FUNCTION__, __LINE__,
-                            HOSTSFILE_CLUSTERLIST_MODULE_NAME, strerror(errno));
+          cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: strdup: %s", 
+				   __FILE__, __FUNCTION__, __LINE__,
+				   HOSTSFILE_CLUSTERLIST_MODULE_NAME, strerror(errno));
           goto cleanup;
         }
 
       if (!list_append(hosts, str))
         {
-          cerebro_err_debug("%s(%s:%d): %s clusterlist module: list_append: %s", 
-                            __FILE__, __FUNCTION__, __LINE__,
-                            HOSTSFILE_CLUSTERLIST_MODULE_NAME, strerror(errno));
+          cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: list_append: %s", 
+				   __FILE__, __FUNCTION__, __LINE__,
+				   HOSTSFILE_CLUSTERLIST_MODULE_NAME, strerror(errno));
           goto cleanup;
         }
     }
@@ -323,9 +324,9 @@ hostsfile_clusterlist_cleanup(void)
 {
   if (!hosts)
     {
-      cerebro_err_debug("%s(%s:%d): %s clusterlist module: hosts null", 
-                        __FILE__, __FUNCTION__, __LINE__,
-                        HOSTSFILE_CLUSTERLIST_MODULE_NAME);
+      cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: hosts null", 
+			       __FILE__, __FUNCTION__, __LINE__,
+			       HOSTSFILE_CLUSTERLIST_MODULE_NAME);
       return 0;
     }
 
@@ -351,18 +352,18 @@ hostsfile_clusterlist_get_all_nodes(char **nodes, unsigned int nodeslen)
 
   if (!hosts)
     {
-      cerebro_err_debug("%s(%s:%d): %s clusterlist module: hosts null", 
-                        __FILE__, __FUNCTION__, __LINE__,
-                        HOSTSFILE_CLUSTERLIST_MODULE_NAME);
+      cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: hosts null", 
+			       __FILE__, __FUNCTION__, __LINE__,
+			       HOSTSFILE_CLUSTERLIST_MODULE_NAME);
       return -1;
     }
 
   if (!nodes)
     {     
-      cerebro_err_debug("%s(%s:%d): %s clusterlist module: "
-                        "invalid nodes parameter",
-                        HOSTSFILE_CLUSTERLIST_MODULE_NAME,
-                        __FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: "
+			       "nodes null"
+			       HOSTSFILE_CLUSTERLIST_MODULE_NAME,
+			       __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
@@ -370,17 +371,18 @@ hostsfile_clusterlist_get_all_nodes(char **nodes, unsigned int nodeslen)
 
   if (numnodes > nodeslen)
     {
-      cerebro_err_debug("%s(%s:%d): %s clusterlist module: nodeslen too small",
-                        __FILE__, __FUNCTION__, __LINE__,
-                        HOSTSFILE_CLUSTERLIST_MODULE_NAME);
+      cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: "
+			       "nodeslen invalid",
+			       __FILE__, __FUNCTION__, __LINE__,
+			       HOSTSFILE_CLUSTERLIST_MODULE_NAME);
       goto cleanup;
     }
 
   if (!(itr = list_iterator_create(hosts)))
     {
-      cerebro_err_debug("%s(%s:%d): %s clusterlist module: list_iterator_create: %s", 
-                        __FILE__, __FUNCTION__, __LINE__,
-                        HOSTSFILE_CLUSTERLIST_MODULE_NAME, strerror(errno));
+      cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: list_iterator_create: %s", 
+			       __FILE__, __FUNCTION__, __LINE__,
+			       HOSTSFILE_CLUSTERLIST_MODULE_NAME, strerror(errno));
       goto cleanup;
     }
 
@@ -388,18 +390,18 @@ hostsfile_clusterlist_get_all_nodes(char **nodes, unsigned int nodeslen)
     {
       if (!(nodes[i++] = strdup(node)))
         {
-          cerebro_err_debug("%s(%s:%d): %s clusterlist module: strdup: %s", 
-                            __FILE__, __FUNCTION__, __LINE__,
-                            HOSTSFILE_CLUSTERLIST_MODULE_NAME, strerror(errno));
+          cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: strdup: %s", 
+				   __FILE__, __FUNCTION__, __LINE__,
+				   HOSTSFILE_CLUSTERLIST_MODULE_NAME, strerror(errno));
           goto cleanup;
         }
     }
 
   if (i > numnodes)
     {
-      cerebro_err_debug("%s(%s:%d): %s clusterlist module: iterator count error",
-                        __FILE__, __FUNCTION__, __LINE__,
-                        HOSTSFILE_CLUSTERLIST_MODULE_NAME);
+      cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: iterator count error",
+			       __FILE__, __FUNCTION__, __LINE__,
+			       HOSTSFILE_CLUSTERLIST_MODULE_NAME);
       goto cleanup;
     }
 
@@ -423,9 +425,9 @@ hostsfile_clusterlist_numnodes(void)
 {
   if (!hosts)
     {
-      cerebro_err_debug("%s(%s:%d): %s clusterlist module: hosts null", 
-                        __FILE__, __FUNCTION__, __LINE__,
-                        HOSTSFILE_CLUSTERLIST_MODULE_NAME);
+      cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: hosts null", 
+			       __FILE__, __FUNCTION__, __LINE__,
+			       HOSTSFILE_CLUSTERLIST_MODULE_NAME);
       return -1;
     }
 
@@ -446,18 +448,18 @@ hostsfile_clusterlist_node_in_cluster(const char *node)
 
   if (!hosts)
     {
-      cerebro_err_debug("%s(%s:%d): %s clusterlist module: hosts null", 
-                        __FILE__, __FUNCTION__, __LINE__,
-                        HOSTSFILE_CLUSTERLIST_MODULE_NAME);
+      cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: hosts null", 
+			       __FILE__, __FUNCTION__, __LINE__,
+			       HOSTSFILE_CLUSTERLIST_MODULE_NAME);
       return -1;
     }
 
   if (!node)
     {     
-      cerebro_err_debug("%s(%s:%d): %s clusterlist module: "
-                        "invalid node parameter",
-                        HOSTSFILE_CLUSTERLIST_MODULE_NAME,
-                        __FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: "
+			       "node null",
+			       HOSTSFILE_CLUSTERLIST_MODULE_NAME,
+			       __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
@@ -493,36 +495,36 @@ hostsfile_clusterlist_get_nodename(const char *node, char *buf, unsigned int buf
 
   if (!hosts)
     {
-      cerebro_err_debug("%s(%s:%d): %s clusterlist module: hosts null", 
-                        __FILE__, __FUNCTION__, __LINE__,
-                        HOSTSFILE_CLUSTERLIST_MODULE_NAME);
+      cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: hosts null", 
+			       __FILE__, __FUNCTION__, __LINE__,
+			       HOSTSFILE_CLUSTERLIST_MODULE_NAME);
       return -1;
     }
 
   if (!node)
     {     
-      cerebro_err_debug("%s(%s:%d): %s clusterlist module: "
-                        "invalid node parameter",
-                        HOSTSFILE_CLUSTERLIST_MODULE_NAME,
-                        __FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: "
+			       "node null",
+			       HOSTSFILE_CLUSTERLIST_MODULE_NAME,
+			       __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
   if (!buf)
     {     
-      cerebro_err_debug("%s(%s:%d): %s clusterlist module: "
-                        "invalid buf parameter",
-                        HOSTSFILE_CLUSTERLIST_MODULE_NAME,
-                        __FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: "
+			       "buf null",
+			       HOSTSFILE_CLUSTERLIST_MODULE_NAME,
+			       __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
   if (!(buflen > 0))
     {
-      cerebro_err_debug("%s(%s:%d): %s clusterlist module: "
-                        "invalid buflen parameter",
-                        HOSTSFILE_CLUSTERLIST_MODULE_NAME,
-                        __FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: "
+			       "buflen invalid",
+			       HOSTSFILE_CLUSTERLIST_MODULE_NAME,
+			       __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
