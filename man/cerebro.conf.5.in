@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro.conf.5.in,v 1.2 2005-05-02 21:26:46 achu Exp $
+\."$Id: cerebro.conf.5.in,v 1.3 2005-05-04 15:57:24 achu Exp $
 \."#############################################################################
 .TH cerebro.conf 5 "May 2005" "cerebro.conf @VERSION@" "cerebro.conf"
 .SH "NAME"
@@ -149,6 +149,6 @@ from the command line with the
 option.  This option is turned off by default.
 \}
 .SH "FILES"
-@CEREBROD_CONFIG_FILE_DEFAULT@
+@CEREBRO_CONFIG_FILE_DEFAULT@
 .SH "SEE ALSO"
 cerebrod(1), cerebrod(8)

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.86 2005-05-04 01:00:55 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.87 2005-05-04 15:57:24 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -66,7 +66,7 @@ _cerebrod_config_default(void)
 #ifndef NDEBUG
   conf.debug = CEREBROD_DEBUG_DEFAULT;
 #endif /* NDEBUG */
-  conf.config_file = CEREBROD_CONFIG_FILE_DEFAULT;
+  conf.config_file = CEREBRO_CONFIG_FILE_DEFAULT;
   conf.heartbeat_frequency_min = CEREBROD_HEARTBEAT_FREQUENCY_MIN_DEFAULT;
   conf.heartbeat_frequency_max = CEREBROD_HEARTBEAT_FREQUENCY_MAX_DEFAULT;
   conf.heartbeat_source_port = CEREBROD_HEARTBEAT_SOURCE_PORT_DEFAULT;
@@ -195,7 +195,7 @@ _cerebrod_cmdline_check(void)
       /* The default config_file is allowed to be missing, so don't
        * bother checking if it exists.
        */
-      if (strcmp(conf.config_file, CEREBROD_CONFIG_FILE_DEFAULT) != 0)
+      if (strcmp(conf.config_file, CEREBRO_CONFIG_FILE_DEFAULT) != 0)
         {
           struct stat buf;
   
