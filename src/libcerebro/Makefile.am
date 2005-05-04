@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.31 2005-05-04 18:23:37 achu Exp $
+## $Id: Makefile.am,v 1.32 2005-05-04 23:04:23 achu Exp $
 ##*****************************************************************************
 
 if WITH_GNU_LD
@@ -35,7 +35,7 @@ libcerebro_la_CFLAGS  = -D_REENTRANT \
 			-DCEREBRO_CLUSTERLIST_MODULE_BUILDDIR=\"$(cerebro_clusterlist_module_builddir)\" \
 			-DCEREBRO_CONFIG_MODULE_BUILDDIR=\"$(cerebro_config_module_builddir)\" \
 			-I$(srcdir)/../libcommon
-libcerebro_la_SOURCES = cerebro_api.c \
+libcerebro_la_SOURCES = cerebro.c \
 			cerebro_config.c \
 			cerebro_error.c \
 			cerebro_marshalling.c \
