@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.10 2005-05-04 00:20:55 achu Exp $
+ *  $Id: cerebro.h,v 1.11 2005-05-04 18:23:37 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_H
@@ -156,6 +156,15 @@ int cerebro_updown_load_data(cerebro_t handle,
                              unsigned int port, 
                              unsigned int timeout_len,
                              int flags);
+
+/* 
+ * cerebro_updown_unload_data
+ *
+ * Cleanup allocated updown data
+ *
+ * Returns 0 on success, -1 on error
+ */
+int cerebro_updown_unload_data(cerebro_t handle);
 
 /*
  * cerebro_updown_get_up_nodes

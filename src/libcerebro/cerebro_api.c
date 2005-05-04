@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_api.c,v 1.12 2005-05-04 00:20:55 achu Exp $
+ *  $Id: cerebro_api.c,v 1.13 2005-05-04 18:23:37 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -17,12 +17,8 @@
 #include "cerebro_config.h"
 #include "cerebro_module.h"
 #include "cerebro_util.h"
-#include "cerebro_updown.h"
 
-#include "conffile.h"
-#include "ltdl.h"
-
-char *cerebro_error_messages[] =
+static char *cerebro_error_messages[] =
   {
     "success",
     "null cerebro_t handle",

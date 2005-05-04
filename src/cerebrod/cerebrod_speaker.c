@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.26 2005-05-04 17:43:26 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.27 2005-05-04 18:23:37 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -24,11 +24,10 @@
 #include "cerebrod_heartbeat_protocol.h"
 
 #include "cerebrod.h"
-#include "cerebrod_speaker.h"
 #include "cerebrod_config.h"
 #include "cerebrod_data.h"
 #include "cerebrod_heartbeat.h"
-#include "fd.h"
+#include "cerebrod_speaker.h"
 #include "wrappers.h"
 
 extern struct cerebrod_config conf;

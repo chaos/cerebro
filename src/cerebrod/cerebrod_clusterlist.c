@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist.c,v 1.34 2005-05-04 01:00:55 achu Exp $
+ *  $Id: cerebrod_clusterlist.c,v 1.35 2005-05-04 18:23:37 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -8,22 +8,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#if STDC_HEADERS
-#include <string.h>
-#endif /* STDC_HEADERS */
-#include <assert.h>
-#include <errno.h>
-
-#include <sys/param.h>
 
 #include "cerebro_error.h"
-#include "cerebro_clusterlist_module.h"
 #include "cerebro_module.h"
 
 #include "cerebrod.h"
 #include "cerebrod_clusterlist.h"
 #include "cerebrod_config.h"
-#include "wrappers.h"
 
 extern struct cerebrod_config conf;
 

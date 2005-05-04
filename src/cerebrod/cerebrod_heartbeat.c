@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_heartbeat.c,v 1.22 2005-05-04 17:43:26 achu Exp $
+ *  $Id: cerebrod_heartbeat.c,v 1.23 2005-05-04 18:23:37 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -8,14 +8,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#if STDC_HEADERS
-#include <string.h>
-#endif /* STDC_HEADERS */
-#include <netinet/in.h>
 #include <assert.h>
 #include <errno.h>
 
 #include "cerebrod_heartbeat_protocol.h"
+
 #include "cerebrod_heartbeat.h"
 #include "cerebrod_config.h"
 #include "wrappers.h"

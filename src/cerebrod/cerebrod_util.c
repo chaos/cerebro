@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_util.c,v 1.11 2005-05-04 17:24:05 achu Exp $
+ *  $Id: cerebrod_util.c,v 1.12 2005-05-04 18:23:37 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -11,7 +11,6 @@
 #if STDC_HEADERS
 #include <string.h>
 #endif /* STDC_HEADERS */
-#include <netinet/in.h>
 #include <assert.h>
 #include <errno.h>
 

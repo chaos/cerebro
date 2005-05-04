@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.h,v 1.8 2005-04-27 18:11:35 achu Exp $
+ *  $Id: cerebrod_listener.h,v 1.9 2005-05-04 18:23:37 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_LISTENER_H
@@ -12,8 +12,6 @@
 #if HAVE_PTHREAD_H
 #include <pthread.h>
 #endif /* HAVE_PTHREAD_H */
-
-#include "cerebrod.h"
 
 #define CEREBROD_LISTENER_REINITIALIZE_WAIT 2
 

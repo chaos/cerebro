@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_data.c,v 1.9 2005-05-04 17:43:26 achu Exp $
+ *  $Id: cerebrod_data.c,v 1.10 2005-05-04 18:23:37 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -31,7 +31,6 @@
  * cached cerebrod starttime value
  */
 static u_int32_t cerebrod_starttime = 0;
-
 
 /* 
  * cerebrod_boottime

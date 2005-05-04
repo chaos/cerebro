@@ -1,11 +1,9 @@
 /*****************************************************************************\
- *  $Id: cerebro_util.h,v 1.3 2005-04-27 00:01:30 achu Exp $
+ *  $Id: cerebro_util.h,v 1.4 2005-05-04 18:23:37 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_UTIL_H
 #define _CEREBRO_UTIL_H
-
-#include "cerebro.h"
 
 /* 
  * cerebro_handle_check

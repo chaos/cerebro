@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_daemon.c,v 1.6 2005-03-30 05:41:45 achu Exp $
+ *  $Id: cerebrod_daemon.c,v 1.7 2005-05-04 18:23:37 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -11,7 +11,6 @@
 #if HAVE_UNISTD_H
 #include <unistd.h>
 #endif /* HAVE_UNISTD_H */
-#include <assert.h>
 
 #include "cerebrod_daemon.h"
 #include "wrappers.h"

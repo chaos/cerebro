@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_error.c,v 1.4 2005-05-03 23:41:40 achu Exp $
+ *  $Id: cerebro_error.c,v 1.5 2005-05-04 18:23:37 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -13,7 +13,9 @@
 #include <stdarg.h>
 #endif /* STDC_HEADERS */
 #include <errno.h>
+#if HAVE_PTHREAD_H
 #include <pthread.h>
+#endif /* HAVE_PTHREAD_H */
 
 #include "cerebro_error.h"
 #include "error.h"

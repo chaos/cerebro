@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_util.c,v 1.9 2005-05-04 17:43:26 achu Exp $
+ *  $Id: cerebro_util.c,v 1.10 2005-05-04 18:23:37 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -23,7 +23,6 @@
 #include <sys/types.h>
 #include <sys/select.h>
 #include <errno.h>
-
 
 #include "cerebro.h"
 #include "cerebro_api.h"

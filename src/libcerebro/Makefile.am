@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.30 2005-05-04 17:24:05 achu Exp $
+## $Id: Makefile.am,v 1.31 2005-05-04 18:23:37 achu Exp $
 ##*****************************************************************************
 
 if WITH_GNU_LD
@@ -15,7 +15,6 @@ endif
 noinst_HEADERS = cerebro_config.h \
 		 cerebro_marshalling.h \
 		 cerebro_module.h \
-		 cerebro_updown.h \
 		 cerebro_updown_protocol.h \
 		 cerebro_util.h \
 		 cerebrod_heartbeat_protocol.h 

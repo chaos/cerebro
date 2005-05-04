@@ -12,11 +12,11 @@ Testing
 
 Cleanup
 - reorg cerebro err codes
-- .h file order consistency
 - buf vs. buffer
 - rv
   - retval for an actual return value
   - ptr, temp, etc. for something temporarily read
+- constants - good names
 - naming convention, begin with _cerebro or not
 - 80 columns
 - still legit comments
@@ -32,6 +32,7 @@ Portability
 - Non-pthreads support
 
 Design
+- move listener hash into status hash 
 - strerror_r and errormsg_r funcs
 - libcerebro set configfile, module, etc. functions
 - generic err message in cerebro_t handle, i.e for conffile errors
