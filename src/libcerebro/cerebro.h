@@ -1,32 +1,31 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.11 2005-05-04 18:23:37 achu Exp $
+ *  $Id: cerebro.h,v 1.12 2005-05-04 20:58:08 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_H
 #define _CEREBRO_H
 
-#define CEREBRO_ERR_SUCCESS               0
-#define CEREBRO_ERR_NULLHANDLE            1
-#define CEREBRO_ERR_MAGIC_NUMBER          2
-#define CEREBRO_ERR_PARAMETERS            3
-#define CEREBRO_ERR_NOT_LOADED            4
-#define CEREBRO_ERR_VERSION_INCOMPATIBLE  5
-#define CEREBRO_ERR_HOSTNAME              6
-#define CEREBRO_ERR_ADDRESS               7
-#define CEREBRO_ERR_CONNECT               8
-#define CEREBRO_ERR_CONNECT_TIMEOUT       9
-#define CEREBRO_ERR_NETWORK              10
-#define CEREBRO_ERR_PROTOCOL             11
-#define CEREBRO_ERR_PROTOCOL_TIMEOUT     12 
-#define CEREBRO_ERR_OVERFLOW             13
-#define CEREBRO_ERR_NODE_NOTFOUND        14
-#define CEREBRO_ERR_OUTMEM               15 
-#define CEREBRO_ERR_CONFIG_FILE          16
-#define CEREBRO_ERR_CONFIG_MODULE        17
-#define CEREBRO_ERR_CONFIG_INPUT         18
-#define CEREBRO_ERR_CLUSTERLIST_MODULE   19
-#define CEREBRO_ERR_INTERNAL             20
-#define CEREBRO_ERR_ERRNUMRANGE          21
+#define CEREBRO_ERR_SUCCESS                0
+#define CEREBRO_ERR_NULLHANDLE             1
+#define CEREBRO_ERR_MAGIC_NUMBER           2
+#define CEREBRO_ERR_PARAMETERS             3
+#define CEREBRO_ERR_NOT_LOADED             4
+#define CEREBRO_ERR_HOSTNAME               5
+#define CEREBRO_ERR_ADDRESS                6
+#define CEREBRO_ERR_CONNECT                7
+#define CEREBRO_ERR_CONNECT_TIMEOUT        8
+#define CEREBRO_ERR_PROTOCOL               9
+#define CEREBRO_ERR_PROTOCOL_TIMEOUT      10 
+#define CEREBRO_ERR_VERSION_INCOMPATIBLE  11
+#define CEREBRO_ERR_OVERFLOW              12
+#define CEREBRO_ERR_NODE_NOTFOUND         13
+#define CEREBRO_ERR_CONFIG_FILE           14
+#define CEREBRO_ERR_CONFIG_MODULE         15
+#define CEREBRO_ERR_CONFIG_INPUT          16
+#define CEREBRO_ERR_CLUSTERLIST_MODULE    17
+#define CEREBRO_ERR_OUTMEM                18 
+#define CEREBRO_ERR_INTERNAL              19
+#define CEREBRO_ERR_ERRNUMRANGE           20
 
 typedef struct cerebro *cerebro_t;
 

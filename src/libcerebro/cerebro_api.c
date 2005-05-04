@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_api.c,v 1.14 2005-05-04 20:08:06 achu Exp $
+ *  $Id: cerebro_api.c,v 1.15 2005-05-04 20:58:08 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -25,21 +25,20 @@ static char *cerebro_error_messages[] =
     "invalid magic number",
     "invalid parameters",
     "server data not loaded",
-    "cerebro version incompatabile",
     "invalid hostname",
     "invalid address",
     "connection error",
     "connection timeout",
-    "network communication error",
     "protocol error",
     "protocol timeout",
+    "version incompatible",
     "buffer overflow",
     "node not found",
-    "out of memory",
     "config file error",
     "config module error",
     "config input error",
     "clusterlist module error",
+    "out of memory",
     "internal error",
     "errnum out of range",
   };

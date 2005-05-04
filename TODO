@@ -1,5 +1,4 @@
 Documention
-
 - README description
 - cerebro.1 manpage
 - doc for writing modules
@@ -11,7 +10,6 @@ Testing
 - none module works if no clusterlist modules found
 
 Cleanup
-- reorg cerebro err codes
 - naming convention, begin with _cerebro or not
 - 80 columns
 - still legit comments

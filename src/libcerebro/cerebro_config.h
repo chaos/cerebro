@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config.h,v 1.6 2005-05-04 20:11:01 achu Exp $
+ *  $Id: cerebro_config.h,v 1.7 2005-05-04 20:58:08 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_CONFIG_H
@@ -44,7 +44,7 @@ struct cerebro_config
   int cerebrod_heartbeat_source_port_flag;
   int cerebrod_heartbeat_destination_port;
   int cerebrod_heartbeat_destination_port_flag;
-  char cerebrod_heartbeat_destination_ip[CEREBRO_MAXIPADDREN+1];
+  char cerebrod_heartbeat_destination_ip[CEREBRO_MAXIPADDRLEN+1];
   int cerebrod_heartbeat_destination_ip_flag;
   char cerebrod_heartbeat_network_interface[CEREBRO_MAXNETWORKINTERFACELEN+1];
   int cerebrod_heartbeat_network_interface_flag;

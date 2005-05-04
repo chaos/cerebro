@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_util.h,v 1.4 2005-04-29 23:39:44 achu Exp $
+ *  $Id: cerebro_clusterlist_util.h,v 1.5 2005-05-04 20:58:09 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_CLUSTERLIST_UTIL_H
@@ -14,7 +14,6 @@
  */
 int cerebro_clusterlist_copy_nodename(const char *node, 
                                       char *buf, 
-                                      unsigned int buflen, 
-                                      char *clusterlist_module_name);
+                                      unsigned int buflen);
 
 #endif /* _CEREBRO_CLUSTERLIST_UTIL_H */

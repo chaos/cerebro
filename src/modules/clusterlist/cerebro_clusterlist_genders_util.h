@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_genders_util.h,v 1.4 2005-05-04 01:15:30 achu Exp $
+ *  $Id: cerebro_clusterlist_genders_util.h,v 1.5 2005-05-04 20:58:09 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_CLUSTERLIST_GENDERS_UTIL_H
@@ -10,16 +10,14 @@
  *
  * common setup function for genders and gendersllnl setup
  */
-int cerebro_clusterlist_genders_setup(genders_t *handle, 
-                                      char *clusterlist_module_name);
+int cerebro_clusterlist_genders_setup(genders_t *handle);
 
 /* 
  * cerebro_clusterlist_genders_cleanup
  *
  * common cleanup function for genders and gendersllnl cleanup
  */
-int cerebro_clusterlist_genders_cleanup(genders_t *handle, 
-                                        char *clusterlist_module_name);
+int cerebro_clusterlist_genders_cleanup(genders_t *handle);
 
 /* 
  * cerebro_clusterlist_genders_get_all_nodes
@@ -28,15 +26,13 @@ int cerebro_clusterlist_genders_cleanup(genders_t *handle,
  */
 int cerebro_clusterlist_genders_get_all_nodes(genders_t handle, 
                                               char **nodes, 
-                                              unsigned int nodeslen, 
-                                              char *clusterlist_module_name);
+                                              unsigned int nodeslen);
 
 /* 
  * cerebro_clusterlist_genders_numnodes
  *
  * common numnodes function for genders and gendersllnl numnodes
  */
-int cerebro_clusterlist_genders_numnodes(genders_t handle, 
-                                         char *clusterlist_module_name);
+int cerebro_clusterlist_genders_numnodes(genders_t handle);
 
 #endif /* _CEREBRO_CLUSTERLIST_GENDERS_UTIL_H */
