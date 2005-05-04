@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.c,v 1.50 2005-05-04 22:21:33 achu Exp $
+ *  $Id: cerebrod_updown.c,v 1.51 2005-05-04 23:15:58 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -693,7 +693,7 @@ _cerebrod_updown_respond_with_error(int client_fd,
       err_res.version = version;
       err_res.updown_err_code = updown_err_code;
 
-      if (_cerebrod_updown_err_response_send_one(client_fd, &err_res) < 0)
+      if (_cerebrod_updown_err_response_send(client_fd, &err_res) < 0)
         return -1;
 
       return 0;
