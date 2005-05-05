@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_updown.c,v 1.34 2005-05-05 23:22:12 achu Exp $
+ *  $Id: cerebro_updown.c,v 1.35 2005-05-05 23:23:22 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -542,6 +542,12 @@ _cerebro_updown_response_receive_all(cerebro_t handle,
 
       if (res.updown_state == CEREBRO_UPDOWN_PROTOCOL_STATE_NODE_UP)
         {
+          if (updown_data->up_nodes)
+            {
+              handle->errnum = CEREBRO_ERR_INTERNAL;
+              goto cleanup;
+            }
+
           if (!hostlist_push(updown_data->up_nodes, res.nodename))
             {
 	      cerebro_err_debug_lib("%s(%s:%d): hostlist_push: %s",
@@ -553,6 +559,12 @@ _cerebro_updown_response_receive_all(cerebro_t handle,
         }
       else if (res.updown_state == CEREBRO_UPDOWN_PROTOCOL_STATE_NODE_DOWN)
         {
+          if (updown_data->down_nodes)
+            {
+              handle->errnum = CEREBRO_ERR_INTERNAL;
+              goto cleanup;
+            }
+
           if (!hostlist_push(updown_data->down_nodes, res.nodename))
             {
 	      cerebro_err_debug_lib("%s(%s:%d): hostlist_push: %s",
