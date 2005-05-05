@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.c,v 1.52 2005-05-05 16:12:57 achu Exp $
+ *  $Id: cerebrod_updown.c,v 1.53 2005-05-05 22:38:22 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -246,8 +246,6 @@ _cerebrod_updown_initialize(void)
           Hash_insert(updown_node_data_index, nodes[i], ud);
 
           list_sort(updown_node_data, (ListCmpF)_updown_node_data_strcmp);
-	  
-	  free(nodes[i]);
         }
 
       Free(nodes);
