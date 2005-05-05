@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.12 2005-05-04 20:58:08 achu Exp $
+ *  $Id: cerebro.h,v 1.13 2005-05-05 23:45:03 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_H
@@ -90,7 +90,7 @@ void cerebro_perror(cerebro_t handle, const char *msg);
 int cerebro_load_config(cerebro_t handle);
 
 /* 
- * cerebro_api_load_config
+ * cerebro_unload_config
  *
  * Unload config file info
  *
