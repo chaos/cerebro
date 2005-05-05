@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.c,v 1.9 2005-05-05 16:26:56 achu Exp $
+ *  $Id: cerebro.c,v 1.10 2005-05-05 22:20:54 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -176,7 +176,7 @@ cerebro_load_config(cerebro_t handle)
 
   if (cerebro_config_load_config_file(&config_file_conf) < 0)
     {
-      handle->errnum = CEREBRO_ERR_CONFIG_MODULE;
+      handle->errnum = CEREBRO_ERR_CONFIG_FILE;
       return -1;
     }
 

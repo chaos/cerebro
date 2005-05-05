@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebrod.8.in,v 1.16 2005-05-02 20:42:25 achu Exp $
+\."$Id: cerebrod.8.in,v 1.17 2005-05-05 22:20:54 achu Exp $
 \."#############################################################################
 .TH cerebrod 8 "May 2005" "cerebrod @VERSION@" cerebrod
 .SH "NAME"
@@ -169,7 +169,7 @@ will search for other clusterlist modules.
 
 It is not necessary for a configuration module to be found and loaded.
 .B Cerebrod
-will simply not use a clusterlist module if one cannot be found.
+will use a default clusterlist module if one cannot be found.
 
 .if !@MANPAGE_STATIC_MODULES@ \{
 For more information on writing 
