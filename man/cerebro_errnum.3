@@ -1,21 +1,44 @@
 \."#############################################################################
-\."$Id: cerebro_errnum.3,v 1.1 2005-05-05 00:26:19 achu Exp $
+\."$Id: cerebro_errnum.3,v 1.2 2005-05-05 23:42:31 achu Exp $
 \."#############################################################################
 .TH CEREBRO_ERRNUM 3 "May 2005" "LLNL" "LIBCEREBRO"
 .SH "NAME"
-cerebro_errnum \- retrieve cerebro error code
+cerebro_errnum, cerebro_strerror, cerebro_errormsg, cerebro_perror \-
+cerebro error routines
 .SH "SYNOPSIS"
 .B #include <cerebro.h>
 .sp
 .BI "int cerebro_errnum(cerebro_t handle);"
+.sp
+.BI "char *cerebro_strerror(int errnum);"
+.sp
+.BI "char *cerebro_errormsg(cerebro_t handle);"
+.sp
+.BI "void cerebro_perror(cerebro_t handle, const char *msg);"
 .br
 .SH "DESCRIPTION"
 \fBcerebro_errnum()\fR returns the error code stored in \fIhandle\fR.
-Generally, the error code is passed to 
-.BR cerebro_strerror(3) 
-to output an error message.
+
+\fBcerebro_strerror()\fR returns a pointer to a string describing the
+error code \fIerrnum\fR.
+
+Generally, an error code is retrieved by
+.BR cerebro_errnum()
+and then passed to 
+.BR cerebro_strerror().
+
+\fBcerebro_errormsg()\fR returns a pointer to a string describing the
+error stored in \fIhandle\fR.  It is logically equivalent to:
+
+char *cerebro_strerror(cerebro_errnum(cerebro_t handle));
+
+\fBcerebro_perror()\fR is similar to
+.BR perror(3).
+It produces a message on standard error output, describing the error
+stored in \fIhandle\fR.  If \fImsg\fR is not NULL, the string pointed
+to by \fImsg\fR, a colon, and a blank are printed before the error
+message.
+
 .br
 .SH "FILES"
 /usr/include/cerebro.h
-.SH "SEE ALSO"
-cerebro_strerror(3), cerebro_errormsg(3), cerebro_perror(3)

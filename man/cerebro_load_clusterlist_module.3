@@ -1,13 +1,16 @@
 \."#############################################################################
-\."$Id: cerebro_load_clusterlist_module.3,v 1.1 2005-05-05 22:20:54 achu Exp $
+\."$Id: cerebro_load_clusterlist_module.3,v 1.2 2005-05-05 23:42:31 achu Exp $
 \."#############################################################################
 .TH CEREBRO_LOAD_CLUSTERLIST_MODULE 3 "May 2005" "LLNL" "LIBCEREBRO"
 .SH "NAME"
-cerebro_load_clusterlist_module \- load clusterlist module
+cerebro_load_clusterlist_module, cerebro_unload_clusterlist_module \-
+cerebro clusterlist module routines
 .SH "SYNOPSIS"
 .B #include <cerebro.h>
 .sp
 .BI "int cerebro_load_clusterlist_module(cerebro_t handle);"
+.sp
+.BI "int cerebro_unload_clusterlist_module(cerebro_t handle);"
 .br
 .SH "DESCRIPTION"
 \fBcerebro_load_clusterlist_module()\fR loads clusterlist module data into
@@ -15,6 +18,9 @@ the cerebro_t handle.  Clusterlist modules are searched for in the
 .B Cerebro
 package library directory, @CEREBROD_MODULE_DIR@.  If a module cannot
 be found, a default module will be loaded.
+
+\fBcerebro_unload_clusterlist_module()\fR unloads the clusterlist
+module data stored in a cerebro_t handle.
 
 For more information on clusterlist modules see XXX.
 .br
@@ -46,5 +52,4 @@ An internal system error occurred.
 .SH "FILES"
 /usr/include/cerebro.h
 .SH "SEE ALSO"
-cerebro_handle_create(3), cerebro_unload_clusterlist_module(3), cerebro_errnum(3),
-cerebro_strerror(3), cerebro.conf(5)
+cerebro_errnum(3), cerebro_strerror(3)

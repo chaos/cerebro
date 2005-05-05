@@ -1,38 +1,4 @@
 \."#############################################################################
-\."$Id: cerebro_unload_config.3,v 1.1 2005-05-05 22:20:54 achu Exp $
+\."$Id: cerebro_unload_config.3,v 1.2 2005-05-05 23:42:31 achu Exp $
 \."#############################################################################
-.TH CEREBRO_UNLOAD_CONFIG 3 "May 2005" "LLNL" "LIBCEREBRO"
-.SH "NAME"
-cerebro_unload_config \- unload configuration data
-.SH "SYNOPSIS"
-.B #include <cerebro.h>
-.sp
-.BI "int cerebro_unload_config(cerebro_t handle);"
-.br
-.SH "DESCRIPTION"
-\fBcerebro_unload_config()\fR unloads the config data 
-stored in a cerebro_t handle.
-.br
-.SH "RETURN VALUES"
-On success, 0 is returned.  On error, -1 is returned, and an error
-code is returned in \fIhandle\fR.  The error code can be retrieved via
-.BR cerebro_errnum (3),
-and a description of the error code can be retrieved via
-.BR cerebro_strerror (3).
-.br
-.SH "ERRORS"
-.TP
-.B CEREBRO_ERR_NULLHANDLE
-The handle parameter is NULL.  The cerebro_t handle must be created
-with
-.BR cerebro_handle_create (3).
-.TP
-.B CEREBRO_ERR_MAGIC_NUMBER
-\fIhandle\fR has an incorrect magic number.  \fIhandle\fR does not
-point to a cerebro_t handle or \fIhandle\fR has already been
-destroyed.
-.br
-.SH "FILES"
-/usr/include/cerebro.h
-.SH "SEE ALSO"
-cerebro_load_config(3), cerebro_errnum(3), cerebro_strerror(3)
+.so man3/cerebro_load_config.3
