@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.90 2005-05-05 16:12:57 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.91 2005-05-05 22:24:59 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -219,7 +219,7 @@ _cerebrod_config_setup(void)
 #endif /* NDEBUG */
 
   if (cerebro_config_load(&conf_l) < 0)
-    cerebro_err_exit("%s(%s:%d): cerebro_find_config_module",
+    cerebro_err_exit("%s(%s:%d): cerebro_config_load",
 		     __FILE__, __FUNCTION__, __LINE__);
   
   if (conf_l.cerebrod_heartbeat_frequency_flag)
@@ -235,6 +235,7 @@ _cerebrod_config_setup(void)
     conf.heartbeat_destination_ip = Strdup(conf_l.cerebrod_heartbeat_destination_ip);
   if (conf_l.cerebrod_heartbeat_network_interface_flag)
     conf.heartbeat_network_interface = Strdup(conf_l.cerebrod_heartbeat_network_interface);
+
   if (conf_l.cerebrod_heartbeat_ttl_flag)
     conf.heartbeat_ttl = conf_l.cerebrod_heartbeat_ttl;
   if (conf_l.cerebrod_speak_flag)

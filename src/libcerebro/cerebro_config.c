@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config.c,v 1.14 2005-05-05 16:12:57 achu Exp $
+ *  $Id: cerebro_config.c,v 1.15 2005-05-05 22:24:59 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -462,6 +462,8 @@ cerebro_config_merge_cerebro_config(struct cerebro_config *conf,
    * configuration
    */
 
+  memset(conf, '\0', sizeof(struct cerebro_config));
+
   if (config_file_conf->cerebro_updown_hostnames_flag)
     {
       for (i = 0; i < config_file_conf->cerebro_updown_hostnames_len; i++)
@@ -554,7 +556,7 @@ cerebro_config_merge_cerebro_config(struct cerebro_config *conf,
     }
   else if (module_conf->cerebrod_heartbeat_destination_ip_flag)
     {
-      strcpy(conf->cerebrod_heartbeat_destination_ip, config_file_conf->cerebrod_heartbeat_destination_ip);
+      strcpy(conf->cerebrod_heartbeat_destination_ip, module_conf->cerebrod_heartbeat_destination_ip);
       conf->cerebrod_heartbeat_destination_ip_flag++;
     }
 
@@ -565,7 +567,7 @@ cerebro_config_merge_cerebro_config(struct cerebro_config *conf,
     }
   else if (module_conf->cerebrod_heartbeat_network_interface_flag)
     {
-      strcpy(conf->cerebrod_heartbeat_network_interface, config_file_conf->cerebrod_heartbeat_network_interface);
+      strcpy(conf->cerebrod_heartbeat_network_interface, module_conf->cerebrod_heartbeat_network_interface);
       conf->cerebrod_heartbeat_network_interface_flag++;
     }
 
@@ -689,6 +691,7 @@ cerebro_config_load(struct cerebro_config *conf)
   memset(conf, '\0', sizeof(struct cerebro_config));
   memset(&module_conf, '\0', sizeof(struct cerebro_config));
   memset(&config_file_conf, '\0', sizeof(struct cerebro_config));
+
 
   if (cerebro_config_load_config_module(&module_conf) < 0)
     return -1;
