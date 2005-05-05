@@ -1,26 +1,26 @@
 \."#############################################################################
-\."$Id: cerebro_handle_create.3,v 1.1 2005-05-04 23:20:15 achu Exp $
+\."$Id: cerebro_handle_create.3,v 1.2 2005-05-05 00:26:19 achu Exp $
 \."#############################################################################
 .TH CEREBRO_HANDLE_CREATE 3 "May 2005" "LLNL" "LIBCEREBRO"
-.SH NAME
+.SH "NAME"
 cerebro_handle_create \- create a cerebro handle 
-.SH SYNOPSIS
+.SH "SYNOPSIS"
 .B #include <cerebro.h>
 .sp
 .BI "cerebro_t cerebro_handle_create(void);"
 .br
-.SH DESCRIPTION
+.SH "DESCRIPTION"
 .br
 \fBcerebro_handle_create()\fR creates a cerebro handle for use
 with the cerebro library of functions.  A cerebro handle is of
 type cerebro_t, which is defined in cerebro.h.  The cerebro
 handle must be passed to most of the cerebro library functions.
 .br
-.SH RETURN VALUES
+.SH "RETURN VALUES"
 On success, a cerebro handle (datatype cerebro_t) will be
 returned. On error, NULL is returned.
 .br
-.SH FILES
+.SH "FILES"
 /usr/include/cerebro.h
-.SH SEE ALSO
+.SH "SEE ALSO"
 cerebro_handle_destroy(3)

@@ -1,0 +1,21 @@
+\."#############################################################################
+\."$Id: cerebro_errormsg.3,v 1.1 2005-05-05 00:26:19 achu Exp $
+\."#############################################################################
+.TH CEREBRO_ERRORMSG 3 "May 2005" "LLNL" "LIBCEREBRO"
+.SH "NAME"
+cerebro_errormsg \- retrieve cerebro error string
+.SH "SYNOPSIS"
+.B #include <cerebro.h>
+.sp
+.BI "char *cerebro_errormsg(cerebro_t handle);"
+.br
+.SH "DESCRIPTION"
+\fBcerebro_errormsg()\fR returns a pointer to a string describing the
+error stored in \fIhandle\fR.  It is more or less equivalent to:
+
+char *cerebro_strerror(cerebro_errnum(cerebro_t handle));
+.br
+.SH "FILES"
+/usr/include/cerebro.h
+.SH "SEE ALSO"
+cerebro_errnum(3), cerebro_strerror(3), cerebro_perror(3)

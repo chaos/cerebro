@@ -1,0 +1,21 @@
+\."#############################################################################
+\."$Id: cerebro_errnum.3,v 1.1 2005-05-05 00:26:19 achu Exp $
+\."#############################################################################
+.TH CEREBRO_ERRNUM 3 "May 2005" "LLNL" "LIBCEREBRO"
+.SH "NAME"
+cerebro_errnum \- retrieve cerebro error code
+.SH "SYNOPSIS"
+.B #include <cerebro.h>
+.sp
+.BI "int cerebro_errnum(cerebro_t handle);"
+.br
+.SH "DESCRIPTION"
+\fBcerebro_errnum()\fR returns the error code stored in \fIhandle\fR.
+Generally, the error code is passed to 
+.BR cerebro_strerror(3) 
+to output an error message.
+.br
+.SH "FILES"
+/usr/include/cerebro.h
+.SH "SEE ALSO"
+cerebro_strerror(3), cerebro_errormsg(3), cerebro_perror(3)

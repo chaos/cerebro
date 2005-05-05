@@ -1,0 +1,23 @@
+\."#############################################################################
+\."$Id: cerebro_perror.3,v 1.1 2005-05-05 00:26:19 achu Exp $
+\."#############################################################################
+.TH CEREBRO_PERROR 3 "May 2005" "LLNL" "LIBCEREBRO"
+.SH "NAME"
+cerebro_perror \- output error to stderr
+.SH "SYNOPSIS"
+.B #include <cerebro.h>
+.sp
+.BI "void cerebro_perror(cerebro_t handle, const char *msg);"
+.br
+.SH "DESCRIPTION"
+\fBcerebro_perror()\fR is similar to
+.BR perror(3).
+It produces a message on standard error output, describing the error
+stored in \fIhandle\fR.  If \fImsg\fR is not NULL, the string pointed
+to by \fImsg\fR, a colon, and a blank are printed before the error
+message.
+.br
+.SH "FILES"
+/usr/include/cerebro.h
+.SH "SEE ALSO"
+cerebro_errnum(3), cerebro_strerror(3), cerebro_errormsg(3)

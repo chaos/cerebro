@@ -1,20 +1,20 @@
 \."#############################################################################
-\."$Id: cerebro_handle_destroy.3,v 1.1 2005-05-04 23:20:15 achu Exp $
+\."$Id: cerebro_handle_destroy.3,v 1.2 2005-05-05 00:26:19 achu Exp $
 \."#############################################################################
 .TH CEREBRO_HANDLE_DESTROY 3 "May 2005" "LLNL" "LIBCEREBRO"
-.SH NAME
+.SH "NAME"
 cerebro_handle_destroy \- destroys a cerebro handle
-.SH SYNOPSIS
+.SH "SYNOPSIS"
 .B #include <cerebro.h>
 .sp
 .BI "int cerebro_handle_destroy(cerebro_t handle);"
 .br
-.SH DESCRIPTION
+.SH "DESCRIPTION"
 \fBcerebro_handle_destroy()\fR destroys the cerebro handle
 pointed to by \fIhandle\fR and frees all allocated memory associated
 with it.
 .br
-.SH RETURN VALUES
+.SH "RETURN VALUES"
 On success, 0 is returned.  On error, -1 is returned, and an error
 code is returned in \fIhandle\fR.  The error code can be retrieved via
 .BR cerebro_errnum (3)
@@ -22,7 +22,7 @@ code is returned in \fIhandle\fR.  The error code can be retrieved via
 .BR cerebro_strerror (3).  
 Error codes are defined in cerebro.h.
 .br
-.SH ERRORS
+.SH "ERRORS"
 .TP
 .B CEREBRO_ERR_NULLHANDLE
 The handle parameter is NULL.  The cerebro handle must be created
@@ -40,7 +40,7 @@ An internal clusterlist module error occurred.
 .B CEREBRO_ERR_INTERNAL
 An internal system error occurred.
 .br
-.SH FILES
+.SH "FILES"
 /usr/include/cerebro.h
-.SH SEE ALSO
+.SH "SEE ALSO"
 cerebro_handle_create(3)

@@ -3,6 +3,7 @@ Documention
 - cerebro.1 manpage
 - doc for writing modules
 - cerebro api manpages
+- libcerebro main manpage
 
 Testing
 - fd leaking
@@ -10,6 +11,7 @@ Testing
 - none module works if no clusterlist modules found
 
 Cleanup
+- /usr/include/cerebro.h in manpages??
 
 Audit
 - code review to reduce memory footprint
