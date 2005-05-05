@@ -10,13 +10,16 @@ Group: System Environment/Base
 License: GPL
 Source: @PROJECT@-@VERSION@-@RELEASE@.tgz
 BuildRoot: %{_tmppath}/@PROJECT@-@VERSION@-@RELEASE@
+%if %{?_with_chaos:1}%{!?_with_chaos:0}
+Requires: gendersllnl
+%endif
 
 %description
 Cerebro is a collection of tools for dynamically monitoring a cluster of nodes.
 
 %{!?_with_genders: %{!?_without_genders: %define _with_genders --with-genders}}
 %{!?_with_gendersllnl: %{!?_without_gendersllnl: %define _with_gendersllnl --with-gen\dersllnl}}
-                                                                                      
+
 %package gendersllnl
 Summary: whatsup gendersllnl modules package
 Group: System Environment/Base
@@ -24,7 +27,7 @@ Requires: whatsup
 Requires: gendersllnl
 %description gendersllnl
 Gendersllnl modules packages.
-                                                                                      
+
 %package genders
 Summary: whatsup genders modules package
 Group: System Environment/Base
@@ -32,7 +35,7 @@ Requires: whatsup
 Requires: genders >= 1.2
 %description genders
 Genders modules packages.
-                                                                                      
+
 %package hostsfile
 Summary: whatsup hostsfile modules package
 Group: System Environment/Base

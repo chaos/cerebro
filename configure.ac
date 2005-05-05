@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.27 2005-05-04 23:54:06 achu Exp $
+## $Id: configure.ac,v 1.28 2005-05-04 23:55:13 achu Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -122,7 +122,9 @@ AC_CHECK_FUNCS( \
 )
 
 ACX_PTHREAD([], AC_MSG_ERROR([Posix threads required to build]))
-#AC_DEFINE(WITH_PTHREADS, 1, [Define pthreads])
+# Don't define WITH_PTHREADS, libcommon will not be built with
+# pthreads.  Thread locking is the responsibility of binaries
+# AC_DEFINE(WITH_PTHREADS, 1, [Define pthreads])
 LIBS="$PTHREAD_LIBS $LIBS"
 CFLAGS="$PTHREAD_CFLAGS $CFLAGS"
 
