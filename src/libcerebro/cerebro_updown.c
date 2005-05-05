@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_updown.c,v 1.33 2005-05-05 23:19:06 achu Exp $
+ *  $Id: cerebro_updown.c,v 1.34 2005-05-05 23:22:12 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -633,16 +633,6 @@ cerebro_updown_load_data(cerebro_t handle,
       goto cleanup;
     }
 
-  if (!(updown_data = (struct cerebro_updown_data *)malloc(sizeof(struct cerebro_updown_data))))
-    {
-      handle->errnum = CEREBRO_ERR_OUTMEM;
-      goto cleanup;
-    }
-  memset(updown_data, '\0', sizeof(struct cerebro_updown_data));
-  updown_data->magic = CEREBRO_UPDOWN_MAGIC_NUMBER;
-  updown_data->up_nodes = NULL;
-  updown_data->down_nodes = NULL;
-  
   if (!(handle->loaded_state & CEREBRO_CLUSTERLIST_MODULE_LOADED))
     {
       if (cerebro_load_clusterlist_module(handle) < 0)
@@ -703,6 +693,16 @@ cerebro_updown_load_data(cerebro_t handle,
 	flags = CEREBRO_UPDOWN_UP_AND_DOWN_NODES;
     }
   
+  if (!(updown_data = (struct cerebro_updown_data *)malloc(sizeof(struct cerebro_updown_data))))
+    {
+      handle->errnum = CEREBRO_ERR_OUTMEM;
+      goto cleanup;
+    }
+  memset(updown_data, '\0', sizeof(struct cerebro_updown_data));
+  updown_data->magic = CEREBRO_UPDOWN_MAGIC_NUMBER;
+  updown_data->up_nodes = NULL;
+  updown_data->down_nodes = NULL;
+
   if (flags & CEREBRO_UPDOWN_UP_NODES)
     {
       if (!(updown_data->up_nodes = hostlist_create(NULL)))
