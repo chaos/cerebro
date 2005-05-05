@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_updown.c,v 1.30 2005-05-05 16:12:57 achu Exp $
+ *  $Id: cerebro_updown.c,v 1.31 2005-05-05 16:26:56 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -29,12 +29,12 @@
 #include <errno.h>
 
 #include "cerebro.h"
-#include "cerebro/cerebro_api.h"
+#include "cerebro_api.h"
+#include "cerebro_util.h"
 #include "cerebro/cerebro_error.h"
 #include "cerebro/cerebro_marshalling.h"
 #include "cerebro/cerebro_module.h"
 #include "cerebro/cerebro_updown_protocol.h"
-#include "cerebro/cerebro_util.h"
 #include "hostlist.h"
 #include "fd.h"
 

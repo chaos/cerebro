@@ -11,7 +11,6 @@ Testing
 - none module works if no clusterlist modules found
 
 Cleanup
-- only install proper headers
 
 Audit
 - code review to reduce memory footprint
