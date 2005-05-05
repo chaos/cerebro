@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.c,v 1.51 2005-05-04 23:15:58 achu Exp $
+ *  $Id: cerebrod_updown.c,v 1.52 2005-05-05 16:12:57 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -18,11 +18,11 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
-#include "cerebro_constants.h"
-#include "cerebro_error.h"
-#include "cerebro_marshalling.h"
-#include "cerebro_module.h"
-#include "cerebro_updown_protocol.h"
+#include "cerebro/cerebro_constants.h"
+#include "cerebro/cerebro_error.h"
+#include "cerebro/cerebro_marshalling.h"
+#include "cerebro/cerebro_module.h"
+#include "cerebro/cerebro_updown_protocol.h"
 
 #include "cerebrod.h"
 #include "cerebrod_config.h"

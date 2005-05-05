@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_clusterlist.c,v 1.35 2005-05-04 18:23:37 achu Exp $
+ *  $Id: cerebrod_clusterlist.c,v 1.36 2005-05-05 16:12:57 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -9,8 +9,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "cerebro_error.h"
-#include "cerebro_module.h"
+#include "cerebro/cerebro_error.h"
+#include "cerebro/cerebro_module.h"
 
 #include "cerebrod.h"
 #include "cerebrod_clusterlist.h"

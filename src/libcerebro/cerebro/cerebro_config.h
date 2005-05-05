@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config.h,v 1.7 2005-05-04 20:58:08 achu Exp $
+ *  $Id: cerebro_config.h,v 1.1 2005-05-05 16:12:57 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_CONFIG_H
@@ -9,8 +9,7 @@
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
 
-/* XXX */
-#include "cerebro_constants.h"
+#include <cerebro/cerebro_constants.h>
 
 #define CEREBRO_CONFIG_UPDOWN_HOSTNAMES_MAX  16
 

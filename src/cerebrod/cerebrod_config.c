@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.89 2005-05-04 18:23:37 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.90 2005-05-05 16:12:57 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -25,10 +25,10 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 
-#include "cerebro_error.h"
-#include "cerebro_config.h"
-#include "cerebro_config_module.h"
-#include "cerebro_module.h"
+#include "cerebro/cerebro_error.h"
+#include "cerebro/cerebro_config.h"
+#include "cerebro/cerebro_config_module.h"
+#include "cerebro/cerebro_module.h"
 
 #include "cerebrod_config.h"
 #include "cerebrod_util.h"

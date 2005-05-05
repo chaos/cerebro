@@ -1,12 +1,13 @@
 /*****************************************************************************\
- *  $Id: cerebro_updown_protocol.h,v 1.15 2005-05-04 17:24:05 achu Exp $
+ *  $Id: cerebro_updown_protocol.h,v 1.1 2005-05-05 16:12:57 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_UPDOWN_PROTOCOL_H
 #define _CEREBRO_UPDOWN_PROTOCOL_H
 
 #include <sys/types.h>
-#include "cerebro_constants.h"
+
+#include <cerebro/cerebro_constants.h>
 
 /* Updown server protocol
  *

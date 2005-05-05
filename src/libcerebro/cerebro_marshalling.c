@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_marshalling.c,v 1.9 2005-05-04 22:21:33 achu Exp $
+ *  $Id: cerebro_marshalling.c,v 1.10 2005-05-05 16:12:57 achu Exp $
 \*****************************************************************************/
  
 #if HAVE_CONFIG_H
@@ -13,8 +13,8 @@
 #endif /* STDC_HEADERS */
 #include <netinet/in.h>
 
-#include "cerebro_error.h"
-#include "cerebro_marshalling.h"
+#include "cerebro/cerebro_error.h"
+#include "cerebro/cerebro_marshalling.h"
 
 int
 cerebro_marshall_int8(int8_t val, char *buf, unsigned int buflen)

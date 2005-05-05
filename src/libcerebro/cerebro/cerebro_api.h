@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_api.h,v 1.10 2005-05-04 18:23:37 achu Exp $
+ *  $Id: cerebro_api.h,v 1.1 2005-05-05 16:12:57 achu Exp $
 \*****************************************************************************/
  
 #ifndef _CEREBRO_API_H
@@ -7,7 +7,7 @@
 
 #include <sys/types.h>
 
-#include "cerebro_config.h"
+#include "cerebro/cerebro_config.h"
 
 /* 
  * CEREBRO_MAGIC_NUMBER

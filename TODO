@@ -11,7 +11,7 @@ Testing
 - none module works if no clusterlist modules found
 
 Cleanup
-- /usr/include/cerebro.h in manpages??
+- only install proper headers
 
 Audit
 - code review to reduce memory footprint
@@ -32,6 +32,7 @@ Later Design
 
 Before distribution
 - do .h trick for header files like freeipmi
+- devel package?
 
 Debugging
 - signals to daemon to log/unlog debug info?

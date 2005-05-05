@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config.c,v 1.13 2005-05-04 22:21:33 achu Exp $
+ *  $Id: cerebro_config.c,v 1.14 2005-05-05 16:12:57 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -12,9 +12,9 @@
 #include <string.h>
 #endif /* STDC_HEADERS */
 
-#include "cerebro_config.h"
-#include "cerebro_error.h"
-#include "cerebro_module.h"
+#include "cerebro/cerebro_config.h"
+#include "cerebro/cerebro_error.h"
+#include "cerebro/cerebro_module.h"
 #include "conffile.h"
 
 #ifndef NDEBUG

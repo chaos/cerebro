@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_heartbeat_protocol.h,v 1.5 2005-05-04 18:23:37 achu Exp $
+ *  $Id: cerebrod_heartbeat_protocol.h,v 1.1 2005-05-05 16:12:57 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_HEARTBEAT_PROTOCOL_H
@@ -7,7 +7,7 @@
 
 #include <sys/types.h>
 
-#include "cerebro_constants.h"
+#include <cerebro/cerebro_constants.h>
 
 #define CEREBROD_HEARTBEAT_PROTOCOL_VERSION 1
 

@@ -1,3 +1,7 @@
+2005-05-05  Albert Chu  <chu11@llnl.gov>
+
+	* Re-org libcerebro include headers.
+	
 2005-05-04  Albert Chu  <chu11@llnl.gov>
 
 	* Major code cleanup in preparation for beta release.

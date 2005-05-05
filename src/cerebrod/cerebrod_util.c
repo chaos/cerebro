@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_util.c,v 1.13 2005-05-04 20:08:05 achu Exp $
+ *  $Id: cerebrod_util.c,v 1.14 2005-05-05 16:12:57 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -14,7 +14,7 @@
 #include <assert.h>
 #include <errno.h>
 
-#include "cerebro_error.h"
+#include "cerebro/cerebro_error.h"
 
 #include "cerebrod_util.h"
 #include "wrappers.h"
@@ -60,7 +60,7 @@ cerebrod_rehash(hash_t *old_hash,
 		pthread_mutex_t *hash_mutex)
 {
   hash_t new_hash;
-  int rv, num;
+  int num;
 
   assert(old_hash);
   assert(hash_size);
@@ -72,7 +72,7 @@ cerebrod_rehash(hash_t *old_hash,
   /* Should be called with lock already set */
   if (hash_mutex)
     {
-      rv = Pthread_mutex_trylock(hash_mutex);
+      int rv = Pthread_mutex_trylock(hash_mutex);
       if (rv != EBUSY)
 	cerebro_err_exit("%s(%s:%d): hash_mutex not locked",
                          __FILE__, __FUNCTION__, __LINE__);

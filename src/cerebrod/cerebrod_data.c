@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_data.c,v 1.10 2005-05-04 18:23:37 achu Exp $
+ *  $Id: cerebrod_data.c,v 1.11 2005-05-05 16:12:57 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -16,8 +16,8 @@
 #include <assert.h>
 #include <errno.h>
 
-#include "cerebro_constants.h"
-#include "cerebro_error.h"
+#include "cerebro/cerebro_constants.h"
+#include "cerebro/cerebro_error.h"
 
 #include "cerebrod_data.h"
 #include "wrappers.h"

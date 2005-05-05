@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_error.c,v 1.6 2005-05-04 23:54:06 achu Exp $
+ *  $Id: cerebro_error.c,v 1.7 2005-05-05 16:12:57 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -14,7 +14,7 @@
 #endif /* STDC_HEADERS */
 #include <errno.h>
 
-#include "cerebro_error.h"
+#include "cerebro/cerebro_error.h"
 #include "error.h"
 
 #define CEREBRO_ERROR_STRING_BUFLEN 1024

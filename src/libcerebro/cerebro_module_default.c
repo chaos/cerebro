@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module_default.c,v 1.5 2005-05-04 18:23:37 achu Exp $
+ *  $Id: cerebro_module_default.c,v 1.6 2005-05-05 16:12:57 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -12,9 +12,9 @@
 #include <string.h>
 #endif /* STDC_HEADERS */
 
-#include "cerebro_config_module.h"
-#include "cerebro_clusterlist_module.h"
-#include "cerebro_error.h"
+#include "cerebro/cerebro_config_module.h"
+#include "cerebro/cerebro_clusterlist_module.h"
+#include "cerebro/cerebro_error.h"
 
 #define DEFAULT_CLUSTERLIST_MODULE_NAME "default"
 #define DEFAULT_CONFIG_MODULE_NAME "default"

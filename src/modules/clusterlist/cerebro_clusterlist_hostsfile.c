@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_hostsfile.c,v 1.16 2005-05-04 20:58:09 achu Exp $
+ *  $Id: cerebro_clusterlist_hostsfile.c,v 1.17 2005-05-05 16:12:57 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -19,9 +19,10 @@
 #include <fcntl.h>
 #endif /* HAVE_FCNTL_H */
 
-#include "cerebro_constants.h"
-#include "cerebro_error.h"
-#include "cerebro_clusterlist_module.h"
+#include "cerebro/cerebro_clusterlist_module.h"
+#include "cerebro/cerebro_constants.h"
+#include "cerebro/cerebro_error.h"
+
 #include "cerebro_clusterlist_util.h"
 
 #include "fd.h"
