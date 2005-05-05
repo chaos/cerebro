@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_updown.c,v 1.32 2005-05-05 16:37:46 achu Exp $
+ *  $Id: cerebro_updown.c,v 1.33 2005-05-05 23:19:06 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -571,6 +571,7 @@ _cerebro_updown_response_receive_all(cerebro_t handle,
 
   return 0;
  cleanup:
+  printf("%s:%d\n", __FUNCTION__, __LINE__);
   return -1;
 }
 
@@ -641,25 +642,7 @@ cerebro_updown_load_data(cerebro_t handle,
   updown_data->magic = CEREBRO_UPDOWN_MAGIC_NUMBER;
   updown_data->up_nodes = NULL;
   updown_data->down_nodes = NULL;
-
-  if (flags & CEREBRO_UPDOWN_UP_NODES)
-    {
-      if (!(updown_data->up_nodes = hostlist_create(NULL)))
-        {
-          handle->errnum = CEREBRO_ERR_OUTMEM;
-          goto cleanup;
-        }
-    }
-
-  if (flags & CEREBRO_UPDOWN_DOWN_NODES)
-    {
-      if (!(updown_data->down_nodes = hostlist_create(NULL)))
-        {
-          handle->errnum = CEREBRO_ERR_OUTMEM;
-          goto cleanup;
-        }
-    }
-
+  
   if (!(handle->loaded_state & CEREBRO_CLUSTERLIST_MODULE_LOADED))
     {
       if (cerebro_load_clusterlist_module(handle) < 0)
@@ -720,6 +703,24 @@ cerebro_updown_load_data(cerebro_t handle,
 	flags = CEREBRO_UPDOWN_UP_AND_DOWN_NODES;
     }
   
+  if (flags & CEREBRO_UPDOWN_UP_NODES)
+    {
+      if (!(updown_data->up_nodes = hostlist_create(NULL)))
+        {
+          handle->errnum = CEREBRO_ERR_OUTMEM;
+          goto cleanup;
+        }
+    }
+
+  if (flags & CEREBRO_UPDOWN_DOWN_NODES)
+    {
+      if (!(updown_data->down_nodes = hostlist_create(NULL)))
+        {
+          handle->errnum = CEREBRO_ERR_OUTMEM;
+          goto cleanup;
+        }
+    }
+
   if (!hostname)
     {
       if (handle->config_data.cerebro_updown_hostnames_flag)
@@ -762,8 +763,6 @@ cerebro_updown_load_data(cerebro_t handle,
 					  flags) < 0)
 	goto cleanup;
     }
-
-
 
   if (handle->loaded_state & CEREBRO_UPDOWN_DATA_LOADED)
     {
