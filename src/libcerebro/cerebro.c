@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.c,v 1.10 2005-05-05 22:20:54 achu Exp $
+ *  $Id: cerebro.c,v 1.11 2005-05-06 22:13:27 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -168,18 +168,21 @@ cerebro_load_config(cerebro_t handle)
       return 0;
     }
   
+  memset(&module_conf, '\0', sizeof(struct cerebro_config));
   if (cerebro_config_load_config_module(&module_conf) < 0)
     {
       handle->errnum = CEREBRO_ERR_CONFIG_MODULE;
       return -1;
     }
 
+  memset(&config_file_conf, '\0', sizeof(struct cerebro_config));
   if (cerebro_config_load_config_file(&config_file_conf) < 0)
     {
       handle->errnum = CEREBRO_ERR_CONFIG_FILE;
       return -1;
     }
 
+  memset(&(handle->config_data), '\0', sizeof(struct cerebro_config));
   if (cerebro_config_merge_cerebro_config(&(handle->config_data), 
 					  &module_conf, 
 					  &config_file_conf) < 0)

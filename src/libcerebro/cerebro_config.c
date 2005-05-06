@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config.c,v 1.16 2005-05-06 21:36:52 achu Exp $
+ *  $Id: cerebro_config.c,v 1.17 2005-05-06 22:13:27 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -697,7 +697,6 @@ cerebro_config_load(struct cerebro_config *conf)
   memset(conf, '\0', sizeof(struct cerebro_config));
   memset(&module_conf, '\0', sizeof(struct cerebro_config));
   memset(&config_file_conf, '\0', sizeof(struct cerebro_config));
-
 
   if (cerebro_config_load_config_module(&module_conf) < 0)
     return -1;

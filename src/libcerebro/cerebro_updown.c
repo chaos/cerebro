@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_updown.c,v 1.35 2005-05-05 23:23:22 achu Exp $
+ *  $Id: cerebro_updown.c,v 1.36 2005-05-06 22:13:27 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -542,8 +542,10 @@ _cerebro_updown_response_receive_all(cerebro_t handle,
 
       if (res.updown_state == CEREBRO_UPDOWN_PROTOCOL_STATE_NODE_UP)
         {
-          if (updown_data->up_nodes)
+          if (!updown_data->up_nodes)
             {
+	      cerebro_err_debug_lib("%s(%s:%d): up_nodes null",
+                                    __FILE__, __FUNCTION__, __LINE__);
               handle->errnum = CEREBRO_ERR_INTERNAL;
               goto cleanup;
             }
@@ -559,8 +561,10 @@ _cerebro_updown_response_receive_all(cerebro_t handle,
         }
       else if (res.updown_state == CEREBRO_UPDOWN_PROTOCOL_STATE_NODE_DOWN)
         {
-          if (updown_data->down_nodes)
+          if (!updown_data->down_nodes)
             {
+	      cerebro_err_debug_lib("%s(%s:%d): down_nodes null",
+                                    __FILE__, __FUNCTION__, __LINE__);
               handle->errnum = CEREBRO_ERR_INTERNAL;
               goto cleanup;
             }
@@ -583,7 +587,6 @@ _cerebro_updown_response_receive_all(cerebro_t handle,
 
   return 0;
  cleanup:
-  printf("%s:%d\n", __FUNCTION__, __LINE__);
   return -1;
 }
 
@@ -694,7 +697,6 @@ cerebro_updown_load_data(cerebro_t handle,
 	  if (handle->config_data.cerebro_updown_flags != CEREBRO_UPDOWN_UP_NODES
 	      && handle->config_data.cerebro_updown_flags != CEREBRO_UPDOWN_DOWN_NODES
 	      && handle->config_data.cerebro_updown_flags != CEREBRO_UPDOWN_UP_AND_DOWN_NODES)
-
 	    {
 	      handle->errnum = CEREBRO_ERR_CONFIG_INPUT;
 	      goto cleanup;
@@ -751,8 +753,14 @@ cerebro_updown_load_data(cerebro_t handle,
 	      break;
 	    }
 	  
+          if (i >= handle->config_data.cerebro_updown_hostnames_len)
+            {
+              handle->errnum = CEREBRO_ERR_CONNECT;
+              goto cleanup;
+            }
+
 	  if (rv < 0)
-	    goto cleanup;
+            goto cleanup;
 	}
       else
 	{
