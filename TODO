@@ -8,6 +8,7 @@ Documention
 Testing
 - fd leaking
 - mem-leaking
+- can actually build module
 - none module works if no clusterlist modules found
 
 Cleanup
