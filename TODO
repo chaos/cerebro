@@ -9,7 +9,6 @@ Testing
 - fd leaking
 - mem-leaking
 - can actually build module
-- none module works if no clusterlist modules found
 
 Cleanup
 
@@ -31,7 +30,6 @@ Later Design
 - pthreads locking for clusterlists/config modules?? (they are read only)
 
 Before distribution
-- do .h trick for header files like freeipmi
 - devel package?
 
 Debugging

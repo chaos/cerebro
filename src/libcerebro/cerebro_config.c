@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config.c,v 1.15 2005-05-05 22:24:59 achu Exp $
+ *  $Id: cerebro_config.c,v 1.16 2005-05-06 21:36:52 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -19,6 +19,7 @@
 
 #ifndef NDEBUG
 char *cerebro_config_debug_config_file = NULL;
+int cerebro_config_debug_output = 0;
 #endif /* NDEBUG */
 
 int
@@ -46,12 +47,17 @@ cerebro_config_load_config_module(struct cerebro_config *conf)
       load_config_module_called++;
     }
 
-  cerebro_err_debug_lib("**************************************");
-  cerebro_err_debug_lib("* Cerebro Config Configuration:");
-  cerebro_err_debug_lib("* -----------------------");
-  cerebro_err_debug_lib("* Loading config from module: %s",
-			cerebro_config_module_name());
-  cerebro_err_debug_lib("**************************************");
+#ifndef NDEBUG  
+  if (cerebro_config_debug_output)
+    {
+      fprintf(stderr, "**************************************\n");
+      fprintf(stderr, "* Cerebro Config Configuration:\n");
+      fprintf(stderr, "* -----------------------\n");
+      fprintf(stderr, "* Loading config from module: %s\n",
+              cerebro_config_module_name());
+      fprintf(stderr, "**************************************\n");
+    }
+#endif /* NDEBUG */
 
   if (cerebro_config_module_load_default(conf) < 0)
     goto cleanup;
