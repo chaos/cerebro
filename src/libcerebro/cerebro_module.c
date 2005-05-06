@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.c,v 1.24 2005-05-06 18:21:30 achu Exp $
+ *  $Id: cerebro_module.c,v 1.25 2005-05-06 20:29:02 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -112,7 +112,7 @@ char *dynamic_clusterlist_modules[] = {
   "cerebro_clusterlist_hostsfile.la",
   NULL
 };
-int dynamic_clusterlist_modules_len = 4;
+int dynamic_clusterlist_modules_len = 3;
 
 /*
  * dynamic_config_modules

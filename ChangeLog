@@ -1,3 +1,7 @@
+2005-05-06  Albert Chu  <chu11@llnl.gov>
+
+	* Minor bug fixes.
+	
 2005-05-05  Albert Chu  <chu11@llnl.gov>
 
 	* Re-org libcerebro include headers.
