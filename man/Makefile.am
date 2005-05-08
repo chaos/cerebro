@@ -1,25 +1,27 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.7 2005-05-05 22:20:54 achu Exp $
+## $Id: Makefile.am,v 1.8 2005-05-08 15:17:23 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
 
-man1_MANS = cerebro.1
+man1_MANS  = cerebro.1
 
-man3_MANS = cerebro_handle_create.3 \
-	    cerebro_handle_destroy.3 \
-	    cerebro_errnum.3 \
-	    cerebro_strerror.3 \
-	    cerebro_errormsg.3 \
-	    cerebro_perror.3 \
-	    cerebro_load_config.3 \
-	    cerebro_unload_config.3 \
-	    cerebro_load_clusterlist_module.3 \
-	    cerebro_unload_clusterlist_module.3
+man3_MANS  =  cerebro_handle_create.3 \
+	     cerebro_handle_destroy.3 \
+	     cerebro_errnum.3 \
+	     cerebro_strerror.3 \
+	     cerebro_errormsg.3 \
+	     cerebro_perror.3 \
+	     cerebro_load_config.3 \
+	     cerebro_unload_config.3 \
+	     cerebro_load_clusterlist_module.3 \
+	     cerebro_unload_clusterlist_module.3 \
+	     cerebro_updown_load_data.3 \
+	     cerebro_updown_unload_data.3
 
-man5_MANS = cerebro.conf.5
+man5_MANS  = cerebro.conf.5
  
-man8_MANS = cerebrod.8
+man8_MANS  = cerebrod.8
 
 EXTRA_DIST = cerebro.1 \
 	     cerebro_handle_create.3 \
@@ -32,5 +34,7 @@ EXTRA_DIST = cerebro.1 \
 	     cerebro_unload_config.3 \
 	     cerebro_load_clusterlist_module.3 \
 	     cerebro_unload_clusterlist_module.3 \
-             cerebro.conf.5 \
-             cerebrod.8
+	     cerebro_updown_load_data.3 \
+	     cerebro_updown_unload_data.3 \
+	     cerebro.conf.5 \
+	     cerebrod.8

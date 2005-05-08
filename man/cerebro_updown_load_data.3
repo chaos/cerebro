@@ -1,0 +1,131 @@
+\."#############################################################################
+\."$Id: cerebro_updown_load_data.3,v 1.1 2005-05-08 15:17:23 achu Exp $
+\."#############################################################################
+\."  Copyright (C) 2003 The Regents of the University of California.
+\."  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
+\."  Written by Albert Chu <chu11@llnl.gov>
+\."  UCRL-CODE-155699
+\."  
+\."  This file is part of Whatsup, tools and libraries for determining up and
+\."  down nodes in a cluster.  For details, see http://www.llnl.gov/linux/.
+\."
+\."  Whatsup is free software; you can redistribute it and/or modify it under
+\."  the terms of the GNU General Public License as published by the Free
+\."  Software Foundation; either version 2 of the License, or (at your option)
+\."  any later version.
+\."  
+\."  Whatsup is distributed in the hope that it will be useful, but WITHOUT 
+\."  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
+\."  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License 
+\."  for more details.
+\."  
+\."  You should have received a copy of the GNU General Public License along
+\."  with Whatsup; if not, write to the Free Software Foundation, Inc.,
+\."  59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.
+\."############################################################################
+.TH CEREBRO_LOAD_DATA 3 "November 2003" "LLNL" "LIBCEREBRO"
+.SH "NAME"
+cerebro_updown_load_data, cerebro_updown_unload_data \- cerebro updown
+loading routines
+.SH "SYNOPSIS"
+.B #include <cerebro.h>
+.sp
+.BI "int cerebro_updown_load_data(cerebro_t handle, const char *hostname, unsigned int port, unsigned int timeout_len, int flags);"
+.sp
+.BI "int cerebro_updown_unload_data(cerebro_t handle);"
+.br
+.SH "DESCRIPTION"
+\fBcerebro_updown_load_data()\fR loads updown data from the 
+.B cerebrod
+updown server and stores it in the handle.
+
+\fIhostname\fR should indicate the location of the 
+.B cerebrod
+updown server.  If
+\fIhostname\fR is NULL, cerebro assumes the server is on the
+localhost.
+
+\fIport\fR should indicate the port number of the updown server.  If
+\fIport\fR is equal to 0, the default server port is assumed.
+
+\fItimeout_len\fR should indicate the timeout length in seconds that
+should be used to determine if a node is up or down.  If
+\fItimeout_len\fR is equal to 0, the default timeout length is used.
+ 
+\fIflags\fR should indicate the data to be loaded.  Flags may be one
+of CEREBRO_UPDOWN_UP_NODES, CEREBRO_UPDOWN_DOWN_NODES, or
+CEREBRO_UPDOWN_UP_AND_DOWN_NODES.  These flags retrieve a list of up
+nodes, down nodes, or both respectively.  If \fIflags\fR is equal to
+0, CEREBRO_UPDOWN_UP_AND_DOWN_NODES is used.
+
+See 
+.BR cerebro.conf(5)
+for information on how the default values of
+\fBcerebro_updown_load_data\fR can be altered.
+
+\fBcerebro_updown_unload_data\fR unlods the updown data stored in a
+cerebro_t handle.
+.br
+.SH "RETURN VALUES"
+On success, 0 is returned.  On error, -1 is returned, and an error
+code is returned in \fIhandle\fR.  The error code can be retrieved via
+.BR cerebro_errnum (3)
+, and a description of the error code can be retrieved via
+.BR cerebro_strerror (3).  
+.br
+.SH "ERRORS"
+.TP
+.B CEREBRO_ERR_NULLHANDLE
+The handle parameter is NULL.  The cerebro_t handle must be created
+with
+.BR cerebro_handle_create (3).
+.TP
+.B CEREBRO_ERR_MAGIC_NUMBER
+\fIhandle\fR has an incorrect magic number.  \fIhandle\fR does not
+point to a cerebro_t handle or \fIhandle\fR has already been
+destroyed.
+.TP
+.B CEREBRO_ERR_PARAMETERS
+Invalid parameter passed in.
+.TP
+.B CEREBRO_ERR_HOSTNAME
+Invalid hostname specified.
+.TP
+.B CEREBRO_ERR_ADDRESS
+Invalid network address specified.
+.TP
+.B CEREBRO_ERR_CONNECT
+Error connecting to 
+.B cerebrod
+updown server.
+.TP
+.B CEREBRO_ERR_CONNECT_TIMEOUT
+Timed out connecting to
+.B cerebrod
+updown server.
+.TP
+.B CEREBRO_ERR_PROTOCOL
+Error during protocol communication.
+.TP
+.B CEREBRO_ERR_PROTOCOL_TIMEOUT
+Timeout during protocol communication.
+.TP
+.B CEREBRO_ERR_VERSION_INCOMPATIBLE
+Version incompatible with updown server.
+.TP
+.B CEREBRO_ERR_CONFIG_FILE
+A config file error occurred.
+.TP
+.B CEREBRO_ERR_CONFIG_MODULE
+A config module error occurred.
+.TP
+.B CEREBRO_ERR_CLUSTERLIST_MODULE
+A clusterlist module error occurred.
+.TP
+.B CEREBRO_ERR_INTERNAL
+An internal system error occurred.
+.br
+.SH "FILES"
+/usr/include/cerebro.h
+.SH "SEE ALSO"
+cerebro_errnum(3), cerebro_strerror(3), cerebro.conf(5)
