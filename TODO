@@ -21,6 +21,7 @@ Portability
 - Non-pthreads support
 
 Design
+- Iterator interface for updown nodes
 
 Later Design
 - move listener hash into status hash 

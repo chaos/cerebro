@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.c,v 1.11 2005-05-06 22:13:27 achu Exp $
+ *  $Id: cerebro.c,v 1.12 2005-05-08 18:51:24 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -24,7 +24,6 @@ static char *cerebro_error_messages[] =
     "null cerebro_t handle",
     "invalid magic number",
     "invalid parameters",
-    "server data not loaded",
     "invalid hostname",
     "invalid address",
     "connection error",
@@ -33,6 +32,7 @@ static char *cerebro_error_messages[] =
     "protocol timeout",
     "version incompatible",
     "buffer overflow",
+    "server data not loaded",
     "node not found",
     "config file error",
     "config module error",

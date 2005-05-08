@@ -1,0 +1,63 @@
+\."#############################################################################
+\."$Id: cerebro_updown_is_node_up.3,v 1.1 2005-05-08 18:51:24 achu Exp $
+\."#############################################################################
+.TH CEREBRO_UPDOWN_IS_NODE_UP 3 "May 2005" "LLNL" "LIBCEREBRO"
+.SH "NAME"
+cerebro_updown_is_node_up, cerebro_updown_is_node_down \- cerebro node
+updown test routines
+.SH "SYNOPSIS"
+.B #include <cerebro.h>
+.sp
+.BI "int cerebro_updown_is_node_up(cerebro_t handle, const char *node);"
+q.sp
+.BI "int cerebro_updown_is_node_down(cerebro_t handle, const char *node);"
+.br
+.SH "DESCRIPTION"
+\fBcerebro_updown_is_node_up()\fR tests if the node pointed to by
+\fInode\fR is up.
+
+\fBcerebro_updown_is_node_down()\fR tests if the node pointed to by
+\fInode\fR is down.
+.br
+.SH "RETURN VALUES"
+For \fBcerebro_updown_is_node_up()\fR, 1 is returned if the node is
+up, 0 is returned if the node is down.  For
+\fBcerebro_updown_is_node_down()\fR, 1 is returned if the node is
+down, 0 is returned if the node is up.  On error, both return -1, and
+an error code is returned in \fIhandle\fR.  The error code can be
+retrieved via
+.BR cerebro_errnum (3)
+, and a description of the error code can be retrieved via 
+.BR cerebro_strerror (3).  
+.br
+.SH "ERRORS"
+.TP
+.B CEREBRO_ERR_NULLHANDLE
+The handle parameter is NULL.  The cerebro_t handle must be created
+with
+.BR cerebro_handle_create (3).
+.TP
+.B CEREBRO_ERR_MAGIC_NUMBER
+\fIhandle\fR has an incorrect magic number.  \fIhandle\fR does not
+point to a cerebro_t handle or \fIhandle\fR has already been
+destroyed.
+.TP
+.B CEREBRO_ERR_PARAMETERS
+Invalid parameter passed in.
+.TP
+.B CEREBRO_ERR_NOT_LOADED
+Updown data not loaded.
+.TP 
+.B CEREBRO_ERR_NODE_NOTFOUND
+Invalid node passed in.
+.TP
+.B CEREBRO_ERR_CLUSTERLIST_MODULE
+A clusterlist module error occurred.
+.TP
+.B CEREBRO_ERR_INTERNAL
+An internal system error occurred.
+.br
+.SH "FILES"
+/usr/include/cerebro.h
+.SH "SEE ALSO"
+cerebro_updown_load_data(3), cerebro_errnum(3), cerebro_strerror(3)

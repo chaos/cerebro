@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.13 2005-05-05 23:45:03 achu Exp $
+ *  $Id: cerebro.h,v 1.14 2005-05-08 18:51:24 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_H
@@ -9,14 +9,14 @@
 #define CEREBRO_ERR_NULLHANDLE             1
 #define CEREBRO_ERR_MAGIC_NUMBER           2
 #define CEREBRO_ERR_PARAMETERS             3
-#define CEREBRO_ERR_NOT_LOADED             4
-#define CEREBRO_ERR_HOSTNAME               5
-#define CEREBRO_ERR_ADDRESS                6
-#define CEREBRO_ERR_CONNECT                7
-#define CEREBRO_ERR_CONNECT_TIMEOUT        8
-#define CEREBRO_ERR_PROTOCOL               9
-#define CEREBRO_ERR_PROTOCOL_TIMEOUT      10 
-#define CEREBRO_ERR_VERSION_INCOMPATIBLE  11
+#define CEREBRO_ERR_HOSTNAME               4
+#define CEREBRO_ERR_ADDRESS                5
+#define CEREBRO_ERR_CONNECT                6
+#define CEREBRO_ERR_CONNECT_TIMEOUT        7
+#define CEREBRO_ERR_PROTOCOL               8
+#define CEREBRO_ERR_PROTOCOL_TIMEOUT       9 
+#define CEREBRO_ERR_VERSION_INCOMPATIBLE  10
+#define CEREBRO_ERR_NOT_LOADED            11
 #define CEREBRO_ERR_OVERFLOW              12
 #define CEREBRO_ERR_NODE_NOTFOUND         13
 #define CEREBRO_ERR_CONFIG_FILE           14
