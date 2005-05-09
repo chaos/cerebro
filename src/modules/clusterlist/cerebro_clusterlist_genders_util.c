@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_genders_util.c,v 1.12 2005-05-05 16:12:57 achu Exp $
+ *  $Id: cerebro_clusterlist_genders_util.c,v 1.13 2005-05-09 05:17:30 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -16,7 +16,6 @@
 #include <genders.h>
 
 #include "cerebro/cerebro_error.h"
-#include "cerebro/cerebro_module.h"
 
 int 
 cerebro_clusterlist_genders_setup(genders_t *handle)
