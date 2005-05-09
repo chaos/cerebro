@@ -1,0 +1,56 @@
+\."#############################################################################
+\."$Id: cerebro_updown_get_up_nodes.3,v 1.1 2005-05-09 04:52:22 achu Exp $
+\."#############################################################################
+.TH CEREBRO_UPDOWN_GET_UP_NODES 3 "May 2005" "LLNL" "LIBCEREBRO"
+.SH "NAME"
+cerebro_updown_get_up_nodes, cerebro_updown_get_down_nodes \- cerebro
+updown retrievel routines
+.SH "SYNOPSIS"
+.B #include <cerebro.h>
+.sp
+.BI "int cerebro_updown_get_up_nodes(cerebro_t handle, char *buf, unsigned int buflen"
+q.sp
+.BI "int cerebro_updown_get_down_nodes(cerebro_t handle, char *buf, unsigned int buflen"
+.br
+.SH "DESCRIPTION"
+\fBcerebro_updown_get_up_nodes()\fR and
+\fBcerebro_updown_get_down_nodes()\fR retrieves a ranged string of up
+and down nodes respectively.  The string is returned in the buffer
+pointed to by \fIbuf\fR.  \fIbuflen\fR should indicate the length of
+the buffer.
+.br
+.SH "RETURN VALUES"
+On success, 0 is returned.  On error, -1 is returned, and an error
+code is returned in \fIhandle\fR.  The error code can be retrieved via
+.BR cerebro_errnum (3)
+, and a description of the error code can be retrieved via
+.BR cerebro_strerror (3).  
+.br
+.SH "ERRORS"
+.TP
+.B CEREBRO_ERR_NULLHANDLE
+The handle parameter is NULL.  The cerebro_t handle must be created
+with
+.BR cerebro_handle_create (3).
+.TP
+.B CEREBRO_ERR_MAGIC_NUMBER
+\fIhandle\fR has an incorrect magic number.  \fIhandle\fR does not
+point to a cerebro_t handle or \fIhandle\fR has already been
+destroyed.
+.TP
+.B CEREBRO_ERR_PARAMETERS
+Invalid parameter passed in.
+.TP
+.B CEREBRO_ERR_NOT_LOADED
+Updown data not loaded.
+.TP
+.B CEREBRO_ERR_OVERFLOW
+Buffer overflow.
+.TP
+.B CEREBRO_ERR_INTERNAL
+An internal system error occurred.
+.br
+.SH "FILES"
+/usr/include/cerebro.h
+.SH "SEE ALSO"
+cerebro_updown_load_data(3), cerebro_errnum(3), cerebro_strerror(3)
