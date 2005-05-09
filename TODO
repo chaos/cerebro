@@ -12,6 +12,8 @@ Testing
 
 Cleanup
 - underscore cerebro functions that shouldn't be exported
+  - rather move cerebro_config and cerebro_module funcs to 
+    local libcerebrocommon kind of library.
 
 Audit
 - code review to reduce memory footprint
