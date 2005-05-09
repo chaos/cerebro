@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_updown.c,v 1.36 2005-05-06 22:13:27 achu Exp $
+ *  $Id: cerebro_updown.c,v 1.37 2005-05-09 14:20:52 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -93,7 +93,7 @@ _cerebro_handle_updown_data_loaded_check(cerebro_t handle)
 {
   struct cerebro_updown_data *updown_data;
 
-  if (cerebro_handle_check(handle) < 0)
+  if (_cerebro_handle_check(handle) < 0)
     return -1;
 
   if (!(handle->loaded_state & CEREBRO_UPDOWN_DATA_LOADED))
@@ -608,10 +608,10 @@ _cerebro_updown_get_updown_data(cerebro_t handle,
 {
   int fd = -1, rv = -1;
 
-  if ((fd = cerebro_low_timeout_connect(handle, 
-                                        hostname, 
-                                        port, 
-                                        CEREBRO_UPDOWN_PROTOCOL_CONNECT_TIMEOUT_LEN)) < 0)
+  if ((fd = _cerebro_low_timeout_connect(handle, 
+					 hostname, 
+					 port, 
+					 CEREBRO_UPDOWN_PROTOCOL_CONNECT_TIMEOUT_LEN)) < 0)
     goto cleanup;
 
   if (_cerebro_updown_request_send(handle, fd, timeout_len, flags) < 0)
@@ -636,7 +636,7 @@ cerebro_updown_load_data(cerebro_t handle,
 {
   struct cerebro_updown_data *updown_data = NULL;
 
-  if (cerebro_handle_check(handle) < 0)
+  if (_cerebro_handle_check(handle) < 0)
     goto cleanup;
 
   if (flags 
@@ -1054,7 +1054,7 @@ cerebro_updown_down_count(cerebro_t handle)
 int
 cerebro_updown_unload_data(cerebro_t handle)
 {
-  if (cerebro_handle_check(handle) < 0)
+  if (_cerebro_handle_check(handle) < 0)
     return -1;
 
   if (handle->loaded_state & CEREBRO_UPDOWN_DATA_LOADED)

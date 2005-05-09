@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.c,v 1.12 2005-05-08 18:51:24 achu Exp $
+ *  $Id: cerebro.c,v 1.13 2005-05-09 14:20:52 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -14,6 +14,7 @@
 
 #include "cerebro.h"
 #include "cerebro_api.h"
+#include "cerebro_config_util.h"
 #include "cerebro_util.h"
 #include "cerebro/cerebro_config.h"
 #include "cerebro/cerebro_module.h"
@@ -65,7 +66,7 @@ cerebro_handle_create(void)
 int
 cerebro_handle_destroy(cerebro_t handle)
 {
-  if (cerebro_handle_check(handle) < 0)
+  if (_cerebro_handle_check(handle) < 0)
     return -1;
 
   if (handle->loaded_state & CEREBRO_CONFIG_LOADED)
@@ -159,7 +160,7 @@ cerebro_load_config(cerebro_t handle)
   struct cerebro_config module_conf;
   struct cerebro_config config_file_conf;
   
-  if (cerebro_handle_check(handle) < 0)
+  if (_cerebro_handle_check(handle) < 0)
     return -1;
 
   if (handle->loaded_state & CEREBRO_CONFIG_LOADED)
@@ -169,23 +170,23 @@ cerebro_load_config(cerebro_t handle)
     }
   
   memset(&module_conf, '\0', sizeof(struct cerebro_config));
-  if (cerebro_config_load_config_module(&module_conf) < 0)
+  if (_cerebro_config_load_config_module(&module_conf) < 0)
     {
       handle->errnum = CEREBRO_ERR_CONFIG_MODULE;
       return -1;
     }
 
   memset(&config_file_conf, '\0', sizeof(struct cerebro_config));
-  if (cerebro_config_load_config_file(&config_file_conf) < 0)
+  if (_cerebro_config_load_config_file(&config_file_conf) < 0)
     {
       handle->errnum = CEREBRO_ERR_CONFIG_FILE;
       return -1;
     }
 
   memset(&(handle->config_data), '\0', sizeof(struct cerebro_config));
-  if (cerebro_config_merge_cerebro_config(&(handle->config_data), 
-					  &module_conf, 
-					  &config_file_conf) < 0)
+  if (_cerebro_config_merge_cerebro_config(&(handle->config_data), 
+					   &module_conf, 
+					   &config_file_conf) < 0)
     {
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
@@ -199,7 +200,7 @@ cerebro_load_config(cerebro_t handle)
 int 
 cerebro_unload_config(cerebro_t handle)
 {
-  if (cerebro_handle_check(handle) < 0)
+  if (_cerebro_handle_check(handle) < 0)
     return -1;
 
   memset(&(handle->config_data), '\0', sizeof(struct cerebro_config));
@@ -214,7 +215,7 @@ cerebro_load_clusterlist_module(cerebro_t handle)
 {
   int module_setup_called = 0;
 
-  if (cerebro_handle_check(handle) < 0)
+  if (_cerebro_handle_check(handle) < 0)
     return -1;
 
   if (!(handle->loaded_state & CEREBRO_MODULE_SETUP_CALLED))
@@ -253,7 +254,7 @@ cerebro_load_clusterlist_module(cerebro_t handle)
 int 
 cerebro_unload_clusterlist_module(cerebro_t handle)
 {
-  if (cerebro_handle_check(handle) < 0)
+  if (_cerebro_handle_check(handle) < 0)
     return -1;
 
   if (handle->loaded_state & CEREBRO_CLUSTERLIST_MODULE_LOADED)

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.h,v 1.3 2005-05-09 05:17:30 achu Exp $
+ *  $Id: cerebro_module.h,v 1.4 2005-05-09 14:20:52 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_MODULE_H
@@ -113,14 +113,14 @@ char *cerebro_clusterlist_module_name(void);
  * call clusterlist module setup function
  */
 int cerebro_clusterlist_module_setup(void);
-                                                                                     
+
 /*
  * cerebro_clusterlist_module_cleanup
  *
  * call clusterlist module parse cleanup function
  */
 int cerebro_clusterlist_module_cleanup(void);
-                                                                                     
+
 /*
  * cerebro_clusterlist_module_get_all_nodes
  *
@@ -135,14 +135,14 @@ int cerebro_clusterlist_module_get_all_nodes(char **nodes,
  * call clusterlist module numnodes function
  */
 int cerebro_clusterlist_module_numnodes(void);
-                                                                                     
+
 /*
  * cerebro_clusterlist_module_node_in_cluster
  *
  * call clusterlist module node in cluster function
  */
 int cerebro_clusterlist_module_node_in_cluster(const char *node);
-                                                                                     
+
 /*
  * cerebro_clusterlist_module_get_nodename
  *
@@ -158,21 +158,21 @@ int cerebro_clusterlist_module_get_nodename(const char *node,
  * Return config module name
  */
 char *cerebro_config_module_name(void);
-                                                                                     
+
 /*
  * cerebro_config_module_setup
  *
  * call config module setup function
  */
 int cerebro_config_module_setup(void);
-                                                                                     
+
 /*
  * cerebro_config_module_cleanup
  *
  * call config module parse cleanup function
  */
 int cerebro_config_module_cleanup(void);
-                                                                                     
+
 /*
  * cerebro_config_module_load_default
  *

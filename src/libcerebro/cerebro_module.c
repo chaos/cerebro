@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.c,v 1.25 2005-05-06 20:29:02 achu Exp $
+ *  $Id: cerebro_module.c,v 1.26 2005-05-09 14:20:52 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -197,7 +197,7 @@ _cerebro_module_find_known_module(char *search_dir,
 {
   DIR *dir;
   int i = 0, found = 0;
-                                                                                     
+
   if (!search_dir)
     {
       cerebro_err_debug_lib("%s(%s:%d): search_dir null", 
@@ -989,10 +989,10 @@ cerebro_config_module_name(void)
 			    __FILE__, __FUNCTION__, __LINE__);
       return NULL;
     }
-                                                                                     
+
   return config_module_info->config_module_name;
 }
-                                                                                     
+
 int
 cerebro_config_module_setup(void)
 {

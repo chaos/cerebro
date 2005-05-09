@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config.c,v 1.17 2005-05-06 22:13:27 achu Exp $
+ *  $Id: cerebro_config_util.c,v 1.1 2005-05-09 14:21:53 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -12,6 +12,7 @@
 #include <string.h>
 #endif /* STDC_HEADERS */
 
+#include "cerebro_config_util.h"
 #include "cerebro/cerebro_config.h"
 #include "cerebro/cerebro_error.h"
 #include "cerebro/cerebro_module.h"
@@ -23,7 +24,7 @@ int cerebro_config_debug_output = 0;
 #endif /* NDEBUG */
 
 int
-cerebro_config_load_config_module(struct cerebro_config *conf)
+_cerebro_config_load_config_module(struct cerebro_config *conf)
 {
   int load_config_module_called = 0;
   int module_setup_called = 0;
@@ -170,7 +171,7 @@ _cb_cerebro_updown_hostnames(conffile_t cf, struct conffile_data *data,
 }
 
 int
-cerebro_config_load_config_file(struct cerebro_config *conf)
+_cerebro_config_load_config_file(struct cerebro_config *conf)
 {
   char *config_file = NULL;
 
@@ -436,9 +437,9 @@ cerebro_config_load_config_file(struct cerebro_config *conf)
 }
 
 int 
-cerebro_config_merge_cerebro_config(struct cerebro_config *conf,
-				    struct cerebro_config *module_conf,
-				    struct cerebro_config *config_file_conf)
+_cerebro_config_merge_cerebro_config(struct cerebro_config *conf,
+				     struct cerebro_config *module_conf,
+				     struct cerebro_config *config_file_conf)
 {
   int i;
 
@@ -698,15 +699,15 @@ cerebro_config_load(struct cerebro_config *conf)
   memset(&module_conf, '\0', sizeof(struct cerebro_config));
   memset(&config_file_conf, '\0', sizeof(struct cerebro_config));
 
-  if (cerebro_config_load_config_module(&module_conf) < 0)
+  if (_cerebro_config_load_config_module(&module_conf) < 0)
     return -1;
 
-  if (cerebro_config_load_config_file(&config_file_conf) < 0)
+  if (_cerebro_config_load_config_file(&config_file_conf) < 0)
     return -1;
 
-  if (cerebro_config_merge_cerebro_config(conf, 
-					  &module_conf,
-					  &config_file_conf) < 0)
+  if (_cerebro_config_merge_cerebro_config(conf, 
+					   &module_conf,
+					   &config_file_conf) < 0)
     return -1;
  
   return 0;

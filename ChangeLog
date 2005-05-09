@@ -1,3 +1,7 @@
+2005-05-09  Albert Chu  <chu11@llnl.gov>
+
+	* Hide functions that shouldn't be exported.
+	
 2005-05-08  Albert Chu  <chu11@llnl.gov>
 
 	* More manpage additions.

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_util.c,v 1.13 2005-05-05 16:26:56 achu Exp $
+ *  $Id: cerebro_util.c,v 1.14 2005-05-09 14:20:52 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -30,7 +30,7 @@
 #include "cerebro/cerebro_error.h"
 
 int 
-cerebro_handle_check(cerebro_t handle)
+_cerebro_handle_check(cerebro_t handle)
 {
   if (!handle || handle->magic != CEREBRO_MAGIC_NUMBER)
     return -1;
@@ -39,10 +39,10 @@ cerebro_handle_check(cerebro_t handle)
 }
 
 int
-cerebro_low_timeout_connect(cerebro_t handle,
-                            const char *hostname,
-                            unsigned int port,
-                            unsigned int connect_timeout)
+_cerebro_low_timeout_connect(cerebro_t handle,
+			     const char *hostname,
+			     unsigned int port,
+			     unsigned int connect_timeout)
 {
   int rv, old_flags, fd = -1;
   struct sockaddr_in servaddr;
