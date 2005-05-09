@@ -1,13 +1,9 @@
 /*****************************************************************************\
- *  $Id: cerebro_config.h,v 1.4 2005-05-09 14:20:52 achu Exp $
+ *  $Id: cerebro_config.h,v 1.5 2005-05-09 16:02:11 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_CONFIG_H
 #define _CEREBRO_CONFIG_H
-
-#if HAVE_CONFIG_H
-#include "config.h"
-#endif /* HAVE_CONFIG_H */
 
 #include <cerebro/cerebro_constants.h>
 
@@ -59,14 +55,14 @@ struct cerebro_config
   int cerebrod_updown_server_flag;
   int cerebrod_updown_server_port;
   int cerebrod_updown_server_port_flag;
-#ifndef NDEBUG
+#if CEREBRO_DEBUG
   int cerebrod_speak_debug;
   int cerebrod_speak_debug_flag;
   int cerebrod_listen_debug;
   int cerebrod_listen_debug_flag;
   int cerebrod_updown_server_debug;
   int cerebrod_updown_server_debug_flag;
-#endif /* NDEBUG */
+#endif /* CEREBRO_DEBUG */
 };
 
 #endif /* _CEREBRO_CONFIG_H */

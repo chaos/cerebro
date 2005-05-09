@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.c,v 1.26 2005-05-09 14:20:52 achu Exp $
+ *  $Id: cerebro_module.c,v 1.27 2005-05-09 16:02:11 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -20,11 +20,11 @@
 #include <dirent.h>
 
 #include "cerebro.h"
+#include "cerebro_module.h"
 #include "cerebro/cerebro_clusterlist_module.h"
 #include "cerebro/cerebro_config_module.h"
 #include "cerebro/cerebro_constants.h"
 #include "cerebro/cerebro_error.h"
-#include "cerebro/cerebro_module.h"
 
 #if !WITH_STATIC_MODULES
 #include "ltdl.h"

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_util.c,v 1.1 2005-05-09 14:21:53 achu Exp $
+ *  $Id: cerebro_config_util.c,v 1.2 2005-05-09 16:02:11 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -13,15 +13,15 @@
 #endif /* STDC_HEADERS */
 
 #include "cerebro_config_util.h"
+#include "cerebro_module.h"
 #include "cerebro/cerebro_config.h"
 #include "cerebro/cerebro_error.h"
-#include "cerebro/cerebro_module.h"
 #include "conffile.h"
 
-#ifndef NDEBUG
+#if CEREBRO_DEBUG
 char *cerebro_config_debug_config_file = NULL;
 int cerebro_config_debug_output = 0;
-#endif /* NDEBUG */
+#endif /* CEREBRO_DEBUG */
 
 int
 _cerebro_config_load_config_module(struct cerebro_config *conf)
@@ -48,7 +48,7 @@ _cerebro_config_load_config_module(struct cerebro_config *conf)
       load_config_module_called++;
     }
 
-#ifndef NDEBUG  
+#if CEREBRO_DEBUG  
   if (cerebro_config_debug_output)
     {
       fprintf(stderr, "**************************************\n");
@@ -58,7 +58,7 @@ _cerebro_config_load_config_module(struct cerebro_config *conf)
               cerebro_config_module_name());
       fprintf(stderr, "**************************************\n");
     }
-#endif /* NDEBUG */
+#endif /* CEREBRO_DEBUG */
 
   if (cerebro_config_module_load_default(conf) < 0)
     goto cleanup;
@@ -348,7 +348,7 @@ _cerebro_config_load_config_file(struct cerebro_config *conf)
 	&(conf->cerebrod_updown_server_port), 
 	0
       },
-#ifndef NDEBUG
+#if CEREBRO_DEBUG
       {
 	"cerebrod_speak_debug", 
 	CONFFILE_OPTION_BOOL, 
@@ -382,7 +382,7 @@ _cerebro_config_load_config_file(struct cerebro_config *conf)
 	&conf->cerebrod_updown_server_debug, 
 	0
       },
-#endif /* NDEBUG */
+#endif /* CEREBRO_DEBUG */
     };
   conffile_t cf = NULL;
   int num;
@@ -394,7 +394,7 @@ _cerebro_config_load_config_file(struct cerebro_config *conf)
       goto cleanup;
     }
   
-#ifndef NDEBUG
+#if CEREBRO_DEBUG
   if (!cerebro_config_debug_config_file)
     config_file = CEREBRO_CONFIG_FILE_DEFAULT;
   else
@@ -644,7 +644,7 @@ _cerebro_config_merge_cerebro_config(struct cerebro_config *conf,
       conf->cerebrod_updown_server_port_flag++;
     }
 
-#ifndef NDEBUG
+#if CEREBRO_DEBUG
   if (config_file_conf->cerebrod_speak_debug_flag)
     {
       conf->cerebrod_speak_debug = config_file_conf->cerebrod_speak_debug;
@@ -677,7 +677,7 @@ _cerebro_config_merge_cerebro_config(struct cerebro_config *conf,
       conf->cerebrod_updown_server_debug = module_conf->cerebrod_updown_server_debug;
       conf->cerebrod_updown_server_debug_flag++;
     }
-#endif /* NDEBUG */
+#endif /* CEREBRO_DEBUG */
 
   return 0;
 }

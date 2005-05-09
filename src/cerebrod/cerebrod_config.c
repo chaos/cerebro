@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.93 2005-05-09 14:20:52 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.94 2005-05-09 16:02:11 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -29,7 +29,6 @@
 #include "cerebro/cerebro_error.h"
 #include "cerebro/cerebro_config.h"
 #include "cerebro/cerebro_config_module.h"
-#include "cerebro/cerebro_module.h"
 
 #include "cerebrod_config.h"
 #include "cerebrod_util.h"
@@ -40,10 +39,10 @@
 #define IPADDR_BITS          32   
 #define IPADDR6_BITS        128
 
-#ifndef NDEBUG
+#if CEREBRO_DEBUG
 extern char *cerebro_config_debug_config_file;
 extern int cerebro_config_debug_output;
-#endif /* NDEBUG */
+#endif /* CEREBRO_DEBUG */
 
 /* 
  * conf
@@ -62,9 +61,9 @@ _cerebrod_config_default(void)
 {
   memset(&conf, '\0', sizeof(struct cerebrod_config));
 
-#ifndef NDEBUG
+#if CEREBRO_DEBUG
   conf.debug = CEREBROD_DEBUG_DEFAULT;
-#endif /* NDEBUG */
+#endif /* CEREBRO_DEBUG */
   conf.config_file = CEREBRO_CONFIG_FILE_DEFAULT;
   conf.heartbeat_frequency_min = CEREBROD_HEARTBEAT_FREQUENCY_MIN_DEFAULT;
   conf.heartbeat_frequency_max = CEREBROD_HEARTBEAT_FREQUENCY_MAX_DEFAULT;
@@ -78,11 +77,11 @@ _cerebrod_config_default(void)
   conf.listen_threads = CEREBROD_LISTEN_THREADS_DEFAULT;
   conf.updown_server = CEREBROD_UPDOWN_SERVER_DEFAULT;
   conf.updown_server_port = CEREBROD_UPDOWN_SERVER_PORT_DEFAULT;
-#ifndef NDEBUG
+#if CEREBRO_DEBUG
   conf.speak_debug = CEREBROD_SPEAK_DEBUG_DEFAULT;
   conf.listen_debug = CEREBROD_LISTEN_DEBUG_DEFAULT;
   conf.updown_server_debug = CEREBROD_UPDOWN_SERVER_DEBUG_DEFAULT;
-#endif /* NDEBUG */
+#endif /* CEREBRO_DEBUG */
 }
 
 /* 
@@ -96,12 +95,12 @@ _usage(void)
   fprintf(stderr, "Usage: cerebrod [OPTIONS]\n"
           "-h    --help          Output Help\n"
           "-v    --version       Output Version\n");
-#ifndef NDEBUG
+#if CEREBRO_DEBUG
   fprintf(stderr, 
           "-c    --config_file   Specify alternate config file\n"
           "-d    --debug         Turn on debugging and run daemon\n"
 	  "                      in foreground\n");
-#endif /* NDEBUG */
+#endif /* CEREBRO_DEBUG */
   exit(0);
 }
 
@@ -133,10 +132,10 @@ _cerebrod_cmdline(int argc, char **argv)
     {
       {"help",                0, NULL, 'h'},
       {"version",             0, NULL, 'v'},
-#ifndef NDEBUG
+#if CEREBRO_DEBUG
       {"config-file",         1, NULL, 'c'},
       {"debug",               0, NULL, 'd'},
-#endif /* NDEBUG */
+#endif /* CEREBRO_DEBUG */
     };
 #endif /* HAVE_GETOPT_LONG */
 
@@ -144,9 +143,9 @@ _cerebrod_cmdline(int argc, char **argv)
 
   memset(options, '\0', sizeof(options));
   strcat(options, "hvc:");
-#ifndef NDEBUG
+#if CEREBRO_DEBUG
   strcat(options, "d");
-#endif /* NDEBUG */
+#endif /* CEREBRO_DEBUG */
 
   /* turn off output messages */
   opterr = 0;
@@ -165,14 +164,14 @@ _cerebrod_cmdline(int argc, char **argv)
         case 'v':       /* --version */
           _version();
           break;
-#ifndef NDEBUG
+#if CEREBRO_DEBUG
         case 'c':       /* --config-file */
           conf.config_file = Strdup(optarg);
           break;
         case 'd':       /* --debug */
           conf.debug++;
           break;
-#endif /* NDEBUG */
+#endif /* CEREBRO_DEBUG */
         case '?':
         default:
           cerebro_err_exit("unknown command line option '%c'", optopt);
@@ -216,10 +215,10 @@ _cerebrod_config_setup(void)
 {
   struct cerebro_config conf_l;
 
-#ifndef NDEBUG
+#if CEREBRO_DEBUG
   cerebro_config_debug_config_file = conf.config_file;
   cerebro_config_debug_output = conf.debug;
-#endif /* NDEBUG */
+#endif /* CEREBRO_DEBUG */
 
   if (cerebro_config_load(&conf_l) < 0)
     cerebro_err_exit("%s(%s:%d): cerebro_config_load",
@@ -251,14 +250,14 @@ _cerebrod_config_setup(void)
     conf.updown_server = conf_l.cerebrod_updown_server;
   if (conf_l.cerebrod_updown_server_port_flag)
     conf.updown_server_port = conf_l.cerebrod_updown_server_port;
-#ifndef NDEBUG
+#if CEREBRO_DEBUG
   if (conf_l.cerebrod_speak_debug_flag)
     conf.speak_debug = conf_l.cerebrod_speak_debug;
   if (conf_l.cerebrod_listen_debug_flag)
     conf.listen_debug = conf_l.cerebrod_listen_debug;
   if (conf_l.cerebrod_updown_server_debug_flag)
     conf.updown_server_debug = conf_l.cerebrod_updown_server_debug;
-#endif /* NDEBUG */
+#endif /* CEREBRO_DEBUG */
 }
 
 /*
@@ -845,7 +844,7 @@ _cerebrod_post_calculate_config_check(void)
 static void 
 _cerebrod_config_dump(void)
 {
-#ifndef NDEBUG
+#if CEREBRO_DEBUG
   if (conf.debug)
     {
       fprintf(stderr, "**************************************\n");
@@ -882,7 +881,7 @@ _cerebrod_config_dump(void)
       fprintf(stderr, "* heartbeat_interface_index: %d\n", conf.heartbeat_interface_index);
       fprintf(stderr, "**************************************\n");
     }
-#endif /* NDEBUG */
+#endif /* CEREBRO_DEBUG */
 }
 
 void

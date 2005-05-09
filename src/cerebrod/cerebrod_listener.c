@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.57 2005-05-05 16:12:57 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.58 2005-05-09 16:02:11 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -18,10 +18,10 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
+#include "cerebro_module.h"
 #include "cerebro/cerebro_constants.h"
 #include "cerebro/cerebro_error.h"
 #include "cerebro/cerebro_marshalling.h"
-#include "cerebro/cerebro_module.h"
 #include "cerebro/cerebrod_heartbeat_protocol.h"
 
 #include "cerebrod.h"
@@ -37,9 +37,9 @@
 #define CEREBROD_LISTENER_REHASH_LIMIT        (cluster_data_hash_size*2)
 
 extern struct cerebrod_config conf;
-#ifndef NDEBUG
+#if CEREBRO_DEBUG
 extern pthread_mutex_t debug_output_mutex;
-#endif /* NDEBUG */
+#endif /* CEREBRO_DEBUG */
 
 /* 
  * cerebrod_listener_initialization_complete
@@ -257,7 +257,7 @@ _cerebrod_heartbeat_unmarshall(struct cerebrod_heartbeat *hb,
 static void
 _cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb)
 {
-#ifndef NDEBUG
+#if CEREBRO_DEBUG
   assert(hb);
 
   if (conf.debug && conf.listen_debug)
@@ -278,7 +278,7 @@ _cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb)
       fprintf(stderr, "**************************************\n");
       Pthread_mutex_unlock(&debug_output_mutex);
     }
-#endif /* NDEBUG */
+#endif /* CEREBRO_DEBUG */
 }
 
 /* 
@@ -286,7 +286,7 @@ _cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb)
  *
  * callback function from hash_for_each to dump cluster node data
  */
-#ifndef NDEBUG
+#if CEREBRO_DEBUG
 static int
 _cerebrod_listener_dump_cluster_node_data_item(void *data, 
 					       const void *key, 
@@ -306,7 +306,7 @@ _cerebrod_listener_dump_cluster_node_data_item(void *data,
 
   return 1;
 }
-#endif /* NDEBUG */
+#endif /* CEREBRO_DEBUG */
 
 /* 
  * _cerebrod_listener_dump_cluster_node_data_hash
@@ -316,7 +316,7 @@ _cerebrod_listener_dump_cluster_node_data_item(void *data,
 static void
 _cerebrod_listener_dump_cluster_node_data_hash(void)
 {
-#ifndef NDEBUG
+#if CEREBRO_DEBUG
   if (conf.debug && conf.listen_debug)
     {
       int num;
@@ -348,7 +348,7 @@ _cerebrod_listener_dump_cluster_node_data_hash(void)
       Pthread_mutex_unlock(&debug_output_mutex);
       Pthread_mutex_unlock(&cluster_data_hash_lock);
     }
-#endif /* NDEBUG */
+#endif /* CEREBRO_DEBUG */
 }
 
 void *

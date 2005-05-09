@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_util.c,v 1.14 2005-05-05 16:12:57 achu Exp $
+ *  $Id: cerebrod_util.c,v 1.15 2005-05-09 16:02:11 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -68,7 +68,7 @@ cerebrod_rehash(hash_t *old_hash,
   assert(hash_num > 0);
   assert(hash_mutex);
 
-#ifndef NDEBUG
+#if CEREBRO_DEBUG
   /* Should be called with lock already set */
   if (hash_mutex)
     {
@@ -77,7 +77,7 @@ cerebrod_rehash(hash_t *old_hash,
 	cerebro_err_exit("%s(%s:%d): hash_mutex not locked",
                          __FILE__, __FUNCTION__, __LINE__);
     }
-#endif /* NDEBUG */
+#endif /* CEREBRO_DEBUG */
 
   *hash_size += hash_size_increment;
   

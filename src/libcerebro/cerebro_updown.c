@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_updown.c,v 1.37 2005-05-09 14:20:52 achu Exp $
+ *  $Id: cerebro_updown.c,v 1.38 2005-05-09 16:02:11 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -30,10 +30,10 @@
 
 #include "cerebro.h"
 #include "cerebro_api.h"
+#include "cerebro_module.h"
 #include "cerebro_util.h"
 #include "cerebro/cerebro_error.h"
 #include "cerebro/cerebro_marshalling.h"
-#include "cerebro/cerebro_module.h"
 #include "cerebro/cerebro_updown_protocol.h"
 #include "hostlist.h"
 #include "fd.h"
@@ -64,13 +64,13 @@ static int
 _cerebro_handle_updown_data_check(cerebro_t handle, 
 				  struct cerebro_updown_data *updown_data)
 {
-#ifndef NDEBUG
+#if CEREBRO_DEBUG
   if (!updown_data)
     {
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
-#endif /* NDEBUG */
+#endif /* CEREBRO_DEBUG */
 
   if (updown_data->magic != CEREBRO_UPDOWN_MAGIC_NUMBER)
     {
@@ -182,7 +182,7 @@ _cerebro_updown_request_marshall(cerebro_t handle,
 {
   int len, count = 0;
 
-#ifndef NDEBUG
+#if CEREBRO_DEBUG
   if (!buf)
     {
       cerebro_err_debug_lib("%s(%s:%d): buf null",
@@ -199,7 +199,7 @@ _cerebro_updown_request_marshall(cerebro_t handle,
       return -1;
     }
 
-#endif /* NDEBUG */
+#endif /* CEREBRO_DEBUG */
 
   memset(buf, '\0', buflen);
 
@@ -248,7 +248,7 @@ _cerebro_updown_response_unmarshall(cerebro_t handle,
 {
   int len, count = 0;
 
-#ifndef NDEBUG
+#if CEREBRO_DEBUG
   if (!buf)
     {
       cerebro_err_debug_lib("%s(%s:%d): buf null",
@@ -256,7 +256,7 @@ _cerebro_updown_response_unmarshall(cerebro_t handle,
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
-#endif /* NDEBUG */
+#endif /* CEREBRO_DEBUG */
 
   if ((len = cerebro_unmarshall_int32(&(res->version),
 				      buf + count,

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.30 2005-05-05 16:12:57 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.31 2005-05-09 16:02:11 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -31,9 +31,9 @@
 #include "wrappers.h"
 
 extern struct cerebrod_config conf;
-#ifndef NDEBUG
+#if CEREBRO_DEBUG
 extern pthread_mutex_t debug_output_mutex;
-#endif /* NDEBUG */
+#endif /* CEREBRO_DEBUG */
 
 /* 
  * _cerebrod_speaker_create_and_setup_socket
@@ -235,7 +235,7 @@ _cerebrod_heartbeat_marshall(struct cerebrod_heartbeat *hb,
 static void
 _cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb)
 {
-#ifndef NDEBUG
+#if CEREBRO_DEBUG
   assert(hb);
 
   if (conf.debug && conf.speak_debug)
@@ -256,7 +256,7 @@ _cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb)
       fprintf(stderr, "**************************************\n");
       Pthread_mutex_unlock(&debug_output_mutex);
     }
-#endif /* NDEBUG */
+#endif /* CEREBRO_DEBUG */
 }
 
 void *

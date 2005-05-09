@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.h,v 1.38 2005-05-05 16:12:57 achu Exp $
+ *  $Id: cerebrod_config.h,v 1.39 2005-05-09 16:02:11 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_CONFIG_H
@@ -44,9 +44,9 @@
 struct cerebrod_config
 {
   /* Set by the user on the command line */
-#ifndef NDEBUG
+#if CEREBRO_DEBUG
   int debug;
-#endif /* NDEBUG */
+#endif /* CEREBRO_DEBUG */
   char *config_file;
 
   /* Set by the user in the configuration file */
@@ -66,11 +66,11 @@ struct cerebrod_config
   int updown_server;
   unsigned int updown_server_port;
 
-#ifndef NDEBUG
+#if CEREBRO_DEBUG
   int speak_debug;
   int listen_debug;
   int updown_server_debug;
-#endif /* NDEBUG */
+#endif /* CEREBRO_DEBUG */
 
   /* Determined by cerebrod based on configuration */
 

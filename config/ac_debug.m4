@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: ac_debug.m4,v 1.2 2005-01-18 18:43:34 achu Exp $
+## $Id: ac_debug.m4,v 1.3 2005-05-09 16:02:11 achu Exp $
 ##*****************************************************************************
 #  AUTHOR:
 #    Chris Dunlap <cdunlap@llnl.gov>
@@ -35,6 +35,7 @@ AC_DEFUN([AC_DEBUG],
       test "$ac_cv_prog_cc_g" = yes && CFLAGS="-g -Werror-implicit-function-declaration"
       test "$GCC" = yes && CFLAGS="$CFLAGS -Wall"
     fi
+    AC_DEFINE([CEREBRO_DEBUG], [1], [Define to 1 for Cerebro debugging])
     MANPAGE_DEBUG=1
   else
     if test -z "$ac_save_CFLAGS"; then

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.45 2005-05-05 23:40:58 achu Exp $
+ *  $Id: cerebrod.c,v 1.46 2005-05-09 16:02:11 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -10,8 +10,8 @@
 #include <stdlib.h>
 #include <syslog.h>
 
+#include "cerebro_module.h"
 #include "cerebro/cerebro_error.h"
-#include "cerebro/cerebro_module.h"
 
 #include "cerebrod.h"
 #include "cerebrod_daemon.h"
@@ -23,7 +23,7 @@
 #include "cerebrod_updown.h"
 #include "wrappers.h"
 
-#ifndef NDEBUG
+#if CEREBRO_DEBUG
 /*  
  * debug_output_mutex
  *
@@ -35,7 +35,7 @@
  * Lucking Rule: Only lock around fprintf or similar statements.
  */
 pthread_mutex_t debug_output_mutex = PTHREAD_MUTEX_INITIALIZER;
-#endif /* NDEBUG */
+#endif /* CEREBRO_DEBUG */
 
 extern struct cerebrod_config conf;
 
@@ -47,7 +47,7 @@ extern int cerebrod_updown_initialization_complete;
 extern pthread_cond_t cerebrod_updown_initialization_complete_cond;
 extern pthread_mutex_t cerebrod_updown_initialization_complete_lock;
 
-#ifndef NDEBUG
+#if CEREBRO_DEBUG
 /* 
  * _cerebrod_err_lock
  *
@@ -69,7 +69,7 @@ _cerebrod_err_unlock(void)
 {
   Pthread_mutex_unlock(&debug_output_mutex);
 }
-#endif /* NDEBUG */
+#endif /* CEREBRO_DEBUG */
 
 
 /* 
@@ -133,12 +133,7 @@ main(int argc, char **argv)
 
   _cerebrod_post_config_initialization();
 
-#ifdef NDEBUG
-  cerebrod_daemon_init();
-  cerebro_err_set_flags(CEREBRO_ERROR_SYSLOG
-                        | CEREBRO_ERROR_LIB
-                        | CEREBRO_ERROR_MODULE);
-#else  /* !NDEBUG */
+#if CEREBRO_DEBUG
   if (!conf.debug)
     {
       cerebrod_daemon_init();
@@ -154,7 +149,12 @@ main(int argc, char **argv)
 			    | CEREBRO_ERROR_LIB
 			    | CEREBRO_ERROR_MODULE);
     }
-#endif /* !NDEBUG */
+#else  /* !CEREBRO_DEBUG */
+  cerebrod_daemon_init();
+  cerebro_err_set_flags(CEREBRO_ERROR_SYSLOG
+                        | CEREBRO_ERROR_LIB
+                        | CEREBRO_ERROR_MODULE);
+#endif /* !CEREBRO_DEBUG */
 
   /* Call after daemonization, since daemonization closes currently
    * open fds 
