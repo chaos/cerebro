@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.9 2005-05-08 18:51:24 achu Exp $
+## $Id: Makefile.am,v 1.10 2005-05-09 04:20:54 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -19,7 +19,9 @@ man3_MANS  = cerebro_handle_create.3 \
 	     cerebro_updown_load_data.3 \
 	     cerebro_updown_unload_data.3 \
 	     cerebro_updown_is_node_up.3 \
-	     cerebro_updown_is_node_down.3
+	     cerebro_updown_is_node_down.3 \
+	     cerebro_updown_up_count.3 \
+	     cerebro_updown_down_count.3
 
 man5_MANS  = cerebro.conf.5
  
@@ -40,5 +42,7 @@ EXTRA_DIST = cerebro.1 \
 	     cerebro_updown_unload_data.3 \
 	     cerebro_updown_is_node_up.3 \
 	     cerebro_updown_is_node_down.3 \
+	     cerebro_updown_up_count.3 \
+	     cerebro_updown_down_count.3 \
 	     cerebro.conf.5 \
 	     cerebrod.8
