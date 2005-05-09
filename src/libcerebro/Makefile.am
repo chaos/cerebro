@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.37 2005-05-09 14:20:52 achu Exp $
+## $Id: Makefile.am,v 1.38 2005-05-09 15:40:35 achu Exp $
 ##*****************************************************************************
 
 if WITH_GNU_LD
@@ -14,6 +14,7 @@ endif
 
 noinst_HEADERS	       = cerebro_api.h \
 			 cerebro_config_util.h \
+			 cerebro_module.h \
 			 cerebro_util.h
 
 include_HEADERS        = cerebro.h
@@ -23,7 +24,6 @@ nobase_include_HEADERS = cerebro/cerebro_clusterlist_module.h \
 			 cerebro/cerebro_constants.h \
 			 cerebro/cerebro_error.h \
 			 cerebro/cerebro_marshalling.h \
-			 cerebro/cerebro_module.h \
 			 cerebro/cerebro_updown_protocol.h \
 			 cerebro/cerebrod_heartbeat_protocol.h
 
