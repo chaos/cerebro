@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_util.c,v 1.2 2005-05-09 16:02:11 achu Exp $
+ *  $Id: cerebro_config_util.c,v 1.3 2005-05-10 21:00:28 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -131,8 +131,8 @@ _cb_cerebrod_heartbeat_freq(conffile_t cf, struct conffile_data *data,
  */
 static int
 _cb_cerebro_updown_hostnames(conffile_t cf, struct conffile_data *data,
-                 char *optionname, int option_type, void *option_ptr,
-                 int option_data, void *app_ptr, int app_data)
+                             char *optionname, int option_type, void *option_ptr,
+                             int option_data, void *app_ptr, int app_data)
 {
   struct cerebro_config *conf;
 

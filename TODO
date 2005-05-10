@@ -21,7 +21,6 @@ Portability
 
 Design
 - Iterator interface for updown nodes
-- cerebro.conf updown_flags.
 
 Later Design
 - move listener hash into status hash 
