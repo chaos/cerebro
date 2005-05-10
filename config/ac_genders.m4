@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: ac_genders.m4,v 1.5 2005-03-21 17:55:48 achu Exp $
+## $Id: ac_genders.m4,v 1.6 2005-05-10 22:39:40 achu Exp $
 ##*****************************************************************************
 
 AC_DEFUN([AC_GENDERS],
@@ -17,9 +17,7 @@ AC_DEFUN([AC_GENDERS],
   AC_MSG_RESULT([${ac_genders_test=yes}])
   
   if test "$ac_genders_test" = "yes"; then
-     AC_MSG_CHECKING([for libgenders library])
      AC_CHECK_LIB([genders], [genders_handle_create], [ac_have_genders=yes], [])
-     AC_MSG_RESULT([${ac_have_genders=no}])
   fi
 
   if test "$ac_have_genders" = "yes"; then

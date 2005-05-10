@@ -3,6 +3,8 @@
 	* More manpage cleanup/fixes.
 
 	* Small design cleanup/changes.
+
+	* cerebro.spec.in: Add daemon start/stop installation routines.
 	
 2005-05-09  Albert Chu  <chu11@llnl.gov>
 
