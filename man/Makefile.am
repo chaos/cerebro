@@ -1,8 +1,12 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.12 2005-05-10 17:51:55 achu Exp $
+## $Id: Makefile.am,v 1.13 2005-05-10 18:25:53 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
+
+if !WITH_STATIC_MODULES
+DYNAMIC_MODULES_MANPAGES = cerebro_module.3
+endif
 
 man1_MANS  = cerebro.1
 
@@ -24,7 +28,7 @@ man3_MANS  = cerebro_handle_create.3 \
 	     cerebro_updown_is_node_down.3 \
 	     cerebro_updown_up_count.3 \
 	     cerebro_updown_down_count.3 \
-	     cerebro_module.3
+	     $(DYNAMIC_MODULES_MANPAGES)
 
 man5_MANS  = cerebro.conf.5
  
@@ -49,6 +53,6 @@ EXTRA_DIST = cerebro.1 \
 	     cerebro_updown_is_node_down.3 \
 	     cerebro_updown_up_count.3 \
 	     cerebro_updown_down_count.3 \
-	     cerebro_module.3 \
+	     $(DYNAMIC_MODULES_MANPAGES) \
 	     cerebro.conf.5 \
 	     cerebrod.8
