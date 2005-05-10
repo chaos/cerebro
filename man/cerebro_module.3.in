@@ -1,296 +1,106 @@
 \."#############################################################################
-\."$Id: cerebro_module.3.in,v 1.1 2005-05-10 17:51:55 achu Exp $
+\."$Id: cerebro_module.3.in,v 1.2 2005-05-10 20:24:22 achu Exp $
 \."#############################################################################
 .TH LIBCEREBRO 3 "May 2005" "LLNL" "LIBCEREBRO"
 .SH NAME
-Introduction to writing cerebro modules
-or down
-.SH SYNOPSIS
-.B #include <cerebro/cerebro_clusterlist_module.h>
-.sp
-.B #include <cerebro/cerebro_config.h>
-.sp
-.B #include <cerebro/cerebro_config_module.h>
-.sp
-.B #include <cerebro/cerebro_constants.h>
-.sp
-.B #include <cerebro/cerebro_error.h>
-.sp
-.B void cerebro_err_debug_lib(const char *fmt, ...);
-.br
-.SH DESCRIPTION
-Additional information about the development of cerebro clusterlist
-and config modules can be found below.
-
-Module writers should use \fBcerebro_err_debug_lib\fR when outputting
-debugging.
-
+Introduction to cerebro modules
 .SH CLUSTERLIST MODULES
 
-A cerebro clusterlist module of the name 'foobar' can be written by
-compiling a shared object library with the filename
-cerebro_clusterlist_foobar.so, and installing it in the cerebro
-package library directory @CEREBRO_MODULE_DIR@.
+In order for
+.B Cerebro
+to be utilized at its full potential, a list of cluster nodes should be
+loaded.
+.B Cerebro
+can be used without a clusterlist, but some features will be
+diminished without one.  For example, there will be no way to
+determine the down nodes of the cluster if there is no knowledge of
+what all of the nodes in the cluster actually are.
 
-The clusterlist module should define a structure of the following
-type:
+The list of cluster nodes can be specified in several formats by using
+one of a number of clusterlist modules.
 
-.nf
-struct cerebro_clusterlist_module_info {
-.in +2
-  char *clusterlist_module_name;
-  Cerebro_clusterlist_setup setup;
-  Cerebro_clusterlist_cleanup cleanup;
-  Cerebro_clusterlist_get_all_nodes get_all_nodes;
-  Cerebro_clusterlist_numnodes numnodes;
-  Cerebro_clusterlist_node_in_cluster node_in_cluster;
-  Cerebro_clusterlist_get_nodename get_nodename;
-.in -2
-};
-.fi
+The following config modules are distributed:
 
-The structure should be named 'clusterlist_module_info' and be populated
-with the following information.
+.if @MANPAGE_GENDERSLLNL@ \{
+gendersllnl - Reads and parses a genders database with LLNL specific
+attributes and values.  Can be passed a filename=value option to
+specify an non-default genders database location.
 
-The field 'clusterlist_module_name' should indicate the name of the
-clusterlist module.
+\}
 
-The field 'setup' should point to a function of the following type:
+.if @MANPAGE_GENDERS@ \{
+genders - Reads and parses a generic genders database.  Can be passed
+a filename=value option to specify an non-default genders database
+location.
 
-typedef int (*Cerebro_clusterlist_setup)(void);
+\}
 
-The 'setup' function sets up the clusterlist module with whatever
-initialization is necessary.  It returns 0 on success, -1 on error.
+.if @MANPAGE_HOSTSFILE@ \{
+hostsfile - Reads and parses a file listing each cluster node on a
+separate line.  Can be passed a filename=value option to specify an
+non-default hostsfile database location.  The default hostsfile is
+located at @CEREBRO_CLUSTERLIST_HOSTSFILE_DEFAULT@.
+\}
 
-The field 'cleanup' should point to a function of the following type:
+.ie @MANPAGE_STATIC_MODULES@ \{
+When a clusterlist module is not specified, the above clusterlist
+modules are searched for in the above order.
+\}
+.el \{
+Clusterlist modules are searched for in the
+.B Cerebro
+package library directory, @CEREBROD_MODULE_DIR@, in the above order.
+If none of the above are found,
+.B cerebrod
+will search for other clusterlist modules.
+\}
 
-typedef int (*Cerebro_clusterlist_cleanup)(void);
-
-The 'cleanup' function cleans up the clusterlist module from earlier
-initializations.  It returns 0 on success, -1 on error.
-
-The field 'get_all_nodes' should point to a function of the following type:
-
-typedef int (*Cerebro_clusterlist_get_all_nodes)(char **nodes, unsigned int nodeslen);
-
-The 'get_all_nodes' function retrieves a list of nodes in the cluster.
-The caller is responsible for allocating a char * array of appropriate
-length and freeing strdup()'ed entries.  Returns the number of cluster
-nodes copied on success, -1 on error.
-
-The field 'numnodes' should point to a function of the following type:
-
-typedef int (*Cerebro_clusterlist_numnodes)(void);
-
-The 'numnodes' function returns the number of nodes in the
-cluster, or -1 on error.
-
-The field 'node_in_cluster' should point to a function of the following type:
-
-typedef int (*Cerebro_clusterlist_node_in_cluster)(const char *node);
-
-The 'node_in_cluster' function is passed a nodename.  It returns 1 if
-the specified node is in the cluster, 0 if not, and -1 on error.
-
-The field 'get_nodename' should point to a function of the following type:
-
-typedef int (*Cerebro_clusterlist_get_nodename)(const char *node, char *buf, unsigned int buflen);
-
-The 'get_nodename' function is passed a nodename, a buffer, and a
-buffer length.  It determines the appropriate nodename to use and
-copies it into the buffer.  This function is primarily used to convert
-aliased nodenames into the appropriate nodename to use for
-calculations.  The majority of clusterlist module writers will
-probably copy the nodename directly into the buffer and not do any
-calculations.  'get_nodename' returns 0 on success, -1 on error.
-
-All of the above functions must be defined in the module and listed in
-the 'clusterlist_module_info' structure.
+If a clusterlist module cannot be found, a default module is loaded.
 
 .SH CONFIG MODULES
 
-A cerebro config module of the name 'foobar' can be written by
-compiling a shared object library with the filename
-cerebro_config_foobar.so, and installing it in the cerebro
-package library directory @CEREBRO_MODULE_DIR@.
+A configuration module format has been developed into
+.B Cerebro
+to alleviate the potential difficulty of configuring many different
+cluster nodes with different configuration files.  The configuration
+module loads an alternate set of default configuration options.  For
+example, if the cluster contains a cluster configuration database, a
+configuration module could be written to read from the cluster
+configuration database, and configure each node accordingly.
 
-The config module should define a structure of the following
-type:
+The configuration loaded by a configuration module can be overrided by
+the options specified in the configuration file.
 
-.nf
-struct cerebro_config_module_info {
-.in +2
-  char *config_module_name;
-  Cerebro_config_setup setup;
-  Cerebro_config_cleanup cleanup;
-  Cerebro_config_load_default load_default;
-.in -2
-};
-.fi
+The following config modules are distributed:
 
-The structure should be named 'config_module_info' and be populated
-with the following information.
+.ie @MANPAGE_GENDERSLLNL@ \{
+gendersllnl - Configures 
+.B Cerebro specifically for use on LLNL clusters.
 
-The field 'config_module_name' should indicate the name of the
-config module.
-
-The field 'setup' should point to a function of the following type:
-
-typedef int (*Cerebro_config_setup)(void);
-
-The 'setup' function sets up the config module with whatever
-initialization is necessary.  It returns 0 on success, -1 on error.
-
-The field 'cleanup' should point to a function of the following type:
-
-typedef int (*Cerebro_config_cleanup)(void);
-
-The 'cleanup' function cleans up the config module from earlier
-initializations.  It returns 0 on success, -1 on error.
-
-The field 'load_default' should point to a function of the following
-type:
-
-typedef int (*Cerebro_config_load_default)(struct cerebro_config *conf);
-
-The 'load_default' function loads an alternate set of configuration
-values and stores them within the configuration structure passed in.
-
-All of the above functions must be defined in the module and listed in
-the 'config_module_info' structure.
-
-The structure cerebro_config is defined as:
-
-.nf
-struct cerebro_config {
-.in +2
-  char cerebro_updown_hostnames[CEREBRO_CONFIG_UPDOWN_HOSTNAMES_MAX][CEREBRO_MAXNODENAMELEN+1];
-  int cerebro_updown_hostnames_len;
-  int cerebro_updown_hostnames_flag;
-  unsigned int cerebro_updown_port;
-  int cerebro_updown_port_flag;
-  unsigned int cerebro_updown_timeout_len;
-  int cerebro_updown_timeout_len_flag;
-  int cerebro_updown_flags;
-  int cerebro_updown_flags_flag;
-
-  unsigned int cerebrod_heartbeat_frequency_min;
-  unsigned int cerebrod_heartbeat_frequency_max;
-  int cerebrod_heartbeat_frequency_flag;
-  int cerebrod_heartbeat_source_port;
-  int cerebrod_heartbeat_source_port_flag;
-  int cerebrod_heartbeat_destination_port;
-  int cerebrod_heartbeat_destination_port_flag;
-  char cerebrod_heartbeat_destination_ip[CEREBRO_MAXIPADDRLEN+1];
-  int cerebrod_heartbeat_destination_ip_flag;
-  char cerebrod_heartbeat_network_interface[CEREBRO_MAXNETWORKINTERFACELEN+1];
-  int cerebrod_heartbeat_network_interface_flag;
-  int cerebrod_heartbeat_ttl;
-  int cerebrod_heartbeat_ttl_flag;
-  int cerebrod_speak;
-  int cerebrod_speak_flag;
-  int cerebrod_listen;
-  int cerebrod_listen_flag;
-  int cerebrod_listen_threads;
-  int cerebrod_listen_threads_flag;
-  int cerebrod_updown_server;
-  int cerebrod_updown_server_flag;
-  int cerebrod_updown_server_port;
-  int cerebrod_updown_server_port_flag;
-.if @MANPAGE_DEBUG@ \{
-  int cerebrod_speak_debug;
-  int cerebrod_speak_debug_flag;
-  int cerebrod_listen_debug;
-  int cerebrod_listen_debug_flag;
-  int cerebrod_updown_server_debug;
-  int cerebrod_updown_server_debug_flag;
 \}
-.in -2
-};
-.fi
-
-The 'updown_hostnames' field should store an array of default hostnames for
-.BR cerebro_updown_load_data(3).
-
-The 'updown_port' field should store the default port for
-.BR cerebro_updown_load_data(3).
-
-The 'updown_timeout_len' field should store the default timeout length
-for
-.BR cerebro_updown_load_data(3).
-
-The 'updown_flags' field should store the default flags for
-.BR cerebro_updown_load_data(3).
-
-The 'cerebrod_heartbeat_frequency_min' and
-'cerebrod_heartbeat_frequency_max' fields store the minimum and
-maximum heartbeat frequencey for
-.BR cerebrod(8).
-
-The 'cerebrod_heartbeat_source_port' field stores the heartbeat source
-port for
-.BR cerebrod(8).
-
-The 'cerebrod_heartbeat_destination_port' field stores the heartbeat
-destination port for
-.BR cerebrod(8).
-
-The 'cerebrod_heartbeat_destination_ip' field stores the heartbeat
-destination ip of heartbeat packets sent from
-.BR cerebrod(8).
-The destination IP address may be a single case or multicast IPv4
-address.
-
-The 'cerebrod_heartbeat_network_interface' field stores the heartbeat
-network interface for
-.BR cerebrod(8)
-to send heartbeat packets out of.  The network interface can be
-specified as a network interface, ip address, or a subnet using CIDR
-notation.
-
-The 'cerebrod_heartbeat_ttl' field stores the heartbeat time to live
-for heartbeat packets multicast from
-.BR cerebrod(8).
-
-The 'cerebrod_speak' field is a boolean that turns on the 
-.BR cerebrod(8)
-speaker to send out heartbeat packets.
-
-The 'cerebrod_listen' field is a boolean that turns on the
-.BR cerebrod(8)
-listener to receive heartbeat packets.
-
-The 'cerebrod_listen_threads' field stores the number of listener
-threads that should be created in
-.BR cerebrod(8).
-
-The 'cerebrod_updown_server' field is a boolean that turns on the
-.BR cerebrod(8)
-updown server to receive updown data requests.
-
-The 'cerebrod_updown_server_port' field stores the updown server
-port for 
-.BR cerebrod(8).
-.if @MANPAGE_DEBUG@ \{
-
-The 'cerebrod_speak_debug' field is a boolean that turns on speaker
-debugging for 
-.BR cerebrod.
-
-The 'cerebrod_listen_debug' field is a boolean that turns on listener
-debugging for
-.BR cerebrod.
-
-The 'cerebrod_updown_server_debug' field is a boolean that turns on
-updown server debugging for
-.BR cerebrod.
+.el \{
+No configuration modules are searched in this build.
 
 \}
 
-Any parameter that is set in the configuration structure must have its
-respective flag set.  The 'updown_hostnames' field must also have the
-'updown_hostnames_len' field appropriately set to the number of hostnames
-loaded.
+.ie @MANPAGE_STATIC_MODULES@ \{
+When a config module is not specified, the above config modules are
+searched for in the above order.
+\}
+.el \{
+Configuration modules are searched for in the
+.B Cerebro
+package library directory, @CEREBRO_MODULE_DIR@, in the above order.
+If none of the above are found,
+.B cerebrod
+will search for other configuration modules.
+\}
+
+If a configuration module cannot be found, a default module is loaded.
 
 .SH SEE ALSO
-libcerebro(3), cerebro.conf(5)
+libcerebro(3), 
+.if !@WITH_STATIC_MODULES@ \{
+cerebro_module_devel(3),
+\}
+cerebro.conf(5)
