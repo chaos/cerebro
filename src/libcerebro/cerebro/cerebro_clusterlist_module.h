@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_module.h,v 1.1 2005-05-05 16:12:57 achu Exp $
+ *  $Id: cerebro_clusterlist_module.h,v 1.2 2005-05-10 17:51:55 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_CLUSTERLIST_MODULE_H
@@ -37,7 +37,7 @@ typedef int (*Cerebro_clusterlist_cleanup)(void);
  * - nodeslen - array length, usually retrieved by numnodes
  *   clusterlist module function
  *
- * Returns number of cluster nodes copied in the buffer on success, -1
+ * Returns number of cluster nodes retrieved on success, -1
  * on error
  */
 typedef int (*Cerebro_clusterlist_get_all_nodes)(char **nodes, 
