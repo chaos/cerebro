@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.14 2005-05-10 20:24:22 achu Exp $
+## $Id: Makefile.am,v 1.15 2005-05-10 20:38:36 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -10,7 +10,9 @@ endif
 
 man1_MANS  = cerebro.1
 
-man3_MANS  = cerebro_handle_create.3 \
+man3_MANS  = libcerebro.3 \
+	     cerebro.3 \
+	     cerebro_handle_create.3 \
 	     cerebro_handle_destroy.3 \
 	     cerebro_errnum.3 \
 	     cerebro_strerror.3 \
@@ -36,6 +38,8 @@ man5_MANS  = cerebro.conf.5
 man8_MANS  = cerebrod.8
 
 EXTRA_DIST = cerebro.1 \
+	     libcerebro.3 \
+	     cerebro.3 \
 	     cerebro_handle_create.3 \
 	     cerebro_handle_destroy.3 \
 	     cerebro_errnum.3 \

@@ -1,21 +1,21 @@
 \."#############################################################################
-\."$Id: cerebro_module_devel.3.in,v 1.1 2005-05-10 20:24:22 achu Exp $
+\."$Id: cerebro_module_devel.3.in,v 1.2 2005-05-10 20:38:36 achu Exp $
 \."#############################################################################
 .TH LIBCEREBRO 3 "May 2005" "LLNL" "LIBCEREBRO"
 .SH NAME
 Introduction to writing cerebro modules
 .SH SYNOPSIS
-.B #include <cerebro/cerebro_clusterlist_module.h>
+.BI #include <cerebro/cerebro_clusterlist_module.h>
 .sp
-.B #include <cerebro/cerebro_config.h>
+.BI #include <cerebro/cerebro_config.h>
 .sp
-.B #include <cerebro/cerebro_config_module.h>
+.BI #include <cerebro/cerebro_config_module.h>
 .sp
-.B #include <cerebro/cerebro_constants.h>
+.BI #include <cerebro/cerebro_constants.h>
 .sp
-.B #include <cerebro/cerebro_error.h>
+.BI #include <cerebro/cerebro_error.h>
 .sp
-.B void cerebro_err_debug_lib(const char *fmt, ...);
+.BI void cerebro_err_debug_lib(const char *fmt, ...);
 .br
 .SH DESCRIPTION
 Additional information about the development of cerebro clusterlist

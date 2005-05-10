@@ -1,0 +1,80 @@
+\."#############################################################################
+\."$Id: libcerebro.3,v 1.1 2005-05-10 20:38:36 achu Exp $
+\."#############################################################################
+.TH LIBCEREBRO 3 "August 2003" "LLNL" "LIBCEREBRO"
+.SH NAME
+libcerebro \- a library of functions to determine if a node is up
+or down
+.SH SYNOPSIS
+.B #include <cerebro.h>
+.sp
+.BI "cerebro_t cerebro_handle_create(void);"
+.sp
+.BI "int cerebro_handle_destroy(cerebro_t handle);"
+.sp
+.BI "int cerebro_errnum(cerebro_t handle);"
+.sp
+.BI "char *cerebro_strerror(int errnum);"
+.sp
+.BI "char *cerebro_errormsg(int errnum);"
+.sp
+.BI "void cerebro_perror(cerebro_t handle, const char *msg);"
+.sp
+.BI "int cerebro_load_config(cerebro_t handle);"
+.sp
+.BI "int cerebro_unload_config(cerebro_t handle);"
+.sp
+.BI "int cerebro_load_clusterlist_module(cerebro_t handle);"
+.sp
+.BI "int cerebro_unload_clusterlist_module(cerebro_t handle);"
+.sp
+.BI "int cerebro_updown_load_data(cerebro_t handle, const char *hostname, unsigned int port, unsigned int timeout_len, int flags);"
+.sp
+.BI "int cerebro_updown_get_up_nodes(cerebro_t handle, char *buf, unsigned int buflen);"
+.sp
+.BI "int cerebro_updown_get_down_nodes(cerebro_t handle, char *buf, unsigned int buflen);"
+.sp
+.BI "int cerebro_updown_is_node_up(cerebro_t handle, const char *node);"
+.sp
+.BI "int cerebro_updown_is_node_down(cerebro_t handle, const char *node);"
+.sp
+.BI "int cerebro_updown_up_count(cerebro_t handle);"
+.sp
+.BI "int cerebro_updown_down_count(cerebro_t handle);"
+.br
+.SH DESCRIPTION
+The cerebro library functions are a set of functions that interacts
+with the 
+.B cerebro
+library to determine status information about a cluster.
+
+For API information, please see the individual manpages for each of
+the functions above, or read the comments written in
+/usr/include/cerebro.h.  The
+.B Cerebro
+
+configuration file, clusterlist module, or configuration module may be
+loaded or called during API calls.  Please see the
+.BR cerebro.conf(5)
+manpage for information about the cerebro configuration file.  Please see
+the 
+.BR cerebro_module(3)
+manpage for information on cerebro modules.  
+
+.SH FILES
+/usr/include/cerebro.h
+.SH SEE ALSO
+
+cerebro_handle_create(3), cerebro_handle_destroy(3),
+cerebro_errnum(3), cerebro_strerror(3), cerebro_errormsg(3),
+cerebro_perror(3), cerebro_load_config(3), cerebro_unload_config(3),
+cerebro_load_clusterlist_module(3),
+cerebro_unload_clusterlist_module(3), cerebro_updown_load_data(3),
+cerebro_updown_get_up_nodes(3), cerebro_updown_get_down_nodes(3),
+cerebro_updown_is_node_up(3), cerebro_updown_is_node_down(3),
+cerebro_updown_up_count(3), cerebro_updown_down_count(3),
+cerebro_module(3),
+.if !@WITH_STATIC_MODULES@ \{
+cerebro_module_devel(3),
+\}
+cerebro.conf(5)
