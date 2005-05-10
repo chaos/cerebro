@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_genders_util.h,v 1.5 2005-05-04 20:58:09 achu Exp $
+ *  $Id: cerebro_clusterlist_genders_util.h,v 1.6 2005-05-10 17:55:27 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_CLUSTERLIST_GENDERS_UTIL_H
@@ -20,6 +20,13 @@ int cerebro_clusterlist_genders_setup(genders_t *handle);
 int cerebro_clusterlist_genders_cleanup(genders_t *handle);
 
 /* 
+ * cerebro_clusterlist_genders_numnodes
+ *
+ * common numnodes function for genders and gendersllnl numnodes
+ */
+int cerebro_clusterlist_genders_numnodes(genders_t handle);
+
+/* 
  * cerebro_clusterlist_genders_get_all_nodes
  *
  * common get_all_nodes function for genders and gendersllnl get_all_nodes
@@ -27,12 +34,5 @@ int cerebro_clusterlist_genders_cleanup(genders_t *handle);
 int cerebro_clusterlist_genders_get_all_nodes(genders_t handle, 
                                               char **nodes, 
                                               unsigned int nodeslen);
-
-/* 
- * cerebro_clusterlist_genders_numnodes
- *
- * common numnodes function for genders and gendersllnl numnodes
- */
-int cerebro_clusterlist_genders_numnodes(genders_t handle);
 
 #endif /* _CEREBRO_CLUSTERLIST_GENDERS_UTIL_H */

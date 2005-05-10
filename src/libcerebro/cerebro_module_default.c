@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module_default.c,v 1.6 2005-05-05 16:12:57 achu Exp $
+ *  $Id: cerebro_module_default.c,v 1.7 2005-05-10 17:55:27 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -30,14 +30,15 @@ default_clusterlist_cleanup(void)
 {
   return 0;
 }
+
 int
-default_clusterlist_get_all_nodes(char **nodes, unsigned int nodeslen)
+default_clusterlist_numnodes(void)
 {
   return 0;
 }
 
 int
-default_clusterlist_numnodes(void)
+default_clusterlist_get_all_nodes(char **nodes, unsigned int nodeslen)
 {
   return 0;
 }
@@ -102,8 +103,8 @@ struct cerebro_clusterlist_module_info default_clusterlist_module_info =
     DEFAULT_CLUSTERLIST_MODULE_NAME,
     &default_clusterlist_setup,
     &default_clusterlist_cleanup,
-    &default_clusterlist_get_all_nodes,
     &default_clusterlist_numnodes,
+    &default_clusterlist_get_all_nodes,
     &default_clusterlist_node_in_cluster,
     &default_clusterlist_get_nodename,
   };

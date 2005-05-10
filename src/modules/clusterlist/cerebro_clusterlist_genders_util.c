@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_genders_util.c,v 1.13 2005-05-09 05:17:30 achu Exp $
+ *  $Id: cerebro_clusterlist_genders_util.c,v 1.14 2005-05-10 17:55:27 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -86,6 +86,29 @@ cerebro_clusterlist_genders_cleanup(genders_t *handle)
   return 0;
 }
 
+int 
+cerebro_clusterlist_genders_numnodes(genders_t handle)
+{
+  int num;
+
+  if (!handle)
+    {
+      cerebro_err_debug_module("%s(%s:%d): handle null",
+			       __FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+
+  if ((num = genders_getnumnodes(handle)) < 0)
+    {
+      cerebro_err_debug_module("%s(%s:%d): genders_getnumnodes: %s",
+			       __FILE__, __FUNCTION__, __LINE__,
+			       genders_errormsg(handle));
+      return -1;
+    }
+
+  return num;
+}
+
 int
 cerebro_clusterlist_genders_get_all_nodes(genders_t handle, 
                                           char **nodes, 
@@ -161,25 +184,3 @@ cerebro_clusterlist_genders_get_all_nodes(genders_t handle,
   return -1;
 }
 
-int 
-cerebro_clusterlist_genders_numnodes(genders_t handle)
-{
-  int num;
-
-  if (!handle)
-    {
-      cerebro_err_debug_module("%s(%s:%d): handle null",
-			       __FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
-
-  if ((num = genders_getnumnodes(handle)) < 0)
-    {
-      cerebro_err_debug_module("%s(%s:%d): genders_getnumnodes: %s",
-			       __FILE__, __FUNCTION__, __LINE__,
-			       genders_errormsg(handle));
-      return -1;
-    }
-
-  return num;
-}

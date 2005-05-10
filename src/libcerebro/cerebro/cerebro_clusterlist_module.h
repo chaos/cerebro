@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_module.h,v 1.2 2005-05-10 17:51:55 achu Exp $
+ *  $Id: cerebro_clusterlist_module.h,v 1.3 2005-05-10 17:55:27 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_CLUSTERLIST_MODULE_H
@@ -26,6 +26,17 @@ typedef int (*Cerebro_clusterlist_setup)(void);
 typedef int (*Cerebro_clusterlist_cleanup)(void);
 
 /*
+ * Cerebro_clusterlist_numnodes
+ *
+ * function prototype for clusterlist module function to determine the
+ * number of nodes in the cluster.  Required to be defined by each
+ * config module.
+ *
+ * Returns number of cluster nodes on success, -1 on error
+ */
+typedef int (*Cerebro_clusterlist_numnodes)(void);
+
+/*
  * Cerebro_clusterlist_get_all_nodes
  *
  * function prototype for clusterlist module function to get all
@@ -42,17 +53,6 @@ typedef int (*Cerebro_clusterlist_cleanup)(void);
  */
 typedef int (*Cerebro_clusterlist_get_all_nodes)(char **nodes, 
                                                  unsigned int nodeslen);
-
-/*
- * Cerebro_clusterlist_numnodes
- *
- * function prototype for clusterlist module function to determine the
- * number of nodes in the cluster.  Required to be defined by each
- * config module.
- *
- * Returns number of cluster nodes on success, -1 on error
- */
-typedef int (*Cerebro_clusterlist_numnodes)(void);
 
 /*
  * Cerebro_clusterlist_node_in_cluster
@@ -98,8 +98,8 @@ struct cerebro_clusterlist_module_info
   char *clusterlist_module_name;
   Cerebro_clusterlist_setup setup;
   Cerebro_clusterlist_cleanup cleanup;
-  Cerebro_clusterlist_get_all_nodes get_all_nodes;
   Cerebro_clusterlist_numnodes numnodes;
+  Cerebro_clusterlist_get_all_nodes get_all_nodes;
   Cerebro_clusterlist_node_in_cluster node_in_cluster;
   Cerebro_clusterlist_get_nodename get_nodename;
 };

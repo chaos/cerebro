@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_gendersllnl.c,v 1.17 2005-05-05 16:12:57 achu Exp $
+ *  $Id: cerebro_clusterlist_gendersllnl.c,v 1.18 2005-05-10 17:55:27 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -83,6 +83,24 @@ gendersllnl_clusterlist_cleanup(void)
 }
 
 /*
+ * gendersllnl_clusterlist_numnodes
+ *
+ * gendersllnl clusterlist module numnodes function
+ */
+static int
+gendersllnl_clusterlist_numnodes(void)
+{
+  if (!gendersllnl_handle)
+    {
+      cerebro_err_debug_module("%s(%s:%d): gendersllnl_handle null",
+			       __FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+
+  return cerebro_clusterlist_genders_numnodes(gendersllnl_handle);
+}
+
+/*
  * gendersllnl_clusterlist_get_all_nodes
  *
  * gendersllnl clusterlist module get all nodes function
@@ -107,24 +125,6 @@ gendersllnl_clusterlist_get_all_nodes(char **nodes, unsigned int nodeslen)
   return cerebro_clusterlist_genders_get_all_nodes(gendersllnl_handle, 
                                                    nodes, 
                                                    nodeslen);
-}
-
-/*
- * gendersllnl_clusterlist_numnodes
- *
- * gendersllnl clusterlist module numnodes function
- */
-static int
-gendersllnl_clusterlist_numnodes(void)
-{
-  if (!gendersllnl_handle)
-    {
-      cerebro_err_debug_module("%s(%s:%d): gendersllnl_handle null",
-			       __FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
-
-  return cerebro_clusterlist_genders_numnodes(gendersllnl_handle);
 }
 
 /*
@@ -266,8 +266,8 @@ struct cerebro_clusterlist_module_info clusterlist_module_info =
     GENDERSLLNL_CLUSTERLIST_MODULE_NAME,
     &gendersllnl_clusterlist_setup,
     &gendersllnl_clusterlist_cleanup,
-    &gendersllnl_clusterlist_get_all_nodes,
     &gendersllnl_clusterlist_numnodes,
+    &gendersllnl_clusterlist_get_all_nodes,
     &gendersllnl_clusterlist_node_in_cluster,
     &gendersllnl_clusterlist_get_nodename,
   };

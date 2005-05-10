@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_hostsfile.c,v 1.17 2005-05-05 16:12:57 achu Exp $
+ *  $Id: cerebro_clusterlist_hostsfile.c,v 1.18 2005-05-10 17:55:27 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -337,6 +337,24 @@ hostsfile_clusterlist_cleanup(void)
 }
 
 /*
+ * hostsfile_clusterlist_numnodes
+ *
+ * hostsfile clusterlist module numnodes function
+ */
+static int 
+hostsfile_clusterlist_numnodes(void)
+{
+  if (!hosts)
+    {
+      cerebro_err_debug_module("%s(%s:%d): hosts null", 
+			       __FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+
+  return list_count(hosts);
+}
+
+/*
  * hostsfile_clusterlist_get_all_nodes
  *
  * hostsfile clusterlist module get all nodes function
@@ -405,24 +423,6 @@ hostsfile_clusterlist_get_all_nodes(char **nodes, unsigned int nodeslen)
   if (itr)
     list_iterator_destroy(itr);
   return -1;
-}
-
-/*
- * hostsfile_clusterlist_numnodes
- *
- * hostsfile clusterlist module numnodes function
- */
-static int 
-hostsfile_clusterlist_numnodes(void)
-{
-  if (!hosts)
-    {
-      cerebro_err_debug_module("%s(%s:%d): hosts null", 
-			       __FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
-
-  return list_count(hosts);
 }
 
 /*
@@ -539,8 +539,8 @@ struct cerebro_clusterlist_module_info clusterlist_module_info =
     HOSTSFILE_CLUSTERLIST_MODULE_NAME,
     &hostsfile_clusterlist_setup,
     &hostsfile_clusterlist_cleanup,
-    &hostsfile_clusterlist_get_all_nodes,
     &hostsfile_clusterlist_numnodes,
+    &hostsfile_clusterlist_get_all_nodes,
     &hostsfile_clusterlist_node_in_cluster,
     &hostsfile_clusterlist_get_nodename,
   };

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.c,v 1.27 2005-05-09 16:02:11 achu Exp $
+ *  $Id: cerebro_module.c,v 1.28 2005-05-10 17:55:27 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -498,16 +498,16 @@ _cerebro_module_load_clusterlist_module(char *module)
       goto cleanup;
     }
 
-  if (!clusterlist_module_info_l->get_all_nodes)
+  if (!clusterlist_module_info_l->numnodes)
     {
-      cerebro_err_debug_lib("clusterlist module '%s': get_all_nodes null",
+      cerebro_err_debug_lib("clusterlist module '%s': numnodes null",
 			    clusterlist_module_info_l->clusterlist_module_name);
       goto cleanup;
     }
 
-  if (!clusterlist_module_info_l->numnodes)
+  if (!clusterlist_module_info_l->get_all_nodes)
     {
-      cerebro_err_debug_lib("clusterlist module '%s': numnodes null",
+      cerebro_err_debug_lib("clusterlist module '%s': get_all_nodes null",
 			    clusterlist_module_info_l->clusterlist_module_name);
       goto cleanup;
     }
@@ -926,6 +926,19 @@ cerebro_clusterlist_module_cleanup(void)
 }
 
 int
+cerebro_clusterlist_module_numnodes(void)
+{
+  if (!clusterlist_module_info)
+    {
+      cerebro_err_debug_lib("%s(%s:%d): clusterlist_module_info null",
+			    __FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+  
+  return ((*clusterlist_module_info->numnodes)());
+}
+
+int
 cerebro_clusterlist_module_get_all_nodes(char **nodes, 
 					 unsigned int nodeslen)
 {
@@ -937,19 +950,6 @@ cerebro_clusterlist_module_get_all_nodes(char **nodes,
     }
   
   return ((*clusterlist_module_info->get_all_nodes)(nodes, nodeslen));
-}
-
-int
-cerebro_clusterlist_module_numnodes(void)
-{
-  if (!clusterlist_module_info)
-    {
-      cerebro_err_debug_lib("%s(%s:%d): clusterlist_module_info null",
-			    __FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
-  
-  return ((*clusterlist_module_info->numnodes)());
 }
 
 int

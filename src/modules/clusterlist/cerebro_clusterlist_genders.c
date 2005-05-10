@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_genders.c,v 1.17 2005-05-05 16:12:57 achu Exp $
+ *  $Id: cerebro_clusterlist_genders.c,v 1.18 2005-05-10 17:55:27 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -68,6 +68,24 @@ genders_clusterlist_cleanup(void)
 }
 
 /*
+ * genders_clusterlist_numnodes
+ *
+ * genders clusterlist module numnodes function
+ */
+static int 
+genders_clusterlist_numnodes(void)
+{
+  if (!genders_handle)
+    {
+      cerebro_err_debug_module("%s(%s:%d): genders_handle null",
+			       __FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+
+  return cerebro_clusterlist_genders_numnodes(genders_handle);
+}
+
+/*
  * genders_clusterlist_get_all_nodes
  *
  * genders clusterlist module get all nodes function
@@ -92,24 +110,6 @@ genders_clusterlist_get_all_nodes(char **nodes, unsigned int nodeslen)
   return cerebro_clusterlist_genders_get_all_nodes(genders_handle, 
                                                    nodes,
                                                    nodeslen);
-}
-
-/*
- * genders_clusterlist_numnodes
- *
- * genders clusterlist module numnodes function
- */
-static int 
-genders_clusterlist_numnodes(void)
-{
-  if (!genders_handle)
-    {
-      cerebro_err_debug_module("%s(%s:%d): genders_handle null",
-			       __FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
-
-  return cerebro_clusterlist_genders_numnodes(genders_handle);
 }
 
 /*
@@ -232,8 +232,8 @@ struct cerebro_clusterlist_module_info clusterlist_module_info =
     GENDERS_CLUSTERLIST_MODULE_NAME,
     &genders_clusterlist_setup,
     &genders_clusterlist_cleanup,
-    &genders_clusterlist_get_all_nodes,
     &genders_clusterlist_numnodes,
+    &genders_clusterlist_get_all_nodes,
     &genders_clusterlist_node_in_cluster,
     &genders_clusterlist_get_nodename,
   };
