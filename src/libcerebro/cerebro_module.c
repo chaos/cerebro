@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.c,v 1.28 2005-05-10 17:55:27 achu Exp $
+ *  $Id: cerebro_module.c,v 1.29 2005-05-10 18:18:52 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -939,8 +939,7 @@ cerebro_clusterlist_module_numnodes(void)
 }
 
 int
-cerebro_clusterlist_module_get_all_nodes(char **nodes, 
-					 unsigned int nodeslen)
+cerebro_clusterlist_module_get_all_nodes(char ***nodes)
 {
   if (!clusterlist_module_info)
     {
@@ -949,7 +948,7 @@ cerebro_clusterlist_module_get_all_nodes(char **nodes,
       return -1;
     }
   
-  return ((*clusterlist_module_info->get_all_nodes)(nodes, nodeslen));
+  return ((*clusterlist_module_info->get_all_nodes)(nodes));
 }
 
 int

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_hostsfile.c,v 1.18 2005-05-10 17:55:27 achu Exp $
+ *  $Id: cerebro_clusterlist_hostsfile.c,v 1.19 2005-05-10 18:18:52 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -360,8 +360,9 @@ hostsfile_clusterlist_numnodes(void)
  * hostsfile clusterlist module get all nodes function
  */
 static int
-hostsfile_clusterlist_get_all_nodes(char **nodes, unsigned int nodeslen)
+hostsfile_clusterlist_get_all_nodes(char ***nodes)
 {
+  char **nodelist = NULL;
   char *node;
   ListIterator itr = NULL;
   int numnodes, i = 0;
@@ -380,14 +381,8 @@ hostsfile_clusterlist_get_all_nodes(char **nodes, unsigned int nodeslen)
       return -1;
     }
 
-  numnodes = list_count(hosts);
-
-  if (numnodes > nodeslen)
-    {
-      cerebro_err_debug_module("%s(%s:%d): nodeslen invalid",
-			       __FILE__, __FUNCTION__, __LINE__);
-      goto cleanup;
-    }
+  if (!(numnodes = list_count(hosts)))
+    return 0;
 
   if (!(itr = list_iterator_create(hosts)))
     {
@@ -397,15 +392,25 @@ hostsfile_clusterlist_get_all_nodes(char **nodes, unsigned int nodeslen)
       goto cleanup;
     }
 
+  if (!(nodelist = (char **)malloc(sizeof(char *) * (numnodes + 1))))
+    {
+      cerebro_err_debug_module("%s(%s:%d): malloc: %s", 
+			       __FILE__, __FUNCTION__, __LINE__,
+			       strerror(errno));
+      goto cleanup;
+    }
+  memset(nodelist, '\0', sizeof(char *) * (numnodes + 1));
+
   while ((node = list_next(itr)) && (i < numnodes))
     {
-      if (!(nodes[i++] = strdup(node)))
+      if (!(nodelist[i] = strdup(node)))
         {
           cerebro_err_debug_module("%s(%s:%d): strdup: %s", 
 				   __FILE__, __FUNCTION__, __LINE__,
 				   strerror(errno));
           goto cleanup;
         }
+      i++;
     }
 
   if (i > numnodes)
@@ -417,11 +422,19 @@ hostsfile_clusterlist_get_all_nodes(char **nodes, unsigned int nodeslen)
 
   list_iterator_destroy(itr);
 
+  *nodes = nodelist;
   return numnodes;
 
  cleanup:
   if (itr)
     list_iterator_destroy(itr);
+  if (nodelist)
+    {
+      int j;
+      for (j = 0; j < i; j++)
+        free(nodelist[j]);
+      free(nodelist);
+    }
   return -1;
 }
 

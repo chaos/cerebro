@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_genders.c,v 1.18 2005-05-10 17:55:27 achu Exp $
+ *  $Id: cerebro_clusterlist_genders.c,v 1.19 2005-05-10 18:18:52 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -91,7 +91,7 @@ genders_clusterlist_numnodes(void)
  * genders clusterlist module get all nodes function
  */
 static int
-genders_clusterlist_get_all_nodes(char **nodes, unsigned int nodeslen)
+genders_clusterlist_get_all_nodes(char ***nodes)
 {
   if (!genders_handle)
     {
@@ -108,8 +108,7 @@ genders_clusterlist_get_all_nodes(char **nodes, unsigned int nodeslen)
     }
   
   return cerebro_clusterlist_genders_get_all_nodes(genders_handle, 
-                                                   nodes,
-                                                   nodeslen);
+                                                   nodes);
 }
 
 /*

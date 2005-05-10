@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.c,v 1.54 2005-05-09 16:02:11 achu Exp $
+ *  $Id: cerebrod_updown.c,v 1.55 2005-05-10 18:18:52 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -225,9 +225,7 @@ _cerebrod_updown_initialize(void)
       int i;
       char **nodes;
 
-      nodes = (char **)Malloc(sizeof(char *) * numnodes);
-
-      if (cerebro_clusterlist_module_get_all_nodes(nodes, numnodes) < 0)
+      if (cerebro_clusterlist_module_get_all_nodes(&nodes) < 0)
         cerebro_err_exit("%s(%s:%d): cerebro_clusterlist_module_get_all_nodes",
                          __FILE__, __FUNCTION__, __LINE__);
 
@@ -243,12 +241,14 @@ _cerebrod_updown_initialize(void)
           Pthread_mutex_init(&(ud->updown_node_data_lock), NULL);
 
           List_append(updown_node_data, ud);
-          Hash_insert(updown_node_data_index, nodes[i], ud);
+          Hash_insert(updown_node_data_index, Strdup(nodes[i]), ud);
 
           list_sort(updown_node_data, (ListCmpF)_updown_node_data_strcmp);
+
+          free(nodes[i]);
         }
 
-      Free(nodes);
+      free(nodes);
     }
 
   Pthread_mutex_lock(&cerebrod_updown_initialization_complete_lock);

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_genders_util.c,v 1.14 2005-05-10 17:55:27 achu Exp $
+ *  $Id: cerebro_clusterlist_genders_util.c,v 1.15 2005-05-10 18:18:52 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -111,11 +111,10 @@ cerebro_clusterlist_genders_numnodes(genders_t handle)
 
 int
 cerebro_clusterlist_genders_get_all_nodes(genders_t handle, 
-                                          char **nodes, 
-                                          unsigned int nodeslen)
+                                          char ***nodes)
 {
   char **nodelist = NULL;
-  int i, nodelistlen, numnodes;
+  int nodelistlen, numnodes;
   
   if (!handle)
     {
@@ -151,31 +150,8 @@ cerebro_clusterlist_genders_get_all_nodes(genders_t handle,
       goto cleanup;
     }
 
-  if (numnodes > nodeslen)
-    {
-      cerebro_err_debug_module("%s(%s:%d): nodeslen too small", 
-			       __FILE__, __FUNCTION__, __LINE__);
-      goto cleanup;
-    }
 
-  for (i = 0; i < numnodes; i++)
-    {
-      if (!(nodes[i] = strdup(nodelist[i])))
-	{
-	  cerebro_err_debug_module("%s(%s:%d): strdup: %s",
-                                   __FILE__, __FUNCTION__, __LINE__,
-                                   strerror(errno));
-	}
-    }
-
-  if (genders_nodelist_destroy(handle, nodelist) < 0)
-    {
-      cerebro_err_debug_module("%s(%s:%d): genders_nodelist_destroy: %s",
-			       __FILE__, __FUNCTION__, __LINE__,
-			       genders_errormsg(handle));
-      goto cleanup;
-    }
-  
+  *nodes = nodelist;
   return numnodes;
 
  cleanup:

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_module.h,v 1.3 2005-05-10 17:55:27 achu Exp $
+ *  $Id: cerebro_clusterlist_module.h,v 1.4 2005-05-10 18:18:52 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_CLUSTERLIST_MODULE_H
@@ -9,7 +9,7 @@
  * Cerebro_clusterlist_setup
  *
  * function prototype for clusterlist module function to setup the
- * module.  Required to be defined by each config module.
+ * module.  Required to be defined by each clusterlist module.
  *
  * Returns 0 on success, -1 on error
  */
@@ -19,7 +19,7 @@ typedef int (*Cerebro_clusterlist_setup)(void);
  * Cerebro_clusterlist_cleanup
  *
  * function prototype for clusterlist module function to
- * cleanup. Required to be defined by each config module.
+ * cleanup. Required to be defined by each clusterlist module.
  *
  * Returns 0 on success, -1 on error
  */
@@ -30,7 +30,7 @@ typedef int (*Cerebro_clusterlist_cleanup)(void);
  *
  * function prototype for clusterlist module function to determine the
  * number of nodes in the cluster.  Required to be defined by each
- * config module.
+ * clusterlist module.
  *
  * Returns number of cluster nodes on success, -1 on error
  */
@@ -40,25 +40,23 @@ typedef int (*Cerebro_clusterlist_numnodes)(void);
  * Cerebro_clusterlist_get_all_nodes
  *
  * function prototype for clusterlist module function to get all
- * cluster nodes.  Caller is responsible for allocating a char * array
- * of appropriate length and freeing returned strdup()'ed entries.
- * Required to be defined by each config module.
+ * cluster nodes.  Caller is responsible for freeing the created 
+ * char ** array of nodes.  The returned array of strings will
+ * be NULL terminated.   Required to be defined by each clusterlist 
+ * module.
  *
- * - nodes - array of char * pointers
- * - nodeslen - array length, usually retrieved by numnodes
- *   clusterlist module function
+ * - nodes - pointer to return char ** array of nodes
  *
  * Returns number of cluster nodes retrieved on success, -1
  * on error
  */
-typedef int (*Cerebro_clusterlist_get_all_nodes)(char **nodes, 
-                                                 unsigned int nodeslen);
+typedef int (*Cerebro_clusterlist_get_all_nodes)(char ***nodes);
 
 /*
  * Cerebro_clusterlist_node_in_cluster
  *
  * function prototype for clusterlist module function to determine if
- * a node is in the cluser. Required to be defined by each config
+ * a node is in the cluser. Required to be defined by each clusterlist
  * module.
  *
  * - node - node string
@@ -75,7 +73,7 @@ typedef int (*Cerebro_clusterlist_node_in_cluster)(const char *node);
  * copy the node passed in into the buffer passed in.  However, in
  * some circumstances, nodes with duplicate names (perhaps aliased)
  * need to be identified with a single nodename key. Required to be
- * defined by each config module.
+ * defined by each clusterlist module.
  *
  * - node - node string
  * - buf - buffer pointer
