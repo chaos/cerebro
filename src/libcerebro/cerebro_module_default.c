@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module_default.c,v 1.7 2005-05-10 17:55:27 achu Exp $
+ *  $Id: cerebro_module_default.c,v 1.8 2005-05-10 18:19:54 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -38,7 +38,7 @@ default_clusterlist_numnodes(void)
 }
 
 int
-default_clusterlist_get_all_nodes(char **nodes, unsigned int nodeslen)
+default_clusterlist_get_all_nodes(char ***nodes)
 {
   return 0;
 }
