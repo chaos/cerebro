@@ -60,6 +60,34 @@ make
 rm -rf $RPM_BUILD_ROOT
 DESTDIR="$RPM_BUILD_ROOT" make install
 
+%post
+#
+# Restart cerebrod if already running
+#
+if [ "$1" = 1 ]; then
+   if [ -x /etc/init.d/cerebrod ]; then
+      [ -x /sbin/chkconfig ] && /sbin/chkconfig --add cerebrod
+   fi
+fi
+if [ $1 -ge 1 ]; then
+   if [ -x /etc/init.d/cerebrod ]; then
+      /etc/init.d/cerebrod condrestart
+   fi
+fi
+
+%preun
+#
+# Stop cerebrod if it is running
+#
+if [ "$1" = 0 ]; then
+    if [ -x /etc/init.d/cerebrod ]; then
+       if /etc/init.d/cerebrod status | grep -q running; then
+          /etc/init.d/cerebrod stop
+       fi
+       [ -x /sbin/chkconfig ] && /sbin/chkconfig --del cerebrod
+    fi
+fi
+
 %files
 %defattr(-,root,root)
 %doc README NEWS ChangeLog 
