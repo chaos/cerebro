@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_updown.c,v 1.40 2005-05-11 17:06:28 achu Exp $
+ *  $Id: cerebro_updown.c,v 1.41 2005-05-11 21:49:02 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -39,8 +39,6 @@
 #include "cerebro/cerebro_updown_protocol.h"
 #include "hostlist.h"
 #include "fd.h"
-
-#define CEREBRO_UPDOWN_MAGIC_NUMBER             0xF00F5678
 
 /* 
  * cerebro_updown_data

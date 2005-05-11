@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.15 2005-05-11 16:38:12 achu Exp $
+ *  $Id: cerebro.h,v 1.16 2005-05-11 21:49:02 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_H
@@ -28,6 +28,8 @@
 #define CEREBRO_ERR_ERRNUMRANGE           20
 
 typedef struct cerebro *cerebro_t;
+
+typedef struct cerebro_nodes_iterator *cerebro_nodes_iterator_t;
 
 /*
  * cerebro_handle_create
@@ -79,6 +81,37 @@ char *cerebro_errormsg(cerebro_t handle);
  * Output a message to standard error
  */
 void cerebro_perror(cerebro_t handle, const char *msg);
+
+/* 
+ * Nodes Iterator API
+ */
+
+/* 
+ * cerebro_nodes_iterator_next
+ *
+ * Retrieve next node from iterator and copy it into a buffer
+ *
+ * Returns 1 if node copied, 0 on end of list, -1 on error
+ */
+int cerebro_nodes_iterator_next(cerebro_t handle, 
+                                cerebro_nodes_iterator_t itr,
+                                char *buf,
+                                unsigned int buflen);
+/* 
+ * cerebro_nodes_iterator_reset
+ *
+ * Returns 0 on success, -1 on error
+ */
+int cerebro_nodes_iterator_reset(cerebro_t handle, 
+                                 cerebro_nodes_iterator_t itr);
+
+/* 
+ * cerebro_nodes_iterator_destroy
+ *
+ * Returns 0 on success, -1 on error
+ */
+int cerebro_nodes_iterator_destroy(cerebro_t handle, 
+                                   cerebro_nodes_iterator_t itr);
 
 /* 
  * Up-Down API

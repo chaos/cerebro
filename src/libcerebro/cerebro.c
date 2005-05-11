@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.c,v 1.16 2005-05-11 17:06:28 achu Exp $
+ *  $Id: cerebro.c,v 1.17 2005-05-11 21:49:02 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -24,7 +24,7 @@ static char *cerebro_error_messages[] =
   {
     "success",
     "null cerebro_t handle",
-    "invalid magic number",
+    "invalid magic number found",
     "invalid parameters",
     "invalid hostname",
     "invalid address",

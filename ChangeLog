@@ -3,7 +3,9 @@
 	* Hide remaining functions that shouldn't be exported by
 	libcerebro, or hide through not distributing .h file and
 	underscoring them.
-	
+
+	* Added nodes iterator interface to libcerebro.
+
 2005-05-10  Albert Chu  <chu11@llnl.gov>
 
 	* More manpage cleanup/fixes.
