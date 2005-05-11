@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro_module_devel.3.in,v 1.2 2005-05-10 20:38:36 achu Exp $
+\."$Id: cerebro_module_devel.3.in,v 1.3 2005-05-11 20:13:38 achu Exp $
 \."#############################################################################
 .TH LIBCEREBRO 3 "May 2005" "LLNL" "LIBCEREBRO"
 .SH NAME
@@ -15,13 +15,13 @@ Introduction to writing cerebro modules
 .sp
 .BI #include <cerebro/cerebro_error.h>
 .sp
-.BI void cerebro_err_debug_lib(const char *fmt, ...);
+.BI void cerebro_err_debug_module(const char *fmt, ...);
 .br
 .SH DESCRIPTION
 Additional information about the development of cerebro clusterlist
 and config modules can be found below.
 
-Module writers should use \fBcerebro_err_debug_lib\fR when debugging
+Module writers should use \fBcerebro_err_debug_module\fR when debugging
 information is output.
 
 .SH CLUSTERLIST MODULES
