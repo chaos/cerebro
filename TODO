@@ -11,6 +11,7 @@ Testing
 - can actually build module
 
 Cleanup
+- updown function names??
 
 Audit
 - code review to reduce memory footprint

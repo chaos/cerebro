@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro_updown_up_count.3,v 1.3 2005-05-10 20:38:36 achu Exp $
+\."$Id: cerebro_updown_up_count.3,v 1.4 2005-05-11 23:34:25 achu Exp $
 \."#############################################################################
 .TH CEREBRO_UPDOWN_UP_COUNT 3 "May 2005" "LLNL" "LIBCEREBRO"
 .SH "NAME"
@@ -23,16 +23,16 @@ On success, \fBcerebro_updown_up_count()\fR and
 \fBcerebro_updown_down_count()\fR will return the number of up or down
 nodes respectively. On error, both return -1, and an error code is
 returned in \fIhandle\fR.  The error code can be retrieved via
-.BR cerebro_errnum (3),
+.BR cerebro_errnum(3),
 and a description of the error code can be retrieved via
-.BR cerebro_strerror (3).
+.BR cerebro_strerror(3).
 .br
 .SH "ERRORS"
 .TP
 .B CEREBRO_ERR_NULLHANDLE
 The handle parameter is NULL.  The cerebro_t handle must be created
 with
-.BR cerebro_handle_create (3).
+.BR cerebro_handle_create(3).
 .TP
 .B CEREBRO_ERR_MAGIC_NUMBER
 \fIhandle\fR has an incorrect magic number.  \fIhandle\fR does not

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.16 2005-05-11 21:49:02 achu Exp $
+ *  $Id: cerebro.h,v 1.17 2005-05-11 23:34:25 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_H
@@ -179,6 +179,24 @@ int cerebro_updown_get_up_nodes(cerebro_t handle, char *buf, unsigned int buflen
  * Returns 0 on success, -1 on error
  */
 int cerebro_updown_get_down_nodes(cerebro_t handle, char *buf, unsigned int buflen);
+
+/*
+ * cerebro_updown_up_nodes_iterator
+ *
+ * Retrieve a cerebro nodes iterator for all up nodes
+ *
+ * Returns an iterator on success, NULL on error
+ */
+cerebro_nodes_iterator_t cerebro_updown_up_nodes_iterator(cerebro_t handle);
+
+/*
+ * cerebro_updown_down_nodes_iterator
+ *
+ * Retrieve a cerebro nodes iterator for all down nodes
+ *
+ * Returns an iterator on success, NULL on error
+ */
+cerebro_nodes_iterator_t cerebro_updown_down_nodes_iterator(cerebro_t handle);
 
 /*
  * cerebro_updown_is_node_up

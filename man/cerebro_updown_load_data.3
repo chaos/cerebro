@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro_updown_load_data.3,v 1.2 2005-05-08 18:51:24 achu Exp $
+\."$Id: cerebro_updown_load_data.3,v 1.3 2005-05-11 23:34:25 achu Exp $
 \."#############################################################################
 .TH CEREBRO_LOAD_DATA 3 "May 2005" "LLNL" "LIBCEREBRO"
 .SH "NAME"
@@ -47,16 +47,16 @@ cerebro_t handle.
 .SH "RETURN VALUES"
 On success, 0 is returned.  On error, -1 is returned, and an error
 code is returned in \fIhandle\fR.  The error code can be retrieved via
-.BR cerebro_errnum (3)
+.BR cerebro_errnum(3)
 , and a description of the error code can be retrieved via
-.BR cerebro_strerror (3).  
+.BR cerebro_strerror(3).  
 .br
 .SH "ERRORS"
 .TP
 .B CEREBRO_ERR_NULLHANDLE
 The handle parameter is NULL.  The cerebro_t handle must be created
 with
-.BR cerebro_handle_create (3).
+.BR cerebro_handle_create(3).
 .TP
 .B CEREBRO_ERR_MAGIC_NUMBER
 \fIhandle\fR has an incorrect magic number.  \fIhandle\fR does not
@@ -99,6 +99,9 @@ A config module error occurred.
 .TP
 .B CEREBRO_ERR_CLUSTERLIST_MODULE
 A clusterlist module error occurred.
+.TP
+.B CEREBRO_ERR_OUTMEM
+Out of memory.
 .TP
 .B CEREBRO_ERR_INTERNAL
 An internal system error occurred.

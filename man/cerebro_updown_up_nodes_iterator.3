@@ -1,27 +1,26 @@
 \."#############################################################################
-\."$Id: cerebro_updown_get_up_nodes.3,v 1.3 2005-05-11 23:34:25 achu Exp $
+\."$Id: cerebro_updown_up_nodes_iterator.3,v 1.1 2005-05-11 23:34:25 achu Exp $
 \."#############################################################################
-.TH CEREBRO_UPDOWN_GET_UP_NODES 3 "May 2005" "LLNL" "LIBCEREBRO"
+.TH CEREBRO_UPDOWN_UP_NODES_ITERATOR 3 "May 2005" "LLNL" "LIBCEREBRO"
 .SH "NAME"
-cerebro_updown_get_up_nodes, cerebro_updown_get_down_nodes \- cerebro
+cerebro_updown_up_nodes_iterator, cerebro_updown_down_nodes_iterator \- cerebro
 updown retrieval routines
 .SH "SYNOPSIS"
 .B #include <cerebro.h>
 .sp
-.BI "int cerebro_updown_get_up_nodes(cerebro_t handle, char *buf, unsigned int buflen);"
+.BI "cerebro_nodes_iterator_t cerebro_updown_up_nodes_iterator(cerebro_t handle);"
 .sp
-.BI "int cerebro_updown_get_down_nodes(cerebro_t handle, char *buf, unsigned int buflen);"
+.BI "cerebro_nodes_iterator_t cerebro_updown_down_nodes_iterator(cerebro_t handle);"
 .br
 .SH "DESCRIPTION"
-\fBcerebro_updown_get_up_nodes()\fR and
-\fBcerebro_updown_get_down_nodes()\fR retrieves a ranged string of up
-and down nodes respectively.  The string is returned in the buffer
-pointed to by \fIbuf\fR.  \fIbuflen\fR should indicate the length of
-the buffer.
+\fBcerebro_updown_up_nodes_iterator()\fR and
+\fBcerebro_updown_down_nodes_iterator()\fR retrieve a cerebro nodes
+iterator for up and down nodes respectively.
 .br
 .SH "RETURN VALUES"
-On success, 0 is returned.  On error, -1 is returned, and an error
-code is returned in \fIhandle\fR.  The error code can be retrieved via
+On success, a cerebro nodes iterator is returned.  On error, NULL is
+returned, and an error code is returned in \fIhandle\fR.  The error
+code can be retrieved via
 .BR cerebro_errnum(3)
 , and a description of the error code can be retrieved via
 .BR cerebro_strerror(3).  
@@ -38,14 +37,11 @@ with
 point to a cerebro_t handle or \fIhandle\fR has already been
 destroyed.
 .TP
-.B CEREBRO_ERR_PARAMETERS
-Invalid parameter passed in.
-.TP
 .B CEREBRO_ERR_NOT_LOADED
 Updown data not loaded.
 .TP
-.B CEREBRO_ERR_OVERFLOW
-Buffer overflow.
+.B CEREBRO_ERR_OUTMEM
+Out of memory.
 .TP
 .B CEREBRO_ERR_INTERNAL
 An internal system error occurred.

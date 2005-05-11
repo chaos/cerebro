@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_updown.c,v 1.41 2005-05-11 21:49:02 achu Exp $
+ *  $Id: cerebro_updown.c,v 1.42 2005-05-11 23:34:25 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -34,6 +34,7 @@
 #include "cerebro_config_util.h"
 #include "cerebro_marshalling.h"
 #include "cerebro_module.h"
+#include "cerebro_nodes_iterator_util.h"
 #include "cerebro_util.h"
 #include "cerebro/cerebro_error.h"
 #include "cerebro/cerebro_updown_protocol.h"
@@ -903,6 +904,51 @@ cerebro_updown_get_down_nodes(cerebro_t handle, char *buf, unsigned int buflen)
   return _cerebro_updown_get_nodes(handle, buf, buflen, CEREBRO_UPDOWN_DOWN_NODES);
 }
  
+/* 
+ * _cerebro_updown_nodes_iterator
+ *
+ * Common function for cerebro_updown_up_nodes_iterator and
+ * cerebro_updown_down_nodes_iterator.
+ * 
+ * Returns an iterator on success, NULL on error
+ */
+static cerebro_nodes_iterator_t
+_cerebro_updown_nodes_iterator(cerebro_t handle,
+                               int up_down_flag)
+{
+  struct cerebro_updown_data *updown_data;
+  cerebro_nodes_iterator_t itr;
+  hostlist_t hl;
+
+  if (_cerebro_handle_updown_data_loaded_check(handle) < 0)
+    return NULL;
+
+  updown_data = (struct cerebro_updown_data *)handle->updown_data;
+
+  if (up_down_flag == CEREBRO_UPDOWN_UP_NODES)
+    hl = updown_data->up_nodes;
+  else
+    hl = updown_data->down_nodes;
+
+  if (!(itr = _cerebro_nodes_iterator_create(handle, hl)))
+    return NULL;
+
+  handle->errnum = CEREBRO_ERR_SUCCESS;
+  return itr;
+}
+
+cerebro_nodes_iterator_t 
+cerebro_updown_up_nodes_iterator(cerebro_t handle)
+{
+  return _cerebro_updown_nodes_iterator(handle, CEREBRO_UPDOWN_UP_NODES);
+}
+
+cerebro_nodes_iterator_t 
+cerebro_updown_down_nodes_iterator(cerebro_t handle)
+{
+  return _cerebro_updown_nodes_iterator(handle, CEREBRO_UPDOWN_DOWN_NODES);
+}
+
 /* 
  * _cerebro_updown_is_node
  *
