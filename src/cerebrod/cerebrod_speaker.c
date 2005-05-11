@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.31 2005-05-09 16:02:11 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.32 2005-05-11 16:38:12 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -18,9 +18,9 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
+#include "cerebro_marshalling.h"
 #include "cerebro/cerebro_constants.h"
 #include "cerebro/cerebro_error.h"
-#include "cerebro/cerebro_marshalling.h"
 #include "cerebro/cerebrod_heartbeat_protocol.h"
 
 #include "cerebrod.h"
@@ -195,32 +195,32 @@ _cerebrod_heartbeat_marshall(struct cerebrod_heartbeat *hb,
   assert(buflen >= CEREBROD_HEARTBEAT_LEN);
   
   memset(buf, '\0', buflen);
-  if ((len = cerebro_marshall_int32(hb->version,
-				    buf + count,
-				    buflen - count)) < 0)
-    cerebro_err_exit("%s(%s:%d): cerebro_marshall_int32",
+  if ((len = _cerebro_marshall_int32(hb->version,
+                                     buf + count,
+                                     buflen - count)) < 0)
+    cerebro_err_exit("%s(%s:%d): _cerebro_marshall_int32",
                      __FILE__, __FUNCTION__, __LINE__);
   count += len;
   
-  if ((len = cerebro_marshall_buffer(hb->nodename,
-				     sizeof(hb->nodename),
-				     buf + count,
-				     buflen - count)) < 0)
-    cerebro_err_exit("%s(%s:%d): cerebro_marshall_buffer",
+  if ((len = _cerebro_marshall_buffer(hb->nodename,
+                                      sizeof(hb->nodename),
+                                      buf + count,
+                                      buflen - count)) < 0)
+    cerebro_err_exit("%s(%s:%d): _cerebro_marshall_buffer",
                      __FILE__, __FUNCTION__, __LINE__);
   count += len;
   
-  if ((len = cerebro_marshall_uint32(hb->starttime,
-				     buf + count,
-				     buflen - count)) < 0)
-    cerebro_err_exit("%s(%s:%d): cerebro_marshall_uint32",
+  if ((len = _cerebro_marshall_uint32(hb->starttime,
+                                      buf + count,
+                                      buflen - count)) < 0)
+    cerebro_err_exit("%s(%s:%d): _cerebro_marshall_uint32",
                      __FILE__, __FUNCTION__, __LINE__);
   count += len;
   
-  if ((len = cerebro_marshall_uint32(hb->boottime,
-				     buf + count,
-				     buflen - count)) < 0)
-    cerebro_err_exit("%s(%s:%d): cerebro_marshall_uint32",
+  if ((len = _cerebro_marshall_uint32(hb->boottime,
+                                      buf + count,
+                                      buflen - count)) < 0)
+    cerebro_err_exit("%s(%s:%d): _cerebro_marshall_uint32",
                      __FILE__, __FUNCTION__, __LINE__);
   count += len;
   

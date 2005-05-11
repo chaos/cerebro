@@ -1,3 +1,9 @@
+2005-05-11  Albert Chu  <chu11@llnl.gov>
+
+	* Hide remaining functions that shouldn't be exported by
+	libcerebro, or hide through not distributing .h file and
+	underscoring them.
+	
 2005-05-10  Albert Chu  <chu11@llnl.gov>
 
 	* More manpage cleanup/fixes.

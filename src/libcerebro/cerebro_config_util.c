@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_util.c,v 1.3 2005-05-10 21:00:28 achu Exp $
+ *  $Id: cerebro_config_util.c,v 1.4 2005-05-11 16:38:12 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -683,7 +683,7 @@ _cerebro_config_merge_cerebro_config(struct cerebro_config *conf,
 }
 
 int 
-cerebro_config_load(struct cerebro_config *conf)
+_cerebro_config_load(struct cerebro_config *conf)
 {
   struct cerebro_config module_conf; 
   struct cerebro_config config_file_conf;

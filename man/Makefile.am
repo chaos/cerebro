@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.15 2005-05-10 20:38:36 achu Exp $
+## $Id: Makefile.am,v 1.16 2005-05-11 16:38:12 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -18,10 +18,6 @@ man3_MANS  = libcerebro.3 \
 	     cerebro_strerror.3 \
 	     cerebro_errormsg.3 \
 	     cerebro_perror.3 \
-	     cerebro_load_config.3 \
-	     cerebro_unload_config.3 \
-	     cerebro_load_clusterlist_module.3 \
-	     cerebro_unload_clusterlist_module.3 \
 	     cerebro_updown_load_data.3 \
 	     cerebro_updown_unload_data.3 \
 	     cerebro_updown_get_up_nodes.3 \
@@ -46,10 +42,6 @@ EXTRA_DIST = cerebro.1 \
 	     cerebro_strerror.3 \
 	     cerebro_errormsg.3 \
 	     cerebro_perror.3 \
-	     cerebro_load_config.3 \
-	     cerebro_unload_config.3 \
-	     cerebro_load_clusterlist_module.3 \
-	     cerebro_unload_clusterlist_module.3 \
 	     cerebro_updown_load_data.3 \
 	     cerebro_updown_unload_data.3 \
 	     cerebro_updown_get_up_nodes.3 \

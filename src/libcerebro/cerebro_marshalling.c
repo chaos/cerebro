@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_marshalling.c,v 1.10 2005-05-05 16:12:57 achu Exp $
+ *  $Id: cerebro_marshalling.c,v 1.11 2005-05-11 16:38:12 achu Exp $
 \*****************************************************************************/
  
 #if HAVE_CONFIG_H
@@ -13,11 +13,11 @@
 #endif /* STDC_HEADERS */
 #include <netinet/in.h>
 
+#include "cerebro_marshalling.h"
 #include "cerebro/cerebro_error.h"
-#include "cerebro/cerebro_marshalling.h"
 
 int
-cerebro_marshall_int8(int8_t val, char *buf, unsigned int buflen)
+_cerebro_marshall_int8(int8_t val, char *buf, unsigned int buflen)
 {
   if (!buf)
     {
@@ -38,7 +38,7 @@ cerebro_marshall_int8(int8_t val, char *buf, unsigned int buflen)
 }
 
 int
-cerebro_marshall_int32(int32_t val, char *buf, unsigned int buflen)
+_cerebro_marshall_int32(int32_t val, char *buf, unsigned int buflen)
 {
   int32_t temp;
 
@@ -62,7 +62,7 @@ cerebro_marshall_int32(int32_t val, char *buf, unsigned int buflen)
 }
 
 int
-cerebro_marshall_uint8(u_int8_t val, char *buf, unsigned int buflen)
+_cerebro_marshall_uint8(u_int8_t val, char *buf, unsigned int buflen)
 {
   if (!buf)
     {
@@ -83,7 +83,7 @@ cerebro_marshall_uint8(u_int8_t val, char *buf, unsigned int buflen)
 }
 
 int
-cerebro_marshall_uint32(u_int32_t val, char *buf, unsigned int buflen)
+_cerebro_marshall_uint32(u_int32_t val, char *buf, unsigned int buflen)
 {
   u_int32_t temp;
 
@@ -107,10 +107,10 @@ cerebro_marshall_uint32(u_int32_t val, char *buf, unsigned int buflen)
 }
 
 int
-cerebro_marshall_buffer(const char *val, 
-			unsigned int vallen, 
-			char *buf, 
-			unsigned int buflen)
+_cerebro_marshall_buffer(const char *val, 
+                         unsigned int vallen, 
+                         char *buf, 
+                         unsigned int buflen)
 {
   if (!val)
     {
@@ -145,9 +145,9 @@ cerebro_marshall_buffer(const char *val,
 }
 
 int
-cerebro_unmarshall_int8(int8_t *val, 
-			const char *buf, 
-			unsigned int buflen)
+_cerebro_unmarshall_int8(int8_t *val, 
+                         const char *buf, 
+                         unsigned int buflen)
 {
   if (!val)
     {
@@ -172,9 +172,9 @@ cerebro_unmarshall_int8(int8_t *val,
 }
 
 int
-cerebro_unmarshall_int32(int32_t *val, 
-			 const char *buf, 
-			 unsigned int buflen)
+_cerebro_unmarshall_int32(int32_t *val, 
+                          const char *buf, 
+                          unsigned int buflen)
 {
   int32_t temp;
 
@@ -202,9 +202,9 @@ cerebro_unmarshall_int32(int32_t *val,
 }
 
 int
-cerebro_unmarshall_uint8(u_int8_t *val, 
-			 const char *buf, 
-			 unsigned int buflen)
+_cerebro_unmarshall_uint8(u_int8_t *val, 
+                          const char *buf, 
+                          unsigned int buflen)
 {
   if (!val)
     {
@@ -229,7 +229,7 @@ cerebro_unmarshall_uint8(u_int8_t *val,
 }
 
 int
-cerebro_unmarshall_uint32(u_int32_t *val, 
+_cerebro_unmarshall_uint32(u_int32_t *val, 
 			  const char *buf, 
 			  unsigned int buflen)
 {
@@ -259,10 +259,10 @@ cerebro_unmarshall_uint32(u_int32_t *val,
 }
 
 int
-cerebro_unmarshall_buffer(char *val, 
-			  unsigned int vallen, 
-			  const char *buf, 
-			  unsigned int buflen)
+_cerebro_unmarshall_buffer(char *val, 
+                           unsigned int vallen, 
+                           const char *buf, 
+                           unsigned int buflen)
 {
   if (!val)
     {

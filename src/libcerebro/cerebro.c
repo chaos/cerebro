@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.c,v 1.14 2005-05-09 16:02:11 achu Exp $
+ *  $Id: cerebro.c,v 1.15 2005-05-11 16:38:12 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -14,7 +14,6 @@
 
 #include "cerebro.h"
 #include "cerebro_api.h"
-#include "cerebro_config_util.h"
 #include "cerebro_module.h"
 #include "cerebro_util.h"
 #include "cerebro/cerebro_config.h"
@@ -71,7 +70,7 @@ cerebro_handle_destroy(cerebro_t handle)
 
   if (handle->loaded_state & CEREBRO_CONFIG_LOADED)
     {
-      if (cerebro_unload_config(handle) < 0)
+      if (_cerebro_unload_config(handle) < 0)
 	return -1;
 
       if (handle->loaded_state & CEREBRO_CONFIG_LOADED)
@@ -83,7 +82,7 @@ cerebro_handle_destroy(cerebro_t handle)
 
   if (handle->loaded_state & CEREBRO_CLUSTERLIST_MODULE_LOADED)
     {
-      if (cerebro_unload_clusterlist_module(handle) < 0)
+      if (_cerebro_unload_clusterlist_module(handle) < 0)
         return -1;
       
       if (handle->loaded_state & CEREBRO_CLUSTERLIST_MODULE_LOADED)
@@ -107,7 +106,12 @@ cerebro_handle_destroy(cerebro_t handle)
 
   if (handle->loaded_state & CEREBRO_MODULE_SETUP_CALLED)
     {
-      cerebro_module_cleanup();
+      if (cerebro_module_cleanup() < 0)
+        {
+          handle->errnum = CEREBRO_ERR_INTERNAL;
+          return -1;
+        }
+
       handle->loaded_state &= ~CEREBRO_MODULE_SETUP_CALLED;
     }
 
@@ -154,125 +158,3 @@ cerebro_perror(cerebro_t handle, const char *msg)
     fprintf(stderr, "%s: %s\n", msg, errormsg);
 }
 
-int 
-cerebro_load_config(cerebro_t handle)
-{
-  struct cerebro_config module_conf;
-  struct cerebro_config config_file_conf;
-  
-  if (_cerebro_handle_check(handle) < 0)
-    return -1;
-
-  if (handle->loaded_state & CEREBRO_CONFIG_LOADED)
-    {
-      handle->errnum = CEREBRO_ERR_SUCCESS;
-      return 0;
-    }
-  
-  memset(&module_conf, '\0', sizeof(struct cerebro_config));
-  if (_cerebro_config_load_config_module(&module_conf) < 0)
-    {
-      handle->errnum = CEREBRO_ERR_CONFIG_MODULE;
-      return -1;
-    }
-
-  memset(&config_file_conf, '\0', sizeof(struct cerebro_config));
-  if (_cerebro_config_load_config_file(&config_file_conf) < 0)
-    {
-      handle->errnum = CEREBRO_ERR_CONFIG_FILE;
-      return -1;
-    }
-
-  memset(&(handle->config_data), '\0', sizeof(struct cerebro_config));
-  if (_cerebro_config_merge_cerebro_config(&(handle->config_data), 
-					   &module_conf, 
-					   &config_file_conf) < 0)
-    {
-      handle->errnum = CEREBRO_ERR_INTERNAL;
-      return -1;
-    }
-  
-  handle->loaded_state |= CEREBRO_CONFIG_LOADED;
-  handle->errnum = CEREBRO_ERR_SUCCESS;
-  return 0;
-}
-
-int 
-cerebro_unload_config(cerebro_t handle)
-{
-  if (_cerebro_handle_check(handle) < 0)
-    return -1;
-
-  memset(&(handle->config_data), '\0', sizeof(struct cerebro_config));
-  
-  handle->loaded_state &= ~CEREBRO_CONFIG_LOADED;
-  handle->errnum = CEREBRO_ERR_SUCCESS;
-  return 0;
-}
-
-int 
-cerebro_load_clusterlist_module(cerebro_t handle)
-{
-  int module_setup_called = 0;
-
-  if (_cerebro_handle_check(handle) < 0)
-    return -1;
-
-  if (!(handle->loaded_state & CEREBRO_MODULE_SETUP_CALLED))
-    {
-      if (cerebro_module_setup() < 0)
-	{
-	  handle->errnum = CEREBRO_ERR_CLUSTERLIST_MODULE;
-	  goto cleanup;
-	}
-    }
-
-  if (cerebro_module_load_clusterlist_module() < 0)
-    {
-      handle->errnum = CEREBRO_ERR_CLUSTERLIST_MODULE;
-      goto cleanup;
-    }
-  
-  if (cerebro_clusterlist_module_setup() < 0)
-    {
-      handle->errnum = CEREBRO_ERR_CLUSTERLIST_MODULE;
-      goto cleanup;
-    }
-  
-  if (module_setup_called)
-    handle->loaded_state |= CEREBRO_MODULE_SETUP_CALLED;
-  handle->loaded_state |= CEREBRO_CLUSTERLIST_MODULE_LOADED;
-  
-  return 0;
- cleanup:
-  if (module_setup_called)
-    cerebro_module_cleanup();
-  
-  return -1;
-}
-
-int 
-cerebro_unload_clusterlist_module(cerebro_t handle)
-{
-  if (_cerebro_handle_check(handle) < 0)
-    return -1;
-
-  if (handle->loaded_state & CEREBRO_CLUSTERLIST_MODULE_LOADED)
-    {
-      if (cerebro_clusterlist_module_cleanup() < 0)
-        {
-	  handle->errnum = CEREBRO_ERR_CLUSTERLIST_MODULE;
-	  return -1;
-        }
-      
-      if (cerebro_module_unload_clusterlist_module() < 0)
-	{
-	  handle->errnum = CEREBRO_ERR_CLUSTERLIST_MODULE;
-	  return -1;
-	}
-    }
-
-  handle->loaded_state &= ~CEREBRO_CLUSTERLIST_MODULE_LOADED;
-  handle->errnum = CEREBRO_ERR_SUCCESS;
-  return 0;
-}

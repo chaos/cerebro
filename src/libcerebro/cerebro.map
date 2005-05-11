@@ -1,6 +1,9 @@
 {
   global:
     cerebro*;
+    _cerebro_marshall*;
+    _cerebro_unmarshall*;
+    _cerebro_config_load;
   local:
     *;
 };

@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: libcerebro.3,v 1.1 2005-05-10 20:38:36 achu Exp $
+\."$Id: libcerebro.3,v 1.2 2005-05-11 16:38:12 achu Exp $
 \."#############################################################################
 .TH LIBCEREBRO 3 "August 2003" "LLNL" "LIBCEREBRO"
 .SH NAME
@@ -19,14 +19,6 @@ or down
 .BI "char *cerebro_errormsg(int errnum);"
 .sp
 .BI "void cerebro_perror(cerebro_t handle, const char *msg);"
-.sp
-.BI "int cerebro_load_config(cerebro_t handle);"
-.sp
-.BI "int cerebro_unload_config(cerebro_t handle);"
-.sp
-.BI "int cerebro_load_clusterlist_module(cerebro_t handle);"
-.sp
-.BI "int cerebro_unload_clusterlist_module(cerebro_t handle);"
 .sp
 .BI "int cerebro_updown_load_data(cerebro_t handle, const char *hostname, unsigned int port, unsigned int timeout_len, int flags);"
 .sp
@@ -64,12 +56,9 @@ manpage for information on cerebro modules.
 .SH FILES
 /usr/include/cerebro.h
 .SH SEE ALSO
-
 cerebro_handle_create(3), cerebro_handle_destroy(3),
 cerebro_errnum(3), cerebro_strerror(3), cerebro_errormsg(3),
-cerebro_perror(3), cerebro_load_config(3), cerebro_unload_config(3),
-cerebro_load_clusterlist_module(3),
-cerebro_unload_clusterlist_module(3), cerebro_updown_load_data(3),
+cerebro_perror(3), cerebro_updown_load_data(3),
 cerebro_updown_get_up_nodes(3), cerebro_updown_get_down_nodes(3),
 cerebro_updown_is_node_up(3), cerebro_updown_is_node_down(3),
 cerebro_updown_up_count(3), cerebro_updown_down_count(3),

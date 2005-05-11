@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_util.h,v 1.1 2005-05-09 14:21:53 achu Exp $
+ *  $Id: cerebro_config_util.h,v 1.2 2005-05-11 16:38:12 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_CONFIG_UTIL_H
@@ -37,7 +37,7 @@ int _cerebro_config_merge_cerebro_config(struct cerebro_config *conf,
 					 struct cerebro_config *config_file_conf);
 
 /* 
- * cerebro_config_load
+ * _cerebro_config_load
  *
  * Wrapper that calls cerebro_config_load_config_module,
  * cerebro_config_load_config_file, and
@@ -45,6 +45,6 @@ int _cerebro_config_merge_cerebro_config(struct cerebro_config *conf,
  *
  * Returns data in structure and 0 on success, -1 on error
  */
-int cerebro_config_load(struct cerebro_config *conf);
+int _cerebro_config_load(struct cerebro_config *conf);
 
 #endif /* _CEREBRO_CONFIG_UTIL_H */

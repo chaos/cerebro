@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.94 2005-05-09 16:02:11 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.95 2005-05-11 16:38:12 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -220,7 +220,7 @@ _cerebrod_config_setup(void)
   cerebro_config_debug_output = conf.debug;
 #endif /* CEREBRO_DEBUG */
 
-  if (cerebro_config_load(&conf_l) < 0)
+  if (_cerebro_config_load(&conf_l) < 0)
     cerebro_err_exit("%s(%s:%d): cerebro_config_load",
 		     __FILE__, __FUNCTION__, __LINE__);
   
