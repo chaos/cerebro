@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: conffile.c,v 1.6 2005-05-02 17:50:34 achu Exp $
+ *  $Id: conffile.c,v 1.7 2005-05-11 17:38:04 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2003 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -210,7 +210,10 @@ _setup(conffile_t cf,
 {
     int i;
     
-    if (access(filename, F_OK) < 0) {
+    /* If it doesn't exist for real or can't be read, we consider it
+     * non-existant 
+     */
+    if (access(filename, R_OK) < 0) {
         cf->errnum = CONFFILE_ERR_EXIST;
         return -1;
     }
