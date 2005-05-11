@@ -1,28 +1,22 @@
 /*****************************************************************************\
- *  $Id: cerebro_nodes_iterator_util.h,v 1.1 2005-05-11 21:59:57 achu Exp $
+ *  $Id: cerebro_nodes_iterator_util.h,v 1.2 2005-05-11 22:31:21 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_NODES_ITERATOR_UTIL_H
 #define _CEREBRO_NODES_ITERATOR_UTIL_H
 
-#include "cerebro_api.h"
+#include "cerebro.h"
+
+#include "hostlist.h"
 
 /* 
- * _cerebro_load_clusterlist_module
+ * _cerebro_nodes_iterator_create
  *
- * Find and load clusterlist module
+ * Create a nodes iterator based using the nodes from the hostlist.
  *
- * Returns 1 if clusterlist module was loaded, 0 if not, -1 on fatal error
+ * Returns iterator on success, NULL on error
  */
-int _cerebro_load_clusterlist_module(cerebro_t handle);
-
-/* 
- * _cerebro_unload_clusterlist_module
- *
- * Unload clusterlist module
- *
- * Returns 0 on success, -1 on error
- */
-int _cerebro_unload_clusterlist_module(cerebro_t handle);
+cerebro_nodes_iterator_t _cerebro_nodes_iterator_create(cerebro_t handle, 
+                                                        hostlist_t nodes);
 
 #endif /* _CEREBRO_NODES_ITERATOR_UTIL_H */
