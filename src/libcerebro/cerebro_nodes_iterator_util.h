@@ -1,11 +1,11 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_util.h,v 1.2 2005-05-11 21:59:57 achu Exp $
+ *  $Id: cerebro_nodes_iterator_util.h,v 1.1 2005-05-11 21:59:57 achu Exp $
 \*****************************************************************************/
 
-#ifndef _CEREBRO_CLUSTERLIST_UTIL_H
-#define _CEREBRO_CLUSTERLIST_UTIL_H
+#ifndef _CEREBRO_NODES_ITERATOR_UTIL_H
+#define _CEREBRO_NODES_ITERATOR_UTIL_H
 
-#include "cerebro.h"
+#include "cerebro_api.h"
 
 /* 
  * _cerebro_load_clusterlist_module
@@ -25,4 +25,4 @@ int _cerebro_load_clusterlist_module(cerebro_t handle);
  */
 int _cerebro_unload_clusterlist_module(cerebro_t handle);
 
-#endif /* _CEREBRO_CLUSTERLIST_UTIL_H */
+#endif /* _CEREBRO_NODES_ITERATOR_UTIL_H */

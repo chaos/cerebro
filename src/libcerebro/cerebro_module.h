@@ -1,11 +1,11 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.h,v 1.20 2005-05-11 17:06:28 achu Exp $
+ *  $Id: cerebro_module.h,v 1.21 2005-05-11 21:59:57 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_MODULE_H
 #define _CEREBRO_MODULE_H
 
-#include <cerebro/cerebro_config.h>
+#include "cerebro/cerebro_config.h"
 
 /* 
  * _cerebro_module_setup

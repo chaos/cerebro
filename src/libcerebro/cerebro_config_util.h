@@ -1,13 +1,13 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_util.h,v 1.3 2005-05-11 17:06:28 achu Exp $
+ *  $Id: cerebro_config_util.h,v 1.4 2005-05-11 21:59:57 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_CONFIG_UTIL_H
 #define _CEREBRO_CONFIG_UTIL_H
 
-#include <cerebro.h>
-#include <cerebro/cerebro_config.h>
-#include <cerebro/cerebro_constants.h>
+#include "cerebro.h"
+#include "cerebro/cerebro_config.h"
+#include "cerebro/cerebro_constants.h"
 
 /* 
  * _cerebro_config_load_config_module
