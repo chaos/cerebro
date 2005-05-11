@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_updown.c,v 1.39 2005-05-11 16:38:12 achu Exp $
+ *  $Id: cerebro_updown.c,v 1.40 2005-05-11 17:06:28 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -30,6 +30,8 @@
 
 #include "cerebro.h"
 #include "cerebro_api.h"
+#include "cerebro_clusterlist_util.h"
+#include "cerebro_config_util.h"
 #include "cerebro_marshalling.h"
 #include "cerebro_module.h"
 #include "cerebro_util.h"
@@ -933,9 +935,9 @@ _cerebro_updown_is_node(cerebro_t handle,
   updown_data = (struct cerebro_updown_data *)handle->updown_data;
 
   if (handle->loaded_state & CEREBRO_CLUSTERLIST_MODULE_LOADED
-      && cerebro_module_clusterlist_module_found())
+      && _cerebro_module_clusterlist_module_found())
     {
-      if ((rv = cerebro_clusterlist_module_node_in_cluster(node)) < 0)
+      if ((rv = _cerebro_clusterlist_module_node_in_cluster(node)) < 0)
 	{
 	  handle->errnum = CEREBRO_ERR_CLUSTERLIST_MODULE;
 	  return -1;
@@ -949,9 +951,9 @@ _cerebro_updown_is_node(cerebro_t handle,
 
       memset(buf, '\0', CEREBRO_MAXNODENAMELEN+1);
       
-      if (cerebro_clusterlist_module_get_nodename(node,
-						  buf, 
-						  CEREBRO_MAXNODENAMELEN) < 0)
+      if (_cerebro_clusterlist_module_get_nodename(node,
+                                                   buf, 
+                                                   CEREBRO_MAXNODENAMELEN) < 0)
 	{
 	  handle->errnum = CEREBRO_ERR_CLUSTERLIST_MODULE;
 	  return -1;

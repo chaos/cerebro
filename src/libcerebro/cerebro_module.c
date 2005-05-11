@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.c,v 1.29 2005-05-10 18:18:52 achu Exp $
+ *  $Id: cerebro_module.c,v 1.30 2005-05-11 17:06:28 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -346,7 +346,7 @@ _cerebro_module_find_unknown_module(char *search_dir,
 #endif /* !WITH_STATIC_MODULES */
 
 int 
-cerebro_module_setup(void)
+_cerebro_module_setup(void)
 {
 #if !WITH_STATIC_MODULES
   if (lt_dlinit() != 0)
@@ -363,7 +363,7 @@ cerebro_module_setup(void)
 }
 
 int 
-cerebro_module_is_setup(void)
+_cerebro_module_is_setup(void)
 {
   if (cerebro_module_library_is_setup)
     return 1;
@@ -371,10 +371,10 @@ cerebro_module_is_setup(void)
 }
 
 int 
-cerebro_module_cleanup(void)
+_cerebro_module_cleanup(void)
 {
-  cerebro_module_unload_clusterlist_module();
-  cerebro_module_unload_config_module();
+  _cerebro_module_unload_clusterlist_module();
+  _cerebro_module_unload_config_module();
 
 #if !WITH_STATIC_MODULES
   if (lt_dlexit() != 0)
@@ -391,7 +391,7 @@ cerebro_module_cleanup(void)
 }
 
 /* 
- * _cerebro_module_load_clusterlist_module
+ * _load_clusterlist_module
  *
  * If compiled statically, attempt to load the module specified by the
  * module name.
@@ -402,7 +402,7 @@ cerebro_module_cleanup(void)
  * Return 1 is module is loaded, 0 if not, -1 on fatal error
  */
 static int
-_cerebro_module_load_clusterlist_module(char *module)
+_load_clusterlist_module(char *module)
 {
 #if WITH_STATIC_MODULES
   struct cerebro_clusterlist_module_info **ptr;
@@ -541,7 +541,7 @@ _cerebro_module_load_clusterlist_module(char *module)
 }
 
 int 
-cerebro_module_load_clusterlist_module(void)
+_cerebro_module_load_clusterlist_module(void)
 {
 #if WITH_STATIC_MODULES
   struct cerebro_clusterlist_module_info **ptr;
@@ -569,7 +569,7 @@ cerebro_module_load_clusterlist_module(void)
 	  continue;
 	}
 
-      if ((rv = _cerebro_module_load_clusterlist_module(name)) < 0)
+      if ((rv = _load_clusterlist_module(name)) < 0)
 	  return -1;
 
       if (rv)
@@ -580,7 +580,7 @@ cerebro_module_load_clusterlist_module(void)
   if ((rv = _cerebro_module_find_known_module(CEREBRO_CLUSTERLIST_MODULE_BUILDDIR,
 					      dynamic_clusterlist_modules,
 					      dynamic_clusterlist_modules_len,
-					      _cerebro_module_load_clusterlist_module)) < 0)
+					      _load_clusterlist_module)) < 0)
       return -1;
 
   if (rv)
@@ -589,7 +589,7 @@ cerebro_module_load_clusterlist_module(void)
   if ((rv = _cerebro_module_find_known_module(CEREBRO_MODULE_DIR,
 					      dynamic_clusterlist_modules,
 					      dynamic_clusterlist_modules_len,
-					      _cerebro_module_load_clusterlist_module)) < 0)
+					      _load_clusterlist_module)) < 0)
     return -1;
 
   if (rv)
@@ -598,7 +598,7 @@ cerebro_module_load_clusterlist_module(void)
   
   if ((rv = _cerebro_module_find_unknown_module(CEREBRO_MODULE_DIR,
 						CEREBRO_CLUSTERLIST_FILENAME_SIGNATURE,
-						_cerebro_module_load_clusterlist_module)) < 0)
+						_load_clusterlist_module)) < 0)
     return -1;
   
   if (rv)
@@ -614,7 +614,7 @@ cerebro_module_load_clusterlist_module(void)
 }
 
 int
-cerebro_module_unload_clusterlist_module(void)
+_cerebro_module_unload_clusterlist_module(void)
 {
   if (!cerebro_module_library_is_setup)
     {
@@ -634,7 +634,7 @@ cerebro_module_unload_clusterlist_module(void)
 }
 
 /* 
- * _cerebro_module_load_config_module
+ * _load_config_module
  *
  * If compiled statically, attempt to load the module specified by the
  * module name.
@@ -645,7 +645,7 @@ cerebro_module_unload_clusterlist_module(void)
  * Return 1 is module is loaded, 0 if not, -1 on fatal error
  */
 static int 
-_cerebro_module_load_config_module(char *module)
+_load_config_module(char *module)
 {
 #if WITH_STATIC_MODULES
   struct cerebro_config_module_info **ptr;
@@ -763,7 +763,7 @@ _cerebro_module_load_config_module(char *module)
 }
 
 int 
-cerebro_module_load_config_module(void)
+_cerebro_module_load_config_module(void)
 {
 #if WITH_STATIC_MODULES
   struct cerebro_config_module_info **ptr;
@@ -791,7 +791,7 @@ cerebro_module_load_config_module(void)
 	  continue;
 	}
 
-      if ((rv = _cerebro_module_load_config_module(name)) < 0)
+      if ((rv = _load_config_module(name)) < 0)
 	  return -1;
 
       if (rv)
@@ -802,7 +802,7 @@ cerebro_module_load_config_module(void)
   if ((rv = _cerebro_module_find_known_module(CEREBRO_CONFIG_MODULE_BUILDDIR,
 					      dynamic_config_modules,
 					      dynamic_config_modules_len,
-					      _cerebro_module_load_config_module)) < 0)
+					      _load_config_module)) < 0)
     return -1;
 
   if (rv)
@@ -811,7 +811,7 @@ cerebro_module_load_config_module(void)
   if ((rv = _cerebro_module_find_known_module(CEREBRO_MODULE_DIR,
 					      dynamic_config_modules,
 					      dynamic_config_modules_len,
-					      _cerebro_module_load_config_module)) < 0)
+					      _load_config_module)) < 0)
     return -1;
 
   if (rv)
@@ -819,7 +819,7 @@ cerebro_module_load_config_module(void)
 
   if ((rv = _cerebro_module_find_unknown_module(CEREBRO_MODULE_DIR,
 						CEREBRO_CONFIG_FILENAME_SIGNATURE,
-						_cerebro_module_load_config_module)) < 0)
+						_load_config_module)) < 0)
     return -1;
 
   if (rv)
@@ -835,7 +835,7 @@ cerebro_module_load_config_module(void)
 }
 
 int
-cerebro_module_unload_config_module(void)
+_cerebro_module_unload_config_module(void)
 {
   if (!cerebro_module_library_is_setup)
     {
@@ -855,7 +855,7 @@ cerebro_module_unload_config_module(void)
 }
 
 int 
-cerebro_module_clusterlist_module_is_loaded(void)
+_cerebro_module_clusterlist_module_is_loaded(void)
 {
   if (clusterlist_module_info)
     return 1;
@@ -863,7 +863,7 @@ cerebro_module_clusterlist_module_is_loaded(void)
 }
 
 int 
-cerebro_module_config_module_is_loaded(void)
+_cerebro_module_config_module_is_loaded(void)
 {
   if (config_module_info)
     return 1;
@@ -871,7 +871,7 @@ cerebro_module_config_module_is_loaded(void)
 }
 
 int 
-cerebro_module_clusterlist_module_found(void)
+_cerebro_module_clusterlist_module_found(void)
 {
   if (clusterlist_module_found)
     return 1;
@@ -879,7 +879,7 @@ cerebro_module_clusterlist_module_found(void)
 }
 
 int 
-cerebro_module_config_module_found(void)
+_cerebro_module_config_module_found(void)
 {
   if (config_module_found)
     return 1;
@@ -887,7 +887,7 @@ cerebro_module_config_module_found(void)
 }
 
 char *
-cerebro_clusterlist_module_name(void)
+_cerebro_clusterlist_module_name(void)
 {
   if (!clusterlist_module_info)
     {
@@ -900,7 +900,7 @@ cerebro_clusterlist_module_name(void)
 }
 
 int
-cerebro_clusterlist_module_setup(void)
+_cerebro_clusterlist_module_setup(void)
 {
   if (!clusterlist_module_info)
     {
@@ -913,7 +913,7 @@ cerebro_clusterlist_module_setup(void)
 }
 
 int
-cerebro_clusterlist_module_cleanup(void)
+_cerebro_clusterlist_module_cleanup(void)
 {
   if (!clusterlist_module_info)
     {
@@ -926,7 +926,7 @@ cerebro_clusterlist_module_cleanup(void)
 }
 
 int
-cerebro_clusterlist_module_numnodes(void)
+_cerebro_clusterlist_module_numnodes(void)
 {
   if (!clusterlist_module_info)
     {
@@ -939,7 +939,7 @@ cerebro_clusterlist_module_numnodes(void)
 }
 
 int
-cerebro_clusterlist_module_get_all_nodes(char ***nodes)
+_cerebro_clusterlist_module_get_all_nodes(char ***nodes)
 {
   if (!clusterlist_module_info)
     {
@@ -952,7 +952,7 @@ cerebro_clusterlist_module_get_all_nodes(char ***nodes)
 }
 
 int
-cerebro_clusterlist_module_node_in_cluster(const char *node)
+_cerebro_clusterlist_module_node_in_cluster(const char *node)
 {
   if (!clusterlist_module_info)
     {
@@ -965,9 +965,9 @@ cerebro_clusterlist_module_node_in_cluster(const char *node)
 }
 
 int
-cerebro_clusterlist_module_get_nodename(const char *node, 
-					char *buf, 
-					unsigned int buflen)
+_cerebro_clusterlist_module_get_nodename(const char *node, 
+                                         char *buf, 
+                                         unsigned int buflen)
 {
   if (!clusterlist_module_info)
     {
@@ -980,7 +980,7 @@ cerebro_clusterlist_module_get_nodename(const char *node,
 }
 
 char *
-cerebro_config_module_name(void)
+_cerebro_config_module_name(void)
 {
   if (!config_module_info)
     {
@@ -993,7 +993,7 @@ cerebro_config_module_name(void)
 }
 
 int
-cerebro_config_module_setup(void)
+_cerebro_config_module_setup(void)
 {
   if (!config_module_info)
     {
@@ -1006,7 +1006,7 @@ cerebro_config_module_setup(void)
 }
 
 int
-cerebro_config_module_cleanup(void)
+_cerebro_config_module_cleanup(void)
 {
   if (!config_module_info)
     {
@@ -1018,7 +1018,7 @@ cerebro_config_module_cleanup(void)
   return ((*config_module_info->cleanup)());
 }
 int
-cerebro_config_module_load_default(struct cerebro_config *conf)
+_cerebro_config_module_load_default(struct cerebro_config *conf)
 {
   if (!config_module_info)
     {

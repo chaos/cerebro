@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.59 2005-05-11 16:38:12 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.60 2005-05-11 17:06:27 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -167,8 +167,8 @@ _cerebrod_listener_initialize(void)
   Pthread_mutex_unlock(&listener_fd_lock);
   
   /* Use the clusterlist numnodes count as the  initializing hash size */
-  if ((cluster_data_hash_size = cerebro_clusterlist_module_numnodes()) < 0)
-    cerebro_err_exit("%s(%s:%d): cerebro_clusterlist_module_numnodes",
+  if ((cluster_data_hash_size = _cerebro_clusterlist_module_numnodes()) < 0)
+    cerebro_err_exit("%s(%s:%d): _cerebro_clusterlist_module_numnodes",
 		     __FILE__, __FUNCTION__, __LINE__);
   
   if (cluster_data_hash_size <= 0) 
@@ -445,8 +445,8 @@ cerebrod_listener(void *arg)
 	  continue;
 	}
       
-      if ((flag = cerebro_clusterlist_module_node_in_cluster(hb.nodename)) < 0)
-	cerebro_err_exit("%s(%s:%d): cerebro_clusterlist_module_node_in_cluster: %s",
+      if ((flag = _cerebro_clusterlist_module_node_in_cluster(hb.nodename)) < 0)
+	cerebro_err_exit("%s(%s:%d): _cerebro_clusterlist_module_node_in_cluster: %s",
 			 __FILE__, __FUNCTION__, __LINE__, hb.nodename);
       
       if (!flag)
@@ -463,11 +463,11 @@ cerebrod_listener(void *arg)
 
       memset(nodename_key, '\0', CEREBRO_MAXNODENAMELEN+1);
 
-      if (cerebro_clusterlist_module_get_nodename(nodename_buf,
-						  nodename_key, 
-						  CEREBRO_MAXNODENAMELEN+1) < 0)
+      if (_cerebro_clusterlist_module_get_nodename(nodename_buf,
+                                                   nodename_key, 
+                                                   CEREBRO_MAXNODENAMELEN+1) < 0)
 	{
-	  cerebro_err_debug("%s(%s:%d): cerebro_clusterlist_module_get_nodename: %s",
+	  cerebro_err_debug("%s(%s:%d): _cerebro_clusterlist_module_get_nodename: %s",
 			    __FILE__, __FUNCTION__, __LINE__,
 			    hb.nodename);
 	  continue;

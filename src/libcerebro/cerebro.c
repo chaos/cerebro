@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.c,v 1.15 2005-05-11 16:38:12 achu Exp $
+ *  $Id: cerebro.c,v 1.16 2005-05-11 17:06:28 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -14,6 +14,8 @@
 
 #include "cerebro.h"
 #include "cerebro_api.h"
+#include "cerebro_clusterlist_util.h"
+#include "cerebro_config_util.h"
 #include "cerebro_module.h"
 #include "cerebro_util.h"
 #include "cerebro/cerebro_config.h"
@@ -106,7 +108,7 @@ cerebro_handle_destroy(cerebro_t handle)
 
   if (handle->loaded_state & CEREBRO_MODULE_SETUP_CALLED)
     {
-      if (cerebro_module_cleanup() < 0)
+      if (_cerebro_module_cleanup() < 0)
         {
           handle->errnum = CEREBRO_ERR_INTERNAL;
           return -1;

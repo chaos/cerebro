@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_util.c,v 1.4 2005-05-11 16:38:12 achu Exp $
+ *  $Id: cerebro_config_util.c,v 1.5 2005-05-11 17:06:28 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -12,8 +12,10 @@
 #include <string.h>
 #endif /* STDC_HEADERS */
 
+#include "cerebro_api.h"
 #include "cerebro_config_util.h"
 #include "cerebro_module.h"
+#include "cerebro_util.h"
 #include "cerebro/cerebro_config.h"
 #include "cerebro/cerebro_error.h"
 #include "conffile.h"
@@ -30,19 +32,19 @@ _cerebro_config_load_config_module(struct cerebro_config *conf)
   int module_setup_called = 0;
   int rv = -1;
 
-  if (!cerebro_module_config_module_is_loaded())
+  if (!_cerebro_module_config_module_is_loaded())
     {
-      if (!cerebro_module_is_setup())
+      if (!_cerebro_module_is_setup())
 	{
-	  if (cerebro_module_setup() < 0)
+	  if (_cerebro_module_setup() < 0)
 	    goto cleanup;
 	  module_setup_called++;
 	}
       
-      if (cerebro_module_load_config_module() < 0)
+      if (_cerebro_module_load_config_module() < 0)
 	goto cleanup;
 
-      if (cerebro_config_module_setup() < 0)
+      if (_cerebro_config_module_setup() < 0)
 	goto cleanup;
 
       load_config_module_called++;
@@ -55,23 +57,23 @@ _cerebro_config_load_config_module(struct cerebro_config *conf)
       fprintf(stderr, "* Cerebro Config Configuration:\n");
       fprintf(stderr, "* -----------------------\n");
       fprintf(stderr, "* Loading config from module: %s\n",
-              cerebro_config_module_name());
+              _cerebro_config_module_name());
       fprintf(stderr, "**************************************\n");
     }
 #endif /* CEREBRO_DEBUG */
 
-  if (cerebro_config_module_load_default(conf) < 0)
+  if (_cerebro_config_module_load_default(conf) < 0)
     goto cleanup;
 
   rv = 0;
  cleanup:
   if (load_config_module_called)
     {
-      cerebro_config_module_cleanup();
-      cerebro_module_unload_config_module();
+      _cerebro_config_module_cleanup();
+      _cerebro_module_unload_config_module();
     }
   if (module_setup_called)
-    cerebro_module_cleanup();
+    _cerebro_module_cleanup();
   return rv;
 }
 
@@ -710,5 +712,61 @@ _cerebro_config_load(struct cerebro_config *conf)
 					   &config_file_conf) < 0)
     return -1;
  
+  return 0;
+}
+
+int 
+_cerebro_load_config(cerebro_t handle)
+{
+  struct cerebro_config module_conf;
+  struct cerebro_config config_file_conf;
+  
+  if (_cerebro_handle_check(handle) < 0)
+    return -1;
+
+  if (handle->loaded_state & CEREBRO_CONFIG_LOADED)
+    {
+      handle->errnum = CEREBRO_ERR_SUCCESS;
+      return 0;
+    }
+  
+  memset(&module_conf, '\0', sizeof(struct cerebro_config));
+  if (_cerebro_config_load_config_module(&module_conf) < 0)
+    {
+      handle->errnum = CEREBRO_ERR_CONFIG_MODULE;
+      return -1;
+    }
+
+  memset(&config_file_conf, '\0', sizeof(struct cerebro_config));
+  if (_cerebro_config_load_config_file(&config_file_conf) < 0)
+    {
+      handle->errnum = CEREBRO_ERR_CONFIG_FILE;
+      return -1;
+    }
+
+  memset(&(handle->config_data), '\0', sizeof(struct cerebro_config));
+  if (_cerebro_config_merge_cerebro_config(&(handle->config_data), 
+					   &module_conf, 
+					   &config_file_conf) < 0)
+    {
+      handle->errnum = CEREBRO_ERR_INTERNAL;
+      return -1;
+    }
+  
+  handle->loaded_state |= CEREBRO_CONFIG_LOADED;
+  handle->errnum = CEREBRO_ERR_SUCCESS;
+  return 0;
+}
+
+int 
+_cerebro_unload_config(cerebro_t handle)
+{
+  if (_cerebro_handle_check(handle) < 0)
+    return -1;
+
+  memset(&(handle->config_data), '\0', sizeof(struct cerebro_config));
+  
+  handle->loaded_state &= ~CEREBRO_CONFIG_LOADED;
+  handle->errnum = CEREBRO_ERR_SUCCESS;
   return 0;
 }

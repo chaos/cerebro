@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.47 2005-05-09 20:54:21 achu Exp $
+ *  $Id: cerebrod.c,v 1.48 2005-05-11 17:06:27 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -80,8 +80,8 @@ _cerebrod_err_unlock(void)
 static void
 _cerebrod_pre_config_initialization(void)
 {
-  if (cerebro_module_setup() < 0)
-    cerebro_err_exit("%s(%s:%d): cerebro_module_setup",
+  if (_cerebro_module_setup() < 0)
+    cerebro_err_exit("%s(%s:%d): _cerebro_module_setup",
 		     __FILE__, __FUNCTION__, __LINE__);
 
   cerebrod_load_data();

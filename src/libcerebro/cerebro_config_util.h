@@ -1,10 +1,11 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_util.h,v 1.2 2005-05-11 16:38:12 achu Exp $
+ *  $Id: cerebro_config_util.h,v 1.3 2005-05-11 17:06:28 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_CONFIG_UTIL_H
 #define _CEREBRO_CONFIG_UTIL_H
 
+#include <cerebro.h>
 #include <cerebro/cerebro_config.h>
 #include <cerebro/cerebro_constants.h>
 
@@ -46,5 +47,23 @@ int _cerebro_config_merge_cerebro_config(struct cerebro_config *conf,
  * Returns data in structure and 0 on success, -1 on error
  */
 int _cerebro_config_load(struct cerebro_config *conf);
+
+/* 
+ * _cerebro_load_config
+ *
+ * Read and load config file data
+ *
+ * Returns 0 on success, -1 on error
+ */
+int _cerebro_load_config(cerebro_t handle);
+
+/* 
+ * _cerebro_unload_config
+ *
+ * Unload config file info
+ *
+ * Returns 0 on success, -1 on error
+ */
+int _cerebro_unload_config(cerebro_t handle);
 
 #endif /* _CEREBRO_CONFIG_UTIL_H */
