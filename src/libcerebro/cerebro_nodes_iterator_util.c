@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_nodes_iterator_util.c,v 1.2 2005-05-11 22:31:21 achu Exp $
+ *  $Id: cerebro_nodes_iterator_util.c,v 1.3 2005-05-12 00:40:07 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -8,6 +8,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#if STDC_HEADERS
+#include <string.h>
+#endif /* STDC_HEADERS */
 
 #include "cerebro.h"
 #include "cerebro_api.h"
@@ -30,7 +33,7 @@ _cerebro_nodes_iterator_create(cerebro_t handle,
       return NULL;
     }
 
-  if (!itr = (cerebro_nodes_iterator_t)malloc(sizeof(struct cerebro_nodes_iterator)))
+  if (!(itr = (cerebro_nodes_iterator_t)malloc(sizeof(struct cerebro_nodes_iterator))))
     {
       handle->errnum = CEREBRO_ERR_OUTMEM;
       goto cleanup;
@@ -50,6 +53,7 @@ _cerebro_nodes_iterator_create(cerebro_t handle,
       goto cleanup;
     }
 
+  itr->magic = CEREBRO_NODES_ITERATOR_MAGIC_NUMBER;
   return itr;
 
  cleanup:
