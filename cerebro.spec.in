@@ -12,8 +12,7 @@ Source: @PROJECT@-@VERSION@-@RELEASE@.tgz
 BuildRoot: %{_tmppath}/@PROJECT@-@VERSION@-@RELEASE@
 %if %{?_with_chaos:1}%{!?_with_chaos:0}
 Requires: gendersllnl
-# Temporary until Chaos 3.0 systems are fully ready
-# Conflicts: ganglia-monitor-core
+Conflicts: ganglia-monitor-core
 %endif
 
 %description
