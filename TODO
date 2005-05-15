@@ -1,9 +1,6 @@
 Documention
 - README description
 - cerebro.1 manpage
-- doc for writing modules
-- cerebro api manpages
-- libcerebro main manpage
 
 Testing
 - fd leaking
@@ -12,6 +9,7 @@ Testing
 
 Cleanup
 - updown function names??
+- split libcerebro into exported and unexported lib funcs
 
 Audit
 - code review to reduce memory footprint
@@ -21,7 +19,6 @@ Portability
 - Non-pthreads support
 
 Design
-- Iterator interface for updown nodes
 
 Later Design
 - move listener hash into status hash 
