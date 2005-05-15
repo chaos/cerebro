@@ -8,8 +8,6 @@ Testing
 - can actually build module
 
 Cleanup
-- updown function names??
-- split libcerebro into exported and unexported lib funcs
 
 Audit
 - code review to reduce memory footprint
