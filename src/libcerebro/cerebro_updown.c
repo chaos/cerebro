@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_updown.c,v 1.42 2005-05-11 23:34:25 achu Exp $
+ *  $Id: cerebro_updown.c,v 1.43 2005-05-15 14:03:44 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -844,18 +844,18 @@ cerebro_updown_load_data(cerebro_t handle,
 }
 
 /* 
- * _cerebro_updown_get_nodes
+ * _cerebro_updown_get_nodes_string
  *
- * Common function for cerebro_updown_get_up_nodes and
- * cerebro_updown_get_down_nodes.
+ * Common function for cerebro_updown_get_up_nodes_string and
+ * cerebro_updown_get_down_nodes_string.
  * 
  * Returns 0 on success, -1 on error
  */
 static int
-_cerebro_updown_get_nodes(cerebro_t handle, 
-                          char *buf, 
-                          unsigned int buflen,
-                          int up_down_flag)
+_cerebro_updown_get_nodes_string(cerebro_t handle, 
+				 char *buf, 
+				 unsigned int buflen,
+				 int up_down_flag)
 {
   struct cerebro_updown_data *updown_data;
   hostlist_t hl;
@@ -893,19 +893,19 @@ _cerebro_updown_get_nodes(cerebro_t handle,
 }
 
 int 
-cerebro_updown_get_up_nodes(cerebro_t handle, char *buf, unsigned int buflen)
+cerebro_updown_get_up_nodes_string(cerebro_t handle, char *buf, unsigned int buflen)
 {
   return _cerebro_updown_get_nodes(handle, buf, buflen, CEREBRO_UPDOWN_UP_NODES);
 }
  
 int 
-cerebro_updown_get_down_nodes(cerebro_t handle, char *buf, unsigned int buflen)
+cerebro_updown_get_down_nodes_string(cerebro_t handle, char *buf, unsigned int buflen)
 {
   return _cerebro_updown_get_nodes(handle, buf, buflen, CEREBRO_UPDOWN_DOWN_NODES);
 }
  
 /* 
- * _cerebro_updown_nodes_iterator
+ * _cerebro_updown_get_nodes_iterator
  *
  * Common function for cerebro_updown_up_nodes_iterator and
  * cerebro_updown_down_nodes_iterator.
@@ -913,8 +913,8 @@ cerebro_updown_get_down_nodes(cerebro_t handle, char *buf, unsigned int buflen)
  * Returns an iterator on success, NULL on error
  */
 static cerebro_nodes_iterator_t
-_cerebro_updown_nodes_iterator(cerebro_t handle,
-                               int up_down_flag)
+_cerebro_updown_get_nodes_iterator(cerebro_t handle,
+				   int up_down_flag)
 {
   struct cerebro_updown_data *updown_data;
   cerebro_nodes_iterator_t itr;
@@ -938,15 +938,15 @@ _cerebro_updown_nodes_iterator(cerebro_t handle,
 }
 
 cerebro_nodes_iterator_t 
-cerebro_updown_up_nodes_iterator(cerebro_t handle)
+cerebro_updown_get_up_nodes_iterator(cerebro_t handle)
 {
-  return _cerebro_updown_nodes_iterator(handle, CEREBRO_UPDOWN_UP_NODES);
+  return _cerebro_updown_get_nodes_iterator(handle, CEREBRO_UPDOWN_UP_NODES);
 }
 
 cerebro_nodes_iterator_t 
-cerebro_updown_down_nodes_iterator(cerebro_t handle)
+cerebro_updown_get_down_nodes_iterator(cerebro_t handle)
 {
-  return _cerebro_updown_nodes_iterator(handle, CEREBRO_UPDOWN_DOWN_NODES);
+  return _cerebro_updown_get_nodes_iterator(handle, CEREBRO_UPDOWN_DOWN_NODES);
 }
 
 /* 

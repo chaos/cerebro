@@ -1,3 +1,7 @@
+2005-05-15  Albert Chu  <chu11@llnl.gov>
+
+	* Slight library function names re-wording.
+	
 2005-05-11  Albert Chu  <chu11@llnl.gov>
 
 	* Hide remaining functions that shouldn't be exported by

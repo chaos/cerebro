@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.17 2005-05-11 23:34:25 achu Exp $
+ *  $Id: cerebro.h,v 1.18 2005-05-15 14:03:44 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_H
@@ -163,40 +163,40 @@ int cerebro_updown_load_data(cerebro_t handle,
 int cerebro_updown_unload_data(cerebro_t handle);
 
 /*
- * cerebro_updown_get_up_nodes
+ * cerebro_updown_get_up_nodes_string
  *
  * Retrieve a ranged string of up nodes and store it in the buffer.
  *
  * Returns 0 on success, -1 on error
  */
-int cerebro_updown_get_up_nodes(cerebro_t handle, char *buf, unsigned int buflen);
+int cerebro_updown_get_up_nodes_string(cerebro_t handle, char *buf, unsigned int buflen);
 
 /*
- * cerebro_updown_get_down_nodes
+ * cerebro_updown_get_down_nodes_string
  *
  * Retrieve a ranged string of down nodes and store it in the buffer
  *
  * Returns 0 on success, -1 on error
  */
-int cerebro_updown_get_down_nodes(cerebro_t handle, char *buf, unsigned int buflen);
+int cerebro_updown_get_down_nodes_string(cerebro_t handle, char *buf, unsigned int buflen);
 
 /*
- * cerebro_updown_up_nodes_iterator
+ * cerebro_updown_get_up_nodes_iterator
  *
  * Retrieve a cerebro nodes iterator for all up nodes
  *
  * Returns an iterator on success, NULL on error
  */
-cerebro_nodes_iterator_t cerebro_updown_up_nodes_iterator(cerebro_t handle);
+cerebro_nodes_iterator_t cerebro_updown_get_up_nodes_iterator(cerebro_t handle);
 
 /*
- * cerebro_updown_down_nodes_iterator
+ * cerebro_updown_get_down_nodes_iterator
  *
  * Retrieve a cerebro nodes iterator for all down nodes
  *
  * Returns an iterator on success, NULL on error
  */
-cerebro_nodes_iterator_t cerebro_updown_down_nodes_iterator(cerebro_t handle);
+cerebro_nodes_iterator_t cerebro_updown_get_down_nodes_iterator(cerebro_t handle);
 
 /*
  * cerebro_updown_is_node_up

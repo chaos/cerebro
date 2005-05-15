@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: libcerebro.3,v 1.3 2005-05-11 23:47:18 achu Exp $
+\."$Id: libcerebro.3,v 1.4 2005-05-15 14:03:44 achu Exp $
 \."#############################################################################
 .TH LIBCEREBRO 3 "August 2003" "LLNL" "LIBCEREBRO"
 .SH NAME
@@ -28,13 +28,13 @@ or down
 .sp
 .BI "int cerebro_updown_load_data(cerebro_t handle, const char *hostname, unsigned int port, unsigned int timeout_len, int flags);"
 .sp
-.BI "int cerebro_updown_get_up_nodes(cerebro_t handle, char *buf, unsigned int buflen);"
+.BI "int cerebro_updown_get_up_nodes_string(cerebro_t handle, char *buf, unsigned int buflen);"
 .sp
-.BI "int cerebro_updown_get_down_nodes(cerebro_t handle, char *buf, unsigned int buflen);"
+.BI "int cerebro_updown_get_down_nodes_string(cerebro_t handle, char *buf, unsigned int buflen);"
 .sp
-.BI "cerebro_nodes_iterator_t cerebro_updown_up_nodes_iterator(cerebro_t handle);"
+.BI "cerebro_nodes_iterator_t cerebro_updown_get_up_nodes_iterator(cerebro_t handle);"
 .sp
-.BI "cerebro_nodes_iterator_t cerebro_updown_down_nodes_iterator(cerebro_t handle);"
+.BI "cerebro_nodes_iterator_t cerebro_updown_get_down_nodes_iterator(cerebro_t handle);"
 .sp
 .BI "int cerebro_updown_is_node_up(cerebro_t handle, const char *node);"
 .sp
@@ -70,9 +70,9 @@ cerebro_handle_create(3), cerebro_handle_destroy(3),
 cerebro_errnum(3), cerebro_strerror(3), cerebro_errormsg(3),
 cerebro_perror(3), cerebro_nodes_iterator_next(3),
 cerebro_nodes_iterator_reset(3), cerebro_nodes_iterator_destroy(3),
-cerebro_updown_load_data(3), cerebro_updown_get_up_nodes(3),
-cerebro_updown_get_down_nodes(3), cerebro_updown_up_nodes_iterator(3),
-cerebro_updown_down_nodes_iterator(3), cerebro_updown_is_node_up(3),
+cerebro_updown_load_data(3), cerebro_updown_get_up_nodes_string(3),
+cerebro_updown_get_down_nodes_string(3), cerebro_updown_get_up_nodes_iterator(3),
+cerebro_updown_get_down_nodes_iterator(3), cerebro_updown_is_node_up(3),
 cerebro_updown_is_node_down(3), cerebro_updown_up_count(3),
 cerebro_updown_down_count(3), cerebro_module(3),
 .if !@WITH_STATIC_MODULES@ \{
