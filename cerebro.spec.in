@@ -5,7 +5,7 @@ Release: @RELEASE@chaos
 %else
 Release: @RELEASE@
 %endif
-Summary: Cerebro dynamic monitoring tools and libraries
+Summary: Cerebro cluster monitoring tools and libraries
 Group: System Environment/Base
 License: GPL
 Source: @PROJECT@-@VERSION@-@RELEASE@.tgz
@@ -16,7 +16,7 @@ Conflicts: ganglia-monitor-core
 %endif
 
 %description
-Cerebro is a collection of tools for dynamically monitoring a cluster of nodes.
+Cerebro is a collection of cluster monitoring tools and libraries.
 
 %{!?_with_genders: %{!?_without_genders: %define _with_genders --with-genders}}
 %{!?_with_gendersllnl: %{!?_without_gendersllnl: %define _with_gendersllnl --with-gen\dersllnl}}

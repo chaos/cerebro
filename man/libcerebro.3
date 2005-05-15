@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: libcerebro.3,v 1.4 2005-05-15 14:03:44 achu Exp $
+\."$Id: libcerebro.3,v 1.5 2005-05-15 14:45:33 achu Exp $
 \."#############################################################################
 .TH LIBCEREBRO 3 "August 2003" "LLNL" "LIBCEREBRO"
 .SH NAME
@@ -45,16 +45,13 @@ or down
 .BI "int cerebro_updown_down_count(cerebro_t handle);"
 .br
 .SH DESCRIPTION
-The cerebro library functions are a set of functions that interacts
-with the 
-.B cerebro
-library to determine status information about a cluster.
+The cerebro library contains functions to gather status information
+about a cluster.
 
 For API information, please see the individual manpages for each of
 the functions above, or read the comments written in
 /usr/include/cerebro.h.  The
 .B Cerebro
-
 configuration file, clusterlist module, or configuration module may be
 loaded or called during API calls.  Please see the
 .BR cerebro.conf(5)
