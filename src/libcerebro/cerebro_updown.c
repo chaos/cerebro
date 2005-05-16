@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_updown.c,v 1.43 2005-05-15 14:03:44 achu Exp $
+ *  $Id: cerebro_updown.c,v 1.44 2005-05-16 17:34:36 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -895,13 +895,19 @@ _cerebro_updown_get_nodes_string(cerebro_t handle,
 int 
 cerebro_updown_get_up_nodes_string(cerebro_t handle, char *buf, unsigned int buflen)
 {
-  return _cerebro_updown_get_nodes(handle, buf, buflen, CEREBRO_UPDOWN_UP_NODES);
+  return _cerebro_updown_get_nodes_string(handle, 
+                                          buf, 
+                                          buflen, 
+                                          CEREBRO_UPDOWN_UP_NODES);
 }
  
 int 
 cerebro_updown_get_down_nodes_string(cerebro_t handle, char *buf, unsigned int buflen)
 {
-  return _cerebro_updown_get_nodes(handle, buf, buflen, CEREBRO_UPDOWN_DOWN_NODES);
+  return _cerebro_updown_get_nodes_string(handle, 
+                                          buf, 
+                                          buflen, 
+                                          CEREBRO_UPDOWN_DOWN_NODES);
 }
  
 /* 
