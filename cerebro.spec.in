@@ -12,6 +12,7 @@ Source: @PROJECT@-@VERSION@-@RELEASE@.tgz
 BuildRoot: %{_tmppath}/@PROJECT@-@VERSION@-@RELEASE@
 %if %{?_with_chaos:1}%{!?_with_chaos:0}
 Requires: gendersllnl
+Requires: genders >= 1.4
 Conflicts: ganglia-monitor-core
 %endif
 
