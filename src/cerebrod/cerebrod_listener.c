@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.60 2005-05-11 17:06:27 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.61 2005-05-17 22:40:02 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -29,12 +29,7 @@
 #include "cerebrod_heartbeat.h"
 #include "cerebrod_listener.h"
 #include "cerebrod_updown.h"
-#include "cerebrod_util.h"
 #include "wrappers.h"
-
-#define CEREBROD_LISTENER_HASH_SIZE_DEFAULT   1024
-#define CEREBROD_LISTENER_HASH_SIZE_INCREMENT 1024
-#define CEREBROD_LISTENER_REHASH_LIMIT        (cluster_data_hash_size*2)
 
 extern struct cerebrod_config conf;
 #if CEREBRO_DEBUG
@@ -61,20 +56,6 @@ pthread_mutex_t cerebrod_listener_initialization_complete_lock = PTHREAD_MUTEX_I
  */
 int listener_fd = 0;
 pthread_mutex_t listener_fd_lock = PTHREAD_MUTEX_INITIALIZER;
-
-/*
- * cluster_data_hash
- * cluster_data_hash_numnodes
- * cluster_data_hash_size
- * cluster_data_hash_lock
- *
- * cluster node data, number of currently hashed entries, hash size, and 
- * lock to protect concurrent access
- */
-hash_t cluster_data_hash = NULL;
-int cluster_data_hash_numnodes = 0;
-int cluster_data_hash_size = 0;
-pthread_mutex_t cluster_data_hash_lock = PTHREAD_MUTEX_INITIALIZER;
 
 /* 
  * _cerebrod_listener_create_and_setup_socket
@@ -166,19 +147,6 @@ _cerebrod_listener_initialize(void)
                      __FILE__, __FUNCTION__, __LINE__);
   Pthread_mutex_unlock(&listener_fd_lock);
   
-  /* Use the clusterlist numnodes count as the  initializing hash size */
-  if ((cluster_data_hash_size = _cerebro_clusterlist_module_numnodes()) < 0)
-    cerebro_err_exit("%s(%s:%d): _cerebro_clusterlist_module_numnodes",
-		     __FILE__, __FUNCTION__, __LINE__);
-  
-  if (cluster_data_hash_size <= 0) 
-    cluster_data_hash_size = CEREBROD_LISTENER_HASH_SIZE_DEFAULT;
-
-  cluster_data_hash_numnodes = 0;
-  cluster_data_hash = Hash_create(cluster_data_hash_size,
-				  (hash_key_f)hash_key_string,
-				  (hash_cmp_f)strcmp,
-				  (hash_del_f)_Free);
   cerebrod_listener_initialization_complete++;
   Pthread_cond_signal(&cerebrod_listener_initialization_complete_cond);
  out:
@@ -281,76 +249,6 @@ _cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb)
 #endif /* CEREBRO_DEBUG */
 }
 
-/* 
- * _cerebrod_listener_dump_cluster_node_data_item
- *
- * callback function from hash_for_each to dump cluster node data
- */
-#if CEREBRO_DEBUG
-static int
-_cerebrod_listener_dump_cluster_node_data_item(void *data, 
-					       const void *key, 
-					       void *arg)
-{
-  struct cerebrod_node_data *nd;
-
-  assert(data);
-  assert(key);
-
-  nd = (struct cerebrod_node_data *)data;
-
-  Pthread_mutex_lock(&(nd->node_data_lock));
-  fprintf(stderr, "* %s: starttime=%u boottime=%u last_received=%u\n", 
-          (char *)key, nd->starttime, nd->boottime, nd->last_received);
-  Pthread_mutex_unlock(&(nd->node_data_lock));
-
-  return 1;
-}
-#endif /* CEREBRO_DEBUG */
-
-/* 
- * _cerebrod_listener_dump_cluster_node_data_hash
- *
- * Dump contents of cluster node data hash
- */
-static void
-_cerebrod_listener_dump_cluster_node_data_hash(void)
-{
-#if CEREBRO_DEBUG
-  if (conf.debug && conf.listen_debug)
-    {
-      int num;
-
-      Pthread_mutex_lock(&cluster_data_hash_lock);
-      Pthread_mutex_lock(&debug_output_mutex);
-      fprintf(stderr, "**************************************\n");
-      fprintf(stderr, "* Cluster Node Hash State\n");
-      fprintf(stderr, "* -----------------------\n");
-      fprintf(stderr, "* Hashed Nodes: %d\n", cluster_data_hash_numnodes);
-      fprintf(stderr, "* -----------------------\n");
-      if (cluster_data_hash_numnodes > 0)
-        {          
-          num = Hash_for_each(cluster_data_hash, 
-			      _cerebrod_listener_dump_cluster_node_data_item,
-			      NULL);
-          if (num != cluster_data_hash_numnodes)
-	    {
-	      fprintf(stderr, "_cerebrod_listener_dump_cluster_node_data_hash: "
-		      "invalid dump count: num=%d numnodes=%d",
-		      num, cluster_data_hash_numnodes);
-	      exit(1);
-	    }
-        }
-      else
-        fprintf(stderr, "_cerebrod_listener_dump_cluster_node_data_hash: "
-		"called with empty hash\n");
-      fprintf(stderr, "**************************************\n");
-      Pthread_mutex_unlock(&debug_output_mutex);
-      Pthread_mutex_unlock(&cluster_data_hash_lock);
-    }
-#endif /* CEREBRO_DEBUG */
-}
-
 void *
 cerebrod_listener(void *arg)
 {
@@ -361,11 +259,10 @@ cerebrod_listener(void *arg)
   for (;;)
     {
       struct cerebrod_heartbeat hb;
-      struct cerebrod_node_data *nd;
       char buf[CEREBRO_PACKET_BUFLEN];
       char nodename_buf[CEREBRO_MAXNODENAMELEN+1];
       char nodename_key[CEREBRO_MAXNODENAMELEN+1];
-      int recv_len, heartbeat_len, flag, cluster_data_updated_flag = 0;
+      int recv_len, heartbeat_len, flag;
       
       Pthread_mutex_lock(&listener_fd_lock);
       if ((recv_len = recvfrom(listener_fd, 
@@ -473,44 +370,9 @@ cerebrod_listener(void *arg)
 	  continue;
 	}
 
-      Pthread_mutex_lock(&cluster_data_hash_lock);
-      nd = Hash_find(cluster_data_hash, nodename_key);
-      if (!nd)
-        {
-          char *key;
-
-          key = Strdup(nodename_key);
-          nd = (struct cerebrod_node_data *)Malloc(sizeof(struct cerebrod_node_data));
-          Pthread_mutex_init(&(nd->node_data_lock), NULL);
-
-          /* Re-hash if our hash is getting too small */
-          if ((cluster_data_hash_numnodes + 1) > CEREBROD_LISTENER_REHASH_LIMIT)
-            cerebrod_rehash(&cluster_data_hash, 
-			    &cluster_data_hash_size,
-			    CEREBROD_LISTENER_HASH_SIZE_INCREMENT,
-			    cluster_data_hash_numnodes,
-			    &cluster_data_hash_lock);
-
-          Hash_insert(cluster_data_hash, key, nd);
-          cluster_data_hash_numnodes++;
-        }
-      Pthread_mutex_unlock(&cluster_data_hash_lock);
-
-      Pthread_mutex_lock(&(nd->node_data_lock));
       Gettimeofday(&tv, NULL);
-      if (tv.tv_sec >= nd->last_received)
-        {
-          nd->starttime = hb.starttime;
-          nd->boottime = hb.boottime;
-          nd->last_received = tv.tv_sec;
-	  cluster_data_updated_flag++;
-        }
-      Pthread_mutex_unlock(&(nd->node_data_lock));
-
-      if (conf.updown_server && cluster_data_updated_flag)
-	cerebrod_updown_update_data(nodename_key, nd->last_received);
-
-      _cerebrod_listener_dump_cluster_node_data_hash();
+      if (conf.updown_server)
+	cerebrod_updown_update_data(nodename_key, tv.tv_sec);
     }
 
   return NULL;			/* NOT REACHED */
