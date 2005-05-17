@@ -1,6 +1,8 @@
 2005-05-17  Albert Chu  <chu11@llnl.gov>
 
 	* Removed unused error codes.
+
+	* Begin status server work.
 	
 2005-05-17  Albert Chu  <chu11@llnl.gov>
 

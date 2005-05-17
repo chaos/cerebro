@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro.conf.5.in,v 1.3 2005-05-04 15:57:24 achu Exp $
+\."$Id: cerebro.conf.5.in,v 1.4 2005-05-17 19:55:15 achu Exp $
 \."#############################################################################
 .TH cerebro.conf 5 "May 2005" "cerebro.conf @VERSION@" "cerebro.conf"
 .SH "NAME"
@@ -114,10 +114,8 @@ listener server should execute.  The default executes 2 threads.
 .I cerebrod_updown_server ( on | off )
 Specify if the
 .B cerebrod
-daemon should turn on the updown server.  The updown server can send
-be various tools and libraries to determine the up and down nodes
-in the cluster.  Generally speaking, this option should be turned on
-if the 
+daemon should turn on the updown server.  Generally speaking, this
+option should be turned on if the
 .I cerebrod_listen
 option is turned on.  If the 
 .I cerebrod_listen
@@ -128,6 +126,22 @@ option is turned on.
 .TP
 .I cerebrod_updown_server_port num
 Specify the updown server port.  The default server port is 8852.
+.TP
+.I cerebrod_status_server ( on | off )
+Specify if the
+.B cerebrod
+daemon should turn on the status server.  Generally speaking, this
+option should be turned on if the
+.I cerebrod_listen
+option is turned on.  If the 
+.I cerebrod_listen
+option is turned off, the status_server will not be started.  The default
+turns this option on as long as the 
+.I cerebrod_listen
+option is turned on.
+.TP
+.I cerebrod_status_server_port num
+Specify the status server port.  The default server port is 8853.
 .if @MANPAGE_DEBUG@ \{
 .TP
 .I cerebrod_speak_debug ( on | off )
@@ -144,6 +158,12 @@ option.  This option is turned off by default.
 .TP
 .I cerebrod_updown_server_debug ( on | off )
 Turn on updown server debugging.  Requires that debugging be turned on
+from the command line with the
+.I -d
+option.  This option is turned off by default.
+.TP
+.I cerebrod_status_server_debug ( on | off )
+Turn on status server debugging.  Requires that debugging be turned on
 from the command line with the
 .I -d
 option.  This option is turned off by default.

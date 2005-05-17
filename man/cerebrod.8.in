@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebrod.8.in,v 1.18 2005-05-10 20:24:22 achu Exp $
+\."$Id: cerebrod.8.in,v 1.19 2005-05-17 19:55:15 achu Exp $
 \."#############################################################################
 .TH cerebrod 8 "May 2005" "cerebrod @VERSION@" cerebrod
 .SH "NAME"
@@ -52,4 +52,4 @@ Turn on debugging and run daemon in foreground
 .SH "ORIGIN"
 Developed by Albert Chu <chu11@llnl.gov> on LLNL's Linux clusters.
 .SH "SEE ALSO"
-cerebrod(1), cerebro_module(3), cerebro.conf(5)
+cerebro_module(3), cerebro.conf(5)
