@@ -19,8 +19,15 @@ Conflicts: ganglia-monitor-core
 %description
 Cerebro is a collection of cluster monitoring tools and libraries.
 
-%{!?_with_genders: %{!?_without_genders: %define _with_genders --with-genders}}
+%if %{?_with_chaos:1}%{!?_with_chaos:0}
+%define _with_gendersllnl  --with-gendersllnl
+%define _without_genders   --without-genders
+%define _without_hostsfile --without-hostsfile
+%else
 %{!?_with_gendersllnl: %{!?_without_gendersllnl: %define _with_gendersllnl --with-gen\dersllnl}}
+%{!?_with_genders: %{!?_without_genders: %define _with_genders --with-genders}}
+%{!?_with_hostsfile: %{!?_without_hostsfile: %define _with_hostsfile --with-hostsfile}}
+%endif
 
 %package gendersllnl
 Summary: whatsup gendersllnl modules package
@@ -50,10 +57,12 @@ Hostsfile modules packages.
 
 %build
 %configure --program-prefix=%{?_program_prefix:%{_program_prefix}} \
+           %{?_with_gendersllnl} \
+           %{?_without_gendersllnl} \
            %{?_with_genders} \
            %{?_without_genders} \
-           %{?_with_gendersllnl} \
-           %{?_without_gendersllnl}
+           %{?_with_hostsfile} \
+           %{?_without_hostsfile}
 make 
 
 %install

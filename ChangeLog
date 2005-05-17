@@ -1,5 +1,7 @@
 2005-05-17  Albert Chu  <chu11@llnl.gov>
 
+	* cerebro.spec.in: Update chaos build.
+	
 	* tagged cerebro-1-0-0-pre1
 	
 2005-05-16  Albert Chu  <chu11@llnl.gov>
