@@ -7,6 +7,7 @@ Testing
 - can actually build module
 
 Cleanup
+- common code for looping servers??
 
 Audit
 - code review to reduce memory footprint
