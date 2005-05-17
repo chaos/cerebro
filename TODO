@@ -7,7 +7,6 @@ Testing
 - can actually build module
 
 Cleanup
-- Fix to install in /lib64
 
 Audit
 - code review to reduce memory footprint
