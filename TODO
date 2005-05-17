@@ -10,6 +10,8 @@ Cleanup
 - common code for looping servers??
 - common code for various server code
 - merge server data into one hash??
+- need better name for status stuff??
+  - call metric??
 
 Audit
 - code review to reduce memory footprint
@@ -21,6 +23,9 @@ Portability
 Design
 
 Later Design
+- support float/double/string for status monitoring
+- how remove status data?
+- need list for updown server??
 - move listener hash into status hash 
 - strerror_r and errormsg_r funcs
 - libcerebro set configfile, module, etc. functions

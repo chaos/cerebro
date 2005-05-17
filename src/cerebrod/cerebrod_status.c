@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_status.c,v 1.2 2005-05-17 20:53:59 achu Exp $
+ *  $Id: cerebrod_status.c,v 1.3 2005-05-17 22:33:44 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -230,19 +230,20 @@ _cerebrod_status_initialize(void)
 
       for (i = 0; i < numnodes; i++)
         {
-          struct cerebrod_status_node_data *ud;
+          struct cerebrod_status_node_data *sd;
 
-          ud = Malloc(sizeof(struct cerebrod_status_node_data));
+          sd = Malloc(sizeof(struct cerebrod_status_node_data));
 
-          ud->nodename = Strdup(nodes[i]);
-#if 0
-          ud->discovered = 0;
-          ud->last_received = 0;
-#endif /* 0 */
-          Pthread_mutex_init(&(ud->status_node_data_lock), NULL);
+          sd->nodename = Strdup(nodes[i]);
+          sd->status_node_data = Hash_create(CEREBRO_STATUS_MAX,
+                                             (hash_key_f)hash_key_string,
+                                             (hash_cmp_f)strcmp,
+                                             (hash_del_f)_Free);
+          sd->status_node_data_count = 0;
+          Pthread_mutex_init(&(sd->status_node_data_lock), NULL);
 
-          List_append(status_node_data, ud);
-          Hash_insert(status_node_data_index, Strdup(nodes[i]), ud);
+          List_append(status_node_data, sd);
+          Hash_insert(status_node_data_index, Strdup(nodes[i]), sd);
 
           list_sort(status_node_data, (ListCmpF)_status_node_data_strcmp);
 
@@ -1197,7 +1198,10 @@ _cerebrod_updown_dump_updown_node_data_list(void)
 #endif /* 0 */
 
 void 
-cerebrod_status_update_data(char *nodename, u_int32_t last_received)
+cerebrod_status_update_data(char *nodename,
+                            char *status_name,
+                            cerebrod_status_type_t status_type,
+                            cerebrod_status_val_t status_val)
 {
 #if 0
   struct cerebrod_status_node_data *ud;

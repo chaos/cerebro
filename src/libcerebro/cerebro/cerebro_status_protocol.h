@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_status_protocol.h,v 1.2 2005-05-17 20:53:59 achu Exp $
+ *  $Id: cerebro_status_protocol.h,v 1.3 2005-05-17 22:33:44 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_STATUS_PROTOCOL_H
@@ -37,11 +37,14 @@
  *   so the server can respond to the client with a meaningful error
  *   message.
  */
+#endif /* 0 */
 
-#define CEREBRO_UPDOWN_PROTOCOL_VERSION                    1
-#define CEREBRO_UPDOWN_PROTOCOL_SERVER_TIMEOUT_LEN         3
-#define CEREBRO_UPDOWN_PROTOCOL_CLIENT_TIMEOUT_LEN         5
-#define CEREBRO_UPDOWN_PROTOCOL_CONNECT_TIMEOUT_LEN        5
+#define CEREBRO_STATUS_PROTOCOL_VERSION                    1
+#define CEREBRO_STATUS_PROTOCOL_SERVER_TIMEOUT_LEN         3
+#define CEREBRO_STATUS_PROTOCOL_CLIENT_TIMEOUT_LEN         5
+#define CEREBRO_STATUS_PROTOCOL_CONNECT_TIMEOUT_LEN        5
+
+#if 0
 
 #define CEREBRO_UPDOWN_PROTOCOL_ERR_SUCCESS                0
 #define CEREBRO_UPDOWN_PROTOCOL_ERR_VERSION_INVALID        1
@@ -62,11 +65,11 @@
 
 #endif /* 0 */
 
-#define CEREBRO_STATUS_SERVER_PORT                         8853
+#define CEREBRO_STATUS_SERVER_PORT  8853
+
+#define CEREBRO_STATUS_MAX          16
 
 #if 0
-
-#define CEREBRO_UPDOWN_TIMEOUT_LEN_DEFAULT                 60 
 
 /*
  * struct cerebro_updown_request
