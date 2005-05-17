@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.c,v 1.17 2005-05-11 21:49:02 achu Exp $
+ *  $Id: cerebro.c,v 1.18 2005-05-17 16:41:36 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -27,7 +27,6 @@ static char *cerebro_error_messages[] =
     "invalid magic number found",
     "invalid parameters",
     "invalid hostname",
-    "invalid address",
     "connection error",
     "connection timeout",
     "protocol error",

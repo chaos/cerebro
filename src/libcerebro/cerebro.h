@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.18 2005-05-15 14:03:44 achu Exp $
+ *  $Id: cerebro.h,v 1.19 2005-05-17 16:41:36 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_H
@@ -10,22 +10,21 @@
 #define CEREBRO_ERR_MAGIC_NUMBER           2
 #define CEREBRO_ERR_PARAMETERS             3
 #define CEREBRO_ERR_HOSTNAME               4
-#define CEREBRO_ERR_ADDRESS                5
-#define CEREBRO_ERR_CONNECT                6
-#define CEREBRO_ERR_CONNECT_TIMEOUT        7
-#define CEREBRO_ERR_PROTOCOL               8
-#define CEREBRO_ERR_PROTOCOL_TIMEOUT       9 
-#define CEREBRO_ERR_VERSION_INCOMPATIBLE  10
-#define CEREBRO_ERR_NOT_LOADED            11
-#define CEREBRO_ERR_OVERFLOW              12
-#define CEREBRO_ERR_NODE_NOTFOUND         13
-#define CEREBRO_ERR_CONFIG_FILE           14
-#define CEREBRO_ERR_CONFIG_MODULE         15
-#define CEREBRO_ERR_CONFIG_INPUT          16
-#define CEREBRO_ERR_CLUSTERLIST_MODULE    17
-#define CEREBRO_ERR_OUTMEM                18 
-#define CEREBRO_ERR_INTERNAL              19
-#define CEREBRO_ERR_ERRNUMRANGE           20
+#define CEREBRO_ERR_CONNECT                5
+#define CEREBRO_ERR_CONNECT_TIMEOUT        6
+#define CEREBRO_ERR_PROTOCOL               7
+#define CEREBRO_ERR_PROTOCOL_TIMEOUT       8
+#define CEREBRO_ERR_VERSION_INCOMPATIBLE   9
+#define CEREBRO_ERR_NOT_LOADED            10
+#define CEREBRO_ERR_OVERFLOW              11
+#define CEREBRO_ERR_NODE_NOTFOUND         12
+#define CEREBRO_ERR_CONFIG_FILE           13
+#define CEREBRO_ERR_CONFIG_MODULE         14
+#define CEREBRO_ERR_CONFIG_INPUT          15
+#define CEREBRO_ERR_CLUSTERLIST_MODULE    16
+#define CEREBRO_ERR_OUTMEM                17
+#define CEREBRO_ERR_INTERNAL              18
+#define CEREBRO_ERR_ERRNUMRANGE           19
 
 typedef struct cerebro *cerebro_t;
 
