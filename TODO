@@ -8,6 +8,8 @@ Testing
 
 Cleanup
 - common code for looping servers??
+- common code for various server code
+- merge server data into one hash??
 
 Audit
 - code review to reduce memory footprint

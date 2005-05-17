@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.c,v 1.57 2005-05-11 17:06:27 achu Exp $
+ *  $Id: cerebrod_updown.c,v 1.58 2005-05-17 20:53:59 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -217,8 +217,7 @@ _cerebrod_updown_initialize(void)
   
   /* If the clusterlist module contains nodes, retrieve all of these
    * nodes and put them into the updown_node_data list.  All updates
-   * will simply involve updating the last_received time, rather than
-   * involve insertion.
+   * will involve updating data rather than involve insertion.
    */
   if (numnodes > 0)
     {

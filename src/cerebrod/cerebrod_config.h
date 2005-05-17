@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.h,v 1.39 2005-05-09 16:02:11 achu Exp $
+ *  $Id: cerebrod_config.h,v 1.40 2005-05-17 20:53:59 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_CONFIG_H
@@ -11,6 +11,7 @@
 
 #include <netinet/in.h>
 
+#include "cerebro/cerebro_status_protocol.h"
 #include "cerebro/cerebro_updown_protocol.h"
 
 /*
@@ -30,11 +31,14 @@
 #define CEREBROD_LISTEN_THREADS_DEFAULT               2
 #define CEREBROD_UPDOWN_SERVER_DEFAULT                1
 #define CEREBROD_UPDOWN_SERVER_PORT_DEFAULT           CEREBRO_UPDOWN_SERVER_PORT
+#define CEREBROD_STATUS_SERVER_DEFAULT                1
+#define CEREBROD_STATUS_SERVER_PORT_DEFAULT           CEREBRO_STATUS_SERVER_PORT
 #define CEREBROD_CLUSTERLIST_MODULE_DEFAULT           NULL
 #define CEREBROD_CLUSTERLIST_MODULE_OPTIONS_DEFAULT   NULL
 #define CEREBROD_SPEAK_DEBUG_DEFAULT                  0
 #define CEREBROD_LISTEN_DEBUG_DEFAULT                 0
 #define CEREBROD_UPDOWN_SERVER_DEBUG_DEFAULT          0
+#define CEREBROD_STATUS_SERVER_DEBUG_DEFAULT          0
 
 /*
  * struct cerebrod_config 
@@ -65,11 +69,14 @@ struct cerebrod_config
 
   int updown_server;
   unsigned int updown_server_port;
+  int status_server;
+  unsigned int status_server_port;
 
 #if CEREBRO_DEBUG
   int speak_debug;
   int listen_debug;
   int updown_server_debug;
+  int status_server_debug;
 #endif /* CEREBRO_DEBUG */
 
   /* Determined by cerebrod based on configuration */
