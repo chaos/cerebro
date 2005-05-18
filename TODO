@@ -21,9 +21,11 @@ Portability
 - Non-pthreads support
 
 Design/Re-Code
+- How user get list of all nodes?
 - default timeout_len configurable in config file
   - necessary for event based up/down
 - merge server datas into one hash??
+- merge servers into one server??
 - gendersllnl config, up listening threads dependent on cluster size
   i.e. 4 threads for mcr/thunder size clusters?
 - support float/double/string for status monitoring
