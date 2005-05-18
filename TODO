@@ -12,6 +12,7 @@ Cleanup
 - merge server data into one hash??
 - need better name for status stuff??
   - call metric??
+- status_type data conversion thingie
 
 Audit
 - code review to reduce memory footprint

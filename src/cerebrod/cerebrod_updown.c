@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.c,v 1.58 2005-05-17 20:53:59 achu Exp $
+ *  $Id: cerebrod_updown.c,v 1.59 2005-05-18 00:53:53 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -236,7 +236,7 @@ _cerebrod_updown_initialize(void)
 
           ud->nodename = Strdup(nodes[i]);
           ud->discovered = 0;
-          ud->last_received = 0;
+          ud->last_received_time = 0;
           Pthread_mutex_init(&(ud->updown_node_data_lock), NULL);
 
           List_append(updown_node_data, ud);
@@ -739,14 +739,14 @@ _cerebrod_updown_evaluate_updown_state(void *x, void *arg)
                      __FILE__, __FUNCTION__, __LINE__);
 
   /* With locking, it shouldn't be possible for local time to be
-   * greater than the time stored in any last_received time.
+   * greater than the time stored in any last_received_time.
    */
-  if (ed->time_now < ud->last_received)
-    cerebro_err_debug("%s(%s:%d): last_received time later than time_now time",
+  if (ed->time_now < ud->last_received_time)
+    cerebro_err_debug("%s(%s:%d): last_received_time later than time_now time",
                       __FILE__, __FUNCTION__, __LINE__);
 #endif /* CEREBRO_DEBUG */
 
-  if ((ed->time_now - ud->last_received) < ed->timeout_len)
+  if ((ed->time_now - ud->last_received_time) < ed->timeout_len)
     updown_state = CEREBRO_UPDOWN_PROTOCOL_STATE_NODE_UP;
   else
     updown_state = CEREBRO_UPDOWN_PROTOCOL_STATE_NODE_DOWN;
@@ -1106,12 +1106,12 @@ _cerebrod_updown_output_update(struct cerebrod_updown_node_data *ud)
       struct tm tm;
       char strbuf[CEREBROD_STRING_BUFLEN];
  
-      Localtime_r((time_t *)&(ud->last_received), &tm);
+      Localtime_r((time_t *)&(ud->last_received_time), &tm);
       strftime(strbuf, CEREBROD_STRING_BUFLEN, "%H:%M:%S", &tm);
  
       Pthread_mutex_lock(&debug_output_mutex);
       fprintf(stderr, "**************************************\n");
-      fprintf(stderr, "* Updown Server Update: Node=%s Last_Received=%s\n", 
+      fprintf(stderr, "* Updown Server Update: Node=%s Last_Received_Time=%s\n", 
 	      ud->nodename, strbuf);
       fprintf(stderr, "**************************************\n");
       Pthread_mutex_unlock(&debug_output_mutex);
@@ -1135,8 +1135,8 @@ _cerebrod_updown_dump_updown_node_data_item(void *x, void *arg)
   ud = (struct cerebrod_updown_node_data *)x;
  
   Pthread_mutex_lock(&(ud->updown_node_data_lock));
-  fprintf(stderr, "* %s: discovered=%d last_received=%u\n",
-          ud->nodename, ud->discovered, ud->last_received);
+  fprintf(stderr, "* %s: discovered=%d last_received_time=%u\n",
+          ud->nodename, ud->discovered, ud->last_received_time);
   Pthread_mutex_unlock(&(ud->updown_node_data_lock));
  
   return 1;
@@ -1187,7 +1187,7 @@ _cerebrod_updown_dump_updown_node_data_list(void)
 }
 
 void 
-cerebrod_updown_update_data(char *nodename, u_int32_t last_received)
+cerebrod_updown_update_data(char *nodename, u_int32_t received_time)
 {
   struct cerebrod_updown_node_data *ud;
   int update_output_flag = 0;
@@ -1228,10 +1228,10 @@ cerebrod_updown_update_data(char *nodename, u_int32_t last_received)
   Pthread_mutex_unlock(&updown_node_data_lock);
   
   Pthread_mutex_lock(&(ud->updown_node_data_lock));
-  if (last_received >= ud->last_received)
+  if (received_time >= ud->last_received_time)
     {
       ud->discovered = 1;
-      ud->last_received = last_received;
+      ud->last_received_time = received_time;
       update_output_flag++;
 
       /* Can't call a debug output function in here, it can cause a

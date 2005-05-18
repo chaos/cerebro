@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.h,v 1.9 2005-04-27 18:11:35 achu Exp $
+ *  $Id: cerebrod_updown.h,v 1.10 2005-05-18 00:53:53 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_UPDOWN_H
@@ -26,7 +26,7 @@ struct cerebrod_updown_node_data
 {
   char *nodename;
   int discovered;
-  u_int32_t last_received;
+  u_int32_t last_received_time;
   pthread_mutex_t updown_node_data_lock;
 };
 
@@ -44,7 +44,6 @@ struct cerebrod_updown_evaluation_data
   List node_responses;
 };
 
-
 /*
  * cerebrod_updown
  *
@@ -59,9 +58,8 @@ void *cerebrod_updown(void *);
 /* 
  * cerebrod_updown_update_data
  *
- * Update updown server with last_received time for a specific cluster
- * node
+ * Update updown server with received time for a specific cluster node
  */
-void cerebrod_updown_update_data(char *nodename, u_int32_t last_received);
+void cerebrod_updown_update_data(char *nodename, u_int32_t received_time);
 
 #endif /* _CEREBROD_UPDOWN_H */
