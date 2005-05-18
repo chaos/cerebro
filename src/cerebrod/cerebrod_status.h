@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_status.h,v 1.4 2005-05-18 00:53:53 achu Exp $
+ *  $Id: cerebrod_status.h,v 1.5 2005-05-18 18:53:00 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_STATUS_H
@@ -14,6 +14,8 @@
 #endif /* HAVE_PTHREAD_H */
 
 #include <sys/types.h>
+
+#include "cerebro/cerebrod_heartbeat_protocol.h"
 
 #include "hash.h"
 
@@ -79,13 +81,10 @@ void *cerebrod_status(void *);
 /* 
  * cerebrod_status_update_data
  *
- * Update status server with last_received time for a specific cluster
- * node
+ * Update status server with status data
  */
 void cerebrod_status_update_data(char *nodename, 
-                                 char *status_name,
-                                 cerebrod_status_type_t status_type,
-                                 cerebrod_status_value_t status_val,
+                                 struct cerebrod_heartbeat *hb,
                                  u_int32_t received_time);
 
 #endif /* _CEREBROD_STATUS_H */

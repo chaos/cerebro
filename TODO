@@ -9,7 +9,6 @@ Testing
 Cleanup
 - common code for looping servers??
 - common code for various server code
-- merge server data into one hash??
 - need better name for status stuff??
   - call metric??
 - status_type data conversion thingie
@@ -21,9 +20,10 @@ Portability
 - IPv6
 - Non-pthreads support
 
-Design
-
-Later Design
+Design/Re-Code
+- merge server datas into one hash??
+- gendersllnl config, up listening threads dependent on cluster size
+  i.e. 4 threads for mcr/thunder size clusters?
 - support float/double/string for status monitoring
 - how remove status data?
 - need list for updown server??

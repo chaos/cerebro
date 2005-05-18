@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.61 2005-05-17 22:40:02 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.62 2005-05-18 18:53:00 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -22,12 +22,14 @@
 #include "cerebro_module.h"
 #include "cerebro/cerebro_constants.h"
 #include "cerebro/cerebro_error.h"
+#include "cerebro/cerebro_status_protocol.h"
 #include "cerebro/cerebrod_heartbeat_protocol.h"
 
 #include "cerebrod.h"
 #include "cerebrod_config.h"
 #include "cerebrod_heartbeat.h"
 #include "cerebrod_listener.h"
+#include "cerebrod_status.h"
 #include "cerebrod_updown.h"
 #include "wrappers.h"
 
@@ -371,8 +373,12 @@ cerebrod_listener(void *arg)
 	}
 
       Gettimeofday(&tv, NULL);
+
       if (conf.updown_server)
 	cerebrod_updown_update_data(nodename_key, tv.tv_sec);
+
+      if (conf.status_server)
+        cerebrod_status_update_data(nodename_key, &hb, tv.tv_sec);
     }
 
   return NULL;			/* NOT REACHED */

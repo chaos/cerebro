@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_status_protocol.h,v 1.3 2005-05-17 22:33:44 achu Exp $
+ *  $Id: cerebro_status_protocol.h,v 1.4 2005-05-18 18:53:01 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_STATUS_PROTOCOL_H
@@ -43,6 +43,9 @@
 #define CEREBRO_STATUS_PROTOCOL_SERVER_TIMEOUT_LEN         3
 #define CEREBRO_STATUS_PROTOCOL_CLIENT_TIMEOUT_LEN         5
 #define CEREBRO_STATUS_PROTOCOL_CONNECT_TIMEOUT_LEN        5
+
+#define CEREBRO_STATUS_STARTTIME                           "starttime"
+#define CEREBRO_STATUS_BOOTTIME                            "boottime"
 
 #if 0
 

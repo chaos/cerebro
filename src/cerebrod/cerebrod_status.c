@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_status.c,v 1.4 2005-05-18 00:53:53 achu Exp $
+ *  $Id: cerebrod_status.c,v 1.5 2005-05-18 18:53:00 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -1116,7 +1116,7 @@ _cerebrod_status_output_update(struct cerebrod_status_node_data *sd,
     {
       Pthread_mutex_lock(&debug_output_mutex);
       fprintf(stderr, "**************************************\n");
-      fprintf(stderr, "* Status Server Update: Node=%s Status_Name=%s\n", 
+      fprintf(stderr, "* Status Server Update: Node=%s Status_Name=\"%s\"\n", 
 	      sd->nodename, status_name);
       fprintf(stderr, "**************************************\n");
       Pthread_mutex_unlock(&debug_output_mutex);
@@ -1124,10 +1124,9 @@ _cerebrod_status_output_update(struct cerebrod_status_node_data *sd,
 #endif /* CEREBRO_DEBUG */
 }
 
-#if 0
 #if CEREBRO_DEBUG
 /*
- * _cerebrod_status_dump_status_node_data_item
+ * _cerebrod_status_dump_status_data_item
  *
  * callback function from hash_for_each to dump status node data
  */
@@ -1135,20 +1134,23 @@ static int
 _cerebrod_status_dump_status_data_item(void *data, const void *key, void *arg)
 {
   struct cerebrod_status_data *status_data;
- 
-  assert(x);
+  char *nodename;
+
+  assert(data);
   assert(key);
+  assert(arg);
 
   status_data = (struct cerebrod_status_data *)data;
+  nodename = (char *)arg;
 
   fprintf(stderr, "* %s: status_name=%s status_type=%d ",
-          (char *)key,
+          nodename,
           status_data->status_name,
           status_data->status_type);
   if (status_data->status_type == CEREBROD_STATUS_TYPE_INT32_T)
-    fprintf(stderr, "status_value=%d", status_data->status_value.val_int32_t);
+    fprintf(stderr, "status_value=%d", status_data->status_value.val_int32);
   else if (status_data->status_type == CEREBROD_STATUS_TYPE_U_INT32_T)
-    fprintf(stderr, "status_value=%u", status_data->status_value.val_u_int32_t);
+    fprintf(stderr, "status_value=%u", status_data->status_value.val_u_int32);
   else
     cerebro_err_debug("%s(%s:%d): nodename=%s invalid status_type=%d",
                       __FILE__, __FUNCTION__, __LINE__,
@@ -1176,12 +1178,16 @@ _cerebrod_status_dump_status_node_data_item(void *x, void *arg)
   sd = (struct cerebrod_status_node_data *)x;
  
   Pthread_mutex_lock(&(sd->status_node_data_lock));
-
   num = Hash_for_each(sd->status_data,
-                      
-                      NULL);
-  fprintf(stderr, "* %s: discovered=%d last_received=%u\n",
-          sd->nodename, sd->discovered, sd->last_received);
+                      _cerebrod_status_dump_status_data_item,
+                      sd->nodename);
+  if (num != sd->status_data_count)
+    {
+      fprintf(stderr, "_cerebrod_status_dump_status_node_data_item: "
+              "invalid dump count: num=%d numnodes=%d",
+              num, sd->status_data_count);
+      exit(1);
+    }
   Pthread_mutex_unlock(&(sd->status_node_data_lock));
  
   return 1;
@@ -1230,14 +1236,18 @@ _cerebrod_status_dump_status_node_data_list(void)
     }
 #endif /* CEREBRO_DEBUG */
 }
-#endif /* 0 */
 
-void 
-cerebrod_status_update_data(char *nodename,
-                            char *status_name,
-                            cerebrod_status_type_t status_type,
-                            cerebrod_status_value_t status_value,
-                            u_int32_t received_time)
+/* 
+ * _cerebrod_status_update_status_data
+ *
+ * Update the data of a particular status
+ */
+static void
+_cerebrod_status_update_status_data(char *nodename,
+                                    char *status_name,
+                                    cerebrod_status_type_t status_type,
+                                    cerebrod_status_value_t status_value,
+                                    u_int32_t received_time)
 {
   struct cerebrod_status_node_data *sd;
   int update_output_flag = 0;
@@ -1246,10 +1256,6 @@ cerebrod_status_update_data(char *nodename,
   assert(status_name);
   assert(status_type == CEREBROD_STATUS_TYPE_INT32_T
          || status_type == CEREBROD_STATUS_TYPE_U_INT32_T);
-
-  if (!cerebrod_status_initialization_complete)
-    cerebro_err_exit("%s(%s:%d): initialization not complete",
-                     __FILE__, __FUNCTION__, __LINE__);
 
   Pthread_mutex_lock(&status_node_data_lock);
   if (!(sd = Hash_find(status_node_data_index, nodename)))
@@ -1335,9 +1341,36 @@ cerebrod_status_update_data(char *nodename,
 
   if (update_output_flag)
     _cerebrod_status_output_update(sd, status_name);
+}
 
-#if 0
-  _cerebrod_status_dump_updown_node_data_list();
-#endif /* 0 */
+void 
+cerebrod_status_update_data(char *nodename,
+                            struct cerebrod_heartbeat *hb,
+                            u_int32_t received_time)
+{
+  cerebrod_status_value_t val;
+
+  assert(nodename);
+  assert(hb);
+  
+  if (!cerebrod_status_initialization_complete)
+    cerebro_err_exit("%s(%s:%d): initialization not complete",
+                     __FILE__, __FUNCTION__, __LINE__);
+
+  val.val_u_int32 = hb->starttime;
+  _cerebrod_status_update_status_data(nodename,
+                                      CEREBRO_STATUS_STARTTIME,
+                                      CEREBROD_STATUS_TYPE_U_INT32_T,
+                                      val,
+                                      received_time);
+ 
+  val.val_u_int32 = hb->boottime;
+  _cerebrod_status_update_status_data(nodename,
+                                      CEREBRO_STATUS_BOOTTIME,
+                                      CEREBROD_STATUS_TYPE_U_INT32_T,
+                                      val,
+                                      received_time);
+
+  _cerebrod_status_dump_status_node_data_list();
 }
 
