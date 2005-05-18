@@ -21,6 +21,8 @@ Portability
 - Non-pthreads support
 
 Design/Re-Code
+- default timeout_len configurable in config file
+  - necessary for event based up/down
 - merge server datas into one hash??
 - gendersllnl config, up listening threads dependent on cluster size
   i.e. 4 threads for mcr/thunder size clusters?
