@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_marshalling.h,v 1.7 2005-05-11 17:40:52 achu Exp $
+ *  $Id: cerebro_marshalling.h,v 1.8 2005-05-19 19:59:40 achu Exp $
 \*****************************************************************************/
  
 #ifndef _CEREBRO_MARSHALLING_H
@@ -40,6 +40,24 @@ int _cerebro_marshall_uint8(u_int8_t val, char *buf, unsigned int buflen);
  * Returns length of data copied into buffer, -1 on error
  */
 int _cerebro_marshall_uint32(u_int32_t val, char *buf, unsigned int buflen);
+
+/*
+ * _cerebro_marshall_float
+ *
+ * marshall contents of a float
+ *
+ * Returns length of data copied into buffer, -1 on error
+ */
+int _cerebro_marshall_float(float val, char *buf, unsigned int buflen);
+
+/*
+ * _cerebro_marshall_double
+ *
+ * marshall contents of a double
+ *
+ * Returns length of data copied into buffer, -1 on error
+ */
+int _cerebro_marshall_double(double val, char *buf, unsigned int buflen);
 
 /*
  * _cerebro_marshall_buffer
@@ -98,6 +116,30 @@ int _cerebro_unmarshall_uint8(u_int8_t *val,
  * not contain enough data, -1 on error
  */
 int _cerebro_unmarshall_uint32(u_int32_t *val, 
+                               const char *buf, 
+                               unsigned int buflen);
+
+/*
+ * _cerebro_unmarshall_float
+ *
+ * unmarshall contents of a float
+ *
+ * Returns length of data unmarshalled from buffer, 0 if buffer does
+ * not contain enough data, -1 on error
+ */
+int _cerebro_unmarshall_float(float *val, 
+                              const char *buf, 
+                              unsigned int buflen);
+
+/*
+ * _cerebro_unmarshall_double
+ *
+ * unmarshall contents of a double
+ *
+ * Returns length of data unmarshalled from buffer, 0 if buffer does
+ * not contain enough data, -1 on error
+ */
+int _cerebro_unmarshall_double(double *val, 
                                const char *buf, 
                                unsigned int buflen);
 

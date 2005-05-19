@@ -7,6 +7,12 @@ support our Linux clusters. Over time, it was apparent that an
 internally developed monitoring tool was needed instead of a heavily
 modified Ganglia.
 
+- things made better
+   - not sleep(1)
+   - not need to modify code to monitor new things
+   - with library interface rather than gmetric
+   - and module interface
+
 Albert Chu
 chu11@llnl.gov
 Lawrence Livermore National Laboratories    
