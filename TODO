@@ -22,6 +22,7 @@ Portability
 
 Design/Re-Code
 - How user get list of all nodes?
+- only one load function for libcerebro?
 - default timeout_len configurable in config file
   - necessary for event based up/down
 - merge server datas into one hash??
