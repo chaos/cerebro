@@ -1,34 +1,11 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.h,v 1.10 2005-05-18 00:53:53 achu Exp $
+ *  $Id: cerebrod_updown.h,v 1.11 2005-05-19 22:21:10 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_UPDOWN_H
 #define _CEREBROD_UPDOWN_H
 
-#if HAVE_CONFIG_H
-#include "config.h"
-#endif /* HAVE_CONFIG_H */
-
-#if HAVE_PTHREAD_H
-#include <pthread.h>
-#endif /* HAVE_PTHREAD_H */
-
 #include "list.h"
-
-#define CEREBROD_UPDOWN_REINITIALIZE_WAIT 2
-
-/*
- * struct cerebrod_updown_node_data
- *
- * contains cerebrod updown node data
- */
-struct cerebrod_updown_node_data
-{
-  char *nodename;
-  int discovered;
-  u_int32_t last_received_time;
-  pthread_mutex_t updown_node_data_lock;
-};
 
 /* 
  * struct cerebrod_updown_evaluation_data
@@ -54,12 +31,5 @@ struct cerebrod_updown_evaluation_data
  * Executed in detached state, no return value.
  */
 void *cerebrod_updown(void *);
-
-/* 
- * cerebrod_updown_update_data
- *
- * Update updown server with received time for a specific cluster node
- */
-void cerebrod_updown_update_data(char *nodename, u_int32_t received_time);
 
 #endif /* _CEREBROD_UPDOWN_H */

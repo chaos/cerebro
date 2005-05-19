@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_protocol.h,v 1.1 2005-05-19 16:40:40 achu Exp $
+ *  $Id: cerebro_metric_protocol.h,v 1.2 2005-05-19 22:21:10 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_METRIC_PROTOCOL_H
@@ -68,9 +68,11 @@
 
 #endif /* 0 */
 
-#define CEREBRO_METRIC_SERVER_PORT  8853
+#define CEREBRO_METRIC_SERVER_PORT    8853
 
-#define CEREBRO_METRIC_MAX          16
+#define CEREBRO_METRIC_MAX            16
+
+#define CEREBRO_METRIC_STRING_MAXLEN  64
 
 #if 0
 

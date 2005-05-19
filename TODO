@@ -9,6 +9,7 @@ Cleanup
 - common code for looping servers??
 - common code for various server code
 - metric_type data conversion thingie
+- cleanup common hash into "data" and put in data.c??
 
 Audit
 - code review to reduce memory footprint

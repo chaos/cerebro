@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.c,v 1.60 2005-05-19 21:36:51 achu Exp $
+ *  $Id: cerebrod_updown.c,v 1.61 2005-05-19 22:21:10 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -26,22 +26,26 @@
 
 #include "cerebrod.h"
 #include "cerebrod_config.h"
+#include "cerebrod_node_data.h"
 #include "cerebrod_updown.h"
 #include "cerebrod_util.h"
 #include "fd.h"
 #include "list.h"
 #include "wrappers.h"
 
-#define CEREBROD_UPDOWN_BACKLOG                        10
-
-#define CEREBROD_UPDOWN_NODE_DATA_INDEX_SIZE_DEFAULT   1024
-#define CEREBROD_UPDOWN_NODE_DATA_INDEX_SIZE_INCREMENT 1024
-#define CEREBROD_UPDOWN_REHASH_LIMIT                   (updown_node_data_index_size*2)
+#define CEREBROD_UPDOWN_BACKLOG           10
+#define CEREBROD_UPDOWN_REINITIALIZE_WAIT 2
 
 extern struct cerebrod_config conf;
 #if CEREBRO_DEBUG
 extern pthread_mutex_t debug_output_mutex;
 #endif /* CEREBRO_DEBUG */
+
+extern List cerebrod_node_data_list;
+extern hash_t cerebrod_node_data_index;
+extern int cerebrod_node_data_index_numnodes;
+extern int cerebrod_node_data_index_size;
+extern pthread_mutex_t cerebrod_node_data_lock;
 
 /*
  * cerebrod_updown_initialization_complete
@@ -61,33 +65,6 @@ pthread_mutex_t cerebrod_updown_initialization_complete_lock = PTHREAD_MUTEX_INI
  * updown server file descriptor
  */
 int updown_fd = 0;
-
-/* 
- * updown_node_data
- *
- * contains list of nodes with last received times
- */
-List updown_node_data = NULL;
-
-/*
- * updown_node_data_index
- * updown_node_data_index_numnodes
- * updown_node_data_index_size
- *
- * hash index into updown_node_data list for faster access, number of
- * currently indexed entries, and index size
- */
-hash_t updown_node_data_index = NULL;
-int updown_node_data_index_numnodes;
-int updown_node_data_index_size;
-
-/*  
- * updown_node_data_lock
- *
- * lock to protect pthread access to both updown node data list and
- * index
- */
-pthread_mutex_t updown_node_data_lock = PTHREAD_MUTEX_INITIALIZER;
 
 /*
  * _cerebrod_updown_create_and_setup_socket
@@ -162,21 +139,6 @@ _cerebrod_updown_create_and_setup_socket(void)
   return temp_fd;
 }
 
-/* 
- * _updown_node_data_strcmp
- *
- * callback function for list_sort to sort updown node names
- */
-static int 
-_updown_node_data_strcmp(void *x, void *y)
-{
-  assert(x);
-  assert(y);
-
-  return strcmp(((struct cerebrod_updown_node_data *)x)->nodename,
-                ((struct cerebrod_updown_node_data *)y)->nodename);
-}
-
 /*
  * _cerebrod_updown_initialize
  *
@@ -185,71 +147,15 @@ _updown_node_data_strcmp(void *x, void *y)
 static void
 _cerebrod_updown_initialize(void)
 {
-  int numnodes = 0;
-
   Pthread_mutex_lock(&cerebrod_updown_initialization_complete_lock);
   if (cerebrod_updown_initialization_complete)
     goto out;
 
+  cerebrod_node_data_initialize();
+
   if ((updown_fd = _cerebrod_updown_create_and_setup_socket()) < 0)
     cerebro_err_exit("%s(%s:%d): updown_fd setup failed",
                      __FILE__, __FUNCTION__, __LINE__);
-
-  if ((numnodes = _cerebro_clusterlist_module_numnodes()) < 0)
-    cerebro_err_exit("%s(%s:%d): _cerebro_clusterlist_module_numnodes",
-		     __FILE__, __FUNCTION__, __LINE__);
-
-  if (numnodes > 0)
-    {
-      updown_node_data_index_numnodes = numnodes;
-      updown_node_data_index_size = numnodes;
-    }
-  else
-    {
-      updown_node_data_index_numnodes = 0;
-      updown_node_data_index_size = CEREBROD_UPDOWN_NODE_DATA_INDEX_SIZE_DEFAULT;
-    }
-
-  updown_node_data = List_create((ListDelF)_Free);
-  updown_node_data_index = Hash_create(updown_node_data_index_size,
-                                       (hash_key_f)hash_key_string,
-                                       (hash_cmp_f)strcmp,
-                                       (hash_del_f)_Free);
-  
-  /* If the clusterlist module contains nodes, retrieve all of these
-   * nodes and put them into the updown_node_data list.  All updates
-   * will involve updating data rather than involve insertion.
-   */
-  if (numnodes > 0)
-    {
-      int i;
-      char **nodes;
-
-      if (_cerebro_clusterlist_module_get_all_nodes(&nodes) < 0)
-        cerebro_err_exit("%s(%s:%d): _cerebro_clusterlist_module_get_all_nodes",
-                         __FILE__, __FUNCTION__, __LINE__);
-
-      for (i = 0; i < numnodes; i++)
-        {
-          struct cerebrod_updown_node_data *ud;
-
-          ud = Malloc(sizeof(struct cerebrod_updown_node_data));
-
-          ud->nodename = Strdup(nodes[i]);
-          ud->discovered = 0;
-          ud->last_received_time = 0;
-          Pthread_mutex_init(&(ud->updown_node_data_lock), NULL);
-
-          List_append(updown_node_data, ud);
-          Hash_insert(updown_node_data_index, Strdup(nodes[i]), ud);
-
-          list_sort(updown_node_data, (ListCmpF)_updown_node_data_strcmp);
-
-          free(nodes[i]);
-        }
-
-      free(nodes);
-    }
 
   Pthread_mutex_lock(&cerebrod_updown_initialization_complete_lock);
   cerebrod_updown_initialization_complete++;
@@ -719,7 +625,7 @@ _cerebrod_updown_respond_with_error(int client_fd,
 static int
 _cerebrod_updown_evaluate_updown_state(void *x, void *arg)
 {
-  struct cerebrod_updown_node_data *ud;
+  struct cerebrod_node_data *nd;
   struct cerebrod_updown_evaluation_data *ed;
   struct cerebro_updown_response *res = NULL;
   u_int8_t updown_state;
@@ -730,12 +636,12 @@ _cerebrod_updown_evaluate_updown_state(void *x, void *arg)
   assert(x);
   assert(arg);
 
-  ud = (struct cerebrod_updown_node_data *)x;
+  nd = (struct cerebrod_node_data *)x;
   ed = (struct cerebrod_updown_evaluation_data *)arg;
   
 #if CEREBRO_DEBUG
   /* Should be called with lock already set */
-  rv = Pthread_mutex_trylock(&updown_node_data_lock);
+  rv = Pthread_mutex_trylock(&cerebrod_node_data_lock);
   if (rv != EBUSY)
     cerebro_err_exit("%s(%s:%d): mutex not locked",	
                      __FILE__, __FUNCTION__, __LINE__);
@@ -743,12 +649,12 @@ _cerebrod_updown_evaluate_updown_state(void *x, void *arg)
   /* With locking, it shouldn't be possible for local time to be
    * greater than the time stored in any last_received_time.
    */
-  if (ed->time_now < ud->last_received_time)
+  if (ed->time_now < nd->last_received_time)
     cerebro_err_debug("%s(%s:%d): last_received_time later than time_now time",
                       __FILE__, __FUNCTION__, __LINE__);
 #endif /* CEREBRO_DEBUG */
 
-  if ((ed->time_now - ud->last_received_time) < ed->timeout_len)
+  if ((ed->time_now - nd->last_received_time) < ed->timeout_len)
     updown_state = CEREBRO_UPDOWN_PROTOCOL_STATE_NODE_UP;
   else
     updown_state = CEREBRO_UPDOWN_PROTOCOL_STATE_NODE_DOWN;
@@ -764,13 +670,13 @@ _cerebrod_updown_evaluate_updown_state(void *x, void *arg)
   res->updown_err_code = CEREBRO_UPDOWN_PROTOCOL_ERR_SUCCESS;
   res->end_of_responses = CEREBRO_UPDOWN_PROTOCOL_IS_NOT_LAST_RESPONSE;
 #if CEREBRO_DEBUG
-  if (ud->nodename && strlen(ud->nodename) > CEREBRO_MAXNODENAMELEN)
+  if (nd->nodename && strlen(nd->nodename) > CEREBRO_MAXNODENAMELEN)
     cerebro_err_debug("%s(%s:%d): invalid node name length: %s", 
                       __FILE__, __FUNCTION__, __LINE__,
-                      ud->nodename);
+                      nd->nodename);
 #endif /* CEREBRO_DEBUG */
   /* strncpy, b/c terminating character not required */
-  strncpy(res->nodename, ud->nodename, CEREBRO_MAXNODENAMELEN);
+  strncpy(res->nodename, nd->nodename, CEREBRO_MAXNODENAMELEN);
   res->updown_state = updown_state;
 
   if (!list_append(ed->node_responses, res))
@@ -832,15 +738,14 @@ _cerebrod_updown_respond_with_updown_nodes(int client_fd,
 	 || updown_request == CEREBRO_UPDOWN_PROTOCOL_REQUEST_DOWN_NODES
 	 || updown_request == CEREBRO_UPDOWN_PROTOCOL_REQUEST_UP_AND_DOWN_NODES);
   assert(timeout_len);
-  assert(updown_node_data);
 
   memset(&ed, '\0', sizeof(struct cerebrod_updown_evaluation_data));
 
-  Pthread_mutex_lock(&updown_node_data_lock);
+  Pthread_mutex_lock(&cerebrod_node_data_lock);
   
-  if (!List_count(updown_node_data))
+  if (!List_count(cerebrod_node_data_list))
     {
-      Pthread_mutex_unlock(&updown_node_data_lock);
+      Pthread_mutex_unlock(&cerebrod_node_data_lock);
       goto end_response;
     }
 
@@ -849,7 +754,7 @@ _cerebrod_updown_respond_with_updown_nodes(int client_fd,
       cerebro_err_debug("%s(%s:%d): list_create: %s", 
                         __FILE__, __FUNCTION__, __LINE__,
                         strerror(errno));
-      Pthread_mutex_unlock(&updown_node_data_lock);
+      Pthread_mutex_unlock(&cerebrod_node_data_lock);
       _cerebrod_updown_respond_with_error(client_fd,
                                           version,
 					  CEREBRO_UPDOWN_PROTOCOL_ERR_INTERNAL_SYSTEM_ERROR);
@@ -863,11 +768,11 @@ _cerebrod_updown_respond_with_updown_nodes(int client_fd,
   ed.time_now = tv.tv_sec;
   ed.node_responses = node_responses;
 
-  if (list_for_each(updown_node_data, 
+  if (list_for_each(cerebrod_node_data_list, 
 		    _cerebrod_updown_evaluate_updown_state, 
 		    &ed) < 0)
     {
-      Pthread_mutex_unlock(&updown_node_data_lock);
+      Pthread_mutex_unlock(&cerebrod_node_data_lock);
       _cerebrod_updown_respond_with_error(client_fd,
                                           version,
 					  CEREBRO_UPDOWN_PROTOCOL_ERR_INTERNAL_SYSTEM_ERROR);
@@ -877,7 +782,7 @@ _cerebrod_updown_respond_with_updown_nodes(int client_fd,
   /* Evaluation is done.  Transmission of the results can be done
    * without this lock.
    */
-  Pthread_mutex_unlock(&updown_node_data_lock);
+  Pthread_mutex_unlock(&cerebrod_node_data_lock);
 
   if (List_count(node_responses))
     {
@@ -885,7 +790,7 @@ _cerebrod_updown_respond_with_updown_nodes(int client_fd,
 			_cerebrod_updown_response_send_all, 
 			&client_fd) < 0)
         {
-          Pthread_mutex_unlock(&updown_node_data_lock);
+          Pthread_mutex_unlock(&cerebrod_node_data_lock);
           _cerebrod_updown_respond_with_error(client_fd,
                                               version,
                                               CEREBRO_UPDOWN_PROTOCOL_ERR_INTERNAL_SYSTEM_ERROR);
@@ -1068,182 +973,4 @@ cerebrod_updown(void *arg)
     }
 
   return NULL;			/* NOT REACHED */
-}
-
-/*  
- * _cerebrod_updown_output_insert
- *
- * Output debugging info about a recently inserted node
- */
-static void
-_cerebrod_updown_output_insert(struct cerebrod_updown_node_data *ud)
-{
-#if CEREBRO_DEBUG
-  assert(ud);
- 
-  if (conf.debug && conf.updown_server_debug)
-    {
-      Pthread_mutex_lock(&debug_output_mutex);
-      fprintf(stderr, "**************************************\n");
-      fprintf(stderr, "* Updown Server Insertion: Node=%s\n", ud->nodename);
-      fprintf(stderr, "**************************************\n");
-      Pthread_mutex_unlock(&debug_output_mutex);
-    }
-#endif /* CEREBRO_DEBUG */
-}
-
-/*  
- * _cerebrod_updown_output_update
- *
- * Output debugging info about a recently updated node
- */
-static void
-_cerebrod_updown_output_update(struct cerebrod_updown_node_data *ud)
-{
-#if CEREBRO_DEBUG
-  assert(ud);
- 
-  if (conf.debug && conf.updown_server_debug)
-    {
-      struct tm tm;
-      char strbuf[CEREBROD_STRING_BUFLEN];
- 
-      Localtime_r((time_t *)&(ud->last_received_time), &tm);
-      strftime(strbuf, CEREBROD_STRING_BUFLEN, "%H:%M:%S", &tm);
- 
-      Pthread_mutex_lock(&debug_output_mutex);
-      fprintf(stderr, "**************************************\n");
-      fprintf(stderr, "* Updown Server Update: Node=%s Last_Received_Time=%s\n", 
-	      ud->nodename, strbuf);
-      fprintf(stderr, "**************************************\n");
-      Pthread_mutex_unlock(&debug_output_mutex);
-    }
-#endif /* CEREBRO_DEBUG */
-}
-
-/*
- * _cerebrod_updown_dump_updown_node_data_item
- *
- * callback function from hash_for_each to dump updown node data
- */
-#if CEREBRO_DEBUG
-static int
-_cerebrod_updown_dump_updown_node_data_item(void *x, void *arg)
-{
-  struct cerebrod_updown_node_data *ud;
- 
-  assert(x);
- 
-  ud = (struct cerebrod_updown_node_data *)x;
- 
-  Pthread_mutex_lock(&(ud->updown_node_data_lock));
-  fprintf(stderr, "* %s: discovered=%d last_received_time=%u\n",
-          ud->nodename, ud->discovered, ud->last_received_time);
-  Pthread_mutex_unlock(&(ud->updown_node_data_lock));
- 
-  return 1;
-}
-#endif /* CEREBRO_DEBUG */
-
-/*
- * _cerebrod_updown_dump_updown_node_data_list
- *
- * Dump contents of updown node data list
- */
-static void
-_cerebrod_updown_dump_updown_node_data_list(void)
-{
-#if CEREBRO_DEBUG
-  if (conf.debug && conf.updown_server_debug)
-    {
-      int num;
- 
-      Pthread_mutex_lock(&updown_node_data_lock);
-      Pthread_mutex_lock(&debug_output_mutex);
-      fprintf(stderr, "**************************************\n");
-      fprintf(stderr, "* Updown List State\n");
-      fprintf(stderr, "* -----------------------\n");
-      fprintf(stderr, "* Listed Nodes: %d\n", updown_node_data_index_numnodes);
-      fprintf(stderr, "* -----------------------\n");
-      if (updown_node_data_index_numnodes > 0)
-        {
-          num = List_for_each(updown_node_data,
-			      _cerebrod_updown_dump_updown_node_data_item,
-			      NULL);
-          if (num != updown_node_data_index_numnodes)
-	    {
-	      fprintf(stderr, "_cerebrod_updown_dump_updown_node_data: "
-		      "invalid dump count: num=%d numnodes=%d",
-		      num, updown_node_data_index_numnodes);
-	      exit(1);
-	    }
-        }
-      else
-        fprintf(stderr, "_cerebrod_updown_dump_node_data: "
-                "called with empty list\n");
-      fprintf(stderr, "**************************************\n");
-      Pthread_mutex_unlock(&debug_output_mutex);
-      Pthread_mutex_unlock(&updown_node_data_lock);
-    }
-#endif /* CEREBRO_DEBUG */
-}
-
-void 
-cerebrod_updown_update_data(char *nodename, u_int32_t received_time)
-{
-  struct cerebrod_updown_node_data *ud;
-  int update_output_flag = 0;
-
-  if (!cerebrod_updown_initialization_complete)
-    cerebro_err_exit("%s(%s:%d): initialization not complete",
-                     __FILE__, __FUNCTION__, __LINE__);
-
-  Pthread_mutex_lock(&updown_node_data_lock);
-  if (!(ud = Hash_find(updown_node_data_index, nodename)))
-    {
-      char *key;
-
-      ud = Malloc(sizeof(struct cerebrod_updown_node_data));
-
-      key = Strdup(nodename);
-
-      ud->nodename = Strdup(nodename);
-      Pthread_mutex_init(&(ud->updown_node_data_lock), NULL);
-
-      /* Re-hash if our hash is getting too small */
-      if ((updown_node_data_index_numnodes + 1) > CEREBROD_UPDOWN_REHASH_LIMIT)
-	cerebrod_rehash(&updown_node_data_index,
-			&updown_node_data_index_size,
-			CEREBROD_UPDOWN_NODE_DATA_INDEX_SIZE_INCREMENT,
-			updown_node_data_index_numnodes,
-			&updown_node_data_lock);
-
-      List_append(updown_node_data, ud);
-      Hash_insert(updown_node_data_index, key, ud);
-      updown_node_data_index_numnodes++;
-
-      /* Ok to call debug output function, since updown_node_data_lock
-       * is locked.
-       */
-      _cerebrod_updown_output_insert(ud);
-    }
-  Pthread_mutex_unlock(&updown_node_data_lock);
-  
-  Pthread_mutex_lock(&(ud->updown_node_data_lock));
-  if (received_time >= ud->last_received_time)
-    {
-      ud->discovered = 1;
-      ud->last_received_time = received_time;
-      update_output_flag++;
-
-      /* Can't call a debug output function in here, it can cause a
-       * deadlock b/c the updown_node_data_lock is not locked.
-       */
-    }
-  Pthread_mutex_unlock(&(ud->updown_node_data_lock));
-
-  if (update_output_flag)
-    _cerebrod_updown_output_update(ud);
-
-  _cerebrod_updown_dump_updown_node_data_list();
 }
