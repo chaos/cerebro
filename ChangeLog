@@ -1,3 +1,8 @@
+2005-05-19  Albert Chu  <chu11@llnl.gov>
+
+	* Rename status to metric due to design and goal differences from
+	original ganglia implementation.
+	
 2005-05-18  Albert Chu  <chu11@llnl.gov>
 
 	* Complete status listener.

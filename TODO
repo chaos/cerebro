@@ -9,9 +9,7 @@ Testing
 Cleanup
 - common code for looping servers??
 - common code for various server code
-- need better name for status stuff??
-  - call metric??
-- status_type data conversion thingie
+- metric_type data conversion thingie
 
 Audit
 - code review to reduce memory footprint
@@ -29,10 +27,10 @@ Design/Re-Code
 - merge servers into one server??
 - gendersllnl config, up listening threads dependent on cluster size
   i.e. 4 threads for mcr/thunder size clusters?
-- support float/double/string for status monitoring
-- how remove status data?
+- support float/double/string for metric monitoring
+- how remove metric data?
 - need list for updown server??
-- move listener hash into status hash 
+- move listener hash into metric hash 
 - strerror_r and errormsg_r funcs
 - libcerebro set configfile, module, etc. functions
 - generic err message in cerebro_t handle, i.e for conffile errors

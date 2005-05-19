@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.96 2005-05-17 20:53:59 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.97 2005-05-19 16:40:40 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -75,15 +75,15 @@ _cerebrod_config_default(void)
   conf.speak = CEREBROD_SPEAK_DEFAULT;
   conf.listen = CEREBROD_LISTEN_DEFAULT;
   conf.listen_threads = CEREBROD_LISTEN_THREADS_DEFAULT;
+  conf.metric_server = CEREBROD_METRIC_SERVER_DEFAULT;
+  conf.metric_server_port = CEREBROD_METRIC_SERVER_PORT_DEFAULT;
   conf.updown_server = CEREBROD_UPDOWN_SERVER_DEFAULT;
   conf.updown_server_port = CEREBROD_UPDOWN_SERVER_PORT_DEFAULT;
-  conf.status_server = CEREBROD_STATUS_SERVER_DEFAULT;
-  conf.status_server_port = CEREBROD_STATUS_SERVER_PORT_DEFAULT;
 #if CEREBRO_DEBUG
   conf.speak_debug = CEREBROD_SPEAK_DEBUG_DEFAULT;
   conf.listen_debug = CEREBROD_LISTEN_DEBUG_DEFAULT;
+  conf.metric_server_debug = CEREBROD_METRIC_SERVER_DEBUG_DEFAULT;
   conf.updown_server_debug = CEREBROD_UPDOWN_SERVER_DEBUG_DEFAULT;
-  conf.status_server_debug = CEREBROD_STATUS_SERVER_DEBUG_DEFAULT;
 #endif /* CEREBRO_DEBUG */
 }
 
@@ -249,23 +249,23 @@ _cerebrod_config_setup(void)
     conf.listen = conf_l.cerebrod_listen;
   if (conf_l.cerebrod_listen_threads_flag)
     conf.listen_threads = conf_l.cerebrod_listen_threads;
+  if (conf_l.cerebrod_metric_server_flag)
+    conf.metric_server = conf_l.cerebrod_metric_server;
+  if (conf_l.cerebrod_metric_server_port_flag)
+    conf.metric_server_port = conf_l.cerebrod_metric_server_port;
   if (conf_l.cerebrod_updown_server_flag)
     conf.updown_server = conf_l.cerebrod_updown_server;
   if (conf_l.cerebrod_updown_server_port_flag)
     conf.updown_server_port = conf_l.cerebrod_updown_server_port;
-  if (conf_l.cerebrod_status_server_flag)
-    conf.status_server = conf_l.cerebrod_status_server;
-  if (conf_l.cerebrod_status_server_port_flag)
-    conf.status_server_port = conf_l.cerebrod_status_server_port;
 #if CEREBRO_DEBUG
   if (conf_l.cerebrod_speak_debug_flag)
     conf.speak_debug = conf_l.cerebrod_speak_debug;
   if (conf_l.cerebrod_listen_debug_flag)
     conf.listen_debug = conf_l.cerebrod_listen_debug;
+  if (conf_l.cerebrod_metric_server_debug_flag)
+    conf.metric_server_debug = conf_l.cerebrod_metric_server_debug;
   if (conf_l.cerebrod_updown_server_debug_flag)
     conf.updown_server_debug = conf_l.cerebrod_updown_server_debug;
-  if (conf_l.cerebrod_status_server_debug_flag)
-    conf.status_server_debug = conf_l.cerebrod_status_server_debug;
 #endif /* CEREBRO_DEBUG */
 }
 
@@ -325,8 +325,21 @@ _cerebrod_pre_calculate_config_check(void)
    */
   if (!conf.listen)
     {
+      conf.metric_server = 0;
       conf.updown_server = 0;
-      conf.status_server = 0;
+    }
+
+  if (conf.metric_server)
+    {
+      if (conf.metric_server_port == conf.heartbeat_destination_port)
+	cerebro_err_exit("metric server port '%d' cannot be identical "
+                         "to heartbeat destination port");
+      if (conf.metric_server_port == conf.heartbeat_source_port)
+	cerebro_err_exit("metric server port '%d' cannot be identical "
+                         "to heartbeat source port");
+      if (conf.metric_server_port == conf.updown_server_port)
+	cerebro_err_exit("metric server port '%d' cannot be identical "
+                         "to updown server port");
     }
 
   if (conf.updown_server)
@@ -337,22 +350,9 @@ _cerebrod_pre_calculate_config_check(void)
       if (conf.updown_server_port == conf.heartbeat_source_port)
 	cerebro_err_exit("updown server port '%d' cannot be identical "
                          "to heartbeat source port");
-      if (conf.updown_server_port == conf.status_server_port)
+      if (conf.updown_server_port == conf.metric_server_port)
 	cerebro_err_exit("updown server port '%d' cannot be identical "
-                         "to status server port");
-    }
-
-  if (conf.status_server)
-    {
-      if (conf.status_server_port == conf.heartbeat_destination_port)
-	cerebro_err_exit("status server port '%d' cannot be identical "
-                         "to heartbeat destination port");
-      if (conf.status_server_port == conf.heartbeat_source_port)
-	cerebro_err_exit("status server port '%d' cannot be identical "
-                         "to heartbeat source port");
-      if (conf.status_server_port == conf.updown_server_port)
-	cerebro_err_exit("status server port '%d' cannot be identical "
-                         "to updown server port");
+                         "to metric server port");
     }
 }
 
@@ -895,14 +895,14 @@ _cerebrod_config_dump(void)
       fprintf(stderr, "* speak: %d\n", conf.speak);
       fprintf(stderr, "* listen: %d\n", conf.listen);
       fprintf(stderr, "* listen_threads: %d\n", conf.listen_threads);
+      fprintf(stderr, "* metric_server: %d\n", conf.metric_server);
+      fprintf(stderr, "* metric_server_port: %d\n", conf.metric_server_port);
       fprintf(stderr, "* updown_server: %d\n", conf.updown_server);
       fprintf(stderr, "* updown_server_port: %d\n", conf.updown_server_port);
-      fprintf(stderr, "* status_server: %d\n", conf.status_server);
-      fprintf(stderr, "* status_server_port: %d\n", conf.status_server_port);
       fprintf(stderr, "* speak_debug: %d\n", conf.speak_debug);
       fprintf(stderr, "* listen_debug: %d\n", conf.listen_debug);
+      fprintf(stderr, "* metric_server_debug: %d\n", conf.metric_server_debug);
       fprintf(stderr, "* updown_server_debug: %d\n", conf.updown_server_debug);
-      fprintf(stderr, "* status_server_debug: %d\n", conf.status_server_debug);
       fprintf(stderr, "* -------------------------------\n");
       fprintf(stderr, "* Calculated Configuration\n");
       fprintf(stderr, "* -------------------------------\n");

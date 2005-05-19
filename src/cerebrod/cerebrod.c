@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.49 2005-05-17 20:53:59 achu Exp $
+ *  $Id: cerebrod.c,v 1.50 2005-05-19 16:40:40 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -19,8 +19,8 @@
 #include "cerebrod_clusterlist.h"
 #include "cerebrod_config.h"
 #include "cerebrod_listener.h"
+#include "cerebrod_metric.h"
 #include "cerebrod_speaker.h"
-#include "cerebrod_status.h"
 #include "cerebrod_updown.h"
 #include "wrappers.h"
 
@@ -44,13 +44,13 @@ extern int cerebrod_listener_initialization_complete;
 extern pthread_cond_t cerebrod_listener_initialization_complete_cond;
 extern pthread_mutex_t cerebrod_listener_initialization_complete_lock;
 
+extern int cerebrod_metric_initialization_complete;
+extern pthread_cond_t cerebrod_metric_initialization_complete_cond;
+extern pthread_mutex_t cerebrod_metric_initialization_complete_lock;
+
 extern int cerebrod_updown_initialization_complete;
 extern pthread_cond_t cerebrod_updown_initialization_complete_cond;
 extern pthread_mutex_t cerebrod_updown_initialization_complete_lock;
-
-extern int cerebrod_status_initialization_complete;
-extern pthread_cond_t cerebrod_status_initialization_complete_cond;
-extern pthread_mutex_t cerebrod_status_initialization_complete_lock;
 
 #if CEREBRO_DEBUG
 /* 
@@ -171,6 +171,27 @@ main(int argc, char **argv)
    */
   openlog(argv[0], LOG_ODELAY | LOG_PID, LOG_DAEMON);
 
+  /* Start metric server.  Start before the listener begins receiving
+   * data.
+   */
+  if (conf.metric_server)
+    {
+      pthread_t thread;
+      pthread_attr_t attr;
+
+      Pthread_attr_init(&attr);
+      Pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+      Pthread_create(&thread, &attr, cerebrod_metric, NULL);
+      Pthread_attr_destroy(&attr);
+
+      /* Wait for initialization to complete */
+      Pthread_mutex_lock(&cerebrod_metric_initialization_complete_lock);
+      while (cerebrod_metric_initialization_complete == 0)
+        Pthread_cond_wait(&cerebrod_metric_initialization_complete_cond,
+                          &cerebrod_metric_initialization_complete_lock);
+      Pthread_mutex_unlock(&cerebrod_metric_initialization_complete_lock);
+    }
+
   /* Start updown server.  Start before the listener begins receiving
    * data.
    */
@@ -190,27 +211,6 @@ main(int argc, char **argv)
         Pthread_cond_wait(&cerebrod_updown_initialization_complete_cond,
                           &cerebrod_updown_initialization_complete_lock);
       Pthread_mutex_unlock(&cerebrod_updown_initialization_complete_lock);
-    }
-
-  /* Start status server.  Start before the listener begins receiving
-   * data.
-   */
-  if (conf.status_server)
-    {
-      pthread_t thread;
-      pthread_attr_t attr;
-
-      Pthread_attr_init(&attr);
-      Pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-      Pthread_create(&thread, &attr, cerebrod_status, NULL);
-      Pthread_attr_destroy(&attr);
-
-      /* Wait for initialization to complete */
-      Pthread_mutex_lock(&cerebrod_status_initialization_complete_lock);
-      while (cerebrod_status_initialization_complete == 0)
-        Pthread_cond_wait(&cerebrod_status_initialization_complete_cond,
-                          &cerebrod_status_initialization_complete_lock);
-      Pthread_mutex_unlock(&cerebrod_status_initialization_complete_lock);
     }
 
   /* Start listening server.  Start before speaker, since the listener

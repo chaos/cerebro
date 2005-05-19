@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_util.c,v 1.6 2005-05-17 19:55:15 achu Exp $
+ *  $Id: cerebro_config_util.c,v 1.7 2005-05-19 16:40:40 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -329,6 +329,28 @@ _cerebro_config_load_config_file(struct cerebro_config *conf)
 	0
       },
       {
+	"cerebrod_metric_server", 
+	CONFFILE_OPTION_BOOL, 
+	-1,
+	conffile_bool, 
+	1, 
+	0, 
+	&(conf->cerebrod_metric_server_flag),
+	&conf->cerebrod_metric_server, 
+	0
+      },
+      {
+	"cerebrod_metric_server_port", 
+	CONFFILE_OPTION_INT, 
+	-1,
+	conffile_int, 
+	1, 
+	0, 
+	&(conf->cerebrod_metric_server_port_flag),
+	&(conf->cerebrod_metric_server_port), 
+	0
+      },
+      {
 	"cerebrod_updown_server", 
 	CONFFILE_OPTION_BOOL, 
 	-1,
@@ -348,28 +370,6 @@ _cerebro_config_load_config_file(struct cerebro_config *conf)
 	0, 
 	&(conf->cerebrod_updown_server_port_flag),
 	&(conf->cerebrod_updown_server_port), 
-	0
-      },
-      {
-	"cerebrod_status_server", 
-	CONFFILE_OPTION_BOOL, 
-	-1,
-	conffile_bool, 
-	1, 
-	0, 
-	&(conf->cerebrod_status_server_flag),
-	&conf->cerebrod_status_server, 
-	0
-      },
-      {
-	"cerebrod_status_server_port", 
-	CONFFILE_OPTION_INT, 
-	-1,
-	conffile_int, 
-	1, 
-	0, 
-	&(conf->cerebrod_status_server_port_flag),
-	&(conf->cerebrod_status_server_port), 
 	0
       },
 #if CEREBRO_DEBUG
@@ -396,6 +396,17 @@ _cerebro_config_load_config_file(struct cerebro_config *conf)
 	0
       },
       {
+	"cerebrod_metric_server_debug", 
+	CONFFILE_OPTION_BOOL, 
+	-1,
+	conffile_bool, 
+	1, 
+	0, 
+	&(conf->cerebrod_metric_server_debug_flag),
+	&conf->cerebrod_metric_server_debug, 
+	0
+      },
+      {
 	"cerebrod_updown_server_debug", 
 	CONFFILE_OPTION_BOOL, 
 	-1,
@@ -404,17 +415,6 @@ _cerebro_config_load_config_file(struct cerebro_config *conf)
 	0, 
 	&(conf->cerebrod_updown_server_debug_flag),
 	&conf->cerebrod_updown_server_debug, 
-	0
-      },
-      {
-	"cerebrod_status_server_debug", 
-	CONFFILE_OPTION_BOOL, 
-	-1,
-	conffile_bool, 
-	1, 
-	0, 
-	&(conf->cerebrod_status_server_debug_flag),
-	&conf->cerebrod_status_server_debug, 
 	0
       },
 #endif /* CEREBRO_DEBUG */
@@ -657,6 +657,28 @@ _cerebro_config_merge_cerebro_config(struct cerebro_config *conf,
       conf->cerebrod_listen_threads_flag++;
     }
 
+  if (config_file_conf->cerebrod_metric_server_flag)
+    {
+      conf->cerebrod_metric_server = config_file_conf->cerebrod_metric_server;
+      conf->cerebrod_metric_server_flag++;
+    }
+  else if (module_conf->cerebrod_metric_server_flag)
+    {
+      conf->cerebrod_metric_server = module_conf->cerebrod_metric_server;
+      conf->cerebrod_metric_server_flag++;
+    }
+
+  if (config_file_conf->cerebrod_metric_server_port_flag)
+    {
+      conf->cerebrod_metric_server_port = config_file_conf->cerebrod_metric_server_port;
+      conf->cerebrod_metric_server_port_flag++;
+    }
+  else if (module_conf->cerebrod_metric_server_port_flag)
+    {
+      conf->cerebrod_metric_server_port = module_conf->cerebrod_metric_server_port;
+      conf->cerebrod_metric_server_port_flag++;
+    }
+
   if (config_file_conf->cerebrod_updown_server_flag)
     {
       conf->cerebrod_updown_server = config_file_conf->cerebrod_updown_server;
@@ -678,29 +700,6 @@ _cerebro_config_merge_cerebro_config(struct cerebro_config *conf,
       conf->cerebrod_updown_server_port = module_conf->cerebrod_updown_server_port;
       conf->cerebrod_updown_server_port_flag++;
     }
-
-  if (config_file_conf->cerebrod_status_server_flag)
-    {
-      conf->cerebrod_status_server = config_file_conf->cerebrod_status_server;
-      conf->cerebrod_status_server_flag++;
-    }
-  else if (module_conf->cerebrod_status_server_flag)
-    {
-      conf->cerebrod_status_server = module_conf->cerebrod_status_server;
-      conf->cerebrod_status_server_flag++;
-    }
-
-  if (config_file_conf->cerebrod_status_server_port_flag)
-    {
-      conf->cerebrod_status_server_port = config_file_conf->cerebrod_status_server_port;
-      conf->cerebrod_status_server_port_flag++;
-    }
-  else if (module_conf->cerebrod_status_server_port_flag)
-    {
-      conf->cerebrod_status_server_port = module_conf->cerebrod_status_server_port;
-      conf->cerebrod_status_server_port_flag++;
-    }
-
 #if CEREBRO_DEBUG
   if (config_file_conf->cerebrod_speak_debug_flag)
     {
@@ -724,6 +723,17 @@ _cerebro_config_merge_cerebro_config(struct cerebro_config *conf,
       conf->cerebrod_listen_debug_flag++;
     }
 
+  if (config_file_conf->cerebrod_metric_server_debug_flag)
+    {
+      conf->cerebrod_metric_server_debug = config_file_conf->cerebrod_metric_server_debug;
+      conf->cerebrod_metric_server_debug_flag++;
+    }
+  else if (module_conf->cerebrod_metric_server_debug_flag)
+    {
+      conf->cerebrod_metric_server_debug = module_conf->cerebrod_metric_server_debug;
+      conf->cerebrod_metric_server_debug_flag++;
+    }
+
   if (config_file_conf->cerebrod_updown_server_debug_flag)
     {
       conf->cerebrod_updown_server_debug = config_file_conf->cerebrod_updown_server_debug;
@@ -733,17 +743,6 @@ _cerebro_config_merge_cerebro_config(struct cerebro_config *conf,
     {
       conf->cerebrod_updown_server_debug = module_conf->cerebrod_updown_server_debug;
       conf->cerebrod_updown_server_debug_flag++;
-    }
-
-  if (config_file_conf->cerebrod_status_server_debug_flag)
-    {
-      conf->cerebrod_status_server_debug = config_file_conf->cerebrod_status_server_debug;
-      conf->cerebrod_status_server_debug_flag++;
-    }
-  else if (module_conf->cerebrod_status_server_debug_flag)
-    {
-      conf->cerebrod_status_server_debug = module_conf->cerebrod_status_server_debug;
-      conf->cerebrod_status_server_debug_flag++;
     }
 #endif /* CEREBRO_DEBUG */
 

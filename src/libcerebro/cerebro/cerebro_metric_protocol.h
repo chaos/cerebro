@@ -1,9 +1,9 @@
 /*****************************************************************************\
- *  $Id: cerebro_status_protocol.h,v 1.4 2005-05-18 18:53:01 achu Exp $
+ *  $Id: cerebro_metric_protocol.h,v 1.1 2005-05-19 16:40:40 achu Exp $
 \*****************************************************************************/
 
-#ifndef _CEREBRO_STATUS_PROTOCOL_H
-#define _CEREBRO_STATUS_PROTOCOL_H
+#ifndef _CEREBRO_METRIC_PROTOCOL_H
+#define _CEREBRO_METRIC_PROTOCOL_H
 
 #if 0
 
@@ -17,7 +17,7 @@
  * - Cerebro updown request.
  * 
  * Server -> Client
- * - Stream of updown responses indicating up/down status of each
+ * - Stream of updown responses indicating up/down metric of each
  *   node.  Stream of nodes returned will depend on the request.
  *   After the stream of nodes is complete, an "end of responses"
  *   response will indicate the end of stream and completion of
@@ -39,13 +39,13 @@
  */
 #endif /* 0 */
 
-#define CEREBRO_STATUS_PROTOCOL_VERSION                    1
-#define CEREBRO_STATUS_PROTOCOL_SERVER_TIMEOUT_LEN         3
-#define CEREBRO_STATUS_PROTOCOL_CLIENT_TIMEOUT_LEN         5
-#define CEREBRO_STATUS_PROTOCOL_CONNECT_TIMEOUT_LEN        5
+#define CEREBRO_METRIC_PROTOCOL_VERSION                    1
+#define CEREBRO_METRIC_PROTOCOL_SERVER_TIMEOUT_LEN         3
+#define CEREBRO_METRIC_PROTOCOL_CLIENT_TIMEOUT_LEN         5
+#define CEREBRO_METRIC_PROTOCOL_CONNECT_TIMEOUT_LEN        5
 
-#define CEREBRO_STATUS_STARTTIME                           "starttime"
-#define CEREBRO_STATUS_BOOTTIME                            "boottime"
+#define CEREBRO_METRIC_STARTTIME                           "starttime"
+#define CEREBRO_METRIC_BOOTTIME                            "boottime"
 
 #if 0
 
@@ -68,9 +68,9 @@
 
 #endif /* 0 */
 
-#define CEREBRO_STATUS_SERVER_PORT  8853
+#define CEREBRO_METRIC_SERVER_PORT  8853
 
-#define CEREBRO_STATUS_MAX          16
+#define CEREBRO_METRIC_MAX          16
 
 #if 0
 
@@ -127,4 +127,4 @@ struct cerebro_updown_err_response
 
 #endif /* 0 */
 
-#endif /* _CEREBRO_STATUS_PROTOCOL_H */
+#endif /* _CEREBRO_METRIC_PROTOCOL_H */
