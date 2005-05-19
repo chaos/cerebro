@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_data.h,v 1.2 2005-03-30 18:46:58 achu Exp $
+ *  $Id: cerebrod_data.h,v 1.3 2005-05-19 17:31:05 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_CACHE_H
@@ -26,7 +26,6 @@ u_int32_t cerebrod_get_starttime(void);
  * Return the cached system boottime
  */
 u_int32_t cerebrod_get_boottime(void);
-
 
 /* 
  * cerebrod_get_nodename

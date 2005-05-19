@@ -4,7 +4,6 @@ Documention
 Testing
 - fd leaking
 - mem-leaking
-- can actually build module
 
 Cleanup
 - common code for looping servers??

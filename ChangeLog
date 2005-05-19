@@ -2,6 +2,9 @@
 
 	* Rename status to metric due to design and goal differences from
 	original ganglia implementation.
+
+	* Begin rework of node data lists and hashes into one global node
+	data list and hash.
 	
 2005-05-18  Albert Chu  <chu11@llnl.gov>
 
