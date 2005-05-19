@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.c,v 1.61 2005-05-19 22:21:10 achu Exp $
+ *  $Id: cerebrod_updown.c,v 1.62 2005-05-19 23:38:46 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -157,7 +157,6 @@ _cerebrod_updown_initialize(void)
     cerebro_err_exit("%s(%s:%d): updown_fd setup failed",
                      __FILE__, __FUNCTION__, __LINE__);
 
-  Pthread_mutex_lock(&cerebrod_updown_initialization_complete_lock);
   cerebrod_updown_initialization_complete++;
   Pthread_cond_signal(&cerebrod_updown_initialization_complete_cond);
  out:
@@ -643,8 +642,8 @@ _cerebrod_updown_evaluate_updown_state(void *x, void *arg)
   /* Should be called with lock already set */
   rv = Pthread_mutex_trylock(&cerebrod_node_data_lock);
   if (rv != EBUSY)
-    cerebro_err_exit("%s(%s:%d): mutex not locked",	
-                     __FILE__, __FUNCTION__, __LINE__);
+    cerebro_err_exit("%s(%s:%d): mutex not locked: rv=%d",	
+                     __FILE__, __FUNCTION__, __LINE__, rv);
 
   /* With locking, it shouldn't be possible for local time to be
    * greater than the time stored in any last_received_time.

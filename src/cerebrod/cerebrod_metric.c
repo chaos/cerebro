@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric.c,v 1.3 2005-05-19 22:21:10 achu Exp $
+ *  $Id: cerebrod_metric.c,v 1.4 2005-05-19 23:38:46 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -27,6 +27,7 @@
 #include "cerebrod.h"
 #include "cerebrod_config.h"
 #include "cerebrod_metric.h"
+#include "cerebrod_node_data.h"
 #include "cerebrod_util.h"
 #include "fd.h"
 #include "list.h"
@@ -146,11 +147,12 @@ _cerebrod_metric_initialize(void)
   if (cerebrod_metric_initialization_complete)
     goto out;
 
+  cerebrod_node_data_initialize();
+
   if ((metric_fd = _cerebrod_metric_create_and_setup_socket()) < 0)
     cerebro_err_exit("%s(%s:%d): metric_fd setup failed",
                      __FILE__, __FUNCTION__, __LINE__);
 
-  Pthread_mutex_lock(&cerebrod_metric_initialization_complete_lock);
   cerebrod_metric_initialization_complete++;
   Pthread_cond_signal(&cerebrod_metric_initialization_complete_cond);
  out:
@@ -638,8 +640,8 @@ _cerebrod_updown_evaluate_updown_state(void *x, void *arg)
   /* Should be called with lock already set */
   rv = Pthread_mutex_trylock(&updown_node_data_lock);
   if (rv != EBUSY)
-    cerebro_err_exit("%s(%s:%d): mutex not locked",	
-                     __FILE__, __FUNCTION__, __LINE__);
+    cerebro_err_exit("%s(%s:%d): mutex not locked: rv=%d",	
+                     __FILE__, __FUNCTION__, __LINE__, rv);
 
   /* With locking, it shouldn't be possible for local time to be
    * greater than the time stored in any last_received time.

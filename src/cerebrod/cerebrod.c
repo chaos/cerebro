@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.51 2005-05-19 22:21:10 achu Exp $
+ *  $Id: cerebrod.c,v 1.52 2005-05-19 23:38:46 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -175,6 +175,7 @@ main(int argc, char **argv)
   /* Start metric server.  Start before the listener begins receiving
    * data.
    */
+
   if (conf.metric_server)
     {
       pthread_t thread;

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_node_data.h,v 1.3 2005-05-19 22:21:10 achu Exp $
+ *  $Id: cerebrod_node_data.h,v 1.4 2005-05-19 23:38:46 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_NODE_DATA_H
@@ -18,20 +18,6 @@
 #include "cerebro/cerebrod_heartbeat_protocol.h"
 
 #include "hash.h"
-
-/*
- * struct cerebrod_metric_node_data
- *
- * contains cerebrod metric node data
- */
-struct cerebrod_metric_node_data
-{
-  char *nodename;
-  hash_t metric_data;
-  int metric_data_count;
-  u_int32_t last_received_time;
-  pthread_mutex_t metric_node_data_lock;
-};
 
 /* 
  * cerebrod_metric_type_t
@@ -83,9 +69,9 @@ struct cerebrod_node_data
 {
   char *nodename;
   int discovered;
-  u_int32_t last_received_time;
   hash_t metric_data;
   int metric_data_count;
+  u_int32_t last_received_time;
   pthread_mutex_t node_data_lock;
 };
 

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.64 2005-05-19 22:21:10 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.65 2005-05-19 23:38:46 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -375,15 +375,7 @@ cerebrod_listener(void *arg)
 
       Gettimeofday(&tv, NULL);
 
-#if 0
-      if (conf.updown_server)
-	cerebrod_updown_update_data(nodename_key, tv.tv_sec);
-
-      if (conf.metric_server)
-        cerebrod_metric_update_data(nodename_key, &hb, tv.tv_sec);
-
       cerebrod_node_data_update(nodename_key, &hb, tv.tv_sec);
-#endif /* 0 */
     }
 
   return NULL;			/* NOT REACHED */

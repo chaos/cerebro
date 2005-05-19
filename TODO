@@ -10,6 +10,8 @@ Cleanup
 - common code for various server code
 - metric_type data conversion thingie
 - cleanup common hash into "data" and put in data.c??
+- common "cerebrod_node_data" create function and insertion function
+- fprintf debug messages also use __FILE__, etc. style output
 
 Audit
 - code review to reduce memory footprint
