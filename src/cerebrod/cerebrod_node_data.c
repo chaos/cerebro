@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_node_data.c,v 1.4 2005-05-19 23:38:46 achu Exp $
+ *  $Id: cerebrod_node_data.c,v 1.5 2005-05-19 23:56:02 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -86,6 +86,33 @@ _cerebrod_node_data_strcmp(void *x, void *y)
                 ((struct cerebrod_node_data *)y)->nodename);
 }
 
+/* 
+ * _cerebrod_node_data_create_and_init
+ *
+ * Create and initialize a cerebrod_node_data 
+ *
+ */
+static struct cerebrod_node_data *
+_cerebrod_node_data_create_and_init(const char *nodename)
+{
+  struct cerebrod_node_data *nd;
+  
+  assert(nodename);
+
+  nd = Malloc(sizeof(struct cerebrod_node_data));
+
+  nd->nodename = Strdup(nodename);
+  nd->discovered = 0;
+  nd->metric_data = Hash_create(CEREBRO_METRIC_MAX,
+                                (hash_key_f)hash_key_string,
+                                (hash_cmp_f)strcmp,
+                                (hash_del_f)_Free);
+  nd->metric_data_count = 0;
+  nd->last_received_time = 0;
+  Pthread_mutex_init(&(nd->node_data_lock), NULL);
+  return nd;
+}
+
 void 
 cerebrod_node_data_initialize(void)
 {
@@ -132,18 +159,8 @@ cerebrod_node_data_initialize(void)
       for (i = 0; i < numnodes; i++)
         {
           struct cerebrod_node_data *nd;
-
-          nd = Malloc(sizeof(struct cerebrod_node_data));
-
-          nd->nodename = Strdup(nodes[i]);
-          nd->discovered = 0;
-          nd->metric_data = Hash_create(CEREBRO_METRIC_MAX,
-                                        (hash_key_f)hash_key_string,
-                                        (hash_cmp_f)strcmp,
-                                        (hash_del_f)_Free);
-          nd->metric_data_count = 0;
-          nd->last_received_time = 0;
-          Pthread_mutex_init(&(nd->node_data_lock), NULL);
+          
+          nd = _cerebrod_node_data_create_and_init(nodes[i]);
 
           List_append(cerebrod_node_data_list, nd);
           Hash_insert(cerebrod_node_data_index, Strdup(nodes[i]), nd);
@@ -294,9 +311,8 @@ _cerebrod_node_data_item_dump(void *x, void *arg)
                           nd->nodename);
       if (num != nd->metric_data_count)
         {
-          fprintf(stderr, "_cerebrod_node_data_item_dump: "
-                  "invalid dump count: num=%d numnodes=%d",
-                  num, nd->metric_data_count);
+          fprintf(stderr, "%s(%s:%d): invalid dump count: num=%d numnodes=%d",
+                  __FILE__, __FUNCTION__, __LINE__, num, nd->metric_data_count);
           exit(1);
         }
       fprintf(stderr, "* %s: metric_data_count=%d\n", 
@@ -337,9 +353,9 @@ _cerebrod_node_data_list_dump(void)
 			      NULL);
           if (num != cerebrod_node_data_index_numnodes)
 	    {
-	      fprintf(stderr, "_cerebrod_node_data_list_dump: "
-		      "invalid dump count: num=%d numnodes=%d",
-		      num, cerebrod_node_data_index_numnodes);
+              fprintf(stderr, "%s(%s:%d): invalid dump count: num=%d numnodes=%d",
+                      __FILE__, __FUNCTION__, __LINE__, 
+                      num, cerebrod_node_data_index_numnodes);
 	      exit(1);
 	    }
         }
@@ -447,20 +463,6 @@ cerebrod_node_data_update(char *nodename,
     {
       char *key;
 
-      nd = Malloc(sizeof(struct cerebrod_node_data));
-
-      key = Strdup(nodename);
-
-      nd->nodename = Strdup(nodename);
-      nd->discovered = 0;
-      nd->last_received_time = 0;
-      nd->metric_data = Hash_create(CEREBRO_METRIC_MAX,
-                                    (hash_key_f)hash_key_string,
-                                    (hash_cmp_f)strcmp,
-                                    (hash_del_f)_Free);
-      nd->metric_data_count = 0;
-      Pthread_mutex_init(&(nd->node_data_lock), NULL);
-
       /* Re-hash if our hash is getting too small */
       if ((cerebrod_node_data_index_numnodes + 1) > CEREBROD_NODE_DATA_REHASH_LIMIT)
 	cerebrod_rehash(&cerebrod_node_data_index,
@@ -469,6 +471,7 @@ cerebrod_node_data_update(char *nodename,
 			cerebrod_node_data_index_numnodes,
 			&cerebrod_node_data_lock);
 
+      nd = _cerebrod_node_data_create_and_init(nodename);
       List_append(cerebrod_node_data_list, nd);
       Hash_insert(cerebrod_node_data_index, key, nd);
       cerebrod_node_data_index_numnodes++;
