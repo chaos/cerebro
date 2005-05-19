@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric.c,v 1.1 2005-05-19 16:40:40 achu Exp $
+ *  $Id: cerebrod_metric.c,v 1.2 2005-05-19 21:36:51 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -187,8 +187,9 @@ _cerebrod_metric_initialize(void)
 {
   int numnodes = 0;
 
+  Pthread_mutex_lock(&cerebrod_metric_initialization_complete_lock);
   if (cerebrod_metric_initialization_complete)
-    return;
+    goto out;
 
   if ((metric_fd = _cerebrod_metric_create_and_setup_socket()) < 0)
     cerebro_err_exit("%s(%s:%d): metric_fd setup failed",
@@ -257,6 +258,7 @@ _cerebrod_metric_initialize(void)
   Pthread_mutex_lock(&cerebrod_metric_initialization_complete_lock);
   cerebrod_metric_initialization_complete++;
   Pthread_cond_signal(&cerebrod_metric_initialization_complete_cond);
+ out:
   Pthread_mutex_unlock(&cerebrod_metric_initialization_complete_lock);
 }
 

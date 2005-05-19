@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.c,v 1.59 2005-05-18 00:53:53 achu Exp $
+ *  $Id: cerebrod_updown.c,v 1.60 2005-05-19 21:36:51 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -187,8 +187,9 @@ _cerebrod_updown_initialize(void)
 {
   int numnodes = 0;
 
+  Pthread_mutex_lock(&cerebrod_updown_initialization_complete_lock);
   if (cerebrod_updown_initialization_complete)
-    return;
+    goto out;
 
   if ((updown_fd = _cerebrod_updown_create_and_setup_socket()) < 0)
     cerebro_err_exit("%s(%s:%d): updown_fd setup failed",
@@ -253,6 +254,7 @@ _cerebrod_updown_initialize(void)
   Pthread_mutex_lock(&cerebrod_updown_initialization_complete_lock);
   cerebrod_updown_initialization_complete++;
   Pthread_cond_signal(&cerebrod_updown_initialization_complete_cond);
+ out:
   Pthread_mutex_unlock(&cerebrod_updown_initialization_complete_lock);
 }
 

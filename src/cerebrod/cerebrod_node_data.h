@@ -1,11 +1,9 @@
 /*****************************************************************************\
- *  $Id: cerebrod_node_data.h,v 1.1 2005-05-19 17:31:05 achu Exp $
+ *  $Id: cerebrod_node_data.h,v 1.2 2005-05-19 21:36:51 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_NODE_DATA_H
 #define _CEREBROD_NODE_DATA_H
-
-#if 0
 
 #if HAVE_CONFIG_H
 #include "config.h"
@@ -15,55 +13,41 @@
 #include <pthread.h>
 #endif /* HAVE_PTHREAD_H */
 
-#include "list.h"
+#include <sys/types.h>
 
-#define CEREBROD_NODE_DATA_REINITIALIZE_WAIT 2
+#include "cerebro/cerebrod_heartbeat_protocol.h"
+
+#include "hash.h"
 
 /*
- * struct cerebrod_node_data_node_data
+ * struct cerebrod_node_data
  *
- * contains cerebrod node_data node data
+ * contains cerebrod node data
  */
-struct cerebrod_node_data_node_data
+struct cerebrod_node_data
 {
   char *nodename;
   int discovered;
   u_int32_t last_received_time;
-  pthread_mutex_t node_data_node_data_lock;
+  hash_t metric_data;
+  int metric_data_count;
+  pthread_mutex_t node_data_lock;
 };
 
 /* 
- * struct cerebrod_node_data_evaluation_data
+ * cerebrod_node_data_initialize
  *
- * Holds data for callback function when evaluating node_data state.
+ * Initialize node_data structures
  */
-struct cerebrod_node_data_evaluation_data
-{
-  int client_fd;
-  u_int32_t node_data_request;
-  u_int32_t timeout_len;
-  u_int32_t time_now;
-  List node_responses;
-};
-
-/*
- * cerebrod_node_data
- *
- * Runs the cerebrod node_data server thread
- *
- * Passed no argument
- *
- * Executed in detached state, no return value.
- */
-void *cerebrod_node_data(void *);
+void cerebrod_node_data_initialize(void);
 
 /* 
- * cerebrod_node_data_update_data
+ * cerebrod_node_data_update
  *
- * Update node_data server with received time for a specific cluster node
+ * Update node_data with more up to date information
  */
-void cerebrod_node_data_update_data(char *nodename, u_int32_t received_time);
-
-#endif /* 0 */
+void cerebrod_node_data_update(char *nodename,
+                               struct cerebrod_heartbeat *hb,
+                               u_int32_t received_time);
 
 #endif /* _CEREBROD_NODE_DATA_H */
