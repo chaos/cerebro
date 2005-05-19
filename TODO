@@ -24,7 +24,7 @@ Design/Re-Code
 - default timeout_len configurable in config file
   - necessary for event based up/down
 - list interface w/ iterators count, foreach, find, etc.
-  - and type num func??
+  - and type func??
 - merge server datas into one hash??
 - merge servers into one server??
 - gendersllnl config, up listening threads dependent on cluster size
