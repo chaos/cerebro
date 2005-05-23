@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.c,v 1.62 2005-05-19 23:38:46 achu Exp $
+ *  $Id: cerebrod_updown.c,v 1.63 2005-05-23 18:11:07 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -13,10 +13,6 @@
 #endif /* STDC_HEADERS */
 #include <errno.h>
 #include <assert.h>
-
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
 
 #include "cerebro_marshalling.h"
 #include "cerebro_module.h"
@@ -60,86 +56,6 @@ pthread_cond_t cerebrod_updown_initialization_complete_cond = PTHREAD_COND_INITI
 pthread_mutex_t cerebrod_updown_initialization_complete_lock = PTHREAD_MUTEX_INITIALIZER;
 
 /*
- * updown_fd
- *
- * updown server file descriptor
- */
-int updown_fd = 0;
-
-/*
- * _cerebrod_updown_create_and_setup_socket
- *
- * Create and setup the updown server socket.  Do not use wrappers in
- * this function.  We want to give the server additional chances to
- * "survive" an error condition.
- *
- * Returns file descriptor on success, -1 on error
- */
-static int
-_cerebrod_updown_create_and_setup_socket(void)
-{
-  struct sockaddr_in server_addr;
-  int temp_fd;
-
-  if ((temp_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
-    {
-      cerebro_err_debug("%s(%s:%d): socket: %s",
-                        __FILE__, __FUNCTION__, __LINE__,
-                        strerror(errno));
-      return -1;
-    }
-
-  /* Configuration checks ensure destination ip is on this machine if
-   * it is a non-multicast address.
-   */
-  memset(&server_addr, '\0', sizeof(struct sockaddr_in));
-  server_addr.sin_family = AF_INET;
-  server_addr.sin_port = htons(conf.updown_server_port);
-  server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-
-  if (bind(temp_fd, 
-	   (struct sockaddr *)&server_addr, 
-	   sizeof(struct sockaddr_in)) < 0)
-    {
-      cerebro_err_debug("%s(%s:%d): bind: %s",
-                        __FILE__, __FUNCTION__, __LINE__,
-                        strerror(errno));
-      return -1;
-    }
-
-  if (listen(temp_fd, CEREBROD_UPDOWN_BACKLOG) < 0)
-    {
-      cerebro_err_debug("%s(%s:%d): listen: %s",
-                        __FILE__, __FUNCTION__, __LINE__,
-                        strerror(errno));
-      return -1;
-    }
-
-#if CEREBRO_DEBUG
-  if (conf.debug)
-    {
-      int optval = 1;
-        
-      /* For quick start/restart debugging purposes */
-      if (setsockopt(temp_fd,
-                     SOL_SOCKET,
-                     SO_REUSEADDR,
-                     &optval,
-                     sizeof(int)) < 0)
-        {
-          cerebro_err_debug("%s(%s:%d): setsockopt: %s",
-                            __FILE__, __FUNCTION__, __LINE__,
-                            strerror(errno));
-          return -1;
-        }
-                 
-    }
-#endif /* CEREBRO_DEBUG */
-
-  return temp_fd;
-}
-
-/*
  * _cerebrod_updown_initialize
  *
  * perform updown server initialization
@@ -152,10 +68,6 @@ _cerebrod_updown_initialize(void)
     goto out;
 
   cerebrod_node_data_initialize();
-
-  if ((updown_fd = _cerebrod_updown_create_and_setup_socket()) < 0)
-    cerebro_err_exit("%s(%s:%d): updown_fd setup failed",
-                     __FILE__, __FUNCTION__, __LINE__);
 
   cerebrod_updown_initialization_complete++;
   Pthread_cond_signal(&cerebrod_updown_initialization_complete_cond);
@@ -903,73 +815,10 @@ cerebrod_updown(void *arg)
 {
   _cerebrod_updown_initialize();
 
-  for (;;)
-    {
-      pthread_t thread;
-      pthread_attr_t attr;
-      int client_fd, client_addr_len, *arg;
-      struct sockaddr_in client_addr;
-
-      client_addr_len = sizeof(struct sockaddr_in);
-      if ((client_fd = accept(updown_fd, 
-                              (struct sockaddr *)&client_addr, 
-                              &client_addr_len)) < 0)
-	{
-          /* For errnos EINVAL, EBADF, ENODEV, assume the device has
-           * been temporarily brought down then back up.  For example,
-           * this can occur if the administrator runs
-           * '/etc/init.d/network restart'.  We just need to re-setup
-           * the socket.
-           *
-           * If fd < 0, the network device just isn't back up yet from
-           * the previous time we got an errno EINVAL, EBADF, or
-           * ENODEV.
-           */
-          if (errno == EINVAL
-	      || errno == EBADF
-	      || errno == ENODEV
-	      || updown_fd < 0)
-            {
-              if (!(updown_fd < 0))
-		close(updown_fd);	/* no-wrapper, make best effort */
-
-              if ((updown_fd = _cerebrod_updown_create_and_setup_socket()) < 0)
-		{
-		  cerebro_err_debug("%s(%s:%d): error re-initializing socket",
-                                    __FILE__, __FUNCTION__, __LINE__);
-
-		  /* Wait a bit, so we don't spin */
-		  sleep(CEREBROD_UPDOWN_REINITIALIZE_WAIT);
-		}
-              else
-                cerebro_err_debug("%s(%s:%d): success re-initializing socket",
-                                  __FILE__, __FUNCTION__, __LINE__);
-            }
-          else if (errno == EINTR)
-            cerebro_err_debug("%s(%s:%d): accept: %s", 
-                              __FILE__, __FUNCTION__, __LINE__,
-                              strerror(errno));
-          else
-            cerebro_err_exit("%s(%s:%d): accept: %s", 
-                             __FILE__, __FUNCTION__, __LINE__,
-                             strerror(errno));
-	}
-
-      if (client_fd < 0)
-	continue;
-
-      /* Pass off connection to thread */
-      Pthread_attr_init(&attr);
-      Pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-      arg = Malloc(sizeof(int));
-      *arg = client_fd;
-      Pthread_create(&thread, 
-                     &attr, 
-                     _cerebrod_updown_service_connection, 
-                     (void *)arg);
-      Pthread_attr_destroy(&attr);
-
-    }
-
+  cerebrod_tcp_data_server(_cerebrod_updown_service_connection,
+                           conf.updown_server_port,
+                           CEREBROD_UPDOWN_BACKLOG,
+                           CEREBROD_UPDOWN_REINITIALIZE_WAIT);
+  
   return NULL;			/* NOT REACHED */
 }
