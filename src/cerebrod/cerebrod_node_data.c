@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_node_data.c,v 1.5 2005-05-19 23:56:02 achu Exp $
+ *  $Id: cerebrod_node_data.c,v 1.6 2005-05-23 17:58:24 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -304,21 +304,30 @@ _cerebrod_node_data_item_dump(void *x, void *arg)
   Pthread_mutex_lock(&(nd->node_data_lock));
   if (nd->discovered)
     {
-      int num;
-      fprintf(stderr, "* %s: discovered=%d\n", nd->nodename, nd->discovered);
-      num = Hash_for_each(nd->metric_data,
-                          _cerebrod_node_data_metric_data_dump,
-                          nd->nodename);
-      if (num != nd->metric_data_count)
+      if (conf.updown_server_debug)
+        fprintf(stderr, "* %s: discovered=%d\n", nd->nodename, nd->discovered);
+
+      
+      if (conf.metric_server_debug)
         {
-          fprintf(stderr, "%s(%s:%d): invalid dump count: num=%d numnodes=%d",
-                  __FILE__, __FUNCTION__, __LINE__, num, nd->metric_data_count);
-          exit(1);
+          int num;
+
+          num = Hash_for_each(nd->metric_data,
+                              _cerebrod_node_data_metric_data_dump,
+                              nd->nodename);
+          if (num != nd->metric_data_count)
+            {
+              fprintf(stderr, "%s(%s:%d): invalid dump count: num=%d numnodes=%d",
+                      __FILE__, __FUNCTION__, __LINE__, num, nd->metric_data_count);
+              exit(1);
+            }
+          fprintf(stderr, "* %s: metric_data_count=%d\n", 
+                  nd->nodename, nd->metric_data_count);
         }
-      fprintf(stderr, "* %s: metric_data_count=%d\n", 
-              nd->nodename, nd->metric_data_count);
-      fprintf(stderr, "* %s: last_received_time=%u\n", 
-              nd->nodename, nd->last_received_time);
+
+      if (conf.updown_server_debug || conf.metric_server_debug)
+        fprintf(stderr, "* %s: last_received_time=%u\n", 
+                nd->nodename, nd->last_received_time);
     }
   Pthread_mutex_unlock(&(nd->node_data_lock));
 

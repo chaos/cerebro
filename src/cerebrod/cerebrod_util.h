@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_util.h,v 1.8 2005-04-27 18:11:35 achu Exp $
+ *  $Id: cerebrod_util.h,v 1.9 2005-05-23 17:58:24 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_UTIL_H
@@ -34,5 +34,31 @@ void cerebrod_rehash(hash_t *old_hash,
 		     int hash_size_increment,
 		     int hash_num, 
 		     pthread_mutex_t *hash_mutex);
+
+/* 
+ * cerebrod_service_connection
+ *
+ * function prototype for a function that will service a TCP
+ * connection.  Function is passed a void * pointer to the
+ * TCP connection's file descriptor.  Function is responsible
+ * for closing the file descriptor.
+ *
+ * Function is executed in detached state, so any return is
+ * ignored.
+ */
+typedef void *(*Cerebrod_service_connection)(void *arg);
+
+/* 
+ * cerebrod_tcp_data_server
+ *
+ * Will execute 'service_connection' thread after a TCP connection
+ * received, passing it the connection's file descriptor.  The thread
+ * is executed in the detached state, so the return value will be
+ * ignored.
+ */
+void cerebrod_tcp_data_server(Cerebrod_service_connection service_connection,
+                              unsigned int port,
+                              unsigned int backlog,
+                              unsigned int reinitialize_wait_time);
 
 #endif /* _CEREBROD_UTIL_H */

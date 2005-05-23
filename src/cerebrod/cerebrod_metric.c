@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric.c,v 1.4 2005-05-19 23:38:46 achu Exp $
+ *  $Id: cerebrod_metric.c,v 1.5 2005-05-23 17:58:24 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -141,8 +141,6 @@ _cerebrod_metric_create_and_setup_socket(void)
 static void
 _cerebrod_metric_initialize(void)
 {
-  int numnodes = 0;
-
   Pthread_mutex_lock(&cerebrod_metric_initialization_complete_lock);
   if (cerebrod_metric_initialization_complete)
     goto out;
