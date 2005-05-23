@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_updown.c,v 1.44 2005-05-16 17:34:36 achu Exp $
+ *  $Id: cerebro_updown.c,v 1.45 2005-05-23 21:30:29 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -34,7 +34,9 @@
 #include "cerebro_config_util.h"
 #include "cerebro_marshalling.h"
 #include "cerebro_module.h"
+#if 0
 #include "cerebro_nodes_iterator_util.h"
+#endif /* 0 */
 #include "cerebro_util.h"
 #include "cerebro/cerebro_error.h"
 #include "cerebro/cerebro_updown_protocol.h"
@@ -910,6 +912,8 @@ cerebro_updown_get_down_nodes_string(cerebro_t handle, char *buf, unsigned int b
                                           CEREBRO_UPDOWN_DOWN_NODES);
 }
  
+#if 0
+
 /* 
  * _cerebro_updown_get_nodes_iterator
  *
@@ -954,6 +958,8 @@ cerebro_updown_get_down_nodes_iterator(cerebro_t handle)
 {
   return _cerebro_updown_get_nodes_iterator(handle, CEREBRO_UPDOWN_DOWN_NODES);
 }
+
+#endif /* 0 */
 
 /* 
  * _cerebro_updown_is_node

@@ -1,0 +1,242 @@
+/*****************************************************************************\
+ *  $Id: cerebro_nodelist.c,v 1.1 2005-05-23 21:30:29 achu Exp $
+\*****************************************************************************/
+
+#if HAVE_CONFIG_H
+#include "config.h"
+#endif /* HAVE_CONFIG_H */
+
+#include <stdio.h>
+#include <stdlib.h>
+#if STDC_HEADERS
+#include <string.h>
+#endif /* STDC_HEADERS */
+
+#include "cerebro.h"
+#include "cerebro_api.h"
+#include "cerebro_util.h"
+#include "cerebro/cerebro_error.h"
+
+#include "list.h"
+
+static char *cerebro_nodelist_error_messages[] =
+  {
+    "success",
+    "null cerebro_nodelist_t nodelist",
+    "invalid magic number found",
+    "invalid parameters",
+    "out of memory",
+    "internal error",
+    "errnum out of range",
+  };
+
+/* 
+ * _cerebro_nodelist_check
+ *
+ * Checks for a proper cerebro nodelist, setting the errnum
+ * appropriately if an error is found.
+ *
+ * Returns 0 on success, -1 on error
+ */
+int
+_cerebro_nodelist_check(cerebro_nodelist_t nodelist)
+{
+  if (!nodelist || nodelist->magic != CEREBRO_NODELIST_MAGIC_NUMBER)
+    return -1;
+
+  if (!nodelist->nodes)
+    {
+      cerebro_err_debug_lib("%s(%s:%d): nodelist null",
+                            __FILE__, __FUNCTION__, __LINE__);
+      nodelist->errnum = CEREBRO_NODELIST_ERR_INTERNAL;
+      return -1;
+    }
+  
+  return 0;
+}
+
+int 
+cerebro_nodelist_count(cerebro_nodelist_t nodelist)
+{
+  if (_cerebro_nodelist_check(nodelist) < 0)
+    return -1;
+  
+  nodelist->errnum = CEREBRO_NODELIST_ERR_SUCCESS;
+  return list_count(nodelist->nodes);
+}
+ 
+/* 
+ * _cerebro_nodelist_find_func
+ *
+ * Callback function to find node in nodelist.
+ *
+ * Returns 1 on match, 0 on no match 
+ */
+int
+_cerebro_nodelist_find_func(void *x, void *key)
+{
+  if (!x || !key)
+    return 0;
+
+  return (!strcmp((char *)x, (char *)key) ? 1 : 0);
+}
+
+int 
+cerebro_nodelist_find(cerebro_nodelist_t nodelist, const char *node)
+{
+  if (_cerebro_nodelist_check(nodelist) < 0)
+    return -1;
+
+  if (!node)
+    {
+      nodelist->errnum = CEREBRO_NODELIST_ERR_PARAMETERS;
+      return -1;
+    }
+
+  nodelist->errnum = CEREBRO_NODELIST_ERR_SUCCESS;
+  return (list_find_first(nodelist->nodes,
+                          _cerebro_nodelist_find_func,
+                          (void *)node) ? 1 : 0);
+}
+ 
+int 
+cerebro_nodelist_for_each(cerebro_nodelist_t nodelist,
+                          Cerebro_for_each for_each,
+                          void *arg)
+{
+  if (_cerebro_nodelist_check(nodelist) < 0)
+    return -1;
+
+  if (!for_each)
+    {
+      nodelist->errnum = CEREBRO_NODELIST_ERR_PARAMETERS;
+      return -1;
+    }
+  
+  return (list_for_each(nodelist->nodes, 
+                        (ListForF)for_each, 
+                        arg) < 0 ? -1 : 0);
+}
+
+int 
+cerebro_nodelist_destroy(cerebro_nodelist_t nodelist)
+{
+  if (_cerebro_nodelist_check(nodelist) < 0)
+    return -1;
+
+  list_destroy(nodelist->nodes);
+  nodelist->magic = ~CEREBRO_NODELIST_MAGIC_NUMBER;
+  nodelist->errnum = CEREBRO_NODELIST_ERR_SUCCESS;
+  nodelist->nodes = NULL;
+  free(nodelist);
+  return 0;
+}
+ 
+int 
+cerebro_nodelist_errnum(cerebro_nodelist_t nodelist)
+{
+  if (!nodelist)
+    return CEREBRO_NODELIST_ERR_NULLNODELIST;
+  else if (nodelist->magic != CEREBRO_NODELIST_MAGIC_NUMBER)
+    return CEREBRO_NODELIST_ERR_MAGIC_NUMBER;
+  else
+    return nodelist->errnum;
+}
+
+char *
+cerebro_nodelist_strerror(int errnum)
+{
+  if (errnum >= CEREBRO_NODELIST_ERR_SUCCESS 
+      && errnum <= CEREBRO_NODELIST_ERR_ERRNUMRANGE)
+    return cerebro_nodelist_error_messages[errnum];
+  else
+    return cerebro_nodelist_error_messages[CEREBRO_NODELIST_ERR_ERRNUMRANGE];
+}
+
+char *
+cerebro_nodelist_errormsg(cerebro_nodelist_t nodelist)
+{
+  return cerebro_nodelist_strerror(cerebro_nodelist_errnum(nodelist));
+}
+
+void 
+cerebro_nodelist_perror(cerebro_nodelist_t nodelist, const char *msg)
+{
+  char *errormsg = cerebro_nodelist_errormsg(nodelist);
+  
+  if (!msg)
+    fprintf(stderr, "%s\n", errormsg);
+  else
+    fprintf(stderr, "%s: %s\n", msg, errormsg);
+}
+
+#if 0
+
+int cerebro_nodelist_next(cerebro_t handle, 
+                                cerebro_nodelist_t itr,
+                                char *buf,
+                                unsigned int buflen)
+{
+  char *node = NULL;
+  int rv = 0;
+
+  if (_cerebro_nodelist_check(handle, itr) < 0)
+    return -1;
+
+  if (!buf || !buflen)
+    {
+      handle->errnum = CEREBRO_ERR_PARAMETERS;
+      return -1;
+    }
+
+  if ((node = hostlist_next(itr->nodesitr)))
+    {
+      if ((strlen(node) + 1) > buflen)
+        {
+          handle->errnum = CEREBRO_ERR_OVERFLOW;
+          goto cleanup;
+        }
+      strcpy(buf, node);
+      rv = 1;
+    }
+  else
+    rv = 0;
+
+  handle->errnum = CEREBRO_ERR_SUCCESS;
+ cleanup:
+  free(node);
+  return rv;
+}
+
+int 
+cerebro_nodelist_reset(cerebro_t handle,
+                             cerebro_nodelist_t itr)
+{
+  if (_cerebro_nodelist_check(handle, itr) < 0)
+    return -1;
+
+  hostlist_iterator_reset(itr->nodesitr);
+  
+  handle->errnum = CEREBRO_ERR_SUCCESS;
+  return 0;
+}
+                                                                                
+int 
+cerebro_nodelist_destroy(cerebro_t handle,
+                               cerebro_nodelist_t itr)
+{
+  if (_cerebro_nodelist_check(handle, itr) < 0)
+    return -1;
+
+  hostlist_iterator_destroy(itr->nodesitr);
+  hostlist_destroy(itr->nodes);
+  itr->magic = ~CEREBRO_NODELIST_MAGIC_NUMBER;
+  itr->nodesitr = NULL;
+  itr->nodes = NULL;
+  free(itr);
+
+  handle->errnum = CEREBRO_ERR_SUCCESS;
+  return 0;
+}
+
+#endif /* 0 */

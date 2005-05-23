@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_api.h,v 1.13 2005-05-11 21:49:02 achu Exp $
+ *  $Id: cerebro_api.h,v 1.14 2005-05-23 21:30:29 achu Exp $
 \*****************************************************************************/
  
 #ifndef _CEREBRO_API_H
@@ -9,16 +9,18 @@
 
 #include "cerebro/cerebro_config.h"
 
-#include "hostlist.h"
+#include "list.h"
 
 /* 
  * CEREBRO_MAGIC_NUMBER
  *
  * Magic number for cerebro handle
  */
-#define CEREBRO_MAGIC_NUMBER                0xF00F1234
-#define CEREBRO_NODES_ITERATOR_MAGIC_NUMBER 0xF00F2345
-#define CEREBRO_UPDOWN_MAGIC_NUMBER         0xF00F3456
+#define CEREBRO_MAGIC_NUMBER                   0xF00F1234
+#define CEREBRO_NODELIST_MAGIC_NUMBER          0xF00F2345
+#define CEREBRO_NODELIST_ITERATOR_MAGIC_NUMBER 0xF00F3456
+#define CEREBRO_UPDOWN_MAGIC_NUMBER            0xF00F4567
+
 /* 
  * Cerebro loaded state flags
  */
@@ -41,14 +43,26 @@ struct cerebro {
 };
 
 /* 
- * struct cerebro_nodes_iterator
+ * struct cerebro_nodelist
  *
- * Used for interator interface
+ * Used for nodelist interface
  */
-struct cerebro_nodes_iterator {
+struct cerebro_nodelist {
   int32_t magic;
-  hostlist_iterator_t nodesitr;
-  hostlist_t nodes;
+  int32_t errnum;
+  List nodes;
+  /* XXX list of iterators? */
+};
+
+/* 
+ * struct cerebro_nodelist_iterator
+ *
+ * Used for nodelist iterator interface
+ */
+struct cerebro_nodelist_iterator {
+  int32_t magic;
+  int32_t errnum;
+  ListIterator itr;
 };
 
 #endif /* _CEREBRO_API_H */

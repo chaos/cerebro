@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.c,v 1.18 2005-05-17 16:41:36 achu Exp $
+ *  $Id: cerebro.c,v 1.19 2005-05-23 21:30:29 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -151,7 +151,7 @@ cerebro_errormsg(cerebro_t handle)
 void
 cerebro_perror(cerebro_t handle, const char *msg)
 {
-  char *errormsg = cerebro_strerror(cerebro_errnum(handle));
+  char *errormsg = cerebro_errormsg(handle);
  
   if (!msg)
     fprintf(stderr, "%s\n", errormsg);

@@ -1,6 +1,8 @@
 2005-05-23  Albert Chu  <chu11@llnl.gov>
 
 	* Re-org duplicate code into common code.
+
+	* Begin re-org of library to use list interface.
 	
 2005-05-19  Albert Chu  <chu11@llnl.gov>
 

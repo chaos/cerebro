@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.19 2005-05-17 16:41:36 achu Exp $
+ *  $Id: cerebro.h,v 1.20 2005-05-23 21:30:29 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_H
@@ -26,9 +26,19 @@
 #define CEREBRO_ERR_INTERNAL              18
 #define CEREBRO_ERR_ERRNUMRANGE           19
 
+#define CEREBRO_NODELIST_ERR_SUCCESS       0
+#define CEREBRO_NODELIST_ERR_NULLNODELIST  1
+#define CEREBRO_NODELIST_ERR_MAGIC_NUMBER  2
+#define CEREBRO_NODELIST_ERR_PARAMETERS    3
+#define CEREBRO_NODELIST_ERR_OUTMEM        4
+#define CEREBRO_NODELIST_ERR_INTERNAL      5
+#define CEREBRO_NODELIST_ERR_ERRNUMRANGE   6
+
 typedef struct cerebro *cerebro_t;
 
-typedef struct cerebro_nodes_iterator *cerebro_nodes_iterator_t;
+typedef struct cerebro_nodelist *cerebro_nodelist_t;
+
+typedef struct cerebro_nodelist_iterator *cerebro_nodelist_iterator_t;
 
 /*
  * cerebro_handle_create
@@ -82,35 +92,133 @@ char *cerebro_errormsg(cerebro_t handle);
 void cerebro_perror(cerebro_t handle, const char *msg);
 
 /* 
- * Nodes Iterator API
+ * Nodelist Iterator API
+ *
  */
 
 /* 
- * cerebro_nodes_iterator_next
+ * cerebro_nodelist_count
  *
- * Retrieve next node from iterator and copy it into a buffer
+ * Determine the length of the nodelist.
  *
- * Returns 1 if node copied, 0 on end of list, -1 on error
+ * Returns the length of the nodelist on success, -1 on error
  */
-int cerebro_nodes_iterator_next(cerebro_t handle, 
-                                cerebro_nodes_iterator_t itr,
-                                char *buf,
-                                unsigned int buflen);
-/* 
- * cerebro_nodes_iterator_reset
- *
- * Returns 0 on success, -1 on error
- */
-int cerebro_nodes_iterator_reset(cerebro_t handle, 
-                                 cerebro_nodes_iterator_t itr);
+int cerebro_nodelist_count(cerebro_nodelist_t nodelist);
 
 /* 
- * cerebro_nodes_iterator_destroy
+ * cerebro_nodelist_find
+ *
+ * Determine if 'node' exists in the list.
+ *
+ * Returns 1 if 'node' is found, 0 if not, -1 on error
+ */
+int cerebro_nodelist_find(cerebro_nodelist_t nodelist, const char *node);
+
+/* 
+ * Cerebro_for_each
+ *
+ * Function prototype for operating on each node stored in
+ * a cerebro_nodelist_t.
  *
  * Returns 0 on success, -1 on error
  */
-int cerebro_nodes_iterator_destroy(cerebro_t handle, 
-                                   cerebro_nodes_iterator_t itr);
+typedef int (*Cerebro_for_each)(char *nodename, void *arg);
+
+/* 
+ * cerebro_nodelist_for_each
+ *
+ * For each node in 'nodelist' invoke 'for_each', passing 'arg'.
+ *
+ * Return 0 on success, -1 on error
+ */
+int cerebro_nodelist_for_each(cerebro_nodelist_t nodelist,
+                              Cerebro_for_each for_each,
+                              void *arg);
+
+/* 
+ * cerebro_nodelist_destroy
+ *
+ * Destroy a nodelist
+ *
+ * Return 0 on success, -1 on error
+ */
+int cerebro_nodelist_destroy(cerebro_nodelist_t nodelist);
+
+/*
+ * cerebro_nodelist_errnum
+ *
+ * Return the most recent error number
+ *
+ * Returns error number on success
+ */
+int cerebro_nodelist_errnum(cerebro_nodelist_t handle);
+
+/*
+ * cerebro_nodelist_strerror
+ *
+ * Return a string message describing an error number
+ *
+ * Returns pointer to message on success
+ */
+char *cerebro_nodelist_strerror(int errnum);
+
+/*
+ * cerebro_nodelist_errormsg
+ *
+ * Return a string message describing the most recent error
+ *
+ * Returns pointer to message on success
+ */
+char *cerebro_nodelist_errormsg(cerebro_nodelist_t handle);
+
+/*
+ * cerebro_nodelist_perror
+ *
+ * Output a message to standard error
+ */
+void cerebro_nodelist_perror(cerebro_nodelist_t handle, const char *msg);
+
+/* 
+ * cerebro_nodelist_iterator_create
+ *
+ * Create a nodelist iterator
+ *
+ * Return iterator on success, NULL on error
+ */
+cerebro_nodelist_iterator_t cerebro_nodelist_iterator_create(cerebro_nodelist_t nodelist);
+
+/* 
+ * cerebro_nodelist_iterator_next
+ *
+ * Retrieve next node from iterator and move the nodename pointer forward
+ *
+ * Return the next node in the iterator
+ */
+char *cerebro_nodelist_iterator_next(cerebro_nodelist_iterator_t nodelist);
+
+/* 
+ * cerebro_nodelist_iterator_peek
+ *
+ * Retrieve next node from iterator, but do not move the nodename
+ * pointer forward
+ *
+ * Return the next node in the iterator
+ */
+char *cerebro_nodelist_iterator_peek(cerebro_nodelist_iterator_t nodelist);
+
+/* 
+ * cerebro_nodelist_iterator_reset
+ *
+ * Returns 0 on success, -1 on error
+ */
+int cerebro_nodes_iterator_reset(cerebro_nodelist_iterator_t nodelist);
+
+/* 
+ * cerebro_nodelist_iterator_destroy
+ *
+ * Returns 0 on success, -1 on error
+ */
+int cerebro_nodes_iterator_destroy(cerebro_nodelist_iterator_t itr);
 
 /* 
  * Up-Down API
@@ -179,6 +287,7 @@ int cerebro_updown_get_up_nodes_string(cerebro_t handle, char *buf, unsigned int
  */
 int cerebro_updown_get_down_nodes_string(cerebro_t handle, char *buf, unsigned int buflen);
 
+#if 0
 /*
  * cerebro_updown_get_up_nodes_iterator
  *
@@ -196,6 +305,8 @@ cerebro_nodes_iterator_t cerebro_updown_get_up_nodes_iterator(cerebro_t handle);
  * Returns an iterator on success, NULL on error
  */
 cerebro_nodes_iterator_t cerebro_updown_get_down_nodes_iterator(cerebro_t handle);
+
+#endif /* 0 */
 
 /*
  * cerebro_updown_is_node_up

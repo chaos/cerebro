@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_nodes_iterator_util.c,v 1.3 2005-05-12 00:40:07 achu Exp $
+ *  $Id: cerebro_nodelist_util.c,v 1.1 2005-05-23 21:30:29 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -14,11 +14,14 @@
 
 #include "cerebro.h"
 #include "cerebro_api.h"
+#if 0
 #include "cerebro_nodes_iterator_util.h"
+#endif /* 0 */
 #include "cerebro/cerebro_error.h"
 
 #include "hostlist.h"
 
+#if 0
 cerebro_nodes_iterator_t 
 _cerebro_nodes_iterator_create(cerebro_t handle,
                                hostlist_t nodes)
@@ -67,3 +70,4 @@ _cerebro_nodes_iterator_create(cerebro_t handle,
   return NULL;
 }
 
+#endif /* 0 */
