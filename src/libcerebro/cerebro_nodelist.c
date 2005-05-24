@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_nodelist.c,v 1.3 2005-05-24 00:10:08 achu Exp $
+ *  $Id: cerebro_nodelist.c,v 1.4 2005-05-24 21:18:59 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -255,7 +255,7 @@ _cerebro_nodelist_iterator_check(cerebro_nodelist_iterator_t nodelistItr)
       return -1;
     }
   
-  if (nodelistItr->nodelist->magic == CEREBRO_NODELIST_MAGIC_NUMBER)
+  if (nodelistItr->nodelist->magic != CEREBRO_NODELIST_MAGIC_NUMBER)
     {
       cerebro_err_debug_lib("%s(%s:%d): nodelist destroyed",
                             __FILE__, __FUNCTION__, __LINE__);
