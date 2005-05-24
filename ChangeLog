@@ -1,3 +1,7 @@
+2005-05-24  Albert Chu  <chu11@llnl.gov>
+
+	* Minor cleanup.
+	
 2005-05-23  Albert Chu  <chu11@llnl.gov>
 
 	* Re-org duplicate code into common code.
