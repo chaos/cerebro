@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.20 2005-05-23 21:30:29 achu Exp $
+ *  $Id: cerebro.h,v 1.21 2005-05-24 00:07:45 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_H
@@ -33,6 +33,14 @@
 #define CEREBRO_NODELIST_ERR_OUTMEM        4
 #define CEREBRO_NODELIST_ERR_INTERNAL      5
 #define CEREBRO_NODELIST_ERR_ERRNUMRANGE   6
+
+#define CEREBRO_NODELIST_ITERATOR_ERR_SUCCESS       0
+#define CEREBRO_NODELIST_ITERATOR_ERR_NULLITERATOR  1
+#define CEREBRO_NODELIST_ITERATOR_ERR_MAGIC_NUMBER  2
+#define CEREBRO_NODELIST_ITERATOR_ERR_PARAMETERS    3
+#define CEREBRO_NODELIST_ITERATOR_ERR_OUTMEM        4
+#define CEREBRO_NODELIST_ITERATOR_ERR_INTERNAL      5
+#define CEREBRO_NODELIST_ITERATOR_ERR_ERRNUMRANGE   6
 
 typedef struct cerebro *cerebro_t;
 
@@ -92,7 +100,7 @@ char *cerebro_errormsg(cerebro_t handle);
 void cerebro_perror(cerebro_t handle, const char *msg);
 
 /* 
- * Nodelist Iterator API
+ * Nodelist API
  *
  */
 
@@ -151,7 +159,7 @@ int cerebro_nodelist_destroy(cerebro_nodelist_t nodelist);
  *
  * Returns error number on success
  */
-int cerebro_nodelist_errnum(cerebro_nodelist_t handle);
+int cerebro_nodelist_errnum(cerebro_nodelist_t nodelist);
 
 /*
  * cerebro_nodelist_strerror
@@ -169,14 +177,14 @@ char *cerebro_nodelist_strerror(int errnum);
  *
  * Returns pointer to message on success
  */
-char *cerebro_nodelist_errormsg(cerebro_nodelist_t handle);
+char *cerebro_nodelist_errormsg(cerebro_nodelist_t nodelist);
 
 /*
  * cerebro_nodelist_perror
  *
  * Output a message to standard error
  */
-void cerebro_nodelist_perror(cerebro_nodelist_t handle, const char *msg);
+void cerebro_nodelist_perror(cerebro_nodelist_t nodelist, const char *msg);
 
 /* 
  * cerebro_nodelist_iterator_create
@@ -185,16 +193,16 @@ void cerebro_nodelist_perror(cerebro_nodelist_t handle, const char *msg);
  *
  * Return iterator on success, NULL on error
  */
-cerebro_nodelist_iterator_t cerebro_nodelist_iterator_create(cerebro_nodelist_t nodelist);
+cerebro_nodelist_iterator_t cerebro_nodelist_iterator_create(cerebro_nodelist_t itr);
 
 /* 
  * cerebro_nodelist_iterator_next
  *
  * Retrieve next node from iterator and move the nodename pointer forward
  *
- * Return the next node in the iterator
+ * Return 1 if node returned, 0 at end of list, -1 on error
  */
-char *cerebro_nodelist_iterator_next(cerebro_nodelist_iterator_t nodelist);
+int cerebro_nodelist_iterator_next(cerebro_nodelist_iterator_t itr, char **node);
 
 /* 
  * cerebro_nodelist_iterator_peek
@@ -202,16 +210,16 @@ char *cerebro_nodelist_iterator_next(cerebro_nodelist_iterator_t nodelist);
  * Retrieve next node from iterator, but do not move the nodename
  * pointer forward
  *
- * Return the next node in the iterator
+ * Return 1 if node returned, 0 at end of list, -1 on error
  */
-char *cerebro_nodelist_iterator_peek(cerebro_nodelist_iterator_t nodelist);
+int cerebro_nodelist_iterator_peek(cerebro_nodelist_iterator_t itr, char **node);
 
 /* 
  * cerebro_nodelist_iterator_reset
  *
  * Returns 0 on success, -1 on error
  */
-int cerebro_nodes_iterator_reset(cerebro_nodelist_iterator_t nodelist);
+int cerebro_nodes_iterator_reset(cerebro_nodelist_iterator_t itr);
 
 /* 
  * cerebro_nodelist_iterator_destroy
@@ -219,6 +227,40 @@ int cerebro_nodes_iterator_reset(cerebro_nodelist_iterator_t nodelist);
  * Returns 0 on success, -1 on error
  */
 int cerebro_nodes_iterator_destroy(cerebro_nodelist_iterator_t itr);
+
+/*
+ * cerebro_nodelist_iterator_errnum
+ *
+ * Return the most recent error number
+ *
+ * Returns error number on success
+ */
+int cerebro_nodelist_iterator_errnum(cerebro_nodelist_iterator_t handle);
+
+/*
+ * cerebro_nodelist_iterator_strerror
+ *
+ * Return a string message describing an error number
+ *
+ * Returns pointer to message on success
+ */
+char *cerebro_nodelist_iterator_strerror(int errnum);
+
+/*
+ * cerebro_nodelist_iterator_errormsg
+ *
+ * Return a string message describing the most recent error
+ *
+ * Returns pointer to message on success
+ */
+char *cerebro_nodelist_iterator_errormsg(cerebro_nodelist_iterator_t handle);
+
+/*
+ * cerebro_nodelist_iterator_perror
+ *
+ * Output a message to standard error
+ */
+void cerebro_nodelist_iterator_perror(cerebro_nodelist_iterator_t handle, const char *msg);
 
 /* 
  * Up-Down API

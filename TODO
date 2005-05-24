@@ -23,8 +23,7 @@ Design/Re-Code
 - only one load function for libcerebro?
 - default timeout_len configurable in config file
   - necessary for event based up/down
-- list interface w/ iterators count, foreach, find, etc.
-  - and type func??
+- rework nodelist/iterator interface error code stuff.
 - merge server datas into one hash??
 - merge servers into one server??
 - gendersllnl config, up listening threads dependent on cluster size

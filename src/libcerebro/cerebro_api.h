@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_api.h,v 1.14 2005-05-23 21:30:29 achu Exp $
+ *  $Id: cerebro_api.h,v 1.15 2005-05-24 00:07:45 achu Exp $
 \*****************************************************************************/
  
 #ifndef _CEREBRO_API_H
@@ -51,7 +51,7 @@ struct cerebro_nodelist {
   int32_t magic;
   int32_t errnum;
   List nodes;
-  /* XXX list of iterators? */
+  List iterators;
 };
 
 /* 
@@ -63,6 +63,7 @@ struct cerebro_nodelist_iterator {
   int32_t magic;
   int32_t errnum;
   ListIterator itr;
+  struct cerebro_nodelist *nodelist;
 };
 
 #endif /* _CEREBRO_API_H */
