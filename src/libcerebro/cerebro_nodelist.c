@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_nodelist.c,v 1.2 2005-05-24 00:07:45 achu Exp $
+ *  $Id: cerebro_nodelist.c,v 1.3 2005-05-24 00:10:08 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -280,24 +280,6 @@ cerebro_nodelist_iterator_next(cerebro_nodelist_iterator_t nodelistItr,
     }
 
   *node = (char *)list_next(nodelistItr->itr);
-  nodelistItr->errnum = CEREBRO_NODELIST_ITERATOR_ERR_SUCCESS;
-  return (*node) ? 1 : 0;
-}
-
-int
-cerebro_nodelist_iterator_peek(cerebro_nodelist_iterator_t nodelistItr,
-                               char **node)
-{
-  if (_cerebro_nodelist_iterator_check(nodelistItr) < 0)
-    return -1;
-
-  if (!node)
-    {
-      nodelistItr->errnum = CEREBRO_NODELIST_ITERATOR_ERR_PARAMETERS;
-      return -1;
-    }
-
-  *node = (char *)list_peek(nodelistItr->itr);
   nodelistItr->errnum = CEREBRO_NODELIST_ITERATOR_ERR_SUCCESS;
   return (*node) ? 1 : 0;
 }

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.21 2005-05-24 00:07:45 achu Exp $
+ *  $Id: cerebro.h,v 1.22 2005-05-24 00:10:08 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_H
@@ -203,16 +203,6 @@ cerebro_nodelist_iterator_t cerebro_nodelist_iterator_create(cerebro_nodelist_t 
  * Return 1 if node returned, 0 at end of list, -1 on error
  */
 int cerebro_nodelist_iterator_next(cerebro_nodelist_iterator_t itr, char **node);
-
-/* 
- * cerebro_nodelist_iterator_peek
- *
- * Retrieve next node from iterator, but do not move the nodename
- * pointer forward
- *
- * Return 1 if node returned, 0 at end of list, -1 on error
- */
-int cerebro_nodelist_iterator_peek(cerebro_nodelist_iterator_t itr, char **node);
 
 /* 
  * cerebro_nodelist_iterator_reset
