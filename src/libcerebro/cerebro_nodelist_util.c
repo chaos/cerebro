@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_nodelist_util.c,v 1.2 2005-05-24 00:07:45 achu Exp $
+ *  $Id: cerebro_nodelist_util.c,v 1.3 2005-05-24 21:35:34 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -165,8 +165,6 @@ _cerebro_nodelist_by_hostlist_create(cerebro_t handle, hostlist_t nodes)
         }
     }
   nodename = NULL;
-
-  list_sort(nodelist->nodes, (ListCmpF)strcmp);
 
   hostlist_iterator_destroy(itr);
   return nodelist;

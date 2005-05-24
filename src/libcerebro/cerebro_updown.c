@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_updown.c,v 1.46 2005-05-24 21:07:32 achu Exp $
+ *  $Id: cerebro_updown.c,v 1.47 2005-05-24 21:35:34 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -585,6 +585,12 @@ _cerebro_updown_response_receive_all(cerebro_t handle,
           goto cleanup;
         }
     }
+
+  if (updown_data->up_nodes)
+    hostlist_sort(updown_data->up_nodes);
+
+  if (updown_data->down_nodes)
+    hostlist_sort(updown-data->down_nodes);
 
   return 0;
  cleanup:
