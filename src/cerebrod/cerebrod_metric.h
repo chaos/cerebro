@@ -1,9 +1,24 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric.h,v 1.2 2005-05-19 22:21:10 achu Exp $
+ *  $Id: cerebrod_metric.h,v 1.3 2005-05-25 22:24:33 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_METRIC_H
 #define _CEREBROD_METRIC_H
+
+#include "list.h"
+ 
+/*
+ * struct cerebrod_metric_evaluation_data
+ *
+ * Holds data for callback functions
+ */
+struct cerebrod_metric_evaluation_data
+{
+  int client_fd;
+  struct cerebro_metric_request *req;
+  u_int32_t time_now;
+  List node_responses;
+};
 
 /*
  * cerebrod_metric

@@ -20,12 +20,17 @@ Portability
 - Non-pthreads support
 
 Design/Re-Code
+- nodelist_t, not cerebro_nodelist_t??
+- use get_node(), get_value(), get_type() into nodelist format.
 - modules so cerebro server can calculate additional metric in a special way?
 - up/down nodes gathered through metric?? names
   - "cluster_nodes"
   - "up_nodes"
   - "down_nodes"
-- How user get list of all nodes?
+- metric load flag, indicating only up nodes?
+  - requires "default up/down timeout_len" cnofig??
+- set_hostname(), set_port(), set_flags(), set_timeout_len() functions
+- internal system error on server not counted as "err_internal"?
 - check if metric name exists in list rather than hard coded
 - only one load function for libcerebro?
 - default timeout_len configurable in config file

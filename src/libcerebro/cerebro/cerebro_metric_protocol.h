@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_protocol.h,v 1.4 2005-05-25 20:39:35 achu Exp $
+ *  $Id: cerebro_metric_protocol.h,v 1.5 2005-05-25 22:24:33 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_METRIC_PROTOCOL_H
@@ -84,12 +84,13 @@
  * type for metric type
  */
 typedef enum {
-  CEREBRO_METRIC_TYPE_BOOL = 0,
-  CEREBRO_METRIC_TYPE_INT32 = 1,
-  CEREBRO_METRIC_TYPE_UNSIGNED_INT32 = 2,
-  CEREBRO_METRIC_TYPE_FLOAT = 3,
-  CEREBRO_METRIC_TYPE_DOUBLE = 4,
-  CEREBRO_METRIC_TYPE_STRING = 5
+  CEREBRO_METRIC_TYPE_NONE = 0,
+  CEREBRO_METRIC_TYPE_BOOL = 1,
+  CEREBRO_METRIC_TYPE_INT32 = 2,
+  CEREBRO_METRIC_TYPE_UNSIGNED_INT32 = 3,
+  CEREBRO_METRIC_TYPE_FLOAT = 4,
+  CEREBRO_METRIC_TYPE_DOUBLE = 5,
+  CEREBRO_METRIC_TYPE_STRING = 6
 } cerebro_metric_type_t;
 
 /* 

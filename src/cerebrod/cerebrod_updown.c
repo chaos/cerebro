@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.c,v 1.65 2005-05-25 20:39:35 achu Exp $
+ *  $Id: cerebrod_updown.c,v 1.66 2005-05-25 22:24:33 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -556,7 +556,10 @@ _cerebrod_updown_evaluate_updown_state(void *x, void *arg)
   if (rv != EBUSY)
     cerebro_err_exit("%s(%s:%d): mutex not locked: rv=%d",	
                      __FILE__, __FUNCTION__, __LINE__, rv);
+#endif /* CEREBRO_DEBUG */
 
+  Pthread_mutex_lock(&(nd->node_data_lock));
+#if CEREBRO_DEBUG
   /* With locking, it shouldn't be possible for local time to be
    * greater than the time stored in any last_received_time.
    */
@@ -574,7 +577,10 @@ _cerebrod_updown_evaluate_updown_state(void *x, void *arg)
        && updown_state != CEREBRO_UPDOWN_PROTOCOL_STATE_NODE_UP)
       || (ed->updown_request == CEREBRO_UPDOWN_PROTOCOL_REQUEST_DOWN_NODES
           && updown_state != CEREBRO_UPDOWN_PROTOCOL_STATE_NODE_DOWN))
-    return 0;
+    {
+      Pthread_mutex_unlock(&(nd->node_data_lock));
+      return 0;
+    }
 
   res = Malloc(sizeof(struct cerebro_updown_response));
   res->version = CEREBRO_UPDOWN_PROTOCOL_VERSION;
@@ -596,16 +602,18 @@ _cerebrod_updown_evaluate_updown_state(void *x, void *arg)
                         __FILE__, __FUNCTION__, __LINE__,
                         strerror(errno));
       Free(res);
+      Pthread_mutex_unlock(&(nd->node_data_lock));
       return -1;
     }
 
-  return 0;
+  Pthread_mutex_unlock(&(nd->node_data_lock));
+  return rv;
 }
 
 /*
  * _cerebrod_updown_response_send_all
  *
- * respond to the updown_request with a node
+ * respond to the metric_request with nodes
  *
  * Return 0 on success, -1 on error
  */
@@ -701,7 +709,6 @@ _cerebrod_updown_respond_with_updown_nodes(int client_fd,
 			_cerebrod_updown_response_send_all, 
 			&client_fd) < 0)
         {
-          Pthread_mutex_unlock(&cerebrod_node_data_lock);
           _cerebrod_updown_respond_with_error(client_fd,
                                               version,
                                               CEREBRO_UPDOWN_PROTOCOL_ERR_INTERNAL_SYSTEM_ERROR);
