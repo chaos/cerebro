@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.32 2005-05-11 16:38:12 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.33 2005-05-25 20:39:35 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -210,17 +210,17 @@ _cerebrod_heartbeat_marshall(struct cerebrod_heartbeat *hb,
                      __FILE__, __FUNCTION__, __LINE__);
   count += len;
   
-  if ((len = _cerebro_marshall_uint32(hb->starttime,
-                                      buf + count,
-                                      buflen - count)) < 0)
-    cerebro_err_exit("%s(%s:%d): _cerebro_marshall_uint32",
+  if ((len = _cerebro_marshall_unsigned_int32(hb->starttime,
+                                              buf + count,
+                                              buflen - count)) < 0)
+    cerebro_err_exit("%s(%s:%d): _cerebro_marshall_unsigned_int32",
                      __FILE__, __FUNCTION__, __LINE__);
   count += len;
   
-  if ((len = _cerebro_marshall_uint32(hb->boottime,
-                                      buf + count,
-                                      buflen - count)) < 0)
-    cerebro_err_exit("%s(%s:%d): _cerebro_marshall_uint32",
+  if ((len = _cerebro_marshall_unsigned_int32(hb->boottime,
+                                              buf + count,
+                                              buflen - count)) < 0)
+    cerebro_err_exit("%s(%s:%d): _cerebro_marshall_unsigned_int32",
                      __FILE__, __FUNCTION__, __LINE__);
   count += len;
   

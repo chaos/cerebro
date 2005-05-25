@@ -8,6 +8,9 @@ Testing
 Cleanup
 - metric_type data conversion thingie
 - cleanup common hash into "data" and put in data.c??
+- marshalling/unmarshall for metric value
+- rename _LEN req/res defines, b/c its about buffer lenghts, not length
+  of the struct??
 
 Audit
 - code review to reduce memory footprint
@@ -23,6 +26,7 @@ Design/Re-Code
   - "up_nodes"
   - "down_nodes"
 - How user get list of all nodes?
+- check if metric name exists in list rather than hard coded
 - only one load function for libcerebro?
 - default timeout_len configurable in config file
   - necessary for event based up/down

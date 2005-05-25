@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_marshalling.h,v 1.8 2005-05-19 19:59:40 achu Exp $
+ *  $Id: cerebro_marshalling.h,v 1.9 2005-05-25 20:39:35 achu Exp $
 \*****************************************************************************/
  
 #ifndef _CEREBRO_MARSHALLING_H
@@ -24,22 +24,26 @@ int _cerebro_marshall_int8(int8_t val, char *buf, unsigned int buflen);
 int _cerebro_marshall_int32(int32_t val, char *buf, unsigned int buflen);
 
 /*
- * _cerebro_marshall_uint8
+ * _cerebro_marshall_unsigned_int8
  *
  * marshall contents of an unsigned 8 bit integer
  *
  * Returns length of data copied into buffer, -1 on error
  */
-int _cerebro_marshall_uint8(u_int8_t val, char *buf, unsigned int buflen);
+int _cerebro_marshall_unsigned_int8(u_int8_t val, 
+                                    char *buf, 
+                                    unsigned int buflen);
 
 /*
- * _cerebro_marshall_uint32
+ * _cerebro_marshall_unsigned_int32
  *
  * marshall contents of an unsigned 32 bit integer
  *
  * Returns length of data copied into buffer, -1 on error
  */
-int _cerebro_marshall_uint32(u_int32_t val, char *buf, unsigned int buflen);
+int _cerebro_marshall_unsigned_int32(u_int32_t val, 
+                                     char *buf, 
+                                     unsigned int buflen);
 
 /*
  * _cerebro_marshall_float
@@ -96,28 +100,28 @@ int _cerebro_unmarshall_int32(int32_t *val,
                               unsigned int buflen);
 
 /*
- * _cerebro_unmarshall_uint8
+ * _cerebro_unmarshall_unsigned_int8
  *
  * unmarshall contents of an unsigned 8 bit integer
  *
  * Returns length of data unmarshalled from buffer, 0 if buffer does
  * not contain enough data, -1 on error
  */
-int _cerebro_unmarshall_uint8(u_int8_t *val, 
-                              const char *buf, 
-                              unsigned int buflen);
+int _cerebro_unmarshall_unsigned_int8(u_int8_t *val, 
+                                      const char *buf, 
+                                      unsigned int buflen);
 
 /*
- * _cerebro_unmarshall_uint32
+ * _cerebro_unmarshall_unsigned_int32
  *
  * unmarshall contents of an unsigned 32 bit integer
  *
  * Returns length of data unmarshalled from buffer, 0 if buffer does
  * not contain enough data, -1 on error
  */
-int _cerebro_unmarshall_uint32(u_int32_t *val, 
-                               const char *buf, 
-                               unsigned int buflen);
+int _cerebro_unmarshall_unsigned_int32(u_int32_t *val, 
+                                       const char *buf, 
+                                       unsigned int buflen);
 
 /*
  * _cerebro_unmarshall_float

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_updown.c,v 1.49 2005-05-25 17:09:43 achu Exp $
+ *  $Id: cerebro_updown.c,v 1.50 2005-05-25 20:39:35 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -213,18 +213,18 @@ _cerebro_updown_request_marshall(cerebro_t handle,
     }
   count += len;
 
-  if ((len = _cerebro_marshall_uint32(req->updown_request,
-                                      buf + count, 
-                                      buflen - count)) < 0)
+  if ((len = _cerebro_marshall_unsigned_int32(req->updown_request,
+                                              buf + count, 
+                                              buflen - count)) < 0)
     {
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
   count += len;
 
-  if ((len = _cerebro_marshall_uint32(req->timeout_len,
-                                      buf + count, 
-                                      buflen - count)) < 0)
+  if ((len = _cerebro_marshall_unsigned_int32(req->timeout_len,
+                                              buf + count, 
+                                              buflen - count)) < 0)
     {
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
@@ -271,9 +271,9 @@ _cerebro_updown_response_unmarshall(cerebro_t handle,
 
   count += len;
 
-  if ((len = _cerebro_unmarshall_uint32(&(res->updown_err_code),
-                                        buf + count,
-                                        buflen - count)) < 0)
+  if ((len = _cerebro_unmarshall_unsigned_int32(&(res->updown_err_code),
+                                                buf + count,
+                                                buflen - count)) < 0)
     {
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
@@ -283,9 +283,9 @@ _cerebro_updown_response_unmarshall(cerebro_t handle,
 
   count += len;
 
-  if ((len = _cerebro_unmarshall_uint8(&(res->end_of_responses),
-                                       buf + count,
-                                       buflen - count)) < 0)
+  if ((len = _cerebro_unmarshall_unsigned_int8(&(res->end_of_responses),
+                                               buf + count,
+                                               buflen - count)) < 0)
     {
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
@@ -308,9 +308,9 @@ _cerebro_updown_response_unmarshall(cerebro_t handle,
 
   count += len;
 
-  if ((len = _cerebro_unmarshall_uint8(&(res->updown_state),
-                                       buf + count,
-                                       buflen - count)) < 0)
+  if ((len = _cerebro_unmarshall_unsigned_int8(&(res->updown_state),
+                                               buf + count,
+                                               buflen - count)) < 0)
     {
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
