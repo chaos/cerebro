@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_node_data.c,v 1.6 2005-05-23 17:58:24 achu Exp $
+ *  $Id: cerebrod_node_data.c,v 1.7 2005-05-25 17:04:07 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -254,22 +254,22 @@ _cerebrod_node_data_metric_data_dump(void *data, const void *key, void *arg)
           metric_data->metric_type);
   switch (metric_data->metric_type)
     {
-    case CEREBROD_METRIC_TYPE_BOOL:
+    case CEREBRO_METRIC_TYPE_BOOL:
       fprintf(stderr, "metric_value=%d", metric_data->metric_value.val_bool);
       break;
-    case CEREBROD_METRIC_TYPE_INT32:
+    case CEREBRO_METRIC_TYPE_INT32:
       fprintf(stderr, "metric_value=%d", metric_data->metric_value.val_int32);
       break;
-    case CEREBROD_METRIC_TYPE_UNSIGNED_INT32:
+    case CEREBRO_METRIC_TYPE_UNSIGNED_INT32:
       fprintf(stderr, "metric_value=%u", metric_data->metric_value.val_unsigned_int32);
       break;
-    case CEREBROD_METRIC_TYPE_FLOAT:
+    case CEREBRO_METRIC_TYPE_FLOAT:
       fprintf(stderr, "metric_value=%f", metric_data->metric_value.val_float);
       break;
-    case CEREBROD_METRIC_TYPE_DOUBLE:
+    case CEREBRO_METRIC_TYPE_DOUBLE:
       fprintf(stderr, "metric_value=%f", metric_data->metric_value.val_double);
       break;
-    case CEREBROD_METRIC_TYPE_STRING:
+    case CEREBRO_METRIC_TYPE_STRING:
       /* Ensure null termination */
       memset(buf, '\0', CEREBRO_METRIC_STRING_MAXLEN+1);
       memcpy(buf, metric_data->metric_value.val_string, CEREBRO_METRIC_STRING_MAXLEN);
@@ -387,8 +387,8 @@ _cerebrod_node_data_list_dump(void)
 static void
 _cerebrod_metric_data_update(struct cerebrod_node_data *nd,
                              char *metric_name,
-                             cerebrod_metric_type_t metric_type,
-                             cerebrod_metric_value_t metric_value,
+                             cerebro_metric_type_t metric_type,
+                             cerebro_metric_value_t metric_value,
                              u_int32_t received_time)
 {
   struct cerebrod_metric_data *data;
@@ -398,12 +398,12 @@ _cerebrod_metric_data_update(struct cerebrod_node_data *nd,
 
   assert(nd);
   assert(metric_name);
-  assert(metric_type == CEREBROD_METRIC_TYPE_BOOL
-         || metric_type == CEREBROD_METRIC_TYPE_INT32
-         || metric_type == CEREBROD_METRIC_TYPE_UNSIGNED_INT32
-         || metric_type == CEREBROD_METRIC_TYPE_FLOAT
-         || metric_type == CEREBROD_METRIC_TYPE_DOUBLE
-         || metric_type == CEREBROD_METRIC_TYPE_STRING);
+  assert(metric_type == CEREBRO_METRIC_TYPE_BOOL
+         || metric_type == CEREBRO_METRIC_TYPE_INT32
+         || metric_type == CEREBRO_METRIC_TYPE_UNSIGNED_INT32
+         || metric_type == CEREBRO_METRIC_TYPE_FLOAT
+         || metric_type == CEREBRO_METRIC_TYPE_DOUBLE
+         || metric_type == CEREBRO_METRIC_TYPE_STRING);
 
 #if CEREBRO_DEBUG
   /* Should be called with lock already set */
@@ -495,7 +495,7 @@ cerebrod_node_data_update(char *nodename,
   Pthread_mutex_lock(&(nd->node_data_lock));
   if (received_time >= nd->last_received_time)
     {
-      cerebrod_metric_value_t val;
+      cerebro_metric_value_t val;
 
       nd->discovered = 1;
       nd->last_received_time = received_time;
@@ -503,14 +503,14 @@ cerebrod_node_data_update(char *nodename,
       val.val_unsigned_int32 = hb->starttime;
       _cerebrod_metric_data_update(nd,
                                    CEREBRO_METRIC_STARTTIME,
-                                   CEREBROD_METRIC_TYPE_UNSIGNED_INT32,
+                                   CEREBRO_METRIC_TYPE_UNSIGNED_INT32,
                                    val,
                                    received_time);
  
       val.val_unsigned_int32 = hb->boottime;
       _cerebrod_metric_data_update(nd,
                                    CEREBRO_METRIC_BOOTTIME,
-                                   CEREBROD_METRIC_TYPE_UNSIGNED_INT32,
+                                   CEREBRO_METRIC_TYPE_UNSIGNED_INT32,
                                    val,
                                    received_time);
 

@@ -1,29 +1,27 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_protocol.h,v 1.2 2005-05-19 22:21:10 achu Exp $
+ *  $Id: cerebro_metric_protocol.h,v 1.3 2005-05-25 17:04:07 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_METRIC_PROTOCOL_H
 #define _CEREBRO_METRIC_PROTOCOL_H
 
-#if 0
-
 #include <sys/types.h>
-
 #include <cerebro/cerebro_constants.h>
 
-/* Updown server protocol
+/* Metric server protocol
  *
  * Client -> Server
- * - Cerebro updown request.
+ * - Metric request.
  * 
  * Server -> Client
- * - Stream of updown responses indicating up/down metric of each
- *   node.  Stream of nodes returned will depend on the request.
- *   After the stream of nodes is complete, an "end of responses"
- *   response will indicate the end of stream and completion of
- *   the updown request.  This "end of responses" response will be
- *   sent even if no nodes are returned (i.e. only down nodes are
- *   requested, but all nodes are up).
+ * - Stream of node and node data responses indicating metric values.
+ *   Stream of nodes returned will depend on the request.  After the
+ *   stream of nodes is complete, an "end of responses" response will
+ *   indicate the end of stream and completion of the request.
+ *   This "end of responses" response will be sent even if no nodes are
+ *   returned (i.e. only down nodes are requested, but all nodes are
+ *   up, or no nodes are monitoring the indicated metric).
+
  * - On "normal" errors, the "end of responses" packet will contain 
  *   the error code.
  * - On version incompatability errors, older version responses
@@ -37,96 +35,129 @@
  *   so the server can respond to the client with a meaningful error
  *   message.
  */
-#endif /* 0 */
 
 #define CEREBRO_METRIC_PROTOCOL_VERSION                    1
 #define CEREBRO_METRIC_PROTOCOL_SERVER_TIMEOUT_LEN         3
 #define CEREBRO_METRIC_PROTOCOL_CLIENT_TIMEOUT_LEN         5
 #define CEREBRO_METRIC_PROTOCOL_CONNECT_TIMEOUT_LEN        5
 
+#define CEREBRO_METRIC_CLUSTER_NODES                       "cluster_nodes"
+#define CEREBRO_METRIC_UP_NODES                            "up_nodes"
+#define CEREBRO_METRIC_DOWN_NODES                          "down_nodes"
+#define CEREBRO_METRIC_UP_AND_DOWN_NODES                   "up_and_down_nodes"
 #define CEREBRO_METRIC_STARTTIME                           "starttime"
 #define CEREBRO_METRIC_BOOTTIME                            "boottime"
 
+#define CEREBRO_METRIC_PROTOCOL_ERR_SUCCESS                0
+#define CEREBRO_METRIC_PROTOCOL_ERR_VERSION_INVALID        1
+#define CEREBRO_METRIC_PROTOCOL_ERR_METRIC_NAME_UNKNOWN    2
+#define CEREBRO_METRIC_PROTOCOL_ERR_PARAMETER_INVALID      3
+#define CEREBRO_METRIC_PROTOCOL_ERR_PACKET_INVALID         4
+#define CEREBRO_METRIC_PROTOCOL_ERR_INTERNAL_SYSTEM_ERROR  5
+
+#define CEREBRO_METRIC_PROTOCOL_IS_LAST_RESPONSE           1
+#define CEREBRO_METRIC_PROTOCOL_IS_NOT_LAST_RESPONSE       0
+
+/* 
+ * Updown Definitions
+ */
 #if 0
+#define CEREBRO_UPDOWN_STATE_NODE_UP              1
+#define CEREBRO_UPDOWN_STATE_NODE_DOWN            0
+#endif
 
-#define CEREBRO_UPDOWN_PROTOCOL_ERR_SUCCESS                0
-#define CEREBRO_UPDOWN_PROTOCOL_ERR_VERSION_INVALID        1
-#define CEREBRO_UPDOWN_PROTOCOL_ERR_UPDOWN_REQUEST_INVALID 2
-#define CEREBRO_UPDOWN_PROTOCOL_ERR_TIMEOUT_INVALID        3
-#define CEREBRO_UPDOWN_PROTOCOL_ERR_PACKET_INVALID         4
-#define CEREBRO_UPDOWN_PROTOCOL_ERR_INTERNAL_SYSTEM_ERROR  5
+#define CEREBRO_METRIC_SERVER_PORT           8853
 
-#define CEREBRO_UPDOWN_PROTOCOL_REQUEST_UP_NODES           0
-#define CEREBRO_UPDOWN_PROTOCOL_REQUEST_DOWN_NODES         1
-#define CEREBRO_UPDOWN_PROTOCOL_REQUEST_UP_AND_DOWN_NODES  2
+#define CEREBRO_METRIC_MAX                   16
 
-#define CEREBRO_UPDOWN_PROTOCOL_STATE_NODE_UP              1
-#define CEREBRO_UPDOWN_PROTOCOL_STATE_NODE_DOWN            0
+#define CEREBRO_METRIC_NAME_MAXLEN           32
 
-#define CEREBRO_UPDOWN_PROTOCOL_IS_LAST_RESPONSE           1
-#define CEREBRO_UPDOWN_PROTOCOL_IS_NOT_LAST_RESPONSE       0
+#define CEREBRO_METRIC_STRING_MAXLEN         64
 
-#endif /* 0 */
-
-#define CEREBRO_METRIC_SERVER_PORT    8853
-
-#define CEREBRO_METRIC_MAX            16
-
-#define CEREBRO_METRIC_STRING_MAXLEN  64
-
-#if 0
+#define CEREBRO_METRIC_STRING_PARAM_MAXLEN   64
 
 /*
- * struct cerebro_updown_request
+ * cerebro_metric_type_t
  *
- * defines a updown server data request
+ * type for metric type
  */
-struct cerebro_updown_request
+typedef enum {
+  CEREBRO_METRIC_TYPE_BOOL = 0,
+  CEREBRO_METRIC_TYPE_INT32 = 1,
+  CEREBRO_METRIC_TYPE_UNSIGNED_INT32 = 2,
+  CEREBRO_METRIC_TYPE_FLOAT = 3,
+  CEREBRO_METRIC_TYPE_DOUBLE = 4,
+  CEREBRO_METRIC_TYPE_STRING = 5
+} cerebro_metric_type_t;
+
+/* 
+ * cerebro_metric_value_t
+ *
+ * metric value
+ */
+typedef union {
+  char      val_bool;
+  int32_t   val_int32;
+  u_int32_t val_unsigned_int32;
+  float     val_float;
+  double    val_double;
+  char      val_string[CEREBRO_METRIC_STRING_MAXLEN];
+} cerebro_metric_value_t;
+
+/*
+ * struct cerebro_metric_request
+ *
+ * defines a metric server data request
+ */
+struct cerebro_metric_request
 {
   int32_t version;
-  u_int32_t updown_request;
-  u_int32_t timeout_len;
+  char metric_name[CEREBRO_METRIC_NAME_MAXLEN];
+  int32_t int32_param1;
+  u_int32_t unsigned_int32_param1;
+  char string_param1[CEREBRO_METRIC_STRING_PARAM_MAXLEN];
 };
   
-#define CEREBRO_UPDOWN_REQUEST_LEN  (sizeof(int32_t) \
+#define CEREBRO_METRIC_REQUEST_LEN  (sizeof(int32_t) \
+                                     + CEREBRO_MAXNODENAMELEN \
+                                     + sizeof(int32_t) \
                                      + sizeof(u_int32_t) \
-                                     + sizeof(u_int32_t))
+                                     + CEREBRO_METRIC_STRING_PARAM_MAXLEN)
 
 /*
- * struct cerebro_updown_response
+ * struct cerebro_metric_response
  *
- * defines a updown server data response
+ * defines a metric server data response
  */
-struct cerebro_updown_response
+struct cerebro_metric_response
 {
   int32_t version;
-  u_int32_t updown_err_code;
+  u_int32_t metric_err_code;
   u_int8_t end_of_responses;
   char nodename[CEREBRO_MAXNODENAMELEN];
-  u_int8_t updown_state;
+  cerebro_metric_type_t metric_type; 
+  cerebro_metric_value_t metric_value;
 };
   
-#define CEREBRO_UPDOWN_RESPONSE_LEN  (sizeof(int32_t) \
+#define CEREBRO_METRIC_RESPONSE_LEN  (sizeof(int32_t) \
                                       + sizeof(u_int32_t) \
                                       + sizeof(u_int8_t) \
                                       + CEREBRO_MAXNODENAMELEN \
-                                      + sizeof(u_int8_t))
+                                      + sizeof(cerebro_metric_type_t) \
+                                      + sizeof(cerebro_metric_value_t))
 
 /*
- * struct cerebro_updown_err_response
+ * struct cerebro_metric_err_response
  *
- * defines a updown server invalid version or packet response
+ * defines a metric server invalid version or packet response
  */
-struct cerebro_updown_err_response
+struct cerebro_metric_err_response
 {
   int32_t version;
-  u_int32_t updown_err_code;
+  u_int32_t metric_err_code;
 };
   
-#define CEREBRO_UPDOWN_ERR_RESPONSE_LEN  (sizeof(int32_t) \
+#define CEREBRO_METRIC_ERR_RESPONSE_LEN  (sizeof(int32_t) \
                                           + sizeof(u_int32_t))
-
-
-#endif /* 0 */
 
 #endif /* _CEREBRO_METRIC_PROTOCOL_H */

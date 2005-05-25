@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.c,v 1.63 2005-05-23 18:11:07 achu Exp $
+ *  $Id: cerebrod_updown.c,v 1.64 2005-05-25 17:04:07 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -302,8 +302,8 @@ _cerebrod_updown_request_receive(int client_fd,
 	   * the received bytes.  Its possible we are expecting more
 	   * bytes than the client is sending, perhaps because we are
 	   * using a different protocol version.  This will allow the
-	   * server to return a invalid version number back to the
-	   * user.
+	   * server to return a invalid version number error back to
+	   * the user.
 	   */
 	  if (!bytes_read)
 	    goto cleanup;

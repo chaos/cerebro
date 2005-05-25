@@ -6,8 +6,6 @@ Testing
 - mem-leaking
 
 Cleanup
-- common code for looping servers??
-- common code for various server code
 - metric_type data conversion thingie
 - cleanup common hash into "data" and put in data.c??
 
@@ -19,6 +17,11 @@ Portability
 - Non-pthreads support
 
 Design/Re-Code
+- modules so cerebro server can calculate additional metric in a special way?
+- up/down nodes gathered through metric?? names
+  - "cluster_nodes"
+  - "up_nodes"
+  - "down_nodes"
 - How user get list of all nodes?
 - only one load function for libcerebro?
 - default timeout_len configurable in config file

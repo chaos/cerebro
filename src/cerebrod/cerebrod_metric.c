@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric.c,v 1.6 2005-05-23 18:11:07 achu Exp $
+ *  $Id: cerebrod_metric.c,v 1.7 2005-05-25 17:04:07 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -189,15 +189,17 @@ _cerebrod_updown_err_response_marshall(struct cerebro_updown_err_response *err_r
   return count;
 }
 
+#endif /* 0 */
+
 /*
- * _cerebrod_updown_request_unmarshall
+ * _cerebrod_metric_request_unmarshall
  *
- * unmarshall contents of a updown request packet buffer
+ * unmarshall contents of a metric request packet buffer
  *
  * Returns length of data unmarshalled on success, -1 on error
  */
 static int
-_cerebrod_updown_request_unmarshall(struct cerebro_updown_request *req,
+_cerebrod_metric_request_unmarshall(struct cerebro_metric_request *req,
 				    const char *buf, 
                                     unsigned int buflen)
 {
@@ -220,7 +222,22 @@ _cerebrod_updown_request_unmarshall(struct cerebro_updown_request *req,
 
   count += len;
 
-  if ((len = _cerebro_unmarshall_uint32(&(req->updown_request), 
+  if ((len = _cerebro_unmarshall_buffer(req->metric_name,
+                                        sizeof(req->metric_name),
+                                        buf + count,
+                                        buflen - count)) < 0)
+    {
+      cerebro_err_debug("%s(%s:%d): _cerebro_unmarshall_buffer",
+                        __FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+
+  if (!len)
+    return count;
+
+  count += len;
+
+  if ((len = _cerebro_unmarshall_uint32(&(req->int32_param1), 
                                         buf + count, 
                                         buflen - count)) < 0)
     {
@@ -234,11 +251,26 @@ _cerebrod_updown_request_unmarshall(struct cerebro_updown_request *req,
 
   count += len;
  
-  if ((len = _cerebro_unmarshall_uint32(&(req->timeout_len), 
+  if ((len = _cerebro_unmarshall_uint32(&(req->unsigned_int32_param1), 
                                         buf + count, 
                                         buflen - count)) < 0)
     {
       cerebro_err_debug("%s(%s:%d): _cerebro_unmarshall_uint32",
+                        __FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+
+  if (!len)
+    return count;
+
+  count += len;
+
+  if ((len = _cerebro_unmarshall_buffer(req->string_param1,
+                                        sizeof(req->string_param1),
+                                        buf + count,
+                                        buflen - count)) < 0)
+    {
+      cerebro_err_debug("%s(%s:%d): _cerebro_unmarshall_buffer",
                         __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
@@ -252,33 +284,33 @@ _cerebrod_updown_request_unmarshall(struct cerebro_updown_request *req,
 }
 
 /*
- * _cerebrod_updown_request_receive
+ * _cerebrod_metric_request_receive
  *
- * Receive updown server request
+ * Receive metric server request
  * 
  * Return request packet and length of packet unmarshalled on success,
  * -1 on error
  */
 static int
-_cerebrod_updown_request_receive(int client_fd,	
-				 struct cerebro_updown_request *req)
+_cerebrod_metric_request_receive(int client_fd,	
+				 struct cerebro_metric_request *req)
 {
   int rv, bytes_read = 0;
   char buf[CEREBRO_PACKET_BUFLEN];
-
+  
   assert(client_fd >= 0);
   assert(req);
-
+  
   memset(buf, '\0', CEREBRO_PACKET_BUFLEN);
-
+  
   /* Wait for request from client */
-  while (bytes_read < CEREBRO_UPDOWN_REQUEST_LEN)
+  while (bytes_read < CEREBRO_METRIC_REQUEST_LEN)
     {
       fd_set rfds;
       struct timeval tv;
       int num;
 
-      tv.tv_sec = CEREBRO_UPDOWN_PROTOCOL_SERVER_TIMEOUT_LEN;
+      tv.tv_sec = CEREBRO_METRIC_PROTOCOL_SERVER_TIMEOUT_LEN;
       tv.tv_usec = 0;
       
       FD_ZERO(&rfds);
@@ -298,8 +330,8 @@ _cerebrod_updown_request_receive(int client_fd,
 	   * the received bytes.  Its possible we are expecting more
 	   * bytes than the client is sending, perhaps because we are
 	   * using a different protocol version.  This will allow the
-	   * server to return a invalid version number back to the
-	   * user.
+	   * server to return a invalid version number error back to
+	   * the user.
 	   */
 	  if (!bytes_read)
 	    goto cleanup;
@@ -312,12 +344,12 @@ _cerebrod_updown_request_receive(int client_fd,
 	  int n;
 
           /* Don't use fd_read_n b/c it loops until exactly
-           * CEREBRO_UPDOWN_REQUEST_LEN is read.  Due to version
+           * CEREBRO_METRIC_REQUEST_LEN is read.  Due to version
            * incompatability, we may want to read a smaller packet.
            */
 	  if ((n = read(client_fd, 
                         buf + bytes_read, 
-                        CEREBRO_UPDOWN_REQUEST_LEN - bytes_read)) < 0)
+                        CEREBRO_METRIC_REQUEST_LEN - bytes_read)) < 0)
 	    {
 	      cerebro_err_debug("%s(%s:%d): read: %s", 
                                 __FILE__, __FUNCTION__, __LINE__,
@@ -342,7 +374,7 @@ _cerebrod_updown_request_receive(int client_fd,
     }
 
  unmarshall_received:
-  if ((rv = _cerebrod_updown_request_unmarshall(req, buf, bytes_read)) < 0)
+  if ((rv = _cerebrod_metric_request_unmarshall(req, buf, bytes_read)) < 0)
     goto cleanup;
 
   return rv;
@@ -350,6 +382,8 @@ _cerebrod_updown_request_receive(int client_fd,
  cleanup:
   return -1;
 }
+
+#if 0
 
 /*  
  * _cerebrod_updown_request_dump
@@ -731,7 +765,7 @@ _cerebrod_updown_respond_with_updown_nodes(int client_fd,
  * _cerebrod_metric_service_connection
  *
  * Thread to service a connection from a client to retrieve metric
- * node data.  Use wrapper functions minimally, b/c we want to return
+ * data.  Use wrapper functions minimally, b/c we want to return
  * errors to the user instead of exitting with errors.
  *
  * Passed int * pointer to client TCP socket file descriptor
@@ -741,7 +775,6 @@ _cerebrod_updown_respond_with_updown_nodes(int client_fd,
 static void *
 _cerebrod_metric_service_connection(void *arg)
 {
-#if 0
   int client_fd, req_len;
   struct cerebro_metric_request req;
   client_fd = *((int *)arg);
@@ -753,6 +786,7 @@ _cerebrod_metric_service_connection(void *arg)
      */
     goto out;
   
+#if 0
   _cerebrod_metric_request_dump(&req);
 
   if (req_len != CEREBRO_METRIC_REQUEST_LEN)
@@ -804,10 +838,10 @@ _cerebrod_metric_service_connection(void *arg)
 						 req.timeout_len) < 0)
     goto out;
 
+#endif /* 0 */
  out:
   Free(arg);
   Close(client_fd);
-#endif /* 0 */
   return NULL;
 }
 
