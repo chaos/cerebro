@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.23 2005-05-24 21:07:32 achu Exp $
+ *  $Id: cerebro.h,v 1.24 2005-05-25 17:09:43 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_H
@@ -318,59 +318,5 @@ cerebro_nodelist_t cerebro_updown_get_up_nodes(cerebro_t handle);
  * Returns an iterator on success, NULL on error
  */
 cerebro_nodelist_t cerebro_updown_get_down_nodes(cerebro_t handle);
-
-/*
- * cerebro_updown_get_up_nodes_string
- *
- * Retrieve a ranged string of up nodes and store it in the buffer.
- *
- * Returns 0 on success, -1 on error
- */
-int cerebro_updown_get_up_nodes_string(cerebro_t handle, char *buf, unsigned int buflen);
-
-/*
- * cerebro_updown_get_down_nodes_string
- *
- * Retrieve a ranged string of down nodes and store it in the buffer
- *
- * Returns 0 on success, -1 on error
- */
-int cerebro_updown_get_down_nodes_string(cerebro_t handle, char *buf, unsigned int buflen);
-
-/*
- * cerebro_updown_is_node_up
- *
- * Check if a node is up.
- *
- * Returns 1 if up, 0 if down, -1 on error
- */
-int cerebro_updown_is_node_up(cerebro_t handle, const char *node);
-
-/*
- * cerebro_updown_is_node_down
- *
- * Check if a node is down.
- *
- * Returns 1 if down, 0 if up, -1 on error
- */
-int cerebro_updown_is_node_down(cerebro_t handle, const char *node);
-
-/*
- * cerebro_updown_up_count
- *
- * Determine the number of up nodes.
- *
- * Returns up count on success, -1 on error
- */
-int cerebro_updown_up_count(cerebro_t handle);
-
-/*
- * cerebro_updown_down_count
- *
- * Determine the number of down nodes. 
- *
- * Returns down count on success, -1 on error
- */
-int cerebro_updown_down_count(cerebro_t handle);
 
 #endif /* _CEREBRO_H */

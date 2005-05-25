@@ -1,6 +1,8 @@
 2005-05-25  Albert Chu  <chu11@llnl.gov>
 
 	* Continue work on metric server.
+
+	* Remove API functions obsoleted by nodelists.
 	
 2005-05-24  Albert Chu  <chu11@llnl.gov>
 
