@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_error.c,v 1.8 2005-05-05 22:24:59 achu Exp $
+ *  $Id: cerebro_error.c,v 1.9 2005-05-26 18:23:38 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -34,6 +34,7 @@ cerebro_err_init(char *prog)
 {
   if (!prog)
     return;
+
   err_init(prog);
 
   cerebro_err_initialized++;

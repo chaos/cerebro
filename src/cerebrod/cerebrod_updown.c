@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.c,v 1.66 2005-05-25 22:24:33 achu Exp $
+ *  $Id: cerebrod_updown.c,v 1.67 2005-05-26 18:23:38 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -582,7 +582,13 @@ _cerebrod_updown_evaluate_updown_state(void *x, void *arg)
       return 0;
     }
 
-  res = Malloc(sizeof(struct cerebro_updown_response));
+  if (!(res = malloc(sizeof(struct cerebro_updown_response))))
+    {
+      cerebro_err_debug("%s(%s:%d): out of memory",
+                        __FILE__, __FUNCTION__, __LINE__);
+      Pthread_mutex_unlock(&(nd->node_data_lock));
+      return -1;
+    }
   res->version = CEREBRO_UPDOWN_PROTOCOL_VERSION;
   res->updown_err_code = CEREBRO_UPDOWN_PROTOCOL_ERR_SUCCESS;
   res->end_of_responses = CEREBRO_UPDOWN_PROTOCOL_IS_NOT_LAST_RESPONSE;
@@ -668,7 +674,7 @@ _cerebrod_updown_respond_with_updown_nodes(int client_fd,
       goto end_response;
     }
 
-  if (!(node_responses = list_create((ListDelF)_Free)))
+  if (!(node_responses = list_create((ListDelF)free)))
     {
       cerebro_err_debug("%s(%s:%d): list_create: %s", 
                         __FILE__, __FUNCTION__, __LINE__,

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.c,v 1.29 2005-05-04 17:24:05 achu Exp $
+ *  $Id: wrappers.c,v 1.30 2005-05-26 18:23:38 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -19,6 +19,27 @@ extern int h_errno;
 #define MALLOC_MAGIC      0xf0e0d0c0
 #define MALLOC_PAD_DATA   0xab
 #define MALLOC_PAD_LEN    16
+
+void 
+wrappers_err_init(char *prog)
+{
+  if (!prog)
+    return;
+
+  err_init(prog);
+}
+ 
+int 
+wrappers_err_get_flags(void)
+{
+  return err_get_flags();
+}
+ 
+void 
+wrappers_err_set_flags(int flags)
+{
+  err_set_flags(flags);
+}
 
 void *
 wrap_malloc(const char *file, const char *function, int line, size_t size)

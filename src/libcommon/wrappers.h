@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.h,v 1.25 2005-04-27 18:11:35 achu Exp $
+ *  $Id: wrappers.h,v 1.26 2005-05-26 18:23:38 achu Exp $
 \*****************************************************************************/
 
 #ifndef _WRAPPERS_H
@@ -48,11 +48,38 @@
 #include <signal.h>
 #include <dirent.h>
 
+#include "error.h"
 #if !WITH_STATIC_MODULES
 #include "ltdl.h"
 #endif
 #include "list.h"
 #include "hash.h"
+
+#define WRAPPERS_ERROR_STDOUT  ERROR_STDOUT
+#define WRAPPERS_ERROR_STDERR  ERROR_STDERR
+#define WRAPPERS_ERROR_SYSLOG  ERROR_SYSLOG
+
+/*
+ * wrappers_err_init
+ *
+ * Initializes wrappers error lib
+ */
+void wrappers_err_init(char *prog);
+ 
+/*
+ * wrappers_err_get_flags
+ *
+ * Returns the currently set flags
+ */
+int wrappers_err_get_flags(void);
+ 
+/*
+ * wrappers_err_set_flags
+ *
+ * Sets the error lib flags to 'flags'.
+ */
+void wrappers_err_set_flags(int flags);
+
 
 /* 
  * Memory/String Wrappers 

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_updown_protocol.h,v 1.1 2005-05-05 16:12:57 achu Exp $
+ *  $Id: cerebro_updown_protocol.h,v 1.2 2005-05-26 18:23:38 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_UPDOWN_PROTOCOL_H
@@ -58,7 +58,7 @@
 #define CEREBRO_UPDOWN_PROTOCOL_IS_LAST_RESPONSE           1
 #define CEREBRO_UPDOWN_PROTOCOL_IS_NOT_LAST_RESPONSE       0
 
-#define CEREBRO_UPDOWN_SERVER_PORT                         8852
+#define CEREBRO_UPDOWN_SERVER_PORT                         8853
 
 #define CEREBRO_UPDOWN_TIMEOUT_LEN_DEFAULT                 60 
 

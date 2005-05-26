@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_protocol.h,v 1.5 2005-05-25 22:24:33 achu Exp $
+ *  $Id: cerebro_metric_protocol.h,v 1.6 2005-05-26 18:23:38 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_METRIC_PROTOCOL_H
@@ -44,7 +44,7 @@
 #define CEREBRO_METRIC_CLUSTER_NODES                       "cluster_nodes"
 #define CEREBRO_METRIC_UP_NODES                            "up_nodes"
 #define CEREBRO_METRIC_DOWN_NODES                          "down_nodes"
-#define CEREBRO_METRIC_UP_AND_DOWN_NODES                   "updown_state"
+#define CEREBRO_METRIC_UPDOWN_STATE                        "updown_state"
 #define CEREBRO_METRIC_STARTTIME                           "starttime"
 #define CEREBRO_METRIC_BOOTTIME                            "boottime"
 
@@ -66,7 +66,7 @@
 #define CEREBRO_UPDOWN_STATE_NODE_DOWN            0
 #endif
 
-#define CEREBRO_METRIC_SERVER_PORT           8853
+#define CEREBRO_METRIC_SERVER_PORT           8852
 
 #define CEREBRO_METRIC_MAX                   16
 
@@ -122,7 +122,7 @@ struct cerebro_metric_request
 };
   
 #define CEREBRO_METRIC_REQUEST_LEN  (sizeof(int32_t) \
-                                     + CEREBRO_MAXNODENAMELEN \
+                                     + CEREBRO_METRIC_NAME_MAXLEN \
                                      + sizeof(int32_t) \
                                      + sizeof(u_int32_t) \
                                      + CEREBRO_METRIC_STRING_PARAM_MAXLEN)

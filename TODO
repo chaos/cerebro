@@ -20,6 +20,8 @@ Portability
 - Non-pthreads support
 
 Design/Re-Code
+- cleanup error thing w/ 2 inits
+- timeout length ability with metric up/down
 - nodelist_t, not cerebro_nodelist_t??
 - use get_node(), get_value(), get_type() into nodelist format.
 - modules so cerebro server can calculate additional metric in a special way?
@@ -31,7 +33,7 @@ Design/Re-Code
   - requires "default up/down timeout_len" cnofig??
 - set_hostname(), set_port(), set_flags(), set_timeout_len() functions
 - internal system error on server not counted as "err_internal"?
-- check if metric name exists in list rather than hard coded
+- check if metric name exists in list/hash rather than hard coded
 - only one load function for libcerebro?
 - default timeout_len configurable in config file
   - necessary for event based up/down

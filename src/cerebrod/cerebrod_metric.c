@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric.c,v 1.9 2005-05-25 22:24:33 achu Exp $
+ *  $Id: cerebrod_metric.c,v 1.10 2005-05-26 18:23:38 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -666,6 +666,67 @@ _cerebrod_metric_response_send_all(void *x, void *arg)
   return 0;
 }
 
+/* 
+ * _cerebrod_metric_response_create
+ *
+ * Create a metric response and add it to the list of responses
+ * to reply with.
+ *
+ * Returns 0 on success, -1 on error
+ */
+static int
+_cerebrod_metric_response_create(char *nodename,
+                                 cerebro_metric_type_t metric_type,
+                                 cerebro_metric_value_t *metric_value,
+                                 List node_responses)
+{
+  struct cerebro_metric_response *res = NULL;
+
+  assert(nodename);
+  assert(node_responses);
+  
+  if (!(res = malloc(sizeof(struct cerebro_metric_response))))
+    {
+      cerebro_err_debug("%s(%s:%d): out of memory",
+                        __FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+  memset(res, '\0', sizeof(struct cerebro_metric_response));
+
+  res->version = CEREBRO_METRIC_PROTOCOL_VERSION;
+  res->metric_err_code = CEREBRO_METRIC_PROTOCOL_ERR_SUCCESS;
+  res->end_of_responses = CEREBRO_METRIC_PROTOCOL_IS_NOT_LAST_RESPONSE;
+#if CEREBRO_DEBUG
+  if (nodename && strlen(nodename) > CEREBRO_MAXNODENAMELEN)
+    cerebro_err_debug("%s(%s:%d): invalid node name length: %s", 
+                      __FILE__, __FUNCTION__, __LINE__,
+                      nodename);
+#endif /* CEREBRO_DEBUG */
+      
+  /* strncpy, b/c terminating character not required */
+  strncpy(res->nodename, nodename, CEREBRO_MAXNODENAMELEN);
+      
+  res->metric_type = metric_type;
+  if (metric_value)
+    memcpy(&(res->metric_value), 
+           metric_value, 
+           sizeof(cerebro_metric_value_t));
+  
+  if (!list_append(node_responses, res))
+    {
+      cerebro_err_debug("%s(%s:%d): list_append: %s", 
+                        __FILE__, __FUNCTION__, __LINE__,
+                        strerror(errno));
+      goto cleanup;
+    }
+
+  return 0;
+
+ cleanup:
+  Free(res);
+  return -1;
+}
+
 /*  
  * _cerebrod_metric_evaluate
  *
@@ -679,7 +740,6 @@ _cerebrod_metric_evaluate(void *x, void *arg)
 {
   struct cerebrod_node_data *nd;
   struct cerebrod_metric_evaluation_data *ed;
-  struct cerebro_metric_response *res = NULL;
   struct cerebrod_metric_data *data;
 #if CEREBRO_DEBUG
   int rv;
@@ -710,8 +770,8 @@ _cerebrod_metric_evaluate(void *x, void *arg)
                       __FILE__, __FUNCTION__, __LINE__);
 #endif /* CEREBRO_DEBUG */
 
-  /* save for later */
 #if 0
+  /* save for later */
   if ((ed->time_now - nd->last_received) < ed->timeout_len)
     metric_state = CEREBRO_METRIC_PROTOCOL_STATE_NODE_UP;
   else
@@ -721,40 +781,45 @@ _cerebrod_metric_evaluate(void *x, void *arg)
        && metric_state != CEREBRO_METRIC_PROTOCOL_STATE_NODE_UP)
       || (ed->metric_request == CEREBRO_METRIC_PROTOCOL_REQUEST_DOWN_NODES
           && metric_state != CEREBRO_METRIC_PROTOCOL_STATE_NODE_DOWN))
-    return 0;
+    {
+      Pthread_mutex_unlock(&(nd->node_data_lock));
+      return 0;
+    }
 #endif /* 0 */
 
-  if ((data = Hash_find(nd->metric_data, ed->req->metric_name)))
+  if (!strcmp(ed->req->metric_name, CEREBRO_METRIC_CLUSTER_NODES))
     {
-      res = Malloc(sizeof(struct cerebro_metric_response));
-      res->version = CEREBRO_METRIC_PROTOCOL_VERSION;
-      res->metric_err_code = CEREBRO_METRIC_PROTOCOL_ERR_SUCCESS;
-      res->end_of_responses = CEREBRO_METRIC_PROTOCOL_IS_NOT_LAST_RESPONSE;
-#if CEREBRO_DEBUG
-      if (nd->nodename && strlen(nd->nodename) > CEREBRO_MAXNODENAMELEN)
-        cerebro_err_debug("%s(%s:%d): invalid node name length: %s", 
-                          __FILE__, __FUNCTION__, __LINE__,
-                          nd->nodename);
-#endif /* CEREBRO_DEBUG */
-      
-      /* strncpy, b/c terminating character not required */
-      strncpy(res->nodename, nd->nodename, CEREBRO_MAXNODENAMELEN);
-      
-      res->metric_type = data->metric_type;
-      memcpy(&(res->metric_value), 
-             &(data->metric_type), 
-             sizeof(cerebro_metric_value_t));
-
-      if (!list_append(ed->node_responses, res))
+      if (_cerebrod_metric_response_create(nd->nodename,
+                                           CEREBRO_METRIC_TYPE_NONE,
+                                           NULL,
+                                           ed->node_responses) < 0)
         {
-          cerebro_err_debug("%s(%s:%d): list_append: %s", 
-                            __FILE__, __FUNCTION__, __LINE__,
-                            strerror(errno));
-          Free(res);
+          Pthread_mutex_unlock(&(nd->node_data_lock));
+          return -1;
+        }
+    }
+  else if (!strcmp(ed->req->metric_name, CEREBRO_METRIC_UP_NODES))
+    {
+    }
+  else if (!strcmp(ed->req->metric_name, CEREBRO_METRIC_DOWN_NODES))
+    {
+    }
+  else if (!strcmp(ed->req->metric_name, CEREBRO_METRIC_UPDOWN_STATE))
+    {
+    }
+  else if ((data = Hash_find(nd->metric_data, ed->req->metric_name)))
+    {
+      if (_cerebrod_metric_response_create(nd->nodename,
+                                           data->metric_type,
+                                           &(data->metric_value),
+                                           ed->node_responses) < 0)
+        {
+          Pthread_mutex_unlock(&(nd->node_data_lock));
           return -1;
         }
     }
 
+  Pthread_mutex_unlock(&(nd->node_data_lock));
   return 0;
 }
 
@@ -784,7 +849,7 @@ _cerebrod_metric_respond_with_nodes(int client_fd, struct cerebro_metric_request
       goto end_response;
     }
 
-  if (!(node_responses = list_create((ListDelF)_Free)))
+  if (!(node_responses = list_create((ListDelF)free)))
     {
       cerebro_err_debug("%s(%s:%d): list_create: %s", 
                         __FILE__, __FUNCTION__, __LINE__,
