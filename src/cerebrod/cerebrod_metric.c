@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric.c,v 1.10 2005-05-26 18:23:38 achu Exp $
+ *  $Id: cerebrod_metric.c,v 1.11 2005-05-27 20:49:54 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -787,6 +787,10 @@ _cerebrod_metric_evaluate(void *x, void *arg)
     }
 #endif /* 0 */
 
+  /* 
+   * XXX needs to be cleaned up
+   */
+
   if (!strcmp(ed->req->metric_name, CEREBRO_METRIC_CLUSTER_NODES))
     {
       if (_cerebrod_metric_response_create(nd->nodename,
@@ -972,8 +976,12 @@ _cerebrod_metric_service_connection(void *arg)
       goto out;
     }
 
-  if (!strcmp(req.metric_name, CEREBRO_METRIC_STARTTIME)
-      || !strcmp(req.metric_name, CEREBRO_METRIC_BOOTTIME))
+  /* 
+   * XXX needs to be cleaned up
+   */
+  if (strcmp(req.metric_name, CEREBRO_METRIC_CLUSTER_NODES)
+      && strcmp(req.metric_name, CEREBRO_METRIC_STARTTIME)
+      && strcmp(req.metric_name, CEREBRO_METRIC_BOOTTIME))
     {
       _cerebrod_metric_respond_with_error(client_fd,
                                           req.version,

@@ -20,6 +20,9 @@ Portability
 - Non-pthreads support
 
 Design/Re-Code
+- metric flags -
+    - if_up 
+    - if not exist in node do default?
 - cleanup error thing w/ 2 inits
 - timeout length ability with metric up/down
 - nodelist_t, not cerebro_nodelist_t??
