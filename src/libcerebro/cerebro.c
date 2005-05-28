@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.c,v 1.20 2005-05-28 15:40:23 achu Exp $
+ *  $Id: cerebro.c,v 1.21 2005-05-28 16:06:44 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -62,7 +62,6 @@ cerebro_handle_create(void)
   handle->flags = 0;
   handle->loaded_state = 0;
   memset(&(handle->config_data), '\0', sizeof(struct cerebro_config));
-  handle->updown_data = NULL;
 
  cleanup:
   return handle;
@@ -92,18 +91,6 @@ cerebro_handle_destroy(cerebro_t handle)
         return -1;
       
       if (handle->loaded_state & CEREBRO_CLUSTERLIST_MODULE_LOADED)
-        {
-          handle->errnum = CEREBRO_ERR_INTERNAL;
-          return -1;
-        }
-    }
-
-  if (handle->loaded_state & CEREBRO_UPDOWN_DATA_LOADED)
-    {
-      if (cerebro_updown_unload_data(handle) < 0)
-        return -1;
-
-      if (handle->loaded_state & CEREBRO_UPDOWN_DATA_LOADED)
         {
           handle->errnum = CEREBRO_ERR_INTERNAL;
           return -1;

@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.45 2005-05-23 21:30:29 achu Exp $
+## $Id: Makefile.am,v 1.46 2005-05-28 16:06:44 achu Exp $
 ##*****************************************************************************
 
 if WITH_GNU_LD
@@ -27,7 +27,6 @@ nobase_include_HEADERS = cerebro/cerebro_clusterlist_module.h \
 			 cerebro/cerebro_constants.h \
 			 cerebro/cerebro_error.h \
 			 cerebro/cerebro_metric_protocol.h \
-			 cerebro/cerebro_updown_protocol.h \
 			 cerebro/cerebrod_heartbeat_protocol.h
 
 cerebro_clusterlist_module_builddir=`cd $(top_builddir)/src/modules/clusterlist && pwd`
@@ -47,7 +46,6 @@ libcerebro_la_SOURCES = cerebro.c \
 			cerebro_module_default.c \
 			cerebro_nodelist.c \
 			cerebro_nodelist_util.c \
-			cerebro_updown.c \
 			cerebro_util.c
 libcerebro_la_LDFLAGS = -version-info @LIBCEREBRO_VERSION_INFO@ \
 			$(CEREBRO_OTHER_FLAGS)

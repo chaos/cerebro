@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_util.c,v 1.7 2005-05-19 16:40:40 achu Exp $
+ *  $Id: cerebro_config_util.c,v 1.8 2005-05-28 16:06:44 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -124,7 +124,7 @@ _cb_cerebrod_heartbeat_freq(conffile_t cf, struct conffile_data *data,
 }
 
 /*
- * _cb_cerebro_updown_hostnames
+ * _cb_cerebro_hostnames
  *
  * conffile callback function that parses and stores an array of
  * strings
@@ -132,9 +132,9 @@ _cb_cerebrod_heartbeat_freq(conffile_t cf, struct conffile_data *data,
  * Returns 0 on success, -1 on error
  */
 static int
-_cb_cerebro_updown_hostnames(conffile_t cf, struct conffile_data *data,
-                             char *optionname, int option_type, void *option_ptr,
-                             int option_data, void *app_ptr, int app_data)
+_cb_cerebro_hostnames(conffile_t cf, struct conffile_data *data,
+		      char *optionname, int option_type, void *option_ptr,
+		      int option_data, void *app_ptr, int app_data)
 {
   struct cerebro_config *conf;
 
@@ -150,7 +150,7 @@ _cb_cerebro_updown_hostnames(conffile_t cf, struct conffile_data *data,
     {
       int i;
 
-      if (data->stringlist_len > CEREBRO_CONFIG_UPDOWN_HOSTNAMES_MAX)
+      if (data->stringlist_len > CEREBRO_CONFIG_HOSTNAMES_MAX)
 	{
           conffile_seterrnum(cf, CONFFILE_ERR_PARSE_ARG_TOOMANY);
           return -1;
@@ -164,9 +164,9 @@ _cb_cerebro_updown_hostnames(conffile_t cf, struct conffile_data *data,
 	      return -1;
 	    }
 
-	  strcpy(conf->cerebro_updown_hostnames[i], data->stringlist[i]);
+	  strcpy(conf->cerebro_hostnames[i], data->stringlist[i]);
         }
-      conf->cerebro_updown_hostnames_len = data->stringlist_len;
+      conf->cerebro_hostnames_len = data->stringlist_len;
     }
 
   return 0;
@@ -183,47 +183,47 @@ _cerebro_config_load_config_file(struct cerebro_config *conf)
        * Libcerebro configuration
        */
       {
-	"cerebro_updown_hostnames", 
+	"cerebro_hostnames", 
 	CONFFILE_OPTION_LIST_STRING, 
 	-1,
-	_cb_cerebro_updown_hostnames, 
+	_cb_cerebro_hostnames, 
 	1, 
 	0, 
-	&(conf->cerebro_updown_hostnames_flag), 
+	&(conf->cerebro_hostnames_flag), 
 	conf, 
 	0
       },
       {
-	"cerebro_updown_port", 
+	"cerebro_port", 
 	CONFFILE_OPTION_INT, 
 	-1,
 	conffile_int, 
 	1, 
 	0, 
-	&(conf->cerebro_updown_port_flag), 
-	&(conf->cerebro_updown_port), 
+	&(conf->cerebro_port_flag), 
+	&(conf->cerebro_port), 
 	0
       },
       {
-	"cerebro_updown_timeout_len", 
+	"cerebro_timeout_len", 
 	CONFFILE_OPTION_INT, 
 	-1,
 	conffile_int, 
 	1, 
 	0, 
-	&(conf->cerebro_updown_timeout_len_flag),
-	&(conf->cerebro_updown_timeout_len), 
+	&(conf->cerebro_timeout_len_flag),
+	&(conf->cerebro_timeout_len), 
 	0
       },
       {
-	"cerebro_updown_flags", 
+	"cerebro_flags", 
 	CONFFILE_OPTION_INT, 
 	-1,
 	conffile_int, 
 	1, 
 	0, 
-	&(conf->cerebro_updown_flags_flag),
-	&(conf->cerebro_updown_flags), 
+	&(conf->cerebro_flags_flag),
+	&(conf->cerebro_flags), 
 	0
       },
       /*
@@ -350,28 +350,6 @@ _cerebro_config_load_config_file(struct cerebro_config *conf)
 	&(conf->cerebrod_metric_server_port), 
 	0
       },
-      {
-	"cerebrod_updown_server", 
-	CONFFILE_OPTION_BOOL, 
-	-1,
-	conffile_bool, 
-	1, 
-	0, 
-	&(conf->cerebrod_updown_server_flag),
-	&conf->cerebrod_updown_server, 
-	0
-      },
-      {
-	"cerebrod_updown_server_port", 
-	CONFFILE_OPTION_INT, 
-	-1,
-	conffile_int, 
-	1, 
-	0, 
-	&(conf->cerebrod_updown_server_port_flag),
-	&(conf->cerebrod_updown_server_port), 
-	0
-      },
 #if CEREBRO_DEBUG
       {
 	"cerebrod_speak_debug", 
@@ -404,17 +382,6 @@ _cerebro_config_load_config_file(struct cerebro_config *conf)
 	0, 
 	&(conf->cerebrod_metric_server_debug_flag),
 	&conf->cerebrod_metric_server_debug, 
-	0
-      },
-      {
-	"cerebrod_updown_server_debug", 
-	CONFFILE_OPTION_BOOL, 
-	-1,
-	conffile_bool, 
-	1, 
-	0, 
-	&(conf->cerebrod_updown_server_debug_flag),
-	&conf->cerebrod_updown_server_debug, 
 	0
       },
 #endif /* CEREBRO_DEBUG */
@@ -506,54 +473,54 @@ _cerebro_config_merge_cerebro_config(struct cerebro_config *conf,
 
   memset(conf, '\0', sizeof(struct cerebro_config));
 
-  if (config_file_conf->cerebro_updown_hostnames_flag)
+  if (config_file_conf->cerebro_hostnames_flag)
     {
-      for (i = 0; i < config_file_conf->cerebro_updown_hostnames_len; i++)
-	strcpy(conf->cerebro_updown_hostnames[i],
-	       config_file_conf->cerebro_updown_hostnames[i]);
-      conf->cerebro_updown_hostnames_len = config_file_conf->cerebro_updown_hostnames_len;
-      conf->cerebro_updown_hostnames_flag++;
+      for (i = 0; i < config_file_conf->cerebro_hostnames_len; i++)
+	strcpy(conf->cerebro_hostnames[i],
+	       config_file_conf->cerebro_hostnames[i]);
+      conf->cerebro_hostnames_len = config_file_conf->cerebro_hostnames_len;
+      conf->cerebro_hostnames_flag++;
     }
-  else if (module_conf->cerebro_updown_hostnames_flag)
+  else if (module_conf->cerebro_hostnames_flag)
     {
-      for (i = 0; i < module_conf->cerebro_updown_hostnames_len; i++)
-	strcpy(conf->cerebro_updown_hostnames[i],
-	       module_conf->cerebro_updown_hostnames[i]);
-      conf->cerebro_updown_hostnames_len = module_conf->cerebro_updown_hostnames_len;
-      conf->cerebro_updown_hostnames_flag++;
-    }
-
-  if (config_file_conf->cerebro_updown_port_flag)
-    {
-      conf->cerebro_updown_port = config_file_conf->cerebro_updown_port;
-      conf->cerebro_updown_port_flag++;
-    }
-  else if (module_conf->cerebro_updown_port_flag)
-    {
-      conf->cerebro_updown_port = module_conf->cerebro_updown_port;
-      conf->cerebro_updown_port_flag++;
+      for (i = 0; i < module_conf->cerebro_hostnames_len; i++)
+	strcpy(conf->cerebro_hostnames[i],
+	       module_conf->cerebro_hostnames[i]);
+      conf->cerebro_hostnames_len = module_conf->cerebro_hostnames_len;
+      conf->cerebro_hostnames_flag++;
     }
 
-  if (config_file_conf->cerebro_updown_timeout_len_flag)
+  if (config_file_conf->cerebro_port_flag)
     {
-      conf->cerebro_updown_timeout_len = config_file_conf->cerebro_updown_timeout_len;
-      conf->cerebro_updown_timeout_len_flag++;
+      conf->cerebro_port = config_file_conf->cerebro_port;
+      conf->cerebro_port_flag++;
     }
-  else if (module_conf->cerebro_updown_timeout_len_flag)
+  else if (module_conf->cerebro_port_flag)
     {
-      conf->cerebro_updown_timeout_len = module_conf->cerebro_updown_timeout_len;
-      conf->cerebro_updown_timeout_len_flag++;
+      conf->cerebro_port = module_conf->cerebro_port;
+      conf->cerebro_port_flag++;
     }
 
-  if (config_file_conf->cerebro_updown_flags_flag)
+  if (config_file_conf->cerebro_timeout_len_flag)
     {
-      conf->cerebro_updown_flags = config_file_conf->cerebro_updown_flags;
-      conf->cerebro_updown_flags_flag++;
+      conf->cerebro_timeout_len = config_file_conf->cerebro_timeout_len;
+      conf->cerebro_timeout_len_flag++;
     }
-  else if (module_conf->cerebro_updown_flags_flag)
+  else if (module_conf->cerebro_timeout_len_flag)
     {
-      conf->cerebro_updown_flags = module_conf->cerebro_updown_flags;
-      conf->cerebro_updown_flags_flag++;
+      conf->cerebro_timeout_len = module_conf->cerebro_timeout_len;
+      conf->cerebro_timeout_len_flag++;
+    }
+
+  if (config_file_conf->cerebro_flags_flag)
+    {
+      conf->cerebro_flags = config_file_conf->cerebro_flags;
+      conf->cerebro_flags_flag++;
+    }
+  else if (module_conf->cerebro_flags_flag)
+    {
+      conf->cerebro_flags = module_conf->cerebro_flags;
+      conf->cerebro_flags_flag++;
     }
 
   if (config_file_conf->cerebrod_heartbeat_frequency_flag)
@@ -679,27 +646,6 @@ _cerebro_config_merge_cerebro_config(struct cerebro_config *conf,
       conf->cerebrod_metric_server_port_flag++;
     }
 
-  if (config_file_conf->cerebrod_updown_server_flag)
-    {
-      conf->cerebrod_updown_server = config_file_conf->cerebrod_updown_server;
-      conf->cerebrod_updown_server_flag++;
-    }
-  else if (module_conf->cerebrod_updown_server_flag)
-    {
-      conf->cerebrod_updown_server = module_conf->cerebrod_updown_server;
-      conf->cerebrod_updown_server_flag++;
-    }
-
-  if (config_file_conf->cerebrod_updown_server_port_flag)
-    {
-      conf->cerebrod_updown_server_port = config_file_conf->cerebrod_updown_server_port;
-      conf->cerebrod_updown_server_port_flag++;
-    }
-  else if (module_conf->cerebrod_updown_server_port_flag)
-    {
-      conf->cerebrod_updown_server_port = module_conf->cerebrod_updown_server_port;
-      conf->cerebrod_updown_server_port_flag++;
-    }
 #if CEREBRO_DEBUG
   if (config_file_conf->cerebrod_speak_debug_flag)
     {
@@ -732,17 +678,6 @@ _cerebro_config_merge_cerebro_config(struct cerebro_config *conf,
     {
       conf->cerebrod_metric_server_debug = module_conf->cerebrod_metric_server_debug;
       conf->cerebrod_metric_server_debug_flag++;
-    }
-
-  if (config_file_conf->cerebrod_updown_server_debug_flag)
-    {
-      conf->cerebrod_updown_server_debug = config_file_conf->cerebrod_updown_server_debug;
-      conf->cerebrod_updown_server_debug_flag++;
-    }
-  else if (module_conf->cerebrod_updown_server_debug_flag)
-    {
-      conf->cerebrod_updown_server_debug = module_conf->cerebrod_updown_server_debug;
-      conf->cerebrod_updown_server_debug_flag++;
     }
 #endif /* CEREBRO_DEBUG */
 

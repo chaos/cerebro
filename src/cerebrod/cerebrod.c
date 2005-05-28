@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.53 2005-05-26 18:23:38 achu Exp $
+ *  $Id: cerebrod.c,v 1.54 2005-05-28 16:06:44 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -22,7 +22,6 @@
 #include "cerebrod_metric.h"
 #include "cerebrod_node_data.h"
 #include "cerebrod_speaker.h"
-#include "cerebrod_updown.h"
 #include "wrappers.h"
 
 #if CEREBRO_DEBUG
@@ -48,10 +47,6 @@ extern pthread_mutex_t cerebrod_listener_initialization_complete_lock;
 extern int cerebrod_metric_initialization_complete;
 extern pthread_cond_t cerebrod_metric_initialization_complete_cond;
 extern pthread_mutex_t cerebrod_metric_initialization_complete_lock;
-
-extern int cerebrod_updown_initialization_complete;
-extern pthread_cond_t cerebrod_updown_initialization_complete_cond;
-extern pthread_mutex_t cerebrod_updown_initialization_complete_lock;
 
 #if CEREBRO_DEBUG
 /* 
@@ -105,7 +100,7 @@ _cerebrod_post_config_initialization(void)
     cerebro_err_exit("%s(%s:%d): cerebrod_clusterlist_module_setup",
                      __FILE__, __FUNCTION__, __LINE__);
 
-  if (conf.updown_server)
+  if (conf.metric_server)
     Signal(SIGPIPE, SIG_IGN);
 }
 
@@ -198,27 +193,6 @@ main(int argc, char **argv)
         Pthread_cond_wait(&cerebrod_metric_initialization_complete_cond,
                           &cerebrod_metric_initialization_complete_lock);
       Pthread_mutex_unlock(&cerebrod_metric_initialization_complete_lock);
-    }
-
-  /* Start updown server.  Start before the listener begins receiving
-   * data.
-   */
-  if (conf.updown_server)
-    {
-      pthread_t thread;
-      pthread_attr_t attr;
-
-      Pthread_attr_init(&attr);
-      Pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-      Pthread_create(&thread, &attr, cerebrod_updown, NULL);
-      Pthread_attr_destroy(&attr);
-
-      /* Wait for initialization to complete */
-      Pthread_mutex_lock(&cerebrod_updown_initialization_complete_lock);
-      while (cerebrod_updown_initialization_complete == 0)
-        Pthread_cond_wait(&cerebrod_updown_initialization_complete_cond,
-                          &cerebrod_updown_initialization_complete_lock);
-      Pthread_mutex_unlock(&cerebrod_updown_initialization_complete_lock);
     }
 
   /* Start listening server.  Start before speaker, since the listener

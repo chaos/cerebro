@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_gendersllnl.c,v 1.14 2005-05-05 16:12:57 achu Exp $
+ *  $Id: cerebro_config_gendersllnl.c,v 1.15 2005-05-28 16:06:44 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -115,7 +115,7 @@ gendersllnl_config_cleanup(void)
  * config specifically for use on LLNL clusters. 'mgmt' nodes listen
  * and speak, while compute nodes only speak.  We always speak on the
  * private management network interface.  Non-mgmt nodes connect to
- * mgmt nodes to receive updown data.
+ * mgmt nodes to receive data.
  *
  * Returns 0 on success, -1 on error
  */
@@ -157,8 +157,8 @@ gendersllnl_config_load_default(struct cerebro_config *conf)
       conf->cerebrod_speak_flag++;
       conf->cerebrod_listen = 1;
       conf->cerebrod_listen_flag++;
-      conf->cerebrod_updown_server = 1;
-      conf->cerebrod_updown_server_flag++;
+      conf->cerebrod_metric_server = 1;
+      conf->cerebrod_metric_server_flag++;
     }
   else
     {
@@ -169,8 +169,8 @@ gendersllnl_config_load_default(struct cerebro_config *conf)
       conf->cerebrod_speak_flag++;
       conf->cerebrod_listen = 0;
       conf->cerebrod_listen_flag++;
-      conf->cerebrod_updown_server = 0;
-      conf->cerebrod_updown_server_flag++;
+      conf->cerebrod_metric_server = 0;
+      conf->cerebrod_metric_server_flag++;
 
       if ((nodelist_len = genders_nodelist_create(gendersllnl_handle, 
 						  &nodelist)) < 0)
@@ -194,8 +194,8 @@ gendersllnl_config_load_default(struct cerebro_config *conf)
 	  return -1;
 	}
 
-      if (mgmt_len > CEREBRO_CONFIG_UPDOWN_HOSTNAMES_MAX)
-	mgmt_len = CEREBRO_CONFIG_UPDOWN_HOSTNAMES_MAX;
+      if (mgmt_len > CEREBRO_CONFIG_HOSTNAMES_MAX)
+	mgmt_len = CEREBRO_CONFIG_HOSTNAMES_MAX;
 
       for (i = 0 ; i < mgmt_len; i++)
 	{
@@ -207,10 +207,10 @@ gendersllnl_config_load_default(struct cerebro_config *conf)
 	      genders_nodelist_destroy(gendersllnl_handle, nodelist);      
 	      return -1;
 	    }
-	  strcpy(conf->cerebro_updown_hostnames[i], nodelist[i]);
+	  strcpy(conf->cerebro_hostnames[i], nodelist[i]);
 	}
-      conf->cerebro_updown_hostnames_len = mgmt_len;
-      conf->cerebro_updown_hostnames_flag++;
+      conf->cerebro_hostnames_len = mgmt_len;
+      conf->cerebro_hostnames_flag++;
       
       genders_nodelist_destroy(gendersllnl_handle, nodelist);      
     }

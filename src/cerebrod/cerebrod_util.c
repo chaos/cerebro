@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_util.c,v 1.17 2005-05-23 17:58:24 achu Exp $
+ *  $Id: cerebrod_util.c,v 1.18 2005-05-28 16:06:44 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -113,8 +113,8 @@ cerebrod_rehash(hash_t *old_hash,
 /*
  * _cerebrod_create_and_setup_socket
  *
- * Create and setup the updown server socket.  Do not use wrappers in
- * this function.  We want to give the server additional chances to
+ * Create and setup the server socket.  Do not use wrappers in this
+ * function.  We want to give the server additional chances to
  * "survive" an error condition.
  *
  * Returns file descriptor on success, -1 on error

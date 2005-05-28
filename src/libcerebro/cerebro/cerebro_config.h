@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config.h,v 1.7 2005-05-19 16:40:40 achu Exp $
+ *  $Id: cerebro_config.h,v 1.8 2005-05-28 16:06:44 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_CONFIG_H
@@ -7,7 +7,7 @@
 
 #include <cerebro/cerebro_constants.h>
 
-#define CEREBRO_CONFIG_UPDOWN_HOSTNAMES_MAX  16
+#define CEREBRO_CONFIG_HOSTNAMES_MAX  16
 
 /*  
  * struct cerebro_config
@@ -19,15 +19,15 @@ struct cerebro_config
   /* 
    * Libcerebro configuration
    */
-  char cerebro_updown_hostnames[CEREBRO_CONFIG_UPDOWN_HOSTNAMES_MAX][CEREBRO_MAXNODENAMELEN+1];
-  int cerebro_updown_hostnames_len;
-  int cerebro_updown_hostnames_flag;
-  unsigned int cerebro_updown_port;
-  int cerebro_updown_port_flag;
-  unsigned int cerebro_updown_timeout_len;
-  int cerebro_updown_timeout_len_flag;
-  int cerebro_updown_flags;
-  int cerebro_updown_flags_flag;
+  char cerebro_hostnames[CEREBRO_CONFIG_HOSTNAMES_MAX][CEREBRO_MAXHOSTNAMELEN+1];
+  int cerebro_hostnames_len;
+  int cerebro_hostnames_flag;
+  unsigned int cerebro_port;
+  int cerebro_port_flag;
+  unsigned int cerebro_timeout_len;
+  int cerebro_timeout_len_flag;
+  int cerebro_flags;
+  int cerebro_flags_flag;
 
   /* 
    * Cerebrod configuration
@@ -55,10 +55,6 @@ struct cerebro_config
   int cerebrod_metric_server_flag;
   int cerebrod_metric_server_port;
   int cerebrod_metric_server_port_flag;
-  int cerebrod_updown_server;
-  int cerebrod_updown_server_flag;
-  int cerebrod_updown_server_port;
-  int cerebrod_updown_server_port_flag;
 #if CEREBRO_DEBUG
   int cerebrod_speak_debug;
   int cerebrod_speak_debug_flag;
@@ -66,8 +62,6 @@ struct cerebro_config
   int cerebrod_listen_debug_flag;
   int cerebrod_metric_server_debug;
   int cerebrod_metric_server_debug_flag;
-  int cerebrod_updown_server_debug;
-  int cerebrod_updown_server_debug_flag;
 #endif /* CEREBRO_DEBUG */
 };
 

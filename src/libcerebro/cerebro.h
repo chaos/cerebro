@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.25 2005-05-28 15:40:23 achu Exp $
+ *  $Id: cerebro.h,v 1.26 2005-05-28 16:06:44 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_H
@@ -292,72 +292,5 @@ char *cerebro_nodelist_iterator_errormsg(cerebro_nodelist_iterator_t handle);
  * Output a message to standard error
  */
 void cerebro_nodelist_iterator_perror(cerebro_nodelist_iterator_t handle, const char *msg);
-
-/* 
- * Up-Down API
- */
-
-#define CEREBRO_UPDOWN_UP_NODES           0x0001
-#define CEREBRO_UPDOWN_DOWN_NODES         0x0002
-#define CEREBRO_UPDOWN_UP_AND_DOWN_NODES  0x0003
-
-/* 
- * cerebro_updown_load_data
- *
- * Retrieve all updown data from a cerebro updown server and locally
- * cache the data in the cerebro_t handle for use by the remainder of
- * the cerebro updown library.  If updown data has been previously
- * retrieved, the latest data will be retrieved and updated in the
- * local cache.
- *
- * hostname - server to connect to, if NULL defaults to localhost
- *
- * port - port to connect to, if 0 defaults to default port
- *
- * timeout_len - timeout length to use to evaluate up vs. down, if 0
- * defaults to default timeout length
- *
- * flags - indicate the data to be loaded.  Possible flags:
- *
- *   CEREBRO_UPDOWN_UP_NODES
- *   CEREBRO_UPDOWN_DOWN_NODES
- *   CEREBRO_UPDOWN_UP_AND_DOWN_NODES
- * 
- * if 0 defaults to CEREBRO_UPDOWN_UP_AND_DOWN_NODES
- *
- * Returns 0 on success, -1 on error
- */
-int cerebro_updown_load_data(cerebro_t handle, 
-                             const char *hostname, 
-                             unsigned int port, 
-                             unsigned int timeout_len,
-                             int flags);
-
-/* 
- * cerebro_updown_unload_data
- *
- * Cleanup allocated updown data
- *
- * Returns 0 on success, -1 on error
- */
-int cerebro_updown_unload_data(cerebro_t handle);
-
-/*
- * cerebro_updown_get_up_nodes
- *
- * Retrieve a cerebro nodes iterator for all up nodes
- *
- * Returns an iterator on success, NULL on error
- */
-cerebro_nodelist_t cerebro_updown_get_up_nodes(cerebro_t handle);
-
-/*
- * cerebro_updown_get_down_nodes
- *
- * Retrieve a cerebro nodes iterator for all down nodes
- *
- * Returns an iterator on success, NULL on error
- */
-cerebro_nodelist_t cerebro_updown_get_down_nodes(cerebro_t handle);
 
 #endif /* _CEREBRO_H */

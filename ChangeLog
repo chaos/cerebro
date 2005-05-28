@@ -3,6 +3,8 @@
 	* tagged pre-libcerebro-rework-1
 
 	* begin libcerebro rework around metric server and metric data.
+
+	* remove all updown server references
 	
 2005-05-27  Albert Chu  <chu11@llnl.gov>
 

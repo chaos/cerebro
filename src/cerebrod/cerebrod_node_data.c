@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_node_data.c,v 1.8 2005-05-28 08:13:40 achu Exp $
+ *  $Id: cerebrod_node_data.c,v 1.9 2005-05-28 16:06:44 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -74,7 +74,7 @@ pthread_mutex_t cerebrod_node_data_lock = PTHREAD_MUTEX_INITIALIZER;
 /* 
  * _cerebrod_node_data_strcmp
  *
- * callback function for list_sort to sort updown node names
+ * callback function for list_sort to sort node names
  */
 static int 
 _cerebrod_node_data_strcmp(void *x, void *y)
@@ -144,7 +144,7 @@ cerebrod_node_data_initialize(void)
                                          (hash_del_f)_Free);
   
   /* If the clusterlist module contains nodes, retrieve all of these
-   * nodes and put them into the updown_node_data list.  All updates
+   * nodes and put them into the cerebrod_node_data list.  All updates
    * will involve updating data rather than involve insertion.
    */
   if (numnodes > 0)
@@ -289,7 +289,7 @@ _cerebrod_node_data_metric_data_dump(void *data, const void *key, void *arg)
 /*
  * _cerebrod_node_data_item_dump
  *
- * callback function from hash_for_each to dump updown node data
+ * callback function from hash_for_each to dump node data
  */
 #if CEREBRO_DEBUG
 static int
@@ -302,32 +302,25 @@ _cerebrod_node_data_item_dump(void *x, void *arg)
   nd = (struct cerebrod_node_data *)x;
  
   Pthread_mutex_lock(&(nd->node_data_lock));
-  if (nd->discovered)
+  if (nd->discovered && conf.metric_server_debug)
     {
-      if (conf.updown_server_debug)
-        fprintf(stderr, "* %s: discovered=%d\n", nd->nodename, nd->discovered);
-
+      int num;
       
-      if (conf.metric_server_debug)
-        {
-          int num;
-
-          num = Hash_for_each(nd->metric_data,
-                              _cerebrod_node_data_metric_data_dump,
-                              nd->nodename);
-          if (num != nd->metric_data_count)
-            {
-              fprintf(stderr, "%s(%s:%d): invalid dump count: num=%d numnodes=%d",
-                      __FILE__, __FUNCTION__, __LINE__, num, nd->metric_data_count);
-              exit(1);
-            }
-          fprintf(stderr, "* %s: metric_data_count=%d\n", 
-                  nd->nodename, nd->metric_data_count);
-        }
-
-      if (conf.updown_server_debug || conf.metric_server_debug)
-        fprintf(stderr, "* %s: last_received_time=%u\n", 
-                nd->nodename, nd->last_received_time);
+      fprintf(stderr, "* %s: discovered=%d\n", nd->nodename, nd->discovered);
+      
+      num = Hash_for_each(nd->metric_data,
+			  _cerebrod_node_data_metric_data_dump,
+			  nd->nodename);
+      if (num != nd->metric_data_count)
+	{
+	  fprintf(stderr, "%s(%s:%d): invalid dump count: num=%d numnodes=%d",
+		  __FILE__, __FUNCTION__, __LINE__, num, nd->metric_data_count);
+	  exit(1);
+	}
+      fprintf(stderr, "* %s: metric_data_count=%d\n", 
+	      nd->nodename, nd->metric_data_count);
+      fprintf(stderr, "* %s: last_received_time=%u\n", 
+	      nd->nodename, nd->last_received_time);
     }
   Pthread_mutex_unlock(&(nd->node_data_lock));
 
@@ -338,7 +331,7 @@ _cerebrod_node_data_item_dump(void *x, void *arg)
 /*
  * _cerebrod_node_data_list_dump
  *
- * Dump contents of updown node data list
+ * Dump contents of node data list
  */
 static void
 _cerebrod_node_data_list_dump(void)
