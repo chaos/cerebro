@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric.c,v 1.12 2005-05-28 00:07:52 achu Exp $
+ *  $Id: cerebrod_metric.c,v 1.13 2005-05-28 00:36:29 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -984,6 +984,9 @@ _cerebrod_metric_service_connection(void *arg)
    * XXX needs to be cleaned up
    */
   if (strcmp(req.metric_name, CEREBRO_METRIC_CLUSTER_NODES)
+      && strcmp(req.metric_name, CEREBRO_METRIC_UP_NODES)
+      && strcmp(req.metric_name, CEREBRO_METRIC_DOWN_NODES)
+      && strcmp(req.metric_name, CEREBRO_METRIC_UPDOWN_STATE)
       && strcmp(req.metric_name, CEREBRO_METRIC_STARTTIME)
       && strcmp(req.metric_name, CEREBRO_METRIC_BOOTTIME))
     {
