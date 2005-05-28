@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_protocol.h,v 1.7 2005-05-28 00:07:52 achu Exp $
+ *  $Id: cerebro_metric_protocol.h,v 1.8 2005-05-28 15:40:23 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_METRIC_PROTOCOL_H
@@ -66,17 +66,17 @@
 #define CEREBRO_METRIC_UPDOWN_STATE_NODE_DOWN     0
 #define CEREBRO_METRIC_UPDOWN_TIMEOUT_LEN_DEFAULT 60
 
-#define CEREBRO_METRIC_SERVER_PORT            8852
+#define CEREBRO_METRIC_SERVER_PORT                8852
 
-#define CEREBRO_METRIC_MAX                    16
+#define CEREBRO_METRIC_MAX                        16
 
-#define CEREBRO_METRIC_NAME_MAXLEN            32
+#define CEREBRO_METRIC_NAME_MAXLEN                32
 
-#define CEREBRO_METRIC_STRING_MAXLEN          64
+#define CEREBRO_METRIC_STRING_MAXLEN              64
 
-#define CEREBRO_METRIC_STRING_PARAM_MAXLEN    64
+#define CEREBRO_METRIC_STRING_PARAM_MAXLEN        64
 
-#define CEREBRO_METRIC_VALUE_LEN              CEREBRO_METRIC_STRING_MAXLEN
+#define CEREBRO_METRIC_VALUE_LEN                  CEREBRO_METRIC_STRING_MAXLEN
 
 /*
  * cerebro_metric_type_t

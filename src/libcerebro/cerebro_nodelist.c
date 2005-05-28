@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_nodelist.c,v 1.4 2005-05-24 21:18:59 achu Exp $
+ *  $Id: cerebro_nodelist.c,v 1.5 2005-05-28 15:40:23 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -67,7 +67,7 @@ _cerebro_nodelist_check(cerebro_nodelist_t nodelist)
 }
 
 int 
-cerebro_nodelist_count(cerebro_nodelist_t nodelist)
+cerebro_nodelist_length(cerebro_nodelist_t nodelist)
 {
   if (_cerebro_nodelist_check(nodelist) < 0)
     return -1;

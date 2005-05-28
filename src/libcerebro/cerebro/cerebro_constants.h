@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_constants.h,v 1.1 2005-05-05 16:12:57 achu Exp $
+ *  $Id: cerebro_constants.h,v 1.2 2005-05-28 15:40:23 achu Exp $
 \*****************************************************************************/
  
 #ifndef _CEREBRO_CONSTANTS_H
@@ -11,6 +11,7 @@
  * maximum nodename length.
  */
 #define CEREBRO_MAXNODENAMELEN         64 
+#define CEREBRO_MAXHOSTNAMELEN         CEREBRO_MAXNODENAMELEN
 
 #define CEREBRO_MAXPATHLEN             512
 

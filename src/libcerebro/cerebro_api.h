@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_api.h,v 1.15 2005-05-24 00:07:45 achu Exp $
+ *  $Id: cerebro_api.h,v 1.16 2005-05-28 15:40:23 achu Exp $
 \*****************************************************************************/
  
 #ifndef _CEREBRO_API_H
@@ -8,6 +8,7 @@
 #include <sys/types.h>
 
 #include "cerebro/cerebro_config.h"
+#include "cerebro/cerebro_constants.h"
 
 #include "list.h"
 
@@ -37,6 +38,10 @@
 struct cerebro {
   int32_t magic;
   int32_t errnum;
+  char hostname[CEREBRO_MAXHOSTNAMELEN+1];
+  unsigned int port;
+  unsigned int timeout_len;
+  unsigned int flags;
   int32_t loaded_state;
   struct cerebro_config config_data;
   void *updown_data;

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.24 2005-05-25 17:09:43 achu Exp $
+ *  $Id: cerebro.h,v 1.25 2005-05-28 15:40:23 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_H
@@ -98,6 +98,47 @@ char *cerebro_errormsg(cerebro_t handle);
  * Output a message to standard error
  */
 void cerebro_perror(cerebro_t handle, const char *msg);
+
+/* 
+ * Parameter Settings
+ */
+
+/* 
+ * cerebro_set_hostname
+ *
+ * Set the hostname of the cerebrod server
+ * 
+ * Returns 0 on success, -1 on error
+ */
+int cerebro_set_hostname(cerebro_t handle, const char *hostname);
+
+/* 
+ * cerebro_set_port
+ *
+ * Set the cerebrod server port to connect to
+ *
+ * Returns 0 on success, -1 on error
+ */
+int cerebro_set_port(cerebro_t handle, unsigned int port);
+
+/* 
+ * cerebro_set_timeout_len
+ *
+ * Set the cerebrod server timeout_len for up vs. down calculation
+ *
+ * Returns 0 on success, -1 on error
+ */
+int cerebro_set_timeout_len(cerebro_t handle, unsigned int timeout_len);
+
+/* 
+ * cerebro_set_flags
+ *
+ * Set the cerebrod server flags to use
+ *
+ * Returns 0 on success, -1 on error
+ */
+int cerebro_set_flags(cerebro_t handle, unsigned int flags);
+
 
 /* 
  * Nodelist API

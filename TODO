@@ -20,6 +20,8 @@ Portability
 - Non-pthreads support
 
 Design/Re-Code
+- nodelist
+  - use own list instead of 'List' to store iterators?
 - pass around boottime based on module
   - parse boottime based on module
 - metric flags -

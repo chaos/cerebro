@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.c,v 1.19 2005-05-23 21:30:29 achu Exp $
+ *  $Id: cerebro.c,v 1.20 2005-05-28 15:40:23 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -19,6 +19,7 @@
 #include "cerebro_module.h"
 #include "cerebro_util.h"
 #include "cerebro/cerebro_config.h"
+#include "cerebro/cerebro_metric_protocol.h"
 
 static char *cerebro_error_messages[] =
   {
@@ -55,6 +56,10 @@ cerebro_handle_create(void)
   memset(handle, '\0', sizeof(struct cerebro));
   handle->magic = CEREBRO_MAGIC_NUMBER;
   handle->errnum = CEREBRO_ERR_SUCCESS;
+  memset(&(handle->hostname), '\0', CEREBRO_MAXHOSTNAMELEN+1);
+  handle->port = CEREBRO_METRIC_SERVER_PORT;
+  handle->timeout_len = CEREBRO_METRIC_UPDOWN_TIMEOUT_LEN_DEFAULT;
+  handle->flags = 0;
   handle->loaded_state = 0;
   memset(&(handle->config_data), '\0', sizeof(struct cerebro_config));
   handle->updown_data = NULL;
@@ -157,5 +162,65 @@ cerebro_perror(cerebro_t handle, const char *msg)
     fprintf(stderr, "%s\n", errormsg);
   else
     fprintf(stderr, "%s: %s\n", msg, errormsg);
+}
+
+int 
+cerebro_set_hostname(cerebro_t handle, const char *hostname)
+{
+  if (_cerebro_handle_check(handle) < 0)
+    return -1;
+
+  if (!hostname)
+    {
+      handle->errnum = CEREBRO_ERR_PARAMETERS;
+      return -1;
+    }
+
+  if (strlen(hostname) > CEREBRO_MAXHOSTNAMELEN)
+    {
+      handle->errnum = CEREBRO_ERR_OVERFLOW;
+      return -1;
+    }
+
+  strcpy(handle->hostname, hostname);
+  return 0;
+}
+                                                                                   
+int 
+cerebro_set_port(cerebro_t handle, unsigned int port)
+{
+  if (_cerebro_handle_check(handle) < 0)
+    return -1;
+
+  if (!port)
+    port = CEREBRO_METRIC_SERVER_PORT;
+
+  handle->port = port;
+  return 0;
+}
+                                                                                   
+int 
+cerebro_set_timeout_len(cerebro_t handle, unsigned int timeout_len)
+{
+  if (_cerebro_handle_check(handle) < 0)
+    return -1;
+
+  if (!timeout_len)
+    timeout_len = CEREBRO_METRIC_UPDOWN_TIMEOUT_LEN_DEFAULT;
+
+  handle->timeout_len = timeout_len;
+  return 0;
+}
+                                                                                   
+int 
+cerebro_set_flags(cerebro_t handle, unsigned int flags)
+{
+  if (_cerebro_handle_check(handle) < 0)
+    return -1;
+
+  /* XXX should check for valid flags */
+
+  handle->flags = flags;
+  return 0;
 }
 

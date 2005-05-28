@@ -1,3 +1,9 @@
+2005-05-28  Albert Chu  <chu11@llnl.gov>
+
+	* tagged pre-libcerebro-rework-1
+
+	* begin libcerebro rework around metric server and metric data.
+	
 2005-05-27  Albert Chu  <chu11@llnl.gov>
 
 	* Continue work on metric server.
