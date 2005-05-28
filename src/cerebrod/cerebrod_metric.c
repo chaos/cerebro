@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric.c,v 1.11 2005-05-27 20:49:54 achu Exp $
+ *  $Id: cerebrod_metric.c,v 1.12 2005-05-28 00:07:52 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -323,21 +323,7 @@ _cerebrod_metric_request_unmarshall(struct cerebro_metric_request *req,
 
   count += len;
 
-  if ((len = _cerebro_unmarshall_unsigned_int32(&(req->int32_param1), 
-                                                buf + count, 
-                                                buflen - count)) < 0)
-    {
-      cerebro_err_debug("%s(%s:%d): _cerebro_unmarshall_unsigned_int32",
-                        __FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
-
-  if (!len)
-    return count;
-
-  count += len;
- 
-  if ((len = _cerebro_unmarshall_unsigned_int32(&(req->unsigned_int32_param1), 
+  if ((len = _cerebro_unmarshall_unsigned_int32(&(req->flags), 
                                                 buf + count, 
                                                 buflen - count)) < 0)
     {
@@ -351,12 +337,11 @@ _cerebrod_metric_request_unmarshall(struct cerebro_metric_request *req,
 
   count += len;
 
-  if ((len = _cerebro_unmarshall_buffer(req->string_param1,
-                                        sizeof(req->string_param1),
-                                        buf + count,
-                                        buflen - count)) < 0)
+  if ((len = _cerebro_unmarshall_unsigned_int32(&(req->timeout_len), 
+                                                buf + count, 
+                                                buflen - count)) < 0)
     {
-      cerebro_err_debug("%s(%s:%d): _cerebro_unmarshall_buffer",
+      cerebro_err_debug("%s(%s:%d): _cerebro_unmarshall_unsigned_int32",
                         __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
@@ -488,9 +473,8 @@ _cerebrod_metric_request_dump(struct cerebro_metric_request *req)
       fprintf(stderr, "* ------------------------\n");
       fprintf(stderr, "* Version: %d\n", req->version);
       fprintf(stderr, "* Metric_Name: %s\n", req->metric_name);
-      fprintf(stderr, "* Int32_Param1: %d\n", req->int32_param1);
-      fprintf(stderr, "* Unsigned_Int32_Param1: %d\n", req->unsigned_int32_param1);
-      fprintf(stderr, "* String_Param1: %s\n", req->string_param1);
+      fprintf(stderr, "* Flags: %x\n", req->flags);
+      fprintf(stderr, "* Timeout_len: %d\n", req->timeout_len);
       fprintf(stderr, "**************************************\n");
       Pthread_mutex_unlock(&debug_output_mutex);
     }
@@ -770,23 +754,6 @@ _cerebrod_metric_evaluate(void *x, void *arg)
                       __FILE__, __FUNCTION__, __LINE__);
 #endif /* CEREBRO_DEBUG */
 
-#if 0
-  /* save for later */
-  if ((ed->time_now - nd->last_received) < ed->timeout_len)
-    metric_state = CEREBRO_METRIC_PROTOCOL_STATE_NODE_UP;
-  else
-    metric_state = CEREBRO_METRIC_PROTOCOL_STATE_NODE_DOWN;
-
-  if ((ed->metric_request == CEREBRO_METRIC_PROTOCOL_REQUEST_UP_NODES
-       && metric_state != CEREBRO_METRIC_PROTOCOL_STATE_NODE_UP)
-      || (ed->metric_request == CEREBRO_METRIC_PROTOCOL_REQUEST_DOWN_NODES
-          && metric_state != CEREBRO_METRIC_PROTOCOL_STATE_NODE_DOWN))
-    {
-      Pthread_mutex_unlock(&(nd->node_data_lock));
-      return 0;
-    }
-#endif /* 0 */
-
   /* 
    * XXX needs to be cleaned up
    */
@@ -804,12 +771,49 @@ _cerebrod_metric_evaluate(void *x, void *arg)
     }
   else if (!strcmp(ed->req->metric_name, CEREBRO_METRIC_UP_NODES))
     {
+      if ((ed->time_now - nd->last_received_time) < ed->req->timeout_len)
+        {
+          if (_cerebrod_metric_response_create(nd->nodename,
+                                               CEREBRO_METRIC_TYPE_NONE,
+                                               NULL,
+                                               ed->node_responses) < 0)
+            {
+              Pthread_mutex_unlock(&(nd->node_data_lock));
+              return -1;
+            }
+        }
     }
   else if (!strcmp(ed->req->metric_name, CEREBRO_METRIC_DOWN_NODES))
     {
+      if (!((ed->time_now - nd->last_received_time) < ed->req->timeout_len))
+        {
+          if (_cerebrod_metric_response_create(nd->nodename,
+                                               CEREBRO_METRIC_TYPE_NONE,
+                                               NULL,
+                                               ed->node_responses) < 0)
+            {
+              Pthread_mutex_unlock(&(nd->node_data_lock));
+              return -1;
+            }
+        }
     }
   else if (!strcmp(ed->req->metric_name, CEREBRO_METRIC_UPDOWN_STATE))
     {
+      cerebro_metric_value_t metric_value;
+
+      if ((ed->time_now - nd->last_received_time) < ed->req->timeout_len)
+        metric_value.val_unsigned_int32 = CEREBRO_METRIC_UPDOWN_STATE_NODE_UP;
+      else
+        metric_value.val_unsigned_int32 = CEREBRO_METRIC_UPDOWN_STATE_NODE_DOWN;
+
+      if (_cerebrod_metric_response_create(nd->nodename,
+                                           CEREBRO_METRIC_TYPE_UNSIGNED_INT32,
+                                           &metric_value,
+                                           ed->node_responses) < 0)
+        {
+          Pthread_mutex_unlock(&(nd->node_data_lock));
+          return -1;
+        }
     }
   else if ((data = Hash_find(nd->metric_data, ed->req->metric_name)))
     {
@@ -988,6 +992,9 @@ _cerebrod_metric_service_connection(void *arg)
 					  CEREBRO_METRIC_PROTOCOL_ERR_METRIC_UNKNOWN);
       goto out;
     }
+
+  if (!req.timeout_len)
+    req.timeout_len = CEREBRO_METRIC_UPDOWN_TIMEOUT_LEN_DEFAULT;
 
   if (_cerebrod_metric_respond_with_nodes(client_fd, &req) < 0)
     goto out;

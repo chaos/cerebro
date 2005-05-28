@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_protocol.h,v 1.6 2005-05-26 18:23:38 achu Exp $
+ *  $Id: cerebro_metric_protocol.h,v 1.7 2005-05-28 00:07:52 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_METRIC_PROTOCOL_H
@@ -58,25 +58,25 @@
 #define CEREBRO_METRIC_PROTOCOL_IS_LAST_RESPONSE           1
 #define CEREBRO_METRIC_PROTOCOL_IS_NOT_LAST_RESPONSE       0
 
+
 /* 
  * Updown Definitions
  */
-#if 0
-#define CEREBRO_UPDOWN_STATE_NODE_UP              1
-#define CEREBRO_UPDOWN_STATE_NODE_DOWN            0
-#endif
+#define CEREBRO_METRIC_UPDOWN_STATE_NODE_UP       1
+#define CEREBRO_METRIC_UPDOWN_STATE_NODE_DOWN     0
+#define CEREBRO_METRIC_UPDOWN_TIMEOUT_LEN_DEFAULT 60
 
-#define CEREBRO_METRIC_SERVER_PORT           8852
+#define CEREBRO_METRIC_SERVER_PORT            8852
 
-#define CEREBRO_METRIC_MAX                   16
+#define CEREBRO_METRIC_MAX                    16
 
-#define CEREBRO_METRIC_NAME_MAXLEN           32
+#define CEREBRO_METRIC_NAME_MAXLEN            32
 
-#define CEREBRO_METRIC_STRING_MAXLEN         64
+#define CEREBRO_METRIC_STRING_MAXLEN          64
 
-#define CEREBRO_METRIC_STRING_PARAM_MAXLEN   64
+#define CEREBRO_METRIC_STRING_PARAM_MAXLEN    64
 
-#define CEREBRO_METRIC_VALUE_LEN             CEREBRO_METRIC_STRING_MAXLEN
+#define CEREBRO_METRIC_VALUE_LEN              CEREBRO_METRIC_STRING_MAXLEN
 
 /*
  * cerebro_metric_type_t
@@ -116,16 +116,14 @@ struct cerebro_metric_request
 {
   int32_t version;
   char metric_name[CEREBRO_METRIC_NAME_MAXLEN];
-  int32_t int32_param1;
-  u_int32_t unsigned_int32_param1;
-  char string_param1[CEREBRO_METRIC_STRING_PARAM_MAXLEN];
+  u_int32_t flags;
+  u_int32_t timeout_len;
 };
   
 #define CEREBRO_METRIC_REQUEST_LEN  (sizeof(int32_t) \
                                      + CEREBRO_METRIC_NAME_MAXLEN \
-                                     + sizeof(int32_t) \
                                      + sizeof(u_int32_t) \
-                                     + CEREBRO_METRIC_STRING_PARAM_MAXLEN)
+                                     + sizeof(u_int32_t))
 
 /*
  * struct cerebro_metric_response
