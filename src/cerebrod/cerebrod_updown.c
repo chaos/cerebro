@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_updown.c,v 1.67 2005-05-26 18:23:38 achu Exp $
+ *  $Id: cerebrod_updown.c,v 1.68 2005-05-28 08:13:40 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -613,7 +613,7 @@ _cerebrod_updown_evaluate_updown_state(void *x, void *arg)
     }
 
   Pthread_mutex_unlock(&(nd->node_data_lock));
-  return rv;
+  return 0;
 }
 
 /*

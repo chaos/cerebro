@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric.c,v 1.13 2005-05-28 00:36:29 achu Exp $
+ *  $Id: cerebrod_metric.c,v 1.14 2005-05-28 08:13:40 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -732,7 +732,7 @@ _cerebrod_metric_evaluate(void *x, void *arg)
   assert(x);
   assert(arg);
 
-  nd = (struct cerebrod_metric_node_data *)x;
+  nd = (struct cerebrod_node_data *)x;
   ed = (struct cerebrod_metric_evaluation_data *)arg;
   
 #if CEREBRO_DEBUG

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_node_data.c,v 1.7 2005-05-25 17:04:07 achu Exp $
+ *  $Id: cerebrod_node_data.c,v 1.8 2005-05-28 08:13:40 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -480,6 +480,7 @@ cerebrod_node_data_update(char *nodename,
 			cerebrod_node_data_index_numnodes,
 			&cerebrod_node_data_lock);
 
+      key = Strdup(nodename);
       nd = _cerebrod_node_data_create_and_init(nodename);
       List_append(cerebrod_node_data_list, nd);
       Hash_insert(cerebrod_node_data_index, key, nd);
