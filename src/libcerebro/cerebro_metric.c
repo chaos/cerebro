@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric.c,v 1.1 2005-05-29 19:14:12 achu Exp $
+ *  $Id: cerebro_metric.c,v 1.2 2005-05-29 19:32:06 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -38,20 +38,7 @@
 #include "cerebro_util.h"
 #include "cerebro/cerebro_error.h"
 #include "cerebro/cerebro_metric_protocol.h"
-#include "hostlist.h"
 #include "fd.h"
-
-/* 
- * cerebro_metric_data
- *
- * cerebro update state date stored in cerebro handle's metric_data
- * pointer.
- */
-struct cerebro_metric_data {
-  int32_t magic;
-  hostlist_t up_nodes;
-  hostlist_t down_nodes;
-};
 
 #if 0
 /* 
@@ -892,35 +879,5 @@ cerebro_nodelist_t
 cerebro_metric_get_down_nodes(cerebro_t handle)
 {
   return _cerebro_metric_get_nodes(handle, CEREBRO_METRIC_DOWN_NODES);
-}
-
-int
-cerebro_metric_unload_data(cerebro_t handle)
-{
-  if (_cerebro_handle_check(handle) < 0)
-    return -1;
-
-  if (handle->loaded_state & CEREBRO_METRIC_DATA_LOADED)
-    {
-      struct cerebro_metric_data *metric_data;
-
-      metric_data = (struct cerebro_metric_data *)handle->metric_data;
-
-      if (_cerebro_handle_metric_data_check(handle, metric_data) < 0)
-        return -1;
-
-      hostlist_destroy(metric_data->up_nodes);
-      metric_data->up_nodes = NULL;
-      hostlist_destroy(metric_data->down_nodes);
-      metric_data->down_nodes = NULL;
-      metric_data->magic = ~CEREBRO_METRIC_MAGIC_NUMBER;
-      free(metric_data);
-    }
-
-  handle->metric_data = NULL;
-
-  handle->loaded_state &= ~CEREBRO_METRIC_DATA_LOADED;
-  handle->errnum = CEREBRO_ERR_SUCCESS;
-  return 0;
 }
 #endif /* 0 */
