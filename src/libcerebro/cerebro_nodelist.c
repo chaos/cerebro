@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_nodelist.c,v 1.6 2005-05-29 05:33:29 achu Exp $
+ *  $Id: cerebro_nodelist.c,v 1.7 2005-05-29 14:45:52 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -18,31 +18,6 @@
 #include "cerebro/cerebro_error.h"
 
 #include "list.h"
-
-/* 
- * _cerebro_nodelist_check
- *
- * Checks for a proper cerebro nodelist, setting the errnum
- * appropriately if an error is found.
- *
- * Returns 0 on success, -1 on error
- */
-int
-_cerebro_nodelist_check(cerebro_nodelist_t nodelist)
-{
-  if (!nodelist || nodelist->magic != CEREBRO_NODELIST_MAGIC_NUMBER)
-    return -1;
-
-  if (!nodelist->nodes)
-    {
-      cerebro_err_debug_lib("%s(%s:%d): nodelist null",
-                            __FILE__, __FUNCTION__, __LINE__);
-      nodelist->errnum = CEREBRO_ERR_INTERNAL;
-      return -1;
-    }
-  
-  return 0;
-}
 
 int 
 cerebro_nodelist_length(cerebro_nodelist_t nodelist)
@@ -196,6 +171,9 @@ cerebro_nodelist_destroy(cerebro_nodelist_t nodelist)
   if (_cerebro_nodelist_check(nodelist) < 0)
     return -1;
 
+  /* 
+   * destroy nodes first, since it will destroy iterators
+   */
   list_destroy(nodelist->nodes);
   list_destroy(nodelist->iterators);
   nodelist->magic = ~CEREBRO_NODELIST_MAGIC_NUMBER;

@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.47 2005-05-29 13:42:05 achu Exp $
+## $Id: Makefile.am,v 1.48 2005-05-29 14:45:52 achu Exp $
 ##*****************************************************************************
 
 if WITH_GNU_LD
@@ -17,6 +17,7 @@ noinst_HEADERS	       = cerebro_api.h \
 			 cerebro_config_util.h \
 			 cerebro_marshalling.h \
 			 cerebro_module.h \
+			 cerebro_nodelist_util.h \
 			 cerebro_util.h
 
 include_HEADERS        = cerebro.h
@@ -44,6 +45,7 @@ libcerebro_la_SOURCES = cerebro.c \
 			cerebro_module.c \
 			cerebro_module_default.c \
 			cerebro_nodelist.c \
+			cerebro_nodelist_util.c \
 			cerebro_util.c
 libcerebro_la_LDFLAGS = -version-info @LIBCEREBRO_VERSION_INFO@ \
 			$(CEREBRO_OTHER_FLAGS)
