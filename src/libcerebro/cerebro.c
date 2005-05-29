@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.c,v 1.21 2005-05-28 16:06:44 achu Exp $
+ *  $Id: cerebro.c,v 1.22 2005-05-29 05:33:29 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -25,6 +25,8 @@ static char *cerebro_error_messages[] =
   {
     "success",
     "null cerebro_t handle",
+    "null cerebro_nodelist_t nodelist",
+    "null cerebro_nodelist_iterator_t iterator",
     "invalid magic number found",
     "invalid parameters",
     "invalid hostname",
@@ -36,6 +38,8 @@ static char *cerebro_error_messages[] =
     "buffer overflow",
     "server data not loaded",
     "node not found",
+    "end of list reached",
+    "value not found",
     "config file error",
     "config module error",
     "config input error",
@@ -132,23 +136,6 @@ cerebro_strerror(int errnum)
     return cerebro_error_messages[errnum];
   else
     return cerebro_error_messages[CEREBRO_ERR_ERRNUMRANGE];
-}
-
-char *
-cerebro_errormsg(cerebro_t handle)
-{
-  return cerebro_strerror(cerebro_errnum(handle));
-}
-
-void
-cerebro_perror(cerebro_t handle, const char *msg)
-{
-  char *errormsg = cerebro_errormsg(handle);
- 
-  if (!msg)
-    fprintf(stderr, "%s\n", errormsg);
-  else
-    fprintf(stderr, "%s: %s\n", msg, errormsg);
 }
 
 int 

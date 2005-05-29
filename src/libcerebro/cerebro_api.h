@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_api.h,v 1.16 2005-05-28 15:40:23 achu Exp $
+ *  $Id: cerebro_api.h,v 1.17 2005-05-29 05:33:29 achu Exp $
 \*****************************************************************************/
  
 #ifndef _CEREBRO_API_H
@@ -9,6 +9,7 @@
 
 #include "cerebro/cerebro_config.h"
 #include "cerebro/cerebro_constants.h"
+#include "cerebro/cerebro_metric_protocol.h"
 
 #include "list.h"
 
@@ -48,6 +49,16 @@ struct cerebro {
 };
 
 /* 
+ * struct cerebro_nodelist_data
+ *
+ * Stores a nodename and a value
+ */
+struct cerebro_nodelist_data {
+  char nodename[CEREBRO_MAXNODENAMELEN+1];
+  cerebro_metric_value_t metric_value;
+};
+
+/* 
  * struct cerebro_nodelist
  *
  * Used for nodelist interface
@@ -55,6 +66,7 @@ struct cerebro {
 struct cerebro_nodelist {
   int32_t magic;
   int32_t errnum;
+  cerebro_metric_type_t metric_type;
   List nodes;
   List iterators;
 };
@@ -68,6 +80,7 @@ struct cerebro_nodelist_iterator {
   int32_t magic;
   int32_t errnum;
   ListIterator itr;
+  struct cerebro_nodelist_data *current;
   struct cerebro_nodelist *nodelist;
 };
 

@@ -5,6 +5,12 @@
 	* begin libcerebro rework around metric server and metric data.
 
 	* remove all updown server references
+
+	* remove duplicate functions in libcerebro
+
+	* remove unnecessary libcerebro functions
+
+	* rework libcerebro nodelist api
 	
 2005-05-27  Albert Chu  <chu11@llnl.gov>
 

@@ -28,6 +28,8 @@ Design/Re-Code
     - if_up 
     - if not exist in node do default?
 - metric with value of arbitrary data
+  - will require len field to heartbeat packets and metric data
+  - will require magic field to ensure packets are in-sync??
 - cleanup error thing w/ 2 inits
 - timeout length ability with metric up/down
 - nodelist_t, not cerebro_nodelist_t??

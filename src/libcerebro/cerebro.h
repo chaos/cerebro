@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.26 2005-05-28 16:06:44 achu Exp $
+ *  $Id: cerebro.h,v 1.27 2005-05-29 05:33:29 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_H
@@ -7,40 +7,28 @@
 
 #define CEREBRO_ERR_SUCCESS                0
 #define CEREBRO_ERR_NULLHANDLE             1
-#define CEREBRO_ERR_MAGIC_NUMBER           2
-#define CEREBRO_ERR_PARAMETERS             3
-#define CEREBRO_ERR_HOSTNAME               4
-#define CEREBRO_ERR_CONNECT                5
-#define CEREBRO_ERR_CONNECT_TIMEOUT        6
-#define CEREBRO_ERR_PROTOCOL               7
-#define CEREBRO_ERR_PROTOCOL_TIMEOUT       8
-#define CEREBRO_ERR_VERSION_INCOMPATIBLE   9
-#define CEREBRO_ERR_NOT_LOADED            10
-#define CEREBRO_ERR_OVERFLOW              11
-#define CEREBRO_ERR_NODE_NOTFOUND         12
-#define CEREBRO_ERR_CONFIG_FILE           13
-#define CEREBRO_ERR_CONFIG_MODULE         14
-#define CEREBRO_ERR_CONFIG_INPUT          15
-#define CEREBRO_ERR_CLUSTERLIST_MODULE    16
-#define CEREBRO_ERR_OUTMEM                17
-#define CEREBRO_ERR_INTERNAL              18
-#define CEREBRO_ERR_ERRNUMRANGE           19
-
-#define CEREBRO_NODELIST_ERR_SUCCESS       0
-#define CEREBRO_NODELIST_ERR_NULLNODELIST  1
-#define CEREBRO_NODELIST_ERR_MAGIC_NUMBER  2
-#define CEREBRO_NODELIST_ERR_PARAMETERS    3
-#define CEREBRO_NODELIST_ERR_OUTMEM        4
-#define CEREBRO_NODELIST_ERR_INTERNAL      5
-#define CEREBRO_NODELIST_ERR_ERRNUMRANGE   6
-
-#define CEREBRO_NODELIST_ITERATOR_ERR_SUCCESS       0
-#define CEREBRO_NODELIST_ITERATOR_ERR_NULLITERATOR  1
-#define CEREBRO_NODELIST_ITERATOR_ERR_MAGIC_NUMBER  2
-#define CEREBRO_NODELIST_ITERATOR_ERR_PARAMETERS    3
-#define CEREBRO_NODELIST_ITERATOR_ERR_OUTMEM        4
-#define CEREBRO_NODELIST_ITERATOR_ERR_INTERNAL      5
-#define CEREBRO_NODELIST_ITERATOR_ERR_ERRNUMRANGE   6
+#define CEREBRO_ERR_NULLNODELIST           2
+#define CEREBRO_ERR_NULLITERATOR           3
+#define CEREBRO_ERR_MAGIC_NUMBER           4
+#define CEREBRO_ERR_PARAMETERS             5
+#define CEREBRO_ERR_HOSTNAME               6
+#define CEREBRO_ERR_CONNECT                7
+#define CEREBRO_ERR_CONNECT_TIMEOUT        8
+#define CEREBRO_ERR_PROTOCOL               9
+#define CEREBRO_ERR_PROTOCOL_TIMEOUT      10 
+#define CEREBRO_ERR_VERSION_INCOMPATIBLE  11 
+#define CEREBRO_ERR_NOT_LOADED            12
+#define CEREBRO_ERR_OVERFLOW              13
+#define CEREBRO_ERR_NODE_NOTFOUND         14
+#define CEREBRO_ERR_END_OF_LIST           15
+#define CEREBRO_ERR_VALUE_NOTFOUND        16
+#define CEREBRO_ERR_CONFIG_FILE           17
+#define CEREBRO_ERR_CONFIG_MODULE         18
+#define CEREBRO_ERR_CONFIG_INPUT          19
+#define CEREBRO_ERR_CLUSTERLIST_MODULE    20
+#define CEREBRO_ERR_OUTMEM                21
+#define CEREBRO_ERR_INTERNAL              22
+#define CEREBRO_ERR_ERRNUMRANGE           23
 
 typedef struct cerebro *cerebro_t;
 
@@ -82,22 +70,6 @@ int cerebro_errnum(cerebro_t handle);
  * Returns pointer to message on success
  */
 char *cerebro_strerror(int errnum);
-
-/*
- * cerebro_errormsg
- *
- * Return a string message describing the most recent error
- *
- * Returns pointer to message on success
- */
-char *cerebro_errormsg(cerebro_t handle);
-
-/*
- * cerebro_perror
- *
- * Output a message to standard error
- */
-void cerebro_perror(cerebro_t handle, const char *msg);
 
 /* 
  * Parameter Settings
@@ -146,22 +118,34 @@ int cerebro_set_flags(cerebro_t handle, unsigned int flags);
  */
 
 /* 
- * cerebro_nodelist_count
+ * cerebro_nodelist_length
  *
  * Determine the length of the nodelist.
  *
  * Returns the length of the nodelist on success, -1 on error
  */
-int cerebro_nodelist_count(cerebro_nodelist_t nodelist);
+int cerebro_nodelist_length(cerebro_nodelist_t nodelist);
+
+/* 
+ * cerebro_nodelist_value_type
+ *
+ * Determine the type of data stored in the nodelist
+ *
+ * Returns type on success, -1 on error
+ */
+int cerebro_nodelist_value_type(cerebro_nodelist_t nodelist);
 
 /* 
  * cerebro_nodelist_find
  *
- * Determine if 'node' exists in the list.
+ * Determine if 'node' exists in the list.  If a value exists
+ * for the node, it is returned in 'value'.
  *
  * Returns 1 if 'node' is found, 0 if not, -1 on error
  */
-int cerebro_nodelist_find(cerebro_nodelist_t nodelist, const char *node);
+int cerebro_nodelist_find(cerebro_nodelist_t nodelist, 
+			  const char *node, 
+			  void **metric_value);
 
 /* 
  * Cerebro_for_each
@@ -171,7 +155,7 @@ int cerebro_nodelist_find(cerebro_nodelist_t nodelist, const char *node);
  *
  * Returns 0 on success, -1 on error
  */
-typedef int (*Cerebro_for_each)(char *nodename, void *arg);
+typedef int (*Cerebro_for_each)(char *nodename, void *metric_value, void *arg);
 
 /* 
  * cerebro_nodelist_for_each
@@ -202,31 +186,6 @@ int cerebro_nodelist_destroy(cerebro_nodelist_t nodelist);
  */
 int cerebro_nodelist_errnum(cerebro_nodelist_t nodelist);
 
-/*
- * cerebro_nodelist_strerror
- *
- * Return a string message describing an error number
- *
- * Returns pointer to message on success
- */
-char *cerebro_nodelist_strerror(int errnum);
-
-/*
- * cerebro_nodelist_errormsg
- *
- * Return a string message describing the most recent error
- *
- * Returns pointer to message on success
- */
-char *cerebro_nodelist_errormsg(cerebro_nodelist_t nodelist);
-
-/*
- * cerebro_nodelist_perror
- *
- * Output a message to standard error
- */
-void cerebro_nodelist_perror(cerebro_nodelist_t nodelist, const char *msg);
-
 /* 
  * cerebro_nodelist_iterator_create
  *
@@ -239,25 +198,46 @@ cerebro_nodelist_iterator_t cerebro_nodelist_iterator_create(cerebro_nodelist_t 
 /* 
  * cerebro_nodelist_iterator_next
  *
- * Retrieve next node from iterator and move the nodename pointer forward
+ * Move the iterator pointer forward
  *
- * Return 1 if node returned, 0 at end of list, -1 on error
+ * Return 1 if more data exists, 0 if the end of list has been
+ * reached, -1 on error
  */
-int cerebro_nodelist_iterator_next(cerebro_nodelist_iterator_t itr, char **node);
+int cerebro_nodelist_iterator_next(cerebro_nodelist_iterator_t nodelistItr);
 
 /* 
  * cerebro_nodelist_iterator_reset
  *
+ * Reset the nodelist iterator to the beginning.
+ * 
  * Returns 0 on success, -1 on error
  */
-int cerebro_nodes_iterator_reset(cerebro_nodelist_iterator_t itr);
+int cerebro_nodelist_iterator_reset(cerebro_nodelist_iterator_t nodelistItr);
+
+/* 
+ * cerebro_nodelist_iterator_nodename
+ *
+ * Retrieve a pointer to the current nodename
+ *
+ * Returns pointer to nodename, NULL on error
+ */
+char *cerebro_nodelist_iterator_nodename(cerebro_nodelist_iterator_t nodelistItr);
+
+/* 
+ * cerebro_nodelist_iterator_value
+ *
+ * Retrieve a pointer to the current value.
+ *
+ * Returns pointer to value, NULL on error
+ */
+void *cerebro_nodelist_iterator_value(cerebro_nodelist_iterator_t nodelistItr);
 
 /* 
  * cerebro_nodelist_iterator_destroy
  *
  * Returns 0 on success, -1 on error
  */
-int cerebro_nodes_iterator_destroy(cerebro_nodelist_iterator_t itr);
+int cerebro_nodelist_iterator_destroy(cerebro_nodelist_iterator_t nodelistItr);
 
 /*
  * cerebro_nodelist_iterator_errnum
@@ -267,30 +247,5 @@ int cerebro_nodes_iterator_destroy(cerebro_nodelist_iterator_t itr);
  * Returns error number on success
  */
 int cerebro_nodelist_iterator_errnum(cerebro_nodelist_iterator_t handle);
-
-/*
- * cerebro_nodelist_iterator_strerror
- *
- * Return a string message describing an error number
- *
- * Returns pointer to message on success
- */
-char *cerebro_nodelist_iterator_strerror(int errnum);
-
-/*
- * cerebro_nodelist_iterator_errormsg
- *
- * Return a string message describing the most recent error
- *
- * Returns pointer to message on success
- */
-char *cerebro_nodelist_iterator_errormsg(cerebro_nodelist_iterator_t handle);
-
-/*
- * cerebro_nodelist_iterator_perror
- *
- * Output a message to standard error
- */
-void cerebro_nodelist_iterator_perror(cerebro_nodelist_iterator_t handle, const char *msg);
 
 #endif /* _CEREBRO_H */

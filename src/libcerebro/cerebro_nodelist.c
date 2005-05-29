@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_nodelist.c,v 1.5 2005-05-28 15:40:23 achu Exp $
+ *  $Id: cerebro_nodelist.c,v 1.6 2005-05-29 05:33:29 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -19,28 +19,6 @@
 
 #include "list.h"
 
-static char *cerebro_nodelist_error_messages[] =
-  {
-    "success",
-    "null cerebro_nodelist_t nodelist",
-    "invalid magic number found",
-    "invalid parameters",
-    "out of memory",
-    "internal error",
-    "errnum out of range",
-  };
-
-static char *cerebro_nodelist_iterator_error_messages[] =
-  {
-    "success",
-    "null cerebro_nodelist_iterator_t nodelist",
-    "invalid magic number found",
-    "invalid parameters",
-    "out of memory",
-    "internal error",
-    "errnum out of range",
-  };
-
 /* 
  * _cerebro_nodelist_check
  *
@@ -59,7 +37,7 @@ _cerebro_nodelist_check(cerebro_nodelist_t nodelist)
     {
       cerebro_err_debug_lib("%s(%s:%d): nodelist null",
                             __FILE__, __FUNCTION__, __LINE__);
-      nodelist->errnum = CEREBRO_NODELIST_ERR_INTERNAL;
+      nodelist->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
   
@@ -72,7 +50,7 @@ cerebro_nodelist_length(cerebro_nodelist_t nodelist)
   if (_cerebro_nodelist_check(nodelist) < 0)
     return -1;
   
-  nodelist->errnum = CEREBRO_NODELIST_ERR_SUCCESS;
+  nodelist->errnum = CEREBRO_ERR_SUCCESS;
   return list_count(nodelist->nodes);
 }
  
@@ -93,40 +71,123 @@ _cerebro_nodelist_find_func(void *x, void *key)
 }
 
 int 
-cerebro_nodelist_find(cerebro_nodelist_t nodelist, const char *node)
+cerebro_nodelist_find(cerebro_nodelist_t nodelist, 
+		      const char *node,
+		      void **metric_value)
 {
+  struct cerebro_nodelist_data *data;
+
   if (_cerebro_nodelist_check(nodelist) < 0)
     return -1;
 
   if (!node)
     {
-      nodelist->errnum = CEREBRO_NODELIST_ERR_PARAMETERS;
+      nodelist->errnum = CEREBRO_ERR_PARAMETERS;
       return -1;
     }
 
-  nodelist->errnum = CEREBRO_NODELIST_ERR_SUCCESS;
-  return (list_find_first(nodelist->nodes,
-                          _cerebro_nodelist_find_func,
-                          (void *)node) ? 1 : 0);
+  nodelist->errnum = CEREBRO_ERR_SUCCESS;
+  data = list_find_first(nodelist->nodes,
+			 _cerebro_nodelist_find_func,
+			 (void *)node);
+  if (data && metric_value)
+    {
+      switch(nodelist->metric_type)
+	{
+	case CEREBRO_METRIC_TYPE_NONE:
+	  break;
+	case CEREBRO_METRIC_TYPE_BOOL:
+	  *metric_value = (void *)&data->metric_value.val_bool;
+	  break;
+	case CEREBRO_METRIC_TYPE_INT32:
+	  *metric_value= (void *)&data->metric_value.val_int32;
+	  break;
+	case CEREBRO_METRIC_TYPE_UNSIGNED_INT32:
+	  *metric_value= (void *)&data->metric_value.val_unsigned_int32;
+	  break;
+	case CEREBRO_METRIC_TYPE_FLOAT:
+	  *metric_value= (void *)&data->metric_value.val_float;
+	  break;
+	case CEREBRO_METRIC_TYPE_DOUBLE:
+	  *metric_value = (void *)&data->metric_value.val_double;
+	  break;
+	case CEREBRO_METRIC_TYPE_STRING:
+	  *metric_value = (void *)data->metric_value.val_string;
+	  break;
+	default:
+	  nodelist->errnum = CEREBRO_ERR_INTERNAL;
+	  return -1;
+	}
+    }
+
+  return (data ? 1 : 0);
 }
- 
+
 int 
 cerebro_nodelist_for_each(cerebro_nodelist_t nodelist,
                           Cerebro_for_each for_each,
                           void *arg)
 {
+  struct cerebro_nodelist_data *data;
+  ListIterator itr = NULL;
+
   if (_cerebro_nodelist_check(nodelist) < 0)
     return -1;
 
   if (!for_each)
     {
-      nodelist->errnum = CEREBRO_NODELIST_ERR_PARAMETERS;
+      nodelist->errnum = CEREBRO_ERR_PARAMETERS;
       return -1;
     }
   
-  return (list_for_each(nodelist->nodes, 
-                        (ListForF)for_each, 
-                        arg) < 0 ? -1 : 0);
+  if (!(itr = list_iterator_create(nodelist->nodes)))
+    {
+      nodelist->errnum = CEREBRO_ERR_OUTMEM;
+      goto cleanup;
+    }
+
+  while ((data = list_next(itr)))
+    {
+      void *metric_value;
+
+      switch(nodelist->metric_type)
+	{
+	case CEREBRO_METRIC_TYPE_NONE:
+	  metric_value = NULL;
+	  break;
+	case CEREBRO_METRIC_TYPE_BOOL:
+	  metric_value = (void *)&data->metric_value.val_bool;
+	  break;
+	case CEREBRO_METRIC_TYPE_INT32:
+	  metric_value= (void *)&data->metric_value.val_int32;
+	  break;
+	case CEREBRO_METRIC_TYPE_UNSIGNED_INT32:
+	  metric_value= (void *)&data->metric_value.val_unsigned_int32;
+	  break;
+	case CEREBRO_METRIC_TYPE_FLOAT:
+	  metric_value= (void *)&data->metric_value.val_float;
+	  break;
+	case CEREBRO_METRIC_TYPE_DOUBLE:
+	  metric_value = (void *)&data->metric_value.val_double;
+	  break;
+	case CEREBRO_METRIC_TYPE_STRING:
+	  metric_value = (void *)data->metric_value.val_string;
+	  break;
+	default:
+	  nodelist->errnum = CEREBRO_ERR_INTERNAL;
+	  goto cleanup;
+	}
+      
+      if (for_each(data->nodename, metric_value, arg) < 0)
+	goto cleanup;
+    }
+
+  list_iterator_destroy(itr);
+  return 0;
+ cleanup:
+  if (itr)
+    list_iterator_destroy(itr);
+  return -1;
 }
 
 int 
@@ -138,7 +199,7 @@ cerebro_nodelist_destroy(cerebro_nodelist_t nodelist)
   list_destroy(nodelist->nodes);
   list_destroy(nodelist->iterators);
   nodelist->magic = ~CEREBRO_NODELIST_MAGIC_NUMBER;
-  nodelist->errnum = CEREBRO_NODELIST_ERR_SUCCESS;
+  nodelist->errnum = CEREBRO_ERR_SUCCESS;
   nodelist->nodes = NULL;
   nodelist->iterators = NULL;
   free(nodelist);
@@ -149,38 +210,11 @@ int
 cerebro_nodelist_errnum(cerebro_nodelist_t nodelist)
 {
   if (!nodelist)
-    return CEREBRO_NODELIST_ERR_NULLNODELIST;
+    return CEREBRO_ERR_NULLNODELIST;
   else if (nodelist->magic != CEREBRO_NODELIST_MAGIC_NUMBER)
-    return CEREBRO_NODELIST_ERR_MAGIC_NUMBER;
+    return CEREBRO_ERR_MAGIC_NUMBER;
   else
     return nodelist->errnum;
-}
-
-char *
-cerebro_nodelist_strerror(int errnum)
-{
-  if (errnum >= CEREBRO_NODELIST_ERR_SUCCESS 
-      && errnum <= CEREBRO_NODELIST_ERR_ERRNUMRANGE)
-    return cerebro_nodelist_error_messages[errnum];
-  else
-    return cerebro_nodelist_error_messages[CEREBRO_NODELIST_ERR_ERRNUMRANGE];
-}
-
-char *
-cerebro_nodelist_errormsg(cerebro_nodelist_t nodelist)
-{
-  return cerebro_nodelist_strerror(cerebro_nodelist_errnum(nodelist));
-}
-
-void 
-cerebro_nodelist_perror(cerebro_nodelist_t nodelist, const char *msg)
-{
-  char *errormsg = cerebro_nodelist_errormsg(nodelist);
-  
-  if (!msg)
-    fprintf(stderr, "%s\n", errormsg);
-  else
-    fprintf(stderr, "%s: %s\n", msg, errormsg);
 }
 
 cerebro_nodelist_iterator_t 
@@ -193,7 +227,7 @@ cerebro_nodelist_iterator_create(cerebro_nodelist_t nodelist)
 
   if (!(nodelistItr = malloc(sizeof(struct cerebro_nodelist_iterator))))
     {
-      nodelist->errnum = CEREBRO_NODELIST_ERR_OUTMEM;
+      nodelist->errnum = CEREBRO_ERR_OUTMEM;
       goto cleanup;
     }
   memset(nodelistItr, '\0', sizeof(struct cerebro_nodelist_iterator));
@@ -201,18 +235,19 @@ cerebro_nodelist_iterator_create(cerebro_nodelist_t nodelist)
   
   if (!(nodelistItr->itr = list_iterator_create(nodelist->nodes)))
     {
-      nodelist->errnum = CEREBRO_NODELIST_ERR_OUTMEM;
+      nodelist->errnum = CEREBRO_ERR_OUTMEM;
       goto cleanup;
     }
   
   if (!list_append(nodelist->iterators, nodelistItr))
     {
-      nodelist->errnum = CEREBRO_NODELIST_ERR_INTERNAL;
+      nodelist->errnum = CEREBRO_ERR_INTERNAL;
       goto cleanup;
     }
 
   nodelistItr->nodelist = nodelist;
-  nodelistItr->errnum = CEREBRO_NODELIST_ITERATOR_ERR_SUCCESS;
+  nodelistItr->errnum = CEREBRO_ERR_SUCCESS;
+  nodelistItr = list_next(nodelistItr->itr);
   return nodelistItr;
 
  cleanup:
@@ -243,7 +278,7 @@ _cerebro_nodelist_iterator_check(cerebro_nodelist_iterator_t nodelistItr)
     {
       cerebro_err_debug_lib("%s(%s:%d): itr null",
                             __FILE__, __FUNCTION__, __LINE__);
-      nodelistItr->errnum = CEREBRO_NODELIST_ITERATOR_ERR_INTERNAL;
+      nodelistItr->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
 
@@ -251,7 +286,7 @@ _cerebro_nodelist_iterator_check(cerebro_nodelist_iterator_t nodelistItr)
     {
       cerebro_err_debug_lib("%s(%s:%d): nodelist null",
                             __FILE__, __FUNCTION__, __LINE__);
-      nodelistItr->errnum = CEREBRO_NODELIST_ITERATOR_ERR_INTERNAL;
+      nodelistItr->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
   
@@ -259,7 +294,7 @@ _cerebro_nodelist_iterator_check(cerebro_nodelist_iterator_t nodelistItr)
     {
       cerebro_err_debug_lib("%s(%s:%d): nodelist destroyed",
                             __FILE__, __FUNCTION__, __LINE__);
-      nodelistItr->errnum = CEREBRO_NODELIST_ITERATOR_ERR_MAGIC_NUMBER;
+      nodelistItr->errnum = CEREBRO_ERR_MAGIC_NUMBER;
       return -1;
     }
 
@@ -267,36 +302,92 @@ _cerebro_nodelist_iterator_check(cerebro_nodelist_iterator_t nodelistItr)
 }
 
 int
-cerebro_nodelist_iterator_next(cerebro_nodelist_iterator_t nodelistItr,
-                               char **node)
+cerebro_nodelist_iterator_next(cerebro_nodelist_iterator_t nodelistItr)
 {
   if (_cerebro_nodelist_iterator_check(nodelistItr) < 0)
     return -1;
 
-  if (!node)
-    {
-      nodelistItr->errnum = CEREBRO_NODELIST_ITERATOR_ERR_PARAMETERS;
-      return -1;
-    }
-
-  *node = (char *)list_next(nodelistItr->itr);
-  nodelistItr->errnum = CEREBRO_NODELIST_ITERATOR_ERR_SUCCESS;
-  return (*node) ? 1 : 0;
+  if (nodelistItr->current)
+    nodelistItr->current = (struct cerebro_nodelist_data *)list_next(nodelistItr->itr);
+  nodelistItr->errnum = CEREBRO_ERR_SUCCESS;
+  return (nodelistItr->current) ? 1 : 0;
 }
  
 int 
-cerebro_nodes_iterator_reset(cerebro_nodelist_iterator_t nodelistItr)
+cerebro_nodelist_iterator_reset(cerebro_nodelist_iterator_t nodelistItr)
 {
   if (_cerebro_nodelist_iterator_check(nodelistItr) < 0)
     return -1;
 
   list_iterator_reset(nodelistItr->itr);
-  nodelistItr->errnum = CEREBRO_NODELIST_ITERATOR_ERR_SUCCESS;
+  nodelistItr->current = (struct cerebro_nodelist_data *)list_next(nodelistItr->itr);
+  nodelistItr->errnum = CEREBRO_ERR_SUCCESS;
   return 0;
 }
- 
+
+char *
+cerebro_nodelist_iterator_nodename(cerebro_nodelist_iterator_t nodelistItr)
+{
+  if (_cerebro_nodelist_iterator_check(nodelistItr) < 0)
+    return NULL;
+
+  if (!nodelistItr->current)
+    {
+      nodelistItr->errnum = CEREBRO_ERR_END_OF_LIST;
+      return NULL;
+    }
+  
+  return nodelistItr->current->nodename;
+}
+                                                                                   
+void *
+cerebro_nodelist_iterator_value(cerebro_nodelist_iterator_t nodelistItr)
+{
+  void *rv;
+
+  if (_cerebro_nodelist_iterator_check(nodelistItr) < 0)
+    return NULL;
+
+  if (!nodelistItr->current)
+    {
+      nodelistItr->errnum = CEREBRO_ERR_END_OF_LIST;
+      return NULL;
+    }
+
+  switch(nodelistItr->nodelist->metric_type)
+    {
+    case CEREBRO_METRIC_TYPE_NONE:
+      nodelistItr->errnum = CEREBRO_ERR_VALUE_NOTFOUND;
+      return NULL;
+      break;
+    case CEREBRO_METRIC_TYPE_BOOL:
+      rv = (void *)&nodelistItr->current->metric_value.val_bool;
+      break;
+    case CEREBRO_METRIC_TYPE_INT32:
+      rv= (void *)&nodelistItr->current->metric_value.val_int32;
+      break;
+    case CEREBRO_METRIC_TYPE_UNSIGNED_INT32:
+      rv= (void *)&nodelistItr->current->metric_value.val_unsigned_int32;
+      break;
+    case CEREBRO_METRIC_TYPE_FLOAT:
+      rv= (void *)&nodelistItr->current->metric_value.val_float;
+      break;
+    case CEREBRO_METRIC_TYPE_DOUBLE:
+      rv = (void *)&nodelistItr->current->metric_value.val_double;
+      break;
+    case CEREBRO_METRIC_TYPE_STRING:
+      rv = (void *)nodelistItr->current->metric_value.val_string;
+      break;
+    default:
+      nodelistItr->errnum = CEREBRO_ERR_INTERNAL;
+      return NULL;
+    }
+  
+  return rv;
+}
+
 int 
-cerebro_nodes_iterator_destroy(cerebro_nodelist_iterator_t nodelistItr)
+cerebro_nodelist_iterator_destroy(cerebro_nodelist_iterator_t nodelistItr)
 {
   cerebro_nodelist_t nodelist;
   cerebro_nodelist_iterator_t tempItr;
@@ -310,7 +401,7 @@ cerebro_nodes_iterator_destroy(cerebro_nodelist_iterator_t nodelistItr)
 
   if (!(itr = list_iterator_create(nodelist->iterators)))
     {
-      nodelistItr->errnum = CEREBRO_NODELIST_ITERATOR_ERR_OUTMEM;
+      nodelistItr->errnum = CEREBRO_ERR_OUTMEM;
       goto cleanup;
     }
   
@@ -321,7 +412,7 @@ cerebro_nodes_iterator_destroy(cerebro_nodelist_iterator_t nodelistItr)
           list_remove(itr);
           list_iterator_destroy(nodelistItr->itr);
           nodelistItr->magic = ~CEREBRO_NODELIST_ITERATOR_MAGIC_NUMBER;
-          nodelistItr->errnum = CEREBRO_NODELIST_ITERATOR_ERR_SUCCESS;
+          nodelistItr->errnum = CEREBRO_ERR_SUCCESS;
           free(nodelistItr);
           found++;
           break;
@@ -330,7 +421,7 @@ cerebro_nodes_iterator_destroy(cerebro_nodelist_iterator_t nodelistItr)
   
   if (!found)
     {
-      nodelistItr->errnum = CEREBRO_NODELIST_ITERATOR_ERR_PARAMETERS;
+      nodelistItr->errnum = CEREBRO_ERR_PARAMETERS;
       goto cleanup;
     }
 
@@ -345,36 +436,9 @@ int
 cerebro_nodelist_iterator_errnum(cerebro_nodelist_iterator_t nodelist)
 {
   if (!nodelist)
-    return CEREBRO_NODELIST_ITERATOR_ERR_NULLITERATOR;
+    return CEREBRO_ERR_NULLITERATOR;
   else if (nodelist->magic != CEREBRO_NODELIST_ITERATOR_MAGIC_NUMBER)
-    return CEREBRO_NODELIST_ITERATOR_ERR_MAGIC_NUMBER;
+    return CEREBRO_ERR_MAGIC_NUMBER;
   else
     return nodelist->errnum;
-}
-
-char *
-cerebro_nodelist_iterator_strerror(int errnum)
-{
-  if (errnum >= CEREBRO_NODELIST_ITERATOR_ERR_SUCCESS 
-      && errnum <= CEREBRO_NODELIST_ITERATOR_ERR_ERRNUMRANGE)
-    return cerebro_nodelist_iterator_error_messages[errnum];
-  else
-    return cerebro_nodelist_iterator_error_messages[CEREBRO_NODELIST_ITERATOR_ERR_ERRNUMRANGE];
-}
-
-char *
-cerebro_nodelist_iterator_errormsg(cerebro_nodelist_iterator_t nodelist)
-{
-  return cerebro_nodelist_iterator_strerror(cerebro_nodelist_iterator_errnum(nodelist));
-}
-
-void 
-cerebro_nodelist_iterator_perror(cerebro_nodelist_iterator_t nodelist, const char *msg)
-{
-  char *errormsg = cerebro_nodelist_iterator_errormsg(nodelist);
-  
-  if (!msg)
-    fprintf(stderr, "%s\n", errormsg);
-  else
-    fprintf(stderr, "%s: %s\n", msg, errormsg);
 }

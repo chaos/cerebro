@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_protocol.h,v 1.8 2005-05-28 15:40:23 achu Exp $
+ *  $Id: cerebro_metric_protocol.h,v 1.9 2005-05-29 05:33:29 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_METRIC_PROTOCOL_H
@@ -99,7 +99,7 @@ typedef enum {
  * metric value
  */
 typedef union {
-  char      val_bool;
+  int8_t    val_bool;
   int32_t   val_int32;
   u_int32_t val_unsigned_int32;
   float     val_float;
