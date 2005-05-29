@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_api.h,v 1.17 2005-05-29 05:33:29 achu Exp $
+ *  $Id: cerebro_api.h,v 1.18 2005-05-29 19:14:12 achu Exp $
 \*****************************************************************************/
  
 #ifndef _CEREBRO_API_H
@@ -21,7 +21,6 @@
 #define CEREBRO_MAGIC_NUMBER                   0xF00F1234
 #define CEREBRO_NODELIST_MAGIC_NUMBER          0xF00F2345
 #define CEREBRO_NODELIST_ITERATOR_MAGIC_NUMBER 0xF00F3456
-#define CEREBRO_UPDOWN_MAGIC_NUMBER            0xF00F4567
 
 /* 
  * Cerebro loaded state flags
@@ -29,7 +28,6 @@
 #define CEREBRO_MODULE_SETUP_CALLED        0x00000001              
 #define CEREBRO_CONFIG_LOADED              0x00000002
 #define CEREBRO_CLUSTERLIST_MODULE_LOADED  0x00000004
-#define CEREBRO_UPDOWN_DATA_LOADED         0x00000008
 
 /* 
  * struct cerebro
@@ -45,7 +43,6 @@ struct cerebro {
   unsigned int flags;
   int32_t loaded_state;
   struct cerebro_config config_data;
-  void *updown_data;
 };
 
 /* 

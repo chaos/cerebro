@@ -6,9 +6,7 @@ Testing
 - mem-leaking
 
 Cleanup
-- metric_type data conversion thingie
 - cleanup common hash into "data" and put in data.c??
-- marshalling/unmarshall for metric value
 - rename _LEN req/res defines, b/c its about buffer lenghts, not length
   of the struct??
 
@@ -19,46 +17,25 @@ Portability
 - IPv6
 - Non-pthreads support
 
-Design/Re-Code
+Design
+- metric modules
+  - modules for starttime/boottime
 - nodelist
   - use own list instead of 'List' to store iterators?
-- pass around boottime based on module
-  - parse boottime based on module
-- metric flags -
+- metric retrieval flags
     - if_up 
     - if not exist in node do default?
+    - metric timeout length ability with metric up/down
 - metric with value of arbitrary data
   - will require len field to heartbeat packets and metric data
   - will require magic field to ensure packets are in-sync??
-- cleanup error thing w/ 2 inits
-- timeout length ability with metric up/down
-- nodelist_t, not cerebro_nodelist_t??
-- use get_node(), get_value(), get_type() into nodelist format.
-- modules so cerebro server can calculate additional metric in a special way?
-- up/down nodes gathered through metric?? names
-  - "cluster_nodes"
-  - "up_nodes"
-  - "down_nodes"
-- metric load flag, indicating only up nodes?
-  - requires "default up/down timeout_len" cnofig??
-- set_hostname(), set_port(), set_flags(), set_timeout_len() functions
-- internal system error on server not counted as "err_internal"?
 - check if metric name exists in list/hash rather than hard coded
-- only one load function for libcerebro?
-- default timeout_len configurable in config file
-  - necessary for event based up/down
-- rework nodelist/iterator interface error code stuff.
-- merge server datas into one hash??
-- merge servers into one server??
 - gendersllnl config, up listening threads dependent on cluster size
   i.e. 4 threads for mcr/thunder size clusters?
-- support float/double/string for metric monitoring
 - how remove metric data?
-- need list for updown server??
-- move listener hash into metric hash 
 - strerror_r and errormsg_r funcs
 - libcerebro set configfile, module, etc. functions
-- generic err message in cerebro_t handle, i.e for conffile errors
+- generic err message buffer in cerebro_t handle, i.e for conffile errors
 - config_is_setup and and equivalent functions
 - pthreads locking for clusterlists/config modules?? (they are read only)
 
