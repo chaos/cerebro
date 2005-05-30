@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric.c,v 1.3 2005-05-30 05:19:00 achu Exp $
+ *  $Id: cerebro_metric.c,v 1.4 2005-05-30 05:21:19 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -625,8 +625,7 @@ _cerebro_metric_get_metric_data(cerebro_t handle,
 
 cerebro_nodelist_t 
 cerebro_get_metric_data(cerebro_t handle, 
-			const char *metric_name,
-			...)
+			const char *metric_name)
 {
   struct cerebro_nodelist *nodelist = NULL;
   unsigned int port;

@@ -29,6 +29,7 @@ Design
 - metric with value of arbitrary data
   - will require len field to heartbeat packets and metric data
   - will require magic field to ensure packets are in-sync??
+- allow variable arguments for get_nodes 
 - check if metric name exists in list/hash rather than hard coded
 - gendersllnl config, up listening threads dependent on cluster size
   i.e. 4 threads for mcr/thunder size clusters?
