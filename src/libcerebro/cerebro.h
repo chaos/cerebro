@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.28 2005-05-29 19:32:06 achu Exp $
+ *  $Id: cerebro.h,v 1.29 2005-05-30 05:19:00 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_H
@@ -112,15 +112,15 @@ int cerebro_set_timeout_len(cerebro_t handle, unsigned int timeout_len);
 int cerebro_set_flags(cerebro_t handle, unsigned int flags);
 
 /* 
- * cerebro_get_nodelist
+ * cerebro_get_metric_data
  *
  * Get nodelist of nodes and values for a certain metric
  *
  * Returns nodelist on success, -1 on error
  */
-cerebro_nodelist_t cerebro_get_nodelist(cerebro_t handle,
-					const char *metric_name,
-					...);
+cerebro_nodelist_t cerebro_get_metric_data(cerebro_t handle,
+					   const char *metric_name,
+					   ...);
 
 /* 
  * Nodelist API

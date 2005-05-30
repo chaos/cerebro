@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.c,v 1.22 2005-05-29 05:33:29 achu Exp $
+ *  $Id: cerebro.c,v 1.23 2005-05-30 05:19:00 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -144,48 +144,40 @@ cerebro_set_hostname(cerebro_t handle, const char *hostname)
   if (_cerebro_handle_check(handle) < 0)
     return -1;
 
-  if (!hostname)
-    {
-      handle->errnum = CEREBRO_ERR_PARAMETERS;
-      return -1;
-    }
-
-  if (strlen(hostname) > CEREBRO_MAXHOSTNAMELEN)
+  if (hostname && strlen(hostname) > CEREBRO_MAXHOSTNAMELEN)
     {
       handle->errnum = CEREBRO_ERR_OVERFLOW;
       return -1;
     }
 
-  strcpy(handle->hostname, hostname);
+  if (hostname)
+    strcpy(handle->hostname, hostname);
+  else
+    memset(handle->hostname, '\0', CEREBRO_MAXHOSTNAMELEN+1);
+
   return 0;
 }
-                                                                                   
+
 int 
 cerebro_set_port(cerebro_t handle, unsigned int port)
 {
   if (_cerebro_handle_check(handle) < 0)
     return -1;
 
-  if (!port)
-    port = CEREBRO_METRIC_SERVER_PORT;
-
   handle->port = port;
   return 0;
 }
-                                                                                   
+
 int 
 cerebro_set_timeout_len(cerebro_t handle, unsigned int timeout_len)
 {
   if (_cerebro_handle_check(handle) < 0)
     return -1;
 
-  if (!timeout_len)
-    timeout_len = CEREBRO_METRIC_UPDOWN_TIMEOUT_LEN_DEFAULT;
-
   handle->timeout_len = timeout_len;
   return 0;
 }
-                                                                                   
+
 int 
 cerebro_set_flags(cerebro_t handle, unsigned int flags)
 {

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric.c,v 1.2 2005-05-29 19:32:06 achu Exp $
+ *  $Id: cerebro_metric.c,v 1.3 2005-05-30 05:19:00 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -127,34 +127,7 @@ _cerebro_metric_protocol_err_conversion(u_int32_t protocol_error)
     }
 }
 
-/* 
- * _cerebro_metric_request_init
- *
- * Initialize an metric request
- *
- * Returns 0 on success, -1 on error
- */
-static int
-_cerebro_metric_request_init(cerebro_t handle,
-                             struct cerebro_metric_request *req,
-                             unsigned int timeout_len,
-                             int flags)
-{
-  u_int32_t metric_request;
-
-  if (flags == CEREBRO_METRIC_UP_NODES)
-    metric_request = CEREBRO_METRIC_PROTOCOL_REQUEST_UP_NODES;
-  else if (flags == CEREBRO_METRIC_DOWN_NODES)
-    metric_request = CEREBRO_METRIC_PROTOCOL_REQUEST_DOWN_NODES;
-  else 
-    metric_request = CEREBRO_METRIC_PROTOCOL_REQUEST_UP_AND_DOWN_NODES;
-    
-  req->version = CEREBRO_METRIC_PROTOCOL_VERSION;
-  req->metric_request = metric_request;
-  req->timeout_len = timeout_len;
-
-  return 0;
-}
+#endif /* 0 */
 
 /* 
  * _cerebro_metric_request_marshall
@@ -201,7 +174,17 @@ _cerebro_metric_request_marshall(cerebro_t handle,
     }
   count += len;
 
-  if ((len = _cerebro_marshall_unsigned_int32(req->metric_request,
+  if ((len = _cerebro_marshall_buffer(req->metric_name,
+				      sizeof(req->metric_name),
+				      buf + count,
+				      buflen - count)) < 0)
+    {
+      handle->errnum = CEREBRO_ERR_INTERNAL;
+      return -1;
+    }
+  count += len;
+
+  if ((len = _cerebro_marshall_unsigned_int32(req->flags,
                                               buf + count, 
                                               buflen - count)) < 0)
     {
@@ -221,6 +204,8 @@ _cerebro_metric_request_marshall(cerebro_t handle,
 
   return count;
 }
+
+#if 0
 
 /* 
  * _cerebro_metric_response_unmarshall
@@ -311,6 +296,8 @@ _cerebro_metric_response_unmarshall(cerebro_t handle,
   return count;
 }
 
+#endif /* 0 */
+
 /* 
  * _cerebro_metric_request_send
  *
@@ -321,6 +308,7 @@ _cerebro_metric_response_unmarshall(cerebro_t handle,
 static int
 _cerebro_metric_request_send(cerebro_t handle,
                              int fd,
+			     const char *metric_name,
                              unsigned int timeout_len,
                              int flags)
 {
@@ -328,8 +316,10 @@ _cerebro_metric_request_send(cerebro_t handle,
   char buf[CEREBRO_PACKET_BUFLEN];
   int req_len;
 
-  if (_cerebro_metric_request_init(handle, &req, timeout_len, flags) < 0)
-    return -1;
+  req.version = CEREBRO_METRIC_PROTOCOL_VERSION;
+  strncpy(req.metric_name, metric_name, CEREBRO_METRIC_NAME_MAXLEN);
+  req.flags = flags;
+  req.timeout_len = timeout_len;
   
   if ((req_len = _cerebro_metric_request_marshall(handle,
                                                   &req,
@@ -348,6 +338,8 @@ _cerebro_metric_request_send(cerebro_t handle,
 
   return 0;
 }
+
+#if 0
 
 /* 
  * _cerebro_metric_response_receive_one
@@ -585,6 +577,8 @@ _cerebro_metric_response_receive_all(cerebro_t handle,
   return -1;
 }
 
+#endif /* 0 */
+
 /*  
  * _cerebro_metric_get_metric_data
  *
@@ -595,7 +589,8 @@ _cerebro_metric_response_receive_all(cerebro_t handle,
  */
 static int
 _cerebro_metric_get_metric_data(cerebro_t handle,
-				struct cerebro_metric_data *metric_data,
+				cerebro_nodelist_t nodelist,
+				const char *metric_name,
 				const char *hostname,
 				unsigned int port,
 				unsigned int timeout_len,
@@ -609,11 +604,17 @@ _cerebro_metric_get_metric_data(cerebro_t handle,
 					 CEREBRO_METRIC_PROTOCOL_CONNECT_TIMEOUT_LEN)) < 0)
     goto cleanup;
 
-  if (_cerebro_metric_request_send(handle, fd, timeout_len, flags) < 0)
+  if (_cerebro_metric_request_send(handle, 
+				   fd, 
+				   metric_name,
+				   timeout_len, 
+				   flags) < 0)
     goto cleanup;
 
+#if 0
   if (_cerebro_metric_response_receive_all(handle, fd, metric_data, flags) < 0)
     goto cleanup;
+#endif /* 0 */
   
   rv = 0;
 
@@ -622,31 +623,23 @@ _cerebro_metric_get_metric_data(cerebro_t handle,
   return rv;
 }
 
-int 
-cerebro_metric_load_data(cerebro_t handle, 
-                         const char *hostname, 
-                         unsigned int port, 
-                         unsigned int timeout_len,
-                         int flags)
+cerebro_nodelist_t 
+cerebro_get_metric_data(cerebro_t handle, 
+			const char *metric_name,
+			...)
 {
-  struct cerebro_metric_data *metric_data = NULL;
+  struct cerebro_nodelist *nodelist = NULL;
+  unsigned int port;
+  unsigned int timeout_len;
+  unsigned int flags;
 
   if (_cerebro_handle_check(handle) < 0)
     goto cleanup;
 
-  if (flags 
-      && flags != CEREBRO_METRIC_UP_NODES
-      && flags != CEREBRO_METRIC_DOWN_NODES
-      && flags != CEREBRO_METRIC_UP_AND_DOWN_NODES)
+  if (!metric_name || strlen(metric_name) > CEREBRO_METRIC_NAME_MAXLEN)
     {
       handle->errnum = CEREBRO_ERR_PARAMETERS;
       goto cleanup;
-    }
-
-  if (!(handle->loaded_state & CEREBRO_CLUSTERLIST_MODULE_LOADED))
-    {
-      if (_cerebro_load_clusterlist_module(handle) < 0)
-	goto cleanup;
     }
 
   if (!(handle->loaded_state & CEREBRO_CONFIG_LOADED))
@@ -655,16 +648,16 @@ cerebro_metric_load_data(cerebro_t handle,
 	goto cleanup;
     }
 
-  if (!port)
+  if (!handle->port)
     {
-      if (handle->config_data.cerebro_metric_port_flag)
+      if (handle->config_data.cerebro_port_flag)
 	{
-	  if (!handle->config_data.cerebro_metric_port)
+	  if (!handle->config_data.cerebro_port)
 	    {
 	      handle->errnum = CEREBRO_ERR_CONFIG_INPUT;
 	      goto cleanup;
 	    }
-	  port = handle->config_data.cerebro_metric_port;
+	  port = handle->config_data.cerebro_port;
 	}
       else
 	port = CEREBRO_METRIC_SERVER_PORT;
@@ -672,75 +665,54 @@ cerebro_metric_load_data(cerebro_t handle,
 
   if (!timeout_len)
     {
-      if (handle->config_data.cerebro_metric_timeout_len_flag)
+      if (handle->config_data.cerebro_timeout_len_flag)
 	{
-	  if (!handle->config_data.cerebro_metric_timeout_len)
+	  if (!handle->config_data.cerebro_timeout_len)
 	    {
 	      handle->errnum = CEREBRO_ERR_CONFIG_INPUT;
 	      goto cleanup;
 	    }
-	  timeout_len = handle->config_data.cerebro_metric_timeout_len;
+	  timeout_len = handle->config_data.cerebro_timeout_len;
 	}
       else
-	timeout_len = CEREBRO_METRIC_TIMEOUT_LEN_DEFAULT;
+	timeout_len = CEREBRO_METRIC_UPDOWN_TIMEOUT_LEN_DEFAULT;
     }
 
   if (!flags)
     {
-      if (handle->config_data.cerebro_metric_flags_flag)
+      if (handle->config_data.cerebro_flags_flag)
 	{
-	  if (handle->config_data.cerebro_metric_flags != CEREBRO_METRIC_UP_NODES
-	      && handle->config_data.cerebro_metric_flags != CEREBRO_METRIC_DOWN_NODES
-	      && handle->config_data.cerebro_metric_flags != CEREBRO_METRIC_UP_AND_DOWN_NODES)
+	  /* XXX should check for valid flags */
+#if 0
+	  if (handle->config_data.cerebro_flags != CEREBRO_METRIC_UP_NODES
+	      && handle->config_data.cerebro_flags != CEREBRO_METRIC_DOWN_NODES
+	      && handle->config_data.cerebro_flags != CEREBRO_METRIC_UP_AND_DOWN_NODES)
 	    {
 	      handle->errnum = CEREBRO_ERR_CONFIG_INPUT;
 	      goto cleanup;
 	    }
-	  flags = handle->config_data.cerebro_metric_flags;
+#endif /* 0 */
+	  flags = handle->config_data.cerebro_flags;
 	}
       else
-	flags = CEREBRO_METRIC_UP_AND_DOWN_NODES;
+	flags = 0;		/* XXX maybe different default */
     }
   
-  if (!(metric_data = (struct cerebro_metric_data *)malloc(sizeof(struct cerebro_metric_data))))
-    {
-      handle->errnum = CEREBRO_ERR_OUTMEM;
-      goto cleanup;
-    }
-  memset(metric_data, '\0', sizeof(struct cerebro_metric_data));
-  metric_data->magic = CEREBRO_METRIC_MAGIC_NUMBER;
-  metric_data->up_nodes = NULL;
-  metric_data->down_nodes = NULL;
+  if (!(nodelist = _cerebro_nodelist_create(handle)))
+    goto cleanup;
 
-  if (flags & CEREBRO_METRIC_UP_NODES)
+  if (!strlen(handle->hostname))
     {
-      if (!(metric_data->up_nodes = hostlist_create(NULL)))
-        {
-          handle->errnum = CEREBRO_ERR_OUTMEM;
-          goto cleanup;
-        }
-    }
-
-  if (flags & CEREBRO_METRIC_DOWN_NODES)
-    {
-      if (!(metric_data->down_nodes = hostlist_create(NULL)))
-        {
-          handle->errnum = CEREBRO_ERR_OUTMEM;
-          goto cleanup;
-        }
-    }
-
-  if (!hostname)
-    {
-      if (handle->config_data.cerebro_metric_hostnames_flag)
+      if (handle->config_data.cerebro_hostnames_flag)
 	{
 	  int i, rv = -1;
 
-	  for (i = 0; i < handle->config_data.cerebro_metric_hostnames_len; i++)
+	  for (i = 0; i < handle->config_data.cerebro_hostnames_len; i++)
 	    {
 	      if ((rv = _cerebro_metric_get_metric_data(handle,
-							metric_data,
-							handle->config_data.cerebro_metric_hostnames[i],
+							nodelist,
+							metric_name,
+							handle->config_data.cerebro_hostnames[i],
 							port,
 							timeout_len,
 							flags)) < 0)
@@ -748,7 +720,7 @@ cerebro_metric_load_data(cerebro_t handle,
 	      break;
 	    }
 	  
-          if (i >= handle->config_data.cerebro_metric_hostnames_len)
+          if (i >= handle->config_data.cerebro_hostnames_len)
             {
               handle->errnum = CEREBRO_ERR_CONNECT;
               goto cleanup;
@@ -760,7 +732,8 @@ cerebro_metric_load_data(cerebro_t handle,
       else
 	{
 	  if (_cerebro_metric_get_metric_data(handle,
-					      metric_data,
+					      nodelist,
+					      metric_name,
 					      "localhost",
 					      port,
 					      timeout_len,
@@ -771,113 +744,20 @@ cerebro_metric_load_data(cerebro_t handle,
   else
     {
       if (_cerebro_metric_get_metric_data(handle,
-					  metric_data,
-					  hostname,
+					  nodelist,
+					  metric_name,
+					  handle->hostname,
 					  port,
 					  timeout_len,
 					  flags) < 0)
 	goto cleanup;
     }
 
-  if (handle->loaded_state & CEREBRO_METRIC_DATA_LOADED)
-    {
-      struct cerebro_metric_data *metric_data_temp;
-
-      metric_data_temp = (struct cerebro_metric_data *)handle->metric_data;
-
-      if (_cerebro_handle_metric_data_check(handle, metric_data_temp) < 0)
-        goto cleanup;
-
-      if (flags == CEREBRO_METRIC_UP_AND_DOWN_NODES)
-        {
-          if (metric_data_temp->up_nodes)
-            hostlist_destroy(metric_data_temp->up_nodes);
-          if (metric_data_temp->down_nodes)
-            hostlist_destroy(metric_data_temp->down_nodes);
-        }
-      else if (flags == CEREBRO_METRIC_UP_NODES)
-        {
-          if (metric_data_temp->up_nodes)
-            hostlist_destroy(metric_data_temp->up_nodes);
-          if (metric_data_temp->down_nodes)
-            metric_data->down_nodes = metric_data_temp->down_nodes;
-        }
-      else
-        {
-          if (metric_data_temp->down_nodes)
-            hostlist_destroy(metric_data_temp->down_nodes);
-          if (metric_data_temp->up_nodes)
-            metric_data->up_nodes = metric_data_temp->up_nodes;
-        }
-      free(metric_data_temp);
-      handle->loaded_state &= ~CEREBRO_METRIC_DATA_LOADED;
-      handle->metric_data = NULL;
-    }
-
-  handle->loaded_state |= CEREBRO_METRIC_DATA_LOADED;
-  handle->metric_data = (void *)metric_data;
-  handle->errnum = CEREBRO_ERR_SUCCESS;
-  return 0;
-  
- cleanup:
-  if (metric_data)
-    {
-      if (metric_data->up_nodes)
-        {
-          hostlist_destroy(metric_data->up_nodes);
-          metric_data->up_nodes = NULL;
-        }
-      if (metric_data->down_nodes)
-        {
-          hostlist_destroy(metric_data->down_nodes);
-          metric_data->down_nodes = NULL;
-        }
-      free(metric_data);
-    }
-  return -1;
-}
-
-/* 
- * _cerebro_metric_get_nodes
- *
- * Common function for cerebro_metric_get_up_nodes and
- * cerebro_metric_get_down_nodes.
- * 
- * Returns a nodelist on success, NULL on error
- */
-static cerebro_nodelist_t
-_cerebro_metric_get_nodes(cerebro_t handle, int up_down_flag)
-{
-  struct cerebro_metric_data *metric_data;
-  cerebro_nodelist_t nodelist;
-  hostlist_t hl;
-
-  if (_cerebro_handle_metric_data_loaded_check(handle) < 0)
-    return NULL;
-
-  metric_data = (struct cerebro_metric_data *)handle->metric_data;
-
-  if (up_down_flag == CEREBRO_METRIC_UP_NODES)
-    hl = metric_data->up_nodes;
-  else
-    hl = metric_data->down_nodes;
-
-  if (!(nodelist = _cerebro_nodelist_by_hostlist_create(handle, hl)))
-    return NULL;
-
   handle->errnum = CEREBRO_ERR_SUCCESS;
   return nodelist;
+  
+ cleanup:
+  if (nodelist)
+    (void)cerebro_nodelist_destroy(nodelist);
+  return NULL;
 }
-
-cerebro_nodelist_t 
-cerebro_metric_get_up_nodes(cerebro_t handle)
-{
-  return _cerebro_metric_get_nodes(handle, CEREBRO_METRIC_UP_NODES);
-}
-
-cerebro_nodelist_t 
-cerebro_metric_get_down_nodes(cerebro_t handle)
-{
-  return _cerebro_metric_get_nodes(handle, CEREBRO_METRIC_DOWN_NODES);
-}
-#endif /* 0 */
