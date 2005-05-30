@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric.c,v 1.4 2005-05-30 05:21:19 achu Exp $
+ *  $Id: cerebro_metric.c,v 1.5 2005-05-30 18:28:39 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -98,6 +98,8 @@ _cerebro_handle_metric_data_loaded_check(cerebro_t handle)
   return 0;
 }
 
+#endif /* 0 */
+
 /* 
  * _cerebro_metric_protocol_err_conversion
  *
@@ -116,9 +118,10 @@ _cerebro_metric_protocol_err_conversion(u_int32_t protocol_error)
       return CEREBRO_ERR_VERSION_INCOMPATIBLE;
     case CEREBRO_METRIC_PROTOCOL_ERR_PACKET_INVALID:
       return CEREBRO_ERR_PROTOCOL;
-    case CEREBRO_METRIC_PROTOCOL_ERR_METRIC_REQUEST_INVALID:
-    case CEREBRO_METRIC_PROTOCOL_ERR_TIMEOUT_INVALID:
+    case CEREBRO_METRIC_PROTOCOL_ERR_METRIC_UNKNOWN:
+    case CEREBRO_METRIC_PROTOCOL_ERR_PARAMETER_INVALID:
     case CEREBRO_METRIC_PROTOCOL_ERR_INTERNAL_SYSTEM_ERROR:
+      return CEREBRO_ERR_INTERNAL;
     default:
       cerebro_err_debug_lib("%s(%s:%d): invalid protocol error code: %d",
 			    __FILE__, __FUNCTION__, __LINE__, 
@@ -126,8 +129,6 @@ _cerebro_metric_protocol_err_conversion(u_int32_t protocol_error)
       return CEREBRO_ERR_INTERNAL;
     }
 }
-
-#endif /* 0 */
 
 /* 
  * _cerebro_metric_request_marshall
@@ -339,8 +340,6 @@ _cerebro_metric_request_send(cerebro_t handle,
   return 0;
 }
 
-#if 0
-
 /* 
  * _cerebro_metric_response_receive_one
  *
@@ -436,11 +435,13 @@ _cerebro_metric_response_receive_one(cerebro_t handle,
     }
 
  unmarshall_received:
+#if 0
   if ((rv = _cerebro_metric_response_unmarshall(handle, 
                                                 res, 
                                                 buf, 
                                                 bytes_read)) < 0)
     goto cleanup;
+#endif /* 0 */
 
   return rv;
 
@@ -457,8 +458,8 @@ _cerebro_metric_response_receive_one(cerebro_t handle,
  */
 static int
 _cerebro_metric_response_receive_all(cerebro_t handle,
+				     cerebro_nodelist_t nodelist,
 				     int fd,
-				     struct cerebro_metric_data *metric_data,
 				     int flags)
 {
   struct cerebro_metric_response res;
@@ -471,6 +472,7 @@ _cerebro_metric_response_receive_all(cerebro_t handle,
 							  &res)) < 0)
         goto cleanup;
 
+      /* XXX - will not work with variable length buffers */
       if (res_len != CEREBRO_METRIC_RESPONSE_LEN)
         {
           if (res_len == CEREBRO_METRIC_RESPONSE_LEN)
@@ -507,77 +509,19 @@ _cerebro_metric_response_receive_all(cerebro_t handle,
       if (res.end_of_responses == CEREBRO_METRIC_PROTOCOL_IS_LAST_RESPONSE)
         break;
 
-      if (flags == CEREBRO_METRIC_UP_NODES
-          && res.metric_state != CEREBRO_METRIC_PROTOCOL_STATE_NODE_UP)
-        {
-          handle->errnum = CEREBRO_ERR_PROTOCOL;
-          goto cleanup;
-        }
-      
-      if (flags == CEREBRO_METRIC_DOWN_NODES
-          && res.metric_state != CEREBRO_METRIC_PROTOCOL_STATE_NODE_DOWN)
-        {
-          handle->errnum = CEREBRO_ERR_PROTOCOL;
-          goto cleanup;
-        }
-
-      if (res.metric_state == CEREBRO_METRIC_PROTOCOL_STATE_NODE_UP)
-        {
-          if (!metric_data->up_nodes)
-            {
-	      cerebro_err_debug_lib("%s(%s:%d): up_nodes null",
-                                    __FILE__, __FUNCTION__, __LINE__);
-              handle->errnum = CEREBRO_ERR_INTERNAL;
-              goto cleanup;
-            }
-
-          if (!hostlist_push(metric_data->up_nodes, res.nodename))
-            {
-	      cerebro_err_debug_lib("%s(%s:%d): hostlist_push: %s",
-				    __FILE__, __FUNCTION__, __LINE__, 
-				    strerror(errno));
-              handle->errnum = CEREBRO_ERR_INTERNAL;
-              goto cleanup;
-            }
-        }
-      else if (res.metric_state == CEREBRO_METRIC_PROTOCOL_STATE_NODE_DOWN)
-        {
-          if (!metric_data->down_nodes)
-            {
-	      cerebro_err_debug_lib("%s(%s:%d): down_nodes null",
-                                    __FILE__, __FUNCTION__, __LINE__);
-              handle->errnum = CEREBRO_ERR_INTERNAL;
-              goto cleanup;
-            }
-
-          if (!hostlist_push(metric_data->down_nodes, res.nodename))
-            {
-	      cerebro_err_debug_lib("%s(%s:%d): hostlist_push: %s",
-				    __FILE__, __FUNCTION__, __LINE__, 
-				    strerror(errno));
-              handle->errnum = CEREBRO_ERR_INTERNAL;
-              goto cleanup;
-            }
-        }
-      else
-        {
-          handle->errnum = CEREBRO_ERR_PROTOCOL;
-          goto cleanup;
-        }
+      if (_cerebro_nodelist_append(nodelist, 
+				   res.nodename,
+				   &res.metric_value) < 0)
+	goto cleanup;
     }
-
-  if (metric_data->up_nodes)
-    hostlist_sort(metric_data->up_nodes);
-
-  if (metric_data->down_nodes)
-    hostlist_sort(metric_data->down_nodes);
+  
+  if (_cerebro_nodelist_sort(nodelist) < 0)
+    goto cleanup;
 
   return 0;
  cleanup:
   return -1;
 }
-
-#endif /* 0 */
 
 /*  
  * _cerebro_metric_get_metric_data
@@ -611,13 +555,13 @@ _cerebro_metric_get_metric_data(cerebro_t handle,
 				   flags) < 0)
     goto cleanup;
 
-#if 0
-  if (_cerebro_metric_response_receive_all(handle, fd, metric_data, flags) < 0)
+  if (_cerebro_metric_response_receive_all(handle, 
+					   nodelist, 
+					   fd, 
+					   flags) < 0)
     goto cleanup;
-#endif /* 0 */
   
   rv = 0;
-
  cleanup:
   close(fd);
   return rv;
