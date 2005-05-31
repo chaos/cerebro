@@ -20,6 +20,7 @@ Portability
 Design
 - metric modules
   - modules for starttime/boottime
+- metric_type --> metric_value_type ??
 - nodelist
   - use own list instead of 'List' to store iterators?
 - metric retrieval flags

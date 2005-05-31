@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_nodelist.c,v 1.8 2005-05-31 15:48:50 achu Exp $
+ *  $Id: cerebro_nodelist.c,v 1.9 2005-05-31 16:56:09 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -49,7 +49,8 @@ _cerebro_nodelist_find_func(void *x, void *key)
 int 
 cerebro_nodelist_find(cerebro_nodelist_t nodelist, 
 		      const char *node,
-		      void **metric_value)
+		      void **metric_value,
+                      unsigned int *metric_value_size)
 {
   struct cerebro_nodelist_data *data;
 
@@ -66,6 +67,7 @@ cerebro_nodelist_find(cerebro_nodelist_t nodelist,
   data = list_find_first(nodelist->nodes,
 			 _cerebro_nodelist_find_func,
 			 (void *)node);
+
   if (data && metric_value)
     {
       switch(nodelist->metric_type)
@@ -74,21 +76,33 @@ cerebro_nodelist_find(cerebro_nodelist_t nodelist,
 	  break;
 	case CEREBRO_METRIC_TYPE_BOOL:
 	  *metric_value = (void *)&data->metric_value.val_bool;
+          if (metric_value_size)
+            *metric_value_size = sizeof(data->metric_value.val_bool);
 	  break;
 	case CEREBRO_METRIC_TYPE_INT32:
 	  *metric_value= (void *)&data->metric_value.val_int32;
+          if (metric_value_size)
+            *metric_value_size = sizeof(data->metric_value.val_int32);
 	  break;
 	case CEREBRO_METRIC_TYPE_UNSIGNED_INT32:
 	  *metric_value= (void *)&data->metric_value.val_unsigned_int32;
+          if (metric_value_size)
+            *metric_value_size = sizeof(data->metric_value.val_unsigned_int32);
 	  break;
 	case CEREBRO_METRIC_TYPE_FLOAT:
 	  *metric_value= (void *)&data->metric_value.val_float;
+          if (metric_value_size)
+            *metric_value_size = sizeof(data->metric_value.val_float);
 	  break;
 	case CEREBRO_METRIC_TYPE_DOUBLE:
 	  *metric_value = (void *)&data->metric_value.val_double;
+          if (metric_value_size)
+            *metric_value_size = sizeof(data->metric_value.val_double);
 	  break;
 	case CEREBRO_METRIC_TYPE_STRING:
 	  *metric_value = (void *)data->metric_value.val_string;
+          if (metric_value_size)
+            *metric_value_size = sizeof(data->metric_value.val_string);
 	  break;
 	default:
 	  nodelist->errnum = CEREBRO_ERR_INTERNAL;
@@ -226,7 +240,7 @@ cerebro_nodelist_iterator_create(cerebro_nodelist_t nodelist)
 
   nodelistItr->nodelist = nodelist;
   nodelistItr->errnum = CEREBRO_ERR_SUCCESS;
-  nodelistItr = list_next(nodelistItr->itr);
+  nodelistItr->current = list_next(nodelistItr->itr);
   return nodelistItr;
 
  cleanup:
@@ -281,6 +295,15 @@ _cerebro_nodelist_iterator_check(cerebro_nodelist_iterator_t nodelistItr)
 }
 
 int
+cerebro_nodelist_iterator_end(cerebro_nodelist_iterator_t nodelistItr)
+{
+  if (_cerebro_nodelist_iterator_check(nodelistItr) < 0)
+    return -1;
+
+  return (nodelistItr->current) ? 0 : 1;
+}
+
+int
 cerebro_nodelist_iterator_next(cerebro_nodelist_iterator_t nodelistItr)
 {
   if (_cerebro_nodelist_iterator_check(nodelistItr) < 0)
@@ -320,7 +343,8 @@ cerebro_nodelist_iterator_nodename(cerebro_nodelist_iterator_t nodelistItr)
 }
                                                                                    
 void *
-cerebro_nodelist_iterator_value(cerebro_nodelist_iterator_t nodelistItr)
+cerebro_nodelist_iterator_value(cerebro_nodelist_iterator_t nodelistItr,
+                                unsigned int *metric_value_size)
 {
   void *rv;
 
@@ -341,21 +365,33 @@ cerebro_nodelist_iterator_value(cerebro_nodelist_iterator_t nodelistItr)
       break;
     case CEREBRO_METRIC_TYPE_BOOL:
       rv = (void *)&nodelistItr->current->metric_value.val_bool;
+      if (metric_value_size)
+        *metric_value_size = sizeof(nodelistItr->current->metric_value.val_bool);
       break;
     case CEREBRO_METRIC_TYPE_INT32:
       rv= (void *)&nodelistItr->current->metric_value.val_int32;
+      if (metric_value_size)
+        *metric_value_size = sizeof(nodelistItr->current->metric_value.val_int32);
       break;
     case CEREBRO_METRIC_TYPE_UNSIGNED_INT32:
       rv= (void *)&nodelistItr->current->metric_value.val_unsigned_int32;
+      if (metric_value_size)
+        *metric_value_size = sizeof(nodelistItr->current->metric_value.val_unsigned_int32);
       break;
     case CEREBRO_METRIC_TYPE_FLOAT:
       rv= (void *)&nodelistItr->current->metric_value.val_float;
+      if (metric_value_size)
+        *metric_value_size = sizeof(nodelistItr->current->metric_value.val_float);
       break;
     case CEREBRO_METRIC_TYPE_DOUBLE:
       rv = (void *)&nodelistItr->current->metric_value.val_double;
+      if (metric_value_size)
+        *metric_value_size = sizeof(nodelistItr->current->metric_value.val_double);
       break;
     case CEREBRO_METRIC_TYPE_STRING:
       rv = (void *)nodelistItr->current->metric_value.val_string;
+      if (metric_value_size)
+        *metric_value_size = sizeof(nodelistItr->current->metric_value.val_string);
       break;
     default:
       nodelistItr->errnum = CEREBRO_ERR_INTERNAL;

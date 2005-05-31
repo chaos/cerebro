@@ -1,10 +1,10 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric.c,v 1.15 2005-05-31 15:48:50 achu Exp $
+ *  $Id: cerebrod_metric.c,v 1.16 2005-05-31 16:56:09 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
+#enduif /* HAVE_CONFIG_H */
 
 #include <stdio.h>
 #include <stdlib.h>

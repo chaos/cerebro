@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.30 2005-05-30 05:21:19 achu Exp $
+ *  $Id: cerebro.h,v 1.31 2005-05-31 16:56:09 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_H
@@ -148,13 +148,15 @@ int cerebro_nodelist_value_type(cerebro_nodelist_t nodelist);
  * cerebro_nodelist_find
  *
  * Determine if 'node' exists in the list.  If a value exists
- * for the node, it is returned in 'value'.
+ * for the node, it is returned in 'metric_value'.
  *
- * Returns 1 if 'node' is found, 0 if not, -1 on error
+ * Returns 1 if 'node' is found and the length of the data returned in
+ * 'metric_value_size', 0 if not, -1 on error
  */
 int cerebro_nodelist_find(cerebro_nodelist_t nodelist, 
 			  const char *node, 
-			  void **metric_value);
+			  void **metric_value,
+                          unsigned int *metric_value_size);
 
 /* 
  * Cerebro_for_each
@@ -205,6 +207,13 @@ int cerebro_nodelist_errnum(cerebro_nodelist_t nodelist);
 cerebro_nodelist_iterator_t cerebro_nodelist_iterator_create(cerebro_nodelist_t nodelist);
 
 /* 
+ * cerebro_nodelist_iterator_end
+ *
+ * Returns 1 if the end of the list has been reached, 0 if not
+ */
+int cerebro_nodelist_iterator_end(cerebro_nodelist_iterator_t nodelistItr);
+
+/* 
  * cerebro_nodelist_iterator_next
  *
  * Move the iterator pointer forward
@@ -239,7 +248,8 @@ char *cerebro_nodelist_iterator_nodename(cerebro_nodelist_iterator_t nodelistItr
  *
  * Returns pointer to value, NULL on error
  */
-void *cerebro_nodelist_iterator_value(cerebro_nodelist_iterator_t nodelistItr);
+void *cerebro_nodelist_iterator_value(cerebro_nodelist_iterator_t nodelistItr,
+                                      unsigned int *metric_value_size);
 
 /* 
  * cerebro_nodelist_iterator_destroy

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric.c,v 1.5 2005-05-30 18:28:39 achu Exp $
+ *  $Id: cerebro_metric.c,v 1.6 2005-05-31 16:56:09 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -39,66 +39,6 @@
 #include "cerebro/cerebro_error.h"
 #include "cerebro/cerebro_metric_protocol.h"
 #include "fd.h"
-
-#if 0
-/* 
- * _cerebro_handle_metric_data_check
- *
- * Check for a proper metric_data handle, setting the errnum
- * appropriately if an error is found.
- *
- * Returns 0 on success, -1 on error
- */
-static int
-_cerebro_handle_metric_data_check(cerebro_t handle, 
-				  struct cerebro_metric_data *metric_data)
-{
-#if CEREBRO_DEBUG
-  if (!metric_data)
-    {
-      handle->errnum = CEREBRO_ERR_INTERNAL;
-      return -1;
-    }
-#endif /* CEREBRO_DEBUG */
-
-  if (metric_data->magic != CEREBRO_METRIC_MAGIC_NUMBER)
-    {
-      handle->errnum = CEREBRO_ERR_MAGIC_NUMBER;
-      return -1;
-    }
-
-  return 0;
-}
-
-/* 
- * _cerebro_handle_metric_data_loaded_check
- *
- * Checks if the handle contains properly loaded metric_data data.
- * 
- * Returns 0 on success, -1 on error
- */
-static int
-_cerebro_handle_metric_data_loaded_check(cerebro_t handle)
-{
-  struct cerebro_metric_data *metric_data;
-
-  if (_cerebro_handle_check(handle) < 0)
-    return -1;
-
-  if (!(handle->loaded_state & CEREBRO_METRIC_DATA_LOADED))
-    {
-      handle->errnum = CEREBRO_ERR_NOT_LOADED;
-      return -1;
-    }
-
-  metric_data = (struct cerebro_metric_data *)handle->metric_data;
-  if (_cerebro_handle_metric_data_check(handle, metric_data) < 0)
-    return -1;
-
-  return 0;
-}
-
-#endif /* 0 */
 
 /* 
  * _cerebro_metric_protocol_err_conversion
@@ -206,8 +146,6 @@ _cerebro_metric_request_marshall(cerebro_t handle,
   return count;
 }
 
-#if 0
-
 /* 
  * _cerebro_metric_response_unmarshall
  *
@@ -222,6 +160,7 @@ _cerebro_metric_response_unmarshall(cerebro_t handle,
                                     unsigned int buflen)
 {
   int len, count = 0;
+  char val_buf[CEREBRO_METRIC_VALUE_LEN];
 
 #if CEREBRO_DEBUG
   if (!buf)
@@ -282,9 +221,23 @@ _cerebro_metric_response_unmarshall(cerebro_t handle,
 
   count += len;
 
-  if ((len = _cerebro_unmarshall_unsigned_int8(&(res->metric_state),
-                                               buf + count,
-                                               buflen - count)) < 0)
+  if ((len = _cerebro_unmarshall_unsigned_int32(&(res->metric_type),
+                                                buf + count,
+                                                buflen - count)) < 0)
+    {
+      handle->errnum = CEREBRO_ERR_INTERNAL;
+      return -1;
+    }
+  if (!len)
+    return count;
+  
+  count += len;
+
+  memset(val_buf, '\0', CEREBRO_METRIC_VALUE_LEN);
+  if ((len = _cerebro_unmarshall_buffer(val_buf,
+                                        sizeof(val_buf),
+                                        buf + count,
+                                        buflen - count)) < 0)
     {
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
@@ -294,10 +247,78 @@ _cerebro_metric_response_unmarshall(cerebro_t handle,
 
   count += len;
 
+  switch(res->metric_type)
+    {
+    case CEREBRO_METRIC_TYPE_NONE:
+      break;
+    case CEREBRO_METRIC_TYPE_BOOL:
+      if ((len = _cerebro_unmarshall_int8(&(res->metric_value.val_bool),
+                                          val_buf,
+                                          CEREBRO_METRIC_VALUE_LEN)) < 0)
+        {
+          handle->errnum = CEREBRO_ERR_INTERNAL;
+          return -1;
+        }
+      break;
+    case CEREBRO_METRIC_TYPE_INT32:
+      if ((len = _cerebro_unmarshall_int32(&(res->metric_value.val_int32),
+                                           val_buf,
+                                           CEREBRO_METRIC_VALUE_LEN)) < 0)
+        {
+          handle->errnum = CEREBRO_ERR_INTERNAL;
+          return -1;
+        }
+      break;
+    case CEREBRO_METRIC_TYPE_UNSIGNED_INT32:
+      if ((len = _cerebro_unmarshall_unsigned_int32(&(res->metric_value.val_unsigned_int32),
+                                                    val_buf,
+                                                    CEREBRO_METRIC_VALUE_LEN)) < 0)
+        {
+          handle->errnum = CEREBRO_ERR_INTERNAL;
+          return -1;
+        }
+      break;
+    case CEREBRO_METRIC_TYPE_FLOAT:
+      if ((len = _cerebro_unmarshall_float(&(res->metric_value.val_float),
+                                           val_buf,
+                                           CEREBRO_METRIC_VALUE_LEN)) < 0)
+        {
+          handle->errnum = CEREBRO_ERR_INTERNAL;
+          return -1;
+        }
+      break;
+    case CEREBRO_METRIC_TYPE_DOUBLE:
+      if ((len = _cerebro_unmarshall_double(&(res->metric_value.val_double),
+                                            val_buf,
+                                            CEREBRO_METRIC_VALUE_LEN)) < 0)
+        {
+          handle->errnum = CEREBRO_ERR_INTERNAL;
+          return -1;
+        }
+      break;
+    case CEREBRO_METRIC_TYPE_STRING:
+      if ((len = _cerebro_unmarshall_buffer(&(res->metric_value.val_string),
+                                            sizeof(res->metric_value.val_string),
+                                            val_buf,
+                                            CEREBRO_METRIC_VALUE_LEN)) < 0)
+        {
+          handle->errnum = CEREBRO_ERR_INTERNAL;
+          return -1;
+        }
+      break;
+    default:
+      handle->errnum = CEREBRO_ERR_INTERNAL;
+      return -1;
+    };
+
+  if (!len)
+    {
+      handle->errnum = CEREBRO_ERR_INTERNAL;
+      return -1;
+    }
+
   return count;
 }
-
-#endif /* 0 */
 
 /* 
  * _cerebro_metric_request_send
@@ -435,13 +456,11 @@ _cerebro_metric_response_receive_one(cerebro_t handle,
     }
 
  unmarshall_received:
-#if 0
   if ((rv = _cerebro_metric_response_unmarshall(handle, 
                                                 res, 
                                                 buf, 
                                                 bytes_read)) < 0)
     goto cleanup;
-#endif /* 0 */
 
   return rv;
 
