@@ -7,8 +7,6 @@ Testing
 
 Cleanup
 - cleanup common hash into "data" and put in data.c??
-- rename _LEN req/res defines, b/c its about buffer lenghts, not length
-  of the struct??
 
 Audit
 - code review to reduce memory footprint
