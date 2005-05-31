@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_protocol.h,v 1.11 2005-05-31 22:06:03 achu Exp $
+ *  $Id: cerebro_metric_protocol.h,v 1.12 2005-05-31 22:56:14 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_METRIC_PROTOCOL_H
@@ -117,8 +117,8 @@ struct cerebro_metric_request
 {
   int32_t version;
   char metric_name[CEREBRO_METRIC_NAME_MAXLEN];
-  u_int32_t flags;
   u_int32_t timeout_len;
+  u_int32_t flags;
 };
   
 #define CEREBRO_METRIC_REQUEST_PACKET_LEN  (sizeof(int32_t) \

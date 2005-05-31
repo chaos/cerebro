@@ -16,6 +16,7 @@ Portability
 - Non-pthreads support
 
 Design
+- clusterlist_get_nodename call in nodelist_find??
 - metric modules
   - modules for starttime/boottime
 - metric_type --> metric_value_type ??

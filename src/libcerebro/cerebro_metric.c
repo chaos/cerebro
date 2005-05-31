@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric.c,v 1.9 2005-05-31 22:06:03 achu Exp $
+ *  $Id: cerebro_metric.c,v 1.10 2005-05-31 22:56:14 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -125,7 +125,7 @@ _cerebro_metric_request_marshall(cerebro_t handle,
     }
   count += len;
 
-  if ((len = _cerebro_marshall_unsigned_int32(req->flags,
+  if ((len = _cerebro_marshall_unsigned_int32(req->timeout_len,
                                               buf + count, 
                                               buflen - count)) < 0)
     {
@@ -134,7 +134,7 @@ _cerebro_metric_request_marshall(cerebro_t handle,
     }
   count += len;
 
-  if ((len = _cerebro_marshall_unsigned_int32(req->timeout_len,
+  if ((len = _cerebro_marshall_unsigned_int32(req->flags,
                                               buf + count, 
                                               buflen - count)) < 0)
     {

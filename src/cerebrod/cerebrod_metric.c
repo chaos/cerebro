@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric.c,v 1.17 2005-05-31 22:06:03 achu Exp $
+ *  $Id: cerebrod_metric.c,v 1.18 2005-05-31 22:56:14 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -325,7 +325,7 @@ _cerebrod_metric_request_unmarshall(struct cerebro_metric_request *req,
 
   count += len;
 
-  if ((len = _cerebro_unmarshall_unsigned_int32(&(req->flags), 
+  if ((len = _cerebro_unmarshall_unsigned_int32(&(req->timeout_len), 
                                                 buf + count, 
                                                 buflen - count)) < 0)
     {
@@ -339,7 +339,7 @@ _cerebrod_metric_request_unmarshall(struct cerebro_metric_request *req,
 
   count += len;
 
-  if ((len = _cerebro_unmarshall_unsigned_int32(&(req->timeout_len), 
+  if ((len = _cerebro_unmarshall_unsigned_int32(&(req->flags), 
                                                 buf + count, 
                                                 buflen - count)) < 0)
     {
