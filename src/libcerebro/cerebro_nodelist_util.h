@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_nodelist_util.h,v 1.4 2005-05-29 14:45:52 achu Exp $
+ *  $Id: cerebro_nodelist_util.h,v 1.5 2005-05-31 20:45:56 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_NODELIST_UTIL_H
@@ -25,7 +25,8 @@ int _cerebro_nodelist_check(cerebro_nodelist_t nodelist);
  *
  * Returns nodelist on success, NULL on error
  */
-cerebro_nodelist_t _cerebro_nodelist_create(cerebro_t handle);
+cerebro_nodelist_t _cerebro_nodelist_create(cerebro_t handle, 
+                                            const char *metric_name);
 
 /*
  * _cerebro_nodelist_append

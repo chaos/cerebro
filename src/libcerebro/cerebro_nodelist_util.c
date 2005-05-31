@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_nodelist_util.c,v 1.6 2005-05-31 18:25:15 achu Exp $
+ *  $Id: cerebro_nodelist_util.c,v 1.7 2005-05-31 20:45:56 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -42,11 +42,19 @@ _cerebro_nodelist_check(cerebro_nodelist_t nodelist)
       return -1;
     }
 
+  if (!nodelist->handle)
+    {
+      cerebro_err_debug_lib("%s(%s:%d): handle null",
+                            __FILE__, __FUNCTION__, __LINE__);
+      nodelist->errnum = CEREBRO_ERR_INTERNAL;
+      return -1;
+    }
+
   return 0;
 }
 
 cerebro_nodelist_t 
-_cerebro_nodelist_create(cerebro_t handle)
+_cerebro_nodelist_create(cerebro_t handle, const char *metric_name)
 {
   cerebro_nodelist_t nodelist = NULL;
 
@@ -58,6 +66,10 @@ _cerebro_nodelist_create(cerebro_t handle)
 
   memset(nodelist, '\0', sizeof(struct cerebro_nodelist));
   nodelist->magic = CEREBRO_NODELIST_MAGIC_NUMBER;
+  strcpy(nodelist->metric_name, metric_name);
+
+  /* Impossible to know now, must be set elsewhere */
+  nodelist->metric_type = CEREBRO_METRIC_TYPE_NONE;
   
   if (!(nodelist->nodes = list_create(free)))
     {
@@ -65,11 +77,22 @@ _cerebro_nodelist_create(cerebro_t handle)
       goto cleanup;
     }
 
+  /* No delete function, list_destroy() on 'nodes' will take care of
+   * deleting iterators.
+   */
   if (!(nodelist->iterators = list_create(NULL)))
     {
       handle->errnum = CEREBRO_ERR_OUTMEM;
       goto cleanup;
     }
+
+  if (!list_append(handle->nodelists, nodelist))
+    {
+      handle->errnum = CEREBRO_ERR_INTERNAL;
+      goto cleanup;
+    }
+  
+  nodelist->handle = handle;
 
   return nodelist;
       

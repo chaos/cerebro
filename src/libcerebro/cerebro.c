@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.c,v 1.24 2005-05-31 18:25:15 achu Exp $
+ *  $Id: cerebro.c,v 1.25 2005-05-31 20:45:56 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -67,9 +67,16 @@ cerebro_handle_create(void)
   handle->flags = 0;
   handle->loaded_state = 0;
   memset(&(handle->config_data), '\0', sizeof(struct cerebro_config));
+  
+  if (!(handle->nodelists = list_create((ListDelF)cerebro_nodelist_destroy)))
+    goto cleanup;
+  
+  return handle;
 
  cleanup:
-  return handle;
+  if (handle)
+    free(handle);
+  return NULL;
 }
 
 int
@@ -112,6 +119,9 @@ cerebro_handle_destroy(cerebro_t handle)
 
       handle->loaded_state &= ~CEREBRO_MODULE_SETUP_CALLED;
     }
+
+  list_destroy(handle->nodelists);
+  handle->nodelists = NULL;
 
   handle->errnum = CEREBRO_ERR_SUCCESS;
   handle->magic = ~CEREBRO_MAGIC_NUMBER;

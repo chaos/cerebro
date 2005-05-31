@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric.c,v 1.7 2005-05-31 18:25:15 achu Exp $
+ *  $Id: cerebro_metric.c,v 1.8 2005-05-31 20:45:56 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -678,7 +678,7 @@ cerebro_get_metric_data(cerebro_t handle,
   else
     flags = 0;		/* XXX maybe different default */
   
-  if (!(nodelist = _cerebro_nodelist_create(handle)))
+  if (!(nodelist = _cerebro_nodelist_create(handle, metric_name)))
     goto cleanup;
 
   if (!strlen(handle->hostname))

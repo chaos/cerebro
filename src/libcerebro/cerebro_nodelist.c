@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_nodelist.c,v 1.10 2005-05-31 18:25:15 achu Exp $
+ *  $Id: cerebro_nodelist.c,v 1.11 2005-05-31 20:45:56 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -30,8 +30,18 @@ cerebro_nodelist_length(cerebro_nodelist_t nodelist)
   return list_count(nodelist->nodes);
 }
  
+char *
+cerebro_nodelist_metric_name(cerebro_nodelist_t nodelist)
+{
+  if (_cerebro_nodelist_check(nodelist) < 0)
+    return NULL;
+  
+  nodelist->errnum = CEREBRO_ERR_SUCCESS;
+  return nodelist->metric_name;
+}
+
 int
-cerebro_nodelist_value_type(cerebro_nodelist_t nodelist)
+cerebro_nodelist_metric_type(cerebro_nodelist_t nodelist)
 {
   if (_cerebro_nodelist_check(nodelist) < 0)
     return -1;
@@ -193,20 +203,55 @@ cerebro_nodelist_for_each(cerebro_nodelist_t nodelist,
 int 
 cerebro_nodelist_destroy(cerebro_nodelist_t nodelist)
 {
+  cerebro_nodelist_t tempnodelist;
+  ListIterator itr = NULL;
+  int found = 0, rv = -1;
+
   if (_cerebro_nodelist_check(nodelist) < 0)
     return -1;
 
-  /* 
-   * destroy nodes first, since it will destroy iterators
-   */
-  list_destroy(nodelist->nodes);
-  list_destroy(nodelist->iterators);
-  nodelist->magic = ~CEREBRO_NODELIST_MAGIC_NUMBER;
-  nodelist->errnum = CEREBRO_ERR_SUCCESS;
-  nodelist->nodes = NULL;
-  nodelist->iterators = NULL;
-  free(nodelist);
+  if (!(itr = list_iterator_create(nodelist->handle->nodelists)))
+    {
+      nodelist->errnum = CEREBRO_ERR_OUTMEM;
+      goto cleanup;
+    }
+
+  while ((tempnodelist = list_next(itr)))
+    {
+      if (tempnodelist == nodelist)
+        {
+          list_remove(itr);
+          
+          nodelist->magic = ~CEREBRO_NODELIST_MAGIC_NUMBER;
+          nodelist->errnum = CEREBRO_ERR_SUCCESS;
+          /* 
+           * destroy nodes first, since it will destroy iterators
+           */
+          list_destroy(nodelist->nodes);
+          nodelist->nodes = NULL;
+          list_destroy(nodelist->iterators);
+          nodelist->iterators = NULL;
+          nodelist->handle = NULL;
+          free(nodelist);
+          found++;
+          break;
+        }
+    }
+
+  if (!found)
+    {
+      nodelist->errnum = CEREBRO_ERR_PARAMETERS;
+      goto cleanup;
+    }
+
+  rv = 0;
+  list_iterator_destroy(itr);
   return 0;
+
+ cleanup:
+  if (itr)
+    list_iterator_destroy(itr);
+  return rv;
 }
  
 int 
@@ -353,8 +398,8 @@ cerebro_nodelist_iterator_nodename(cerebro_nodelist_iterator_t nodelistItr)
 }
                                                                                    
 void *
-cerebro_nodelist_iterator_value(cerebro_nodelist_iterator_t nodelistItr,
-                                unsigned int *metric_value_size)
+cerebro_nodelist_iterator_metric_value(cerebro_nodelist_iterator_t nodelistItr,
+                                       unsigned int *metric_value_size)
 {
   void *rv;
 

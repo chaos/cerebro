@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_util.c,v 1.16 2005-05-11 17:06:28 achu Exp $
+ *  $Id: cerebro_util.c,v 1.17 2005-05-31 20:45:56 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -35,6 +35,14 @@ _cerebro_handle_check(cerebro_t handle)
   if (!handle || handle->magic != CEREBRO_MAGIC_NUMBER)
     return -1;
 
+  if (!handle->nodelists)
+    {
+      cerebro_err_debug_lib("%s(%s:%d): nodelists null",
+                            __FILE__, __FUNCTION__, __LINE__);
+      handle->errnum = CEREBRO_ERR_INTERNAL;
+      return -1;
+    }
+  
   return 0;
 }
 

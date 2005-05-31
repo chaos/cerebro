@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.32 2005-05-31 18:25:15 achu Exp $
+ *  $Id: cerebro.h,v 1.33 2005-05-31 20:45:56 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_H
@@ -137,13 +137,22 @@ cerebro_nodelist_t cerebro_get_metric_data(cerebro_t handle,
 int cerebro_nodelist_length(cerebro_nodelist_t nodelist);
 
 /* 
- * cerebro_nodelist_value_type
+ * cerebro_nodelist_metric_name
  *
- * Determine the type of data stored in the nodelist
+ * Determine the name of the data stored in the nodelist
+ *
+ * Returns name on success, NULL on error
+ */
+char *cerebro_nodelist_metric_name(cerebro_nodelist_t nodelist);
+
+/* 
+ * cerebro_nodelist_metric_type
+ *
+ * Determine the type of the data stored in the nodelist
  *
  * Returns type on success, -1 on error
  */
-int cerebro_nodelist_value_type(cerebro_nodelist_t nodelist);
+int cerebro_nodelist_metric_type(cerebro_nodelist_t nodelist);
 
 /* 
  * cerebro_nodelist_find
@@ -243,14 +252,14 @@ int cerebro_nodelist_iterator_reset(cerebro_nodelist_iterator_t nodelistItr);
 char *cerebro_nodelist_iterator_nodename(cerebro_nodelist_iterator_t nodelistItr);
 
 /* 
- * cerebro_nodelist_iterator_value
+ * cerebro_nodelist_iterator_metric_value
  *
  * Retrieve a pointer to the current value.
  *
  * Returns pointer to value, NULL on error
  */
-void *cerebro_nodelist_iterator_value(cerebro_nodelist_iterator_t nodelistItr,
-                                      unsigned int *metric_value_size);
+void *cerebro_nodelist_iterator_metric_value(cerebro_nodelist_iterator_t nodelistItr,
+                                             unsigned int *metric_value_size);
 
 /* 
  * cerebro_nodelist_iterator_destroy
