@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_protocol.h,v 1.9 2005-05-29 05:33:29 achu Exp $
+ *  $Id: cerebro_metric_protocol.h,v 1.10 2005-05-31 15:48:50 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_METRIC_PROTOCOL_H
@@ -14,14 +14,14 @@
  * - Metric request.
  * 
  * Server -> Client
- * - Stream of node and node data responses indicating metric values.
- *   Stream of nodes returned will depend on the request.  After the
- *   stream of nodes is complete, an "end of responses" response will
- *   indicate the end of stream and completion of the request.
- *   This "end of responses" response will be sent even if no nodes are
- *   returned (i.e. only down nodes are requested, but all nodes are
- *   up, or no nodes are monitoring the indicated metric).
-
+ * - Stream of responses indicating nodenames and metric values.
+ *   Nodes returned will depend on the request.  After the stream of
+ *   nodes is complete, an "end of responses" response will indicate the
+ *   end of stream and completion of the request.  This "end of
+ *   responses" response will be sent even if no nodes are returned
+ *   (i.e. only down nodes are requested, but all nodes are up, or no
+ *   nodes are monitoring the indicated metric).
+ *
  * - On "normal" errors, the "end of responses" packet will contain 
  *   the error code.
  * - On version incompatability errors, older version responses
@@ -45,6 +45,7 @@
 #define CEREBRO_METRIC_UP_NODES                            "up_nodes"
 #define CEREBRO_METRIC_DOWN_NODES                          "down_nodes"
 #define CEREBRO_METRIC_UPDOWN_STATE                        "updown_state"
+#define CEREBRO_METRIC_LAST_RECEIVED_TIME                  "last_received_time"
 #define CEREBRO_METRIC_STARTTIME                           "starttime"
 #define CEREBRO_METRIC_BOOTTIME                            "boottime"
 

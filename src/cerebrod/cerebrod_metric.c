@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric.c,v 1.14 2005-05-28 08:13:40 achu Exp $
+ *  $Id: cerebrod_metric.c,v 1.15 2005-05-31 15:48:50 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -806,6 +806,20 @@ _cerebrod_metric_evaluate(void *x, void *arg)
       else
         metric_value.val_unsigned_int32 = CEREBRO_METRIC_UPDOWN_STATE_NODE_DOWN;
 
+      if (_cerebrod_metric_response_create(nd->nodename,
+                                           CEREBRO_METRIC_TYPE_UNSIGNED_INT32,
+                                           &metric_value,
+                                           ed->node_responses) < 0)
+        {
+          Pthread_mutex_unlock(&(nd->node_data_lock));
+          return -1;
+        }
+    }
+  else if (!strcmp(ed->req->metric_name, CEREBRO_METRIC_LAST_RECEIVED_TIME))
+    {
+      cerebro_metric_value_t metric_value;
+
+      metric_value.val_unsigned_int32 = nd->last_received_time;
       if (_cerebrod_metric_response_create(nd->nodename,
                                            CEREBRO_METRIC_TYPE_UNSIGNED_INT32,
                                            &metric_value,
