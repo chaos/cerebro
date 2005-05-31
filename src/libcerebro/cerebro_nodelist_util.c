@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_nodelist_util.c,v 1.5 2005-05-29 14:45:52 achu Exp $
+ *  $Id: cerebro_nodelist_util.c,v 1.6 2005-05-31 18:25:15 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -58,7 +58,7 @@ _cerebro_nodelist_create(cerebro_t handle)
 
   memset(nodelist, '\0', sizeof(struct cerebro_nodelist));
   nodelist->magic = CEREBRO_NODELIST_MAGIC_NUMBER;
-
+  
   if (!(nodelist->nodes = list_create(free)))
     {
       handle->errnum = CEREBRO_ERR_OUTMEM;
@@ -117,6 +117,8 @@ _cerebro_nodelist_append(cerebro_nodelist_t nodelist,
       goto cleanup;
     }
   
+  return 0;
+
  cleanup:
   free(data);
   return -1;

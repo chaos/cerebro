@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_nodelist.c,v 1.9 2005-05-31 16:56:09 achu Exp $
+ *  $Id: cerebro_nodelist.c,v 1.10 2005-05-31 18:25:15 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -30,6 +30,16 @@ cerebro_nodelist_length(cerebro_nodelist_t nodelist)
   return list_count(nodelist->nodes);
 }
  
+int
+cerebro_nodelist_value_type(cerebro_nodelist_t nodelist)
+{
+  if (_cerebro_nodelist_check(nodelist) < 0)
+    return -1;
+
+  nodelist->errnum = CEREBRO_ERR_SUCCESS;
+  return nodelist->metric_type;
+}
+
 /* 
  * _cerebro_nodelist_find_func
  *
@@ -149,13 +159,13 @@ cerebro_nodelist_for_each(cerebro_nodelist_t nodelist,
 	  metric_value = (void *)&data->metric_value.val_bool;
 	  break;
 	case CEREBRO_METRIC_TYPE_INT32:
-	  metric_value= (void *)&data->metric_value.val_int32;
+	  metric_value = (void *)&data->metric_value.val_int32;
 	  break;
 	case CEREBRO_METRIC_TYPE_UNSIGNED_INT32:
-	  metric_value= (void *)&data->metric_value.val_unsigned_int32;
+	  metric_value = (void *)&data->metric_value.val_unsigned_int32;
 	  break;
 	case CEREBRO_METRIC_TYPE_FLOAT:
-	  metric_value= (void *)&data->metric_value.val_float;
+	  metric_value = (void *)&data->metric_value.val_float;
 	  break;
 	case CEREBRO_METRIC_TYPE_DOUBLE:
 	  metric_value = (void *)&data->metric_value.val_double;
@@ -360,7 +370,7 @@ cerebro_nodelist_iterator_value(cerebro_nodelist_iterator_t nodelistItr,
   switch(nodelistItr->nodelist->metric_type)
     {
     case CEREBRO_METRIC_TYPE_NONE:
-      nodelistItr->errnum = CEREBRO_ERR_VALUE_NOTFOUND;
+      nodelistItr->errnum = CEREBRO_ERR_METRIC_VALUE_NOTFOUND;
       return NULL;
       break;
     case CEREBRO_METRIC_TYPE_BOOL:

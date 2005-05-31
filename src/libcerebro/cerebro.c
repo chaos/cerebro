@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.c,v 1.23 2005-05-30 05:19:00 achu Exp $
+ *  $Id: cerebro.c,v 1.24 2005-05-31 18:25:15 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -39,7 +39,8 @@ static char *cerebro_error_messages[] =
     "server data not loaded",
     "node not found",
     "end of list reached",
-    "value not found",
+    "metric value not found",
+    "metric type inconsistent",
     "config file error",
     "config module error",
     "config input error",
@@ -61,8 +62,8 @@ cerebro_handle_create(void)
   handle->magic = CEREBRO_MAGIC_NUMBER;
   handle->errnum = CEREBRO_ERR_SUCCESS;
   memset(&(handle->hostname), '\0', CEREBRO_MAXHOSTNAMELEN+1);
-  handle->port = CEREBRO_METRIC_SERVER_PORT;
-  handle->timeout_len = CEREBRO_METRIC_UPDOWN_TIMEOUT_LEN_DEFAULT;
+  handle->port = 0;
+  handle->timeout_len = 0;
   handle->flags = 0;
   handle->loaded_state = 0;
   memset(&(handle->config_data), '\0', sizeof(struct cerebro_config));
