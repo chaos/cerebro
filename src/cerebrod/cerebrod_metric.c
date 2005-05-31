@@ -1,10 +1,10 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric.c,v 1.16 2005-05-31 16:56:09 achu Exp $
+ *  $Id: cerebrod_metric.c,v 1.17 2005-05-31 22:06:03 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
 #include "config.h"
-#enduif /* HAVE_CONFIG_H */
+#endif /* HAVE_CONFIG_H */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -38,10 +38,12 @@ extern pthread_mutex_t debug_output_mutex;
 #endif /* CEREBRO_DEBUG */
 
 extern List cerebrod_node_data_list;
+extern List cerebrod_metric_name_list;
 extern hash_t cerebrod_node_data_index;
 extern int cerebrod_node_data_index_numnodes;
 extern int cerebrod_node_data_index_size;
 extern pthread_mutex_t cerebrod_node_data_lock;
+extern pthread_mutex_t cerebrod_metric_name_lock;
 
 /*
  * cerebrod_metric_initialization_complete
@@ -92,7 +94,7 @@ _cerebrod_metric_response_marshall(struct cerebro_metric_response *res,
 
   assert(res);
   assert(buf);
-  assert(buflen >= CEREBRO_METRIC_RESPONSE_LEN);
+  assert(buflen >= CEREBRO_METRIC_RESPONSE_PACKET_LEN);
 
   memset(buf, '\0', buflen);
 
@@ -375,7 +377,7 @@ _cerebrod_metric_request_receive(int client_fd,
   memset(buf, '\0', CEREBRO_PACKET_BUFLEN);
   
   /* Wait for request from client */
-  while (bytes_read < CEREBRO_METRIC_REQUEST_LEN)
+  while (bytes_read < CEREBRO_METRIC_REQUEST_PACKET_LEN)
     {
       fd_set rfds;
       struct timeval tv;
@@ -415,12 +417,12 @@ _cerebrod_metric_request_receive(int client_fd,
 	  int n;
 
           /* Don't use fd_read_n b/c it loops until exactly
-           * CEREBRO_METRIC_REQUEST_LEN is read.  Due to version
+           * CEREBRO_METRIC_REQUEST_PACKET_LEN is read.  Due to version
            * incompatability, we may want to read a smaller packet.
            */
 	  if ((n = read(client_fd, 
                         buf + bytes_read, 
-                        CEREBRO_METRIC_REQUEST_LEN - bytes_read)) < 0)
+                        CEREBRO_METRIC_REQUEST_PACKET_LEN - bytes_read)) < 0)
 	    {
 	      cerebro_err_debug("%s(%s:%d): read: %s", 
                                 __FILE__, __FUNCTION__, __LINE__,
@@ -577,7 +579,7 @@ _cerebrod_metric_respond_with_error(int client_fd,
          || metric_err_code == CEREBRO_METRIC_PROTOCOL_ERR_PACKET_INVALID
 	 || metric_err_code == CEREBRO_METRIC_PROTOCOL_ERR_INTERNAL_SYSTEM_ERROR);
   
-  memset(&res, '\0', CEREBRO_METRIC_RESPONSE_LEN);
+  memset(&res, '\0', CEREBRO_METRIC_RESPONSE_PACKET_LEN);
 
   /* 
    * If the version sent is an older version, send a packet in
@@ -753,10 +755,6 @@ _cerebrod_metric_evaluate(void *x, void *arg)
     cerebro_err_debug("%s(%s:%d): last_received time later than time_now time",
                       __FILE__, __FUNCTION__, __LINE__);
 #endif /* CEREBRO_DEBUG */
-
-  /* 
-   * XXX needs to be cleaned up
-   */
 
   if (!strcmp(ed->req->metric_name, CEREBRO_METRIC_CLUSTER_NODES))
     {
@@ -964,12 +962,12 @@ _cerebrod_metric_service_connection(void *arg)
   
   _cerebrod_metric_request_dump(&req);
 
-  if (req_len != CEREBRO_METRIC_REQUEST_LEN)
+  if (req_len != CEREBRO_METRIC_REQUEST_PACKET_LEN)
     {
       cerebro_err_debug("%s(%s:%d): received packet unexpected size: "
                         "expect %d, req_len %d", 
                         __FILE__, __FUNCTION__, __LINE__,
-                        CEREBRO_METRIC_REQUEST_LEN, req_len);
+                        CEREBRO_METRIC_REQUEST_PACKET_LEN, req_len);
 
       if (req_len >= sizeof(req.version)
           && req.version != CEREBRO_METRIC_PROTOCOL_VERSION)
@@ -994,15 +992,9 @@ _cerebrod_metric_service_connection(void *arg)
       goto out;
     }
 
-  /* 
-   * XXX needs to be cleaned up
-   */
-  if (strcmp(req.metric_name, CEREBRO_METRIC_CLUSTER_NODES)
-      && strcmp(req.metric_name, CEREBRO_METRIC_UP_NODES)
-      && strcmp(req.metric_name, CEREBRO_METRIC_DOWN_NODES)
-      && strcmp(req.metric_name, CEREBRO_METRIC_UPDOWN_STATE)
-      && strcmp(req.metric_name, CEREBRO_METRIC_STARTTIME)
-      && strcmp(req.metric_name, CEREBRO_METRIC_BOOTTIME))
+  if (!List_find_first(cerebrod_metric_name_list, 
+                       list_find_first_string,
+                       req.metric_name))
     {
       _cerebrod_metric_respond_with_error(client_fd,
                                           req.version,

@@ -30,10 +30,6 @@ Design
 - metric with value of arbitrary data
   - will require len field to heartbeat packets and metric data
   - will require magic field to ensure packets are in-sync??
-- allow variable arguments for get_nodes 
-- check if metric name exists in list/hash rather than hard coded
-- gendersllnl config, up listening threads dependent on cluster size
-  i.e. 4 threads for mcr/thunder size clusters?
 - how remove metric data?
 - strerror_r and errormsg_r funcs
 - libcerebro set configfile, module, etc. functions
@@ -43,9 +39,6 @@ Design
 
 Before distribution
 - devel package?
-
-Debugging
-- signals to daemon to log/unlog debug info?
 
 GPL
 - do it

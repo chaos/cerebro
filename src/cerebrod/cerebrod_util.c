@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_util.c,v 1.18 2005-05-28 16:06:44 achu Exp $
+ *  $Id: cerebrod_util.c,v 1.19 2005-05-31 22:06:03 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -25,6 +25,15 @@
 #include "wrappers.h"
 
 extern struct cerebrod_config conf;
+
+int 
+list_find_first_string(void *x, void *key)
+{
+  assert(x);
+  assert(key);
+
+  return (!strcmp((char *)x, (char *)key)) ? 1 : 0;
+}
 
 /* 
  * _hash_removeall

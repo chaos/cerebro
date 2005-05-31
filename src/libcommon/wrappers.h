@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.h,v 1.26 2005-05-26 18:23:38 achu Exp $
+ *  $Id: wrappers.h,v 1.27 2005-05-31 22:06:03 achu Exp $
 \*****************************************************************************/
 
 #ifndef _WRAPPERS_H
@@ -276,6 +276,8 @@ int wrap_lt_dlclose(const char *file, const char *function, int line, void *hand
         wrap_list_count(__FILE__, __FUNCTION__, __LINE__, l)
 #define List_append(l, x) \
         wrap_list_append(__FILE__, __FUNCTION__, __LINE__, l, x)
+#define List_find_first(l, f, key) \
+        wrap_list_find_first(__FILE__, __FUNCTION__, __LINE__, l, f, key)
 #define List_delete_all(l, f, key) \
         wrap_list_delete_all(__FILE__, __FUNCTION__, __LINE__, l, f, key)
 #define List_for_each(l, f, arg) \
@@ -289,6 +291,7 @@ List wrap_list_create(const char *file, const char *function, int line, ListDelF
 void wrap_list_destroy(const char *file, const char *function, int line, List l);
 int wrap_list_count(const char *file, const char *function, int line, List l);
 void *wrap_list_append (const char *file, const char *function, int line, List l, void *x);
+void * wrap_list_find_first (const char *file, const char *function, int line, List l, ListFindF f, void *key);
 int wrap_list_delete_all(const char *file, const char *function, int line, List l, ListFindF f, void *key);
 int wrap_list_for_each(const char *file, const char *function, int line, List l, ListForF f, void *arg);
 ListIterator wrap_list_iterator_create(const char *file, const char *function, int line, List l);

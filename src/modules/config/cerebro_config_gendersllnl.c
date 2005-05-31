@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_gendersllnl.c,v 1.15 2005-05-28 16:06:44 achu Exp $
+ *  $Id: cerebro_config_gendersllnl.c,v 1.16 2005-05-31 22:06:03 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -27,6 +27,7 @@ extern int h_errno;
 
 #define GENDERSLLNL_CONFIG_MODULE_NAME "gendersllnl"
 
+#define GENDERSLLNL_LARGE_CLUSTER_SIZE 512
 /*
  * gendersllnl_handle
  *
@@ -123,7 +124,7 @@ int
 gendersllnl_config_load_default(struct cerebro_config *conf)
 {
   char altnamebuf[CEREBRO_MAXNODENAMELEN+1];
-  int flag;
+  int flag, numnodes;
 
   if (!gendersllnl_handle)
     {
@@ -139,6 +140,14 @@ gendersllnl_config_load_default(struct cerebro_config *conf)
       return -1;
     }
 
+  if ((numnodes = genders_getnumnodes(gendersllnl_handle)) < 0)
+    {
+      cerebro_err_debug_module("%s(%s:%d): genders_numnodes: %s", 
+			       __FILE__, __FUNCTION__, __LINE__,
+			       genders_errormsg(gendersllnl_handle));
+      return -1;
+    }
+                                   
   if ((flag = genders_testattr(gendersllnl_handle, 
 			       NULL, 
 			       "mgmt", 
@@ -157,6 +166,11 @@ gendersllnl_config_load_default(struct cerebro_config *conf)
       conf->cerebrod_speak_flag++;
       conf->cerebrod_listen = 1;
       conf->cerebrod_listen_flag++;
+      if (numnodes >= GENDERSLLNL_LARGE_CLUSTER_SIZE)
+        {
+          conf->cerebrod_listen_threads = 4;
+          conf->cerebrod_listen_threads_flag++;
+        }
       conf->cerebrod_metric_server = 1;
       conf->cerebrod_metric_server_flag++;
     }

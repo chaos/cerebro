@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.67 2005-05-28 16:06:44 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.68 2005-05-31 22:06:03 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -326,12 +326,12 @@ cerebrod_listener(void *arg)
 
       _cerebrod_heartbeat_dump(&hb);
 
-      if (heartbeat_len != CEREBROD_HEARTBEAT_LEN)
+      if (heartbeat_len != CEREBROD_HEARTBEAT_PACKET_LEN)
         {
           cerebro_err_debug("%s(%s:%d): received buf length "
                             "unexpected size: expect %d, heartbeat_len %d",
                             __FILE__, __FUNCTION__, __LINE__,
-                            CEREBROD_HEARTBEAT_LEN, heartbeat_len);
+                            CEREBROD_HEARTBEAT_PACKET_LEN, heartbeat_len);
           continue;
         }
 

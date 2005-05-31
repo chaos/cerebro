@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_util.h,v 1.9 2005-05-23 17:58:24 achu Exp $
+ *  $Id: cerebrod_util.h,v 1.10 2005-05-31 22:06:03 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_UTIL_H
@@ -14,6 +14,13 @@
 #endif /* HAVE_PTHREAD_H */
 
 #include "hash.h"
+
+/* 
+ * list_find_first_string
+ *
+ * callback function for list_find_first to find a string
+ */
+int list_find_first_string(void *x, void *key);
 
 /* 
  * cerebrod_rehash

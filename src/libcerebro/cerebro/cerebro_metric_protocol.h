@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_protocol.h,v 1.10 2005-05-31 15:48:50 achu Exp $
+ *  $Id: cerebro_metric_protocol.h,v 1.11 2005-05-31 22:06:03 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_METRIC_PROTOCOL_H
@@ -121,10 +121,10 @@ struct cerebro_metric_request
   u_int32_t timeout_len;
 };
   
-#define CEREBRO_METRIC_REQUEST_LEN  (sizeof(int32_t) \
-                                     + CEREBRO_METRIC_NAME_MAXLEN \
-                                     + sizeof(u_int32_t) \
-                                     + sizeof(u_int32_t))
+#define CEREBRO_METRIC_REQUEST_PACKET_LEN  (sizeof(int32_t) \
+                                            + CEREBRO_METRIC_NAME_MAXLEN \
+                                            + sizeof(u_int32_t) \
+                                            + sizeof(u_int32_t))
 
 /*
  * struct cerebro_metric_response
@@ -141,12 +141,12 @@ struct cerebro_metric_response
   cerebro_metric_value_t metric_value;
 };
   
-#define CEREBRO_METRIC_RESPONSE_LEN  (sizeof(int32_t) \
-                                      + sizeof(u_int32_t) \
-                                      + sizeof(u_int8_t) \
-                                      + CEREBRO_MAXNODENAMELEN \
-                                      + sizeof(u_int32_t) \
-                                      + CEREBRO_METRIC_VALUE_LEN)
+#define CEREBRO_METRIC_RESPONSE_PACKET_LEN  (sizeof(int32_t) \
+                                             + sizeof(u_int32_t) \
+                                             + sizeof(u_int8_t) \
+                                             + CEREBRO_MAXNODENAMELEN \
+                                             + sizeof(u_int32_t) \
+                                             + CEREBRO_METRIC_VALUE_LEN)
 
 /*
  * struct cerebro_metric_err_response

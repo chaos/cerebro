@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.c,v 1.30 2005-05-26 18:23:38 achu Exp $
+ *  $Id: wrappers.c,v 1.31 2005-05-31 22:06:03 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -113,7 +113,7 @@ wrap_strdup(const char *file, const char *function, int line, const char *s)
 char *
 wrap_strncpy(const char *file, const char *function, int line, char *dest, const char *src, size_t n)
 {
-  char *ret;
+  char *rv;
 
   assert(file);
   assert(function);
@@ -124,10 +124,10 @@ wrap_strncpy(const char *file, const char *function, int line, char *dest, const
   if (!src)
     err_exit("strncpy(%s(%s:%d)): null src pointer", file, function, line);
 
-  ret = strncpy(dest, src, n);
+  rv = strncpy(dest, src, n);
   dest[n-1] = '\0';
   
-  return ret;
+  return rv;
 }
 
 int 
@@ -151,20 +151,20 @@ wrap_open(const char *file, const char *function, int line, const char *pathname
 int 
 wrap_close(const char *file, const char *function, int line, int fd)
 {
-  int ret;
+  int rv;
                                  
   assert(file);
   assert(function);
                                                    
-  if ((ret = close(fd)) < 0)
+  if ((rv = close(fd)) < 0)
     err_exit("close(%s(%s:%d)): %s", file, function, line, strerror(errno));
-  return ret;
+  return rv;
 }
 
 ssize_t
 wrap_read(const char *file, const char *function, int line, int fd, void *buf, size_t count)
 {
-  ssize_t ret;
+  ssize_t rv;
 
   assert(file);
   assert(function);
@@ -175,17 +175,17 @@ wrap_read(const char *file, const char *function, int line, int fd, void *buf, s
   if (!(count > 0 || count <= INT_MAX))
     err_exit("read(%s(%s:%d)): invalid count: %d", file, function, line, count);
 
-  if ((ret = fd_read_n(fd, buf, count)) < 0)
+  if ((rv = fd_read_n(fd, buf, count)) < 0)
     err_exit("read(%s(%s:%d)): count=%d: %s", 
              file, function, line, count, strerror(errno));
   
-  return ret;
+  return rv;
 }
 
 ssize_t
 wrap_write(const char *file, const char *function, int line, int fd, const void *buf, size_t count)
 {
-  ssize_t ret;
+  ssize_t rv;
 
   assert(file);
   assert(function);
@@ -196,17 +196,17 @@ wrap_write(const char *file, const char *function, int line, int fd, const void 
   if (!(count > 0 || count <= INT_MAX))
     err_exit("write(%s(%s:%d)): invalid count: %d", file, function, line, count);
 
-  if ((ret = fd_write_n(fd, buf, count)) < 0)
+  if ((rv = fd_write_n(fd, buf, count)) < 0)
     err_exit("write(%s(%s:%d)): count=%d: %s", 
              file, function, line, count, strerror(errno));
 
-  return ret;
+  return rv;
 }
 
 int
 wrap_chdir(const char *file, const char *function, int line, const char *path)
 {
-  int ret;
+  int rv;
 
   assert(file);
   assert(function);
@@ -214,16 +214,16 @@ wrap_chdir(const char *file, const char *function, int line, const char *path)
   if (!path)
     err_exit("chdir(%s(%s:%d)): null path pointer", file, function, line);
 
-  if ((ret = chdir(path)) < 0)
+  if ((rv = chdir(path)) < 0)
     err_exit("chdir(%s(%s:%d)): path=%s: %s", file, function, line, path, strerror(errno));
 
-  return ret;
+  return rv;
 }
 
 int 
 wrap_stat(const char *file, const char *function, int line, const char *path, struct stat *buf)
 {
-  int ret;
+  int rv;
 
   assert(file);
   assert(function);
@@ -234,10 +234,10 @@ wrap_stat(const char *file, const char *function, int line, const char *path, st
   if (!buf)
     err_exit("stat(%s(%s:%d)): null buf pointer", file, function, line);
 
-  if ((ret = stat(path, buf)) < 0)
+  if ((rv = stat(path, buf)) < 0)
     err_exit("stat(%s(%s:%d)): path=%s: %s", file, function, line, path, strerror(errno));
 
-  return ret;
+  return rv;
 }
 
 mode_t
@@ -253,7 +253,7 @@ wrap_umask(const char *file, const char *function, int line, mode_t mask)
 DIR *
 wrap_opendir(const char *file, const char *function, int line, const char *name)
 {
-  DIR *ret;
+  DIR *rv;
   
   assert(file);
   assert(function);
@@ -261,16 +261,16 @@ wrap_opendir(const char *file, const char *function, int line, const char *name)
   if (!name)
     err_exit("opendir(%s(%s:%d)): null name pointer", file, function, line);
 
-  if (!(ret = opendir(name)))
+  if (!(rv = opendir(name)))
     err_exit("opendir(%s(%s:%d)): name=%s: %s", file, function, line, name, strerror(errno));
 
-  return ret;
+  return rv;
 }
 
 int
 wrap_closedir(const char *file, const char *function, int line, DIR *dir)
 {
-  int ret;
+  int rv;
 
   assert(file);
   assert(function);
@@ -278,10 +278,10 @@ wrap_closedir(const char *file, const char *function, int line, DIR *dir)
   if (!dir)
     err_exit("closedir(%s(%s:%d)): null dir pointer", file, function, line);
 
-  if ((ret = closedir(dir)) < 0)
+  if ((rv = closedir(dir)) < 0)
     err_exit("closedir(%s(%s:%d)): %s", file, function, line, strerror(errno));
 
-  return ret;
+  return rv;
 }
 
 int
@@ -302,7 +302,7 @@ wrap_socket(const char *file, const char *function, int line, int domain, int ty
 int 
 wrap_bind(const char *file, const char *function, int line, int sockfd, struct sockaddr *my_addr, socklen_t addrlen)
 {
-  int ret;
+  int rv;
   
   assert(file);
   assert(function);
@@ -313,17 +313,17 @@ wrap_bind(const char *file, const char *function, int line, int sockfd, struct s
   if (!(addrlen > 0 || addrlen <= INT_MAX))
     err_exit("bind(%s(%s:%d)): invalid addrlen: %d", file, function, line, addrlen);
 
-  if ((ret = bind(sockfd, my_addr, addrlen)) < 0)
+  if ((rv = bind(sockfd, my_addr, addrlen)) < 0)
     err_exit("bind(%s(%s:%d)): addrlen=%d: %s", 
              file, function, line, addrlen, strerror(errno));
 
-  return ret;
+  return rv;
 }
 
 int 
 wrap_connect(const char *file, const char *function, int line, int sockfd, struct sockaddr *serv_addr, socklen_t addrlen)
 {
-  int ret;
+  int rv;
 
   assert(file);
   assert(function);
@@ -334,17 +334,17 @@ wrap_connect(const char *file, const char *function, int line, int sockfd, struc
   if (!(addrlen > 0 || addrlen <= INT_MAX))
     err_exit("connect(%s(%s:%d)): invalid addrlen: %d", file, function, line, addrlen);
 
-  if ((ret = connect(sockfd, serv_addr, addrlen)) < 0)
+  if ((rv = connect(sockfd, serv_addr, addrlen)) < 0)
     err_exit("connect(%s(%s:%d)): addrlen=%d: %s", 
              file, function, line, addrlen, strerror(errno));
 
-  return ret;
+  return rv;
 }
 
 int 
 wrap_listen(const char *file, const char *function, int line, int s, int backlog)
 {
-  int ret;
+  int rv;
 
   assert(file);
   assert(function);
@@ -352,17 +352,17 @@ wrap_listen(const char *file, const char *function, int line, int s, int backlog
   if (!(backlog > 0 || backlog <= INT_MAX))
     err_exit("listen(%s(%s:%d)): invalid backlog: %d", file, function, line, backlog);
 
-  if ((ret = listen(s, backlog)) < 0)
+  if ((rv = listen(s, backlog)) < 0)
     err_exit("listen(%s(%s:%d)): backlog=%d: %s", 
              file, function, line, backlog, strerror(errno));
 
-  return ret;
+  return rv;
 }
 
 int 
 wrap_accept(const char *file, const char *function, int line, int s, struct sockaddr *addr, socklen_t *addrlen)
 {
-  int ret;
+  int rv;
 
   assert(file);
   assert(function);
@@ -376,16 +376,16 @@ wrap_accept(const char *file, const char *function, int line, int s, struct sock
   if (!(*addrlen > 0 || *addrlen <= INT_MAX))
     err_exit("accept(%s(%s:%d)): invalid addrlen: %d", file, function, line, *addrlen);
 
-  if ((ret = accept(s, addr, addrlen)) < 0)
+  if ((rv = accept(s, addr, addrlen)) < 0)
     err_exit("accept(%s(%s:%d)): %s", file, function, line, strerror(errno));
 
-  return ret;
+  return rv;
 }
 
 int 
 wrap_select(const char *file, const char *function, int line, int n, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout)
 {
-  int ret;
+  int rv;
   struct timeval timeout_orig, timeout_current;
   struct timeval start, end, delta;
   
@@ -407,10 +407,10 @@ wrap_select(const char *file, const char *function, int line, int n, fd_set *rea
 
   do 
     {
-      ret = select(n, readfds, writefds, exceptfds, &timeout_current);
-      if (ret < 0 && errno != EINTR)
+      rv = select(n, readfds, writefds, exceptfds, &timeout_current);
+      if (rv < 0 && errno != EINTR)
 	err_exit("select(%s(%s:%d)): %s", strerror(errno));
-      if (ret < 0 && timeout) 
+      if (rv < 0 && timeout) 
 	{
 	  Gettimeofday(&end, NULL);
 	  /* delta = end-start */
@@ -419,15 +419,15 @@ wrap_select(const char *file, const char *function, int line, int n, fd_set *rea
 	  timersub(&timeout_orig, &delta, &timeout_current);     
 	}
     } 
-  while (ret < 0);
+  while (rv < 0);
 
-  return ret;
+  return rv;
 }
 
 int 
 wrap_poll(const char *file, const char *function, int line, struct pollfd *ufds, unsigned int nfds, int timeout)
 {
-  int ret;
+  int rv;
   struct timeval timeout_orig, timeout_current;
   struct timeval start, end, delta;
                                                                          
@@ -445,10 +445,10 @@ wrap_poll(const char *file, const char *function, int line, struct pollfd *ufds,
     }
 
   do {
-    ret = poll(ufds, nfds, timeout);
-    if (ret < 0 && errno != EINTR)
+    rv = poll(ufds, nfds, timeout);
+    if (rv < 0 && errno != EINTR)
       err_exit("poll(%s(%s:%d)): %s", strerror(errno));
-    if (ret < 0 && timeout >= 0) {
+    if (rv < 0 && timeout >= 0) {
       Gettimeofday(&end, NULL);
       /* delta = end-start */
       timersub(&end, &start, &delta);     
@@ -456,15 +456,15 @@ wrap_poll(const char *file, const char *function, int line, struct pollfd *ufds,
       timersub(&timeout_orig, &delta, &timeout_current);
       timeout = (timeout_current.tv_sec * 1000) + (timeout_current.tv_usec/1000);
     }
-  } while (ret < 0);
+  } while (rv < 0);
                                                                          
-  return ret;
+  return rv;
 }
 
 int
 wrap_getsockopt(const char *file, const char *function, int line, int s, int level, int optname, void *optval, socklen_t *optlen)
 {
-  int ret;
+  int rv;
 
   assert(file);
   assert(function);
@@ -478,17 +478,17 @@ wrap_getsockopt(const char *file, const char *function, int line, int s, int lev
   if (!(*optlen > 0 || *optlen <= INT_MAX))
     err_exit("getsockopt(%s(%s:%d)): invalid *optlen: %d", file, function, line, *optlen);
 
-  if ((ret = getsockopt(s, level, optname, optval, optlen)) < 0)
+  if ((rv = getsockopt(s, level, optname, optval, optlen)) < 0)
     err_exit("getsockopt(%s(%s:%d)): optname=%x: %s", 
              file, function, line, optname, strerror(errno));
 
-  return ret;
+  return rv;
 }
 
 int
 wrap_setsockopt(const char *file, const char *function, int line, int s, int level, int optname, const void *optval, socklen_t optlen)
 {
-  int ret;
+  int rv;
 
   assert(file);
   assert(function);
@@ -499,16 +499,16 @@ wrap_setsockopt(const char *file, const char *function, int line, int s, int lev
   if (!(optlen > 0 || optlen <= INT_MAX))
     err_exit("setsockopt(%s(%s:%d)): invalid optlen: %d", file, function, line, optlen);
 
-  if ((ret = setsockopt(s, level, optname, optval, optlen)) < 0)
+  if ((rv = setsockopt(s, level, optname, optval, optlen)) < 0)
     err_exit("setsockopt(%s(%s:%d)): %s", file, function, line, strerror(errno));
 
-  return ret;
+  return rv;
 }
 
 struct hostent *
 wrap_gethostbyname(const char *file, const char *function, int line, const char *name)
 {
-  struct hostent *ret;
+  struct hostent *rv;
 
   assert(file);
   assert(function);
@@ -516,16 +516,16 @@ wrap_gethostbyname(const char *file, const char *function, int line, const char 
   if (!name)
     err_exit("gethostbyname(%s(%s:%d)): null name pointer", file, function, line);
 
-  if (!(ret = gethostbyname(name)))
+  if (!(rv = gethostbyname(name)))
     err_exit("gethostbyname(%s(%s:%d)): name=%s: %s", file, function, line, name, hstrerror(h_errno));
 
-  return ret;
+  return rv;
 }
 
 const char *
 wrap_inet_ntop(const char *file, const char *function, int line, int af, const void *src, char *dst, socklen_t cnt)
 {
-  const char *ret;
+  const char *rv;
 
   assert(file);
   assert(function);
@@ -536,16 +536,16 @@ wrap_inet_ntop(const char *file, const char *function, int line, int af, const v
   if (!dst)
     err_exit("inet_ntop(%s(%s:%d)): null dst pointer", file, function, line);
 
-  if ((ret = inet_ntop(af, src, dst, cnt)) < 0)
+  if ((rv = inet_ntop(af, src, dst, cnt)) < 0)
     err_exit("inet_ntop(%s(%s:%d)): af=%x: %s", file, function, line, af, strerror(errno));
   
-  return ret;
+  return rv;
 }
 
 int 
 wrap_inet_pton(const char *file, const char *function, int line, int af, const char *src, void *dst)
 {
-  int ret;
+  int rv;
   
   assert(file);
   assert(function);
@@ -556,16 +556,16 @@ wrap_inet_pton(const char *file, const char *function, int line, int af, const c
   if (!dst)
     err_exit("inet_pton(%s(%s:%d)): null dst pointer", file, function, line);
 
-  if ((ret = inet_pton(af, src, dst)) < 0)
+  if ((rv = inet_pton(af, src, dst)) < 0)
     err_exit("inet_pton(%s(%s:%d)): af=%x: %s", file, function, line, af, strerror(errno));
 
-  return ret;
+  return rv;
 }
 
 int
 wrap_gettimeofday(const char *file, const char *function, int line, struct timeval *tv, struct timezone *tz)
 {
-  int ret;
+  int rv;
 
   assert(file);
   assert(function);
@@ -575,26 +575,26 @@ wrap_gettimeofday(const char *file, const char *function, int line, struct timev
 
   /* tz can be null */
 
-  if ((ret = gettimeofday(tv, tz)) < 0)
+  if ((rv = gettimeofday(tv, tz)) < 0)
     err_exit("gettimeofday(%s(%s:%d)): %s", file, function, line, strerror(errno));
 
-  return ret;
+  return rv;
 }
 
 time_t 
 wrap_time(const char *file, const char *function, int line, time_t *t)
 {
-  time_t ret;
+  time_t rv;
 
   assert(file);
   assert(function);
 
   /* t can be null */
 
-  if ((ret = time(t)) == ((time_t)-1))
+  if ((rv = time(t)) == ((time_t)-1))
     err_exit("time(%s(%s:%d)): %s", file, function, line, strerror(errno));
 
-  return ret;
+  return rv;
 }
 
 struct tm *
@@ -637,7 +637,7 @@ wrap_localtime_r(const char *file, const char *function, int line, const time_t 
 int 
 wrap_pthread_create(const char *file, const char *function, int line, pthread_t *thread, pthread_attr_t *attr, void *(*start_routine)(void *), void *arg)
 {
-  int ret;
+  int rv;
   
   assert(file);
   assert(function);
@@ -650,16 +650,16 @@ wrap_pthread_create(const char *file, const char *function, int line, pthread_t 
   if (!start_routine)
     err_exit("pthread_create(%s(%s:%d)): null start_routine pointer", file, function, line);
 
-  if ((ret = pthread_create(thread, attr, start_routine, arg)) != 0)
-    err_exit("pthread_create(%s(%s:%d)): %s", file, function, line, strerror(ret));
+  if ((rv = pthread_create(thread, attr, start_routine, arg)) != 0)
+    err_exit("pthread_create(%s(%s:%d)): %s", file, function, line, strerror(rv));
 
-  return ret;
+  return rv;
 }
 
 int 
 wrap_pthread_attr_init(const char *file, const char *function, int line, pthread_attr_t *attr)
 {
-  int ret;
+  int rv;
   
   assert(file);
   assert(function);
@@ -667,16 +667,16 @@ wrap_pthread_attr_init(const char *file, const char *function, int line, pthread
   if (!attr)
     err_exit("pthread_attr_init(%s(%s:%d)): null attr pointer", file, function, line);
 
-  if ((ret = pthread_attr_init(attr)) != 0)
-    err_exit("pthread_attr_init(%s(%s:%d)): %s", file, function, line, strerror(ret));
+  if ((rv = pthread_attr_init(attr)) != 0)
+    err_exit("pthread_attr_init(%s(%s:%d)): %s", file, function, line, strerror(rv));
 
-  return ret;
+  return rv;
 }
 
 int 
 wrap_pthread_attr_destroy(const char *file, const char *function, int line, pthread_attr_t *attr)
 {
-  int ret;
+  int rv;
   
   assert(file);
   assert(function);
@@ -684,16 +684,16 @@ wrap_pthread_attr_destroy(const char *file, const char *function, int line, pthr
   if (!attr)
     err_exit("pthread_attr_destroy(%s(%s:%d)): null attr pointer", file, function, line);
 
-  if ((ret = pthread_attr_destroy(attr)) != 0)
-    err_exit("pthread_attr_destroy(%s(%s:%d)): %s", file, function, line, strerror(ret));
+  if ((rv = pthread_attr_destroy(attr)) != 0)
+    err_exit("pthread_attr_destroy(%s(%s:%d)): %s", file, function, line, strerror(rv));
 
-  return ret;
+  return rv;
 }
 
 int 
 wrap_pthread_attr_setdetachstate(const char *file, const char *function, int line, pthread_attr_t *attr, int detachstate)
 {
-  int ret;
+  int rv;
   
   assert(file);
   assert(function);
@@ -701,17 +701,17 @@ wrap_pthread_attr_setdetachstate(const char *file, const char *function, int lin
   if (!attr)
     err_exit("pthread_attr_setdetachstate(%s(%s:%d)): null attr pointer", file, function, line);
 
-  if ((ret = pthread_attr_setdetachstate(attr, detachstate)) != 0)
+  if ((rv = pthread_attr_setdetachstate(attr, detachstate)) != 0)
     err_exit("pthread_attr_setdetachstate(%s(%s:%d)): detachstate=%d: %s", 
-             file, function, line, detachstate, strerror(ret));
+             file, function, line, detachstate, strerror(rv));
 
-  return ret;
+  return rv;
 }
 
 int
 wrap_pthread_mutex_lock(const char *file, const char *function, int line, pthread_mutex_t *mutex)
 {
-  int ret;
+  int rv;
   
   assert(file);
   assert(function);
@@ -719,16 +719,16 @@ wrap_pthread_mutex_lock(const char *file, const char *function, int line, pthrea
   if (!mutex)
     err_exit("pthread_mutex_lock(%s(%s:%d)): null mutex pointer", file, function, line);
 
-  if ((ret = pthread_mutex_lock(mutex)) != 0)
-    err_exit("pthread_mutex_lock(%s(%s:%d)): %s", file, function, line, strerror(ret));
+  if ((rv = pthread_mutex_lock(mutex)) != 0)
+    err_exit("pthread_mutex_lock(%s(%s:%d)): %s", file, function, line, strerror(rv));
 
-  return ret;
+  return rv;
 }
 
 int 
 wrap_pthread_mutex_trylock(const char *file, const char *function, int line, pthread_mutex_t *mutex)
 {
-  int ret;
+  int rv;
   
   assert(file);
   assert(function);
@@ -736,17 +736,17 @@ wrap_pthread_mutex_trylock(const char *file, const char *function, int line, pth
   if (!mutex)
     err_exit("pthread_mutex_trylock(%s(%s:%d)): null mutex pointer", file, function, line);
 
-  ret = pthread_mutex_trylock(mutex);
-  if (ret != 0 && ret != EBUSY)
-    err_exit("pthread_mutex_trylock(%s(%s:%d)): %s", file, function, line, strerror(ret));
+  rv = pthread_mutex_trylock(mutex);
+  if (rv != 0 && rv != EBUSY)
+    err_exit("pthread_mutex_trylock(%s(%s:%d)): %s", file, function, line, strerror(rv));
 
-  return ret;
+  return rv;
 }
 
 int 
 wrap_pthread_mutex_unlock(const char *file, const char *function, int line, pthread_mutex_t *mutex)
 {
-  int ret;
+  int rv;
   
   assert(file);
   assert(function);
@@ -754,16 +754,16 @@ wrap_pthread_mutex_unlock(const char *file, const char *function, int line, pthr
   if (!mutex)
     err_exit("pthread_mutex_unlock(%s(%s:%d)): null mutex pointer", file, function, line);
 
-  if ((ret = pthread_mutex_unlock(mutex)) != 0)
-    err_exit("pthread_mutex_unlock(%s(%s:%d)): %s", file, function, line, strerror(ret));
+  if ((rv = pthread_mutex_unlock(mutex)) != 0)
+    err_exit("pthread_mutex_unlock(%s(%s:%d)): %s", file, function, line, strerror(rv));
 
-  return ret;
+  return rv;
 }
 
 int
 wrap_pthread_mutex_init(const char *file, const char *function, int line, pthread_mutex_t *mutex, const pthread_mutexattr_t *mutexattr)
 {
-  int ret;
+  int rv;
   
   assert(file);
   assert(function);
@@ -773,16 +773,16 @@ wrap_pthread_mutex_init(const char *file, const char *function, int line, pthrea
 
   /* mutexattr can be null */
 
-  if ((ret = pthread_mutex_init(mutex, mutexattr)) != 0)
-    err_exit("pthread_mutex_init(%s(%s:%d)): %s", file, function, line, strerror(ret));
+  if ((rv = pthread_mutex_init(mutex, mutexattr)) != 0)
+    err_exit("pthread_mutex_init(%s(%s:%d)): %s", file, function, line, strerror(rv));
 
-  return ret;
+  return rv;
 }
 
 int 
 wrap_pthread_cond_signal(const char *file, const char *function, int line, pthread_cond_t *cond)
 {
-  int ret;
+  int rv;
 
   assert(file);
   assert(function);
@@ -790,16 +790,16 @@ wrap_pthread_cond_signal(const char *file, const char *function, int line, pthre
   if (!cond)
     err_exit("pthread_cond_signal(%s(%s:%d)): null cond pointer", file, function, line);
 
-  if ((ret = pthread_cond_signal(cond)) != 0)
-    err_exit("pthread_cond_signal(%s(%s:%d)): %s", file, function, line, strerror(ret));
+  if ((rv = pthread_cond_signal(cond)) != 0)
+    err_exit("pthread_cond_signal(%s(%s:%d)): %s", file, function, line, strerror(rv));
 
-  return ret;
+  return rv;
 }
 
 int 
 wrap_pthread_cond_wait(const char *file, const char *function, int line, pthread_cond_t *cond, pthread_mutex_t *mutex)
 {
-  int ret;
+  int rv;
 
   assert(file);
   assert(function);
@@ -810,10 +810,10 @@ wrap_pthread_cond_wait(const char *file, const char *function, int line, pthread
   if (!mutex)
     err_exit("pthread_cond_wait(%s(%s:%d)): null mutex pointer", file, function, line);
 
-  if ((ret = pthread_cond_wait(cond, mutex)) != 0)
-    err_exit("pthread_cond_signal(%s(%s:%d)): %s", file, function, line, strerror(ret));
+  if ((rv = pthread_cond_wait(cond, mutex)) != 0)
+    err_exit("pthread_cond_signal(%s(%s:%d)): %s", file, function, line, strerror(rv));
 
-  return ret;
+  return rv;
 }
 
 pid_t 
@@ -833,7 +833,7 @@ wrap_fork(const char *file, const char *function, int line)
 Sighandler_t
 wrap_signal(const char *file, const char *function, int line, int signum, Sighandler_t handler)
 {
-  Sighandler_t ret;
+  Sighandler_t rv;
 
   assert(file);
   assert(function);
@@ -841,16 +841,16 @@ wrap_signal(const char *file, const char *function, int line, int signum, Sighan
   if (!handler)
     err_exit("signal(%s(%s:%d)): null handler pointer", file, function, line);
 
-  if ((ret = signal(signum, handler)) == SIG_ERR)
+  if ((rv = signal(signum, handler)) == SIG_ERR)
     err_exit("signal(%s(%s:%d)): %s", file, function, line, strerror(errno));
 
-  return ret;
+  return rv;
 }
 
 int 
 wrap_gethostname(const char *file, const char *function, int line, char *name, size_t len)
 {
-  int ret;
+  int rv;
 
   assert(file);
   assert(function);
@@ -861,46 +861,46 @@ wrap_gethostname(const char *file, const char *function, int line, char *name, s
   if (!(len > 0 || len <= INT_MAX))
     err_exit("gethostname(%s(%s:%d)): invalid len: %d", file, function, line, len);
 
-  if ((ret = gethostname(name, len)) < 0)
+  if ((rv = gethostname(name, len)) < 0)
     err_exit("gethostname(%s(%s:%d)): len=%d: %s", 
              file, function, line, len, strerror(errno));
 
-  return ret;
+  return rv;
 }
 
 #if !WITH_STATIC_MODULES
 int
 wrap_lt_dlinit(const char *file, const char *function, int line)
 {
-  int ret;
+  int rv;
 
   assert(file);
   assert(function);
 
-  if ((ret = lt_dlinit()) != 0)
+  if ((rv = lt_dlinit()) != 0)
     err_exit("lt_dlinit(%s(%s:%d)): %s", file, function, line, lt_dlerror());
 
-  return ret;
+  return rv;
 }
 
 int
 wrap_lt_dlexit(const char *file, const char *function, int line)
 {
-  int ret;
+  int rv;
 
   assert(file);
   assert(function);
 
-  if ((ret = lt_dlexit()) != 0)
+  if ((rv = lt_dlexit()) != 0)
     err_exit("lt_dlexit(%s(%s:%d)): %s", file, function, line, lt_dlerror());
 
-  return ret;
+  return rv;
 }
 
 lt_dlhandle
 wrap_lt_dlopen(const char *file, const char *function, int line, const char *filename)
 {
-  lt_dlhandle ret;
+  lt_dlhandle rv;
 
   assert(file);
   assert(function);
@@ -908,16 +908,16 @@ wrap_lt_dlopen(const char *file, const char *function, int line, const char *fil
   if (!filename)
     err_exit("lt_dlopen(%s(%s:%d)): null filename pointer");
 
-  if (!(ret = lt_dlopen(filename)))
+  if (!(rv = lt_dlopen(filename)))
     err_exit("lt_dlopen(%s(%s:%d)): filename=%s: %s", file, function, line, filename, lt_dlerror());
 
-  return ret;
+  return rv;
 }
 
 lt_ptr
 wrap_lt_dlsym(const char *file, const char *function, int line, void *handle, char *symbol)
 {
-  lt_ptr *ret;
+  lt_ptr *rv;
   const char *err;
 
   assert(file);
@@ -932,20 +932,20 @@ wrap_lt_dlsym(const char *file, const char *function, int line, void *handle, ch
   /* "clear" lt_dlerror() */
   lt_dlerror();
 
-  if (!(ret = lt_dlsym(handle, symbol)))
+  if (!(rv = lt_dlsym(handle, symbol)))
     {
       err = lt_dlerror();
       if (err)
         err_exit("lt_dlsym(%s(%s:%d)): symbol=%s: %s", file, function, line, symbol, err);
     }
 
-  return ret;
+  return rv;
 }
 
 int 
 wrap_lt_dlclose(const char *file, const char *function, int line, void *handle)
 {
-  int ret;
+  int rv;
 
   assert(file);
   assert(function);
@@ -953,27 +953,27 @@ wrap_lt_dlclose(const char *file, const char *function, int line, void *handle)
   if (!handle)
     err_exit("lt_dlclose(%s(%s:%d)): null handle pointer");
 
-  if ((ret = lt_dlclose(handle)) != 0)
+  if ((rv = lt_dlclose(handle)) != 0)
     err_exit("lt_dlclose(%s(%s:%d)): %s", lt_dlerror());
 
-  return ret;
+  return rv;
 }
 #endif /* !WITH_STATIC_MODULES */
 
 List 
 wrap_list_create(const char *file, const char *function, int line, ListDelF f)
 {
-  List ret;
+  List rv;
 
   assert(file);
   assert(function);
 
   /* f can be null */
 
-  if (!(ret = list_create(f)))
+  if (!(rv = list_create(f)))
     err_exit("list_create(%s(%s:%d)): %s", file, function, line, strerror(errno));
 
-  return ret;
+  return rv;
 }
 
 void
@@ -1005,7 +1005,7 @@ wrap_list_count(const char *file, const char *function, int line, List l)
 void *
 wrap_list_append (const char *file, const char *function, int line, List l, void *x)
 {
-  void *ret;
+  void *rv;
 
   assert(file);
   assert(function);
@@ -1016,16 +1016,38 @@ wrap_list_append (const char *file, const char *function, int line, List l, void
   if (!x)
     err_exit("list_append(%s(%s:%d)): null x pointer", file, function, line);
 
-  if (!(ret = list_append(l, x)))
+  if (!(rv = list_append(l, x)))
     err_exit("list_append(%s(%s:%d)): %s", file, function, line, strerror(errno));
   
-  return ret;
+  return rv;
+}
+
+void * 
+wrap_list_find_first (const char *file, const char *function, int line, List l, ListFindF f, void *key)
+{
+  void *rv;
+
+  assert(file);
+  assert(function);
+
+  if (!l)
+    err_exit("list_append(%s(%s:%d)): null l pointer", file, function, line);
+
+  if (!f)
+    err_exit("list_append(%s(%s:%d)): null f pointer", file, function, line);
+
+  if (!key)
+    err_exit("list_append(%s(%s:%d)): null key pointer", file, function, line);
+
+  rv = list_find_first(l, f, key);
+  
+  return rv;
 }
 
 int 
 wrap_list_delete_all(const char *file, const char *function, int line, List l, ListFindF f, void *key)
 {
-  int ret;
+  int rv;
 
   assert(file);
   assert(function);
@@ -1039,16 +1061,16 @@ wrap_list_delete_all(const char *file, const char *function, int line, List l, L
   if (!key)
     err_exit("list_delete_all(%s(%s:%d)): null key pointer", file, function, line);
 
-  if ((ret = list_delete_all(l, f, key)) < 0)
+  if ((rv = list_delete_all(l, f, key)) < 0)
     err_exit("list_delete_all(%s(%s:%d)): %s", file, function, line, strerror(errno));
   
-  return ret;
+  return rv;
 }
 
 int
 wrap_list_for_each(const char *file, const char *function, int line, List l, ListForF f, void *arg)
 {
-  int ret;
+  int rv;
 
   assert(file);
   assert(function);
@@ -1061,16 +1083,16 @@ wrap_list_for_each(const char *file, const char *function, int line, List l, Lis
 
   /* arg can be null */
 
-  if ((ret = list_for_each(l, f, arg)) < 0)
+  if ((rv = list_for_each(l, f, arg)) < 0)
     err_exit("list_for_each(%s(%s:%d)): %s", file, function, line, strerror(errno));
   
-  return ret;
+  return rv;
 }
 
 ListIterator
 wrap_list_iterator_create(const char *file, const char *function, int line, List l)
 {
-  ListIterator ret;
+  ListIterator rv;
 
   assert(file);
   assert(function);
@@ -1078,10 +1100,10 @@ wrap_list_iterator_create(const char *file, const char *function, int line, List
   if (!l)
     err_exit("list_iterator_create(%s(%s:%d)): null l pointer", file, function, line);
 
-  if (!(ret = list_iterator_create(l)))
+  if (!(rv = list_iterator_create(l)))
     err_exit("list_iterator_create(%s(%s:%d)): %s", file, function, line, strerror(errno));
 
-  return ret;
+  return rv;
 }
 
 void
@@ -1101,7 +1123,7 @@ wrap_list_iterator_destroy(const char *file, const char *function, int line, Lis
 hash_t 
 wrap_hash_create(const char *file, const char *function, int line, int size, hash_key_f key_f, hash_cmp_f cmp_f, hash_del_f del_f)
 {
-  hash_t ret;
+  hash_t rv;
 
   assert(file);
   assert(function);
@@ -1117,16 +1139,16 @@ wrap_hash_create(const char *file, const char *function, int line, int size, has
 
   /* del_f can be null */
 
-  if (!(ret = hash_create(size, key_f, cmp_f, del_f)))
+  if (!(rv = hash_create(size, key_f, cmp_f, del_f)))
     err_exit("hash_create(%s(%s:%d)): size=%d: %s", file, function, line, size, strerror(errno));
 
-  return ret;
+  return rv;
 }
 
 int 
 wrap_hash_count(const char *file, const char *function, int line, hash_t h)
 {
-  int ret;
+  int rv;
 
   assert(file);
   assert(function);
@@ -1134,19 +1156,19 @@ wrap_hash_count(const char *file, const char *function, int line, hash_t h)
   if (!h)
     err_exit("hash_count(%s(%s:%d)): null h pointer", file, function, line);
 
-  if (!(ret = hash_count(h)))
+  if (!(rv = hash_count(h)))
     {
       if (errno != 0)
         err_exit("hash_count(%s(%s:%d)): %s", file, function, line, strerror(errno));
     }
 
-  return ret;
+  return rv;
 }
 
 void *
 wrap_hash_find(const char *file, const char *function, int line, hash_t h, const void *key)
 {
-  void *ret;
+  void *rv;
 
   assert(file);
   assert(function);
@@ -1157,17 +1179,17 @@ wrap_hash_find(const char *file, const char *function, int line, hash_t h, const
   if (!key)
     err_exit("hash_find(%s(%s:%d)): null key pointer", file, function, line);
 
-  ret = hash_find(h, key);
-  if (!ret && errno != 0)
+  rv = hash_find(h, key);
+  if (!rv && errno != 0)
     err_exit("hash_find(%s(%s:%d)): key=%s: %s", file, function, line, key, strerror(errno));
 
-  return ret;
+  return rv;
 }
 
 void *
 wrap_hash_insert(const char *file, const char *function, int line, hash_t h, const void *key, void *data)
 {
-  void *ret;
+  void *rv;
 
   assert(file);
   assert(function);
@@ -1181,18 +1203,18 @@ wrap_hash_insert(const char *file, const char *function, int line, hash_t h, con
   if (!data)
     err_exit("hash_insert(%s(%s:%d)): null data pointer", file, function, line);
 
-  if (!(ret = hash_insert(h, key, data)))
+  if (!(rv = hash_insert(h, key, data)))
     err_exit("hash_insert(%s(%s:%d)): key=%s: %s", file, function, line, key, strerror(errno));
-  if (ret != data)
+  if (rv != data)
     err_exit("hash_insert(%s(%s:%d)): key=%s: invalid insert", file, function, line, key);
 
-  return ret;
+  return rv;
 }
 
 void *
 wrap_hash_remove (const char *file, const char *function, int line, hash_t h, const void *key)
 {
-  void *ret;
+  void *rv;
 
   assert(file);
   assert(function);
@@ -1203,16 +1225,16 @@ wrap_hash_remove (const char *file, const char *function, int line, hash_t h, co
   if (!key)
     err_exit("hash_remove(%s(%s:%d)): null key pointer", file, function, line);
 
-  if (!(ret = hash_remove(h, key)))
+  if (!(rv = hash_remove(h, key)))
     err_exit("hash_remove(%s(%s:%d)): key=%s: %s", file, function, line, key, strerror(errno));
 
-  return ret;
+  return rv;
 }
 
 int 
 wrap_hash_delete_if(const char *file, const char *function, int line, hash_t h, hash_arg_f argf, void *arg)
 {
-  int ret;
+  int rv;
 
   assert(file);
   assert(function);
@@ -1225,16 +1247,16 @@ wrap_hash_delete_if(const char *file, const char *function, int line, hash_t h, 
 
   /* arg can be null */
 
-  if ((ret = hash_delete_if(h, argf, arg)) < 0)
+  if ((rv = hash_delete_if(h, argf, arg)) < 0)
     err_exit("hash_delete_if(%s(%s:%d)): %s", file, function, line, strerror(errno));
 
-  return ret;
+  return rv;
 }
 
 int 
 wrap_hash_for_each(const char *file, const char *function, int line, hash_t h, hash_arg_f argf, void *arg)
 {
-  int ret;
+  int rv;
 
   assert(file);
   assert(function);
@@ -1247,10 +1269,10 @@ wrap_hash_for_each(const char *file, const char *function, int line, hash_t h, h
 
   /* arg can be null */
 
-  if ((ret = hash_for_each(h, argf, arg)) < 0)
+  if ((rv = hash_for_each(h, argf, arg)) < 0)
     err_exit("hash_for_each(%s(%s:%d)): %s", file, function, line, strerror(errno));
 
-  return ret;
+  return rv;
 }
 
 void

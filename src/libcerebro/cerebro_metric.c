@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric.c,v 1.8 2005-05-31 20:45:56 achu Exp $
+ *  $Id: cerebro_metric.c,v 1.9 2005-05-31 22:06:03 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -94,7 +94,7 @@ _cerebro_metric_request_marshall(cerebro_t handle,
       return -1;
     }
 
-  if (buflen < CEREBRO_METRIC_REQUEST_LEN)
+  if (buflen < CEREBRO_METRIC_REQUEST_PACKET_LEN)
     {
       cerebro_err_debug_lib("%s(%s:%d): buflen invalid",
 			    __FILE__, __FUNCTION__, __LINE__);
@@ -378,7 +378,8 @@ _cerebro_metric_response_receive_one(cerebro_t handle,
   char buf[CEREBRO_PACKET_BUFLEN];
 
   memset(buf, '\0', CEREBRO_PACKET_BUFLEN);
-  while (bytes_read < CEREBRO_METRIC_RESPONSE_LEN)
+  /* XXX - will not work with variable length buffers */
+  while (bytes_read < CEREBRO_METRIC_RESPONSE_PACKET_LEN)
     {
       fd_set rfds;
       struct timeval tv;
@@ -422,13 +423,13 @@ _cerebro_metric_response_receive_one(cerebro_t handle,
           int n;
 
           /* Don't use fd_read_n b/c it loops until exactly
-           * CEREBRO_METRIC_RESPONSE_LEN is read.  Due to version
+           * CEREBRO_METRIC_RESPONSE_PACKET_LEN is read.  Due to version
            * incompatability or error packets, we may want to read a
            * smaller packet.
            */
           if ((n = read(fd,
                         buf + bytes_read,
-                        CEREBRO_METRIC_RESPONSE_LEN - bytes_read)) < 0)
+                        CEREBRO_METRIC_RESPONSE_PACKET_LEN - bytes_read)) < 0)
             {
 	      cerebro_err_debug_lib("%s(%s:%d): read: %s",
 				    __FILE__, __FUNCTION__, __LINE__,
@@ -493,9 +494,9 @@ _cerebro_metric_response_receive_all(cerebro_t handle,
         goto cleanup;
 
       /* XXX - will not work with variable length buffers */
-      if (res_len != CEREBRO_METRIC_RESPONSE_LEN)
+      if (res_len != CEREBRO_METRIC_RESPONSE_PACKET_LEN)
         {
-          if (res_len == CEREBRO_METRIC_RESPONSE_LEN)
+          if (res_len == CEREBRO_METRIC_RESPONSE_PACKET_LEN)
             {
               if (res.version != CEREBRO_METRIC_PROTOCOL_VERSION)
                 {

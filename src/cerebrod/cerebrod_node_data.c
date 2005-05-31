@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_node_data.c,v 1.9 2005-05-28 16:06:44 achu Exp $
+ *  $Id: cerebrod_node_data.c,v 1.10 2005-05-31 22:06:03 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -51,6 +51,13 @@ pthread_mutex_t cerebrod_node_data_initialization_complete_lock = PTHREAD_MUTEX_
  */
 List cerebrod_node_data_list = NULL;
 
+/* 
+ * cerebrod_metric_name_list
+ *
+ * contains list of metrics currently known
+ */
+List cerebrod_metric_name_list = NULL;
+
 /*
  * cerebrod_node_data_index
  * cerebrod_node_data_index_numnodes
@@ -70,6 +77,14 @@ int cerebrod_node_data_index_size;
  * node_data_index
  */
 pthread_mutex_t cerebrod_node_data_lock = PTHREAD_MUTEX_INITIALIZER;
+
+/*  
+ * cerebrod_metric_name_lock
+ *
+ * lock to protect pthread access to both the metric_name list and
+ * metric_name_index
+ */
+pthread_mutex_t cerebrod_metric_name_lock = PTHREAD_MUTEX_INITIALIZER;
 
 /* 
  * _cerebrod_node_data_strcmp
@@ -172,6 +187,15 @@ cerebrod_node_data_initialize(void)
 
       free(nodes);
     }
+
+  cerebrod_metric_name_list = List_create((ListDelF)_Free);
+
+  /* Initialize with the handle of default metrics */
+  List_append(cerebrod_metric_name_list, Strdup(CEREBRO_METRIC_CLUSTER_NODES));
+  List_append(cerebrod_metric_name_list, Strdup(CEREBRO_METRIC_UP_NODES));
+  List_append(cerebrod_metric_name_list, Strdup(CEREBRO_METRIC_DOWN_NODES));
+  List_append(cerebrod_metric_name_list, Strdup(CEREBRO_METRIC_UPDOWN_STATE));
+  List_append(cerebrod_metric_name_list, Strdup(CEREBRO_METRIC_LAST_RECEIVED_TIME));
 
   cerebrod_node_data_initialization_complete++;
  out:
@@ -289,7 +313,7 @@ _cerebrod_node_data_metric_data_dump(void *data, const void *key, void *arg)
 /*
  * _cerebrod_node_data_item_dump
  *
- * callback function from hash_for_each to dump node data
+ * callback function from list_for_each to dump node data
  */
 #if CEREBRO_DEBUG
 static int
@@ -367,6 +391,47 @@ _cerebrod_node_data_list_dump(void)
       fprintf(stderr, "**************************************\n");
       Pthread_mutex_unlock(&debug_output_mutex);
       Pthread_mutex_unlock(&cerebrod_node_data_lock);
+    }
+#endif /* CEREBRO_DEBUG */
+}
+
+/*
+ * _cerebrod_metric_name_item_dump
+ *
+ * callback function from hash_for_each to dump node data
+ */
+#if CEREBRO_DEBUG
+static int
+_cerebrod_metric_name_item_dump(void *x, void *arg)
+{
+  assert(x);
+  fprintf(stderr, "* %s\n", (char *)x);
+  return 1;
+}
+#endif /* CEREBRO_DEBUG */
+
+/*
+ * _cerebrod_metric_name_list_dump
+ *
+ * Dump contents of node data list
+ */
+static void
+_cerebrod_metric_name_list_dump(void)
+{
+#if CEREBRO_DEBUG
+  if (conf.debug && conf.listen_debug)
+    {
+      Pthread_mutex_lock(&cerebrod_metric_name_lock);
+      Pthread_mutex_lock(&debug_output_mutex);
+      fprintf(stderr, "**************************************\n");
+      fprintf(stderr, "* Metric Name List\n");
+      fprintf(stderr, "* -----------------------\n");
+      List_for_each(cerebrod_node_data_list,
+                    _cerebrod_node_data_item_dump,
+                    NULL);
+      fprintf(stderr, "**************************************\n");
+      Pthread_mutex_unlock(&debug_output_mutex);
+      Pthread_mutex_unlock(&cerebrod_metric_name_lock);
     }
 #endif /* CEREBRO_DEBUG */
 }
@@ -516,8 +581,23 @@ cerebrod_node_data_update(char *nodename,
     }
   Pthread_mutex_unlock(&(nd->node_data_lock));
 
+  Pthread_mutex_lock(&cerebrod_metric_name_lock);
+
+  if (!List_find_first(cerebrod_metric_name_list,
+                       list_find_first_string,
+                       CEREBRO_METRIC_STARTTIME))
+    List_append(cerebrod_metric_name_list, Strdup(CEREBRO_METRIC_STARTTIME));
+
+  if (!List_find_first(cerebrod_metric_name_list,
+                       list_find_first_string,
+                       CEREBRO_METRIC_BOOTTIME))
+    List_append(cerebrod_metric_name_list, Strdup(CEREBRO_METRIC_BOOTTIME));
+
+  Pthread_mutex_unlock(&cerebrod_metric_name_lock);
+
   if (update_output_flag)
     _cerebrod_node_data_output_update(nd);
 
   _cerebrod_node_data_list_dump();
+  _cerebrod_metric_name_list_dump();
 }
