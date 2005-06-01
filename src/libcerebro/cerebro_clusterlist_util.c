@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_util.c,v 1.1 2005-05-11 17:06:28 achu Exp $
+ *  $Id: cerebro_clusterlist_util.c,v 1.2 2005-06-01 18:30:27 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -26,10 +26,11 @@ _cerebro_load_clusterlist_module(cerebro_t handle)
   if (!(handle->loaded_state & CEREBRO_MODULE_SETUP_CALLED))
     {
       if (_cerebro_module_setup() < 0)
-	{
-	  handle->errnum = CEREBRO_ERR_CLUSTERLIST_MODULE;
-	  goto cleanup;
-	}
+        {
+          handle->errnum = CEREBRO_ERR_CLUSTERLIST_MODULE;
+          goto cleanup;
+        }
+      module_setup_called++;
     }
 
   if (_cerebro_module_load_clusterlist_module() < 0)

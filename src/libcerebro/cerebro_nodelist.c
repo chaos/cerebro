@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_nodelist.c,v 1.13 2005-06-01 17:23:21 achu Exp $
+ *  $Id: cerebro_nodelist.c,v 1.14 2005-06-01 18:30:27 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -14,6 +14,7 @@
 
 #include "cerebro.h"
 #include "cerebro_api.h"
+#include "cerebro_module.h"
 #include "cerebro_nodelist_util.h"
 #include "cerebro_util.h"
 #include "cerebro/cerebro_error.h"
@@ -73,6 +74,8 @@ cerebro_nodelist_find(cerebro_nodelist_t nodelist,
                       unsigned int *metric_value_size)
 {
   struct cerebro_nodelist_data *data;
+  char nodebuf[CEREBRO_MAXNODENAMELEN+1];
+  char *nodename;
 
   if (_cerebro_nodelist_check(nodelist) < 0)
     return -1;
@@ -83,10 +86,41 @@ cerebro_nodelist_find(cerebro_nodelist_t nodelist,
       return -1;
     }
 
+  if (nodelist->handle->loaded_state & CEREBRO_CLUSTERLIST_MODULE_LOADED)
+    {
+      int flag;
+      
+      if ((flag = _cerebro_clusterlist_module_node_in_cluster(node)) < 0)
+        {
+          nodelist->errnum = CEREBRO_ERR_INTERNAL;
+          return -1;
+        }
+
+      if (!flag)
+        {
+          nodelist->errnum = CEREBRO_ERR_NODE_NOTFOUND;
+          return -1;
+        }
+      
+      memset(nodebuf, '\0', CEREBRO_MAXNODENAMELEN+1);
+
+      if (_cerebro_clusterlist_module_get_nodename(node,
+                                                   nodebuf,
+                                                   CEREBRO_MAXNODENAMELEN+1) < 0)
+        {
+          nodelist->errnum = CEREBRO_ERR_INTERNAL;
+          return -1;
+        }
+
+      nodename = nodebuf;
+    }
+  else
+    nodename = node;
+
   nodelist->errnum = CEREBRO_ERR_SUCCESS;
   data = list_find_first(nodelist->nodes,
 			 _cerebro_nodelist_find_func,
-			 (void *)node);
+			 (void *)nodename);
 
   if (data && metric_value)
     {
