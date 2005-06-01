@@ -1,9 +1,11 @@
 2005-06-01  Albert Chu  <chu11@llnl.gov>
 
-	* Continued manpage cleanup.
-
 	* Various bug fixes and code cleanup.
+
+	* Complete manpage cleanup.
 	
+	* tagged cerebro-1-0-0-pre2
+
 2005-05-31  Albert Chu  <chu11@llnl.gov>
 	
 	* Completed Rework.
