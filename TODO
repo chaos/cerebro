@@ -17,7 +17,12 @@ Portability
 - Non-pthreads support
 
 Design
-- clusterlist_get_nodename call in nodelist_find??
+- need to abstract away module loading functions into 'handle' like
+  API, so that multiple handles can open the clusterlist and etc.
+  modules.
+  - need counter to protect against module_cleanup functions being
+    called too early?
+  - will need pthreads support?
 - metric modules
   - modules for starttime/boottime
 - metric_type --> metric_value_type ??
@@ -27,6 +32,7 @@ Design
     - if_up 
     - if not exist in node do default?
     - metric timeout length ability with metric up/down
+    - will require metric_type inconsistency to be allowed
 - metric with value of arbitrary data
   - will require len field to heartbeat packets and metric data
   - will require magic field to ensure packets are in-sync??
