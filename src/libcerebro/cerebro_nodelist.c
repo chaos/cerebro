@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_nodelist.c,v 1.12 2005-06-01 16:40:23 achu Exp $
+ *  $Id: cerebro_nodelist.c,v 1.13 2005-06-01 17:23:21 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -338,39 +338,6 @@ _cerebro_nodelist_iterator_check(cerebro_nodelist_iterator_t nodelistItr)
   return 0;
 }
 
-int
-cerebro_nodelist_iterator_next(cerebro_nodelist_iterator_t nodelistItr)
-{
-  if (_cerebro_nodelist_iterator_check(nodelistItr) < 0)
-    return -1;
-
-  if (nodelistItr->current)
-    nodelistItr->current = (struct cerebro_nodelist_data *)list_next(nodelistItr->itr);
-  nodelistItr->errnum = CEREBRO_ERR_SUCCESS;
-  return (nodelistItr->current) ? 1 : 0;
-}
- 
-int 
-cerebro_nodelist_iterator_reset(cerebro_nodelist_iterator_t nodelistItr)
-{
-  if (_cerebro_nodelist_iterator_check(nodelistItr) < 0)
-    return -1;
-
-  list_iterator_reset(nodelistItr->itr);
-  nodelistItr->current = (struct cerebro_nodelist_data *)list_next(nodelistItr->itr);
-  nodelistItr->errnum = CEREBRO_ERR_SUCCESS;
-  return 0;
-}
-
-int
-cerebro_nodelist_iterator_at_end(cerebro_nodelist_iterator_t nodelistItr)
-{
-  if (_cerebro_nodelist_iterator_check(nodelistItr) < 0)
-    return -1;
-
-  return (nodelistItr->current) ? 0 : 1;
-}
-
 char *
 cerebro_nodelist_iterator_nodename(cerebro_nodelist_iterator_t nodelistItr)
 {
@@ -443,6 +410,39 @@ cerebro_nodelist_iterator_metric_value(cerebro_nodelist_iterator_t nodelistItr,
     }
   
   return rv;
+}
+
+int
+cerebro_nodelist_iterator_next(cerebro_nodelist_iterator_t nodelistItr)
+{
+  if (_cerebro_nodelist_iterator_check(nodelistItr) < 0)
+    return -1;
+
+  if (nodelistItr->current)
+    nodelistItr->current = (struct cerebro_nodelist_data *)list_next(nodelistItr->itr);
+  nodelistItr->errnum = CEREBRO_ERR_SUCCESS;
+  return (nodelistItr->current) ? 1 : 0;
+}
+ 
+int 
+cerebro_nodelist_iterator_reset(cerebro_nodelist_iterator_t nodelistItr)
+{
+  if (_cerebro_nodelist_iterator_check(nodelistItr) < 0)
+    return -1;
+
+  list_iterator_reset(nodelistItr->itr);
+  nodelistItr->current = (struct cerebro_nodelist_data *)list_next(nodelistItr->itr);
+  nodelistItr->errnum = CEREBRO_ERR_SUCCESS;
+  return 0;
+}
+
+int
+cerebro_nodelist_iterator_at_end(cerebro_nodelist_iterator_t nodelistItr)
+{
+  if (_cerebro_nodelist_iterator_check(nodelistItr) < 0)
+    return -1;
+
+  return (nodelistItr->current) ? 0 : 1;
 }
 
 int 

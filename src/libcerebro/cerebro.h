@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.34 2005-06-01 16:40:23 achu Exp $
+ *  $Id: cerebro.h,v 1.35 2005-06-01 17:23:21 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_H
@@ -17,19 +17,18 @@
 #define CEREBRO_ERR_PROTOCOL                  9
 #define CEREBRO_ERR_PROTOCOL_TIMEOUT         10 
 #define CEREBRO_ERR_VERSION_INCOMPATIBLE     11 
-#define CEREBRO_ERR_NOT_LOADED               12
-#define CEREBRO_ERR_OVERFLOW                 13
-#define CEREBRO_ERR_NODE_NOTFOUND            14
-#define CEREBRO_ERR_END_OF_LIST              15
-#define CEREBRO_ERR_METRIC_VALUE_NOTFOUND    16
-#define CEREBRO_ERR_METRIC_TYPE_INCONSISTENT 17
-#define CEREBRO_ERR_CONFIG_FILE              18
-#define CEREBRO_ERR_CONFIG_MODULE            19
-#define CEREBRO_ERR_CONFIG_INPUT             20
-#define CEREBRO_ERR_CLUSTERLIST_MODULE       21
-#define CEREBRO_ERR_OUTMEM                   22
-#define CEREBRO_ERR_INTERNAL                 23
-#define CEREBRO_ERR_ERRNUMRANGE              24
+#define CEREBRO_ERR_OVERFLOW                 12
+#define CEREBRO_ERR_NODE_NOTFOUND            13
+#define CEREBRO_ERR_END_OF_LIST              14
+#define CEREBRO_ERR_METRIC_VALUE_NOTFOUND    15
+#define CEREBRO_ERR_METRIC_TYPE_INCONSISTENT 16
+#define CEREBRO_ERR_CONFIG_FILE              17
+#define CEREBRO_ERR_CONFIG_MODULE            18
+#define CEREBRO_ERR_CONFIG_INPUT             19
+#define CEREBRO_ERR_CLUSTERLIST_MODULE       20
+#define CEREBRO_ERR_OUTMEM                   21
+#define CEREBRO_ERR_INTERNAL                 22
+#define CEREBRO_ERR_ERRNUMRANGE              23
 
 typedef struct cerebro *cerebro_t;
 
@@ -228,6 +227,25 @@ int cerebro_nodelist_destroy(cerebro_nodelist_t nodelist);
 cerebro_nodelist_iterator_t cerebro_nodelist_iterator_create(cerebro_nodelist_t nodelist);
 
 /* 
+ * cerebro_nodelist_iterator_nodename
+ *
+ * Retrieve a pointer to the current nodename
+ *
+ * Returns pointer to nodename, NULL on error
+ */
+char *cerebro_nodelist_iterator_nodename(cerebro_nodelist_iterator_t nodelistItr);
+
+/* 
+ * cerebro_nodelist_iterator_metric_value
+ *
+ * Retrieve a pointer to the current value.
+ *
+ * Returns pointer to value, NULL on error
+ */
+void *cerebro_nodelist_iterator_metric_value(cerebro_nodelist_iterator_t nodelistItr,
+                                             unsigned int *metric_value_size);
+
+/* 
  * cerebro_nodelist_iterator_next
  *
  * Move the iterator pointer forward
@@ -253,25 +271,6 @@ int cerebro_nodelist_iterator_reset(cerebro_nodelist_iterator_t nodelistItr);
  * error
  */
 int cerebro_nodelist_iterator_at_end(cerebro_nodelist_iterator_t nodelistItr);
-
-/* 
- * cerebro_nodelist_iterator_nodename
- *
- * Retrieve a pointer to the current nodename
- *
- * Returns pointer to nodename, NULL on error
- */
-char *cerebro_nodelist_iterator_nodename(cerebro_nodelist_iterator_t nodelistItr);
-
-/* 
- * cerebro_nodelist_iterator_metric_value
- *
- * Retrieve a pointer to the current value.
- *
- * Returns pointer to value, NULL on error
- */
-void *cerebro_nodelist_iterator_metric_value(cerebro_nodelist_iterator_t nodelistItr,
-                                             unsigned int *metric_value_size);
 
 /* 
  * cerebro_nodelist_iterator_destroy

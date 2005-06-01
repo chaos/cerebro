@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.c,v 1.26 2005-06-01 16:40:23 achu Exp $
+ *  $Id: cerebro.c,v 1.27 2005-06-01 17:23:21 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -36,7 +36,6 @@ static char *cerebro_error_messages[] =
     "protocol timeout",
     "version incompatible",
     "buffer overflow",
-    "server data not loaded",
     "node not found",
     "end of list reached",
     "metric value not found",

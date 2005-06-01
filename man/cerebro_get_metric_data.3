@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro_get_metric_data.3,v 1.1 2005-06-01 16:40:23 achu Exp $
+\."$Id: cerebro_get_metric_data.3,v 1.2 2005-06-01 17:23:21 achu Exp $
 \."#############################################################################
 .TH CEREBRO_GET_METRIC_DATA 3 "May 2005" "LLNL" "LIBCEREBRO"
 .SH "NAME"
@@ -14,7 +14,8 @@ cerebro_get_metric_data \- retrieve cerebro metric data
 \fImetric_name\fR from
 the 
 .B cerebrod
-metric server and returns it in a cerebro nodelist.
+metric server and returns it in a cerebro nodelist.  The cerebro
+nodelist can then be operated on by the cerebro nodelist routines.
 
 The default behavior of \fBcerebro_get_metric_data()\fR can be altered by
 setting alternate defaults using
@@ -40,14 +41,11 @@ code can be retrieved via
 .SH "ERRORS"
 .TP
 .B CEREBRO_ERR_NULLHANDLE
-The handle parameter is NULL.  The cerebro_t handle must be created
-with
-.BR cerebro_handle_create(3).
+The \fIhandle\fR parameter is NULL.
 .TP
 .B CEREBRO_ERR_MAGIC_NUMBER
 \fIhandle\fR has an incorrect magic number.  \fIhandle\fR does not
-point to a cerebro_t handle or \fIhandle\fR has already been
-destroyed.
+point to an appropriate structure or has already been destroyed.
 .TP
 .B CEREBRO_ERR_PARAMETERS
 Invalid parameter passed in.
@@ -55,18 +53,15 @@ Invalid parameter passed in.
 .B CEREBRO_ERR_HOSTNAME
 Invalid hostname specified.
 .TP
-.B CEREBRO_ERR_ADDRESS
-Invalid network address specified.
-.TP
 .B CEREBRO_ERR_CONNECT
 Error connecting to 
 .B cerebrod
-updown server.
+metric server.
 .TP
 .B CEREBRO_ERR_CONNECT_TIMEOUT
 Timed out connecting to
 .B cerebrod
-updown server.
+metric server.
 .TP
 .B CEREBRO_ERR_PROTOCOL
 Error during protocol communication.
@@ -75,13 +70,20 @@ Error during protocol communication.
 Timeout during protocol communication.
 .TP
 .B CEREBRO_ERR_VERSION_INCOMPATIBLE
-Version incompatible with updown server.
+Version incompatible with metric server.
+.TP
+.B CEREBRO_ERR_METRIC_TYPE_INCONSISTENT
+Metrics of the same name are monitoring metrics of a different type.
+The inconsistency cannot be resolved.
 .TP
 .B CEREBRO_ERR_CONFIG_FILE
 A config file error occurred.
 .TP
 .B CEREBRO_ERR_CONFIG_MODULE
 A config module error occurred.
+.TP
+.B CEREBRO_ERR_CONFIG_INPUT
+A config input is invalid.
 .TP
 .B CEREBRO_ERR_CLUSTERLIST_MODULE
 A clusterlist module error occurred.
@@ -97,4 +99,14 @@ An internal system error occurred.
 .SH "SEE ALSO"
 cerebro_handle_create(3), cerebro_errnum(3), cerebro_strerror(3),
 cerebro_set_hostname(3), cerebro_set_port(3),
-cerebro_set_timeout_len(3), cerebro_set_flags(3), cerebro.conf(5)
+cerebro_set_timeout_len(3), cerebro_set_flags(3),
+cerebro_nodelist_length(3), cerebro_nodelist_metric_name(3),
+cerebro_nodelist_metric_type(3), cerebro_nodelist_find(3),
+cerebro_nodelist_for_each(3), cerebro_nodelist_destroy(3),
+cerebro_nodelist_iterator_create(3),
+cerebro_nodelist_iterator_nodename(3),
+cerebro_nodelist_iterator_metric_value(3),
+cerebro_nodelist_iterator_next(3), cerebro_nodelist_iterator_reset(3),
+cerebro_nodelist_iterator_at_end(3),
+cerebro_nodelist_iterator_destroy(3),
+cerebro_nodelist_iterator_errnum(3), cerebro.conf(5)
