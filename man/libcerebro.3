@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: libcerebro.3,v 1.6 2005-06-01 00:11:27 achu Exp $
+\."$Id: libcerebro.3,v 1.7 2005-06-01 16:40:23 achu Exp $
 \."#############################################################################
 .TH LIBCEREBRO 3 "August 2003" "LLNL" "LIBCEREBRO"
 .SH NAME
@@ -13,6 +13,10 @@ or down
 .BI "int cerebro_handle_destroy(cerebro_t handle);"
 .sp
 .BI "int cerebro_errnum(cerebro_t handle);"
+.sp
+.BI "int cerebro_nodelist_errnum(cerebro_nodelist_t nodelist);"
+.sp
+.BI "int cerebro_nodelist_iterator_errnum(cerebro_nodelist_iterator_t handle);"
 .sp
 .BI "char *cerebro_strerror(int errnum);"
 .sp
@@ -38,23 +42,19 @@ or down
 .sp
 .BI "int cerebro_nodelist_destroy(cerebro_nodelist_t nodelist);"
 .sp
-.BI "int cerebro_nodelist_errnum(cerebro_nodelist_t nodelist);"
-.sp
 .BI "cerebro_nodelist_iterator_t cerebro_nodelist_iterator_create(cerebro_nodelist_t nodelist);"
-.sp
-.BI "int cerebro_nodelist_iterator_end(cerebro_nodelist_iterator_t nodelistItr);"
 .sp
 .BI "int cerebro_nodelist_iterator_next(cerebro_nodelist_iterator_t nodelistItr);"
 .sp
 .BI "int cerebro_nodelist_iterator_reset(cerebro_nodelist_iterator_t nodelistItr);"
+.sp
+.BI "int cerebro_nodelist_iterator_at_end(cerebro_nodelist_iterator_t nodelistItr);"
 .sp
 .BI "char *cerebro_nodelist_iterator_nodename(cerebro_nodelist_iterator_t nodelistItr);"
 .sp
 .BI "void *cerebro_nodelist_iterator_metric_value(cerebro_nodelist_iterator_t nodelistItr, unsigned int *metric_value_size);"
 .sp
 .BI "int cerebro_nodelist_iterator_destroy(cerebro_nodelist_iterator_t nodelistItr);"
-.sp
-.BI "int cerebro_nodelist_iterator_errnum(cerebro_nodelist_iterator_t handle);"
 .br
 .SH DESCRIPTION
 The cerebro library contains functions to gather status information

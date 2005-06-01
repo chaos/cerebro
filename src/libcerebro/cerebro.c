@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.c,v 1.25 2005-05-31 20:45:56 achu Exp $
+ *  $Id: cerebro.c,v 1.26 2005-06-01 16:40:23 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -138,6 +138,29 @@ cerebro_errnum(cerebro_t handle)
     return CEREBRO_ERR_MAGIC_NUMBER;
   else
     return handle->errnum;
+}
+
+
+int 
+cerebro_nodelist_errnum(cerebro_nodelist_t nodelist)
+{
+  if (!nodelist)
+    return CEREBRO_ERR_NULLNODELIST;
+  else if (nodelist->magic != CEREBRO_NODELIST_MAGIC_NUMBER)
+    return CEREBRO_ERR_MAGIC_NUMBER;
+  else
+    return nodelist->errnum;
+}
+
+int 
+cerebro_nodelist_iterator_errnum(cerebro_nodelist_iterator_t nodelistItr)
+{
+  if (!nodelistItr)
+    return CEREBRO_ERR_NULLITERATOR;
+  else if (nodelistItr->magic != CEREBRO_NODELIST_ITERATOR_MAGIC_NUMBER)
+    return CEREBRO_ERR_MAGIC_NUMBER;
+  else
+    return nodelistItr->errnum;
 }
 
 char *

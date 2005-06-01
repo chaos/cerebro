@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_nodelist_util.c,v 1.8 2005-06-01 00:11:27 achu Exp $
+ *  $Id: cerebro_nodelist_util.c,v 1.9 2005-06-01 16:40:23 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -50,11 +50,11 @@ _cerebro_nodelist_check(cerebro_nodelist_t nodelist)
       return -1;
     }
 
-  if (nodelistItr->handle->magic != CEREBRO_MAGIC_NUMBER)
+  if (nodelist->handle->magic != CEREBRO_MAGIC_NUMBER)
     {
       cerebro_err_debug_lib("%s(%s:%d): handle destroyed",
                             __FILE__, __FUNCTION__, __LINE__);
-      nodelistItr->errnum = CEREBRO_ERR_MAGIC_NUMBER;
+      nodelist->errnum = CEREBRO_ERR_MAGIC_NUMBER;
       return -1;
     }
 

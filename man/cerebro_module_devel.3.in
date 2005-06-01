@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro_module_devel.3.in,v 1.3 2005-05-11 20:13:38 achu Exp $
+\."$Id: cerebro_module_devel.3.in,v 1.4 2005-06-01 16:40:23 achu Exp $
 \."#############################################################################
 .TH LIBCEREBRO 3 "May 2005" "LLNL" "LIBCEREBRO"
 .SH NAME
@@ -110,7 +110,7 @@ the 'clusterlist_module_info' structure.
 A cerebro config module of the name 'foobar' can be written by
 compiling a shared object library with the filename
 cerebro_config_foobar.so, and installing it in the cerebro package
-library directory @CEREBRO_MODULE_DIR@.
+library directory  @CEREBRO_MODULE_DIR@.
 
 The config module should define a structure of the following
 type:
@@ -162,15 +162,15 @@ The structure cerebro_config is defined as:
 .nf
 struct cerebro_config {
 .in +2
-  char cerebro_updown_hostnames[CEREBRO_CONFIG_UPDOWN_HOSTNAMES_MAX][CEREBRO_MAXNODENAMELEN+1];
-  int cerebro_updown_hostnames_len;
-  int cerebro_updown_hostnames_flag;
-  unsigned int cerebro_updown_port;
-  int cerebro_updown_port_flag;
-  unsigned int cerebro_updown_timeout_len;
-  int cerebro_updown_timeout_len_flag;
-  int cerebro_updown_flags;
-  int cerebro_updown_flags_flag;
+  char cerebro_hostnames[CEREBRO_CONFIG_HOSTNAMES_MAX][CEREBRO_MAXNODENAMELEN+1];
+  int cerebro_hostnames_len;
+  int cerebro_hostnames_flag;
+  unsigned int cerebro_port;
+  int cerebro_port_flag;
+  unsigned int cerebro_timeout_len;
+  int cerebro_timeout_len_flag;
+  int cerebro_flags;
+  int cerebro_flags_flag;
 
   unsigned int cerebrod_heartbeat_frequency_min;
   unsigned int cerebrod_heartbeat_frequency_max;
@@ -191,34 +191,33 @@ struct cerebro_config {
   int cerebrod_listen_flag;
   int cerebrod_listen_threads;
   int cerebrod_listen_threads_flag;
-  int cerebrod_updown_server;
-  int cerebrod_updown_server_flag;
-  int cerebrod_updown_server_port;
-  int cerebrod_updown_server_port_flag;
-.if @MANPAGE_DEBUG@ \{
+  int cerebrod_metric_server;
+  int cerebrod_metric_server_flag;
+  int cerebrod_metric_server_port;
+  int cerebrod_metric_server_port_flag;
+.if 1 \{
   int cerebrod_speak_debug;
   int cerebrod_speak_debug_flag;
   int cerebrod_listen_debug;
   int cerebrod_listen_debug_flag;
-  int cerebrod_updown_server_debug;
-  int cerebrod_updown_server_debug_flag;
+  int cerebrod_metric_server_debug;
+  int cerebrod_metric_server_debug_flag;
 \}
 .in -2
 };
 .fi
 
-The 'updown_hostnames' field should store an array of default hostnames for
-.BR cerebro_updown_load_data(3).
+The 'hostnames' field should store an array of default hostnames for
+the libcerebro API should attempt to connect to.
 
-The 'updown_port' field should store the default port for
-.BR cerebro_updown_load_data(3).
+The 'port' field should store the default port for
+the libcerebro API should attempt to connect to.
 
-The 'updown_timeout_len' field should store the default timeout length
-for
-.BR cerebro_updown_load_data(3).
+The 'timeout_len' field should store the default timeout length
+the libcerebro API should use to evaluate up vs. down nodes.
 
-The 'updown_flags' field should store the default flags for
-.BR cerebro_updown_load_data(3).
+The 'flags' field should store the default flags the libcerebro API
+should use.
 
 The 'cerebrod_heartbeat_frequency_min' and
 'cerebrod_heartbeat_frequency_max' fields store the minimum and
@@ -262,11 +261,11 @@ The 'cerebrod_listen_threads' field stores the number of listener
 threads that should be created in
 .BR cerebrod(8).
 
-The 'cerebrod_updown_server' field is a boolean that turns on the
+The 'cerebrod_metric_server' field is a boolean that turns on the
 .BR cerebrod(8)
-updown server to receive updown data requests.
+metric server to receive metric data requests.
 
-The 'cerebrod_updown_server_port' field stores the updown server
+The 'cerebrod_metric_server_port' field stores the metric server
 port for 
 .BR cerebrod(8).
 .if @MANPAGE_DEBUG@ \{
@@ -279,15 +278,15 @@ The 'cerebrod_listen_debug' field is a boolean that turns on listener
 debugging for
 .BR cerebrod.
 
-The 'cerebrod_updown_server_debug' field is a boolean that turns on
-updown server debugging for
+The 'cerebrod_metric_server_debug' field is a boolean that turns on
+metric server debugging for
 .BR cerebrod.
 
 \}
 
 Any parameter that is set in the configuration structure must have its
-respective flag set.  The 'updown_hostnames' field must also have the
-'updown_hostnames_len' field appropriately set to the number of hostnames
+respective flag set.  The 'hostnames' field must also have the
+'hostnames_len' field appropriately set to the number of hostnames
 loaded.
 
 .SH SEE ALSO

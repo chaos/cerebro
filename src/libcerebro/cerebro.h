@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.33 2005-05-31 20:45:56 achu Exp $
+ *  $Id: cerebro.h,v 1.34 2005-06-01 16:40:23 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_H
@@ -57,11 +57,31 @@ int cerebro_handle_destroy(cerebro_t handle);
 /*
  * cerebro_errnum
  *
- * Return the most recent error number
+ * Return the most recent error number from a cerebro_t handle
  *
  * Returns error number on success
  */
 int cerebro_errnum(cerebro_t handle);
+
+/*
+ * cerebro_nodelist_errnum
+ *
+ * Return the most recent error number from a cerebro_nodelist_t
+ * nodelist
+ *
+ * Returns error number on success
+ */
+int cerebro_nodelist_errnum(cerebro_nodelist_t nodelist);
+
+/*
+ * cerebro_nodelist_iterator_errnum
+ *
+ * Return the most recent error number from a
+ * cerebro_nodelist_iterator_t iterator
+ *
+ * Returns error number on success
+ */
+int cerebro_nodelist_iterator_errnum(cerebro_nodelist_iterator_t nodelistItr);
 
 /*
  * cerebro_strerror
@@ -198,15 +218,6 @@ int cerebro_nodelist_for_each(cerebro_nodelist_t nodelist,
  */
 int cerebro_nodelist_destroy(cerebro_nodelist_t nodelist);
 
-/*
- * cerebro_nodelist_errnum
- *
- * Return the most recent error number
- *
- * Returns error number on success
- */
-int cerebro_nodelist_errnum(cerebro_nodelist_t nodelist);
-
 /* 
  * cerebro_nodelist_iterator_create
  *
@@ -215,13 +226,6 @@ int cerebro_nodelist_errnum(cerebro_nodelist_t nodelist);
  * Return iterator on success, NULL on error
  */
 cerebro_nodelist_iterator_t cerebro_nodelist_iterator_create(cerebro_nodelist_t nodelist);
-
-/* 
- * cerebro_nodelist_iterator_end
- *
- * Returns 1 if the end of the list has been reached, 0 if not
- */
-int cerebro_nodelist_iterator_end(cerebro_nodelist_iterator_t nodelistItr);
 
 /* 
  * cerebro_nodelist_iterator_next
@@ -241,6 +245,14 @@ int cerebro_nodelist_iterator_next(cerebro_nodelist_iterator_t nodelistItr);
  * Returns 0 on success, -1 on error
  */
 int cerebro_nodelist_iterator_reset(cerebro_nodelist_iterator_t nodelistItr);
+
+/* 
+ * cerebro_nodelist_iterator_at_end
+ *
+ * Returns 1 if the end of the list has been reached, 0 if not, -1 on
+ * error
+ */
+int cerebro_nodelist_iterator_at_end(cerebro_nodelist_iterator_t nodelistItr);
 
 /* 
  * cerebro_nodelist_iterator_nodename
@@ -267,14 +279,5 @@ void *cerebro_nodelist_iterator_metric_value(cerebro_nodelist_iterator_t nodelis
  * Returns 0 on success, -1 on error
  */
 int cerebro_nodelist_iterator_destroy(cerebro_nodelist_iterator_t nodelistItr);
-
-/*
- * cerebro_nodelist_iterator_errnum
- *
- * Return the most recent error number
- *
- * Returns error number on success
- */
-int cerebro_nodelist_iterator_errnum(cerebro_nodelist_iterator_t handle);
 
 #endif /* _CEREBRO_H */

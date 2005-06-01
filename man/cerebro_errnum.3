@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro_errnum.3,v 1.2 2005-05-05 23:42:31 achu Exp $
+\."$Id: cerebro_errnum.3,v 1.3 2005-06-01 16:40:23 achu Exp $
 \."#############################################################################
 .TH CEREBRO_ERRNUM 3 "May 2005" "LLNL" "LIBCEREBRO"
 .SH "NAME"
@@ -10,34 +10,30 @@ cerebro error routines
 .sp
 .BI "int cerebro_errnum(cerebro_t handle);"
 .sp
+.BI "int cerebro_nodelist_errnum(cerebro_nodelist_t nodelist);"
+.sp
+.BI "int cerebro_nodelist_iterator_errnum(cerebro_nodelist_iterator_t handle);"
+.sp
 .BI "char *cerebro_strerror(int errnum);"
-.sp
-.BI "char *cerebro_errormsg(cerebro_t handle);"
-.sp
-.BI "void cerebro_perror(cerebro_t handle, const char *msg);"
 .br
 .SH "DESCRIPTION"
-\fBcerebro_errnum()\fR returns the error code stored in \fIhandle\fR.
+\fBcerebro_errnum()\fR returns the error code stored in the cerebro_t
+handle passed in.
+
+\fBcerebro_nodelist_errnum()\fR returns the error code stored in the cerebro_nodelist_t
+nodelist passed in.
+
+\fBcerebro_nodelist_iterator_errnum()\fR returns the error code stored in the cerebro_nodelist_iterator_t
+nodelist passed in.
 
 \fBcerebro_strerror()\fR returns a pointer to a string describing the
 error code \fIerrnum\fR.
 
 Generally, an error code is retrieved by
-.BR cerebro_errnum()
+\fBcerebro_errnum()\fR, \fBcerebro_nodelist_errnum()\fR, or
+\fBcerebro_nodelist_iterator_errnum()
 and then passed to 
-.BR cerebro_strerror().
-
-\fBcerebro_errormsg()\fR returns a pointer to a string describing the
-error stored in \fIhandle\fR.  It is logically equivalent to:
-
-char *cerebro_strerror(cerebro_errnum(cerebro_t handle));
-
-\fBcerebro_perror()\fR is similar to
-.BR perror(3).
-It produces a message on standard error output, describing the error
-stored in \fIhandle\fR.  If \fImsg\fR is not NULL, the string pointed
-to by \fImsg\fR, a colon, and a blank are printed before the error
-message.
+\fBcerebro_strerror()\fR.
 
 .br
 .SH "FILES"

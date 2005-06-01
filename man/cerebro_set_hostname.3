@@ -1,0 +1,45 @@
+\."#############################################################################
+\."$Id: cerebro_set_hostname.3,v 1.1 2005-06-01 16:40:23 achu Exp $
+\."#############################################################################
+.TH CEREBRO_SET_HOSTNAME 3 "May 2005" "LLNL" "LIBCEREBRO"
+.SH "NAME"
+cerebro_set_hostname, cerebro_set_port, cerebro_set_timeout_len, cerebro_set_flags \-
+cerebro configuration routines
+.SH "SYNOPSIS"
+.B #include <cerebro.h>
+.sp
+.BI "int cerebro_set_hostname(cerebro_t handle, const char *hostname);"
+.sp
+.BI "int cerebro_set_port(cerebro_t handle, unsigned int port);"
+.sp
+.BI "int cerebro_set_timeout_len(cerebro_t handle, unsigned int timeout_len);"
+.sp
+.BI "int cerebro_set_flags(cerebro_t handle, unsigned int flags);"
+.br
+.SH "DESCRIPTION"
+\fBcerebro_set_hostname()\fR sets the default hostname the libcerebro
+API should attempt to connect to.
+
+\fBcerebro_set_port()\fR sets the default port the libcerebro API
+should attempt to connect to.
+
+\fBcerebro_set_timeout_len()\fR sets the default timeout_len the
+libcerebro API should use to evaluate up vs. down nodes.
+
+\fBcerebro_set_flags()\fR sets the default flags the libcerebro API
+should use.
+.br
+.SH "ERRORS"
+.TP
+.B CEREBRO_ERR_NULLHANDLE
+The handle parameter is NULL.  The cerebro_t handle must be created
+with
+.BR cerebro_handle_create(3).
+.TP
+.B CEREBRO_ERR_MAGIC_NUMBER
+\fIhandle\fR has an incorrect magic number.  \fIhandle\fR does not
+point to a cerebro_t handle or \fIhandle\fR has already been
+destroyed.
+.br
+.SH "FILES"
+/usr/include/cerebro.h

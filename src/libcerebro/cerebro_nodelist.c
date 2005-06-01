@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_nodelist.c,v 1.11 2005-05-31 20:45:56 achu Exp $
+ *  $Id: cerebro_nodelist.c,v 1.12 2005-06-01 16:40:23 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -254,17 +254,6 @@ cerebro_nodelist_destroy(cerebro_nodelist_t nodelist)
   return rv;
 }
  
-int 
-cerebro_nodelist_errnum(cerebro_nodelist_t nodelist)
-{
-  if (!nodelist)
-    return CEREBRO_ERR_NULLNODELIST;
-  else if (nodelist->magic != CEREBRO_NODELIST_MAGIC_NUMBER)
-    return CEREBRO_ERR_MAGIC_NUMBER;
-  else
-    return nodelist->errnum;
-}
-
 cerebro_nodelist_iterator_t 
 cerebro_nodelist_iterator_create(cerebro_nodelist_t nodelist)
 {
@@ -350,15 +339,6 @@ _cerebro_nodelist_iterator_check(cerebro_nodelist_iterator_t nodelistItr)
 }
 
 int
-cerebro_nodelist_iterator_end(cerebro_nodelist_iterator_t nodelistItr)
-{
-  if (_cerebro_nodelist_iterator_check(nodelistItr) < 0)
-    return -1;
-
-  return (nodelistItr->current) ? 0 : 1;
-}
-
-int
 cerebro_nodelist_iterator_next(cerebro_nodelist_iterator_t nodelistItr)
 {
   if (_cerebro_nodelist_iterator_check(nodelistItr) < 0)
@@ -380,6 +360,15 @@ cerebro_nodelist_iterator_reset(cerebro_nodelist_iterator_t nodelistItr)
   nodelistItr->current = (struct cerebro_nodelist_data *)list_next(nodelistItr->itr);
   nodelistItr->errnum = CEREBRO_ERR_SUCCESS;
   return 0;
+}
+
+int
+cerebro_nodelist_iterator_at_end(cerebro_nodelist_iterator_t nodelistItr)
+{
+  if (_cerebro_nodelist_iterator_check(nodelistItr) < 0)
+    return -1;
+
+  return (nodelistItr->current) ? 0 : 1;
 }
 
 char *
@@ -500,15 +489,4 @@ cerebro_nodelist_iterator_destroy(cerebro_nodelist_iterator_t nodelistItr)
   if (itr)
     list_iterator_destroy(itr);
   return rv;
-}
-
-int 
-cerebro_nodelist_iterator_errnum(cerebro_nodelist_iterator_t nodelist)
-{
-  if (!nodelist)
-    return CEREBRO_ERR_NULLITERATOR;
-  else if (nodelist->magic != CEREBRO_NODELIST_ITERATOR_MAGIC_NUMBER)
-    return CEREBRO_ERR_MAGIC_NUMBER;
-  else
-    return nodelist->errnum;
 }

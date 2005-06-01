@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.19 2005-05-15 14:03:44 achu Exp $
+## $Id: Makefile.am,v 1.20 2005-06-01 16:40:23 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -15,22 +15,27 @@ man3_MANS  = libcerebro.3 \
 	     cerebro_handle_create.3 \
 	     cerebro_handle_destroy.3 \
 	     cerebro_errnum.3 \
+	     cerebro_nodelist_errnum.3 \
+	     cerebro_nodelist_iterator_errnum.3 \
 	     cerebro_strerror.3 \
-	     cerebro_errormsg.3 \
-	     cerebro_perror.3 \
-	     cerebro_nodes_iterator_next.3 \
-	     cerebro_nodes_iterator_reset.3 \
-	     cerebro_nodes_iterator_destroy.3 \
-	     cerebro_updown_load_data.3 \
-	     cerebro_updown_unload_data.3 \
-	     cerebro_updown_get_up_nodes_string.3 \
-	     cerebro_updown_get_down_nodes_string.3 \
-	     cerebro_updown_get_up_nodes_iterator.3 \
-	     cerebro_updown_get_down_nodes_iterator.3 \
-	     cerebro_updown_is_node_up.3 \
-	     cerebro_updown_is_node_down.3 \
-	     cerebro_updown_up_count.3 \
-	     cerebro_updown_down_count.3 \
+             cerebro_set_hostname.3 \
+	     cerebro_set_port.3 \
+	     cerebro_set_timeout_len.3 \
+	     cerebro_set_flags.3 \
+	     cerebro_get_metric_data.3 \
+	     cerebro_nodelist_length.3 \
+	     cerebro_nodelist_metric_name.3 \
+	     cerebro_nodelist_metric_type.3 \
+	     cerebro_nodelist_find.3 \
+	     cerebro_nodelist_for_each.3 \
+	     cerebro_nodelist_destroy.3 \
+	     cerebro_nodelist_iterator_create.3 \
+	     cerebro_nodelist_iterator_next.3 \
+	     cerebro_nodelist_iterator_reset.3 \
+	     cerebro_nodelist_iterator_at_end.3 \
+	     cerebro_nodelist_iterator_nodename.3 \
+	     cerebro_nodelist_iterator_metric_value.3 \
+	     cerebro_nodelist_iterator_destroy.3 \
 	     cerebro_module.3 \
 	     $(DYNAMIC_MODULES_MANPAGES)
 
@@ -44,22 +49,27 @@ EXTRA_DIST = cerebro.1 \
 	     cerebro_handle_create.3 \
 	     cerebro_handle_destroy.3 \
 	     cerebro_errnum.3 \
+	     cerebro_nodelist_errnum.3 \
+	     cerebro_nodelist_iterator_errnum.3 \
 	     cerebro_strerror.3 \
-	     cerebro_errormsg.3 \
-	     cerebro_perror.3 \
-	     cerebro_nodes_iterator_next.3 \
-	     cerebro_nodes_iterator_reset.3 \
-	     cerebro_nodes_iterator_destroy.3 \
-	     cerebro_updown_load_data.3 \
-	     cerebro_updown_unload_data.3 \
-	     cerebro_updown_get_up_nodes_string.3 \
-	     cerebro_updown_get_down_nodes_string.3 \
-	     cerebro_updown_get_up_nodes_iterator.3 \
-	     cerebro_updown_get_down_nodes_iterator.3 \
-	     cerebro_updown_is_node_up.3 \
-	     cerebro_updown_is_node_down.3 \
-	     cerebro_updown_up_count.3 \
-	     cerebro_updown_down_count.3 \
+             cerebro_set_hostname.3 \
+	     cerebro_set_port.3 \
+	     cerebro_set_timeout_len.3 \
+	     cerebro_set_flags.3 \
+	     cerebro_get_metric_data.3 \
+	     cerebro_nodelist_length.3 \
+	     cerebro_nodelist_metric_name.3 \
+	     cerebro_nodelist_metric_type.3 \
+	     cerebro_nodelist_find.3 \
+	     cerebro_nodelist_for_each.3 \
+	     cerebro_nodelist_destroy.3 \
+	     cerebro_nodelist_iterator_create.3 \
+	     cerebro_nodelist_iterator_next.3 \
+	     cerebro_nodelist_iterator_reset.3 \
+	     cerebro_nodelist_iterator_at_end.3 \
+	     cerebro_nodelist_iterator_nodename.3 \
+	     cerebro_nodelist_iterator_metric_value.3 \
+	     cerebro_nodelist_iterator_destroy.3 \
 	     cerebro_module.3 \
 	     $(DYNAMIC_MODULES_MANPAGES) \
 	     cerebro.conf.5 \

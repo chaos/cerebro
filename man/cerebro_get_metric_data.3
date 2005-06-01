@@ -1,52 +1,38 @@
 \."#############################################################################
-\."$Id: cerebro_updown_load_data.3,v 1.3 2005-05-11 23:34:25 achu Exp $
+\."$Id: cerebro_get_metric_data.3,v 1.1 2005-06-01 16:40:23 achu Exp $
 \."#############################################################################
-.TH CEREBRO_LOAD_DATA 3 "May 2005" "LLNL" "LIBCEREBRO"
+.TH CEREBRO_GET_METRIC_DATA 3 "May 2005" "LLNL" "LIBCEREBRO"
 .SH "NAME"
-cerebro_updown_load_data, cerebro_updown_unload_data \- cerebro updown
-loading routines
+cerebro_get_metric_data \- retrieve cerebro metric data
 .SH "SYNOPSIS"
 .B #include <cerebro.h>
 .sp
-.BI "int cerebro_updown_load_data(cerebro_t handle, const char *hostname, unsigned int port, unsigned int timeout_len, int flags);"
-.sp
-.BI "int cerebro_updown_unload_data(cerebro_t handle);"
+.BI "cerebro_nodelist_t cerebro_get_metric_data(cerebro_t handle, const char *metric_name);"
 .br
 .SH "DESCRIPTION"
-\fBcerebro_updown_load_data()\fR loads updown data from the 
+\fBcerebro_get_metric_data()\fR retrieves metric data for the metric 
+\fImetric_name\fR from
+the 
 .B cerebrod
-updown server and stores it in the handle.
+metric server and returns it in a cerebro nodelist.
 
-\fIhostname\fR should indicate the location of the 
-.B cerebrod
-updown server.  If
-\fIhostname\fR is NULL, cerebro assumes the server is on the
-localhost.
-
-\fIport\fR should indicate the port number of the updown server.  If
-\fIport\fR is equal to 0, the default server port is assumed.
-
-\fItimeout_len\fR should indicate the timeout length in seconds that
-should be used to determine if a node is up or down.  If
-\fItimeout_len\fR is equal to 0, the default timeout length is used.
- 
-\fIflags\fR should indicate the data to be loaded.  Flags may be one
-of CEREBRO_UPDOWN_UP_NODES, CEREBRO_UPDOWN_DOWN_NODES, or
-CEREBRO_UPDOWN_UP_AND_DOWN_NODES.  These flags retrieve a list of up
-nodes, down nodes, or both respectively.  If \fIflags\fR is equal to
-0, CEREBRO_UPDOWN_UP_AND_DOWN_NODES is used.
-
-See 
+The default behavior of \fBcerebro_get_metric_data()\fR can be altered by
+setting alternate defaults using
+.B cerebro_set_hostname(3),
+.B cerebro_set_port(3),
+.B cerebro_set_timeout_len(3),
+or
+.B cerebro_set_flags(3).  It can also be altered using the the cerebro
+configuration file.  See 
 .BR cerebro.conf(5)
-for information on how the default values of
-\fBcerebro_updown_load_data\fR can be altered.
+for information on how the default behavior of
+\fBcerebro_get_metric_data\fR can be altered.
 
-\fBcerebro_updown_unload_data\fR unlods the updown data stored in a
-cerebro_t handle.
 .br
 .SH "RETURN VALUES"
-On success, 0 is returned.  On error, -1 is returned, and an error
-code is returned in \fIhandle\fR.  The error code can be retrieved via
+On success, a cerebro nodelist is returned.  On error, NULL is
+returned, and an error code is returned in \fIhandle\fR.  The error
+code can be retrieved via
 .BR cerebro_errnum(3)
 , and a description of the error code can be retrieved via
 .BR cerebro_strerror(3).  
@@ -110,4 +96,5 @@ An internal system error occurred.
 /usr/include/cerebro.h
 .SH "SEE ALSO"
 cerebro_handle_create(3), cerebro_errnum(3), cerebro_strerror(3),
-cerebro.conf(5)
+cerebro_set_hostname(3), cerebro_set_port(3),
+cerebro_set_timeout_len(3), cerebro_set_flags(3), cerebro.conf(5)
