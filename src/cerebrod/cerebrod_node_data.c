@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_node_data.c,v 1.10 2005-05-31 22:06:03 achu Exp $
+ *  $Id: cerebrod_node_data.c,v 1.11 2005-06-02 16:01:58 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -426,8 +426,8 @@ _cerebrod_metric_name_list_dump(void)
       fprintf(stderr, "**************************************\n");
       fprintf(stderr, "* Metric Name List\n");
       fprintf(stderr, "* -----------------------\n");
-      List_for_each(cerebrod_node_data_list,
-                    _cerebrod_node_data_item_dump,
+      List_for_each(cerebrod_metric_name_list,
+                    _cerebrod_metric_name_item_dump,
                     NULL);
       fprintf(stderr, "**************************************\n");
       Pthread_mutex_unlock(&debug_output_mutex);

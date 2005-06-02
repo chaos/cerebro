@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_gendersllnl.c,v 1.16 2005-05-31 22:06:03 achu Exp $
+ *  $Id: cerebro_config_gendersllnl.c,v 1.17 2005-06-02 16:01:58 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -176,8 +176,8 @@ gendersllnl_config_load_default(struct cerebro_config *conf)
     }
   else
     {
-      char **nodelist = NULL;
-      int i, nodelist_len, mgmt_len;
+      char **altnodelist = NULL;
+      int i, altnodelist_len, mgmt_len;
 
       conf->cerebrod_speak = 1;
       conf->cerebrod_speak_flag++;
@@ -186,49 +186,49 @@ gendersllnl_config_load_default(struct cerebro_config *conf)
       conf->cerebrod_metric_server = 0;
       conf->cerebrod_metric_server_flag++;
 
-      if ((nodelist_len = genders_nodelist_create(gendersllnl_handle, 
-						  &nodelist)) < 0)
+      if ((altnodelist_len = genders_altnodelist_create(gendersllnl_handle, 
+                                                        &altnodelist)) < 0)
 	{
-	  cerebro_err_debug_module("%s(%s:%d): genders_nodelist_create: %s",
+	  cerebro_err_debug_module("%s(%s:%d): genders_altnodelist_create: %s",
 				   __FILE__, __FUNCTION__, __LINE__,
 				   genders_errormsg(gendersllnl_handle));
 	  return -1;
 	}
       
-      if ((mgmt_len = genders_getnodes(gendersllnl_handle,
-				       nodelist,
-				       nodelist_len,
-				       "mgmt",
-				       NULL)) < 0)
+      if ((mgmt_len = genders_getaltnodes_preserve(gendersllnl_handle,
+                                                   altnodelist,
+                                                   altnodelist_len,
+                                                   "mgmt",
+                                                   NULL)) < 0)
 	{
 	  cerebro_err_debug_module("%s(%s:%d): genders_getnodes: %s",
 				   __FILE__, __FUNCTION__, __LINE__,
 				   genders_errormsg(gendersllnl_handle));
-	  genders_nodelist_destroy(gendersllnl_handle, nodelist);      
+	  genders_altnodelist_destroy(gendersllnl_handle, altnodelist);      
 	  return -1;
 	}
-
+      
       if (mgmt_len > CEREBRO_CONFIG_HOSTNAMES_MAX)
 	mgmt_len = CEREBRO_CONFIG_HOSTNAMES_MAX;
-
+      
       for (i = 0 ; i < mgmt_len; i++)
 	{
-	  if (strlen(nodelist[i]) > CEREBRO_MAXNODENAMELEN)
+	  if (strlen(altnodelist[i]) > CEREBRO_MAXNODENAMELEN)
 	    {
 	      cerebro_err_debug_module("%s(%s:%d): genders_getnodes: %s",
 				       __FILE__, __FUNCTION__, __LINE__,
 				       genders_errormsg(gendersllnl_handle));
-	      genders_nodelist_destroy(gendersllnl_handle, nodelist);      
+	      genders_altnodelist_destroy(gendersllnl_handle, altnodelist);      
 	      return -1;
 	    }
-	  strcpy(conf->cerebro_hostnames[i], nodelist[i]);
+	  strcpy(conf->cerebro_hostnames[i], altnodelist[i]);
 	}
       conf->cerebro_hostnames_len = mgmt_len;
       conf->cerebro_hostnames_flag++;
       
-      genders_nodelist_destroy(gendersllnl_handle, nodelist);      
+      genders_altnodelist_destroy(gendersllnl_handle, altnodelist);      
     }
-
+  
   memset(altnamebuf, '\0', CEREBRO_MAXNODENAMELEN+1);
   if ((flag = genders_testattr(gendersllnl_handle, 
 			       NULL, 
