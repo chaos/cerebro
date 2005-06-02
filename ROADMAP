@@ -1,0 +1,16 @@
+cerebro-1-0-0-pre3
+- metric retrieval flags
+  - only up nodes
+  - if not exist
+- allow metric type inconsistency
+- abstract module API
+- variable length metrics and packets
+
+cerebro-1-0-0-pre4
+- monitor new metrics
+- modules for starttime/boottime
+- server for updating metrics
+- api for updating metrics
+
+cerebro-1-0-0-pre5
+- command line tools
