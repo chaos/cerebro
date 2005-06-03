@@ -3,6 +3,8 @@
 	* Cleaned up module loading/unloading libcerebro library calls.
 	Calls now allow multiple cerebro handles to safely load/unload
 	modules.
+
+	* tagged pre-libcerebro-metric-type-rework-1
 	
 2005-06-02  Albert Chu  <chu11@llnl.gov>
 
