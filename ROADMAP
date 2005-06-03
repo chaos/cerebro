@@ -3,7 +3,6 @@ cerebro-1-0-0-pre3
   - only up nodes
   - if not exist
 - allow metric type inconsistency
-- abstract module API w/ handle like thing
 - variable length metrics and packets
 - nodelist -> datalist?  something
 

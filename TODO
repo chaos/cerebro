@@ -17,12 +17,7 @@ Portability
 - Non-pthreads support
 
 Design
-- need to abstract away module loading functions into 'handle' like
-  API, so that multiple handles can open the clusterlist and etc.
-  modules.
-  - need counter to protect against module_cleanup functions being
-    called too early?
-  - will need pthreads support?
+- make cerebro calls pthread safe??
 - metric modules
   - modules for starttime/boottime
 - metric_type --> metric_value_type ??
