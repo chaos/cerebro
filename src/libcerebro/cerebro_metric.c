@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric.c,v 1.13 2005-06-03 21:26:04 achu Exp $
+ *  $Id: cerebro_metric.c,v 1.14 2005-06-03 23:51:52 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -378,6 +378,7 @@ _cerebro_metric_response_receive_one(cerebro_t handle,
   char buf[CEREBRO_PACKET_BUFLEN];
 
   memset(buf, '\0', CEREBRO_PACKET_BUFLEN);
+
   /* XXX - will not work with variable length buffers */
   while (bytes_read < CEREBRO_METRIC_RESPONSE_PACKET_LEN)
     {
@@ -650,21 +651,16 @@ cerebro_get_metric_data(cerebro_t handle,
     {
       if (handle->config_data.cerebro_flags_flag)
 	{
-	  /* XXX should check for valid flags */
-#if 0
-	  if (handle->config_data.cerebro_flags != CEREBRO_METRIC_UP_NODES
-	      && handle->config_data.cerebro_flags != CEREBRO_METRIC_DOWN_NODES
-	      && handle->config_data.cerebro_flags != CEREBRO_METRIC_UP_AND_DOWN_NODES)
+	  if (handle->config_data.cerebro_flags & ~CEREBRO_METRIC_FLAGS_MASK)
 	    {
 	      handle->errnum = CEREBRO_ERR_CONFIG_INPUT;
 	      goto cleanup;
 	    }
-#endif /* 0 */
 	  flags = handle->config_data.cerebro_flags;
 	}
     }
   else
-    flags = 0;		/* XXX maybe different default */
+    flags = handle->flags;
   
   if (!(nodelist = _cerebro_nodelist_create(handle, metric_name)))
     goto cleanup;
