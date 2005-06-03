@@ -1,7 +1,4 @@
 cerebro-1-0-0-pre3
-- metric retrieval flags
-  - only up nodes
-  - if not exist
 - variable length metrics and packets
 - nodelist -> datalist?  something
 

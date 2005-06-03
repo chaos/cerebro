@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_protocol.h,v 1.13 2005-06-03 21:26:04 achu Exp $
+ *  $Id: cerebro_metric_protocol.h,v 1.14 2005-06-03 22:54:42 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_METRIC_PROTOCOL_H
@@ -65,7 +65,12 @@
  */
 #define CEREBRO_METRIC_UPDOWN_STATE_NODE_UP       1
 #define CEREBRO_METRIC_UPDOWN_STATE_NODE_DOWN     0
+
 #define CEREBRO_METRIC_UPDOWN_TIMEOUT_LEN_DEFAULT 60
+
+#define CEREBRO_METRIC_FLAGS_UP_ONLY              0x00000001
+#define CEREBRO_METRIC_FLAGS_NONE_IF_NOEXIST      0x00000002
+#define CEREBRO_METRIC_FLAGS_MASK                 0x00000003
 
 #define CEREBRO_METRIC_SERVER_PORT                8852
 

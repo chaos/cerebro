@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric.c,v 1.18 2005-05-31 22:56:14 achu Exp $
+ *  $Id: cerebrod_metric.c,v 1.19 2005-06-03 22:54:42 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -827,16 +827,37 @@ _cerebrod_metric_evaluate(void *x, void *arg)
           return -1;
         }
     }
-  else if ((data = Hash_find(nd->metric_data, ed->req->metric_name)))
+  else 
     {
-      if (_cerebrod_metric_response_create(nd->nodename,
-                                           data->metric_type,
-                                           &(data->metric_value),
-                                           ed->node_responses) < 0)
+      if (ed->req->flags & CEREBRO_METRIC_FLAGS_UP_ONLY
+          && !((ed->time_now - nd->last_received_time) < ed->req->timeout_len))
+        goto out;
+      
+      if ((data = Hash_find(nd->metric_data, ed->req->metric_name)))
         {
-          Pthread_mutex_unlock(&(nd->node_data_lock));
-          return -1;
+          if (_cerebrod_metric_response_create(nd->nodename,
+                                               data->metric_type,
+                                               &(data->metric_value),
+                                               ed->node_responses) < 0)
+            {
+              Pthread_mutex_unlock(&(nd->node_data_lock));
+              return -1;
+            }
         }
+      else if (ed->req->flags & CEREBRO_METRIC_FLAGS_NONE_IF_NOEXIST)
+        {
+          if (_cerebrod_metric_response_create(nd->nodename,
+                                               CEREBRO_METRIC_TYPE_NONE,
+                                               NULL,
+                                               ed->node_responses) < 0)
+            {
+              Pthread_mutex_unlock(&(nd->node_data_lock));
+              return -1;
+            }
+        }
+
+    out:
+      ;
     }
 
   Pthread_mutex_unlock(&(nd->node_data_lock));

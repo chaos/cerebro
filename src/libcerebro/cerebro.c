@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.c,v 1.29 2005-06-03 21:26:04 achu Exp $
+ *  $Id: cerebro.c,v 1.30 2005-06-03 22:54:42 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -205,7 +205,11 @@ cerebro_set_flags(cerebro_t handle, unsigned int flags)
   if (_cerebro_handle_check(handle) < 0)
     return -1;
 
-  /* XXX should check for valid flags */
+  if (flags & ~CEREBRO_METRIC_FLAGS_MASK)
+    {
+      handle->errnum = CEREBRO_ERR_PARAMETERS;
+      return -1;
+    }
 
   handle->flags = flags;
   return 0;

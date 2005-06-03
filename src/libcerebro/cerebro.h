@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.36 2005-06-03 21:26:04 achu Exp $
+ *  $Id: cerebro.h,v 1.37 2005-06-03 22:54:42 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_H
@@ -186,7 +186,11 @@ int cerebro_nodelist_find(cerebro_nodelist_t nodelist,
  *
  * Returns 0 on success, -1 on error
  */
-typedef int (*Cerebro_for_each)(char *nodename, void *metric_value, void *arg);
+typedef int (*Cerebro_for_each)(char *nodename, 
+                                void *metric_value, 
+                                unsigned int metric_type,
+                                unsigned int metric_value_size,
+                                void *arg);
 
 /* 
  * cerebro_nodelist_for_each

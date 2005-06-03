@@ -7,6 +7,8 @@
 	* tagged pre-libcerebro-metric-type-rework-1
 
 	* Rework metric_type storage and retrieval 
+
+	* Add various flags for metric data retrieval
 	
 2005-06-02  Albert Chu  <chu11@llnl.gov>
 
