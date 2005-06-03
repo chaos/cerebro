@@ -1,3 +1,7 @@
+2005-06-03  Albert Chu  <chu11@llnl.gov>
+
+	* Cleaned up module loading/unloading libcerebro library calls.
+	
 2005-06-02  Albert Chu  <chu11@llnl.gov>
 
 	* src/modules/cerebro_config_gendersllnl.c: Default 'hostnames' on

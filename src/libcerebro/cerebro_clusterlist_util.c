@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_util.c,v 1.2 2005-06-01 18:30:27 achu Exp $
+ *  $Id: cerebro_clusterlist_util.c,v 1.3 2005-06-03 18:08:31 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -19,25 +19,27 @@ int
 _cerebro_load_clusterlist_module(cerebro_t handle)
 {
   int module_setup_called = 0;
-
+  int load_clusterlist_module_called = 0;
+  
   if (_cerebro_handle_check(handle) < 0)
     return -1;
 
-  if (!(handle->loaded_state & CEREBRO_MODULE_SETUP_CALLED))
+  if (handle->loaded_state & CEREBRO_CLUSTERLIST_MODULE_LOADED)
+    return 0;
+
+  if (_cerebro_module_setup() < 0)
     {
-      if (_cerebro_module_setup() < 0)
-        {
-          handle->errnum = CEREBRO_ERR_CLUSTERLIST_MODULE;
-          goto cleanup;
-        }
-      module_setup_called++;
+      handle->errnum = CEREBRO_ERR_CLUSTERLIST_MODULE;
+      goto cleanup;
     }
+  module_setup_called++;
 
   if (_cerebro_module_load_clusterlist_module() < 0)
     {
       handle->errnum = CEREBRO_ERR_CLUSTERLIST_MODULE;
       goto cleanup;
     }
+  load_clusterlist_module_called++;
   
   if (_cerebro_clusterlist_module_setup() < 0)
     {
@@ -45,12 +47,12 @@ _cerebro_load_clusterlist_module(cerebro_t handle)
       goto cleanup;
     }
   
-  if (module_setup_called)
-    handle->loaded_state |= CEREBRO_MODULE_SETUP_CALLED;
   handle->loaded_state |= CEREBRO_CLUSTERLIST_MODULE_LOADED;
-  
   return 0;
+
  cleanup:
+  if (load_clusterlist_module_called)
+    _cerebro_module_unload_clusterlist_module();
   if (module_setup_called)
     _cerebro_module_cleanup();
   
@@ -76,6 +78,12 @@ _cerebro_unload_clusterlist_module(cerebro_t handle)
 	  handle->errnum = CEREBRO_ERR_CLUSTERLIST_MODULE;
 	  return -1;
 	}
+
+      if (_cerebro_module_cleanup() < 0)
+        {
+	  handle->errnum = CEREBRO_ERR_CLUSTERLIST_MODULE;
+	  return -1;
+        }
     }
 
   handle->loaded_state &= ~CEREBRO_CLUSTERLIST_MODULE_LOADED;

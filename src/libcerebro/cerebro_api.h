@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_api.h,v 1.19 2005-05-31 20:45:56 achu Exp $
+ *  $Id: cerebro_api.h,v 1.20 2005-06-03 18:08:31 achu Exp $
 \*****************************************************************************/
  
 #ifndef _CEREBRO_API_H
@@ -25,9 +25,8 @@
 /* 
  * Cerebro loaded state flags
  */
-#define CEREBRO_MODULE_SETUP_CALLED        0x00000001              
-#define CEREBRO_CONFIG_LOADED              0x00000002
-#define CEREBRO_CLUSTERLIST_MODULE_LOADED  0x00000004
+#define CEREBRO_CONFIG_LOADED                  0x00000001
+#define CEREBRO_CLUSTERLIST_MODULE_LOADED      0x00000002
 
 /* 
  * struct cerebro

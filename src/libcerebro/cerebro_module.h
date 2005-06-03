@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.h,v 1.21 2005-05-11 21:59:57 achu Exp $
+ *  $Id: cerebro_module.h,v 1.22 2005-06-03 18:08:31 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_MODULE_H
@@ -15,13 +15,6 @@
  * Returns 0 on success, -1 on error
  */
 int _cerebro_module_setup(void);
-
-/* 
- * _cerebro_module_is_setup
- *
- * Return 1 if module lib has been initialized, 0 if not
- */
-int _cerebro_module_is_setup(void);
 
 /* 
  * _cerebro_module_cleanup
@@ -71,20 +64,6 @@ int _cerebro_module_load_config_module(void);
  * Returns 0 on success, -1 on error
  */
 int _cerebro_module_unload_config_module(void);
-
-/* 
- * _cerebro_module_clusterlist_module_is_loaded
- * 
- * Return 1 if a clusterlist module has been loaded, 0 if not
- */
-int _cerebro_module_clusterlist_module_is_loaded(void);
-
-/* 
- * _cerebro_module_config_module_is_loaded
- * 
- * Return 1 if a config module has been loaded, 0 if not
- */
-int _cerebro_module_config_module_is_loaded(void);
 
 /* 
  * _cerebro_module_clusterlist_module_found

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric.c,v 1.11 2005-06-01 18:30:27 achu Exp $
+ *  $Id: cerebro_metric.c,v 1.12 2005-06-03 18:08:31 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -619,17 +619,11 @@ cerebro_get_metric_data(cerebro_t handle,
       goto cleanup;
     }
 
-  if (!(handle->loaded_state & CEREBRO_CLUSTERLIST_MODULE_LOADED))
-    {
-      if (_cerebro_load_clusterlist_module(handle) < 0)
-        goto cleanup;
-    }
+  if (_cerebro_load_clusterlist_module(handle) < 0)
+    goto cleanup;
   
-  if (!(handle->loaded_state & CEREBRO_CONFIG_LOADED))
-    {
-      if (_cerebro_load_config(handle) < 0)
-	goto cleanup;
-    }
+  if (_cerebro_load_config(handle) < 0)
+    goto cleanup;
 
   if (!handle->port)
     {

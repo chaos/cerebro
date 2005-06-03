@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.c,v 1.27 2005-06-01 17:23:21 achu Exp $
+ *  $Id: cerebro.c,v 1.28 2005-06-03 18:08:31 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -106,17 +106,6 @@ cerebro_handle_destroy(cerebro_t handle)
           handle->errnum = CEREBRO_ERR_INTERNAL;
           return -1;
         }
-    }
-
-  if (handle->loaded_state & CEREBRO_MODULE_SETUP_CALLED)
-    {
-      if (_cerebro_module_cleanup() < 0)
-        {
-          handle->errnum = CEREBRO_ERR_INTERNAL;
-          return -1;
-        }
-
-      handle->loaded_state &= ~CEREBRO_MODULE_SETUP_CALLED;
     }
 
   list_destroy(handle->nodelists);

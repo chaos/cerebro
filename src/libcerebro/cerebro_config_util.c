@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_util.c,v 1.8 2005-05-28 16:06:44 achu Exp $
+ *  $Id: cerebro_config_util.c,v 1.9 2005-06-03 18:08:31 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -28,27 +28,20 @@ int cerebro_config_debug_output = 0;
 int
 _cerebro_config_load_config_module(struct cerebro_config *conf)
 {
-  int load_config_module_called = 0;
-  int module_setup_called = 0;
   int rv = -1;
+  int module_setup_called = 0;
+  int load_config_module_called = 0;
 
-  if (!_cerebro_module_config_module_is_loaded())
-    {
-      if (!_cerebro_module_is_setup())
-	{
-	  if (_cerebro_module_setup() < 0)
-	    goto cleanup;
-	  module_setup_called++;
-	}
+  if (_cerebro_module_setup() < 0)
+    goto cleanup;
+  module_setup_called++;
       
-      if (_cerebro_module_load_config_module() < 0)
-	goto cleanup;
+  if (_cerebro_module_load_config_module() < 0)
+    goto cleanup;
+  load_config_module_called++;
 
-      if (_cerebro_config_module_setup() < 0)
-	goto cleanup;
-
-      load_config_module_called++;
-    }
+  if (_cerebro_config_module_setup() < 0)
+    goto cleanup;
 
 #if CEREBRO_DEBUG  
   if (cerebro_config_debug_output)
@@ -67,11 +60,9 @@ _cerebro_config_load_config_module(struct cerebro_config *conf)
 
   rv = 0;
  cleanup:
+  _cerebro_config_module_cleanup();
   if (load_config_module_called)
-    {
-      _cerebro_config_module_cleanup();
-      _cerebro_module_unload_config_module();
-    }
+    _cerebro_module_unload_config_module();
   if (module_setup_called)
     _cerebro_module_cleanup();
   return rv;
