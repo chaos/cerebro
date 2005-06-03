@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: libcerebro.3,v 1.8 2005-06-01 17:23:21 achu Exp $
+\."$Id: libcerebro.3,v 1.9 2005-06-03 21:26:03 achu Exp $
 \."#############################################################################
 .TH LIBCEREBRO 3 "August 2003" "LLNL" "LIBCEREBRO"
 .SH NAME
@@ -30,11 +30,9 @@ or down
 .sp
 .BI "cerebro_nodelist_t cerebro_get_metric_data(cerebro_t handle, const char *metric_name);"
 .sp
-.BI "int cerebro_nodelist_length(cerebro_nodelist_t nodelist);
-.sp
 .BI "char *cerebro_nodelist_metric_name(cerebro_nodelist_t nodelist);
 .sp
-.BI "int cerebro_nodelist_metric_type(cerebro_nodelist_t nodelist);
+.BI "int cerebro_nodelist_length(cerebro_nodelist_t nodelist);
 .sp
 .BI "int cerebro_nodelist_find(cerebro_nodelist_t nodelist, const char *node, void **metric_value, unsigned int *metric_value_size);"
 .sp
@@ -80,10 +78,10 @@ cerebro_errnum(3), cerebro_nodelist_errnum(3),
 cerebro_nodelist_iterator_errnum(3), cerebro_strerror(3),
 cerebro_set_hostname(3), cerebro_set_port(3),
 cerebro_set_timeout_len(3), cerebro_set_flags(3),
-cerebro_get_metric_data(3), cerebro_nodelist_length(3),
-cerebro_nodelist_metric_name(3), cerebro_nodelist_metric_type(3),
-cerebro_nodelist_find(3), cerebro_nodelist_for_each(3),
-cerebro_nodelist_destroy(3), cerebro_nodelist_iterator_create(3),
+cerebro_get_metric_data(3), cerebro_nodelist_metric_name(3),
+cerebro_nodelist_length(3), cerebro_nodelist_find(3),
+cerebro_nodelist_for_each(3), cerebro_nodelist_destroy(3),
+cerebro_nodelist_iterator_create(3),
 cerebro_nodelist_iterator_nodename(3),
 cerebro_nodelist_iterator_metric_value(3),
 cerebro_nodelist_iterator_next(3), cerebro_nodelist_iterator_reset(3),

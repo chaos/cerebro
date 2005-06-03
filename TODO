@@ -8,6 +8,10 @@ Testing
 Cleanup
 - cleanup common hash into "data" and put in data.c??
 - 'get' configuration routines?
+- move metric_type definitions into cerebro.h or somewhere better
+  - and document
+- move get_data flags into cerebro.h or somewhere better
+  - and document
 
 Audit
 - code review to reduce memory footprint

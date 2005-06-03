@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.c,v 1.28 2005-06-03 18:08:31 achu Exp $
+ *  $Id: cerebro.c,v 1.29 2005-06-03 21:26:04 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -39,7 +39,6 @@ static char *cerebro_error_messages[] =
     "node not found",
     "end of list reached",
     "metric value not found",
-    "metric type inconsistent",
     "config file error",
     "config module error",
     "config input error",

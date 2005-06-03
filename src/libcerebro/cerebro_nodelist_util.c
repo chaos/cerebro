@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_nodelist_util.c,v 1.9 2005-06-01 16:40:23 achu Exp $
+ *  $Id: cerebro_nodelist_util.c,v 1.10 2005-06-03 21:26:04 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -76,9 +76,6 @@ _cerebro_nodelist_create(cerebro_t handle, const char *metric_name)
   nodelist->magic = CEREBRO_NODELIST_MAGIC_NUMBER;
   strcpy(nodelist->metric_name, metric_name);
 
-  /* Impossible to know now, must be set elsewhere */
-  nodelist->metric_type = CEREBRO_METRIC_TYPE_NONE;
-  
   if (!(nodelist->nodes = list_create(free)))
     {
       handle->errnum = CEREBRO_ERR_OUTMEM;
@@ -119,6 +116,7 @@ _cerebro_nodelist_create(cerebro_t handle, const char *metric_name)
 int 
 _cerebro_nodelist_append(cerebro_nodelist_t nodelist,
 			 const char *nodename,
+                         cerebro_metric_type_t metric_type,
 			 cerebro_metric_value_t *metric_value)
 {
   struct cerebro_nodelist_data *data;
@@ -140,6 +138,7 @@ _cerebro_nodelist_append(cerebro_nodelist_t nodelist,
   memset(data, '\0', sizeof(struct cerebro_nodelist_data));
 
   strcpy(data->nodename, nodename);
+  data->metric_type = metric_type;
   memcpy(&(data->metric_value), metric_value, sizeof(cerebro_metric_value_t));
 
   if (!list_append(nodelist->nodes, data))

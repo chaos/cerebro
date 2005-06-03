@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric.c,v 1.12 2005-06-03 18:08:31 achu Exp $
+ *  $Id: cerebro_metric.c,v 1.13 2005-06-03 21:26:04 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -483,8 +483,7 @@ _cerebro_metric_response_receive_all(cerebro_t handle,
 				     int flags)
 {
   struct cerebro_metric_response res;
-  int res_len, first_response = 0;
-  cerebro_metric_type_t metric_type;
+  int res_len;
 
   while (1)
     {
@@ -532,25 +531,13 @@ _cerebro_metric_response_receive_all(cerebro_t handle,
 
       if (_cerebro_nodelist_append(nodelist, 
 				   res.nodename,
+                                   res.metric_type,
 				   &res.metric_value) < 0)
 	goto cleanup;
-
-      if (!first_response)
-        {
-          metric_type = res.metric_type;
-          first_response++;
-        }
-      else if (metric_type != res.metric_type)
-        {
-          handle->errnum = CEREBRO_ERR_METRIC_TYPE_INCONSISTENT;
-          goto cleanup;
-        }
     }
   
   if (_cerebro_nodelist_sort(nodelist) < 0)
     goto cleanup;
-  
-  nodelist->metric_type = metric_type;
 
   return 0;
  cleanup:
