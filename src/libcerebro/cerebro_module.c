@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.c,v 1.31 2005-06-03 18:08:31 achu Exp $
+ *  $Id: cerebro_module.c,v 1.32 2005-06-03 23:45:59 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -363,8 +363,10 @@ _cerebro_module_cleanup(void)
 
   if (!cerebro_module_library_setup_count)
     {
-      _cerebro_module_unload_clusterlist_module();
-      _cerebro_module_unload_config_module();
+      while (cerebro_module_clusterlist_load_count)
+        _cerebro_module_unload_clusterlist_module();
+      while (cerebro_module_config_load_count)
+        _cerebro_module_unload_config_module();
 
 #if !WITH_STATIC_MODULES
       if (lt_dlexit() != 0)
