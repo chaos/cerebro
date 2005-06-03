@@ -1,6 +1,8 @@
 2005-06-03  Albert Chu  <chu11@llnl.gov>
 
 	* Cleaned up module loading/unloading libcerebro library calls.
+	Calls now allow multiple cerebro handles to safely load/unload
+	modules.
 	
 2005-06-02  Albert Chu  <chu11@llnl.gov>
 
