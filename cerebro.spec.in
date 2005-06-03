@@ -110,21 +110,21 @@ fi
 %{_mandir}/*
 
 %if %{?_with_chaos:0}%{!?_with_chaos:1}
-                                                                                      
+
 %if %{?_with_gendersllnl:1}%{!?_with_gendersllnl:0}
 %files gendersllnl
 %defattr(-,root,root)
 %{_libdir}/cerebro/*gendersllnl.*
 %endif
-                                                                                      
+
 %if %{?_with_genders:1}%{!?_with_genders:0}
 %files genders
 %defattr(-,root,root)
 %{_libdir}/cerebro/*genders.*
 %endif
-                                                                                      
+
 %files hostsfile
 %defattr(-,root,root)
 %{_libdir}/cerebro/*hostsfile.*
-                                                                                      
+
 %endif
