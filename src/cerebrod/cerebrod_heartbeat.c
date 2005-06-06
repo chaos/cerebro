@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_heartbeat.c,v 1.26 2005-05-19 23:38:46 achu Exp $
+ *  $Id: cerebrod_heartbeat.c,v 1.27 2005-06-06 20:39:55 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -12,6 +12,8 @@
 #include <errno.h>
 
 #include "cerebro/cerebrod_heartbeat_protocol.h"
+/* XXX */
+#include "cerebro/cerebro_metric_protocol.h"
 
 #include "cerebrod_heartbeat.h"
 #include "cerebrod_config.h"
@@ -30,7 +32,7 @@ cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb)
 
   if (conf.debug)
     {
-      int rv;
+      int i, rv;
 
       rv = Pthread_mutex_trylock(&debug_output_mutex);
       if (rv != EBUSY)
@@ -45,8 +47,47 @@ cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb)
       fprintf(stderr, "* -------------------\n");
       fprintf(stderr, "* version: %d\n", hb->version);
       fprintf(stderr, "* nodename: \"%s\"\n", hb->nodename);
-      fprintf(stderr, "* starttime: %u\n", hb->starttime);
-      fprintf(stderr, "* boottime: %u\n", hb->boottime);
+      fprintf(stderr, "* metrics_len: %d\n", hb->metrics_len);
+      for (i = 0; i < hb->metrics_len; i++)
+        {
+          fprintf(stderr, "* %s: metric_type = %d, metric_len = %d ", 
+                  hb->metrics[i]->metric_name, 
+                  hb->metrics[i]->metric_type,
+                  hb->metrics[i]->metric_len);
+
+          switch(hb->metrics[i]->metric_type)
+            {
+            case CEREBRO_METRIC_TYPE_NONE:
+              break;
+            case CEREBRO_METRIC_TYPE_BOOL:
+              fprintf(stderr, "metric_data = %d\n", 
+                      *((char *)hb->metrics[i]->metric_data));
+              break;
+            case CEREBRO_METRIC_TYPE_INT32:
+              fprintf(stderr, "metric_data = %d\n", 
+                      *((int32_t *)hb->metrics[i]->metric_data));
+              break;
+            case CEREBRO_METRIC_TYPE_UNSIGNED_INT32:
+              fprintf(stderr, "metric_data = %u\n", 
+                      *((u_int32_t *)hb->metrics[i]->metric_data));
+              break;
+            case CEREBRO_METRIC_TYPE_FLOAT:
+              fprintf(stderr, "metric_data = %f\n", 
+                      *((float *)hb->metrics[i]->metric_data));
+              break;
+            case CEREBRO_METRIC_TYPE_DOUBLE:
+              fprintf(stderr, "metric_data = %f\n", 
+                      *((double *)hb->metrics[i]->metric_data));
+              break;
+            case CEREBRO_METRIC_TYPE_STRING:
+              fprintf(stderr, "metric_data = %s\n", 
+                      (char *)hb->metrics[i]->metric_data);
+              break;
+            default:
+              fprintf(stderr, "\n");
+              break;
+            }
+        }
       fprintf(stderr, "**************************************\n");
     }
 #endif /* CEREBRO_DEBUG */

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_data.c,v 1.11 2005-05-05 16:12:57 achu Exp $
+ *  $Id: cerebrod_data.c,v 1.12 2005-06-06 20:39:55 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -26,12 +26,6 @@
 #define CEREBROD_BOOTTIME_FILE     "/proc/stat"
 #define CEREBROD_BOOTTIME_KEYWORD  "btime"
 
-/* cerebrod_starttime 
- *
- * cached cerebrod starttime value
- */
-static u_int32_t cerebrod_starttime = 0;
-
 /* 
  * cerebrod_boottime
  *
@@ -51,23 +45,6 @@ static u_int32_t cerebrod_boottime = 0;
  */
 static char cerebrod_nodename[CEREBRO_MAXNODENAMELEN+1];
 static int cerebrod_nodename_len = 0;
-
-/*
- * _cerebrod_cache_starttime
- *
- * cache the cerebrod starttime
- */
-static void
-_cerebrod_cache_starttime(void)
-{
-  struct timeval tv;
-
-  assert(!cerebrod_starttime);
-
-  Gettimeofday(&tv, NULL);
-
-  cerebrod_starttime = tv.tv_sec;
-}
 
 /*
  * _cerebrod_cache_boottime
@@ -133,17 +110,8 @@ _cerebrod_cache_nodename(void)
 void
 cerebrod_load_data(void)
 {
-  _cerebrod_cache_starttime();
   _cerebrod_cache_boottime();
   _cerebrod_cache_nodename();
-}
-
-u_int32_t
-cerebrod_get_starttime(void)
-{
-  assert(cerebrod_starttime);
-
-  return cerebrod_starttime;
 }
 
 u_int32_t

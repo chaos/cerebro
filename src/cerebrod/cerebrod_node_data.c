@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_node_data.c,v 1.11 2005-06-02 16:01:58 achu Exp $
+ *  $Id: cerebrod_node_data.c,v 1.12 2005-06-06 20:39:55 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -272,31 +272,33 @@ _cerebrod_node_data_metric_data_dump(void *data, const void *key, void *arg)
   metric_data = (struct cerebrod_metric_data *)data;
   nodename = (char *)arg;
  
-  fprintf(stderr, "* %s: metric_name=%s metric_type=%d ",
+  fprintf(stderr, "* %s: metric_name=%s metric_type=%d metric_len=%d",
           nodename,
           metric_data->metric_name,
-          metric_data->metric_type);
+          metric_data->metric_type,
+          metric_data->metric_len);
+
   switch (metric_data->metric_type)
     {
     case CEREBRO_METRIC_TYPE_BOOL:
-      fprintf(stderr, "metric_value=%d", metric_data->metric_value.val_bool);
+      fprintf(stderr, "metric_value=%d", *((int8_t *)metric_data->metric_data));
       break;
     case CEREBRO_METRIC_TYPE_INT32:
-      fprintf(stderr, "metric_value=%d", metric_data->metric_value.val_int32);
+      fprintf(stderr, "metric_value=%d", *((int32_t *)metric_data->metric_data));
       break;
     case CEREBRO_METRIC_TYPE_UNSIGNED_INT32:
-      fprintf(stderr, "metric_value=%u", metric_data->metric_value.val_unsigned_int32);
+      fprintf(stderr, "metric_value=%u", *((u_int32_t *)metric_data->metric_data));
       break;
     case CEREBRO_METRIC_TYPE_FLOAT:
-      fprintf(stderr, "metric_value=%f", metric_data->metric_value.val_float);
+      fprintf(stderr, "metric_value=%f", *((float *)metric_data->metric_data));
       break;
     case CEREBRO_METRIC_TYPE_DOUBLE:
-      fprintf(stderr, "metric_value=%f", metric_data->metric_value.val_double);
+      fprintf(stderr, "metric_value=%f", *((double *)metric_data->metric_data));
       break;
     case CEREBRO_METRIC_TYPE_STRING:
       /* Ensure null termination */
       memset(buf, '\0', CEREBRO_METRIC_STRING_MAXLEN+1);
-      memcpy(buf, metric_data->metric_value.val_string, CEREBRO_METRIC_STRING_MAXLEN);
+      memcpy(buf, metric_data->metric_data, CEREBRO_METRIC_STRING_MAXLEN);
       fprintf(stderr, "metric_value=%s", buf);
       break;
     default:
@@ -444,9 +446,7 @@ _cerebrod_metric_name_list_dump(void)
  */
 static void
 _cerebrod_metric_data_update(struct cerebrod_node_data *nd,
-                             char *metric_name,
-                             cerebro_metric_type_t metric_type,
-                             cerebro_metric_value_t metric_value,
+                             struct cerebrod_heartbeat_metric *hb_data,
                              u_int32_t received_time)
 {
   struct cerebrod_metric_data *data;
@@ -455,13 +455,7 @@ _cerebrod_metric_data_update(struct cerebrod_node_data *nd,
 #endif /* CEREBRO_DEBUG */
 
   assert(nd);
-  assert(metric_name);
-  assert(metric_type == CEREBRO_METRIC_TYPE_BOOL
-         || metric_type == CEREBRO_METRIC_TYPE_INT32
-         || metric_type == CEREBRO_METRIC_TYPE_UNSIGNED_INT32
-         || metric_type == CEREBRO_METRIC_TYPE_FLOAT
-         || metric_type == CEREBRO_METRIC_TYPE_DOUBLE
-         || metric_type == CEREBRO_METRIC_TYPE_STRING);
+  assert(data);
 
 #if CEREBRO_DEBUG
   /* Should be called with lock already set */
@@ -471,9 +465,10 @@ _cerebrod_metric_data_update(struct cerebrod_node_data *nd,
                      __FILE__, __FUNCTION__, __LINE__, rv);
 #endif /* CEREBRO_DEBUG */
   
-  if (!(data = Hash_find(nd->metric_data, metric_name)))
+  if (!(data = Hash_find(nd->metric_data, hb_data->metric_name)))
     {
       char *key;
+      char metric_name_buf[CEREBRO_METRIC_NAME_MAXLEN+1];
 
       if (nd->metric_data_count >= CEREBRO_METRIC_MAX)
         {
@@ -483,24 +478,34 @@ _cerebrod_metric_data_update(struct cerebrod_node_data *nd,
           return;
         }
 
-      key = Strdup(metric_name);
+      /* Guarantee ending '\0' character */
+      memset(metric_name_buf, '\0', CEREBRO_METRIC_NAME_MAXLEN+1);
+      memcpy(metric_name_buf, hb_data->metric_name, CEREBRO_METRIC_NAME_MAXLEN);
+
+      key = Strdup(metric_name_buf);
       data = (struct cerebrod_metric_data *)Malloc(sizeof(struct cerebrod_metric_data));
-      data->metric_name = Strdup(metric_name);
+      data->metric_name = Strdup(metric_name_buf);
           
       Hash_insert(nd->metric_data, key, data);
       nd->metric_data_count++;
     }
   else
     {
-      if (data->metric_type != metric_type)
+      if (data->metric_type != hb_data->metric_type)
         cerebro_err_debug("%s(%s:%d): metric type modified: old=%d new=%d",
                           __FILE__, __FUNCTION__, __LINE__,
-                          data->metric_type, metric_type);
+                          data->metric_type, hb_data->metric_type);
     }
  
   data->last_received_time = received_time;
-  data->metric_type = metric_type;
-  data->metric_value = metric_value;
+  data->metric_type = hb_data->metric_type;
+  if (data->metric_len != hb_data->metric_len)
+    {
+      Free(data->metric_data);
+      data->metric_data = Malloc(hb_data->metric_len);
+    }
+  data->metric_len = hb_data->metric_len;
+  memcpy(data->metric_data, hb_data->metric_data, hb_data->metric_len);
 }
 
 void 
@@ -516,10 +521,7 @@ cerebrod_node_data_update(char *nodename,
 
   /* It is possible no servers are turned on */
   if (!cerebrod_node_data_initialization_complete)
-    {
-      printf("%s:%d\n", __FUNCTION__, __LINE__);
-      return;
-    }
+    return;
 
   if (!cerebrod_node_data_list || !cerebrod_node_data_index)
     cerebro_err_exit("%s(%s:%d): initialization not complete",
@@ -554,24 +556,15 @@ cerebrod_node_data_update(char *nodename,
   Pthread_mutex_lock(&(nd->node_data_lock));
   if (received_time >= nd->last_received_time)
     {
-      cerebro_metric_value_t val;
-
+      int i;
+      
       nd->discovered = 1;
       nd->last_received_time = received_time;
 
-      val.val_unsigned_int32 = hb->starttime;
-      _cerebrod_metric_data_update(nd,
-                                   CEREBRO_METRIC_STARTTIME,
-                                   CEREBRO_METRIC_TYPE_UNSIGNED_INT32,
-                                   val,
-                                   received_time);
- 
-      val.val_unsigned_int32 = hb->boottime;
-      _cerebrod_metric_data_update(nd,
-                                   CEREBRO_METRIC_BOOTTIME,
-                                   CEREBRO_METRIC_TYPE_UNSIGNED_INT32,
-                                   val,
-                                   received_time);
+      for (i = 0; i < hb->metrics_len; i++)
+        _cerebrod_metric_data_update(nd,
+                                     hb->metrics[i],
+                                     received_time);
 
       /* Can't call a debug output function in here, it can cause a
        * deadlock b/c the cerebrod_node_data_lock is not locked.  Use
@@ -582,11 +575,6 @@ cerebrod_node_data_update(char *nodename,
   Pthread_mutex_unlock(&(nd->node_data_lock));
 
   Pthread_mutex_lock(&cerebrod_metric_name_lock);
-
-  if (!List_find_first(cerebrod_metric_name_list,
-                       list_find_first_string,
-                       CEREBRO_METRIC_STARTTIME))
-    List_append(cerebrod_metric_name_list, Strdup(CEREBRO_METRIC_STARTTIME));
 
   if (!List_find_first(cerebrod_metric_name_list,
                        list_find_first_string,

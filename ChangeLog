@@ -1,6 +1,14 @@
 2005-06-06  Albert Chu  <chu11@llnl.gov>
 
 	* tagged pre-heartbeat-protocol-change-1
+
+	* Removed starttime metric.
+
+	* Reworked heartbeat protocol to use variable length data
+
+	* Reworked heartbeat protocol to use variable length metrics
+
+	* Reworked metric protocol to use variable length data
 	
 2005-06-03  Albert Chu  <chu11@llnl.gov>
 

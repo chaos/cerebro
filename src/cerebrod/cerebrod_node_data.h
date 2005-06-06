@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_node_data.h,v 1.5 2005-05-25 17:04:07 achu Exp $
+ *  $Id: cerebrod_node_data.h,v 1.6 2005-06-06 20:39:55 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_NODE_DATA_H
@@ -30,8 +30,9 @@ struct cerebrod_metric_data
 {
   char *metric_name;
   u_int32_t last_received_time;
-  cerebro_metric_type_t metric_type;
-  cerebro_metric_value_t metric_value;
+  u_int32_t metric_type;
+  u_int32_t metric_len;
+  void *metric_data;
 };
 
 /*

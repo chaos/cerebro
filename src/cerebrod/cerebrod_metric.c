@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric.c,v 1.19 2005-06-03 22:54:42 achu Exp $
+ *  $Id: cerebrod_metric.c,v 1.20 2005-06-06 20:39:55 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -90,11 +90,10 @@ _cerebrod_metric_response_marshall(struct cerebro_metric_response *res,
                                    unsigned int buflen)
 {
   int len, count = 0;
-  char val_buf[CEREBRO_METRIC_VALUE_LEN];
 
   assert(res);
   assert(buf);
-  assert(buflen >= CEREBRO_METRIC_RESPONSE_PACKET_LEN);
+  assert(buflen >= CEREBRO_METRIC_RESPONSE_HEADER_LEN);
 
   memset(buf, '\0', buflen);
 
@@ -149,92 +148,102 @@ _cerebrod_metric_response_marshall(struct cerebro_metric_response *res,
     }
   count += len;
 
-  memset(val_buf, '\0', CEREBRO_METRIC_VALUE_LEN);
-  switch(res->metric_type)
+  if ((len = _cerebro_marshall_unsigned_int32(res->metric_len, 
+                                              buf + count, 
+                                              buflen - count)) < 0)
     {
-    case CEREBRO_METRIC_TYPE_NONE:
-      break;
-    case CEREBRO_METRIC_TYPE_BOOL:
-      if ((len = _cerebro_marshall_int8(res->metric_value.val_bool, 
-                                        val_buf, 
-                                        CEREBRO_METRIC_VALUE_LEN)) < 0)
-        {
-          cerebro_err_debug("%s(%s:%d): _cerebro_marshall_int8",
-                            __FILE__, __FUNCTION__, __LINE__);
-          return -1;
-        }
-      break;
-    case CEREBRO_METRIC_TYPE_INT32:
-      if ((len = _cerebro_marshall_int32(res->metric_value.val_int32, 
-                                        val_buf, 
-                                        CEREBRO_METRIC_VALUE_LEN)) < 0)
-        {
-          cerebro_err_debug("%s(%s:%d): _cerebro_marshall_int32",
-                            __FILE__, __FUNCTION__, __LINE__);
-          return -1;
-        }
-      break;
-    case CEREBRO_METRIC_TYPE_UNSIGNED_INT32:
-      if ((len = _cerebro_marshall_unsigned_int32(res->metric_value.val_unsigned_int32, 
-                                                  val_buf, 
-                                                  CEREBRO_METRIC_VALUE_LEN)) < 0)
-        {
-          cerebro_err_debug("%s(%s:%d): _cerebro_marshall_unsigned_int32",
-                            __FILE__, __FUNCTION__, __LINE__);
-          return -1;
-        }
-      break;
-    case CEREBRO_METRIC_TYPE_FLOAT:
-      if ((len = _cerebro_marshall_float(res->metric_value.val_float, 
-                                        val_buf, 
-                                        CEREBRO_METRIC_VALUE_LEN)) < 0)
-        {
-          cerebro_err_debug("%s(%s:%d): _cerebro_marshall_float",
-                            __FILE__, __FUNCTION__, __LINE__);
-          return -1;
-        }
-      break;
-    case CEREBRO_METRIC_TYPE_DOUBLE:
-      if ((len = _cerebro_marshall_double(res->metric_value.val_double, 
-                                          val_buf, 
-                                          CEREBRO_METRIC_VALUE_LEN)) < 0)
-        {
-          cerebro_err_debug("%s(%s:%d): _cerebro_marshall_double",
-                            __FILE__, __FUNCTION__, __LINE__);
-          return -1;
-        }
-      break;
-    case CEREBRO_METRIC_TYPE_STRING:
-      if ((len = _cerebro_marshall_buffer(res->metric_value.val_string,
-                                          sizeof(res->metric_value.val_string),
-                                          val_buf,
-                                          CEREBRO_METRIC_VALUE_LEN)) < 0)
-        {
-          cerebro_err_debug("%s(%s:%d): _cerebro_marshall_buffer",
-                            __FILE__, __FUNCTION__, __LINE__);
-          return -1;
-        }
-      break;
-    default:
-      cerebro_err_debug("%s(%s:%d): invalid type: %d",
-                        __FILE__, __FUNCTION__, __LINE__,
-                        res->metric_type);
-      return -1;
-    }
-
-  if ((len = _cerebro_marshall_buffer(val_buf,
-                                      sizeof(val_buf),
-                                      buf + count,
-                                      buflen - count)) < 0)
-    {
-      cerebro_err_debug("%s(%s:%d): _cerebro_marshall_buffer",
-			__FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug("%s(%s:%d): _cerebro_marshall_unsigned_int32",
+                        __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
   count += len;
-
+  
+  if (res->metric_len)
+    {
+      switch(res->metric_type)
+        {
+        case CEREBRO_METRIC_TYPE_NONE:
+          cerebro_err_debug("%s(%s:%d): packet metric_len > 0 for metric_type NONE",
+                            __FILE__, __FUNCTION__, __LINE__);
+          break;
+        case CEREBRO_METRIC_TYPE_BOOL:
+          if ((len = _cerebro_marshall_int8(*((int8_t *)res->metric_data), 
+                                            buf + count,
+                                            buflen - count)) < 0)
+            {
+              cerebro_err_debug("%s(%s:%d): _cerebro_marshall_int8",
+                                __FILE__, __FUNCTION__, __LINE__);
+              return -1;
+            }
+          count += len;
+          break;
+        case CEREBRO_METRIC_TYPE_INT32:
+          if ((len = _cerebro_marshall_int32(*((int32_t *)res->metric_data),
+                                             buf + count,
+                                             buflen - count)) < 0)
+            {
+              cerebro_err_debug("%s(%s:%d): _cerebro_marshall_int32",
+                                __FILE__, __FUNCTION__, __LINE__);
+              return -1;
+            }
+          count += len;
+          break;
+        case CEREBRO_METRIC_TYPE_UNSIGNED_INT32:
+          if ((len = _cerebro_marshall_unsigned_int32(*((u_int32_t *)res->metric_data),
+                                                      buf + count,
+                                                      buflen - count)) < 0)
+            {
+              cerebro_err_debug("%s(%s:%d): _cerebro_marshall_unsigned_int32",
+                                __FILE__, __FUNCTION__, __LINE__);
+              return -1;
+            }
+          count += len;
+          break;
+        case CEREBRO_METRIC_TYPE_FLOAT:
+          if ((len = _cerebro_marshall_float(*((float *)res->metric_data), 
+                                             buf + count,
+                                             buflen - count)) < 0)
+            {
+              cerebro_err_debug("%s(%s:%d): _cerebro_marshall_float",
+                                __FILE__, __FUNCTION__, __LINE__);
+              return -1;
+            }
+          count += len;
+          break;
+        case CEREBRO_METRIC_TYPE_DOUBLE:
+          if ((len = _cerebro_marshall_double(*((double *)res->metric_data), 
+                                              buf + count,
+                                              buflen - count)) < 0)
+            {
+              cerebro_err_debug("%s(%s:%d): _cerebro_marshall_double",
+                                __FILE__, __FUNCTION__, __LINE__);
+              return -1;
+            }
+          count += len;
+          break;
+        case CEREBRO_METRIC_TYPE_STRING:
+          if ((len = _cerebro_marshall_buffer(res->metric_data,
+                                              res->metric_len,
+                                              buf + count,
+                                              buflen - count)) < 0)
+            {
+              cerebro_err_debug("%s(%s:%d): _cerebro_marshall_buffer",
+                                __FILE__, __FUNCTION__, __LINE__);
+              return -1;
+            }
+          count += len;
+          break;
+        default:
+          cerebro_err_debug("%s(%s:%d): invalid type: %d",
+                            __FILE__, __FUNCTION__, __LINE__,
+                            res->metric_type);
+          return -1;
+        }
+     
+    }
   return count;
 }
+
 
 /*
  * _cerebrod_metric_err_response_marshall
@@ -579,30 +588,10 @@ _cerebrod_metric_respond_with_error(int client_fd,
          || metric_err_code == CEREBRO_METRIC_PROTOCOL_ERR_PACKET_INVALID
 	 || metric_err_code == CEREBRO_METRIC_PROTOCOL_ERR_INTERNAL_SYSTEM_ERROR);
   
-  memset(&res, '\0', CEREBRO_METRIC_RESPONSE_PACKET_LEN);
-
-  /* 
-   * If the version sent is an older version, send a packet in
-   * that older verion's packet format.  If it is a version that
-   * we don't know of, fall through to the err_response section.
-   */
-
-  if (metric_err_code == CEREBRO_METRIC_PROTOCOL_ERR_VERSION_INVALID)
-    {
-      if (version == 1)
-        {
-          res.version = version;
-          res.metric_err_code = CEREBRO_METRIC_PROTOCOL_ERR_VERSION_INVALID;
-          res.end_of_responses = CEREBRO_METRIC_PROTOCOL_IS_LAST_RESPONSE;
-
-          if (_cerebrod_metric_response_send_one(client_fd, &res) < 0)
-            return -1;
-
-          return 0;
-        }
-    }
+  memset(&res, '\0', sizeof(struct cerebro_metric_response));
 
   if (metric_err_code == CEREBRO_METRIC_PROTOCOL_ERR_VERSION_INVALID
+      || metric_err_code == CEREBRO_METRIC_PROTOCOL_ERR_VERSION_INVALID
       || metric_err_code == CEREBRO_METRIC_PROTOCOL_ERR_PACKET_INVALID)
     {
       struct cerebro_metric_err_response err_res;
@@ -662,8 +651,9 @@ _cerebrod_metric_response_send_all(void *x, void *arg)
  */
 static int
 _cerebrod_metric_response_create(char *nodename,
-                                 cerebro_metric_type_t metric_type,
-                                 cerebro_metric_value_t *metric_value,
+                                 u_int32_t metric_type,
+                                 u_int32_t metric_len,
+                                 void *metric_data,
                                  List node_responses)
 {
   struct cerebro_metric_response *res = NULL;
@@ -671,6 +661,24 @@ _cerebrod_metric_response_create(char *nodename,
   assert(nodename);
   assert(node_responses);
   
+  if ((metric_type == CEREBRO_METRIC_TYPE_NONE && metric_len)
+      || (metric_type != CEREBRO_METRIC_TYPE_NONE && !metric_len))
+    {
+      cerebro_err_debug("%s(%s:%d): metric_type = %d, metric_len = %d",
+                        __FILE__, __FUNCTION__, __LINE__, 
+                        metric_type, metric_len);
+      return -1;
+    }
+
+  if ((metric_len && !metric_data)
+      || (!metric_len && metric_data))
+    {
+      cerebro_err_debug("%s(%s:%d): metric_len = %d, metric_data = %p",
+                        __FILE__, __FUNCTION__, __LINE__, 
+                        metric_len, metric_data);
+      return -1;
+    }
+
   if (!(res = malloc(sizeof(struct cerebro_metric_response))))
     {
       cerebro_err_debug("%s(%s:%d): out of memory",
@@ -693,10 +701,18 @@ _cerebrod_metric_response_create(char *nodename,
   strncpy(res->nodename, nodename, CEREBRO_MAXNODENAMELEN);
       
   res->metric_type = metric_type;
-  if (metric_value)
-    memcpy(&(res->metric_value), 
-           metric_value, 
-           sizeof(cerebro_metric_value_t));
+  res->metric_len = metric_len;
+  
+  if (metric_len)
+    {
+      if (!(res->metric_data = (void *)malloc(metric_len)))
+        {
+          cerebro_err_debug("%s(%s:%d): out of memory",
+                            __FILE__, __FUNCTION__, __LINE__);
+          return -1;
+        }
+      memcpy(res->metric_data, metric_data, metric_len);
+    }
   
   if (!list_append(node_responses, res))
     {
@@ -709,7 +725,12 @@ _cerebrod_metric_response_create(char *nodename,
   return 0;
 
  cleanup:
-  Free(res);
+  if (res)
+    {
+      if (res->metric_data)
+        free(res->metric_data);
+      free(res);
+    }
   return -1;
 }
 
@@ -760,6 +781,7 @@ _cerebrod_metric_evaluate(void *x, void *arg)
     {
       if (_cerebrod_metric_response_create(nd->nodename,
                                            CEREBRO_METRIC_TYPE_NONE,
+                                           0,
                                            NULL,
                                            ed->node_responses) < 0)
         {
@@ -773,6 +795,7 @@ _cerebrod_metric_evaluate(void *x, void *arg)
         {
           if (_cerebrod_metric_response_create(nd->nodename,
                                                CEREBRO_METRIC_TYPE_NONE,
+                                               0,
                                                NULL,
                                                ed->node_responses) < 0)
             {
@@ -787,6 +810,7 @@ _cerebrod_metric_evaluate(void *x, void *arg)
         {
           if (_cerebrod_metric_response_create(nd->nodename,
                                                CEREBRO_METRIC_TYPE_NONE,
+                                               0,
                                                NULL,
                                                ed->node_responses) < 0)
             {
@@ -797,16 +821,17 @@ _cerebrod_metric_evaluate(void *x, void *arg)
     }
   else if (!strcmp(ed->req->metric_name, CEREBRO_METRIC_UPDOWN_STATE))
     {
-      cerebro_metric_value_t metric_value;
+      u_int32_t updown_state;
 
       if ((ed->time_now - nd->last_received_time) < ed->req->timeout_len)
-        metric_value.val_unsigned_int32 = CEREBRO_METRIC_UPDOWN_STATE_NODE_UP;
+        updown_state = CEREBRO_METRIC_UPDOWN_STATE_NODE_UP;
       else
-        metric_value.val_unsigned_int32 = CEREBRO_METRIC_UPDOWN_STATE_NODE_DOWN;
+        updown_state = CEREBRO_METRIC_UPDOWN_STATE_NODE_DOWN;
 
       if (_cerebrod_metric_response_create(nd->nodename,
                                            CEREBRO_METRIC_TYPE_UNSIGNED_INT32,
-                                           &metric_value,
+                                           sizeof(u_int32_t),
+                                           &updown_state,
                                            ed->node_responses) < 0)
         {
           Pthread_mutex_unlock(&(nd->node_data_lock));
@@ -815,12 +840,10 @@ _cerebrod_metric_evaluate(void *x, void *arg)
     }
   else if (!strcmp(ed->req->metric_name, CEREBRO_METRIC_LAST_RECEIVED_TIME))
     {
-      cerebro_metric_value_t metric_value;
-
-      metric_value.val_unsigned_int32 = nd->last_received_time;
       if (_cerebrod_metric_response_create(nd->nodename,
                                            CEREBRO_METRIC_TYPE_UNSIGNED_INT32,
-                                           &metric_value,
+                                           sizeof(u_int32_t),
+                                           &(nd->last_received_time),
                                            ed->node_responses) < 0)
         {
           Pthread_mutex_unlock(&(nd->node_data_lock));
@@ -837,7 +860,8 @@ _cerebrod_metric_evaluate(void *x, void *arg)
         {
           if (_cerebrod_metric_response_create(nd->nodename,
                                                data->metric_type,
-                                               &(data->metric_value),
+                                               data->metric_len,
+                                               data->metric_data,
                                                ed->node_responses) < 0)
             {
               Pthread_mutex_unlock(&(nd->node_data_lock));
@@ -848,6 +872,7 @@ _cerebrod_metric_evaluate(void *x, void *arg)
         {
           if (_cerebrod_metric_response_create(nd->nodename,
                                                CEREBRO_METRIC_TYPE_NONE,
+                                               0,
                                                NULL,
                                                ed->node_responses) < 0)
             {
@@ -862,6 +887,22 @@ _cerebrod_metric_evaluate(void *x, void *arg)
 
   Pthread_mutex_unlock(&(nd->node_data_lock));
   return 0;
+}
+
+/* 
+ * _cerebrod_metric_response_destroy
+ *
+ * destroy a metric server data response
+ */
+static void
+_cerebrod_metric_response_destroy(void *x)
+{
+  struct cerebro_metric_response *res = (struct cerebro_metric_response *)x;
+
+  assert(x);
+ 
+  free(res->metric_data);
+  free(res);
 }
 
 /*  
@@ -890,7 +931,7 @@ _cerebrod_metric_respond_with_nodes(int client_fd, struct cerebro_metric_request
       goto end_response;
     }
 
-  if (!(node_responses = list_create((ListDelF)free)))
+  if (!(node_responses = list_create((ListDelF)_cerebrod_metric_response_destroy)))
     {
       cerebro_err_debug("%s(%s:%d): list_create: %s", 
                         __FILE__, __FUNCTION__, __LINE__,
@@ -1035,6 +1076,7 @@ _cerebrod_metric_service_connection(void *arg)
   return NULL;
 }
 
+
 void *
 cerebrod_metric(void *arg)
 {
@@ -1047,3 +1089,4 @@ cerebrod_metric(void *arg)
 
   return NULL;			/* NOT REACHED */
 }
+

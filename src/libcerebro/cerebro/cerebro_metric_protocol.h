@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_protocol.h,v 1.14 2005-06-03 22:54:42 achu Exp $
+ *  $Id: cerebro_metric_protocol.h,v 1.15 2005-06-06 20:39:55 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_METRIC_PROTOCOL_H
@@ -36,7 +36,7 @@
  *   message.
  */
 
-#define CEREBRO_METRIC_PROTOCOL_VERSION                    1
+#define CEREBRO_METRIC_PROTOCOL_VERSION                    2
 #define CEREBRO_METRIC_PROTOCOL_SERVER_TIMEOUT_LEN         3
 #define CEREBRO_METRIC_PROTOCOL_CLIENT_TIMEOUT_LEN         5
 #define CEREBRO_METRIC_PROTOCOL_CONNECT_TIMEOUT_LEN        5
@@ -46,7 +46,6 @@
 #define CEREBRO_METRIC_DOWN_NODES                          "down_nodes"
 #define CEREBRO_METRIC_UPDOWN_STATE                        "updown_state"
 #define CEREBRO_METRIC_LAST_RECEIVED_TIME                  "last_received_time"
-#define CEREBRO_METRIC_STARTTIME                           "starttime"
 #define CEREBRO_METRIC_BOOTTIME                            "boottime"
 
 #define CEREBRO_METRIC_PROTOCOL_ERR_SUCCESS                0
@@ -76,8 +75,6 @@
 
 #define CEREBRO_METRIC_MAX                        16
 
-#define CEREBRO_METRIC_NAME_MAXLEN                32
-
 #define CEREBRO_METRIC_STRING_MAXLEN              64
 
 #define CEREBRO_METRIC_STRING_PARAM_MAXLEN        64
@@ -96,8 +93,7 @@ typedef enum {
   CEREBRO_METRIC_TYPE_UNSIGNED_INT32 = 3,
   CEREBRO_METRIC_TYPE_FLOAT = 4,
   CEREBRO_METRIC_TYPE_DOUBLE = 5,
-  CEREBRO_METRIC_TYPE_STRING = 6,
-  CEREBRO_METRIC_TYPE_RAW_DATA = 7
+  CEREBRO_METRIC_TYPE_STRING = 6
 } cerebro_metric_type_t;
 
 /* 
@@ -143,16 +139,16 @@ struct cerebro_metric_response
   u_int32_t metric_err_code;
   u_int8_t end_of_responses;
   char nodename[CEREBRO_MAXNODENAMELEN];
-  cerebro_metric_type_t metric_type;
-  cerebro_metric_value_t metric_value;
+  u_int32_t metric_type;
+  u_int32_t metric_len;
+  void *metric_data;
 };
   
-#define CEREBRO_METRIC_RESPONSE_PACKET_LEN  (sizeof(int32_t) \
+#define CEREBRO_METRIC_RESPONSE_HEADER_LEN  (sizeof(int32_t) \
                                              + sizeof(u_int32_t) \
                                              + sizeof(u_int8_t) \
                                              + CEREBRO_MAXNODENAMELEN \
-                                             + sizeof(u_int32_t) \
-                                             + CEREBRO_METRIC_VALUE_LEN)
+                                             + sizeof(u_int32_t))
 
 /*
  * struct cerebro_metric_err_response

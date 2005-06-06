@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric.c,v 1.14 2005-06-03 23:51:52 achu Exp $
+ *  $Id: cerebro_metric.c,v 1.15 2005-06-06 20:39:55 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -40,6 +40,7 @@
 #include "cerebro/cerebro_metric_protocol.h"
 #include "fd.h"
 
+#if 0
 /* 
  * _cerebro_metric_protocol_err_conversion
  *
@@ -725,3 +726,4 @@ cerebro_get_metric_data(cerebro_t handle,
     (void)cerebro_nodelist_destroy(nodelist);
   return NULL;
 }
+#endif /* 0 */

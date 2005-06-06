@@ -8,10 +8,22 @@ Testing
 Cleanup
 - cleanup common hash into "data" and put in data.c??
 - 'get' configuration routines?
+- don't use packet buflen #define, need to allocate buffer appropriately.
 - move metric_type definitions into cerebro.h or somewhere better
   - and document
 - move get_data flags into cerebro.h or somewhere better
   - and document
+- move metric constants/#defines from cerebro_metric_protocol.h to
+  somewhere else.
+- configurable max metrics via config file of module
+- possible mem-leak??
+- function to determine sizeof type based on metric_type.
+- common heartbeat destroy?
+  - for speaker/listerner
+- data vs. hb_data vs. metric_data
+- sizeof vs. packet_len-defines
+  - use sizeof on structs
+  - use defines on buffers
 
 Audit
 - code review to reduce memory footprint
@@ -21,7 +33,10 @@ Portability
 - Non-pthreads support
 
 Design
+- metric_max - remove from node_data hash and #define of it
+  - rehash nodedata hash as required
 - make cerebro calls pthread safe??
+- raw metric_data type
 - metric modules
   - modules for starttime/boottime
 - metric_type --> metric_value_type ??
