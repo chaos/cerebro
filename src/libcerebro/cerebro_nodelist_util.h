@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_nodelist_util.h,v 1.6 2005-06-03 21:26:04 achu Exp $
+ *  $Id: cerebro_nodelist_util.h,v 1.7 2005-06-06 23:35:06 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_NODELIST_UTIL_H
@@ -37,8 +37,9 @@ cerebro_nodelist_t _cerebro_nodelist_create(cerebro_t handle,
  */
 int _cerebro_nodelist_append(cerebro_nodelist_t nodelist,
 			     const char *nodename,
-                             cerebro_metric_type_t metric_type,
-			     cerebro_metric_value_t *metric_value);
+                             u_int32_t metric_type,
+                             u_int32_t metric_len,
+                             void *metric_data);
 
 /*
  * _cerebro_nodelist_sort

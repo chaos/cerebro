@@ -4,11 +4,13 @@
 
 	* Removed starttime metric.
 
-	* Reworked heartbeat protocol to use variable length data
+	* Reworked heartbeat protocol to use variable length data.
 
-	* Reworked heartbeat protocol to use variable length metrics
+	* Reworked heartbeat protocol to use variable length metrics.
 
-	* Reworked metric protocol to use variable length data
+	* Reworked metric protocol to use variable length data.
+
+	* Reworked libcerebro library around new protocol.
 	
 2005-06-03  Albert Chu  <chu11@llnl.gov>
 

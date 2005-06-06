@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric.c,v 1.21 2005-06-06 22:14:50 achu Exp $
+ *  $Id: cerebrod_metric.c,v 1.22 2005-06-06 23:35:06 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -378,7 +378,7 @@ static int
 _cerebrod_metric_request_receive(int client_fd,	
 				 struct cerebro_metric_request *req)
 {
-  int rv, bytes_read = 0;
+  int count, bytes_read = 0;
   char buf[CEREBRO_PACKET_BUFLEN];
   
   assert(client_fd >= 0);
@@ -457,10 +457,10 @@ _cerebrod_metric_request_receive(int client_fd,
     }
 
  unmarshall_received:
-  if ((rv = _cerebrod_metric_request_unmarshall(req, buf, bytes_read)) < 0)
+  if ((count = _cerebrod_metric_request_unmarshall(req, buf, bytes_read)) < 0)
     goto cleanup;
 
-  return rv;
+  return count;
 
  cleanup:
   return -1;

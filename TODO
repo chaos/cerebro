@@ -6,6 +6,7 @@ Testing
 - mem-leaking
 
 Cleanup
+- nodelist API, to match new code??
 - cleanup common hash into "data" and put in data.c??
 - 'get' configuration routines?
 - don't use packet buflen #define, need to allocate buffer appropriately.
@@ -24,6 +25,8 @@ Cleanup
 - sizeof vs. packet_len-defines
   - use sizeof on structs
   - use defines on buffers
+
+--> data vs. value argh!!!
 
 Audit
 - code review to reduce memory footprint

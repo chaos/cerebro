@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_nodelist_util.c,v 1.10 2005-06-03 21:26:04 achu Exp $
+ *  $Id: cerebro_nodelist_util.c,v 1.11 2005-06-06 23:35:06 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -61,6 +61,21 @@ _cerebro_nodelist_check(cerebro_nodelist_t nodelist)
   return 0;
 }
 
+/* 
+ * _cerebro_nodelist_data_destroy
+ *
+ * Free contents of a nodelist data item
+ */
+static void
+_cerebro_nodelist_data_destroy(void *x)
+{
+  struct cerebro_nodelist_data *data;
+  
+  if (data->metric_data)
+    free(data->metric_data);
+  free(data);
+}
+
 cerebro_nodelist_t 
 _cerebro_nodelist_create(cerebro_t handle, const char *metric_name)
 {
@@ -76,7 +91,7 @@ _cerebro_nodelist_create(cerebro_t handle, const char *metric_name)
   nodelist->magic = CEREBRO_NODELIST_MAGIC_NUMBER;
   strcpy(nodelist->metric_name, metric_name);
 
-  if (!(nodelist->nodes = list_create(free)))
+  if (!(nodelist->nodes = list_create((ListDelF)_cerebro_nodelist_data_destroy)))
     {
       handle->errnum = CEREBRO_ERR_OUTMEM;
       goto cleanup;
@@ -116,8 +131,9 @@ _cerebro_nodelist_create(cerebro_t handle, const char *metric_name)
 int 
 _cerebro_nodelist_append(cerebro_nodelist_t nodelist,
 			 const char *nodename,
-                         cerebro_metric_type_t metric_type,
-			 cerebro_metric_value_t *metric_value)
+                         u_int32_t metric_type,
+                         u_int32_t metric_len,
+                         void *metric_data)
 {
   struct cerebro_nodelist_data *data;
 
@@ -139,7 +155,8 @@ _cerebro_nodelist_append(cerebro_nodelist_t nodelist,
 
   strcpy(data->nodename, nodename);
   data->metric_type = metric_type;
-  memcpy(&(data->metric_value), metric_value, sizeof(cerebro_metric_value_t));
+  data->metric_len = metric_len;
+  data->metric_data = metric_data;
 
   if (!list_append(nodelist->nodes, data))
     {
