@@ -1,3 +1,7 @@
+2005-06-06  Albert Chu  <chu11@llnl.gov>
+
+	* tagged pre-heartbeat-protocol-change-1
+	
 2005-06-03  Albert Chu  <chu11@llnl.gov>
 
 	* Cleaned up module loading/unloading libcerebro library calls.
