@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_protocol.h,v 1.15 2005-06-06 20:39:55 achu Exp $
+ *  $Id: cerebro_metric_protocol.h,v 1.16 2005-06-06 22:14:50 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_METRIC_PROTOCOL_H
@@ -15,7 +15,7 @@
  * 
  * Server -> Client
  * - Stream of responses indicating nodenames and metric values.
- *   Nodes returned will depend on the request.  After the stream of
+ *   Nodes returned will depend on the request flags.  After the stream of
  *   nodes is complete, an "end of responses" response will indicate the
  *   end of stream and completion of the request.  This "end of
  *   responses" response will be sent even if no nodes are returned
@@ -24,11 +24,10 @@
  *
  * - On "normal" errors, the "end of responses" packet will contain 
  *   the error code.
- * - On version incompatability errors, older version responses
- *   will be sent from the server containing the error code.
- * - On version incompatability errors in which an older version does
- *   not exist and invalid packet format errors, an eight byte packet
- *   containing only the version and error code will be the response.
+ *
+ * - On version incompatability errors and invalid packet format
+ *   errors, an eight byte packet containing only the version and error
+ *   code will be the response.
  *
  * Notes:
  * - Require a smaller timeout len for the server than the client, 
@@ -148,6 +147,7 @@ struct cerebro_metric_response
                                              + sizeof(u_int32_t) \
                                              + sizeof(u_int8_t) \
                                              + CEREBRO_MAXNODENAMELEN \
+                                             + sizeof(u_int32_t) \
                                              + sizeof(u_int32_t))
 
 /*

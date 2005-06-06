@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric.c,v 1.20 2005-06-06 20:39:55 achu Exp $
+ *  $Id: cerebrod_metric.c,v 1.21 2005-06-06 22:14:50 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -241,6 +241,7 @@ _cerebrod_metric_response_marshall(struct cerebro_metric_response *res,
         }
      
     }
+
   return count;
 }
 
