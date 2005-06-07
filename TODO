@@ -2,6 +2,7 @@ Documention
 - cerebro.1 manpage
 
 Testing
+- all protocol error conditions
 - fd leaking
 - mem-leaking
 

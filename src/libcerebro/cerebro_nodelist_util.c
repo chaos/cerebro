@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_nodelist_util.c,v 1.11 2005-06-06 23:35:06 achu Exp $
+ *  $Id: cerebro_nodelist_util.c,v 1.12 2005-06-07 16:18:58 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -71,6 +71,8 @@ _cerebro_nodelist_data_destroy(void *x)
 {
   struct cerebro_nodelist_data *data;
   
+  data = (struct cerebro_nodelist_data *)x;
+
   if (data->metric_data)
     free(data->metric_data);
   free(data);

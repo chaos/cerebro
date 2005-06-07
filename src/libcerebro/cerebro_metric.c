@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric.c,v 1.16 2005-06-06 23:35:06 achu Exp $
+ *  $Id: cerebro_metric.c,v 1.17 2005-06-07 16:18:58 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -484,6 +484,16 @@ _cerebro_metric_response_receive_data(cerebro_t handle,
       goto cleanup;
     }
 
+  if (buflen < bytes_to_read)
+    {
+      cerebro_err_debug_lib("%s(%s:%d): invalid buflen: "
+                            "bytes_to_read = %d buflen = %d",
+                            __FILE__, __FUNCTION__, __LINE__,
+                            bytes_to_read, buflen);
+      handle->errnum = CEREBRO_ERR_INTERNAL;
+      goto cleanup;
+    }
+
   while (bytes_read < bytes_to_read)
     {
       fd_set rfds;
@@ -534,7 +544,7 @@ _cerebro_metric_response_receive_data(cerebro_t handle,
            */
           if ((n = read(fd,
                         buf + bytes_read,
-                        buflen - bytes_read)) < 0)
+                        bytes_to_read - bytes_read)) < 0)
             {
 	      cerebro_err_debug_lib("%s(%s:%d): read: %s",
 				    __FILE__, __FUNCTION__, __LINE__,
@@ -618,7 +628,7 @@ _cerebro_metric_response_receive_one(cerebro_t handle,
                                                               buf,
                                                               CEREBRO_PACKET_BUFLEN)) < 0)
         goto cleanup;
-
+      
       if ((metric_data_count = _cerebro_metric_response_metric_data_unmarshall(handle,
                                                                                res,
                                                                                buf,
@@ -627,7 +637,7 @@ _cerebro_metric_response_receive_one(cerebro_t handle,
     }
   else
     res->metric_data = NULL;
-  
+
   return header_count + metric_data_count;
 
  cleanup:
