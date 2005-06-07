@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.35 2005-06-06 20:39:55 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.36 2005-06-07 17:26:50 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -196,12 +196,12 @@ _cerebrod_heartbeat_create(void)
   /* XXX cleanup */
   strncpy(data->metric_name, "boottime", CEREBRO_METRIC_NAME_MAXLEN);
   /* XXX need a function to calculate this here instead */
-  data->metric_type = CEREBRO_METRIC_TYPE_UNSIGNED_INT32;
-  data->metric_len = sizeof(u_int32_t);
+  data->metric_value_type = CEREBRO_METRIC_VALUE_TYPE_UNSIGNED_INT32;
+  data->metric_value_len = sizeof(u_int32_t);
   
-  data->metric_data = Malloc(data->metric_len);
+  data->metric_value = Malloc(data->metric_value_len);
   boottime = cerebrod_get_boottime();
-  memcpy(data->metric_data, &boottime, data->metric_len);
+  memcpy(data->metric_value, &boottime, data->metric_value_len);
 
   hb->metrics[0] = data;
 
@@ -226,7 +226,7 @@ _cerebrod_heartbeat_destroy(struct cerebrod_heartbeat *hb)
 
   for (i = 0; i < hb->metrics_len; i++)
     {
-      Free(hb->metrics[i]->metric_data);
+      Free(hb->metrics[i]->metric_value);
       Free(hb->metrics[i]);
     }
   
@@ -287,69 +287,69 @@ _cerebrod_heartbeat_marshall(struct cerebrod_heartbeat *hb,
                              __FILE__, __FUNCTION__, __LINE__);
           count += len;
           
-          if ((len = _cerebro_marshall_unsigned_int32(hb->metrics[i]->metric_type,
+          if ((len = _cerebro_marshall_unsigned_int32(hb->metrics[i]->metric_value_type,
                                                       buf + count,
                                                       buflen - count)) < 0)
             cerebro_err_exit("%s(%s:%d): _cerebro_marshall_unsigned_int32",
                              __FILE__, __FUNCTION__, __LINE__);
           count += len;
           
-          if ((len = _cerebro_marshall_unsigned_int32(hb->metrics[i]->metric_len,
+          if ((len = _cerebro_marshall_unsigned_int32(hb->metrics[i]->metric_value_len,
                                                       buf + count,
                                                       buflen - count)) < 0)
             cerebro_err_exit("%s(%s:%d): _cerebro_marshall_unsigned_int32",
                              __FILE__, __FUNCTION__, __LINE__);
           count += len;
           
-          switch(hb->metrics[i]->metric_type)
+          switch(hb->metrics[i]->metric_value_type)
             {
-            case CEREBRO_METRIC_TYPE_NONE:
-              cerebro_err_debug("%s(%s:%d): packet metric_len > 0 for metric_type NONE",
+            case CEREBRO_METRIC_VALUE_TYPE_NONE:
+              cerebro_err_debug("%s(%s:%d): packet metric_value_len > 0 for metric_value_type NONE",
                                 __FILE__, __FUNCTION__, __LINE__);
               break;
-            case CEREBRO_METRIC_TYPE_BOOL:
-              if ((len = _cerebro_marshall_int8(*((int8_t *)hb->metrics[i]->metric_data),
+            case CEREBRO_METRIC_VALUE_TYPE_BOOL:
+              if ((len = _cerebro_marshall_int8(*((int8_t *)hb->metrics[i]->metric_value),
                                                 buf + count,
                                                 buflen - count)) < 0)
                 cerebro_err_exit("%s(%s:%d): _cerebro_marshall_int8",
                                  __FILE__, __FUNCTION__, __LINE__);
               count += len;
               break;
-            case CEREBRO_METRIC_TYPE_INT32:
-              if ((len = _cerebro_marshall_int32(*((int32_t *)hb->metrics[i]->metric_data),
+            case CEREBRO_METRIC_VALUE_TYPE_INT32:
+              if ((len = _cerebro_marshall_int32(*((int32_t *)hb->metrics[i]->metric_value),
                                                  buf + count,
                                                  buflen - count)) < 0)
                 cerebro_err_exit("%s(%s:%d): _cerebro_marshall_int32",
                                  __FILE__, __FUNCTION__, __LINE__);
               count += len;
               break;
-            case CEREBRO_METRIC_TYPE_UNSIGNED_INT32:
-              if ((len = _cerebro_marshall_unsigned_int32(*((u_int32_t *)hb->metrics[i]->metric_data),
+            case CEREBRO_METRIC_VALUE_TYPE_UNSIGNED_INT32:
+              if ((len = _cerebro_marshall_unsigned_int32(*((u_int32_t *)hb->metrics[i]->metric_value),
                                                           buf + count,
                                                           buflen - count)) < 0)
                 cerebro_err_exit("%s(%s:%d): _cerebro_marshall_unsigned_int32",
                                  __FILE__, __FUNCTION__, __LINE__);
               count += len;
               break;
-            case CEREBRO_METRIC_TYPE_FLOAT:
-              if ((len = _cerebro_marshall_float(*((float *)hb->metrics[i]->metric_data),
+            case CEREBRO_METRIC_VALUE_TYPE_FLOAT:
+              if ((len = _cerebro_marshall_float(*((float *)hb->metrics[i]->metric_value),
                                                  buf + count,
                                                  buflen - count)) < 0)
                 cerebro_err_exit("%s(%s:%d): _cerebro_marshall_float",
                                  __FILE__, __FUNCTION__, __LINE__);
               count += len;
               break;
-            case CEREBRO_METRIC_TYPE_DOUBLE:
-              if ((len = _cerebro_marshall_double(*((double *)hb->metrics[i]->metric_data),
+            case CEREBRO_METRIC_VALUE_TYPE_DOUBLE:
+              if ((len = _cerebro_marshall_double(*((double *)hb->metrics[i]->metric_value),
                                                   buf + count,
                                                   buflen - count)) < 0)
                 cerebro_err_exit("%s(%s:%d): _cerebro_marshall_double",
                                  __FILE__, __FUNCTION__, __LINE__);
               count += len;
               break;
-            case CEREBRO_METRIC_TYPE_STRING:
-              if ((len = _cerebro_marshall_buffer((char *)hb->metrics[i]->metric_data,
-                                                  hb->metrics[i]->metric_len,
+            case CEREBRO_METRIC_VALUE_TYPE_STRING:
+              if ((len = _cerebro_marshall_buffer((char *)hb->metrics[i]->metric_value,
+                                                  hb->metrics[i]->metric_value_len,
                                                   buf + count,
                                                   buflen - count)) < 0)
                 cerebro_err_exit("%s(%s:%d): _cerebro_marshall_buffer",
@@ -359,7 +359,7 @@ _cerebrod_heartbeat_marshall(struct cerebrod_heartbeat *hb,
             default:
               cerebro_err_exit("%s(%s:%d): invalid metric type: %d",
                                __FILE__, __FUNCTION__, __LINE__,
-                               hb->metrics[i]->metric_type);
+                               hb->metrics[i]->metric_value_type);
               break;
             }
         }

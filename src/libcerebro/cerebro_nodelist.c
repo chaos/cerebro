@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_nodelist.c,v 1.17 2005-06-06 23:35:06 achu Exp $
+ *  $Id: cerebro_nodelist.c,v 1.18 2005-06-07 17:26:50 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -60,9 +60,9 @@ _cerebro_nodelist_find_func(void *x, void *key)
 int 
 cerebro_nodelist_find(cerebro_nodelist_t nodelist, 
 		      const char *node,
-		      void **metric_value,
-                      unsigned int *metric_type,
-                      unsigned int *metric_value_size)
+                      unsigned int *metric_value_type,
+                      unsigned int *metric_value_len,
+                      void **metric_value)
 {
   struct cerebro_nodelist_data *data;
   char nodebuf[CEREBRO_MAXNODENAMELEN+1];
@@ -115,14 +115,14 @@ cerebro_nodelist_find(cerebro_nodelist_t nodelist,
 
   if (data)
     {
+      if (metric_value_type)
+        *metric_value_type = data->metric_value_type;
+
+      if (metric_value_len)
+        *metric_value_len = data->metric_value_len;
+
       if (metric_value)
-        *metric_value = data->metric_data;
-
-      if (metric_type)
-        *metric_type = data->metric_type;
-
-      if (metric_value_size)
-        *metric_value_size = data->metric_len;
+        *metric_value = data->metric_value;
     }
 
   return (data) ? 1 : 0;
@@ -154,9 +154,9 @@ cerebro_nodelist_for_each(cerebro_nodelist_t nodelist,
   while ((data = list_next(itr)))
     {
       if (for_each(data->nodename, 
-                   data->metric_data, 
-                   data->metric_type,
-                   data->metric_len,
+                   data->metric_value_type,
+                   data->metric_value_len,
+                   data->metric_value, 
                    arg) < 0)
 	goto cleanup;
     }
@@ -328,9 +328,9 @@ cerebro_nodelist_iterator_nodename(cerebro_nodelist_iterator_t nodelistItr,
 
 int 
 cerebro_nodelist_iterator_metric_value(cerebro_nodelist_iterator_t nodelistItr,
-                                       void **metric_value,
-                                       unsigned int *metric_type,
-                                       unsigned int *metric_value_size)
+                                       unsigned int *metric_value_type,
+                                       unsigned int *metric_value_len,
+                                       void **metric_value)
 {
   if (_cerebro_nodelist_iterator_check(nodelistItr) < 0)
     return -1;
@@ -341,15 +341,15 @@ cerebro_nodelist_iterator_metric_value(cerebro_nodelist_iterator_t nodelistItr,
       return -1;
     }
 
+  if (metric_value_type)
+    *metric_value_type = nodelistItr->current->metric_value_type;
+  
+  if (metric_value_len)
+    *metric_value_len = nodelistItr->current->metric_value_len;
+  
   if (metric_value)
-    *metric_value = nodelistItr->current->metric_data;
-  
-  if (metric_type)
-    *metric_type = nodelistItr->current->metric_type;
-  
-  if (metric_value_size)
-    *metric_value_size = nodelistItr->current->metric_len;
-  
+    *metric_value = nodelistItr->current->metric_value;
+
   return 0;
 }
 

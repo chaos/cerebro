@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_heartbeat.c,v 1.27 2005-06-06 20:39:55 achu Exp $
+ *  $Id: cerebrod_heartbeat.c,v 1.28 2005-06-07 17:26:50 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -50,38 +50,38 @@ cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb)
       fprintf(stderr, "* metrics_len: %d\n", hb->metrics_len);
       for (i = 0; i < hb->metrics_len; i++)
         {
-          fprintf(stderr, "* %s: metric_type = %d, metric_len = %d ", 
+          fprintf(stderr, "* %s: metric_value_type = %d, metric_value_len = %d ", 
                   hb->metrics[i]->metric_name, 
-                  hb->metrics[i]->metric_type,
-                  hb->metrics[i]->metric_len);
+                  hb->metrics[i]->metric_value_type,
+                  hb->metrics[i]->metric_value_len);
 
-          switch(hb->metrics[i]->metric_type)
+          switch(hb->metrics[i]->metric_value_type)
             {
-            case CEREBRO_METRIC_TYPE_NONE:
+            case CEREBRO_METRIC_VALUE_TYPE_NONE:
               break;
-            case CEREBRO_METRIC_TYPE_BOOL:
-              fprintf(stderr, "metric_data = %d\n", 
-                      *((char *)hb->metrics[i]->metric_data));
+            case CEREBRO_METRIC_VALUE_TYPE_BOOL:
+              fprintf(stderr, "metric_value = %d\n", 
+                      *((char *)hb->metrics[i]->metric_value));
               break;
-            case CEREBRO_METRIC_TYPE_INT32:
-              fprintf(stderr, "metric_data = %d\n", 
-                      *((int32_t *)hb->metrics[i]->metric_data));
+            case CEREBRO_METRIC_VALUE_TYPE_INT32:
+              fprintf(stderr, "metric_value = %d\n", 
+                      *((int32_t *)hb->metrics[i]->metric_value));
               break;
-            case CEREBRO_METRIC_TYPE_UNSIGNED_INT32:
-              fprintf(stderr, "metric_data = %u\n", 
-                      *((u_int32_t *)hb->metrics[i]->metric_data));
+            case CEREBRO_METRIC_VALUE_TYPE_UNSIGNED_INT32:
+              fprintf(stderr, "metric_value = %u\n", 
+                      *((u_int32_t *)hb->metrics[i]->metric_value));
               break;
-            case CEREBRO_METRIC_TYPE_FLOAT:
-              fprintf(stderr, "metric_data = %f\n", 
-                      *((float *)hb->metrics[i]->metric_data));
+            case CEREBRO_METRIC_VALUE_TYPE_FLOAT:
+              fprintf(stderr, "metric_value = %f\n", 
+                      *((float *)hb->metrics[i]->metric_value));
               break;
-            case CEREBRO_METRIC_TYPE_DOUBLE:
-              fprintf(stderr, "metric_data = %f\n", 
-                      *((double *)hb->metrics[i]->metric_data));
+            case CEREBRO_METRIC_VALUE_TYPE_DOUBLE:
+              fprintf(stderr, "metric_value = %f\n", 
+                      *((double *)hb->metrics[i]->metric_value));
               break;
-            case CEREBRO_METRIC_TYPE_STRING:
-              fprintf(stderr, "metric_data = %s\n", 
-                      (char *)hb->metrics[i]->metric_data);
+            case CEREBRO_METRIC_VALUE_TYPE_STRING:
+              fprintf(stderr, "metric_value = %s\n", 
+                      (char *)hb->metrics[i]->metric_value);
               break;
             default:
               fprintf(stderr, "\n");

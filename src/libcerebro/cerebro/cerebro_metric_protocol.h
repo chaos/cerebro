@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_protocol.h,v 1.16 2005-06-06 22:14:50 achu Exp $
+ *  $Id: cerebro_metric_protocol.h,v 1.17 2005-06-07 17:26:50 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_METRIC_PROTOCOL_H
@@ -81,19 +81,19 @@
 #define CEREBRO_METRIC_VALUE_LEN                  CEREBRO_METRIC_STRING_MAXLEN
 
 /*
- * cerebro_metric_type_t
+ * cerebro_metric_value_type_t
  *
  * type for metric type
  */
 typedef enum {
-  CEREBRO_METRIC_TYPE_NONE = 0,
-  CEREBRO_METRIC_TYPE_BOOL = 1,
-  CEREBRO_METRIC_TYPE_INT32 = 2,
-  CEREBRO_METRIC_TYPE_UNSIGNED_INT32 = 3,
-  CEREBRO_METRIC_TYPE_FLOAT = 4,
-  CEREBRO_METRIC_TYPE_DOUBLE = 5,
-  CEREBRO_METRIC_TYPE_STRING = 6
-} cerebro_metric_type_t;
+  CEREBRO_METRIC_VALUE_TYPE_NONE = 0,
+  CEREBRO_METRIC_VALUE_TYPE_BOOL = 1,
+  CEREBRO_METRIC_VALUE_TYPE_INT32 = 2,
+  CEREBRO_METRIC_VALUE_TYPE_UNSIGNED_INT32 = 3,
+  CEREBRO_METRIC_VALUE_TYPE_FLOAT = 4,
+  CEREBRO_METRIC_VALUE_TYPE_DOUBLE = 5,
+  CEREBRO_METRIC_VALUE_TYPE_STRING = 6
+} cerebro_metric_value_type_t;
 
 /* 
  * cerebro_metric_value_t
@@ -138,9 +138,9 @@ struct cerebro_metric_response
   u_int32_t metric_err_code;
   u_int8_t end_of_responses;
   char nodename[CEREBRO_MAXNODENAMELEN];
-  u_int32_t metric_type;
-  u_int32_t metric_len;
-  void *metric_data;
+  u_int32_t metric_value_type;
+  u_int32_t metric_value_len;
+  void *metric_value;
 };
   
 #define CEREBRO_METRIC_RESPONSE_HEADER_LEN  (sizeof(int32_t) \

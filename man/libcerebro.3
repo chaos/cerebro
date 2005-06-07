@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: libcerebro.3,v 1.9 2005-06-03 21:26:03 achu Exp $
+\."$Id: libcerebro.3,v 1.10 2005-06-07 17:26:50 achu Exp $
 \."#############################################################################
 .TH LIBCEREBRO 3 "August 2003" "LLNL" "LIBCEREBRO"
 .SH NAME
@@ -34,7 +34,7 @@ or down
 .sp
 .BI "int cerebro_nodelist_length(cerebro_nodelist_t nodelist);
 .sp
-.BI "int cerebro_nodelist_find(cerebro_nodelist_t nodelist, const char *node, void **metric_value, unsigned int *metric_value_size);"
+.BI "int cerebro_nodelist_find(cerebro_nodelist_t nodelist, const char *node, unsigned int *metric_value_type, unsigned int *metric_value_len, void **metric_value);"
 .sp
 .BI "int cerebro_nodelist_for_each(cerebro_nodelist_t nodelist, Cerebro_for_each for_each, void *arg);"
 .sp
@@ -42,9 +42,9 @@ or down
 .sp
 .BI "cerebro_nodelist_iterator_t cerebro_nodelist_iterator_create(cerebro_nodelist_t nodelist);"
 .sp
-.BI "char *cerebro_nodelist_iterator_nodename(cerebro_nodelist_iterator_t nodelistItr);"
+.BI "int cerebro_nodelist_iterator_nodename(cerebro_nodelist_iterator_t nodelistItr, char **nodename);"
 .sp
-.BI "void *cerebro_nodelist_iterator_metric_value(cerebro_nodelist_iterator_t nodelistItr, unsigned int *metric_value_size);"
+.BI "int cerebro_nodelist_iterator_metric_value(cerebro_nodelist_iterator_t nodelistItr, unsigned int *metric_value_type, unsigned int *metric_value_len, void **metric_value);"
 .sp
 .BI "int cerebro_nodelist_iterator_next(cerebro_nodelist_iterator_t nodelistItr);"
 .sp

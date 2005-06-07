@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro_nodelist_metric_name.3,v 1.2 2005-06-03 21:26:03 achu Exp $
+\."$Id: cerebro_nodelist_metric_name.3,v 1.3 2005-06-07 17:26:50 achu Exp $
 \."#############################################################################
 .TH CEREBRO_NODELIST_METRIC_NAME 3 "May 2005" "LLNL" "LIBCEREBRO"
 .SH "NAME"
@@ -13,13 +13,13 @@ cerebro_nodelist_iterator_destroy \- cerebro nodelist routines
 .SH "SYNOPSIS"
 .B #include <cerebro.h>
 .sp
-.B "typedef int (*Cerebro_for_each)(char *nodename, void *metric_value, void *arg);"
+.B "typedef int (*Cerebro_for_each)(char *nodename, unsigned int metric_value_type, unsigned int metric_value_len, void *metric_value, void *arg);"
 .sp
 .BI "char *cerebro_nodelist_metric_name(cerebro_nodelist_t nodelist);
 .sp
 .BI "int cerebro_nodelist_length(cerebro_nodelist_t nodelist);
 .sp
-.BI "int cerebro_nodelist_find(cerebro_nodelist_t nodelist, const char *node, void **metric_value, unsigned int *metric_value_size);"
+.BI "int cerebro_nodelist_find(cerebro_nodelist_t nodelist, const char *node, unsigned int *metric_value_type, unsigned int *metric_value_size, void **metric_value);"
 .sp
 .BI "int cerebro_nodelist_for_each(cerebro_nodelist_t nodelist, Cerebro_for_each for_each, void *arg);"
 .sp
@@ -27,15 +27,15 @@ cerebro_nodelist_iterator_destroy \- cerebro nodelist routines
 .sp
 .BI "cerebro_nodelist_iterator_t cerebro_nodelist_iterator_create(cerebro_nodelist_t nodelist);"
 .sp
+.BI "int cerebro_nodelist_iterator_nodename(cerebro_nodelist_iterator_t nodelistItr, char **nodename);"
+.sp
+.BI "int cerebro_nodelist_iterator_metric_value(cerebro_nodelist_iterator_t nodelistItr, unsigned int *metric_value_type, unsigned int *metric_value_size, void **metric_value);"
+.sp
 .BI "int cerebro_nodelist_iterator_next(cerebro_nodelist_iterator_t nodelistItr);"
 .sp
 .BI "int cerebro_nodelist_iterator_reset(cerebro_nodelist_iterator_t nodelistItr);"
 .sp
 .BI "int cerebro_nodelist_iterator_at_end(cerebro_nodelist_iterator_t nodelistItr);"
-.sp
-.BI "char *cerebro_nodelist_iterator_nodename(cerebro_nodelist_iterator_t nodelistItr);"
-.sp
-.BI "void *cerebro_nodelist_iterator_metric_value(cerebro_nodelist_iterator_t nodelistItr, unsigned int *metric_value_size);"
 .sp
 .BI "int cerebro_nodelist_iterator_destroy(cerebro_nodelist_iterator_t nodelistItr);"
 .br
@@ -47,18 +47,26 @@ retrieve the nodelist data.
 the nodelist.
 
 \fBcerebro_nodelist_find\fR determines if \fInode\fR exists in the
-nodelist.  If a value exists for the node, a pointer to it is returned
-in 'metric_value'.
+nodelist.  If a value exists for the node, the metric type, metric
+value length, and metric value are returned in 'metric_value_type',
+'metric_value_len', and 'metric_value' respectively.
 
 \fBcerebro_nodelist_for_each\fR calls the function \fIfor_each\fR for
-each node and value stored in the nodelist.  If the node does not
-contain a value, NULL is passed for the value.
+each node and value stored in the nodelist.
 
 \fBcerebro_nodelist_destroy\fR destroys the cerebro nodelist pointed
 by \fInodelist\fR.  All nodelist iterators created using the indicated
 nodelist will also be destroyed.
 
 \fBcerebro_nodelist_iterator_create\fR creates a cerebro nodelist iterator.
+
+\fBcerebro_nodelist_iterator_nodename\fR returns the nodename of the
+current node pointed at in the iterator.
+
+\fBcerebro_nodelist_iterator_metric_value\fR returns the metric type,
+metric value length, and metric value of the current data pointed at
+in the iterator.  The values are returned in 'metric_value_type',
+'metric_value_len', and 'metric_value' respectively.
 
 \fBcerebro_nodelist_iterator_next\fR moves the iterator pointer forward.
 
@@ -67,12 +75,6 @@ to the beginning.
 
 \fBcerebro_nodelist_iterator_at_end\fR returns a flag indicating if
 the end of the nodelist has been reached.
-
-\fBcerebro_nodelist_iterator_nodename\fR returns a pointer to the
-nodename of the current node pointed at in the iterator.
-
-\fBcerebro_nodelist_iterator_metric_value\fR returns a pointer to the
-value of the current node metric value poitned at in the iterator.
 
 \fBcerebro_nodelist_iterator_destroy\fR destroys the cerebro nodelist
 iterator pointed by \fInodelistItr\fR.
@@ -97,14 +99,9 @@ exists, 0 if not, On error, -1 is returned.
 For \fBcerebro_nodelist_iterator_at_end\fR, 1 is returned if the end
 of the list has been reached, 0 if not.  On error, -1 is returned.
 
-For \fBcerebro_nodelist_iterator_nodename\fR, a pointer to the
-nodename is returned on success.  On error, NULL is returned.
-
-For \fBcerebro_nodelist_iterator_metric_value\fR, a pointer to the
-node's metric value is returned on success.  On error, NULL is
-returned.
-
 For \fBcerebro_nodelist_for_each\fR, \fBcerebro_nodelist_destroy\fR,
+\fBcerebro_nodelist_iterator_nodename\fR,
+\fBcerebro_nodelist_iterator_metric_value\fR
 \fBcerebro_nodelist_iterator_reset\fR, and
 \fBcerebro_nodelist_iterator_destroy\fR, 0 is returned on success.  On
 error -1 is returned.
@@ -133,9 +130,6 @@ Invalid parameter passed in.
 .TP
 .B CEREBRO_ERR_END_OF_LIST
 The end of the list has been reached.
-.TP
-.B CEREBRO_ERR_METRIC_VALUE_NOTFOUND
-A metric value has not been found for the current node.
 .TP
 .B CEREBRO_ERR_OUTMEM
 Out of memory.

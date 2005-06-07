@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_node_data.c,v 1.12 2005-06-06 20:39:55 achu Exp $
+ *  $Id: cerebrod_node_data.c,v 1.13 2005-06-07 17:26:50 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -272,40 +272,40 @@ _cerebrod_node_data_metric_data_dump(void *data, const void *key, void *arg)
   metric_data = (struct cerebrod_metric_data *)data;
   nodename = (char *)arg;
  
-  fprintf(stderr, "* %s: metric_name=%s metric_type=%d metric_len=%d",
+  fprintf(stderr, "* %s: metric_name=%s metric_value_type=%d metric_value_len=%d",
           nodename,
           metric_data->metric_name,
-          metric_data->metric_type,
-          metric_data->metric_len);
+          metric_data->metric_value_type,
+          metric_data->metric_value_len);
 
-  switch (metric_data->metric_type)
+  switch (metric_data->metric_value_type)
     {
-    case CEREBRO_METRIC_TYPE_BOOL:
-      fprintf(stderr, "metric_value=%d", *((int8_t *)metric_data->metric_data));
+    case CEREBRO_METRIC_VALUE_TYPE_BOOL:
+      fprintf(stderr, "metric_value=%d", *((int8_t *)metric_data->metric_value));
       break;
-    case CEREBRO_METRIC_TYPE_INT32:
-      fprintf(stderr, "metric_value=%d", *((int32_t *)metric_data->metric_data));
+    case CEREBRO_METRIC_VALUE_TYPE_INT32:
+      fprintf(stderr, "metric_value=%d", *((int32_t *)metric_data->metric_value));
       break;
-    case CEREBRO_METRIC_TYPE_UNSIGNED_INT32:
-      fprintf(stderr, "metric_value=%u", *((u_int32_t *)metric_data->metric_data));
+    case CEREBRO_METRIC_VALUE_TYPE_UNSIGNED_INT32:
+      fprintf(stderr, "metric_value=%u", *((u_int32_t *)metric_data->metric_value));
       break;
-    case CEREBRO_METRIC_TYPE_FLOAT:
-      fprintf(stderr, "metric_value=%f", *((float *)metric_data->metric_data));
+    case CEREBRO_METRIC_VALUE_TYPE_FLOAT:
+      fprintf(stderr, "metric_value=%f", *((float *)metric_data->metric_value));
       break;
-    case CEREBRO_METRIC_TYPE_DOUBLE:
-      fprintf(stderr, "metric_value=%f", *((double *)metric_data->metric_data));
+    case CEREBRO_METRIC_VALUE_TYPE_DOUBLE:
+      fprintf(stderr, "metric_value=%f", *((double *)metric_data->metric_value));
       break;
-    case CEREBRO_METRIC_TYPE_STRING:
+    case CEREBRO_METRIC_VALUE_TYPE_STRING:
       /* Ensure null termination */
       memset(buf, '\0', CEREBRO_METRIC_STRING_MAXLEN+1);
-      memcpy(buf, metric_data->metric_data, CEREBRO_METRIC_STRING_MAXLEN);
+      memcpy(buf, metric_data->metric_value, CEREBRO_METRIC_STRING_MAXLEN);
       fprintf(stderr, "metric_value=%s", buf);
       break;
     default:
-      cerebro_err_debug("%s(%s:%d): nodename=%s invalid metric_type=%d",
+      cerebro_err_debug("%s(%s:%d): nodename=%s invalid metric_value_type=%d",
                         __FILE__, __FUNCTION__, __LINE__,
                         (char *)key,
-                        metric_data->metric_type);
+                        metric_data->metric_value_type);
     }
   fprintf(stderr, "\n");
 
@@ -491,21 +491,22 @@ _cerebrod_metric_data_update(struct cerebrod_node_data *nd,
     }
   else
     {
-      if (data->metric_type != hb_data->metric_type)
+      if (data->metric_value_type != hb_data->metric_value_type)
         cerebro_err_debug("%s(%s:%d): metric type modified: old=%d new=%d",
                           __FILE__, __FUNCTION__, __LINE__,
-                          data->metric_type, hb_data->metric_type);
+                          data->metric_value_type, hb_data->metric_value_type);
     }
  
   data->last_received_time = received_time;
-  data->metric_type = hb_data->metric_type;
-  if (data->metric_len != hb_data->metric_len)
+  data->metric_value_type = hb_data->metric_value_type;
+  /* Realloc size */
+  if (data->metric_value_len != hb_data->metric_value_len)
     {
-      Free(data->metric_data);
-      data->metric_data = Malloc(hb_data->metric_len);
+      Free(data->metric_value);
+      data->metric_value = Malloc(hb_data->metric_value_len);
     }
-  data->metric_len = hb_data->metric_len;
-  memcpy(data->metric_data, hb_data->metric_data, hb_data->metric_len);
+  data->metric_value_len = hb_data->metric_value_len;
+  memcpy(data->metric_value, hb_data->metric_value, hb_data->metric_value_len);
 }
 
 void 

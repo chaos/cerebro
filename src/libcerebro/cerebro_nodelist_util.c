@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_nodelist_util.c,v 1.12 2005-06-07 16:18:58 achu Exp $
+ *  $Id: cerebro_nodelist_util.c,v 1.13 2005-06-07 17:26:50 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -73,8 +73,8 @@ _cerebro_nodelist_data_destroy(void *x)
   
   data = (struct cerebro_nodelist_data *)x;
 
-  if (data->metric_data)
-    free(data->metric_data);
+  if (data->metric_value)
+    free(data->metric_value);
   free(data);
 }
 
@@ -133,9 +133,9 @@ _cerebro_nodelist_create(cerebro_t handle, const char *metric_name)
 int 
 _cerebro_nodelist_append(cerebro_nodelist_t nodelist,
 			 const char *nodename,
-                         u_int32_t metric_type,
-                         u_int32_t metric_len,
-                         void *metric_data)
+                         u_int32_t metric_value_type,
+                         u_int32_t metric_value_len,
+                         void *metric_value)
 {
   struct cerebro_nodelist_data *data;
 
@@ -156,9 +156,9 @@ _cerebro_nodelist_append(cerebro_nodelist_t nodelist,
   memset(data, '\0', sizeof(struct cerebro_nodelist_data));
 
   strcpy(data->nodename, nodename);
-  data->metric_type = metric_type;
-  data->metric_len = metric_len;
-  data->metric_data = metric_data;
+  data->metric_value_type = metric_value_type;
+  data->metric_value_len = metric_value_len;
+  data->metric_value = metric_value;
 
   if (!list_append(nodelist->nodes, data))
     {

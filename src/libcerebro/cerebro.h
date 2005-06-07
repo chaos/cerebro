@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.37 2005-06-03 22:54:42 achu Exp $
+ *  $Id: cerebro.h,v 1.38 2005-06-07 17:26:50 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_H
@@ -20,14 +20,13 @@
 #define CEREBRO_ERR_OVERFLOW                 12
 #define CEREBRO_ERR_NODE_NOTFOUND            13
 #define CEREBRO_ERR_END_OF_LIST              14
-#define CEREBRO_ERR_METRIC_VALUE_NOTFOUND    15
-#define CEREBRO_ERR_CONFIG_FILE              16
-#define CEREBRO_ERR_CONFIG_MODULE            17
-#define CEREBRO_ERR_CONFIG_INPUT             18
-#define CEREBRO_ERR_CLUSTERLIST_MODULE       19
-#define CEREBRO_ERR_OUTMEM                   20
-#define CEREBRO_ERR_INTERNAL                 21
-#define CEREBRO_ERR_ERRNUMRANGE              22
+#define CEREBRO_ERR_CONFIG_FILE              15
+#define CEREBRO_ERR_CONFIG_MODULE            16
+#define CEREBRO_ERR_CONFIG_INPUT             17
+#define CEREBRO_ERR_CLUSTERLIST_MODULE       18
+#define CEREBRO_ERR_OUTMEM                   19
+#define CEREBRO_ERR_INTERNAL                 20
+#define CEREBRO_ERR_ERRNUMRANGE              21
 
 typedef struct cerebro *cerebro_t;
 
@@ -166,30 +165,31 @@ int cerebro_nodelist_length(cerebro_nodelist_t nodelist);
 /* 
  * cerebro_nodelist_find
  *
- * Determine if 'node' exists in the list.  If a value exists
- * for the node, it is returned in 'metric_value'.
+ * Determine if 'node' exists in the list.  If a value exists for the
+ * node, the metric type, metric value length, and metric value are
+ * returned in 'metric_value_type', 'metric_value_len', and 'metric_value'
+ * respectively.
  *
- * Returns 1 if 'node' is found and the length of the data returned in
- * 'metric_value_size', 0 if not, -1 on error
+ * Returns 1 if 'node' is found, 0 if not, -1 on error
  */
 int cerebro_nodelist_find(cerebro_nodelist_t nodelist, 
 			  const char *node, 
-			  void **metric_value,
-                          unsigned int *metric_type,
-                          unsigned int *metric_value_size);
+                          unsigned int *metric_value_type,
+                          unsigned int *metric_value_len,
+                          void **metric_value);
 
 /* 
  * Cerebro_for_each
  *
- * Function prototype for operating on each node stored in
- * a cerebro_nodelist_t.
+ * Function prototype for operating on each node and metric value
+ * stored in a nodelist.
  *
  * Returns 0 on success, -1 on error
  */
 typedef int (*Cerebro_for_each)(char *nodename, 
-                                void *metric_value, 
-                                unsigned int metric_type,
-                                unsigned int metric_value_size,
+                                unsigned int metric_value_type,
+                                unsigned int metric_value_len,
+                                void *metric_value,
                                 void *arg);
 
 /* 
@@ -234,14 +234,16 @@ int cerebro_nodelist_iterator_nodename(cerebro_nodelist_iterator_t nodelistItr,
 /* 
  * cerebro_nodelist_iterator_metric_value
  *
- * Retrieve a pointer to the current value.
+ * If a value exists for the current point in the list, the metric
+ * type, metric value length, and metric value are returned in
+ * 'metric_value_type', 'metric_value_len', and 'metric_value' respectively.
  *
  * Returns 0 on success, -1 on error
  */
 int cerebro_nodelist_iterator_metric_value(cerebro_nodelist_iterator_t nodelistItr,
-                                           void **metric_value,
-                                           unsigned int *metric_type,
-                                           unsigned int *metric_value_size);
+                                           unsigned int *metric_value_type,
+                                           unsigned int *metric_value_len,
+                                           void **metric_value);
 
 /* 
  * cerebro_nodelist_iterator_next

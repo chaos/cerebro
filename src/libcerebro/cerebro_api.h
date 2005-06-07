@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_api.h,v 1.22 2005-06-06 23:35:06 achu Exp $
+ *  $Id: cerebro_api.h,v 1.23 2005-06-07 17:26:50 achu Exp $
 \*****************************************************************************/
  
 #ifndef _CEREBRO_API_H
@@ -52,9 +52,9 @@ struct cerebro {
  */
 struct cerebro_nodelist_data {
   char nodename[CEREBRO_MAXNODENAMELEN+1];
-  u_int32_t metric_type;
-  u_int32_t metric_len;
-  void *metric_data;
+  u_int32_t metric_value_type;
+  u_int32_t metric_value_len;
+  void *metric_value;
 };
 
 /* 
