@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.71 2005-06-07 20:29:28 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.72 2005-06-07 22:20:39 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -18,11 +18,11 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
+#include "cerebro.h"
 #include "cerebro_marshalling.h"
 #include "cerebro_module.h"
 #include "cerebro/cerebro_constants.h"
 #include "cerebro/cerebro_error.h"
-#include "cerebro/cerebro_metric_protocol.h"
 #include "cerebro/cerebrod_heartbeat_protocol.h"
 
 #include "cerebrod.h"
@@ -58,6 +58,15 @@ pthread_mutex_t cerebrod_listener_initialization_complete_lock = PTHREAD_MUTEX_I
  */
 int listener_fd = 0;
 pthread_mutex_t listener_fd_lock = PTHREAD_MUTEX_INITIALIZER;
+
+/* 
+ * packet_buflen_max
+ *
+ * Maximum packet size discovered
+ */
+int packet_buflen_max = CEREBRO_PACKET_BUFLEN;
+pthread_mutex_t packet_buflen_max_lock = PTHREAD_MUTEX_INITIALIZER;
+
 
 /* 
  * _cerebrod_listener_create_and_setup_socket
@@ -282,20 +291,6 @@ _cerebrod_heartbeat_unmarshall(const char *buf, unsigned int buflen)
                   cerebro_err_debug("%s(%s:%d): packet metric_value_len > 0 for metric_value_type NONE",
                                     __FILE__, __FUNCTION__, __LINE__);
                   break;
-                case CEREBRO_METRIC_VALUE_TYPE_BOOL:
-                  if ((len = _cerebro_unmarshall_int8((int8_t *)hd->metric_value,
-                                                      buf + count,
-                                                      buflen - count)) < 0)
-                    cerebro_err_exit("%s(%s:%d): _cerebro_unmarshall_int8",
-                                     __FILE__, __FUNCTION__, __LINE__);
-                  if (!len)
-                    {
-                      cerebro_err_debug("%s(%s:%d): packet buffer length invalid",
-                                        __FILE__, __FUNCTION__, __LINE__);
-                      goto cleanup;
-                    }
-                  count += len;
-                  break;
                 case CEREBRO_METRIC_VALUE_TYPE_INT32:
                   if ((len = _cerebro_unmarshall_int32((int32_t *)hd->metric_value,
                                                        buf + count,
@@ -471,15 +466,20 @@ cerebrod_listener(void *arg)
   for (;;)
     {
       struct cerebrod_heartbeat *hb;
-      char buf[CEREBRO_PACKET_BUFLEN];
       char nodename_buf[CEREBRO_MAXNODENAMELEN+1];
       char nodename_key[CEREBRO_MAXNODENAMELEN+1];
-      int recv_len, heartbeat_len, flag;
+      int recv_len, heartbeat_len, flag, buflen;
+      char *buf = NULL;
       
+      Pthread_mutex_lock(&packet_buflen_max_lock);
+      buflen = packet_buflen_max;
+      Pthread_mutex_unlock(&packet_buflen_max_lock);
+      buf = Malloc(buflen);
+
       Pthread_mutex_lock(&listener_fd_lock);
       if ((recv_len = recvfrom(listener_fd, 
 			       buf, 
-			       CEREBRO_PACKET_BUFLEN, 
+			       buflen, 
 			       0, 
 			       NULL, 
 			       NULL)) < 0)
@@ -527,7 +527,20 @@ cerebrod_listener(void *arg)
 
       /* No packet read */
       if (recv_len <= 0)
-	continue;
+	goto cleanup_continue;
+
+      /* 
+       * Packet is lost this time, oh well
+       */
+      if (recv_len >= buflen)
+        {
+          buflen += CEREBRO_PACKET_BUFLEN;
+          Pthread_mutex_lock(&packet_buflen_max_lock);
+          if (packet_buflen_max < buflen)
+            packet_buflen_max = buflen;
+          Pthread_mutex_unlock(&packet_buflen_max_lock);
+          goto cleanup_continue;
+        }
 
       if (recv_len < CEREBROD_HEARTBEAT_HEADER_LEN)
         {
@@ -535,11 +548,11 @@ cerebrod_listener(void *arg)
                             "unexpected size: expect %d, heartbeat_len %d",
                             __FILE__, __FUNCTION__, __LINE__,
                             CEREBROD_HEARTBEAT_HEADER_LEN, heartbeat_len);
-          continue;
+          goto cleanup_continue;
         }
 
       if (!(hb = _cerebrod_heartbeat_unmarshall(buf, recv_len)))
-	continue;
+	goto cleanup_continue;
 
       _cerebrod_heartbeat_dump(hb);
 
@@ -549,7 +562,7 @@ cerebrod_listener(void *arg)
                             "expect %d, version %d",
                             __FILE__, __FUNCTION__, __LINE__,
                             CEREBROD_HEARTBEAT_PROTOCOL_VERSION, hb->version);
-	  continue;
+	  goto cleanup_continue;
 	}
       
       if ((flag = _cerebro_clusterlist_module_node_in_cluster(hb->nodename)) < 0)
@@ -561,7 +574,7 @@ cerebrod_listener(void *arg)
 	  cerebro_err_debug("%s(%s:%d): received non-cluster packet from: %s",
 			    __FILE__, __FUNCTION__, __LINE__,
 			    hb->nodename);
-	  continue;
+	  goto cleanup_continue;
 	}
       
       /* Guarantee ending '\0' character */
@@ -577,12 +590,14 @@ cerebrod_listener(void *arg)
 	  cerebro_err_debug("%s(%s:%d): _cerebro_clusterlist_module_get_nodename: %s",
 			    __FILE__, __FUNCTION__, __LINE__,
 			    hb->nodename);
-	  continue;
+	  goto cleanup_continue;
 	}
 
       Gettimeofday(&tv, NULL);
       cerebrod_node_data_update(nodename_key, hb, tv.tv_sec);
       _cerebrod_heartbeat_destroy(hb);
+    cleanup_continue:
+      Free(buf);
     }
 
   return NULL;			/* NOT REACHED */

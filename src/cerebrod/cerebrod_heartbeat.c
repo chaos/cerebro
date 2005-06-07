@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_heartbeat.c,v 1.28 2005-06-07 17:26:50 achu Exp $
+ *  $Id: cerebrod_heartbeat.c,v 1.29 2005-06-07 22:20:39 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -11,9 +11,8 @@
 #include <assert.h>
 #include <errno.h>
 
+#include "cerebro.h"
 #include "cerebro/cerebrod_heartbeat_protocol.h"
-/* XXX */
-#include "cerebro/cerebro_metric_protocol.h"
 
 #include "cerebrod_heartbeat.h"
 #include "cerebrod_config.h"
@@ -58,10 +57,6 @@ cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb)
           switch(hb->metrics[i]->metric_value_type)
             {
             case CEREBRO_METRIC_VALUE_TYPE_NONE:
-              break;
-            case CEREBRO_METRIC_VALUE_TYPE_BOOL:
-              fprintf(stderr, "metric_value = %d\n", 
-                      *((char *)hb->metrics[i]->metric_value));
               break;
             case CEREBRO_METRIC_VALUE_TYPE_INT32:
               fprintf(stderr, "metric_value = %d\n", 

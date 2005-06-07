@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric.c,v 1.24 2005-06-07 20:29:28 achu Exp $
+ *  $Id: cerebrod_metric.c,v 1.25 2005-06-07 22:20:39 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -14,6 +14,7 @@
 #include <errno.h>
 #include <assert.h>
 
+#include "cerebro.h"
 #include "cerebro_marshalling.h"
 #include "cerebro_module.h"
 #include "cerebro/cerebro_constants.h"
@@ -165,17 +166,6 @@ _cerebrod_metric_response_marshall(struct cerebro_metric_response *res,
         case CEREBRO_METRIC_VALUE_TYPE_NONE:
           cerebro_err_debug("%s(%s:%d): packet metric_value_len > 0 for metric_value_type NONE",
                             __FILE__, __FUNCTION__, __LINE__);
-          break;
-        case CEREBRO_METRIC_VALUE_TYPE_BOOL:
-          if ((len = _cerebro_marshall_int8(*((int8_t *)res->metric_value), 
-                                            buf + count,
-                                            buflen - count)) < 0)
-            {
-              cerebro_err_debug("%s(%s:%d): _cerebro_marshall_int8",
-                                __FILE__, __FUNCTION__, __LINE__);
-              return -1;
-            }
-          count += len;
           break;
         case CEREBRO_METRIC_VALUE_TYPE_INT32:
           if ((len = _cerebro_marshall_int32(*((int32_t *)res->metric_value),
@@ -504,30 +494,36 @@ static int
 _cerebrod_metric_response_send_one(int client_fd, 
 				   struct cerebro_metric_response *res)
 {
-  char buf[CEREBRO_PACKET_BUFLEN];
-  int res_len;
+  char *buf = NULL;
+  int buflen, res_len, rv = -1;
 
   assert(client_fd >= 0);
   assert(res);
 
+  buflen = CEREBRO_METRIC_RESPONSE_HEADER_LEN + res->metric_value_len + 1;
+  buf = Malloc(buflen);
+
   if ((res_len = _cerebrod_metric_response_marshall(res, 
-						    buf, 
-						    CEREBRO_PACKET_BUFLEN)) < 0)
+                                                    buf, 
+                                                    buflen)) < 0)
     {
       cerebro_err_debug("%s(%s:%d): _cerebrod_metric_response_marshall",
                         __FILE__, __FUNCTION__, __LINE__);
-      return -1;
+      goto cleanup;
     }
-  
+
   if (fd_write_n(client_fd, buf, res_len) < 0)
     {
       cerebro_err_debug("%s(%s:%d): fd_write_n: %s",
                         __FILE__, __FUNCTION__, __LINE__,
                         strerror(errno));
-      return -1;
+      goto cleanup;
     }
 
-  return 0;
+  rv = 0;
+ cleanup:
+  Free(buf);
+  return rv;
 }
 
 /*

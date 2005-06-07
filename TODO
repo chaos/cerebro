@@ -9,20 +9,12 @@ Testing
 Cleanup
 - cleanup common hash into "data" and put in data.c??
 - 'get' configuration routines?
-- don't use packet buflen #define, need to allocate buffer appropriately.
-- move metric_type definitions into cerebro.h or somewhere better
-  - and document
-- move get_data flags into cerebro.h or somewhere better
-  - and document
-- function to determine sizeof type based on metric_type.
 - common heartbeat destroy?
   - for speaker/listerner
-- sizeof vs. packet_len-defines
-  - use sizeof on structs
-  - use defines on buffers
 - conffile lib - unsigned int?
   - cleanup int vs. unsigned in configs
-- lock names
+- lower resident memory size by using more mallocs rather than buffers.
+- unsigned_int32 vs. u_int32
 
 Audit
 - code review to reduce memory footprint
@@ -32,8 +24,8 @@ Portability
 - Non-pthreads support
 
 Design
+- ability for data to be stored/not-stored in the internal hash
 - Data structure for list/index combination?
-- Index for metric name list?
 - Move pthread_lock in cerebro_error to error lib??
 - wrappers err_init stuff, how fix?
 - metric to get available metrics

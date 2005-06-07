@@ -1,10 +1,10 @@
 \."#############################################################################
-\."$Id: cerebro_module_devel.3.in,v 1.5 2005-06-01 18:30:27 achu Exp $
+\."$Id: cerebro_module_devel.3.in,v 1.6 2005-06-07 22:20:39 achu Exp $
 \."#############################################################################
 .TH LIBCEREBRO 3 "May 2005" "LLNL" "LIBCEREBRO"
-.SH NAME
+.SH "NAME"
 Introduction to writing cerebro modules
-.SH SYNOPSIS
+.SH "SYNOPSIS"
 .B #include <cerebro/cerebro_clusterlist_module.h>
 .sp
 .B #include <cerebro/cerebro_config.h>
@@ -17,14 +17,14 @@ Introduction to writing cerebro modules
 .sp
 .BI "void cerebro_err_debug_module(const char *fmt, ...);"
 .br
-.SH DESCRIPTION
+.SH "DESCRIPTION"
 Additional information about the development of cerebro clusterlist
 and config modules can be found below.
 
 Module writers should use \fBcerebro_err_debug_module\fR when debugging
 information is output.
 
-.SH CLUSTERLIST MODULES
+.SH "CLUSTERLIST MODULES"
 A cerebro clusterlist module of the name 'foobar' can be written by
 compiling a shared object library with the filename
 cerebro_clusterlist_foobar.so, and installing it in the cerebro
@@ -106,7 +106,7 @@ calculations.  'get_nodename' returns 0 on success, -1 on error.
 All of the above functions must be defined in the module and listed in
 the 'clusterlist_module_info' structure.
 
-.SH CONFIG MODULES
+.SH "CONFIG MODULES"
 A cerebro config module of the name 'foobar' can be written by
 compiling a shared object library with the filename
 cerebro_config_foobar.so, and installing it in the cerebro package
@@ -289,5 +289,5 @@ respective flag set.  The 'hostnames' field must also have the
 'hostnames_len' field appropriately set to the number of hostnames
 loaded.
 
-.SH SEE ALSO
+.SH "SEE ALSO"
 libcerebro(3), cerebro_module(3), cerebro.conf(5)

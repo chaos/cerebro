@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_node_data.c,v 1.14 2005-06-07 20:29:28 achu Exp $
+ *  $Id: cerebrod_node_data.c,v 1.15 2005-06-07 22:20:39 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -14,6 +14,7 @@
 #include <errno.h>
 #include <assert.h>
 
+#include "cerebro.h"
 #include "cerebro_module.h"
 #include "cerebro/cerebro_constants.h"
 #include "cerebro/cerebro_error.h"
@@ -291,9 +292,6 @@ _cerebrod_node_data_metric_data_dump(void *data, const void *key, void *arg)
 
   switch (md->metric_value_type)
     {
-    case CEREBRO_METRIC_VALUE_TYPE_BOOL:
-      fprintf(stderr, "metric_value=%d", *((int8_t *)md->metric_value));
-      break;
     case CEREBRO_METRIC_VALUE_TYPE_INT32:
       fprintf(stderr, "metric_value=%d", *((int32_t *)md->metric_value));
       break;

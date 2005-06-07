@@ -1,11 +1,11 @@
 \."#############################################################################
-\."$Id: libcerebro.3,v 1.10 2005-06-07 17:26:50 achu Exp $
+\."$Id: libcerebro.3,v 1.11 2005-06-07 22:20:39 achu Exp $
 \."#############################################################################
 .TH LIBCEREBRO 3 "August 2003" "LLNL" "LIBCEREBRO"
-.SH NAME
+.SH "NAME"
 libcerebro \- a library of functions to determine if a node is up
 or down
-.SH SYNOPSIS
+.SH "SYNOPSIS"
 .B #include <cerebro.h>
 .sp
 .BI "cerebro_t cerebro_handle_create(void);"
@@ -54,7 +54,7 @@ or down
 .sp
 .BI "int cerebro_nodelist_iterator_destroy(cerebro_nodelist_iterator_t nodelistItr);"
 .br
-.SH DESCRIPTION
+.SH "DESCRIPTION"
 The cerebro library contains functions to gather status information
 about a cluster.
 
@@ -70,9 +70,9 @@ the
 .BR cerebro_module(3)
 manpage for information on cerebro modules.  
 
-.SH FILES
+.SH "FILES"
 /usr/include/cerebro.h
-.SH SEE ALSO
+.SH "SEE ALSO"
 cerebro_handle_create(3), cerebro_handle_destroy(3),
 cerebro_errnum(3), cerebro_nodelist_errnum(3),
 cerebro_nodelist_iterator_errnum(3), cerebro_strerror(3),

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_protocol.h,v 1.18 2005-06-07 20:29:28 achu Exp $
+ *  $Id: cerebro_metric_protocol.h,v 1.19 2005-06-07 22:20:39 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_METRIC_PROTOCOL_H
@@ -66,10 +66,6 @@
 
 #define CEREBRO_METRIC_UPDOWN_TIMEOUT_LEN_DEFAULT 60
 
-#define CEREBRO_METRIC_FLAGS_UP_ONLY              0x00000001
-#define CEREBRO_METRIC_FLAGS_NONE_IF_NOEXIST      0x00000002
-#define CEREBRO_METRIC_FLAGS_MASK                 0x00000003
-
 #define CEREBRO_METRIC_SERVER_PORT                8852
 
 #define CEREBRO_METRIC_STRING_MAXLEN              64
@@ -77,35 +73,6 @@
 #define CEREBRO_METRIC_STRING_PARAM_MAXLEN        64
 
 #define CEREBRO_METRIC_VALUE_LEN                  CEREBRO_METRIC_STRING_MAXLEN
-
-/*
- * cerebro_metric_value_type_t
- *
- * type for metric type
- */
-typedef enum {
-  CEREBRO_METRIC_VALUE_TYPE_NONE = 0,
-  CEREBRO_METRIC_VALUE_TYPE_BOOL = 1,
-  CEREBRO_METRIC_VALUE_TYPE_INT32 = 2,
-  CEREBRO_METRIC_VALUE_TYPE_UNSIGNED_INT32 = 3,
-  CEREBRO_METRIC_VALUE_TYPE_FLOAT = 4,
-  CEREBRO_METRIC_VALUE_TYPE_DOUBLE = 5,
-  CEREBRO_METRIC_VALUE_TYPE_STRING = 6
-} cerebro_metric_value_type_t;
-
-/* 
- * cerebro_metric_value_t
- *
- * metric value
- */
-typedef union {
-  int8_t    val_bool;
-  int32_t   val_int32;
-  u_int32_t val_unsigned_int32;
-  float     val_float;
-  double    val_double;
-  char      val_string[CEREBRO_METRIC_STRING_MAXLEN];
-} cerebro_metric_value_t;
 
 /*
  * struct cerebro_metric_request

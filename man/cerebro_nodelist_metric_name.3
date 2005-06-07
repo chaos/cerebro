@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro_nodelist_metric_name.3,v 1.3 2005-06-07 17:26:50 achu Exp $
+\."$Id: cerebro_nodelist_metric_name.3,v 1.4 2005-06-07 22:20:39 achu Exp $
 \."#############################################################################
 .TH CEREBRO_NODELIST_METRIC_NAME 3 "May 2005" "LLNL" "LIBCEREBRO"
 .SH "NAME"
@@ -80,6 +80,26 @@ the end of the nodelist has been reached.
 iterator pointed by \fInodelistItr\fR.
 
 .br
+.SH "METRIC VALUE TYPES"
+The following metric value types can be returned by
+\fBcerebro_nodelist_find\fR,
+\fBcerebro_nodelist_iterator_metric_value\fR, and passed to the
+'for_each' function passed to \fBcerebro_nodelist_for_each\fR.  They
+can be used to determine the data type the 'metric_value' result
+points to.
+
+CEREBRO_METRIC_VALUE_TYPE_NONE - No metric value
+
+CEREBRO_METRIC_VALUE_TYPE_INT32 - 32 bit integer
+
+CEREBRO_METRIC_VALUE_TYPE_UNSIGNED_INT32 - 32 bit unsigned integer
+
+CEREBRO_METRIC_VALUE_TYPE_FLOAT - float
+
+CEREBRO_METRIC_VALUE_TYPE_DOUBLE - double
+
+CEREBRO_METRIC_VALUE_TYPE_STRING - NUL terminated string
+
 .SH "RETURN VALUES"
 For \fBcerebro_nodelist_metric_name\fR, the metric name for the
 nodelist is returned on success.  On error, -1 is returned.

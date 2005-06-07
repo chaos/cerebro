@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_constants.h,v 1.3 2005-06-06 20:39:55 achu Exp $
+ *  $Id: cerebro_constants.h,v 1.4 2005-06-07 22:20:39 achu Exp $
 \*****************************************************************************/
  
 #ifndef _CEREBRO_CONSTANTS_H
@@ -15,7 +15,7 @@
 
 #define CEREBRO_MAXPATHLEN             512
 
-#define CEREBRO_PACKET_BUFLEN          65536
+#define CEREBRO_PACKET_BUFLEN          4096
 
 #define CEREBRO_MAXIPADDRLEN           64
 

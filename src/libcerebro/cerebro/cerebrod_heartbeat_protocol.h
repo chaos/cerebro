@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_heartbeat_protocol.h,v 1.6 2005-06-07 17:26:50 achu Exp $
+ *  $Id: cerebrod_heartbeat_protocol.h,v 1.7 2005-06-07 22:20:39 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_HEARTBEAT_PROTOCOL_H
@@ -23,6 +23,10 @@ struct cerebrod_heartbeat_metric
   u_int32_t metric_value_len;
   void *metric_value;
 };
+
+#define CEREBROD_HEARTBEAT_METRIC_HEADER_LEN  (CEREBRO_METRIC_NAME_MAXLEN \
+                                               + sizeof(u_int32_t) \
+                                               + sizeof(u_int32_t))
 
 /* 
  * struct cerebrod_heartbeat

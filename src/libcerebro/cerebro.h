@@ -1,10 +1,13 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.38 2005-06-07 17:26:50 achu Exp $
+ *  $Id: cerebro.h,v 1.39 2005-06-07 22:20:39 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_H
 #define _CEREBRO_H
 
+/* 
+ * Cerebro Error Codes
+ */
 #define CEREBRO_ERR_SUCCESS                   0
 #define CEREBRO_ERR_NULLHANDLE                1
 #define CEREBRO_ERR_NULLNODELIST              2
@@ -27,6 +30,24 @@
 #define CEREBRO_ERR_OUTMEM                   19
 #define CEREBRO_ERR_INTERNAL                 20
 #define CEREBRO_ERR_ERRNUMRANGE              21
+
+/* 
+ * Cerebro Flags
+ */
+
+#define CEREBRO_METRIC_FLAGS_UP_ONLY              0x00000001
+#define CEREBRO_METRIC_FLAGS_NONE_IF_NOEXIST      0x00000002
+#define CEREBRO_METRIC_FLAGS_MASK                 0x00000003
+
+/* 
+ * Cerebro Metric Value Types
+ */
+#define CEREBRO_METRIC_VALUE_TYPE_NONE            0
+#define CEREBRO_METRIC_VALUE_TYPE_INT32           1
+#define CEREBRO_METRIC_VALUE_TYPE_UNSIGNED_INT32  2
+#define CEREBRO_METRIC_VALUE_TYPE_FLOAT           3
+#define CEREBRO_METRIC_VALUE_TYPE_DOUBLE          4
+#define CEREBRO_METRIC_VALUE_TYPE_STRING          5
 
 typedef struct cerebro *cerebro_t;
 

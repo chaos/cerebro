@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.37 2005-06-07 20:29:28 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.38 2005-06-07 22:20:39 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -18,6 +18,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
+#include "cerebro.h"
 #include "cerebro_marshalling.h"
 #include "cerebro/cerebro_constants.h"
 #include "cerebro/cerebro_error.h"
@@ -166,11 +167,15 @@ _cerebrod_speaker_initialize(void)
  * construct a heartbeat packet
  */
 static struct cerebrod_heartbeat *
-_cerebrod_heartbeat_create(void)
+_cerebrod_heartbeat_create(int *heartbeat_len)
 {
   struct cerebrod_heartbeat *hb = NULL;
   struct cerebrod_heartbeat_metric *hd = NULL;
   u_int32_t boottime;
+
+  assert(heartbeat_len);
+
+  *heartbeat_len = 0;
 
   /* XXX needs cleaning up */
 
@@ -184,7 +189,9 @@ _cerebrod_heartbeat_create(void)
 
   hb->metrics = Malloc(sizeof(struct cerebrod_heartbeat_metric *)*(hb->metrics_len + 1));
   memset(hb->metrics, '\0', sizeof(struct cerebrod_heartbeat_metric *)*(hb->metrics_len + 1));
-                      
+
+  *heartbeat_len += CEREBROD_HEARTBEAT_HEADER_LEN;
+
   /* 
    * Store boottime
    */
@@ -202,6 +209,8 @@ _cerebrod_heartbeat_create(void)
   hd->metric_value = Malloc(hd->metric_value_len);
   boottime = cerebrod_get_boottime();
   memcpy(hd->metric_value, &boottime, hd->metric_value_len);
+
+  *heartbeat_len += CEREBROD_HEARTBEAT_METRIC_HEADER_LEN + hd->metric_value_len;
 
   hb->metrics[0] = hd;
 
@@ -307,14 +316,6 @@ _cerebrod_heartbeat_marshall(struct cerebrod_heartbeat *hb,
               cerebro_err_debug("%s(%s:%d): packet metric_value_len > 0 for metric_value_type NONE",
                                 __FILE__, __FUNCTION__, __LINE__);
               break;
-            case CEREBRO_METRIC_VALUE_TYPE_BOOL:
-              if ((len = _cerebro_marshall_int8(*((int8_t *)hb->metrics[i]->metric_value),
-                                                buf + count,
-                                                buflen - count)) < 0)
-                cerebro_err_exit("%s(%s:%d): _cerebro_marshall_int8",
-                                 __FILE__, __FUNCTION__, __LINE__);
-              count += len;
-              break;
             case CEREBRO_METRIC_VALUE_TYPE_INT32:
               if ((len = _cerebro_marshall_int32(*((int32_t *)hb->metrics[i]->metric_value),
                                                  buf + count,
@@ -414,20 +415,22 @@ cerebrod_speaker(void *arg)
     {
       struct sockaddr_in heartbeat_destination_addr;
       struct cerebrod_heartbeat* hb;
-      char buf[CEREBRO_PACKET_BUFLEN];
-      int send_len, heartbeat_len, sleep_time;
-      
+      int send_len, heartbeat_len, sleep_time, buflen;
+      char *buf = NULL;
+
       /* Algorithm from srand(3) manpage */
       if (conf.heartbeat_frequency_ranged)
 	sleep_time = conf.heartbeat_frequency_min + ((((double)(conf.heartbeat_frequency_max - conf.heartbeat_frequency_min))*rand())/(RAND_MAX+1.0));
       else
 	sleep_time = conf.heartbeat_frequency_min;
 
-      hb = _cerebrod_heartbeat_create();
+      hb = _cerebrod_heartbeat_create(&buflen);
   
+      buf = Malloc(buflen + 1);
+
       heartbeat_len = _cerebrod_heartbeat_marshall(hb, 
 						   buf, 
-						   CEREBRO_PACKET_BUFLEN);
+						   buflen);
 
       _cerebrod_heartbeat_dump(hb);
       
@@ -488,6 +491,7 @@ cerebrod_speaker(void *arg)
         }
 
       _cerebrod_heartbeat_destroy(hb);
+      Free(buf);
       sleep(sleep_time);
     }
 

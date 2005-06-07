@@ -3,9 +3,14 @@
 	* Removed hard defined maximum metric count.  Added
 	cerebrod_metric_max configuration option.
 
+	* Removed hard defined packet buffer for situations where the
+	received/sent packet size is not known.
+	
 	* Various bug fixes.
 
 	* Various code cleanup.
+
+	* Various documentation cleanup/fixing.
 
 2005-06-06  Albert Chu  <chu11@llnl.gov>
 

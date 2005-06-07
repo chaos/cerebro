@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro_set_hostname.3,v 1.3 2005-06-07 17:26:50 achu Exp $
+\."$Id: cerebro_set_hostname.3,v 1.4 2005-06-07 22:20:39 achu Exp $
 \."#############################################################################
 .TH CEREBRO_SET_HOSTNAME 3 "May 2005" "LLNL" "LIBCEREBRO"
 .SH "NAME"
@@ -27,7 +27,29 @@ should attempt to connect to.
 evaluate up vs. down nodes.
 
 \fBcerebro_set_flags()\fR sets the default flags the libcerebro API
-should use.
+should use.  By default, no flags are set.  The following flags
+are available to be set:
+
+CEREBRO_METRIC_FLAGS_UP_ONLY - By default 
+.BR cerebro_get_metric_data(3)
+will return data for every node in the cluster currently
+monitoring the specified metric.  This flag alters this behavior
+to have the
+.BR cerebrod(8)
+metric server return only nodes that are currently up.  This flag does
+not apply to any of the default metrics supplied by
+.BR cerebrod(8).
+
+CEREBRO_METRIC_FLAGS_NONE_IF_NOEXIST - By default, 
+.BR cerebro_get_metric_data(3)
+will not return a cluster node if the cluster node is not currently
+monitoring the specified metric.  This flag alters this behavior to
+have the
+.BR cerebrod(8)
+metric server return the node to the user without a metric_value.
+This flag does not apply to any of the default metrics supplied by
+.BR cerebrod(8).
+
 .br
 .SH "ERRORS"
 .TP
@@ -43,3 +65,5 @@ Buffer overflow.
 .br
 .SH "FILES"
 /usr/include/cerebro.h
+.SH "SEE ALSO"
+cerebro_get_metric_data(3)
