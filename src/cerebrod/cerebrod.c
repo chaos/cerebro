@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.54 2005-05-28 16:06:44 achu Exp $
+ *  $Id: cerebrod.c,v 1.55 2005-06-07 20:29:28 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -33,7 +33,7 @@
  * Locking Rule: Always lock data structure locks before grabbing
  * debugging locks.
  *
- * Lucking Rule: Only lock around fprintf or similar statements.
+ * Locking Rule: Only lock around fprintf or similar statements.
  */
 pthread_mutex_t debug_output_mutex = PTHREAD_MUTEX_INITIALIZER;
 #endif /* CEREBRO_DEBUG */

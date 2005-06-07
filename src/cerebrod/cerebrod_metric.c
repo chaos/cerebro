@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric.c,v 1.23 2005-06-07 17:26:50 achu Exp $
+ *  $Id: cerebrod_metric.c,v 1.24 2005-06-07 20:29:28 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -748,7 +748,7 @@ _cerebrod_metric_evaluate(void *x, void *arg)
 {
   struct cerebrod_node_data *nd;
   struct cerebrod_metric_evaluation_data *ed;
-  struct cerebrod_metric_data *data;
+  struct cerebrod_metric_data *md;
 #if CEREBRO_DEBUG
   int rv;
 #endif /* CEREBRO_DEBUG */
@@ -857,12 +857,12 @@ _cerebrod_metric_evaluate(void *x, void *arg)
           && !((ed->time_now - nd->last_received_time) < ed->req->timeout_len))
         goto out;
       
-      if ((data = Hash_find(nd->metric_data, ed->req->metric_name)))
+      if ((md = Hash_find(nd->metric_data, ed->req->metric_name)))
         {
           if (_cerebrod_metric_response_create(nd->nodename,
-                                               data->metric_value_type,
-                                               data->metric_value_len,
-                                               data->metric_value,
+                                               md->metric_value_type,
+                                               md->metric_value_len,
+                                               md->metric_value,
                                                ed->node_responses) < 0)
             {
               Pthread_mutex_unlock(&(nd->node_data_lock));
@@ -1021,7 +1021,7 @@ _cerebrod_metric_service_connection(void *arg)
     /* At this point, there is no successfully read request, therefore
      * there is no reason to respond w/ a response and an error code.
      */
-    goto out;
+    goto cleanup;
   
   _cerebrod_metric_request_dump(&req);
 
@@ -1038,13 +1038,13 @@ _cerebrod_metric_service_connection(void *arg)
           _cerebrod_metric_respond_with_error(client_fd, 
                                               req.version,
                                               CEREBRO_METRIC_PROTOCOL_ERR_VERSION_INVALID);
-          goto out;
+          goto cleanup;
         }
 
       _cerebrod_metric_respond_with_error(client_fd, 
                                           req.version,
                                           CEREBRO_METRIC_PROTOCOL_ERR_PACKET_INVALID);
-      goto out;
+      goto cleanup;
     }
 
   if (req.version != CEREBRO_METRIC_PROTOCOL_VERSION)
@@ -1052,26 +1052,29 @@ _cerebrod_metric_service_connection(void *arg)
       _cerebrod_metric_respond_with_error(client_fd, 
                                           req.version,
                                           CEREBRO_METRIC_PROTOCOL_ERR_VERSION_INVALID);
-      goto out;
+      goto cleanup;
     }
 
+  Pthread_mutex_lock(&cerebrod_metric_name_lock);
   if (!List_find_first(cerebrod_metric_name_list, 
                        list_find_first_string,
                        req.metric_name))
     {
+      Pthread_mutex_unlock(&cerebrod_metric_name_lock);
       _cerebrod_metric_respond_with_error(client_fd,
                                           req.version,
 					  CEREBRO_METRIC_PROTOCOL_ERR_METRIC_UNKNOWN);
-      goto out;
+      goto cleanup;
     }
+  Pthread_mutex_unlock(&cerebrod_metric_name_lock);
 
   if (!req.timeout_len)
     req.timeout_len = CEREBRO_METRIC_UPDOWN_TIMEOUT_LEN_DEFAULT;
 
   if (_cerebrod_metric_respond_with_nodes(client_fd, &req) < 0)
-    goto out;
+    goto cleanup;
 
- out:
+ cleanup:
   Free(arg);
   Close(client_fd);
   return NULL;

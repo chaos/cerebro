@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.98 2005-05-28 16:06:44 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.99 2005-06-07 20:29:28 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -77,6 +77,7 @@ _cerebrod_config_default(void)
   conf.listen_threads = CEREBROD_LISTEN_THREADS_DEFAULT;
   conf.metric_server = CEREBROD_METRIC_SERVER_DEFAULT;
   conf.metric_server_port = CEREBROD_METRIC_SERVER_PORT_DEFAULT;
+  conf.metric_max = CEREBROD_METRIC_MAX_DEFAULT;
 #if CEREBRO_DEBUG
   conf.speak_debug = CEREBROD_SPEAK_DEBUG_DEFAULT;
   conf.listen_debug = CEREBROD_LISTEN_DEBUG_DEFAULT;
@@ -250,6 +251,8 @@ _cerebrod_config_setup(void)
     conf.metric_server = conf_l.cerebrod_metric_server;
   if (conf_l.cerebrod_metric_server_port_flag)
     conf.metric_server_port = conf_l.cerebrod_metric_server_port;
+  if (conf_l.cerebrod_metric_max_flag)
+    conf.metric_max = conf_l.cerebrod_metric_max;
 #if CEREBRO_DEBUG
   if (conf_l.cerebrod_speak_debug_flag)
     conf.speak_debug = conf_l.cerebrod_speak_debug;
@@ -326,6 +329,9 @@ _cerebrod_pre_calculate_config_check(void)
 	cerebro_err_exit("metric server port '%d' cannot be identical "
                          "to heartbeat source port");
     }
+
+  if (conf.metric_max <= 0)
+    cerebro_err_exit("metric max '%d' invalid", conf.metric_max);
 }
 
 /*
@@ -869,6 +875,7 @@ _cerebrod_config_dump(void)
       fprintf(stderr, "* listen_threads: %d\n", conf.listen_threads);
       fprintf(stderr, "* metric_server: %d\n", conf.metric_server);
       fprintf(stderr, "* metric_server_port: %d\n", conf.metric_server_port);
+      fprintf(stderr, "* metric_max: %d\n", conf.metric_max);
       fprintf(stderr, "* speak_debug: %d\n", conf.speak_debug);
       fprintf(stderr, "* listen_debug: %d\n", conf.listen_debug);
       fprintf(stderr, "* metric_server_debug: %d\n", conf.metric_server_debug);

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_nodelist_util.c,v 1.13 2005-06-07 17:26:50 achu Exp $
+ *  $Id: cerebro_nodelist_util.c,v 1.14 2005-06-07 20:29:28 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -69,13 +69,13 @@ _cerebro_nodelist_check(cerebro_nodelist_t nodelist)
 static void
 _cerebro_nodelist_data_destroy(void *x)
 {
-  struct cerebro_nodelist_data *data;
+  struct cerebro_nodelist_data *nd;
   
-  data = (struct cerebro_nodelist_data *)x;
+  nd = (struct cerebro_nodelist_data *)x;
 
-  if (data->metric_value)
-    free(data->metric_value);
-  free(data);
+  if (nd->metric_value)
+    free(nd->metric_value);
+  free(nd);
 }
 
 cerebro_nodelist_t 
@@ -137,7 +137,7 @@ _cerebro_nodelist_append(cerebro_nodelist_t nodelist,
                          u_int32_t metric_value_len,
                          void *metric_value)
 {
-  struct cerebro_nodelist_data *data;
+  struct cerebro_nodelist_data *nd;
 
   if (_cerebro_nodelist_check(nodelist) < 0)
     return -1;
@@ -148,19 +148,19 @@ _cerebro_nodelist_append(cerebro_nodelist_t nodelist,
       goto cleanup;
     }
 
-  if (!(data = (struct cerebro_nodelist_data *)malloc(sizeof(struct cerebro_nodelist_data))))
+  if (!(nd = (struct cerebro_nodelist_data *)malloc(sizeof(struct cerebro_nodelist_data))))
     {
       nodelist->errnum = CEREBRO_ERR_OUTMEM;
       goto cleanup;
     }
-  memset(data, '\0', sizeof(struct cerebro_nodelist_data));
+  memset(nd, '\0', sizeof(struct cerebro_nodelist_data));
 
-  strcpy(data->nodename, nodename);
-  data->metric_value_type = metric_value_type;
-  data->metric_value_len = metric_value_len;
-  data->metric_value = metric_value;
+  strcpy(nd->nodename, nodename);
+  nd->metric_value_type = metric_value_type;
+  nd->metric_value_len = metric_value_len;
+  nd->metric_value = metric_value;
 
-  if (!list_append(nodelist->nodes, data))
+  if (!list_append(nodelist->nodes, nd))
     {
       nodelist->errnum = CEREBRO_ERR_INTERNAL;
       goto cleanup;
@@ -169,7 +169,7 @@ _cerebro_nodelist_append(cerebro_nodelist_t nodelist,
   return 0;
 
  cleanup:
-  free(data);
+  free(nd);
   return -1;
 }
 

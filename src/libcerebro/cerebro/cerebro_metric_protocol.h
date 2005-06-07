@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_protocol.h,v 1.17 2005-06-07 17:26:50 achu Exp $
+ *  $Id: cerebro_metric_protocol.h,v 1.18 2005-06-07 20:29:28 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_METRIC_PROTOCOL_H
@@ -71,8 +71,6 @@
 #define CEREBRO_METRIC_FLAGS_MASK                 0x00000003
 
 #define CEREBRO_METRIC_SERVER_PORT                8852
-
-#define CEREBRO_METRIC_MAX                        16
 
 #define CEREBRO_METRIC_STRING_MAXLEN              64
 

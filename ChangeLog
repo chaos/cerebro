@@ -1,9 +1,12 @@
 2005-06-07  Albert Chu  <chu11@llnl.gov>
 
+	* Removed hard defined maximum metric count.  Added
+	cerebrod_metric_max configuration option.
+
 	* Various bug fixes.
 
 	* Various code cleanup.
-	
+
 2005-06-06  Albert Chu  <chu11@llnl.gov>
 
 	* tagged pre-heartbeat-protocol-change-1

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.h,v 1.42 2005-05-28 16:06:44 achu Exp $
+ *  $Id: cerebrod_config.h,v 1.43 2005-06-07 20:29:28 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_CONFIG_H
@@ -30,6 +30,7 @@
 #define CEREBROD_LISTEN_THREADS_DEFAULT               2
 #define CEREBROD_METRIC_SERVER_DEFAULT                1
 #define CEREBROD_METRIC_SERVER_PORT_DEFAULT           CEREBRO_METRIC_SERVER_PORT
+#define CEREBROD_METRIC_MAX_DEFAULT                   16
 #define CEREBROD_CLUSTERLIST_MODULE_DEFAULT           NULL
 #define CEREBROD_CLUSTERLIST_MODULE_OPTIONS_DEFAULT   NULL
 #define CEREBROD_SPEAK_DEBUG_DEFAULT                  0
@@ -61,10 +62,11 @@ struct cerebrod_config
   int speak;
 
   int listen;
-  int listen_threads;
+  unsigned int listen_threads;
 
   int metric_server;
   unsigned int metric_server_port;
+  unsigned int metric_max;
 
 #if CEREBRO_DEBUG
   int speak_debug;

@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro.conf.5.in,v 1.6 2005-06-01 16:40:23 achu Exp $
+\."$Id: cerebro.conf.5.in,v 1.7 2005-06-07 20:29:28 achu Exp $
 \."#############################################################################
 .TH cerebro.conf 5 "May 2005" "cerebro.conf @VERSION@" "cerebro.conf"
 .SH "NAME"
@@ -126,6 +126,10 @@ option is turned on.
 .TP
 .I cerebrod_metric_server_port num
 Specify the metric server port.  The default server port is 8852.
+.TP
+.I cerebrod_metric_max num
+Specify the metric number of metrics the server is allowed to
+handle.Th default value is 16.
 .if @MANPAGE_DEBUG@ \{
 .TP
 .I cerebrod_speak_debug ( on | off )

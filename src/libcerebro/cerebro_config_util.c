@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_util.c,v 1.9 2005-06-03 18:08:31 achu Exp $
+ *  $Id: cerebro_config_util.c,v 1.10 2005-06-07 20:29:28 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -339,6 +339,17 @@ _cerebro_config_load_config_file(struct cerebro_config *conf)
 	0, 
 	&(conf->cerebrod_metric_server_port_flag),
 	&(conf->cerebrod_metric_server_port), 
+	0
+      },
+      {
+	"cerebrod_metric_max", 
+	CONFFILE_OPTION_INT, 
+	-1,
+	conffile_int, 
+	1, 
+	0, 
+	&(conf->cerebrod_metric_max_flag),
+	&(conf->cerebrod_metric_max), 
 	0
       },
 #if CEREBRO_DEBUG

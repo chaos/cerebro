@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.36 2005-06-07 17:26:50 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.37 2005-06-07 20:29:28 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -169,7 +169,7 @@ static struct cerebrod_heartbeat *
 _cerebrod_heartbeat_create(void)
 {
   struct cerebrod_heartbeat *hb = NULL;
-  struct cerebrod_heartbeat_metric *data = NULL;
+  struct cerebrod_heartbeat_metric *hd = NULL;
   u_int32_t boottime;
 
   /* XXX needs cleaning up */
@@ -189,21 +189,21 @@ _cerebrod_heartbeat_create(void)
    * Store boottime
    */
 
-  data = Malloc(sizeof(struct cerebrod_heartbeat_metric));
-  memset(data, '\0', sizeof(struct cerebrod_heartbeat_metric));
+  hd = Malloc(sizeof(struct cerebrod_heartbeat_metric));
+  memset(hd, '\0', sizeof(struct cerebrod_heartbeat_metric));
 
   /* need not overflow */
   /* XXX cleanup */
-  strncpy(data->metric_name, "boottime", CEREBRO_METRIC_NAME_MAXLEN);
+  strncpy(hd->metric_name, "boottime", CEREBRO_METRIC_NAME_MAXLEN);
   /* XXX need a function to calculate this here instead */
-  data->metric_value_type = CEREBRO_METRIC_VALUE_TYPE_UNSIGNED_INT32;
-  data->metric_value_len = sizeof(u_int32_t);
+  hd->metric_value_type = CEREBRO_METRIC_VALUE_TYPE_UNSIGNED_INT32;
+  hd->metric_value_len = sizeof(u_int32_t);
   
-  data->metric_value = Malloc(data->metric_value_len);
+  hd->metric_value = Malloc(hd->metric_value_len);
   boottime = cerebrod_get_boottime();
-  memcpy(data->metric_value, &boottime, data->metric_value_len);
+  memcpy(hd->metric_value, &boottime, hd->metric_value_len);
 
-  hb->metrics[0] = data;
+  hb->metrics[0] = hd;
 
   /* 
    * store something else later ??

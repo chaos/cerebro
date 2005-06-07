@@ -7,7 +7,6 @@ Testing
 - mem-leaking
 
 Cleanup
-- nodelist API, to match new code??
 - cleanup common hash into "data" and put in data.c??
 - 'get' configuration routines?
 - don't use packet buflen #define, need to allocate buffer appropriately.
@@ -15,19 +14,15 @@ Cleanup
   - and document
 - move get_data flags into cerebro.h or somewhere better
   - and document
-- move metric constants/#defines from cerebro_metric_protocol.h to
-  somewhere else.
-- configurable max metrics via config file of module
-- possible mem-leak??
 - function to determine sizeof type based on metric_type.
 - common heartbeat destroy?
   - for speaker/listerner
-- data vs. hb_data vs. metric_data
 - sizeof vs. packet_len-defines
   - use sizeof on structs
   - use defines on buffers
-
---> data vs. value argh!!!
+- conffile lib - unsigned int?
+  - cleanup int vs. unsigned in configs
+- lock names
 
 Audit
 - code review to reduce memory footprint
@@ -37,18 +32,17 @@ Portability
 - Non-pthreads support
 
 Design
-- metric_max - remove from node_data hash and #define of it
-  - rehash nodedata hash as required
+- Data structure for list/index combination?
+- Index for metric name list?
+- Move pthread_lock in cerebro_error to error lib??
+- wrappers err_init stuff, how fix?
+- metric to get available metrics
 - make cerebro calls pthread safe??
 - raw metric_data type
 - metric modules
   - modules for starttime/boottime
-- metric_type --> metric_value_type ??
 - nodelist
   - use own list instead of 'List' to store iterators?
-- metric with value of arbitrary data
-  - will require len field to heartbeat packets and metric data
-  - will require magic field to ensure packets are in-sync??
 - how remove metric data?
 - strerror_r and errormsg_r funcs
 - libcerebro set configfile, module, etc. functions

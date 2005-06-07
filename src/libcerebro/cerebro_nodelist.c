@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_nodelist.c,v 1.18 2005-06-07 17:26:50 achu Exp $
+ *  $Id: cerebro_nodelist.c,v 1.19 2005-06-07 20:29:28 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -64,7 +64,7 @@ cerebro_nodelist_find(cerebro_nodelist_t nodelist,
                       unsigned int *metric_value_len,
                       void **metric_value)
 {
-  struct cerebro_nodelist_data *data;
+  struct cerebro_nodelist_data *nd;
   char nodebuf[CEREBRO_MAXNODENAMELEN+1];
   char *nodename;
 
@@ -109,23 +109,23 @@ cerebro_nodelist_find(cerebro_nodelist_t nodelist,
     nodename = (char *)node;
 
   nodelist->errnum = CEREBRO_ERR_SUCCESS;
-  data = list_find_first(nodelist->nodes,
-			 _cerebro_nodelist_find_func,
-			 (void *)nodename);
+  nd = list_find_first(nodelist->nodes,
+                       _cerebro_nodelist_find_func,
+                       (void *)nodename);
 
-  if (data)
+  if (nd)
     {
       if (metric_value_type)
-        *metric_value_type = data->metric_value_type;
+        *metric_value_type = nd->metric_value_type;
 
       if (metric_value_len)
-        *metric_value_len = data->metric_value_len;
+        *metric_value_len = nd->metric_value_len;
 
       if (metric_value)
-        *metric_value = data->metric_value;
+        *metric_value = nd->metric_value;
     }
 
-  return (data) ? 1 : 0;
+  return (nd) ? 1 : 0;
 }
 
 int 
@@ -133,7 +133,7 @@ cerebro_nodelist_for_each(cerebro_nodelist_t nodelist,
                           Cerebro_for_each for_each,
                           void *arg)
 {
-  struct cerebro_nodelist_data *data;
+  struct cerebro_nodelist_data *nd;
   ListIterator itr = NULL;
 
   if (_cerebro_nodelist_check(nodelist) < 0)
@@ -151,12 +151,12 @@ cerebro_nodelist_for_each(cerebro_nodelist_t nodelist,
       goto cleanup;
     }
 
-  while ((data = list_next(itr)))
+  while ((nd = list_next(itr)))
     {
-      if (for_each(data->nodename, 
-                   data->metric_value_type,
-                   data->metric_value_len,
-                   data->metric_value, 
+      if (for_each(nd->nodename, 
+                   nd->metric_value_type,
+                   nd->metric_value_len,
+                   nd->metric_value, 
                    arg) < 0)
 	goto cleanup;
     }
