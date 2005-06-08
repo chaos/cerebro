@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.40 2005-06-08 00:10:49 achu Exp $
+ *  $Id: cerebro.h,v 1.41 2005-06-08 15:32:01 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_H
@@ -40,6 +40,18 @@
 #define CEREBRO_METRIC_FLAGS_MASK                 0x00000003
 
 /* 
+ * Default available metrics
+ */
+#define CEREBRO_METRIC_CLUSTER_NODES              "cluster_nodes"
+#define CEREBRO_METRIC_UP_NODES                   "up_nodes"
+#define CEREBRO_METRIC_DOWN_NODES                 "down_nodes"
+#define CEREBRO_METRIC_UPDOWN_STATE               "updown_state"
+#define CEREBRO_METRIC_LAST_RECEIVED_TIME         "last_received_time"
+
+#define CEREBRO_METRIC_UPDOWN_STATE_NODE_UP       1
+#define CEREBRO_METRIC_UPDOWN_STATE_NODE_DOWN     0
+
+/* 
  * Cerebro Metric Value Types
  */
 #define CEREBRO_METRIC_VALUE_TYPE_NONE            0
@@ -48,6 +60,7 @@
 #define CEREBRO_METRIC_VALUE_TYPE_FLOAT           3
 #define CEREBRO_METRIC_VALUE_TYPE_DOUBLE          4
 #define CEREBRO_METRIC_VALUE_TYPE_STRING          5
+#define CEREBRO_METRIC_VALUE_TYPE_RAW             6
 
 typedef struct cerebro *cerebro_t;
 

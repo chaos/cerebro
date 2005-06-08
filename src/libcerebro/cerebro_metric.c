@@ -384,6 +384,26 @@ _cerebro_metric_response_metric_value_unmarshall(cerebro_t handle,
           return -1;
         }
       break;
+
+    case CEREBRO_METRIC_VALUE_TYPE_RAW:
+
+      if (!(res->metric_value = malloc(res->metric_value_len)));
+        {
+          handle->errnum = CEREBRO_ERR_OUTMEM;
+          return -1;
+        }
+      memset(res->metric_value, '\0', res->metric_value_len);
+
+      if ((len = _cerebro_unmarshall_buffer((char *)res->metric_value,
+                                            res->metric_value_len,
+                                            buf,
+                                            buflen)) < 0)
+        {
+          handle->errnum = CEREBRO_ERR_INTERNAL;
+          return -1;
+        }
+      break;
+
     default:
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;

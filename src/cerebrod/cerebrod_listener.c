@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.74 2005-06-08 00:30:38 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.75 2005-06-08 15:32:01 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -348,7 +348,8 @@ _cerebrod_heartbeat_unmarshall(const char *buf, unsigned int buflen)
                   count += len;
                   break;
                 case CEREBRO_METRIC_VALUE_TYPE_STRING:
-                  if ((len = _cerebro_unmarshall_buffer(hd->metric_value,
+                case CEREBRO_METRIC_VALUE_TYPE_RAW:
+                  if ((len = _cerebro_unmarshall_buffer((char *)hd->metric_value,
                                                         hd->metric_value_len,
                                                         buf + count,
                                                         buflen - count)) < 0)

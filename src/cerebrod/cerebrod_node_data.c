@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_node_data.c,v 1.16 2005-06-08 00:10:49 achu Exp $
+ *  $Id: cerebrod_node_data.c,v 1.17 2005-06-08 15:32:01 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -309,6 +309,9 @@ _cerebrod_node_data_metric_data_dump(void *data, const void *key, void *arg)
       memset(buf, '\0', CEREBRO_METRIC_STRING_MAXLEN+1);
       memcpy(buf, md->metric_value, CEREBRO_METRIC_STRING_MAXLEN);
       fprintf(stderr, "metric_value=%s", buf);
+      break;
+    case CEREBRO_METRIC_VALUE_TYPE_RAW:
+      /* Don't output raw data */
       break;
     default:
       cerebro_err_debug("%s(%s:%d): nodename=%s invalid metric_value_type=%d",

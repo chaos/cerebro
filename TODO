@@ -8,6 +8,10 @@ Testing
 
 Cleanup
 - cleanup common hash into "data" and put in data.c??
+cerebrod_heartbeat_dump
+_cerebrod_node_data_metric_data_dump
+CEREBRO_METRIC_STRING_MAXLEN
+CEREBRO_METRIC_STRING_PARAM_MAXLEN
 
 Audit
 - code review to reduce memory footprint
@@ -23,7 +27,6 @@ Design
 - wrappers err_init stuff, how fix?
 - metric to get available metrics
 - make cerebro calls pthread safe??
-- raw metric_data type
 - metric modules
   - modules for starttime/boottime
 - nodelist

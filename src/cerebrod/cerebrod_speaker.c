@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.40 2005-06-08 00:30:38 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.41 2005-06-08 15:32:01 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -327,6 +327,7 @@ _cerebrod_heartbeat_marshall(struct cerebrod_heartbeat *hb,
               count += len;
               break;
             case CEREBRO_METRIC_VALUE_TYPE_STRING:
+            case CEREBRO_METRIC_VALUE_TYPE_RAW:
               if ((len = _cerebro_marshall_buffer((char *)hb->metrics[i]->metric_value,
                                                   hb->metrics[i]->metric_value_len,
                                                   buf + count,

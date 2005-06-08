@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro_get_metric_data.3,v 1.4 2005-06-08 00:10:49 achu Exp $
+\."$Id: cerebro_get_metric_data.3,v 1.5 2005-06-08 15:32:01 achu Exp $
 \."#############################################################################
 .TH CEREBRO_GET_METRIC_DATA 3 "May 2005" "LLNL" "LIBCEREBRO"
 .SH "NAME"
@@ -24,10 +24,38 @@ setting alternate defaults using
 .B cerebro_set_timeout_len(3),
 or
 .B cerebro_set_flags(3).  It can also be altered using the the cerebro
-configuration file.  See 
-.BR cerebro.conf(5)
-for information on how the default behavior of
-\fBcerebro_get_metric_data\fR can be altered.
+configuration file.
+
+The default metrics available through the
+.B cerebrod
+metric server are:
+
+CEREBRO_METRIC_CLUSTER_NODES - Retrieve all nodes known to 
+.B cerebrod.  
+No metric value is returned for this metric.
+
+CEREBRO_METRIC_UP_NODES - Retrieve all up nodes in the cluster. 
+Up vs. down nodes are determined through the configured timeout_len.
+No metric value is returned for this metric.
+
+CEREBRO_METRIC_DOWN_NODES - Retrieve all down nodes in the cluster.
+in the cluster.  Up vs. down nodes are determined through the
+configured timeout_len.  No metric value is returned for this metric.
+
+CEREBRO_METRIC_UPDOWN_STATE - Retrieve the up vs. down state of all
+nodes in the cluster.  The metric type returned for this metric is a
+CEREBRO_METRIC_VALUE_TYPE_UNSIGNED_INT32.  The value is set to
+CEREBRO_METRIC_UPDOWN_STATE_NODE_UP if the node is up and set to
+CEREBRO_METRIC_UPDOWN_STATE_NODE_DOWN if the node is down.
+
+CEREBRO_METRIC_LAST_RECEIVED_TIME - Retrieve the last received time
+of all nodes in the cluster. The metric type returned for this metric is a
+CEREBRO_METRIC_VALUE_TYPE_UNSIGNED_INT32.  The value is set to the
+seconds returned by
+.BR gettimeofday(2) 
+on the 
+.BR cerebrod
+server.
 
 .br
 .SH "RETURN VALUES"

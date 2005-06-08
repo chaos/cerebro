@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_protocol.h,v 1.1 2005-06-08 00:30:38 achu Exp $
+ *  $Id: cerebro_metric_protocol.h,v 1.2 2005-06-08 15:32:01 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_METRIC_PROTOCOL_H
@@ -40,13 +40,6 @@
 #define CEREBRO_METRIC_PROTOCOL_CLIENT_TIMEOUT_LEN         5
 #define CEREBRO_METRIC_PROTOCOL_CONNECT_TIMEOUT_LEN        5
 
-#define CEREBRO_METRIC_CLUSTER_NODES                       "cluster_nodes"
-#define CEREBRO_METRIC_UP_NODES                            "up_nodes"
-#define CEREBRO_METRIC_DOWN_NODES                          "down_nodes"
-#define CEREBRO_METRIC_UPDOWN_STATE                        "updown_state"
-#define CEREBRO_METRIC_LAST_RECEIVED_TIME                  "last_received_time"
-#define CEREBRO_METRIC_BOOTTIME                            "boottime"
-
 #define CEREBRO_METRIC_PROTOCOL_ERR_SUCCESS                0
 #define CEREBRO_METRIC_PROTOCOL_ERR_VERSION_INVALID        1
 #define CEREBRO_METRIC_PROTOCOL_ERR_METRIC_UNKNOWN         2
@@ -56,13 +49,6 @@
 
 #define CEREBRO_METRIC_PROTOCOL_IS_LAST_RESPONSE           1
 #define CEREBRO_METRIC_PROTOCOL_IS_NOT_LAST_RESPONSE       0
-
-
-/* 
- * Updown Definitions
- */
-#define CEREBRO_METRIC_UPDOWN_STATE_NODE_UP       1
-#define CEREBRO_METRIC_UPDOWN_STATE_NODE_DOWN     0
 
 #define CEREBRO_METRIC_UPDOWN_TIMEOUT_LEN_DEFAULT 60
 

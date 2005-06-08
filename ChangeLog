@@ -1,3 +1,11 @@
+2005-06-08  Albert Chu  <chu11@llnl.gov>
+
+	* Add support for RAW datatype.
+
+	* Documented and made metric defaults available via cerebro.h.
+
+	* Various documentation fixes, bug fixes, and code cleanup.
+	
 2005-06-07  Albert Chu  <chu11@llnl.gov>
 
 	* Removed hard defined maximum metric count.  Added
@@ -7,6 +15,9 @@
 	received/sent packet size is not known.
 
 	* Added get configuration routines to libcerebro.
+
+	* Documented and made flags and value types available via
+	cerebro.h.
 	
 	* Various bug fixes.
 
