@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.38 2005-06-07 22:20:39 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.39 2005-06-08 00:10:49 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -219,28 +219,6 @@ _cerebrod_heartbeat_create(int *heartbeat_len)
    */
 
   return hb;
-}
-
-/*
- * _cerebrod_heartbeat_destroy
- *
- * destroy a heartbeat packet
- */
-static void
-_cerebrod_heartbeat_destroy(struct cerebrod_heartbeat *hb)
-{
-  int i;
-
-  assert(hb);
-
-  for (i = 0; i < hb->metrics_len; i++)
-    {
-      Free(hb->metrics[i]->metric_value);
-      Free(hb->metrics[i]);
-    }
-  
-  Free(hb->metrics);
-  Free(hb);
 }
 
 /*
@@ -490,7 +468,7 @@ cerebrod_speaker(void *arg)
                               __FILE__, __FUNCTION__, __LINE__, send_len);
         }
 
-      _cerebrod_heartbeat_destroy(hb);
+      cerebrod_heartbeat_destroy(hb);
       Free(buf);
       sleep(sleep_time);
     }

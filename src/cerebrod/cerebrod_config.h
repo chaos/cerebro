@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.h,v 1.43 2005-06-07 20:29:28 achu Exp $
+ *  $Id: cerebrod_config.h,v 1.44 2005-06-08 00:10:49 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_CONFIG_H
@@ -30,7 +30,7 @@
 #define CEREBROD_LISTEN_THREADS_DEFAULT               2
 #define CEREBROD_METRIC_SERVER_DEFAULT                1
 #define CEREBROD_METRIC_SERVER_PORT_DEFAULT           CEREBRO_METRIC_SERVER_PORT
-#define CEREBROD_METRIC_MAX_DEFAULT                   16
+#define CEREBROD_METRIC_MAX_DEFAULT                   4
 #define CEREBROD_CLUSTERLIST_MODULE_DEFAULT           NULL
 #define CEREBROD_CLUSTERLIST_MODULE_OPTIONS_DEFAULT   NULL
 #define CEREBROD_SPEAK_DEBUG_DEFAULT                  0
@@ -51,10 +51,10 @@ struct cerebrod_config
   char *config_file;
 
   /* Set by the user in the configuration file */
-  unsigned int heartbeat_frequency_min;
-  unsigned int heartbeat_frequency_max;
-  unsigned int heartbeat_source_port;
-  unsigned int heartbeat_destination_port;
+  int heartbeat_frequency_min;
+  int heartbeat_frequency_max;
+  int heartbeat_source_port;
+  int heartbeat_destination_port;
   char *heartbeat_destination_ip;
   char *heartbeat_network_interface;
   int heartbeat_ttl;
@@ -62,11 +62,11 @@ struct cerebrod_config
   int speak;
 
   int listen;
-  unsigned int listen_threads;
+  int listen_threads;
 
   int metric_server;
-  unsigned int metric_server_port;
-  unsigned int metric_max;
+  int metric_server_port;
+  int metric_max;
 
 #if CEREBRO_DEBUG
   int speak_debug;

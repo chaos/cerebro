@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.99 2005-06-07 20:29:28 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.100 2005-06-08 00:10:49 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -274,6 +274,27 @@ _cerebrod_pre_calculate_config_check(void)
 {
   struct in_addr addr_temp;
   
+  if (conf.heartbeat_frequency_min <= 0)
+    cerebro_err_exit("heartbeat frequency min '%d' invalid", 
+                     conf.heartbeat_frequency_min);
+
+  if (conf.heartbeat_frequency_max <= 0)
+    cerebro_err_exit("heartbeat frequency max '%d' invalid", 
+                     conf.heartbeat_frequency_max);
+  
+  if (conf.heartbeat_source_port <= 0)
+    cerebro_err_exit("heartbeat source port '%d' invalid", 
+                     conf.heartbeat_source_port);
+
+  if (conf.heartbeat_destination_port <= 0)
+    cerebro_err_exit("heartbeat destination port '%d' invalid", 
+                     conf.heartbeat_destination_port); 
+
+  if (conf.heartbeat_destination_port == conf.heartbeat_source_port)
+    cerebro_err_exit("heartbeat destination and source ports '%d' "
+		      "cannot be identical",
+		      conf.heartbeat_destination_port);
+
   if (!Inet_pton(AF_INET, conf.heartbeat_destination_ip, &addr_temp))
     cerebro_err_exit("heartbeat destination IP address '%s' improperly format",
                      conf.heartbeat_destination_ip);
@@ -303,32 +324,15 @@ _cerebrod_pre_calculate_config_check(void)
 	}
     }
 
-  if (conf.heartbeat_destination_port == conf.heartbeat_source_port)
-    cerebro_err_exit("heartbeat destination and source ports '%d' "
-		      "cannot be identical",
-		      conf.heartbeat_destination_port);
-
   if (conf.heartbeat_ttl <= 0)
     cerebro_err_exit("heartbeat ttl '%d' invalid", conf.heartbeat_ttl);
 
   if (conf.listen_threads <= 0)
     cerebro_err_exit("listen threads '%d' invalid", conf.listen_threads);
 
-  /* If the listening server is turned off, none of the other
-   * servers can be on.  So we turn them off.
-   */
-  if (!conf.listen)
-    conf.metric_server = 0;
-
-  if (conf.metric_server)
-    {
-      if (conf.metric_server_port == conf.heartbeat_destination_port)
-	cerebro_err_exit("metric server port '%d' cannot be identical "
-                         "to heartbeat destination port");
-      if (conf.metric_server_port == conf.heartbeat_source_port)
-	cerebro_err_exit("metric server port '%d' cannot be identical "
-                         "to heartbeat source port");
-    }
+  if (conf.metric_server_port <= 0)
+    cerebro_err_exit("metric server port '%d' invalid", 
+                     conf.metric_server_port);
 
   if (conf.metric_max <= 0)
     cerebro_err_exit("metric max '%d' invalid", conf.metric_max);
@@ -784,6 +788,12 @@ _cerebrod_calculate_config(void)
    * the user's heartbeat_network_interface input.
    */
   _cerebrod_calculate_heartbeat_network_interface_in_addr_and_index();
+
+  /* If the listening server is turned off, none of the other
+   * servers can be on.  So we turn them off.
+   */
+  if (!conf.listen)
+    conf.metric_server = 0;
 }
 
 /*
@@ -839,6 +849,17 @@ _cerebrod_post_calculate_config_check(void)
 
       if (!found_interface)
         cerebro_err_exit("heartbeat destination address not found");
+    }
+
+  if (conf.metric_server)
+    {
+      if (conf.metric_server_port == conf.heartbeat_destination_port)
+	cerebro_err_exit("metric server port '%d' cannot be identical "
+                         "to heartbeat destination port");
+
+      if (conf.metric_server_port == conf.heartbeat_source_port)
+	cerebro_err_exit("metric server port '%d' cannot be identical "
+                         "to heartbeat source port");
     }
 }
 

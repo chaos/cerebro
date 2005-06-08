@@ -8,13 +8,6 @@ Testing
 
 Cleanup
 - cleanup common hash into "data" and put in data.c??
-- 'get' configuration routines?
-- common heartbeat destroy?
-  - for speaker/listerner
-- conffile lib - unsigned int?
-  - cleanup int vs. unsigned in configs
-- lower resident memory size by using more mallocs rather than buffers.
-- unsigned_int32 vs. u_int32
 
 Audit
 - code review to reduce memory footprint
@@ -36,6 +29,8 @@ Design
 - nodelist
   - use own list instead of 'List' to store iterators?
 - how remove metric data?
+  - Behlendo Request: Way to force most up to date data
+  - Will require speaker to listen for "control" packets.
 - strerror_r and errormsg_r funcs
 - libcerebro set configfile, module, etc. functions
 - generic err message buffer in cerebro_t handle, i.e for conffile errors

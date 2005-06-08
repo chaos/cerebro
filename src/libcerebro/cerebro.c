@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.c,v 1.31 2005-06-07 17:26:50 achu Exp $
+ *  $Id: cerebro.c,v 1.32 2005-06-08 00:10:49 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -158,6 +158,15 @@ cerebro_strerror(int errnum)
     return cerebro_error_messages[CEREBRO_ERR_ERRNUMRANGE];
 }
 
+char *
+cerebro_get_hostname(cerebro_t handle)
+{
+  if (_cerebro_handle_check(handle) < 0)
+    return NULL;
+
+  return handle->hostname;
+}
+
 int 
 cerebro_set_hostname(cerebro_t handle, const char *hostname)
 {
@@ -179,6 +188,15 @@ cerebro_set_hostname(cerebro_t handle, const char *hostname)
 }
 
 int 
+cerebro_get_port(cerebro_t handle)
+{
+  if (_cerebro_handle_check(handle) < 0)
+    return -1;
+
+  return handle->port;
+}
+
+int 
 cerebro_set_port(cerebro_t handle, unsigned int port)
 {
   if (_cerebro_handle_check(handle) < 0)
@@ -189,6 +207,15 @@ cerebro_set_port(cerebro_t handle, unsigned int port)
 }
 
 int 
+cerebro_get_timeout_len(cerebro_t handle)
+{
+  if (_cerebro_handle_check(handle) < 0)
+    return -1;
+
+  return handle->timeout_len;
+}
+
+int 
 cerebro_set_timeout_len(cerebro_t handle, unsigned int timeout_len)
 {
   if (_cerebro_handle_check(handle) < 0)
@@ -196,6 +223,15 @@ cerebro_set_timeout_len(cerebro_t handle, unsigned int timeout_len)
 
   handle->timeout_len = timeout_len;
   return 0;
+}
+
+int 
+cerebro_get_flags(cerebro_t handle)
+{
+  if (_cerebro_handle_check(handle) < 0)
+    return -1;
+
+  return handle->flags;
 }
 
 int 

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.39 2005-06-07 22:20:39 achu Exp $
+ *  $Id: cerebro.h,v 1.40 2005-06-08 00:10:49 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_H
@@ -111,8 +111,19 @@ int cerebro_nodelist_iterator_errnum(cerebro_nodelist_iterator_t nodelistItr);
 char *cerebro_strerror(int errnum);
 
 /* 
- * Parameter Settings
+ * Parameter Get/Set Routines 
  */
+
+/* 
+ * cerebro_get_hostname
+ *
+ * Get a string pointer to the currently set hostname of the cerebrod
+ * server.  The string returned may be the empty string, indicating no
+ * hostname has been set.
+ * 
+ * Returns pointer on success, NULL on error
+ */
+char *cerebro_get_hostname(cerebro_t handle);
 
 /* 
  * cerebro_set_hostname
@@ -124,6 +135,16 @@ char *cerebro_strerror(int errnum);
 int cerebro_set_hostname(cerebro_t handle, const char *hostname);
 
 /* 
+ * cerebro_get_port
+ *
+ * Get the currently set cerebrod server port.  The port may be 0,
+ * indicating no port has been set.
+ *
+ * Returns port on success, -1 on error
+ */
+int cerebro_get_port(cerebro_t handle);
+
+/* 
  * cerebro_set_port
  *
  * Set the cerebrod server port to connect to
@@ -131,6 +152,16 @@ int cerebro_set_hostname(cerebro_t handle, const char *hostname);
  * Returns 0 on success, -1 on error
  */
 int cerebro_set_port(cerebro_t handle, unsigned int port);
+
+/* 
+ * cerebro_get_timeout_len
+ *
+ * Get the currently set timeout_len.  The timeout_len may be 0,
+ * indicating no timeout_len has been set.
+ *
+ * Returns 0 on success, -1 on error
+ */
+int cerebro_get_timeout_len(cerebro_t handle);
 
 /* 
  * cerebro_set_timeout_len
@@ -142,6 +173,16 @@ int cerebro_set_port(cerebro_t handle, unsigned int port);
 int cerebro_set_timeout_len(cerebro_t handle, unsigned int timeout_len);
 
 /* 
+ * cerebro_get_flags
+ *
+ * Get the currently set flags.  The flags may be 0, indicating no
+ * flags have been set.
+ *
+ * Returns 0 on success, -1 on error
+ */
+int cerebro_get_flags(cerebro_t handle);
+
+/* 
  * cerebro_set_flags
  *
  * Set the cerebrod server flags to use
@@ -149,6 +190,10 @@ int cerebro_set_timeout_len(cerebro_t handle, unsigned int timeout_len);
  * Returns 0 on success, -1 on error
  */
 int cerebro_set_flags(cerebro_t handle, unsigned int flags);
+
+/* 
+ * Core API
+ */
 
 /* 
  * cerebro_get_metric_data

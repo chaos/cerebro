@@ -5,6 +5,8 @@
 
 	* Removed hard defined packet buffer for situations where the
 	received/sent packet size is not known.
+
+	* Added get configuration routines to libcerebro.
 	
 	* Various bug fixes.
 

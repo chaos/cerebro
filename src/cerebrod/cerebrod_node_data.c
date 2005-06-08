@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_node_data.c,v 1.15 2005-06-07 22:20:39 achu Exp $
+ *  $Id: cerebrod_node_data.c,v 1.16 2005-06-08 00:10:49 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -160,7 +160,7 @@ cerebrod_node_data_initialize(void)
   cerebrod_node_data_index = Hash_create(cerebrod_node_data_index_size,
                                          (hash_key_f)hash_key_string,
                                          (hash_cmp_f)strcmp,
-                                         (hash_del_f)_Free);
+                                         (hash_del_f)NULL);
   
   /* If the clusterlist module contains nodes, retrieve all of these
    * nodes and put them into the cerebrod_node_data list.  All updates
@@ -182,7 +182,7 @@ cerebrod_node_data_initialize(void)
           nd = _cerebrod_node_data_create_and_init(nodes[i]);
 
           List_append(cerebrod_node_data_list, nd);
-          Hash_insert(cerebrod_node_data_index, Strdup(nodes[i]), nd);
+          Hash_insert(cerebrod_node_data_index, nd->nodename, nd);
 
           free(nodes[i]);
         }
@@ -477,8 +477,6 @@ _cerebrod_metric_data_update(struct cerebrod_node_data *nd,
   
   if (!(md = Hash_find(nd->metric_data, metric_name)))
     {
-      char *key;
-
       /* Should be impossible to hit due to checks in
        * cerebrod_node_data_update()
        */
@@ -490,11 +488,9 @@ _cerebrod_metric_data_update(struct cerebrod_node_data *nd,
           return;
         }
 
-      key = Strdup(metric_name);
       md = (struct cerebrod_metric_data *)Malloc(sizeof(struct cerebrod_metric_data));
       md->metric_name = Strdup(metric_name);
-          
-      Hash_insert(nd->metric_data, key, md);
+      Hash_insert(nd->metric_data, md->metric_name, md);
       nd->metric_data_count++;
     }
   else
@@ -539,8 +535,6 @@ cerebrod_node_data_update(char *nodename,
   Pthread_mutex_lock(&cerebrod_node_data_lock);
   if (!(nd = Hash_find(cerebrod_node_data_index, nodename)))
     {
-      char *key;
-
       /* Re-hash if our hash is getting too small */
       if ((cerebrod_node_data_index_numnodes + 1) > CEREBROD_NODE_DATA_REHASH_LIMIT)
 	cerebrod_rehash(&cerebrod_node_data_index,
@@ -549,10 +543,9 @@ cerebrod_node_data_update(char *nodename,
 			cerebrod_node_data_index_numnodes,
 			&cerebrod_node_data_lock);
 
-      key = Strdup(nodename);
       nd = _cerebrod_node_data_create_and_init(nodename);
       List_append(cerebrod_node_data_list, nd);
-      Hash_insert(cerebrod_node_data_index, key, nd);
+      Hash_insert(cerebrod_node_data_index, nd->nodename, nd);
       cerebrod_node_data_index_numnodes++;
 
       /* Ok to call debug output function, since cerebrod_node_data_lock

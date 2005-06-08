@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: libcerebro.3,v 1.11 2005-06-07 22:20:39 achu Exp $
+\."$Id: libcerebro.3,v 1.12 2005-06-08 00:10:49 achu Exp $
 \."#############################################################################
 .TH LIBCEREBRO 3 "August 2003" "LLNL" "LIBCEREBRO"
 .SH "NAME"
@@ -20,11 +20,19 @@ or down
 .sp
 .BI "char *cerebro_strerror(int errnum);"
 .sp
+.BI "char *cerebro_get_hostname(cerebro_t handle);"
+.sp
 .BI "int cerebro_set_hostname(cerebro_t handle, const char *hostname);"
+.sp
+.BI "int cerebro_get_port(cerebro_t handle);"
 .sp
 .BI "int cerebro_set_port(cerebro_t handle, unsigned int port);"
 .sp
+.BI "int cerebro_get_timeout_len(cerebro_t handle);"
+.sp
 .BI "int cerebro_set_timeout_len(cerebro_t handle, unsigned int timeout_len);"
+.sp
+.BI "int cerebro_get_flags(cerebro_t handle);"
 .sp
 .BI "int cerebro_set_flags(cerebro_t handle, unsigned int flags);"
 .sp
@@ -76,12 +84,13 @@ manpage for information on cerebro modules.
 cerebro_handle_create(3), cerebro_handle_destroy(3),
 cerebro_errnum(3), cerebro_nodelist_errnum(3),
 cerebro_nodelist_iterator_errnum(3), cerebro_strerror(3),
-cerebro_set_hostname(3), cerebro_set_port(3),
-cerebro_set_timeout_len(3), cerebro_set_flags(3),
-cerebro_get_metric_data(3), cerebro_nodelist_metric_name(3),
-cerebro_nodelist_length(3), cerebro_nodelist_find(3),
-cerebro_nodelist_for_each(3), cerebro_nodelist_destroy(3),
-cerebro_nodelist_iterator_create(3),
+cerebro_get_hostname(3), cerebro_set_hostname(3), cerebro_get_port(3),
+cerebro_set_port(3), cerebro_get_timeout_len(3),
+cerebro_set_timeout_len(3), cerebro_get_flags(3),
+cerebro_set_flags(3), cerebro_get_metric_data(3),
+cerebro_nodelist_metric_name(3), cerebro_nodelist_length(3),
+cerebro_nodelist_find(3), cerebro_nodelist_for_each(3),
+cerebro_nodelist_destroy(3), cerebro_nodelist_iterator_create(3),
 cerebro_nodelist_iterator_nodename(3),
 cerebro_nodelist_iterator_metric_value(3),
 cerebro_nodelist_iterator_next(3), cerebro_nodelist_iterator_reset(3),

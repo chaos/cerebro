@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_heartbeat.c,v 1.29 2005-06-07 22:20:39 achu Exp $
+ *  $Id: cerebrod_heartbeat.c,v 1.30 2005-06-08 00:10:49 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -22,6 +22,23 @@ extern struct cerebrod_config conf;
 #if CEREBRO_DEBUG
 extern pthread_mutex_t debug_output_mutex;
 #endif /* CEREBRO_DEBUG */
+
+void
+cerebrod_heartbeat_destroy(struct cerebrod_heartbeat *hb)
+{
+  int i;
+
+  assert(hb);
+
+  for (i = 0; i < hb->metrics_len; i++)
+    {
+      Free(hb->metrics[i]->metric_value);
+      Free(hb->metrics[i]);
+    }
+
+  Free(hb->metrics);
+  Free(hb);
+}
 
 void
 cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb)
