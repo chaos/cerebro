@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.39 2005-06-08 00:10:49 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.40 2005-06-08 00:30:38 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -20,9 +20,9 @@
 
 #include "cerebro.h"
 #include "cerebro_marshalling.h"
+#include "cerebrod_heartbeat_protocol.h"
 #include "cerebro/cerebro_constants.h"
 #include "cerebro/cerebro_error.h"
-#include "cerebro/cerebrod_heartbeat_protocol.h"
 
 #include "cerebrod.h"
 #include "cerebrod_config.h"

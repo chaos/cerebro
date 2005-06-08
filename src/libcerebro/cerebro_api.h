@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_api.h,v 1.23 2005-06-07 17:26:50 achu Exp $
+ *  $Id: cerebro_api.h,v 1.24 2005-06-08 00:30:38 achu Exp $
 \*****************************************************************************/
  
 #ifndef _CEREBRO_API_H
@@ -9,7 +9,6 @@
 
 #include "cerebro/cerebro_config.h"
 #include "cerebro/cerebro_constants.h"
-#include "cerebro/cerebro_metric_protocol.h"
 
 #include "list.h"
 

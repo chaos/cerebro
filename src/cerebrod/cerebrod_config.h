@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.h,v 1.44 2005-06-08 00:10:49 achu Exp $
+ *  $Id: cerebrod_config.h,v 1.45 2005-06-08 00:30:38 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_CONFIG_H
@@ -11,7 +11,7 @@
 
 #include <netinet/in.h>
 
-#include "cerebro/cerebro_metric_protocol.h"
+#include "cerebro_metric_protocol.h"
 
 /*
  * Cerebrod default configuration values

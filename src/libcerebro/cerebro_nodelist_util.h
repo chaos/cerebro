@@ -1,12 +1,11 @@
 /*****************************************************************************\
- *  $Id: cerebro_nodelist_util.h,v 1.7 2005-06-06 23:35:06 achu Exp $
+ *  $Id: cerebro_nodelist_util.h,v 1.8 2005-06-08 00:30:38 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_NODELIST_UTIL_H
 #define _CEREBRO_NODELIST_UTIL_H
 
 #include "cerebro.h"
-#include "cerebro/cerebro_metric_protocol.h"
 
 /*
  * _cerebro_nodelist_check

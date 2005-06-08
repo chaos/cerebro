@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_node_data.h,v 1.7 2005-06-07 17:26:50 achu Exp $
+ *  $Id: cerebrod_node_data.h,v 1.8 2005-06-08 00:30:38 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_NODE_DATA_H
@@ -15,9 +15,8 @@
 
 #include <sys/types.h>
 
-#include "cerebro/cerebro_metric_protocol.h"
-
-#include "cerebro/cerebrod_heartbeat_protocol.h"
+#include "cerebro_metric_protocol.h"
+#include "cerebrod_heartbeat_protocol.h"
 
 #include "hash.h"
 

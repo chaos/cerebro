@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_heartbeat.c,v 1.30 2005-06-08 00:10:49 achu Exp $
+ *  $Id: cerebrod_heartbeat.c,v 1.31 2005-06-08 00:30:38 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -12,7 +12,7 @@
 #include <errno.h>
 
 #include "cerebro.h"
-#include "cerebro/cerebrod_heartbeat_protocol.h"
+#include "cerebrod_heartbeat_protocol.h"
 
 #include "cerebrod_heartbeat.h"
 #include "cerebrod_config.h"

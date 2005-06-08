@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric.c,v 1.25 2005-06-07 22:20:39 achu Exp $
+ *  $Id: cerebrod_metric.c,v 1.26 2005-06-08 00:30:38 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -16,10 +16,10 @@
 
 #include "cerebro.h"
 #include "cerebro_marshalling.h"
+#include "cerebro_metric_protocol.h"
 #include "cerebro_module.h"
 #include "cerebro/cerebro_constants.h"
 #include "cerebro/cerebro_error.h"
-#include "cerebro/cerebro_metric_protocol.h"
 
 #include "cerebrod.h"
 #include "cerebrod_config.h"
