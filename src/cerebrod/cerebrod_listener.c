@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.76 2005-06-08 16:35:14 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.77 2005-06-08 22:54:38 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -37,6 +37,8 @@ extern struct cerebrod_config conf;
 #if CEREBRO_DEBUG
 extern pthread_mutex_t debug_output_mutex;
 #endif /* CEREBRO_DEBUG */
+
+extern cerebro_clusterlist_module_t clusterlist_handle;
 
 /* 
  * cerebrod_listener_initialization_complete
@@ -545,7 +547,8 @@ cerebrod_listener(void *arg)
 	  goto cleanup_continue;
 	}
       
-      if ((flag = _cerebro_clusterlist_module_node_in_cluster(hb->nodename)) < 0)
+      if ((flag = _cerebro_clusterlist_module_node_in_cluster(clusterlist_handle,
+                                                              hb->nodename)) < 0)
 	cerebro_err_exit("%s(%s:%d): _cerebro_clusterlist_module_node_in_cluster: %s",
 			 __FILE__, __FUNCTION__, __LINE__, hb->nodename);
       
@@ -563,7 +566,8 @@ cerebrod_listener(void *arg)
 
       memset(nodename_key, '\0', CEREBRO_MAXNODENAMELEN+1);
 
-      if (_cerebro_clusterlist_module_get_nodename(nodename_buf,
+      if (_cerebro_clusterlist_module_get_nodename(clusterlist_handle,
+                                                   nodename_buf,
                                                    nodename_key, 
                                                    CEREBRO_MAXNODENAMELEN+1) < 0)
 	{

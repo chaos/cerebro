@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.h,v 1.22 2005-06-03 18:08:31 achu Exp $
+ *  $Id: cerebro_module.h,v 1.23 2005-06-08 22:54:38 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_MODULE_H
@@ -7,23 +7,8 @@
 
 #include "cerebro/cerebro_config.h"
 
-/* 
- * _cerebro_module_setup
- *
- * Initialize library for loading modules
- *
- * Returns 0 on success, -1 on error
- */
-int _cerebro_module_setup(void);
-
-/* 
- * _cerebro_module_cleanup
- *
- * Cleanup library from loading modules
- *
- * Returns 0 on success, -1 on error
- */
-int _cerebro_module_cleanup(void);
+typedef struct cerebro_clusterlist_module *cerebro_clusterlist_module_t;
+typedef struct cerebro_config_module *cerebro_config_module_t; 
 
 /*
  * _cerebro_module_load_clusterlist_module
@@ -31,19 +16,18 @@ int _cerebro_module_cleanup(void);
  * Find and load the clusterlist module.  If none is found, cerebro
  * library will assume a default clusterlist module.
  * 
- * Returns 1 if module is found and loaded, 0 if one isn't found and
- * the default is loaded, -1 on fatal error
+ * Returns clusterlist module handle on success, NULL on error
  */
-int _cerebro_module_load_clusterlist_module(void);
+cerebro_clusterlist_module_t _cerebro_module_load_clusterlist_module(void);
 
 /*
- * _cerebro_module_clusterlist_unload
+ * _cerebro_module_unload_clusterlist_module
  *
- * Unload the clusterlist module.
+ * Unload the clusterlist module specified by the handle.
  *
  * Returns 0 on success, -1 on error
  */
-int _cerebro_module_unload_clusterlist_module(void);
+int _cerebro_module_unload_clusterlist_module(cerebro_clusterlist_module_t handle);
 
 /*
  * _cerebro_module_load_config_module
@@ -54,79 +38,68 @@ int _cerebro_module_unload_clusterlist_module(void);
  * Returns 1 if module is found and loaded, 0 if one isn't found and
  * the default is loaded, -1 on fatal error
  */
-int _cerebro_module_load_config_module(void);
+cerebro_config_module_t _cerebro_module_load_config_module(void);
 
 /*
  * _cerebro_module_unload_config_module
  *
- * Unload the config module.
+ * Unload the config module specified by the handle
  *
  * Returns 0 on success, -1 on error
  */
-int _cerebro_module_unload_config_module(void);
-
-/* 
- * _cerebro_module_clusterlist_module_found
- * 
- * Return 1 if a clusterlist module was found, 0 if we are using the default
- */
-int _cerebro_module_clusterlist_module_found(void);
-
-/* 
- * _cerebro_module_config_module_found
- * 
- * Return 1 if a config module module was found, 0 if we are using the default
- */
-int _cerebro_module_config_module_found(void);
+int _cerebro_module_unload_config_module(cerebro_config_module_t handle);
 
 /*
  * _cerebro_clusterlist_module_name
  *
  * Return clusterlist module name
  */
-char *_cerebro_clusterlist_module_name(void);
+char *_cerebro_clusterlist_module_name(cerebro_clusterlist_module_t handle);
 
 /*
  * _cerebro_clusterlist_module_setup
  *
  * call clusterlist module setup function
  */
-int _cerebro_clusterlist_module_setup(void);
+int _cerebro_clusterlist_module_setup(cerebro_clusterlist_module_t handle);
 
 /*
  * _cerebro_clusterlist_module_cleanup
  *
  * call clusterlist module parse cleanup function
  */
-int _cerebro_clusterlist_module_cleanup(void);
+int _cerebro_clusterlist_module_cleanup(cerebro_clusterlist_module_t handle);
 
 /*
  * _cerebro_clusterlist_module_numnodes
  *
  * call clusterlist module numnodes function
  */
-int _cerebro_clusterlist_module_numnodes(void);
+int _cerebro_clusterlist_module_numnodes(cerebro_clusterlist_module_t handle);
 
 /*
  * _cerebro_clusterlist_module_get_all_nodes
  *
  * call clusterlist module get all nodes function
  */
-int _cerebro_clusterlist_module_get_all_nodes(char ***nodes);
+int _cerebro_clusterlist_module_get_all_nodes(cerebro_clusterlist_module_t handle,
+                                              char ***nodes);
 
 /*
  * _cerebro_clusterlist_module_node_in_cluster
  *
  * call clusterlist module node in cluster function
  */
-int _cerebro_clusterlist_module_node_in_cluster(const char *node);
+int _cerebro_clusterlist_module_node_in_cluster(cerebro_clusterlist_module_t handle,
+                                                const char *node);
 
 /*
  * _cerebro_clusterlist_module_get_nodename
  *
  * call clusterlist module get nodename function
  */
-int _cerebro_clusterlist_module_get_nodename(const char *node, 
+int _cerebro_clusterlist_module_get_nodename(cerebro_clusterlist_module_t handle,
+                                             const char *node, 
                                              char *buf, 
                                              unsigned int buflen);
 
@@ -135,27 +108,28 @@ int _cerebro_clusterlist_module_get_nodename(const char *node,
  *
  * Return config module name
  */
-char *_cerebro_config_module_name(void);
+char *_cerebro_config_module_name(cerebro_config_module_t handle);
 
 /*
  * _cerebro_config_module_setup
  *
  * call config module setup function
  */
-int _cerebro_config_module_setup(void);
+int _cerebro_config_module_setup(cerebro_config_module_t handle);
 
 /*
  * _cerebro_config_module_cleanup
  *
  * call config module parse cleanup function
  */
-int _cerebro_config_module_cleanup(void);
+int _cerebro_config_module_cleanup(cerebro_config_module_t handle);
 
 /*
  * _cerebro_config_module_load_default
  *
  * call config module get all nodes function
  */
-int _cerebro_config_module_load_default(struct cerebro_config *conf);
+int _cerebro_config_module_load_default(cerebro_config_module_t handle,
+                                        struct cerebro_config *conf);
 
 #endif /* _CEREBRO_MODULE_H */

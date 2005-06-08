@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_api.h,v 1.24 2005-06-08 00:30:38 achu Exp $
+ *  $Id: cerebro_api.h,v 1.25 2005-06-08 22:54:38 achu Exp $
 \*****************************************************************************/
  
 #ifndef _CEREBRO_API_H
@@ -7,6 +7,7 @@
 
 #include <sys/types.h>
 
+#include "cerebro_module.h"
 #include "cerebro/cerebro_config.h"
 #include "cerebro/cerebro_constants.h"
 
@@ -41,6 +42,7 @@ struct cerebro {
   unsigned int flags;
   int32_t loaded_state;
   struct cerebro_config config_data;
+  cerebro_clusterlist_module_t clusterlist_handle;
   List nodelists;
 };
 

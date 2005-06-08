@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.h,v 1.45 2005-06-08 00:30:38 achu Exp $
+ *  $Id: cerebrod_config.h,v 1.46 2005-06-08 22:54:38 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_CONFIG_H
@@ -30,7 +30,7 @@
 #define CEREBROD_LISTEN_THREADS_DEFAULT               2
 #define CEREBROD_METRIC_SERVER_DEFAULT                1
 #define CEREBROD_METRIC_SERVER_PORT_DEFAULT           CEREBRO_METRIC_SERVER_PORT
-#define CEREBROD_METRIC_MAX_DEFAULT                   4
+#define CEREBROD_METRIC_MAX_DEFAULT                   8
 #define CEREBROD_CLUSTERLIST_MODULE_DEFAULT           NULL
 #define CEREBROD_CLUSTERLIST_MODULE_OPTIONS_DEFAULT   NULL
 #define CEREBROD_SPEAK_DEBUG_DEFAULT                  0

@@ -6,6 +6,11 @@
 
 	* Various documentation fixes, bug fixes, and code cleanup.
 	
+	* tagged pre-libcerebro-module-rework-2
+
+	* Re-worked module library in libcerebro in anticipation of
+	monitoring modules.
+
 2005-06-07  Albert Chu  <chu11@llnl.gov>
 
 	* Removed hard defined maximum metric count.  Added

@@ -8,6 +8,9 @@ Testing
 
 Cleanup
 - cleanup common hash into "data" and put in data.c??
+- bug debug around all the checks
+- unload -> destroy?
+- handle -> module_handle?
 
 Audit
 - code review to reduce memory footprint

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.55 2005-06-07 20:29:28 achu Exp $
+ *  $Id: cerebrod.c,v 1.56 2005-06-08 22:54:38 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -81,10 +81,6 @@ _cerebrod_err_unlock(void)
 static void
 _cerebrod_pre_config_initialization(void)
 {
-  if (_cerebro_module_setup() < 0)
-    cerebro_err_exit("%s(%s:%d): _cerebro_module_setup",
-		     __FILE__, __FUNCTION__, __LINE__);
-
   cerebrod_load_data();
 }
 
@@ -103,21 +99,6 @@ _cerebrod_post_config_initialization(void)
   if (conf.metric_server)
     Signal(SIGPIPE, SIG_IGN);
 }
-
-/* 
- * _cerebrod_cleanup
- *
- * Perform cerebrod cleanup.  Will never be called.  Used as place holder
- * to indicate appropriate functions to call in the future.
- */
-#if 0
-static void
-_cerebrod_cleanup(void)
-{
-  if (cerebrod_clusterlist_module_found)
-    cerebro_module_cleanup();
-}
-#endif
 
 int 
 main(int argc, char **argv)

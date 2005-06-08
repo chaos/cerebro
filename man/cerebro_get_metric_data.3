@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro_get_metric_data.3,v 1.5 2005-06-08 15:32:01 achu Exp $
+\."$Id: cerebro_get_metric_data.3,v 1.6 2005-06-08 22:54:38 achu Exp $
 \."#############################################################################
 .TH CEREBRO_GET_METRIC_DATA 3 "May 2005" "LLNL" "LIBCEREBRO"
 .SH "NAME"
@@ -98,7 +98,10 @@ Error during protocol communication.
 Timeout during protocol communication.
 .TP
 .B CEREBRO_ERR_VERSION_INCOMPATIBLE
-Version incompatible with metric server.
+Version incompatible with the metric server.
+.TP
+.B CEREBRO_ERR_METRIC_UNKNOWN
+The specified metric is unknown to the metric server.
 .TP
 .B CEREBRO_ERR_CONFIG_FILE
 A config file error occurred.

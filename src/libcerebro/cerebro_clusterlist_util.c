@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_util.c,v 1.3 2005-06-03 18:08:31 achu Exp $
+ *  $Id: cerebro_clusterlist_util.c,v 1.4 2005-06-08 22:54:38 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -18,30 +18,19 @@
 int 
 _cerebro_load_clusterlist_module(cerebro_t handle)
 {
-  int module_setup_called = 0;
-  int load_clusterlist_module_called = 0;
-  
   if (_cerebro_handle_check(handle) < 0)
     return -1;
 
   if (handle->loaded_state & CEREBRO_CLUSTERLIST_MODULE_LOADED)
     return 0;
 
-  if (_cerebro_module_setup() < 0)
+  if (!(handle->clusterlist_handle = _cerebro_module_load_clusterlist_module()))
     {
       handle->errnum = CEREBRO_ERR_CLUSTERLIST_MODULE;
       goto cleanup;
     }
-  module_setup_called++;
-
-  if (_cerebro_module_load_clusterlist_module() < 0)
-    {
-      handle->errnum = CEREBRO_ERR_CLUSTERLIST_MODULE;
-      goto cleanup;
-    }
-  load_clusterlist_module_called++;
   
-  if (_cerebro_clusterlist_module_setup() < 0)
+  if (_cerebro_clusterlist_module_setup(handle->clusterlist_handle) < 0)
     {
       handle->errnum = CEREBRO_ERR_CLUSTERLIST_MODULE;
       goto cleanup;
@@ -51,11 +40,8 @@ _cerebro_load_clusterlist_module(cerebro_t handle)
   return 0;
 
  cleanup:
-  if (load_clusterlist_module_called)
-    _cerebro_module_unload_clusterlist_module();
-  if (module_setup_called)
-    _cerebro_module_cleanup();
-  
+  _cerebro_module_unload_clusterlist_module(handle->clusterlist_handle);
+  handle->clusterlist_handle = NULL;
   return -1;
 }
 
@@ -67,26 +53,21 @@ _cerebro_unload_clusterlist_module(cerebro_t handle)
 
   if (handle->loaded_state & CEREBRO_CLUSTERLIST_MODULE_LOADED)
     {
-      if (_cerebro_clusterlist_module_cleanup() < 0)
+      if (_cerebro_clusterlist_module_cleanup(handle->clusterlist_handle) < 0)
         {
 	  handle->errnum = CEREBRO_ERR_CLUSTERLIST_MODULE;
 	  return -1;
         }
       
-      if (_cerebro_module_unload_clusterlist_module() < 0)
+      if (_cerebro_module_unload_clusterlist_module(handle->clusterlist_handle) < 0)
 	{
 	  handle->errnum = CEREBRO_ERR_CLUSTERLIST_MODULE;
 	  return -1;
 	}
-
-      if (_cerebro_module_cleanup() < 0)
-        {
-	  handle->errnum = CEREBRO_ERR_CLUSTERLIST_MODULE;
-	  return -1;
-        }
     }
 
   handle->loaded_state &= ~CEREBRO_CLUSTERLIST_MODULE_LOADED;
+  handle->clusterlist_handle = NULL;
   handle->errnum = CEREBRO_ERR_SUCCESS;
   return 0;
 }

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.c,v 1.33 2005-06-08 00:30:38 achu Exp $
+ *  $Id: cerebro.c,v 1.34 2005-06-08 22:54:38 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -37,6 +37,7 @@ static char *cerebro_error_messages[] =
     "version incompatible",
     "buffer overflow",
     "node not found",
+    "metric unknown",
     "end of list reached",
     "config file error",
     "config module error",
