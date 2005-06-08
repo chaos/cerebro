@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.100 2005-06-08 00:10:49 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.101 2005-06-08 16:35:14 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -304,16 +304,16 @@ _cerebrod_pre_calculate_config_check(void)
     {
       if (strchr(conf.heartbeat_network_interface, '/'))
 	{
-	  char *heartbeat_network_interface_cpy = Strdup(conf.heartbeat_network_interface);
+	  char *ipaddr_cpy = Strdup(conf.heartbeat_network_interface);
 	  char *tok;
-	  
-	  tok = strtok(heartbeat_network_interface_cpy, "/");
+
+	  tok = strtok(ipaddr_cpy, "/");
 	  if (!Inet_pton(AF_INET, tok, &addr_temp))
 	    cerebro_err_exit("network interface IP address '%s' "
                              "improperly format", 
                              conf.heartbeat_network_interface);
 	  
-	  Free(heartbeat_network_interface_cpy);
+	  Free(ipaddr_cpy);
 	}
       else
 	{
@@ -348,11 +348,11 @@ _cerebrod_calculate_multicast(void)
 {
   if (strchr(conf.heartbeat_destination_ip, '.'))
     {
-      char *heartbeat_destination_ip_cpy = Strdup(conf.heartbeat_destination_ip);
+      char *ipaddr_cpy = Strdup(conf.heartbeat_destination_ip);
       char *tok, *ptr;
       int ip_class;
       
-      tok = strtok(heartbeat_destination_ip_cpy, ".");
+      tok = strtok(ipaddr_cpy, ".");
       ip_class = strtol(tok, &ptr, 10);
       if (ptr != (tok + strlen(tok)))
 	cerebro_err_exit("heartbeat destination IP address '%s' "
@@ -364,7 +364,7 @@ _cerebrod_calculate_multicast(void)
 	conf.multicast = 1;
       else
 	conf.multicast = 0;
-      Free(heartbeat_destination_ip_cpy);
+      Free(ipaddr_cpy);
     }
 }
 

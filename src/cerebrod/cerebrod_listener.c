@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.75 2005-06-08 15:32:01 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.76 2005-06-08 16:35:14 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -288,7 +288,8 @@ _cerebrod_heartbeat_unmarshall(const char *buf, unsigned int buflen)
               switch(hd->metric_value_type)
                 {
                 case CEREBRO_METRIC_VALUE_TYPE_NONE:
-                  cerebro_err_debug("%s(%s:%d): packet metric_value_len > 0 for metric_value_type NONE",
+                  cerebro_err_debug("%s(%s:%d): packet metric_value_len > 0 "
+                                    "for metric_value_type NONE",
                                     __FILE__, __FUNCTION__, __LINE__);
                   break;
                 case CEREBRO_METRIC_VALUE_TYPE_INT32:

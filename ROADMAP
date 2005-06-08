@@ -1,9 +1,8 @@
 cerebro-1-0-0-pre3
-- raw data metrics
 
 cerebro-1-0-0-pre4
-- monitor new metrics
-- modules for starttime/boottime
+- modules for boottime
+- ability to monitor new metrics
 - server for updating metrics
 - api for updating metrics
 

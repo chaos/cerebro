@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_heartbeat.c,v 1.33 2005-06-08 15:56:13 achu Exp $
+ *  $Id: cerebrod_heartbeat.c,v 1.34 2005-06-08 16:35:14 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -67,7 +67,8 @@ cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb)
       fprintf(stderr, "* metrics_len: %d\n", hb->metrics_len);
       for (i = 0; i < hb->metrics_len; i++)
         {
-          fprintf(stderr, "* %s: metric_value_type = %d, metric_value_len = %d ", 
+          fprintf(stderr, 
+                  "* %s: metric_value_type = %d, metric_value_len = %d ",
                   hb->metrics[i]->metric_name, 
                   hb->metrics[i]->metric_value_type,
                   hb->metrics[i]->metric_value_len);
