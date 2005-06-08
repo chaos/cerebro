@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_node_data.c,v 1.17 2005-06-08 15:32:01 achu Exp $
+ *  $Id: cerebrod_node_data.c,v 1.18 2005-06-08 15:56:13 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -274,7 +274,7 @@ static int
 _cerebrod_node_data_metric_data_dump(void *data, const void *key, void *arg)
 {
   struct cerebrod_metric_data *md;
-  char buf[CEREBRO_METRIC_STRING_MAXLEN+1];
+  char *buf;
   char *nodename;
  
   assert(data);
@@ -305,10 +305,12 @@ _cerebrod_node_data_metric_data_dump(void *data, const void *key, void *arg)
       fprintf(stderr, "metric_value=%f", *((double *)md->metric_value));
       break;
     case CEREBRO_METRIC_VALUE_TYPE_STRING:
-      /* Ensure null termination */
-      memset(buf, '\0', CEREBRO_METRIC_STRING_MAXLEN+1);
-      memcpy(buf, md->metric_value, CEREBRO_METRIC_STRING_MAXLEN);
+      /* Watch for NUL termination */
+      buf = Malloc(md->metric_value_len + 1);
+      memset(buf, '\0', md->metric_value_len + 1);
+      memcpy(buf, md->metric_value, md->metric_value_len);
       fprintf(stderr, "metric_value=%s", buf);
+      Free(buf);
       break;
     case CEREBRO_METRIC_VALUE_TYPE_RAW:
       /* Don't output raw data */
@@ -492,6 +494,7 @@ _cerebrod_metric_data_update(struct cerebrod_node_data *nd,
         }
 
       md = (struct cerebrod_metric_data *)Malloc(sizeof(struct cerebrod_metric_data));
+      memset(md, '\0', sizeof(struct cerebrod_metric_data));
       md->metric_name = Strdup(metric_name);
       Hash_insert(nd->metric_data, md->metric_name, md);
       nd->metric_data_count++;
@@ -509,7 +512,13 @@ _cerebrod_metric_data_update(struct cerebrod_node_data *nd,
   /* Realloc size */
   if (md->metric_value_len != hd->metric_value_len)
     {
-      Free(md->metric_value);
+      if (md->metric_value)
+        {
+          cerebro_err_debug("%s(%s:%d): metric length modified: old=%d new=%d",
+                            __FILE__, __FUNCTION__, __LINE__,
+                            md->metric_value_len, hd->metric_value_len);
+          Free(md->metric_value);
+        }
       md->metric_value = Malloc(hd->metric_value_len);
     }
   md->metric_value_len = hd->metric_value_len;

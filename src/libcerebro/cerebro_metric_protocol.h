@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_protocol.h,v 1.2 2005-06-08 15:32:01 achu Exp $
+ *  $Id: cerebro_metric_protocol.h,v 1.3 2005-06-08 15:56:13 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_METRIC_PROTOCOL_H
@@ -53,12 +53,6 @@
 #define CEREBRO_METRIC_UPDOWN_TIMEOUT_LEN_DEFAULT 60
 
 #define CEREBRO_METRIC_SERVER_PORT                8852
-
-#define CEREBRO_METRIC_STRING_MAXLEN              64
-
-#define CEREBRO_METRIC_STRING_PARAM_MAXLEN        64
-
-#define CEREBRO_METRIC_VALUE_LEN                  CEREBRO_METRIC_STRING_MAXLEN
 
 /*
  * struct cerebro_metric_request

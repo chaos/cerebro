@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_heartbeat.c,v 1.32 2005-06-08 15:32:01 achu Exp $
+ *  $Id: cerebrod_heartbeat.c,v 1.33 2005-06-08 15:56:13 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -43,6 +43,8 @@ void
 cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb)
 {
 #if CEREBRO_DEBUG
+  char *buf;
+
   assert(hb);
 
   if (conf.debug)
@@ -75,31 +77,38 @@ cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb)
             case CEREBRO_METRIC_VALUE_TYPE_NONE:
               break;
             case CEREBRO_METRIC_VALUE_TYPE_INT32:
-              fprintf(stderr, "metric_value = %d\n", 
+              fprintf(stderr, "metric_value = %d", 
                       *((int32_t *)hb->metrics[i]->metric_value));
               break;
             case CEREBRO_METRIC_VALUE_TYPE_UNSIGNED_INT32:
-              fprintf(stderr, "metric_value = %u\n", 
+              fprintf(stderr, "metric_value = %u", 
                       *((u_int32_t *)hb->metrics[i]->metric_value));
               break;
             case CEREBRO_METRIC_VALUE_TYPE_FLOAT:
-              fprintf(stderr, "metric_value = %f\n", 
+              fprintf(stderr, "metric_value = %f", 
                       *((float *)hb->metrics[i]->metric_value));
               break;
             case CEREBRO_METRIC_VALUE_TYPE_DOUBLE:
-              fprintf(stderr, "metric_value = %f\n", 
+              fprintf(stderr, "metric_value = %f", 
                       *((double *)hb->metrics[i]->metric_value));
               break;
             case CEREBRO_METRIC_VALUE_TYPE_STRING:
-              fprintf(stderr, "metric_value = %s\n", 
-                      (char *)hb->metrics[i]->metric_value);
+              /* Watch for NUL termination */
+              buf = Malloc(hb->metrics[i]->metric_value_len + 1);
+              memset(buf, '\0', hb->metrics[i]->metric_value_len + 1);
+              memcpy(buf, 
+                     hb->metrics[i]->metric_value, 
+                     hb->metrics[i]->metric_value_len);
+              fprintf(stderr, "metric_value = %s", buf);
+              Free(buf);
               break;
             case CEREBRO_METRIC_VALUE_TYPE_RAW:
+              /* Don't output raw data */
             default:
-              fprintf(stderr, "\n");
               break;
             }
         }
+      fprintf(stderr, "\n");
       fprintf(stderr, "**************************************\n");
     }
 #endif /* CEREBRO_DEBUG */

@@ -8,10 +8,6 @@ Testing
 
 Cleanup
 - cleanup common hash into "data" and put in data.c??
-cerebrod_heartbeat_dump
-_cerebrod_node_data_metric_data_dump
-CEREBRO_METRIC_STRING_MAXLEN
-CEREBRO_METRIC_STRING_PARAM_MAXLEN
 
 Audit
 - code review to reduce memory footprint
@@ -22,6 +18,7 @@ Portability
 
 Design
 - ability for data to be stored/not-stored in the internal hash
+  i.e. passed directly to module and forgotten
 - Data structure for list/index combination?
 - Move pthread_lock in cerebro_error to error lib??
 - wrappers err_init stuff, how fix?
