@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_monitor_boottime.c,v 1.1 2005-06-09 20:09:51 achu Exp $
+ *  $Id: cerebro_monitor_boottime.c,v 1.2 2005-06-09 20:10:36 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -104,6 +104,7 @@ boottime_monitor_setup(void)
                              __FILE__, __FUNCTION__, __LINE__);
                                                                                       
   monitor_boottime = (u_int32_t)bootval;
+  return 0;
 }
 
 /*
