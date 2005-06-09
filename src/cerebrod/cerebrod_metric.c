@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric.c,v 1.28 2005-06-08 16:35:14 achu Exp $
+ *  $Id: cerebrod_metric.c,v 1.29 2005-06-09 17:54:02 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -854,6 +854,20 @@ _cerebrod_metric_evaluate(void *x, void *arg)
       if (ed->req->flags & CEREBRO_METRIC_FLAGS_UP_ONLY
           && !((ed->time_now - nd->last_received_time) < ed->req->timeout_len))
         goto out;
+
+      if (ed->req->flags & CEREBRO_METRIC_FLAGS_NONE_IF_DOWN
+          && !((ed->time_now - nd->last_received_time) < ed->req->timeout_len))
+        {
+          if (_cerebrod_metric_response_create(nd->nodename,
+                                               CEREBRO_METRIC_VALUE_TYPE_NONE,
+                                               0,
+                                               NULL,
+                                               ed->node_responses) < 0)
+            {
+              Pthread_mutex_unlock(&(nd->node_data_lock));
+              return -1;
+            }
+        }
       
       if ((md = Hash_find(nd->metric_data, ed->req->metric_name)))
         {
