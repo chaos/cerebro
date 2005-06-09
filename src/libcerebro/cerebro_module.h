@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.h,v 1.24 2005-06-09 20:17:09 achu Exp $
+ *  $Id: cerebro_module.h,v 1.25 2005-06-09 22:16:06 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_MODULE_H
@@ -9,6 +9,7 @@
 
 typedef struct cerebro_clusterlist_module *cerebro_clusterlist_module_t;
 typedef struct cerebro_config_module *cerebro_config_module_t; 
+typedef struct cerebro_monitor_module *cerebro_monitor_modules_t; 
 
 /*
  * _cerebro_module_load_clusterlist_module
@@ -35,8 +36,7 @@ int _cerebro_module_destroy_clusterlist_handle(cerebro_clusterlist_module_t clus
  * Find and load the config module.  If none is found, cerebro
  * library will assume a default config module.
  * 
- * Returns 1 if module is found and loaded, 0 if one isn't found and
- * the default is loaded, -1 on fatal error
+ * Returns config module handle on success, NULL on error
  */
 cerebro_config_module_t _cerebro_module_load_config_module(void);
 
@@ -47,7 +47,25 @@ cerebro_config_module_t _cerebro_module_load_config_module(void);
  *
  * Returns 0 on success, -1 on error
  */
-int _cerebro_module_destroy_config_handle(cerebro_config_module_t clusterlist_handle);
+int _cerebro_module_destroy_config_handle(cerebro_config_module_t config_handle);
+
+/*
+ * _cerebro_module_load_monitor_modules
+ *
+ * Find and load the monitor modules.
+ * 
+ * Returns monitor module handle on success, NULL on error
+ */
+cerebro_monitor_modules_t _cerebro_module_load_monitor_modules(unsigned int metrics_max);
+
+/*
+ * _cerebro_module_destroy_monitor_handle
+ *
+ * Destroy/Unload the monitor module specified by the handle
+ *
+ * Returns 0 on success, -1 on error
+ */
+int _cerebro_module_destroy_monitor_handle(cerebro_monitor_modules_t config_handle);
 
 /*
  * _cerebro_clusterlist_module_name
@@ -131,5 +149,57 @@ int _cerebro_config_module_cleanup(cerebro_config_module_t config_handle);
  */
 int _cerebro_config_module_load_default(cerebro_config_module_t config_handle,
                                         struct cerebro_config *conf);
+
+
+/*
+ * _cerebro_monitor_module_count
+ *
+ * Return number of monitoring modules loaded, -1 on error
+ */
+int _cerebro_monitor_module_count(cerebro_monitor_modules_t monitor_handle);
+
+/*
+ * _cerebro_monitor_module_name
+ *
+ * Return monitor module name
+ */
+char *_cerebro_monitor_module_name(cerebro_monitor_modules_t monitor_handle, 
+                                   unsigned int index);
+
+/*
+ * _cerebro_monitor_module_setup
+ *
+ * call monitor module setup function
+ */
+int _cerebro_monitor_module_setup(cerebro_monitor_modules_t monitor_handle, 
+                                  unsigned int index);
+
+/*
+ * _cerebro_monitor_module_cleanup
+ *
+ * call monitor module parse cleanup function
+ */
+int _cerebro_monitor_module_cleanup(cerebro_monitor_modules_t monitor_handle, 
+                                    unsigned int index);
+
+/*
+ * _cerebro_monitor_module_get_metric_name
+ *
+ * call monitor module get all nodes function
+ */
+char *_cerebro_monitor_module_get_metric_name(cerebro_monitor_modules_t monitor_handle,
+                                              unsigned int index);
+
+/*
+ * _cerebro_monitor_module_get_metric_value
+ *
+ * call monitor module get all nodes function
+ */
+int _cerebro_monitor_module_get_metric_value(cerebro_monitor_modules_t monitor_handle,
+                                             unsigned int index,
+                                             void *metric_value_buf,
+                                             unsigned int metric_value_buflen,
+                                             unsigned int *metric_value_type,
+                                             unsigned int *metric_value_len);
 
 #endif /* _CEREBRO_MODULE_H */

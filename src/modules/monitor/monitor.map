@@ -1,6 +1,6 @@
 {
   global:
-    config_module_info;
+    monitor_module_info;
   local:
     *;
 };

@@ -6,7 +6,11 @@
 
 	* Various code cleanup
 	
-	* Begin work on monitoring modules.
+	* Added new monitoring modules support.
+
+	* Added boottime monitor module.
+
+	* Added monitor module support to libcerebro.
 
 2005-06-08  Albert Chu  <chu11@llnl.gov>
 

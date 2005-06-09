@@ -9,6 +9,7 @@ Testing
 Cleanup
 - cleanup common hash into "data" and put in data.c??
 - debug around all the checks
+- cleanup module loading stuff
 
 Audit
 - code review to reduce memory footprint
