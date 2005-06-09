@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.h,v 1.23 2005-06-08 22:54:38 achu Exp $
+ *  $Id: cerebro_module.h,v 1.24 2005-06-09 20:17:09 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_MODULE_H
@@ -21,13 +21,13 @@ typedef struct cerebro_config_module *cerebro_config_module_t;
 cerebro_clusterlist_module_t _cerebro_module_load_clusterlist_module(void);
 
 /*
- * _cerebro_module_unload_clusterlist_module
+ * _cerebro_module_destroy_clusterlist_handle
  *
- * Unload the clusterlist module specified by the handle.
+ * Destroy/Unload the clusterlist module specified by the handle.
  *
  * Returns 0 on success, -1 on error
  */
-int _cerebro_module_unload_clusterlist_module(cerebro_clusterlist_module_t handle);
+int _cerebro_module_destroy_clusterlist_handle(cerebro_clusterlist_module_t clusterlist_handle);
 
 /*
  * _cerebro_module_load_config_module
@@ -41,48 +41,48 @@ int _cerebro_module_unload_clusterlist_module(cerebro_clusterlist_module_t handl
 cerebro_config_module_t _cerebro_module_load_config_module(void);
 
 /*
- * _cerebro_module_unload_config_module
+ * _cerebro_module_destroy_config_handle
  *
- * Unload the config module specified by the handle
+ * Destroy/Unload the config module specified by the handle
  *
  * Returns 0 on success, -1 on error
  */
-int _cerebro_module_unload_config_module(cerebro_config_module_t handle);
+int _cerebro_module_destroy_config_handle(cerebro_config_module_t clusterlist_handle);
 
 /*
  * _cerebro_clusterlist_module_name
  *
  * Return clusterlist module name
  */
-char *_cerebro_clusterlist_module_name(cerebro_clusterlist_module_t handle);
+char *_cerebro_clusterlist_module_name(cerebro_clusterlist_module_t clusterlist_handle);
 
 /*
  * _cerebro_clusterlist_module_setup
  *
  * call clusterlist module setup function
  */
-int _cerebro_clusterlist_module_setup(cerebro_clusterlist_module_t handle);
+int _cerebro_clusterlist_module_setup(cerebro_clusterlist_module_t clusterlist_handle);
 
 /*
  * _cerebro_clusterlist_module_cleanup
  *
  * call clusterlist module parse cleanup function
  */
-int _cerebro_clusterlist_module_cleanup(cerebro_clusterlist_module_t handle);
+int _cerebro_clusterlist_module_cleanup(cerebro_clusterlist_module_t clusterlist_handle);
 
 /*
  * _cerebro_clusterlist_module_numnodes
  *
  * call clusterlist module numnodes function
  */
-int _cerebro_clusterlist_module_numnodes(cerebro_clusterlist_module_t handle);
+int _cerebro_clusterlist_module_numnodes(cerebro_clusterlist_module_t clusterlist_handle);
 
 /*
  * _cerebro_clusterlist_module_get_all_nodes
  *
  * call clusterlist module get all nodes function
  */
-int _cerebro_clusterlist_module_get_all_nodes(cerebro_clusterlist_module_t handle,
+int _cerebro_clusterlist_module_get_all_nodes(cerebro_clusterlist_module_t clusterlist_handle,
                                               char ***nodes);
 
 /*
@@ -90,7 +90,7 @@ int _cerebro_clusterlist_module_get_all_nodes(cerebro_clusterlist_module_t handl
  *
  * call clusterlist module node in cluster function
  */
-int _cerebro_clusterlist_module_node_in_cluster(cerebro_clusterlist_module_t handle,
+int _cerebro_clusterlist_module_node_in_cluster(cerebro_clusterlist_module_t clusterlist_handle,
                                                 const char *node);
 
 /*
@@ -98,7 +98,7 @@ int _cerebro_clusterlist_module_node_in_cluster(cerebro_clusterlist_module_t han
  *
  * call clusterlist module get nodename function
  */
-int _cerebro_clusterlist_module_get_nodename(cerebro_clusterlist_module_t handle,
+int _cerebro_clusterlist_module_get_nodename(cerebro_clusterlist_module_t clusterlist_handle,
                                              const char *node, 
                                              char *buf, 
                                              unsigned int buflen);
@@ -108,28 +108,28 @@ int _cerebro_clusterlist_module_get_nodename(cerebro_clusterlist_module_t handle
  *
  * Return config module name
  */
-char *_cerebro_config_module_name(cerebro_config_module_t handle);
+char *_cerebro_config_module_name(cerebro_config_module_t config_handle);
 
 /*
  * _cerebro_config_module_setup
  *
  * call config module setup function
  */
-int _cerebro_config_module_setup(cerebro_config_module_t handle);
+int _cerebro_config_module_setup(cerebro_config_module_t config_handle);
 
 /*
  * _cerebro_config_module_cleanup
  *
  * call config module parse cleanup function
  */
-int _cerebro_config_module_cleanup(cerebro_config_module_t handle);
+int _cerebro_config_module_cleanup(cerebro_config_module_t config_handle);
 
 /*
  * _cerebro_config_module_load_default
  *
  * call config module get all nodes function
  */
-int _cerebro_config_module_load_default(cerebro_config_module_t handle,
+int _cerebro_config_module_load_default(cerebro_config_module_t config_handle,
                                         struct cerebro_config *conf);
 
 #endif /* _CEREBRO_MODULE_H */

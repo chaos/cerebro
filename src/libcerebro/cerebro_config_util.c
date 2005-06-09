@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_util.c,v 1.11 2005-06-08 22:54:38 achu Exp $
+ *  $Id: cerebro_config_util.c,v 1.12 2005-06-09 20:17:09 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -55,7 +55,7 @@ _cerebro_config_load_config_module(struct cerebro_config *conf)
   rv = 0;
  cleanup:
   _cerebro_config_module_cleanup(handle);
-  _cerebro_module_unload_config_module(handle);
+  _cerebro_module_destroy_config_handle(handle);
   return rv;
 }
 

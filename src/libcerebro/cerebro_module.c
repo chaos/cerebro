@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.c,v 1.33 2005-06-08 22:54:38 achu Exp $
+ *  $Id: cerebro_module.c,v 1.34 2005-06-09 20:17:09 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -648,34 +648,32 @@ _cerebro_module_load_clusterlist_module(void)
  * Returns 0 on success, -1 on error
  */
 static int
-_cerebro_module_clusterlist_module_check(cerebro_clusterlist_module_t handle)
+_cerebro_module_clusterlist_module_check(cerebro_clusterlist_module_t clusterlist_handle)
 {
-  if (!handle 
-      || handle->magic != CEREBRO_CLUSTERLIST_MODULE_MAGIC_NUMBER
-      || !handle->module_info)
+  if (!clusterlist_handle 
+      || clusterlist_handle->magic != CEREBRO_CLUSTERLIST_MODULE_MAGIC_NUMBER
+      || !clusterlist_handle->module_info)
     {
       cerebro_err_debug_lib("%s(%s:%d): cerebro handle invalid", 
 			    __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
-
-
   return 0;
 }
 
 int
-_cerebro_module_unload_clusterlist_module(cerebro_clusterlist_module_t handle)
+_cerebro_module_destroy_clusterlist_handle(cerebro_clusterlist_module_t clusterlist_handle)
 {
-  if (_cerebro_module_clusterlist_module_check(handle) < 0)
+  if (_cerebro_module_clusterlist_module_check(clusterlist_handle) < 0)
     return -1;
 
-  handle->magic = ~CEREBRO_CLUSTERLIST_MODULE_MAGIC_NUMBER;
+  clusterlist_handle->magic = ~CEREBRO_CLUSTERLIST_MODULE_MAGIC_NUMBER;
 #if !WITH_STATIC_MODULES
-  if (handle->dl_handle)
-    lt_dlclose(handle->dl_handle);
+  if (clusterlist_handle->dl_handle)
+    lt_dlclose(clusterlist_handle->dl_handle);
 #endif /* !WITH_STATIC_MODULES */
-  handle->module_info = NULL;
+  clusterlist_handle->module_info = NULL;
 
   _cerebro_module_cleanup();
   return 0;
@@ -915,136 +913,136 @@ _cerebro_module_load_config_module(void)
  * Returns 0 on success, -1 on error
  */
 static int
-_cerebro_module_config_module_check(cerebro_config_module_t handle)
+_cerebro_module_config_module_check(cerebro_config_module_t config_handle)
 {
-  if (!handle 
-      || handle->magic != CEREBRO_CONFIG_MODULE_MAGIC_NUMBER
-      || !handle->module_info)
+  if (!config_handle 
+      || config_handle->magic != CEREBRO_CONFIG_MODULE_MAGIC_NUMBER
+      || !config_handle->module_info)
     {
-      cerebro_err_debug_lib("%s(%s:%d): cerebro handle invalid",
+      cerebro_err_debug_lib("%s(%s:%d): cerebro config_handle invalid",
                             __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
-                                                                                      
+
   return 0;
 }
 
 int
-_cerebro_module_unload_config_module(cerebro_config_module_t handle)
+_cerebro_module_destroy_config_handle(cerebro_config_module_t config_handle)
 {
-  if (_cerebro_module_config_module_check(handle) < 0)
+  if (_cerebro_module_config_module_check(config_handle) < 0)
     return -1;
   
-  handle->magic = ~CEREBRO_CONFIG_MODULE_MAGIC_NUMBER;
+  config_handle->magic = ~CEREBRO_CONFIG_MODULE_MAGIC_NUMBER;
 #if !WITH_STATIC_MODULES
-  if (handle->dl_handle)
-    lt_dlclose(handle->dl_handle);
+  if (config_handle->dl_handle)
+    lt_dlclose(config_handle->dl_handle);
 #endif /* !WITH_STATIC_MODULES */
-  handle->module_info = NULL;
+  config_handle->module_info = NULL;
 
   return 0;
 }
 
 char *
-_cerebro_clusterlist_module_name(cerebro_clusterlist_module_t handle)
+_cerebro_clusterlist_module_name(cerebro_clusterlist_module_t clusterlist_handle)
 {
-  if (_cerebro_module_clusterlist_module_check(handle) < 0)
+  if (_cerebro_module_clusterlist_module_check(clusterlist_handle) < 0)
     return NULL;
 
-  return (handle->module_info)->clusterlist_module_name;
+  return (clusterlist_handle->module_info)->clusterlist_module_name;
 }
 
 int
-_cerebro_clusterlist_module_setup(cerebro_clusterlist_module_t handle)
+_cerebro_clusterlist_module_setup(cerebro_clusterlist_module_t clusterlist_handle)
 {
-  if (_cerebro_module_clusterlist_module_check(handle) < 0)
+  if (_cerebro_module_clusterlist_module_check(clusterlist_handle) < 0)
     return -1;
   
-  return ((*(handle->module_info)->setup)());
+  return ((*(clusterlist_handle->module_info)->setup)());
 }
 
 int
-_cerebro_clusterlist_module_cleanup(cerebro_clusterlist_module_t handle)
+_cerebro_clusterlist_module_cleanup(cerebro_clusterlist_module_t clusterlist_handle)
 {
-  if (_cerebro_module_clusterlist_module_check(handle) < 0)
+  if (_cerebro_module_clusterlist_module_check(clusterlist_handle) < 0)
     return -1;
   
-  return ((*(handle->module_info)->cleanup)());
+  return ((*(clusterlist_handle->module_info)->cleanup)());
 }
 
 int
-_cerebro_clusterlist_module_numnodes(cerebro_clusterlist_module_t handle)
+_cerebro_clusterlist_module_numnodes(cerebro_clusterlist_module_t clusterlist_handle)
 {
-  if (_cerebro_module_clusterlist_module_check(handle) < 0)
+  if (_cerebro_module_clusterlist_module_check(clusterlist_handle) < 0)
     return -1;
   
-  return ((*(handle->module_info)->numnodes)());
+  return ((*(clusterlist_handle->module_info)->numnodes)());
 }
 
 int
-_cerebro_clusterlist_module_get_all_nodes(cerebro_clusterlist_module_t handle, 
+_cerebro_clusterlist_module_get_all_nodes(cerebro_clusterlist_module_t clusterlist_handle, 
                                           char ***nodes)
 {
-  if (_cerebro_module_clusterlist_module_check(handle) < 0)
+  if (_cerebro_module_clusterlist_module_check(clusterlist_handle) < 0)
     return -1;
   
-  return ((*(handle->module_info)->get_all_nodes)(nodes));
+  return ((*(clusterlist_handle->module_info)->get_all_nodes)(nodes));
 }
 
 int
-_cerebro_clusterlist_module_node_in_cluster(cerebro_clusterlist_module_t handle, 
+_cerebro_clusterlist_module_node_in_cluster(cerebro_clusterlist_module_t clusterlist_handle, 
                                             const char *node)
 {
-  if (_cerebro_module_clusterlist_module_check(handle) < 0)
+  if (_cerebro_module_clusterlist_module_check(clusterlist_handle) < 0)
     return -1;
   
-  return ((*(handle->module_info)->node_in_cluster)(node));
+  return ((*(clusterlist_handle->module_info)->node_in_cluster)(node));
 }
 
 int
-_cerebro_clusterlist_module_get_nodename(cerebro_clusterlist_module_t handle,
+_cerebro_clusterlist_module_get_nodename(cerebro_clusterlist_module_t clusterlist_handle,
                                          const char *node, 
                                          char *buf, 
                                          unsigned int buflen)
 {
-  if (_cerebro_module_clusterlist_module_check(handle) < 0)
+  if (_cerebro_module_clusterlist_module_check(clusterlist_handle) < 0)
     return -1;
   
-  return ((*(handle->module_info)->get_nodename)(node, buf, buflen));
+  return ((*(clusterlist_handle->module_info)->get_nodename)(node, buf, buflen));
 }
 
 char *
-_cerebro_config_module_name(cerebro_config_module_t handle)
+_cerebro_config_module_name(cerebro_config_module_t config_handle)
 {
-  if (_cerebro_module_config_module_check(handle) < 0)
+  if (_cerebro_module_config_module_check(config_handle) < 0)
     return NULL;
 
-  return (handle->module_info)->config_module_name;
+  return (config_handle->module_info)->config_module_name;
 }
 
 int
-_cerebro_config_module_setup(cerebro_config_module_t handle)
+_cerebro_config_module_setup(cerebro_config_module_t config_handle)
 {
-  if (_cerebro_module_config_module_check(handle) < 0)
+  if (_cerebro_module_config_module_check(config_handle) < 0)
     return -1;
   
-  return ((*(handle->module_info)->setup)());
+  return ((*(config_handle->module_info)->setup)());
 }
 
 int
-_cerebro_config_module_cleanup(cerebro_config_module_t handle)
+_cerebro_config_module_cleanup(cerebro_config_module_t config_handle)
 {
-  if (_cerebro_module_config_module_check(handle) < 0)
+  if (_cerebro_module_config_module_check(config_handle) < 0)
     return -1;
   
-  return ((*(handle->module_info)->cleanup)());
+  return ((*(config_handle->module_info)->cleanup)());
 }
 int
-_cerebro_config_module_load_default(cerebro_config_module_t handle,
+_cerebro_config_module_load_default(cerebro_config_module_t config_handle,
                                     struct cerebro_config *conf)
 {
-  if (_cerebro_module_config_module_check(handle) < 0)
+  if (_cerebro_module_config_module_check(config_handle) < 0)
     return -1;
   
-  return ((*(handle->module_info)->load_default)(conf));
+  return ((*(config_handle->module_info)->load_default)(conf));
 }
