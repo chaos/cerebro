@@ -1,7 +1,9 @@
 2005-06-09  Albert Chu  <chu11@llnl.gov>
 
 	* Added support for CEREBRO_METRIC_FLAGS_NONE_IF_DOWN flag.
-	
+
+	* tagged pre-monitor-module-1
+
 2005-06-08  Albert Chu  <chu11@llnl.gov>
 
 	* Add support for RAW datatype.
