@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.h,v 1.26 2005-06-10 00:28:09 achu Exp $
+ *  $Id: cerebro_module.h,v 1.27 2005-06-10 16:28:20 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_MODULE_H
@@ -29,43 +29,6 @@ cerebro_clusterlist_module_t _cerebro_module_load_clusterlist_module(void);
  * Returns 0 on success, -1 on error
  */
 int _cerebro_module_destroy_clusterlist_handle(cerebro_clusterlist_module_t clusterlist_handle);
-
-/*
- * _cerebro_module_load_config_module
- *
- * Find and load the config module.  If none is found, cerebro
- * library will assume a default config module.
- * 
- * Returns config module handle on success, NULL on error
- */
-cerebro_config_module_t _cerebro_module_load_config_module(void);
-
-/*
- * _cerebro_module_destroy_config_handle
- *
- * Destroy/Unload the config module specified by the handle
- *
- * Returns 0 on success, -1 on error
- */
-int _cerebro_module_destroy_config_handle(cerebro_config_module_t config_handle);
-
-/*
- * _cerebro_module_load_monitor_modules
- *
- * Find and load the monitor modules.
- * 
- * Returns monitor module handle on success, NULL on error
- */
-cerebro_monitor_modules_t _cerebro_module_load_monitor_modules(unsigned int metrics_max);
-
-/*
- * _cerebro_module_destroy_monitor_handle
- *
- * Destroy/Unload the monitor module specified by the handle
- *
- * Returns 0 on success, -1 on error
- */
-int _cerebro_module_destroy_monitor_handle(cerebro_monitor_modules_t config_handle);
 
 /*
  * _cerebro_clusterlist_module_name
@@ -120,6 +83,43 @@ int _cerebro_clusterlist_module_get_nodename(cerebro_clusterlist_module_t cluste
                                              const char *node, 
                                              char *buf, 
                                              unsigned int buflen);
+
+/*
+ * _cerebro_module_load_config_module
+ *
+ * Find and load the config module.  If none is found, cerebro
+ * library will assume a default config module.
+ * 
+ * Returns config module handle on success, NULL on error
+ */
+cerebro_config_module_t _cerebro_module_load_config_module(void);
+
+/*
+ * _cerebro_module_destroy_config_handle
+ *
+ * Destroy/Unload the config module specified by the handle
+ *
+ * Returns 0 on success, -1 on error
+ */
+int _cerebro_module_destroy_config_handle(cerebro_config_module_t config_handle);
+
+/*
+ * _cerebro_module_load_monitor_modules
+ *
+ * Find and load the monitor modules.
+ * 
+ * Returns monitor module handle on success, NULL on error
+ */
+cerebro_monitor_modules_t _cerebro_module_load_monitor_modules(unsigned int metrics_max);
+
+/*
+ * _cerebro_module_destroy_monitor_handle
+ *
+ * Destroy/Unload the monitor module specified by the handle
+ *
+ * Returns 0 on success, -1 on error
+ */
+int _cerebro_module_destroy_monitor_handle(cerebro_monitor_modules_t config_handle);
 
 /*
  * _cerebro_config_module_name

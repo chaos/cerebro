@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.56 2005-06-08 22:54:38 achu Exp $
+ *  $Id: cerebrod.c,v 1.57 2005-06-10 16:28:20 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -15,7 +15,6 @@
 
 #include "cerebrod.h"
 #include "cerebrod_daemon.h"
-#include "cerebrod_data.h"
 #include "cerebrod_clusterlist.h"
 #include "cerebrod_config.h"
 #include "cerebrod_listener.h"
@@ -72,7 +71,6 @@ _cerebrod_err_unlock(void)
 }
 #endif /* CEREBRO_DEBUG */
 
-
 /* 
  * _cerebrod_pre_config_initialization
  *
@@ -81,7 +79,7 @@ _cerebrod_err_unlock(void)
 static void
 _cerebrod_pre_config_initialization(void)
 {
-  cerebrod_load_data();
+  /* Hmmm nothing to do */
 }
 
 /* 

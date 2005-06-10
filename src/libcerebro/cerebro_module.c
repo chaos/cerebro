@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.c,v 1.36 2005-06-10 00:28:09 achu Exp $
+ *  $Id: cerebro_module.c,v 1.37 2005-06-10 16:28:20 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -813,6 +813,74 @@ _cerebro_module_destroy_clusterlist_handle(cerebro_clusterlist_module_t clusterl
   return 0;
 }
 
+char *
+_cerebro_clusterlist_module_name(cerebro_clusterlist_module_t clusterlist_handle)
+{
+  if (_cerebro_module_clusterlist_module_check(clusterlist_handle) < 0)
+    return NULL;
+
+  return (clusterlist_handle->module_info)->clusterlist_module_name;
+}
+
+int
+_cerebro_clusterlist_module_setup(cerebro_clusterlist_module_t clusterlist_handle)
+{
+  if (_cerebro_module_clusterlist_module_check(clusterlist_handle) < 0)
+    return -1;
+  
+  return ((*(clusterlist_handle->module_info)->setup)());
+}
+
+int
+_cerebro_clusterlist_module_cleanup(cerebro_clusterlist_module_t clusterlist_handle)
+{
+  if (_cerebro_module_clusterlist_module_check(clusterlist_handle) < 0)
+    return -1;
+  
+  return ((*(clusterlist_handle->module_info)->cleanup)());
+}
+
+int
+_cerebro_clusterlist_module_numnodes(cerebro_clusterlist_module_t clusterlist_handle)
+{
+  if (_cerebro_module_clusterlist_module_check(clusterlist_handle) < 0)
+    return -1;
+  
+  return ((*(clusterlist_handle->module_info)->numnodes)());
+}
+
+int
+_cerebro_clusterlist_module_get_all_nodes(cerebro_clusterlist_module_t clusterlist_handle, 
+                                          char ***nodes)
+{
+  if (_cerebro_module_clusterlist_module_check(clusterlist_handle) < 0)
+    return -1;
+  
+  return ((*(clusterlist_handle->module_info)->get_all_nodes)(nodes));
+}
+
+int
+_cerebro_clusterlist_module_node_in_cluster(cerebro_clusterlist_module_t clusterlist_handle, 
+                                            const char *node)
+{
+  if (_cerebro_module_clusterlist_module_check(clusterlist_handle) < 0)
+    return -1;
+  
+  return ((*(clusterlist_handle->module_info)->node_in_cluster)(node));
+}
+
+int
+_cerebro_clusterlist_module_get_nodename(cerebro_clusterlist_module_t clusterlist_handle,
+                                         const char *node, 
+                                         char *buf, 
+                                         unsigned int buflen)
+{
+  if (_cerebro_module_clusterlist_module_check(clusterlist_handle) < 0)
+    return -1;
+  
+  return ((*(clusterlist_handle->module_info)->get_nodename)(node, buf, buflen));
+}
+
 /* 
  * _load_config_module
  *
@@ -1387,75 +1455,6 @@ _cerebro_module_destroy_monitor_handle(cerebro_monitor_modules_t monitor_handle)
   _cerebro_module_cleanup();
   return 0;
   
-}
-
-
-char *
-_cerebro_clusterlist_module_name(cerebro_clusterlist_module_t clusterlist_handle)
-{
-  if (_cerebro_module_clusterlist_module_check(clusterlist_handle) < 0)
-    return NULL;
-
-  return (clusterlist_handle->module_info)->clusterlist_module_name;
-}
-
-int
-_cerebro_clusterlist_module_setup(cerebro_clusterlist_module_t clusterlist_handle)
-{
-  if (_cerebro_module_clusterlist_module_check(clusterlist_handle) < 0)
-    return -1;
-  
-  return ((*(clusterlist_handle->module_info)->setup)());
-}
-
-int
-_cerebro_clusterlist_module_cleanup(cerebro_clusterlist_module_t clusterlist_handle)
-{
-  if (_cerebro_module_clusterlist_module_check(clusterlist_handle) < 0)
-    return -1;
-  
-  return ((*(clusterlist_handle->module_info)->cleanup)());
-}
-
-int
-_cerebro_clusterlist_module_numnodes(cerebro_clusterlist_module_t clusterlist_handle)
-{
-  if (_cerebro_module_clusterlist_module_check(clusterlist_handle) < 0)
-    return -1;
-  
-  return ((*(clusterlist_handle->module_info)->numnodes)());
-}
-
-int
-_cerebro_clusterlist_module_get_all_nodes(cerebro_clusterlist_module_t clusterlist_handle, 
-                                          char ***nodes)
-{
-  if (_cerebro_module_clusterlist_module_check(clusterlist_handle) < 0)
-    return -1;
-  
-  return ((*(clusterlist_handle->module_info)->get_all_nodes)(nodes));
-}
-
-int
-_cerebro_clusterlist_module_node_in_cluster(cerebro_clusterlist_module_t clusterlist_handle, 
-                                            const char *node)
-{
-  if (_cerebro_module_clusterlist_module_check(clusterlist_handle) < 0)
-    return -1;
-  
-  return ((*(clusterlist_handle->module_info)->node_in_cluster)(node));
-}
-
-int
-_cerebro_clusterlist_module_get_nodename(cerebro_clusterlist_module_t clusterlist_handle,
-                                         const char *node, 
-                                         char *buf, 
-                                         unsigned int buflen)
-{
-  if (_cerebro_module_clusterlist_module_check(clusterlist_handle) < 0)
-    return -1;
-  
-  return ((*(clusterlist_handle->module_info)->get_nodename)(node, buf, buflen));
 }
 
 char *
