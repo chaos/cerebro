@@ -1,9 +1,9 @@
 /*****************************************************************************\
- *  $Id: cerebrod_node_data.h,v 1.8 2005-06-08 00:30:38 achu Exp $
+ *  $Id: cerebrod_cluster_data.h,v 1.1 2005-06-10 22:05:24 achu Exp $
 \*****************************************************************************/
 
-#ifndef _CEREBROD_NODE_DATA_H
-#define _CEREBROD_NODE_DATA_H
+#ifndef _CEREBROD_CLUSTER_DATA_H
+#define _CEREBROD_CLUSTER_DATA_H
 
 #if HAVE_CONFIG_H
 #include "config.h"
@@ -50,19 +50,19 @@ struct cerebrod_node_data
 };
 
 /* 
- * cerebrod_node_data_initialize
+ * cerebrod_cluster_data_initialize
  *
- * Initialize node_data structures
+ * Initialize cluster_data structures
  */
-void cerebrod_node_data_initialize(void);
+void cerebrod_cluster_data_initialize(void);
 
 /* 
- * cerebrod_node_data_update
+ * cerebrod_cluster_data_update
  *
- * Update node_data with more up to date information
+ * Update cluster_data with more up to date information
  */
-void cerebrod_node_data_update(char *nodename,
-                               struct cerebrod_heartbeat *hb,
-                               u_int32_t received_time);
+void cerebrod_cluster_data_update(char *nodename,
+                                  struct cerebrod_heartbeat *hb,
+                                  u_int32_t received_time);
 
-#endif /* _CEREBROD_NODE_DATA_H */
+#endif /* _CEREBROD_CLUSTER_DATA_H */

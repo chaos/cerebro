@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.52 2005-06-09 22:16:06 achu Exp $
+## $Id: Makefile.am,v 1.53 2005-06-10 22:05:24 achu Exp $
 ##*****************************************************************************
 
 if WITH_GNU_LD
@@ -31,9 +31,9 @@ nobase_include_HEADERS = cerebro/cerebro_clusterlist_module.h \
 			 cerebro/cerebro_error.h \
 			 cerebro/cerebro_monitor_module.h
 
-cerebro_clusterlist_module_builddir=`cd $(top_builddir)/src/modules/clusterlist/.libs && pwd`
-cerebro_config_module_builddir=`cd $(top_builddir)/src/modules/config/.libs && pwd`
-cerebro_monitor_module_builddir=`cd $(top_builddir)/src/modules/monitor/.libs && pwd`
+cerebro_clusterlist_module_builddir=`cd $(top_builddir)/src/modules/clusterlist && pwd`
+cerebro_config_module_builddir=`cd $(top_builddir)/src/modules/config && pwd`
+cerebro_monitor_module_builddir=`cd $(top_builddir)/src/modules/monitor && pwd`
 
 lib_LTLIBRARIES       = libcerebro.la
 libcerebro_la_CFLAGS  = -D_REENTRANT \

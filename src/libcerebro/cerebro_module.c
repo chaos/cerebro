@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.c,v 1.37 2005-06-10 16:28:20 achu Exp $
+ *  $Id: cerebro_module.c,v 1.38 2005-06-10 22:05:24 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -132,6 +132,10 @@ int dynamic_config_modules_len = 1;
 #define CEREBRO_MONITOR_FILENAME_SIGNATURE     "cerebro_monitor_"
 
 #endif /* !WITH_STATIC_MODULES */
+
+#define CEREBRO_CLUSTERLIST_MODULE_DIR CEREBRO_CLUSTERLIST_MODULE_BUILDDIR "/.libs"
+#define CEREBRO_CONFIG_MODULE_DIR      CEREBRO_CONFIG_MODULE_BUILDDIR "/.libs"
+#define CEREBRO_MONITOR_MODULE_DIR     CEREBRO_MONITOR_MODULE_BUILDDIR "/.libs"
 
 #define CEREBRO_CLUSTERLIST_MODULE_MAGIC_NUMBER 0x33882200
 #define CEREBRO_CONFIG_MODULE_MAGIC_NUMBER      0x33882211
@@ -722,7 +726,7 @@ _cerebro_module_load_clusterlist_module(void)
       i++;
     }
 #else  /* !WITH_STATIC_MODULES */
-  if ((rv = _cerebro_module_find_known_module(CEREBRO_CLUSTERLIST_MODULE_BUILDDIR,
+ if ((rv = _cerebro_module_find_known_module(CEREBRO_CLUSTERLIST_MODULE_DIR,
 					      dynamic_clusterlist_modules,
 					      dynamic_clusterlist_modules_len,
 					      _load_clusterlist_module,
@@ -741,7 +745,6 @@ _cerebro_module_load_clusterlist_module(void)
 
   if (rv)
     goto out;
-
   
   if ((rv = _cerebro_module_find_unknown_module(CEREBRO_MODULE_DIR,
 						CEREBRO_CLUSTERLIST_FILENAME_SIGNATURE,
@@ -1057,7 +1060,7 @@ _cerebro_module_load_config_module(void)
       i++;
     }
 #else  /* !WITH_STATIC_MODULES */
-  if ((rv = _cerebro_module_find_known_module(CEREBRO_CONFIG_MODULE_BUILDDIR,
+  if ((rv = _cerebro_module_find_known_module(CEREBRO_CONFIG_MODULE_DIR,
 					      dynamic_config_modules,
 					      dynamic_config_modules_len,
 					      _load_config_module,
@@ -1365,7 +1368,7 @@ _cerebro_module_load_monitor_modules(unsigned int modules_max)
       i++;
     }
 #else  /* !WITH_STATIC_MODULES */
-  if ((rv = _cerebro_module_find_modules(CEREBRO_MONITOR_MODULE_BUILDDIR,
+  if ((rv = _cerebro_module_find_modules(CEREBRO_MONITOR_MODULE_DIR,
                                          CEREBRO_MONITOR_FILENAME_SIGNATURE,
                                          _load_monitor_module,
                                          monitor_handle,

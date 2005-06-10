@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.77 2005-06-08 22:54:38 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.78 2005-06-10 22:05:24 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -26,11 +26,11 @@
 #include "cerebro/cerebro_error.h"
 
 #include "cerebrod.h"
+#include "cerebrod_cluster_data.h"
 #include "cerebrod_config.h"
 #include "cerebrod_heartbeat.h"
 #include "cerebrod_listener.h"
 #include "cerebrod_metric.h"
-#include "cerebrod_node_data.h"
 #include "wrappers.h"
 
 extern struct cerebrod_config conf;
@@ -578,7 +578,7 @@ cerebrod_listener(void *arg)
 	}
 
       Gettimeofday(&tv, NULL);
-      cerebrod_node_data_update(nodename_key, hb, tv.tv_sec);
+      cerebrod_cluster_data_update(nodename_key, hb, tv.tv_sec);
       cerebrod_heartbeat_destroy(hb);
     cleanup_continue:
       Free(buf);
