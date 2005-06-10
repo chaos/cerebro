@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.41 2005-06-08 15:32:01 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.42 2005-06-10 00:28:09 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -20,6 +20,7 @@
 
 #include "cerebro.h"
 #include "cerebro_marshalling.h"
+#include "cerebro_module.h"
 #include "cerebrod_heartbeat_protocol.h"
 #include "cerebro/cerebro_constants.h"
 #include "cerebro/cerebro_error.h"
@@ -35,6 +36,13 @@ extern struct cerebrod_config conf;
 #if CEREBRO_DEBUG
 extern pthread_mutex_t debug_output_mutex;
 #endif /* CEREBRO_DEBUG */
+
+/* 
+ * monitor_handle
+ *
+ * Handle for monitor modules;
+ */
+cerebro_monitor_modules_t monitor_handle = NULL;
 
 /* 
  * _cerebrod_speaker_create_and_setup_socket
@@ -142,7 +150,7 @@ _cerebrod_speaker_initialize(void)
 {
   char nodename[CEREBRO_MAXNODENAMELEN+1];
   unsigned int seed;;
-  int i, len;
+  int i, len, modules_count;
 
   seed = Time(NULL);
 
@@ -159,6 +167,36 @@ _cerebrod_speaker_initialize(void)
     seed += (int)nodename[i];
 
   srand(seed);
+
+  /* XXX */
+
+  if (!(monitor_handle = _cerebro_module_load_monitor_modules(conf.metric_max)))
+    cerebro_err_debug("%s(%s:%d): _cerebro_module_load_monitor_modules failed",
+                      __FILE__, __FUNCTION__, __LINE__);
+
+  if ((modules_count = _cerebro_monitor_module_count(monitor_handle)) < 0)
+    {
+      cerebro_err_debug("%s(%s:%d): _cerebro_monitor_module_count failed",
+                        __FILE__, __FUNCTION__, __LINE__);
+      _cerebro_module_destroy_monitor_handle(monitor_handle);
+      monitor_handle = NULL;
+    }
+
+  for (i = 0; i < modules_count; i++)
+    {
+      if (_cerebro_monitor_module_setup(monitor_handle, i) < 0)
+        {
+          int j;
+
+          cerebro_err_debug("%s(%s:%d): _cerebro_monitor_module_setup failed: monitor_module = %s",
+                            __FILE__, __FUNCTION__, __LINE__, _cerebro_monitor_module_name(monitor_handle, i));
+          for (j = 0; j < i; i++)
+            _cerebro_monitor_module_cleanup(monitor_handle, j);
+          _cerebro_module_destroy_monitor_handle(monitor_handle);
+          monitor_handle = NULL;
+          break;
+        }
+    }
 }
 
 /*
@@ -170,54 +208,138 @@ static struct cerebrod_heartbeat *
 _cerebrod_heartbeat_create(int *heartbeat_len)
 {
   struct cerebrod_heartbeat *hb = NULL;
-  struct cerebrod_heartbeat_metric *hd = NULL;
-  u_int32_t boottime;
+  u_int32_t metrics_count;
+  int i;
 
   assert(heartbeat_len);
 
   *heartbeat_len = 0;
 
-  /* XXX needs cleaning up */
-
+  /* XXX CLEANUP!!! */
   hb = Malloc(sizeof(struct cerebrod_heartbeat));
 
   hb->version = CEREBROD_HEARTBEAT_PROTOCOL_VERSION;
   cerebrod_get_nodename(hb->nodename, CEREBRO_MAXNODENAMELEN);
 
-  /* XXX need clean way to determine this */
-  hb->metrics_len = 1;
+  if (!monitor_handle)
+    {
+      hb->metrics_len = 0;
+      hb->metrics = NULL;
+      *heartbeat_len = CEREBROD_HEARTBEAT_HEADER_LEN;
+      return hb;
+    }
+
+  if ((metrics_count = _cerebro_monitor_module_count(monitor_handle)) < 0)
+    {
+      cerebro_err_debug("%s(%s:%d): _cerebro_monitor_module_count failed",
+                        __FILE__, __FUNCTION__, __LINE__);
+      goto header_only_cleanup;
+    }
+
+  hb->metrics_len = metrics_count;
 
   hb->metrics = Malloc(sizeof(struct cerebrod_heartbeat_metric *)*(hb->metrics_len + 1));
   memset(hb->metrics, '\0', sizeof(struct cerebrod_heartbeat_metric *)*(hb->metrics_len + 1));
 
   *heartbeat_len += CEREBROD_HEARTBEAT_HEADER_LEN;
 
-  /* 
-   * Store boottime
-   */
+  for (i = 0; i < hb->metrics_len; i++)
+    {
+      struct cerebrod_heartbeat_metric *hd = NULL;
+      char *metric_name;
+      int temp, rv;
 
-  hd = Malloc(sizeof(struct cerebrod_heartbeat_metric));
-  memset(hd, '\0', sizeof(struct cerebrod_heartbeat_metric));
+      hd = Malloc(sizeof(struct cerebrod_heartbeat_metric));
+      memset(hd, '\0', sizeof(struct cerebrod_heartbeat_metric));
 
-  /* need not overflow */
-  /* XXX cleanup */
-  strncpy(hd->metric_name, "boottime", CEREBRO_METRIC_NAME_MAXLEN);
-  /* XXX need a function to calculate this here instead */
-  hd->metric_value_type = CEREBRO_METRIC_VALUE_TYPE_UNSIGNED_INT32;
-  hd->metric_value_len = sizeof(u_int32_t);
-  
-  hd->metric_value = Malloc(hd->metric_value_len);
-  boottime = cerebrod_get_boottime();
-  memcpy(hd->metric_value, &boottime, hd->metric_value_len);
+      if (!(metric_name = _cerebro_monitor_module_get_metric_name(monitor_handle,
+                                                                  i)))
+        {
+          cerebro_err_debug("%s(%s:%d): _cerebro_monitor_module_get_metric_name failed: index = %d",
+                            __FILE__, __FUNCTION__, __LINE__, i);
+          Free(hd);
+          goto header_only_cleanup;
+        }
 
-  *heartbeat_len += CEREBROD_HEARTBEAT_METRIC_HEADER_LEN + hd->metric_value_len;
+      /* need not overflow */
+      strncpy(hd->metric_name, metric_name, CEREBRO_METRIC_NAME_MAXLEN);
 
-  hb->metrics[0] = hd;
+      if ((temp = _cerebro_monitor_module_get_metric_value_type(monitor_handle,
+                                                                i)) < 0)
+        {
+          cerebro_err_debug("%s(%s:%d): _cerebro_monitor_module_get_metric_value_type failed: index = %d",
+                            __FILE__, __FUNCTION__, __LINE__, i);
+          Free(hd);
+          goto header_only_cleanup;
+        }
 
-  /* 
-   * store something else later ??
-   */
+      hd->metric_value_type = temp;
 
+      if ((temp = _cerebro_monitor_module_get_metric_value_len(monitor_handle,
+                                                               i)) < 0)
+        {
+          cerebro_err_debug("%s(%s:%d): _cerebro_monitor_module_get_metric_value_len failed: index = %d",
+                            __FILE__, __FUNCTION__, __LINE__, i);
+          Free(hd);
+          goto header_only_cleanup;
+        }
+
+      hd->metric_value_len = temp;
+
+      if (hd->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_NONE
+          || !hd->metric_value_len)
+        {
+          /* XXX make code work around this problem?? */
+          cerebro_err_debug("%s(%s:%d): bogus metric information",
+                            __FILE__, __FUNCTION__, __LINE__, i);
+          Free(hd);
+          goto header_only_cleanup;
+        }
+
+      hd->metric_value = Malloc(hd->metric_value_len);
+
+      if ((rv = _cerebro_monitor_module_get_metric_value(monitor_handle,
+                                                         i,
+                                                         hd->metric_value,
+                                                         hd->metric_value_len)) < 0)
+        {
+          cerebro_err_debug("%s(%s:%d): _cerebro_monitor_module_get_metric_value failed: index = %d",
+                            __FILE__, __FUNCTION__, __LINE__, i);
+          Free(hd->metric_value);
+          Free(hd);
+          goto header_only_cleanup;
+        }
+
+      if (rv != hd->metric_value_len)
+        {
+          cerebro_err_debug("%s(%s:%d): _cerebro_monitor_module_get_metric_value failed to copy correct data amount: rv = %d metric_value_len = %d index = %d",
+                            __FILE__, __FUNCTION__, __LINE__, 
+                            rv, hd->metric_value_len, i);
+          Free(hd->metric_value);
+          Free(hd);
+          goto header_only_cleanup;
+        }
+
+      *heartbeat_len += CEREBROD_HEARTBEAT_METRIC_HEADER_LEN + hd->metric_value_len;
+      
+      hb->metrics[i] = hd;
+    }
+
+  return hb;
+
+ header_only_cleanup:
+  if (hb->metrics_len)
+    {
+      for (i = 0; i < hb->metrics_len; i++)
+        {
+          if (hb->metrics[i]->metric_value)
+            Free(hb->metrics[i]->metric_value);
+          Free(hb->metrics[i]);
+        }
+    }
+  hb->metrics_len = 0;
+  hb->metrics = NULL;
+  *heartbeat_len = CEREBROD_HEARTBEAT_HEADER_LEN;
   return hb;
 }
 

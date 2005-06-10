@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.c,v 1.35 2005-06-09 22:16:06 achu Exp $
+ *  $Id: cerebro_module.c,v 1.36 2005-06-10 00:28:09 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -108,9 +108,9 @@ struct cerebro_monitor_module_info *static_monitor_modules[] =
  * dynamic clusterlist modules to search for by default
  */
 char *dynamic_clusterlist_modules[] = {
-  "cerebro_clusterlist_gendersllnl.la",
-  "cerebro_clusterlist_genders.la",
-  "cerebro_clusterlist_hostsfile.la",
+  "cerebro_clusterlist_gendersllnl.so",
+  "cerebro_clusterlist_genders.so",
+  "cerebro_clusterlist_hostsfile.so",
   NULL
 };
 int dynamic_clusterlist_modules_len = 3;
@@ -122,7 +122,7 @@ int dynamic_clusterlist_modules_len = 3;
  * dynamic configuration modules to search for by default
  */
 char *dynamic_config_modules[] = {
-  "cerebro_config_gendersllnl.la",
+  "cerebro_config_gendersllnl.so",
   NULL
 };
 int dynamic_config_modules_len = 1;
@@ -1555,13 +1555,9 @@ _cerebro_monitor_module_get_metric_name(cerebro_monitor_modules_t monitor_handle
   return ((*(monitor_handle->module_info[index])->get_metric_name)());
 }
 
-int 
-_cerebro_monitor_module_get_metric_value(cerebro_monitor_modules_t monitor_handle,
-                                         unsigned int index,
-                                         void *metric_value_buf,
-                                         unsigned int metric_value_buflen,
-                                         unsigned int *metric_value_type,
-                                         unsigned int *metric_value_len)
+int
+_cerebro_monitor_module_get_metric_value_type(cerebro_monitor_modules_t monitor_handle,
+                                              unsigned int index)
 {
   if (_cerebro_module_monitor_module_check(monitor_handle) < 0)
     return -1;
@@ -1569,8 +1565,34 @@ _cerebro_monitor_module_get_metric_value(cerebro_monitor_modules_t monitor_handl
   if (!(index < monitor_handle->modules_count))
     return -1;
 
+  return ((*(monitor_handle->module_info[index])->get_metric_value_type)());
+}
+
+int
+_cerebro_monitor_module_get_metric_value_len(cerebro_monitor_modules_t monitor_handle,
+                                             unsigned int index)
+{
+  if (_cerebro_module_monitor_module_check(monitor_handle) < 0)
+    return -1;
+  
+  if (!(index < monitor_handle->modules_count))
+    return -1;
+
+  return ((*(monitor_handle->module_info[index])->get_metric_value_len)());
+}
+
+int 
+_cerebro_monitor_module_get_metric_value(cerebro_monitor_modules_t monitor_handle,
+                                         unsigned int index,
+                                         void *metric_value_buf,
+                                         unsigned int metric_value_buflen)
+{
+  if (_cerebro_module_monitor_module_check(monitor_handle) < 0)
+    return -1;
+  
+  if (!(index < monitor_handle->modules_count))
+    return -1;
+  
   return ((*(monitor_handle->module_info[index])->get_metric_value)(metric_value_buf,
-                                                                    metric_value_buflen,
-                                                                    metric_value_type,
-                                                                    metric_value_len));
+                                                                    metric_value_buflen));
 }

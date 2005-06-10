@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_node_data.c,v 1.19 2005-06-08 22:54:38 achu Exp $
+ *  $Id: cerebrod_node_data.c,v 1.20 2005-06-10 00:28:09 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -287,7 +287,7 @@ _cerebrod_node_data_metric_data_dump(void *data, const void *key, void *arg)
   md = (struct cerebrod_metric_data *)data;
   nodename = (char *)arg;
  
-  fprintf(stderr, "* %s: metric_name=%s metric_value_type=%d metric_value_len=%d",
+  fprintf(stderr, "* %s: metric_name=%s metric_value_type=%d metric_value_len=%d ",
           nodename,
           md->metric_name,
           md->metric_value_type,

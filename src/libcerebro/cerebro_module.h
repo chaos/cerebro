@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.h,v 1.25 2005-06-09 22:16:06 achu Exp $
+ *  $Id: cerebro_module.h,v 1.26 2005-06-10 00:28:09 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_MODULE_H
@@ -191,6 +191,22 @@ char *_cerebro_monitor_module_get_metric_name(cerebro_monitor_modules_t monitor_
                                               unsigned int index);
 
 /*
+ * _cerebro_monitor_module_get_metric_value_type
+ *
+ * call monitor module get all nodes function
+ */
+int _cerebro_monitor_module_get_metric_value_type(cerebro_monitor_modules_t monitor_handle,
+                                                  unsigned int index);
+
+/*
+ * _cerebro_monitor_module_get_metric_value_len
+ *
+ * call monitor module get all nodes function
+ */
+int _cerebro_monitor_module_get_metric_value_len(cerebro_monitor_modules_t monitor_handle,
+                                                 unsigned int index);
+
+/*
  * _cerebro_monitor_module_get_metric_value
  *
  * call monitor module get all nodes function
@@ -198,8 +214,6 @@ char *_cerebro_monitor_module_get_metric_name(cerebro_monitor_modules_t monitor_
 int _cerebro_monitor_module_get_metric_value(cerebro_monitor_modules_t monitor_handle,
                                              unsigned int index,
                                              void *metric_value_buf,
-                                             unsigned int metric_value_buflen,
-                                             unsigned int *metric_value_type,
-                                             unsigned int *metric_value_len);
+                                             unsigned int metric_value_buflen);
 
 #endif /* _CEREBRO_MODULE_H */

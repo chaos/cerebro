@@ -12,6 +12,8 @@
 
 	* Added monitor module support to libcerebro.
 
+	* Use boottime module rather than hardcoded boottime in cerebrod.
+
 2005-06-08  Albert Chu  <chu11@llnl.gov>
 
 	* Add support for RAW datatype.

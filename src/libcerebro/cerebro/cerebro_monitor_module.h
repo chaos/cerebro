@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_monitor_module.h,v 1.1 2005-06-09 20:09:51 achu Exp $
+ *  $Id: cerebro_monitor_module.h,v 1.2 2005-06-10 00:28:09 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_MONITOR_MODULE_H
@@ -35,19 +35,36 @@ typedef int (*Cerebro_monitor_cleanup)(void);
  */
 typedef char *(*Cerebro_monitor_get_metric_name)(void);
 
+/* 
+ * Cerebro_monitor_get_metric_value_type
+ *
+ * Returns the value_type of the metric monitored by this module. Required
+ * to be defined by each monitor module.
+ *
+ * Returns value_type on success, -1 on error
+ */
+typedef int (*Cerebro_monitor_get_metric_value_type)(void);
+
+/* 
+ * Cerebro_monitor_get_metric_value_len
+ *
+ * Returns the value_len of the metric monitored by this
+ * module. Required to be defined by each monitor module.
+ *
+ * Returns value_len on success, -1 on error
+ */
+typedef int (*Cerebro_monitor_get_metric_value_len)(void);
+
 /*
  * Cerebro_monitor_get_metric_value
  *
  * function prototype for monitor module function to get a metric
  * value.  Required to be defined by each monitor module.
  *
- * Returns length copied into buffer on success, 0 if buffer was too
- * small, -1 on error
+ * Returns length of data copied on success, -1 on error
  */
 typedef int (*Cerebro_monitor_get_metric_value)(void *metric_value_buf,
-                                                unsigned int metric_value_buflen,
-                                                unsigned int *metric_value_type,
-                                                unsigned int *metric_value_len);
+                                                unsigned int metric_value_buflen);
 
 /*
  * struct cerebro_monitor_module_info 
@@ -61,6 +78,8 @@ struct cerebro_monitor_module_info
   Cerebro_monitor_setup setup;
   Cerebro_monitor_cleanup cleanup;
   Cerebro_monitor_get_metric_name get_metric_name;
+  Cerebro_monitor_get_metric_value_type get_metric_value_type;
+  Cerebro_monitor_get_metric_value_len get_metric_value_len;
   Cerebro_monitor_get_metric_value get_metric_value;
 };
 

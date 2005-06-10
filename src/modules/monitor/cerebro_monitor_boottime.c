@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_monitor_boottime.c,v 1.2 2005-06-09 20:10:36 achu Exp $
+ *  $Id: cerebro_monitor_boottime.c,v 1.3 2005-06-10 00:28:09 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -124,7 +124,7 @@ boottime_monitor_cleanup(void)
  *
  * boottime monitor module get_metric_name function
  *
- * Returns 0 on success, -1 on error
+ * Returns string on success, -1 on error
  */
 char *
 boottime_monitor_get_metric_name(void)
@@ -133,17 +133,41 @@ boottime_monitor_get_metric_name(void)
 }
 
 /* 
+ * boottime_monitor_get_metric_value_type
+ *
+ * boottime monitor module get_metric_value_type function
+ *
+ * Returns value_type on success, -1 on error
+ */
+int
+boottime_monitor_get_metric_value_type(void)
+{
+  return CEREBRO_METRIC_VALUE_TYPE_UNSIGNED_INT32;
+}
+
+/* 
+ * boottime_monitor_get_metric_value_len
+ *
+ * boottime monitor module get_metric_value_len function
+ *
+ * Returns value_len on success, -1 on error
+ */
+int
+boottime_monitor_get_metric_value_len(void)
+{
+  return sizeof(u_int32_t);
+}
+
+/* 
  * boottime_monitor_get_metric_value
  *
  * boottime monitor module get_metric_value function
  *
- * Returns 0 on success, -1 on error
+ * Returns length of data copied on success, -1 on error
  */
 int
 boottime_monitor_get_metric_value(void *metric_value_buf,
-                                  unsigned int metric_value_buflen,
-                                  unsigned int *metric_value_type,
-                                  unsigned int *metric_value_len)
+                                  unsigned int metric_value_buflen)
 {
   if (!metric_value_buf)
     {
@@ -152,34 +176,14 @@ boottime_monitor_get_metric_value(void *metric_value_buf,
       return -1;
     }
 
-  if (!metric_value_buflen)
+  if (metric_value_buflen < sizeof(u_int32_t))
     {
       cerebro_err_debug_module("%s(%s:%d): metric_value_buflen invalid",
                                __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
-  if (!metric_value_type)
-    {
-      cerebro_err_debug_module("%s(%s:%d): metric_value_type null",
-                               __FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
-
-  if (!metric_value_len)
-    {
-      cerebro_err_debug_module("%s(%s:%d): metric_value_len null",
-                               __FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
-
-  if (metric_value_buflen < sizeof(u_int32_t))
-    return 0;
-
   memcpy(metric_value_buf, &monitor_boottime, sizeof(u_int32_t));
-  *metric_value_type = CEREBRO_METRIC_VALUE_TYPE_UNSIGNED_INT32;
-  *metric_value_len = sizeof(u_int32_t);
-
   return sizeof(u_int32_t);
 }
 
@@ -193,5 +197,7 @@ struct cerebro_monitor_module_info monitor_module_info =
     &boottime_monitor_setup,
     &boottime_monitor_cleanup,
     &boottime_monitor_get_metric_name,
+    &boottime_monitor_get_metric_value_type,
+    &boottime_monitor_get_metric_value_len,
     &boottime_monitor_get_metric_value,
   };

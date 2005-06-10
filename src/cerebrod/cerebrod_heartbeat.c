@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_heartbeat.c,v 1.34 2005-06-08 16:35:14 achu Exp $
+ *  $Id: cerebrod_heartbeat.c,v 1.35 2005-06-10 00:28:09 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -108,8 +108,8 @@ cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb)
             default:
               break;
             }
+          fprintf(stderr, "\n");
         }
-      fprintf(stderr, "\n");
       fprintf(stderr, "**************************************\n");
     }
 #endif /* CEREBRO_DEBUG */
