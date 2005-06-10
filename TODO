@@ -20,7 +20,7 @@ Portability
 - Non-pthreads support
 
 Design
-- Update time to cerebro metric data?
+- Update time for each cerebro metric data?
 - ability for data to be stored/not-stored in the internal hash
   i.e. passed directly to module and forgotten
 - speaker scheduler??
@@ -28,11 +28,8 @@ Design
 - listening module
 - Data structure for list/index combination?
 - Move pthread_lock in cerebro_error to error lib??
-- wrappers err_init stuff, how fix?
 - metric to get available metrics
 - make cerebro calls pthread safe??
-- metric modules
-  - modules for starttime/boottime
 - update thread for monitor module
 - nodelist
   - use own list instead of 'List' to store iterators?
@@ -42,7 +39,6 @@ Design
 - strerror_r and errormsg_r funcs
 - libcerebro set configfile, module, etc. functions
 - generic err message buffer in cerebro_t handle, i.e for conffile errors
-- config_is_setup and and equivalent functions
 - pthreads locking for clusterlists/config modules?? (they are read only)
 
 Before distribution

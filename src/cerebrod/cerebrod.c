@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.58 2005-06-10 22:05:24 achu Exp $
+ *  $Id: cerebrod.c,v 1.59 2005-06-10 22:54:42 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -20,7 +20,7 @@
 #include "cerebrod_listener.h"
 #include "cerebrod_metric.h"
 #include "cerebrod_speaker.h"
-#include "wrappers.h"
+#include "cerebrod_wrappers.h"
 
 #if CEREBRO_DEBUG
 /*  
@@ -101,7 +101,6 @@ int
 main(int argc, char **argv)
 {
   cerebro_err_init(argv[0]);
-  wrappers_err_init(argv[0]);
 #if CEREBRO_DEBUG
   cerebro_err_set_flags(CEREBRO_ERROR_STDERR 
 			| CEREBRO_ERROR_SYSLOG 
@@ -111,8 +110,6 @@ main(int argc, char **argv)
   cerebro_err_set_flags(CEREBRO_ERROR_STDERR 
 			| CEREBRO_ERROR_SYSLOG);
 #endif /* !CEREBRO_DEBUG */
-  wrappers_err_set_flags(WRAPPERS_ERROR_STDERR 
-                         | WRAPPERS_ERROR_SYSLOG);
 
   _cerebrod_pre_config_initialization();
 
@@ -127,7 +124,6 @@ main(int argc, char **argv)
       cerebro_err_set_flags(CEREBRO_ERROR_SYSLOG
 			    | CEREBRO_ERROR_LIB
 			    | CEREBRO_ERROR_MODULE);
-      wrappers_err_set_flags(WRAPPERS_ERROR_SYSLOG);
     }
   else
     {
@@ -136,8 +132,6 @@ main(int argc, char **argv)
       cerebro_err_set_flags(CEREBRO_ERROR_STDERR 
 			    | CEREBRO_ERROR_LIB
 			    | CEREBRO_ERROR_MODULE);
-      wrappers_err_set_flags(WRAPPERS_ERROR_STDERR 
-                             | WRAPPERS_ERROR_SYSLOG);
     }
 #else  /* !CEREBRO_DEBUG */
   cerebrod_daemon_init();

@@ -1,9 +1,9 @@
 /*****************************************************************************\
- *  $Id: wrappers.h,v 1.27 2005-05-31 22:06:03 achu Exp $
+ *  $Id: cerebrod_wrappers.h,v 1.1 2005-06-10 22:54:42 achu Exp $
 \*****************************************************************************/
 
-#ifndef _WRAPPERS_H
-#define _WRAPPERS_H
+#ifndef _CEREBROD_WRAPPERS_H
+#define _CEREBROD_WRAPPERS_H
 
 #if HAVE_CONFIG_H
 #include "config.h"
@@ -54,32 +54,6 @@
 #endif
 #include "list.h"
 #include "hash.h"
-
-#define WRAPPERS_ERROR_STDOUT  ERROR_STDOUT
-#define WRAPPERS_ERROR_STDERR  ERROR_STDERR
-#define WRAPPERS_ERROR_SYSLOG  ERROR_SYSLOG
-
-/*
- * wrappers_err_init
- *
- * Initializes wrappers error lib
- */
-void wrappers_err_init(char *prog);
- 
-/*
- * wrappers_err_get_flags
- *
- * Returns the currently set flags
- */
-int wrappers_err_get_flags(void);
- 
-/*
- * wrappers_err_set_flags
- *
- * Sets the error lib flags to 'flags'.
- */
-void wrappers_err_set_flags(int flags);
-
 
 /* 
  * Memory/String Wrappers 
@@ -326,4 +300,4 @@ int wrap_hash_delete_if(const char *file, const char *function, int line, hash_t
 int wrap_hash_for_each(const char *file, const char *function, int line, hash_t h, hash_arg_f argf, void *arg);
 void wrap_hash_destroy(const char *file, const char *function, int line, hash_t h);
 
-#endif /* _WRAPPERS_H */
+#endif /* _CEREBROD_WRAPPERS_H */

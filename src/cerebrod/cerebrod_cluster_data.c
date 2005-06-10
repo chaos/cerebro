@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_cluster_data.c,v 1.1 2005-06-10 22:05:24 achu Exp $
+ *  $Id: cerebrod_cluster_data.c,v 1.2 2005-06-10 22:54:42 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -23,9 +23,9 @@
 #include "cerebrod_cluster_data.h"
 #include "cerebrod_config.h"
 #include "cerebrod_util.h"
+#include "cerebrod_wrappers.h"
 #include "list.h"
 #include "hash.h"
-#include "wrappers.h"
 
 #define CEREBROD_CLUSTER_DATA_INDEX_SIZE_DEFAULT   1024
 #define CEREBROD_CLUSTER_DATA_INDEX_SIZE_INCREMENT 1024

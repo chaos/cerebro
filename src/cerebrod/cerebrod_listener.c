@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.78 2005-06-10 22:05:24 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.79 2005-06-10 22:54:42 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -31,7 +31,7 @@
 #include "cerebrod_heartbeat.h"
 #include "cerebrod_listener.h"
 #include "cerebrod_metric.h"
-#include "wrappers.h"
+#include "cerebrod_wrappers.h"
 
 extern struct cerebrod_config conf;
 #if CEREBRO_DEBUG

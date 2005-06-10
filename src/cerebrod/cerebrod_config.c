@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.101 2005-06-08 16:35:14 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.102 2005-06-10 22:54:42 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -32,7 +32,7 @@
 
 #include "cerebrod_config.h"
 #include "cerebrod_util.h"
-#include "wrappers.h"
+#include "cerebrod_wrappers.h"
 
 #define MULTICAST_CLASS_MIN 224
 #define MULTICAST_CLASS_MAX 239

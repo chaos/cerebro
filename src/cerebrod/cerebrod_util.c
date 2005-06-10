@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_util.c,v 1.19 2005-05-31 22:06:03 achu Exp $
+ *  $Id: cerebrod_util.c,v 1.20 2005-06-10 22:54:42 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -22,7 +22,7 @@
 
 #include "cerebrod_config.h"
 #include "cerebrod_util.h"
-#include "wrappers.h"
+#include "cerebrod_wrappers.h"
 
 extern struct cerebrod_config conf;
 
