@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.54 2005-06-13 16:22:16 achu Exp $
+## $Id: Makefile.am,v 1.55 2005-06-13 23:05:54 achu Exp $
 ##*****************************************************************************
 
 if WITH_GNU_LD
@@ -34,12 +34,14 @@ nobase_include_HEADERS = cerebro/cerebro_clusterlist_module.h \
 cerebro_clusterlist_module_builddir=`cd $(top_builddir)/src/modules/clusterlist && pwd`
 cerebro_config_module_builddir=`cd $(top_builddir)/src/modules/config && pwd`
 cerebro_metric_module_builddir=`cd $(top_builddir)/src/modules/metric && pwd`
+cerebro_monitor_module_builddir=`cd $(top_builddir)/src/modules/monitor && pwd`
 
 lib_LTLIBRARIES       = libcerebro.la
 libcerebro_la_CFLAGS  = -D_REENTRANT \
 			-DCEREBRO_CLUSTERLIST_MODULE_BUILDDIR=\"$(cerebro_clusterlist_module_builddir)\" \
 			-DCEREBRO_CONFIG_MODULE_BUILDDIR=\"$(cerebro_config_module_builddir)\" \
 			-DCEREBRO_METRIC_MODULE_BUILDDIR=\"$(cerebro_metric_module_builddir)\" \
+			-DCEREBRO_MONITOR_MODULE_BUILDDIR=\"$(cerebro_monitor_module_builddir)\" \
 			-I$(srcdir)/../libcommon
 libcerebro_la_SOURCES = cerebro.c \
 			cerebro_clusterlist_util.c \

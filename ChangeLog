@@ -1,6 +1,14 @@
 2005-06-13  Albert Chu  <chu11@llnl.gov>
 
 	* Rename monitor module metric module in preparation for changes.
+
+	* tagged pre-monitor-module-2
+
+	* Added monitor module support.
+
+	* Added bootlog monitor module.
+
+	* Added monitor module support to libcerebro.
 	
 2005-06-10  Albert Chu  <chu11@llnl.gov>
 

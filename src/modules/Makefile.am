@@ -1,7 +1,7 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.5 2005-06-13 16:22:16 achu Exp $
+## $Id: Makefile.am,v 1.6 2005-06-13 23:05:54 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
 
-SUBDIRS = clusterlist config metric
+SUBDIRS = clusterlist config metric monitor

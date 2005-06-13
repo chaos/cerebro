@@ -7,6 +7,7 @@
     _cerebro_clusterlist_module*;
     _cerebro_config_module*;
     _cerebro_metric_module*;
+    _cerebro_monitor_module*;
     _cerebro_config_load;
   local:
     *;

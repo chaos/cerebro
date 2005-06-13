@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.45 2005-06-13 16:22:16 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.46 2005-06-13 23:05:54 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -197,12 +197,40 @@ _cerebrod_speaker_initialize(void)
       metric_handle = NULL;
     }
 
+  if (!modules_count)
+    {
+#if CEREBRO_DEBUG
+      if (conf.debug && conf.speak_debug)
+        {
+          Pthread_mutex_lock(&debug_output_mutex);
+          fprintf(stderr, "**************************************\n");
+          fprintf(stderr, "* No Metric Modules Found\n");     
+          fprintf(stderr, "**************************************\n");
+          Pthread_mutex_unlock(&debug_output_mutex);
+        }
+#endif /* CEREBRO_DEBUG */
+      _cerebro_module_destroy_metric_handle(metric_handle);
+      metric_handle = NULL;
+      return;
+    }
+
   for (i = 0; i < modules_count; i++)
     {
+#if CEREBRO_DEBUG
+      if (conf.debug && conf.speak_debug)
+        {
+          Pthread_mutex_lock(&debug_output_mutex);
+          fprintf(stderr, "**************************************\n");
+          fprintf(stderr, "* Settup up Metric Module: %s\n",
+                  _cerebro_metric_module_name(metric_handle, i));     
+          fprintf(stderr, "**************************************\n");
+          Pthread_mutex_unlock(&debug_output_mutex);
+        }
+#endif /* CEREBRO_DEBUG */
       if (_cerebro_metric_module_setup(metric_handle, i) < 0)
         {
           int j;
-
+          
           cerebro_err_debug("%s(%s:%d): _cerebro_metric_module_setup failed: "
                             "metric_module = %s",
                             __FILE__, __FUNCTION__, __LINE__, 

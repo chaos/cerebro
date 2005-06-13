@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.32 2005-06-13 16:22:16 achu Exp $
+## $Id: configure.ac,v 1.33 2005-06-13 23:05:54 achu Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -95,6 +95,13 @@ AC_HOSTSFILE
 AC_HOSTSFILE_PATH
 AM_CONDITIONAL(WITH_HOSTSFILE, [test "$ac_with_hostsfile" = "yes"])
 
+#
+# Check for bootlog modules
+#
+AC_BOOTLOG
+AC_BOOTLOG_PATH
+AM_CONDITIONAL(WITH_BOOTLOG, [test "$ac_with_bootlog" = "yes"])
+
 ##
 # Checks for typedefs, structures, and compiler characteristics.
 ##
@@ -149,6 +156,7 @@ AC_CONFIG_FILES( \
   src/modules/clusterlist/Makefile \
   src/modules/config/Makefile \
   src/modules/metric/Makefile \
+  src/modules/monitor/Makefile \
   src/libcerebro/Makefile \
   src/libcommon/Makefile \
 )
