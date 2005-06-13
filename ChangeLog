@@ -1,3 +1,7 @@
+2005-06-13  Albert Chu  <chu11@llnl.gov>
+
+	* Rename monitor module metric module in preparation for changes.
+	
 2005-06-10  Albert Chu  <chu11@llnl.gov>
 
 	* Various code cleanup.

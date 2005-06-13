@@ -1,6 +1,6 @@
 {
   global:
-    monitor_module_info;
+    metric_module_info;
   local:
     *;
 };

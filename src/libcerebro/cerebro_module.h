@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.h,v 1.27 2005-06-10 16:28:20 achu Exp $
+ *  $Id: cerebro_module.h,v 1.28 2005-06-13 16:22:16 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_MODULE_H
@@ -9,7 +9,7 @@
 
 typedef struct cerebro_clusterlist_module *cerebro_clusterlist_module_t;
 typedef struct cerebro_config_module *cerebro_config_module_t; 
-typedef struct cerebro_monitor_module *cerebro_monitor_modules_t; 
+typedef struct cerebro_metric_module *cerebro_metric_modules_t; 
 
 /*
  * _cerebro_module_load_clusterlist_module
@@ -104,22 +104,22 @@ cerebro_config_module_t _cerebro_module_load_config_module(void);
 int _cerebro_module_destroy_config_handle(cerebro_config_module_t config_handle);
 
 /*
- * _cerebro_module_load_monitor_modules
+ * _cerebro_module_load_metric_modules
  *
- * Find and load the monitor modules.
+ * Find and load the metric modules.
  * 
- * Returns monitor module handle on success, NULL on error
+ * Returns metric module handle on success, NULL on error
  */
-cerebro_monitor_modules_t _cerebro_module_load_monitor_modules(unsigned int metrics_max);
+cerebro_metric_modules_t _cerebro_module_load_metric_modules(unsigned int metrics_max);
 
 /*
- * _cerebro_module_destroy_monitor_handle
+ * _cerebro_module_destroy_metric_handle
  *
- * Destroy/Unload the monitor module specified by the handle
+ * Destroy/Unload the metric module specified by the handle
  *
  * Returns 0 on success, -1 on error
  */
-int _cerebro_module_destroy_monitor_handle(cerebro_monitor_modules_t config_handle);
+int _cerebro_module_destroy_metric_handle(cerebro_metric_modules_t config_handle);
 
 /*
  * _cerebro_config_module_name
@@ -152,68 +152,68 @@ int _cerebro_config_module_load_default(cerebro_config_module_t config_handle,
 
 
 /*
- * _cerebro_monitor_module_count
+ * _cerebro_metric_module_count
  *
- * Return number of monitoring modules loaded, -1 on error
+ * Return number of metricing modules loaded, -1 on error
  */
-int _cerebro_monitor_module_count(cerebro_monitor_modules_t monitor_handle);
+int _cerebro_metric_module_count(cerebro_metric_modules_t metric_handle);
 
 /*
- * _cerebro_monitor_module_name
+ * _cerebro_metric_module_name
  *
- * Return monitor module name
+ * Return metric module name
  */
-char *_cerebro_monitor_module_name(cerebro_monitor_modules_t monitor_handle, 
-                                   unsigned int index);
-
-/*
- * _cerebro_monitor_module_setup
- *
- * call monitor module setup function
- */
-int _cerebro_monitor_module_setup(cerebro_monitor_modules_t monitor_handle, 
+char *_cerebro_metric_module_name(cerebro_metric_modules_t metric_handle, 
                                   unsigned int index);
 
 /*
- * _cerebro_monitor_module_cleanup
+ * _cerebro_metric_module_setup
  *
- * call monitor module parse cleanup function
+ * call metric module setup function
  */
-int _cerebro_monitor_module_cleanup(cerebro_monitor_modules_t monitor_handle, 
-                                    unsigned int index);
+int _cerebro_metric_module_setup(cerebro_metric_modules_t metric_handle, 
+                                 unsigned int index);
 
 /*
- * _cerebro_monitor_module_get_metric_name
+ * _cerebro_metric_module_cleanup
  *
- * call monitor module get all nodes function
+ * call metric module parse cleanup function
  */
-char *_cerebro_monitor_module_get_metric_name(cerebro_monitor_modules_t monitor_handle,
-                                              unsigned int index);
+int _cerebro_metric_module_cleanup(cerebro_metric_modules_t metric_handle, 
+                                   unsigned int index);
 
 /*
- * _cerebro_monitor_module_get_metric_value_type
+ * _cerebro_metric_module_get_metric_name
  *
- * call monitor module get all nodes function
+ * call metric module get all nodes function
  */
-int _cerebro_monitor_module_get_metric_value_type(cerebro_monitor_modules_t monitor_handle,
-                                                  unsigned int index);
+char *_cerebro_metric_module_get_metric_name(cerebro_metric_modules_t metric_handle,
+                                             unsigned int index);
 
 /*
- * _cerebro_monitor_module_get_metric_value_len
+ * _cerebro_metric_module_get_metric_value_type
  *
- * call monitor module get all nodes function
+ * call metric module get all nodes function
  */
-int _cerebro_monitor_module_get_metric_value_len(cerebro_monitor_modules_t monitor_handle,
+int _cerebro_metric_module_get_metric_value_type(cerebro_metric_modules_t metric_handle,
                                                  unsigned int index);
 
 /*
- * _cerebro_monitor_module_get_metric_value
+ * _cerebro_metric_module_get_metric_value_len
  *
- * call monitor module get all nodes function
+ * call metric module get all nodes function
  */
-int _cerebro_monitor_module_get_metric_value(cerebro_monitor_modules_t monitor_handle,
-                                             unsigned int index,
-                                             void *metric_value_buf,
-                                             unsigned int metric_value_buflen);
+int _cerebro_metric_module_get_metric_value_len(cerebro_metric_modules_t metric_handle,
+                                                unsigned int index);
+
+/*
+ * _cerebro_metric_module_get_metric_value
+ *
+ * call metric module get all nodes function
+ */
+int _cerebro_metric_module_get_metric_value(cerebro_metric_modules_t metric_handle,
+                                            unsigned int index,
+                                            void *metric_value_buf,
+                                            unsigned int metric_value_buflen);
 
 #endif /* _CEREBRO_MODULE_H */
