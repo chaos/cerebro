@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.55 2005-06-13 23:05:54 achu Exp $
+## $Id: Makefile.am,v 1.56 2005-06-13 23:12:33 achu Exp $
 ##*****************************************************************************
 
 if WITH_GNU_LD
@@ -29,7 +29,8 @@ nobase_include_HEADERS = cerebro/cerebro_clusterlist_module.h \
 			 cerebro/cerebro_config_module.h \
 			 cerebro/cerebro_constants.h \
 			 cerebro/cerebro_error.h \
-			 cerebro/cerebro_metric_module.h
+			 cerebro/cerebro_metric_module.h \
+			 cerebro/cerebro_monitor_module.h
 
 cerebro_clusterlist_module_builddir=`cd $(top_builddir)/src/modules/clusterlist && pwd`
 cerebro_config_module_builddir=`cd $(top_builddir)/src/modules/config && pwd`

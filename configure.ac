@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.33 2005-06-13 23:05:54 achu Exp $
+## $Id: configure.ac,v 1.34 2005-06-13 23:12:33 achu Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -99,7 +99,6 @@ AM_CONDITIONAL(WITH_HOSTSFILE, [test "$ac_with_hostsfile" = "yes"])
 # Check for bootlog modules
 #
 AC_BOOTLOG
-AC_BOOTLOG_PATH
 AM_CONDITIONAL(WITH_BOOTLOG, [test "$ac_with_bootlog" = "yes"])
 
 ##
