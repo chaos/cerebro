@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_monitor_bootlog.c,v 1.3 2005-06-13 23:05:54 achu Exp $
+ *  $Id: cerebro_monitor_bootlog.c,v 1.4 2005-06-14 23:01:49 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -98,13 +98,12 @@ bootlog_monitor_setup(void)
                                               NULL, 
                                               0)))
     {
-      cerebro_err_debug_module("%s(%s:%d): failed to connect to database: %s",
-                               __FILE__, __FUNCTION__, __LINE__,
-                               qsql_error(0));
+      cerebro_err_debug_module("%s(%s:%d): failed to connect to database",
+                               __FILE__, __FUNCTION__, __LINE__);
       goto cleanup;
     }
 
-  if (!(res = qsql_list_tables(qsql)))
+  if (!(res = qsql_list_tables(qsql_handle)))
     {
       cerebro_err_debug_module("%s(%s:%d): qsql_list_tables: %s",
                                __FILE__, __FUNCTION__, __LINE__,
@@ -162,7 +161,6 @@ bootlog_monitor_setup(void)
       if (_qsql_query("create table last_btime(name varchar(16), btime int)") < 0)
         goto cleanup;
     }
-
   return 0;
 
  cleanup:
@@ -365,7 +363,7 @@ bootlog_monitor_metric_update(const char *nodename,
                               unsigned int metric_value_len,
                               void *metric_value)
 {
-  u_int32_t boottime;
+  u_int32_t btime;
   int new_btime;
 
   if (!qsql_handle)
@@ -389,7 +387,7 @@ bootlog_monitor_metric_update(const char *nodename,
       return -1;
     }
 
-  if (!strcmp(metric_name, BOOTLOG_BOOTTIME_METRIC_NAME))
+  if (strcmp(metric_name, BOOTLOG_BOOTTIME_METRIC_NAME))
     {
       cerebro_err_debug_module("%s(%s:%d): metric_name invalid: %s",
                                __FILE__, __FUNCTION__, __LINE__,
@@ -420,7 +418,8 @@ bootlog_monitor_metric_update(const char *nodename,
       return -1;
     }
 
-  if ((new_btime = _check_if_new_btime(nodename, boottime)) < 0)
+  btime = *((u_int32_t *)metric_value);
+  if ((new_btime = _check_if_new_btime(nodename, btime)) < 0)
     goto cleanup;
 
   if (new_btime)

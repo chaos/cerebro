@@ -16,6 +16,9 @@ Cleanup
 - metric max use
 - run monitor modules w/o turning metric server on
    - base on update_flag
+- spec file
+  if chaos && ia64, do qsql build
+- debug/lock race issue with cerebro_error functions??
 
 Audit
 - code review to reduce memory footprint

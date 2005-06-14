@@ -1,6 +1,8 @@
 2005-06-14  Albert Chu  <chu11@llnl.gov>
 
 	* Added finishing touches to monitor support in cerebrod.
+
+	* Bug fixes to get bootlog monitoring to work.
 	
 2005-06-13  Albert Chu  <chu11@llnl.gov>
 

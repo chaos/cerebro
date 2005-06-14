@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_cluster_data.c,v 1.4 2005-06-14 16:04:20 achu Exp $
+ *  $Id: cerebrod_cluster_data.c,v 1.5 2005-06-14 23:01:49 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -296,6 +296,13 @@ cerebrod_cluster_data_initialize(void)
           goto monitor_cleanup;
         }
 
+      if (_cerebro_monitor_module_setup(monitor_handle, i) < 0)
+        {
+          cerebro_err_debug("%s(%s:%d): _cerebro_monitor_module_setup failed",
+                            __FILE__, __FUNCTION__, __LINE__);
+          goto monitor_cleanup;
+        }
+
       monitor = Malloc(sizeof(struct cerebrod_monitor));
       monitor->module_name = Strdup(module_name);
       Pthread_mutex_init(&(monitor->monitor_lock), NULL);
@@ -315,6 +322,19 @@ cerebrod_cluster_data_initialize(void)
         {
           struct cerebrod_monitor_metric *monitor_metric;
       
+#if CEREBRO_DEBUG
+          if (conf.debug && conf.listen_debug)
+            {
+              Pthread_mutex_lock(&debug_output_mutex);
+              fprintf(stderr, "**************************************\n");
+              fprintf(stderr, "* Settup up Monitor Module/Metric: %s/%s\n",
+                      _cerebro_monitor_module_name(monitor_handle, i),
+                      metric_names[i]);
+              fprintf(stderr, "**************************************\n");
+              Pthread_mutex_unlock(&debug_output_mutex);
+            }
+#endif /* CEREBRO_DEBUG */
+
           monitor_metric = Malloc(sizeof(struct cerebrod_monitor));
           monitor_metric->metric_name = Strdup(metric_names[j]);
           monitor_metric->index = i;
@@ -324,7 +344,13 @@ cerebrod_cluster_data_initialize(void)
                       monitor_metric->metric_name,
                       monitor_metric);
         }
+
+      for (j = 0; j < metric_count; j++)
+        free(metric_names[j]);
+      free(metric_names);
     }
+
+  goto done;
 
  monitor_cleanup:
   if (monitor_list)
