@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.1 2005-06-13 16:22:16 achu Exp $
+## $Id: Makefile.am,v 1.2 2005-06-14 23:57:32 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -9,8 +9,10 @@ METRIC_VERSION_SCRIPT = $(srcdir)/metric.map
 METRIC_OTHER_FLAGS = -Wl,--version-script=$(METRIC_VERSION_SCRIPT)
 endif
 
+if WITH_BOOTTIME
 BOOTTIME_METRIC_MODULE = cerebro_metric_boottime.la
 BOOTTIME_STATIC_SOURCES = cerebro_metric_boottime.c
+endif
 
 if WITH_STATIC_MODULES
 noinst_LTLIBRARIES = libmetricmodules.la
