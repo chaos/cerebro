@@ -23,10 +23,11 @@ Cerebro is a collection of cluster monitoring tools and libraries.
 %define _with_gendersllnl  --with-gendersllnl
 %define _without_genders   --without-genders
 %define _without_hostsfile --without-hostsfile
-%define _with_boottime     --with-boottime
 %ifarch ia64
+%define _with_boottime     --with-boottime
 %define _with_bootlog      --with-bootlog
 %else
+%define _without_boottime  --without-boottime
 %define _without_bootlog   --without-bootlog
 %endif
 %else
