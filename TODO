@@ -49,6 +49,7 @@ Design
 - libcerebro set configfile, module, etc. functions
 - generic err message buffer in cerebro_t handle, i.e for conffile errors
 - pthreads locking for clusterlists/config modules?? (they are read only)
+- service up/down detection
 
 Before distribution
 - devel package?
