@@ -3,6 +3,8 @@
 	* Added finishing touches to monitor support in cerebrod.
 
 	* Bug fixes to get bootlog monitoring to work.
+
+	* cerebro.spec.in: Updated for new appropriate packages.
 	
 2005-06-13  Albert Chu  <chu11@llnl.gov>
 

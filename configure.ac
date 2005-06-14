@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.34 2005-06-13 23:12:33 achu Exp $
+## $Id: configure.ac,v 1.35 2005-06-14 23:46:13 achu Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -77,26 +77,32 @@ AC_STATIC_MODULES
 AM_CONDITIONAL(WITH_STATIC_MODULES, [test "$ac_with_static_modules" = "yes"])
 
 #
-# Check for gendersllnl modules
+# Check to build gendersllnl module(s)
 #
 AC_GENDERSLLNL
 AM_CONDITIONAL(WITH_GENDERSLLNL, [test "$ac_with_gendersllnl" = "yes"])
 
 #
-# Check for genders modules
+# Check to build genders module(s)
 #
 AC_GENDERS
 AM_CONDITIONAL(WITH_GENDERS, [test "$ac_with_genders" = "yes"])
 
 #
-# Check for hostsfile modules
+# Check to build hostsfile module(s)
 #
 AC_HOSTSFILE
 AC_HOSTSFILE_PATH
 AM_CONDITIONAL(WITH_HOSTSFILE, [test "$ac_with_hostsfile" = "yes"])
 
 #
-# Check for bootlog modules
+# Check to build boottime module(s)
+#
+AC_BOOTTIME
+AM_CONDITIONAL(WITH_BOOTTIME, [test "$ac_with_boottime" = "yes"])
+
+#
+# Check to build bootlog module(s)
 #
 AC_BOOTLOG
 AM_CONDITIONAL(WITH_BOOTLOG, [test "$ac_with_bootlog" = "yes"])

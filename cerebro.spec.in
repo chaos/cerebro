@@ -23,34 +23,58 @@ Cerebro is a collection of cluster monitoring tools and libraries.
 %define _with_gendersllnl  --with-gendersllnl
 %define _without_genders   --without-genders
 %define _without_hostsfile --without-hostsfile
+%define _with_boottime     --with-boottime
+%ifarch ia64
+%define _with_bootlog      --with-bootlog
+%else
+%define _without_bootlog   --without-bootlog
+%endif
 %else
 %{!?_with_gendersllnl: %{!?_without_gendersllnl: %define _with_gendersllnl --with-gen\dersllnl}}
 %{!?_with_genders: %{!?_without_genders: %define _with_genders --with-genders}}
 %{!?_with_hostsfile: %{!?_without_hostsfile: %define _with_hostsfile --with-hostsfile}}
+%{!?_with_boottime: %{!?_without_boottime: %define _with_boottime --with-boottime}}
+%{!?_with_bootlog: %{!?_without_bootlog: %define _without_bootlog --without-bootlog}}
 %endif
 
 %package gendersllnl
-Summary: whatsup gendersllnl modules package
+Summary: gendersllnl module(s)
 Group: System Environment/Base
-Requires: whatsup
+Requires: cerebro
 Requires: gendersllnl
 %description gendersllnl
-Gendersllnl modules packages.
+Gendersllnl module(s).
 
 %package genders
-Summary: whatsup genders modules package
+Summary: genders module(s)
 Group: System Environment/Base
-Requires: whatsup
+Requires: cerebro
 Requires: genders >= 1.2
 %description genders
-Genders modules packages.
+Genders module(s).
 
 %package hostsfile
-Summary: whatsup hostsfile modules package
+Summary: hostsfile module(s)
 Group: System Environment/Base
-Requires: whatsup
+Requires: cerebro
 %description hostsfile
-Hostsfile modules packages.
+Hostsfile module(s).
+
+%package metric-boottime
+Summary: boottime module(s)
+Group: System Environment/Base
+Requires: cerebro
+%description metric-boottime
+Metric module to monitor boottime.
+
+%if %{?_with_chaos:1}%{!?_with_chaos:0}
+%package bootlog
+Summary: bootlog module(s)
+Group: System Environment/Base
+Requires: cerebro
+%description bootlog
+Bootlog monitoring module(s).
+%endif
 
 %prep
 %setup  -q -n @PROJECT@-@VERSION@-@RELEASE@
@@ -62,7 +86,11 @@ Hostsfile modules packages.
            %{?_with_genders} \
            %{?_without_genders} \
            %{?_with_hostsfile} \
-           %{?_without_hostsfile}
+           %{?_without_hostsfile} \
+           %{?_with_boottime} \
+           %{?_without_boottime} \
+           %{?_with_bootlog} \
+           %{?_without_bootlog}
 make 
 
 %install
@@ -103,28 +131,47 @@ fi
 %config(noreplace) %{_sysconfdir}/init.d/cerebrod
 %{_sbindir}/*
 %{_includedir}/*
-%if %{?_with_chaos:1}%{!?_with_chaos:0}
-%{_libdir}/cerebro/*
-%endif
 %{_libdir}/libcerebro.*
 %{_mandir}/*
+%if %{?_with_chaos:1}%{!?_with_chaos:0}
+%{_libdir}/cerebro/cerebro_clusterlist*
+%{_libdir}/cerebro/cerebro_config*
+%endif
 
 %if %{?_with_chaos:0}%{!?_with_chaos:1}
 
 %if %{?_with_gendersllnl:1}%{!?_with_gendersllnl:0}
 %files gendersllnl
 %defattr(-,root,root)
-%{_libdir}/cerebro/*gendersllnl.*
+%{_libdir}/cerebro/cerebro_clusterlist_gendersllnl.*
+%{_libdir}/cerebro/cerebro_config_gendersllnl.*
 %endif
 
 %if %{?_with_genders:1}%{!?_with_genders:0}
 %files genders
 %defattr(-,root,root)
-%{_libdir}/cerebro/*genders.*
+%{_libdir}/cerebro/cerebro_clusterlist_genders.*
 %endif
 
+%if %{?_with_hostsfile:1}%{!?_with_hostsfile:0}
 %files hostsfile
 %defattr(-,root,root)
-%{_libdir}/cerebro/*hostsfile.*
+%{_libdir}/cerebro/cerebro_clusterlist_hostsfile.*
+%endif
 
+%if %{?_with_boottime:1}%{!?_with_boottime:0}
+%files boottime
+%defattr(-,root,root)
+%{_libdir}/cerebro/cerebro_metric_boottime.*
+%endif
+
+%endif
+
+%if %{?_with_chaos:1}%{!?_with_chaos:0}
+%if %{?_with_bootlog:1}%{!?_with_bootlog:0}
+%files bootlog
+%defattr(-,root,root)
+%{_libdir}/cerebro/cerebro_metric_boottime.*
+%{_libdir}/cerebro/cerebro_monitor_bootlog.*
+%endif
 %endif
