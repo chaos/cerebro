@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.46 2005-06-13 23:05:54 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.47 2005-06-14 00:43:48 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -186,8 +186,11 @@ _cerebrod_speaker_initialize(void)
    */
 
   if (!(metric_handle = _cerebro_module_load_metric_modules(conf.metric_max)))
-    cerebro_err_debug("%s(%s:%d): _cerebro_module_load_metric_modules failed",
-                      __FILE__, __FUNCTION__, __LINE__);
+    {
+      cerebro_err_debug("%s(%s:%d): _cerebro_module_load_metric_modules failed",
+                        __FILE__, __FUNCTION__, __LINE__);
+      return;
+    }
 
   if ((modules_count = _cerebro_metric_module_count(metric_handle)) < 0)
     {
@@ -195,6 +198,7 @@ _cerebrod_speaker_initialize(void)
                         __FILE__, __FUNCTION__, __LINE__);
       _cerebro_module_destroy_metric_handle(metric_handle);
       metric_handle = NULL;
+      return;
     }
 
   if (!modules_count)

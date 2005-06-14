@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_cluster_data.h,v 1.1 2005-06-10 22:05:24 achu Exp $
+ *  $Id: cerebrod_cluster_data.h,v 1.2 2005-06-14 00:43:48 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_CLUSTER_DATA_H
@@ -47,6 +47,29 @@ struct cerebrod_node_data
   int metric_data_count;
   u_int32_t last_received_time;
   pthread_mutex_t node_data_lock;
+};
+
+/*
+ * struct cerebrod_monitor
+ *
+ * contains cerebrod monitor module information
+ */
+struct cerebrod_monitor
+{
+  char *module_name;
+  pthread_mutex_t monitor_lock;
+};
+
+/*
+ * struct cerebrod_monitor_metric
+ *
+ * contains cerebrod monitor module metric information
+ */
+struct cerebrod_monitor_metric
+{
+  char *metric_name;
+  int index;
+  struct cerebrod_monitor *monitor;
 };
 
 /* 

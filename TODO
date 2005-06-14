@@ -23,6 +23,7 @@ Portability
 
 Design
 - Update time for each cerebro metric data?
+- thread safeness in monitor modules?
 - ability for data to be stored/not-stored in the internal hash
   i.e. passed directly to module and forgotten
 - speaker scheduler??

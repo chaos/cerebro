@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_cluster_data.c,v 1.2 2005-06-10 22:54:42 achu Exp $
+ *  $Id: cerebrod_cluster_data.c,v 1.3 2005-06-14 00:43:48 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -92,6 +92,33 @@ pthread_mutex_t cerebrod_cluster_data_lock = PTHREAD_MUTEX_INITIALIZER;
  */
 pthread_mutex_t cerebrod_metric_name_lock = PTHREAD_MUTEX_INITIALIZER;
 
+#if !WITH_STATIC_MODULES
+/* 
+ * monitor_handle
+ *
+ * monitoring module handles
+ */
+cerebro_monitor_modules_t monitor_handle = NULL;
+
+/*
+ * monitor_list
+ *
+ * list of monitors
+ */
+List monitor_list = NULL;
+
+/*
+ * monitor_index
+ * monitor_index_size
+ *
+ * hash index to quickly determine what metrics are being
+ * monitored by modules and what index they are.
+ */
+hash_t monitor_index = NULL;
+int monitor_index_size;
+
+#endif /* !WITH_STATIC_MODULES */
+
 /* 
  * _cerebrod_node_data_strcmp
  *
@@ -137,7 +164,7 @@ _cerebrod_node_data_create_and_init(const char *nodename)
 void 
 cerebrod_cluster_data_initialize(void)
 {
-  int numnodes = 0;
+  int i, numnodes = 0;
 
   Pthread_mutex_lock(&cerebrod_cluster_data_initialization_complete_lock);
   if (cerebrod_cluster_data_initialization_complete)
@@ -212,6 +239,112 @@ cerebrod_cluster_data_initialize(void)
         List_append(cerebrod_metric_name_list, Strdup(CEREBRO_METRIC_LAST_RECEIVED_TIME));
     }
 
+  /* XXX is metric_max correct?? */
+  if (!(monitor_handle = _cerebro_module_load_monitor_modules(conf.metric_max)))
+    {
+      cerebro_err_debug("%s(%s:%d): _cerebro_module_load_monitor_modules failed",
+                        __FILE__, __FUNCTION__, __LINE__);
+      goto done;
+    }
+
+
+  if ((monitor_index_size = _cerebro_monitor_module_count(monitor_handle)) < 0)
+    {
+      cerebro_err_debug("%s(%s:%d): _cerebro_monitor_module_count failed",
+                        __FILE__, __FUNCTION__, __LINE__);
+      _cerebro_module_destroy_monitor_handle(monitor_handle);
+      monitor_handle = NULL;
+      goto done;
+    }
+
+  if (!monitor_index_size)
+    {
+#if CEREBRO_DEBUG
+      if (conf.debug && conf.speak_debug)
+        {
+          Pthread_mutex_lock(&debug_output_mutex);
+          fprintf(stderr, "**************************************\n");
+          fprintf(stderr, "* No Monitor Modules Found\n");
+          fprintf(stderr, "**************************************\n");
+          Pthread_mutex_unlock(&debug_output_mutex);
+        }
+#endif /* CEREBRO_DEBUG */
+      _cerebro_module_destroy_monitor_handle(monitor_handle);
+      monitor_handle = NULL;
+      goto done;
+    }
+  
+  monitor_list = List_create((ListDelF)_Free);
+  monitor_index = Hash_create(monitor_index_size,
+                              (hash_key_f)hash_key_string,
+                              (hash_cmp_f)strcmp,
+                              (hash_del_f)_Free);
+
+  for (i = 0; i < monitor_index_size; i++)
+    {
+      struct cerebrod_monitor *monitor;
+      char *module_name;
+      char **metric_names;
+      int metric_count;
+      int j;
+
+      if (!(module_name = _cerebro_monitor_module_name(monitor_handle, i)))
+        {
+          cerebro_err_debug("%s(%s:%d): _cerebro_monitor_module_name failed",
+                            __FILE__, __FUNCTION__, __LINE__);
+          goto monitor_cleanup;
+        }
+
+      monitor = Malloc(sizeof(struct cerebrod_monitor));
+      monitor->module_name = Strdup(module_name);
+      Pthread_mutex_init(&(monitor->monitor_lock), NULL);
+
+      List_append(monitor_list, monitor);
+
+      if ((metric_count = _cerebro_monitor_module_metric_names(monitor_handle,
+                                                               i,
+                                                               &metric_names)) < 0)
+        {
+          cerebro_err_debug("%s(%s:%d): _cerebro_monitor_module_metric_names failed",
+                            __FILE__, __FUNCTION__, __LINE__);
+          goto monitor_cleanup;
+        }
+      
+      for (j = 0; j < metric_count; j++)
+        {
+          struct cerebrod_monitor_metric *monitor_metric;
+      
+          monitor_metric = Malloc(sizeof(struct cerebrod_monitor));
+          monitor_metric->metric_name = Strdup(metric_names[j]);
+          monitor_metric->index = i;
+          monitor_metric->monitor = monitor;
+
+          Hash_insert(monitor_index, 
+                      monitor_metric->metric_name,
+                      monitor_metric);
+        }
+    }
+
+ monitor_cleanup:
+  if (monitor_list)
+    {
+      List_destroy(monitor_list);
+      monitor_list = NULL;
+    }
+  if (monitor_handle)
+    {
+      _cerebro_module_destroy_monitor_handle(monitor_handle);
+      monitor_handle = NULL;
+    }
+  if (monitor_index)
+    {
+      Hash_destroy(monitor_index);
+      monitor_index = NULL;
+    }
+  monitor_index_size = 0;
+  goto done;
+
+ done:
   cerebrod_cluster_data_initialization_complete++;
  out:
   Pthread_mutex_unlock(&cerebrod_cluster_data_initialization_complete_lock);

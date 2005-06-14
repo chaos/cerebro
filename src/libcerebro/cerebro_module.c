@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.c,v 1.40 2005-06-13 23:05:54 achu Exp $
+ *  $Id: cerebro_module.c,v 1.41 2005-06-14 00:43:48 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -1185,6 +1185,43 @@ _cerebro_module_destroy_config_handle(cerebro_config_module_t config_handle)
   return 0;
 }
 
+char *
+_cerebro_config_module_name(cerebro_config_module_t config_handle)
+{
+  if (_cerebro_module_config_module_check(config_handle) < 0)
+    return NULL;
+
+  return (config_handle->module_info)->config_module_name;
+}
+
+int
+_cerebro_config_module_setup(cerebro_config_module_t config_handle)
+{
+  if (_cerebro_module_config_module_check(config_handle) < 0)
+    return -1;
+  
+  return ((*(config_handle->module_info)->setup)());
+}
+
+int
+_cerebro_config_module_cleanup(cerebro_config_module_t config_handle)
+{
+  if (_cerebro_module_config_module_check(config_handle) < 0)
+    return -1;
+  
+  return ((*(config_handle->module_info)->cleanup)());
+}
+
+int
+_cerebro_config_module_load_default(cerebro_config_module_t config_handle,
+                                    struct cerebro_config *conf)
+{
+  if (_cerebro_module_config_module_check(config_handle) < 0)
+    return -1;
+  
+  return ((*(config_handle->module_info)->load_default)(conf));
+}
+
 /* 
  * _load_metric_module
  *
@@ -1507,42 +1544,6 @@ _cerebro_module_destroy_metric_handle(cerebro_metric_modules_t metric_handle)
   _cerebro_module_cleanup();
   return 0;
   
-}
-
-char *
-_cerebro_config_module_name(cerebro_config_module_t config_handle)
-{
-  if (_cerebro_module_config_module_check(config_handle) < 0)
-    return NULL;
-
-  return (config_handle->module_info)->config_module_name;
-}
-
-int
-_cerebro_config_module_setup(cerebro_config_module_t config_handle)
-{
-  if (_cerebro_module_config_module_check(config_handle) < 0)
-    return -1;
-  
-  return ((*(config_handle->module_info)->setup)());
-}
-
-int
-_cerebro_config_module_cleanup(cerebro_config_module_t config_handle)
-{
-  if (_cerebro_module_config_module_check(config_handle) < 0)
-    return -1;
-  
-  return ((*(config_handle->module_info)->cleanup)());
-}
-int
-_cerebro_config_module_load_default(cerebro_config_module_t config_handle,
-                                    struct cerebro_config *conf)
-{
-  if (_cerebro_module_config_module_check(config_handle) < 0)
-    return -1;
-  
-  return ((*(config_handle->module_info)->load_default)(conf));
 }
 
 int 
@@ -1956,6 +1957,28 @@ _cerebro_module_destroy_monitor_handle(cerebro_monitor_modules_t monitor_handle)
   _cerebro_module_cleanup();
   return 0;
   
+}
+
+int 
+_cerebro_monitor_module_count(cerebro_monitor_modules_t monitor_handle)
+{
+  if (_cerebro_module_monitor_module_check(monitor_handle) < 0)
+    return -1;
+
+  return monitor_handle->modules_count;
+}
+
+char *
+_cerebro_monitor_module_name(cerebro_monitor_modules_t monitor_handle,
+                             unsigned int index)
+{
+  if (_cerebro_module_monitor_module_check(monitor_handle) < 0)
+    return NULL;
+
+  if (!(index < monitor_handle->modules_count))
+    return NULL;
+
+  return (monitor_handle->module_info[index])->monitor_module_name;
 }
 
 int 

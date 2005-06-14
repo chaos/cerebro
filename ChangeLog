@@ -9,6 +9,8 @@
 	* Added bootlog monitor module.
 
 	* Added monitor module support to libcerebro.
+
+	* Begin adding monitor support in cerebrod.
 	
 2005-06-10  Albert Chu  <chu11@llnl.gov>
 
