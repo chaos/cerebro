@@ -13,6 +13,9 @@ Cleanup
 - behavior on module loading/read/get
   - total fail, or only fail on one module
   - inconsistency between module types??
+- metric max use
+- run monitor modules w/o turning metric server on
+   - base on update_flag
 
 Audit
 - code review to reduce memory footprint

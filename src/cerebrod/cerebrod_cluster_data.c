@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_cluster_data.c,v 1.3 2005-06-14 00:43:48 achu Exp $
+ *  $Id: cerebrod_cluster_data.c,v 1.4 2005-06-14 16:04:20 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -240,6 +240,7 @@ cerebrod_cluster_data_initialize(void)
     }
 
   /* XXX is metric_max correct?? */
+
   if (!(monitor_handle = _cerebro_module_load_monitor_modules(conf.metric_max)))
     {
       cerebro_err_debug("%s(%s:%d): _cerebro_module_load_monitor_modules failed",
@@ -260,7 +261,7 @@ cerebrod_cluster_data_initialize(void)
   if (!monitor_index_size)
     {
 #if CEREBRO_DEBUG
-      if (conf.debug && conf.speak_debug)
+      if (conf.debug && conf.listen_debug)
         {
           Pthread_mutex_lock(&debug_output_mutex);
           fprintf(stderr, "**************************************\n");
@@ -712,6 +713,7 @@ cerebrod_cluster_data_update(char *nodename,
       for (i = 0; i < hb->metrics_len; i++)
         {
           char metric_name_buf[CEREBRO_METRIC_NAME_MAXLEN+1];
+          struct cerebrod_monitor_metric *monitor_metric;
 
           /* Guarantee ending '\0' character */
           memset(metric_name_buf, '\0', CEREBRO_METRIC_NAME_MAXLEN+1);
@@ -738,6 +740,22 @@ cerebrod_cluster_data_update(char *nodename,
                                        metric_name_buf,
                                        hb->metrics[i],
                                        received_time);
+
+          if (monitor_index)
+            {
+              if ((monitor_metric = Hash_find(monitor_index, metric_name_buf)))
+                {
+                  Pthread_mutex_lock(&monitor_metric->monitor->monitor_lock);
+                  _cerebro_monitor_module_metric_update(monitor_handle,
+                                                        monitor_metric->index,
+                                                        nodename,
+                                                        metric_name_buf,
+                                                        hb->metrics[i]->metric_value_type,
+                                                        hb->metrics[i]->metric_value_len,
+                                                        hb->metrics[i]->metric_value);
+                  Pthread_mutex_unlock(&monitor_metric->monitor->monitor_lock);
+                }
+            }
         }
       
       /* Can't call a debug output function in here, it can cause a
@@ -747,6 +765,7 @@ cerebrod_cluster_data_update(char *nodename,
       update_output_flag++;
     }
   Pthread_mutex_unlock(&(nd->node_data_lock));
+
 
   if (update_output_flag)
     _cerebrod_cluster_data_output_update(nd);
