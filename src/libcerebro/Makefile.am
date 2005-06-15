@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.57 2005-06-15 16:43:29 achu Exp $
+## $Id: Makefile.am,v 1.58 2005-06-15 22:31:39 achu Exp $
 ##*****************************************************************************
 
 if WITH_GNU_LD
@@ -16,7 +16,6 @@ endif
 noinst_HEADERS	       = cerebro_api.h \
 			 cerebro_clusterlist_util.h \
 			 cerebro_config_util.h \
-			 cerebro_marshalling.h \
 			 cerebro_metric_protocol.h \
 			 cerebro_module.h \
 			 cerebro_nodelist_util.h \
@@ -43,12 +42,12 @@ libcerebro_la_CFLAGS  = -D_REENTRANT \
 			-DCEREBRO_CONFIG_MODULE_BUILDDIR=\"$(cerebro_config_module_builddir)\" \
 			-DCEREBRO_METRIC_MODULE_BUILDDIR=\"$(cerebro_metric_module_builddir)\" \
 			-DCEREBRO_MONITOR_MODULE_BUILDDIR=\"$(cerebro_monitor_module_builddir)\" \
-			-I$(srcdir)/../libcommon
+			-I$(srcdir)/../libcommon \
+			-I$(srcdir)/../libmarshall
 libcerebro_la_SOURCES = cerebro.c \
 			cerebro_clusterlist_util.c \
 			cerebro_config_util.c \
 			cerebro_error.c \
-			cerebro_marshalling.c \
 			cerebro_metric.c \
 			cerebro_module.c \
 			cerebro_module_default.c \
@@ -58,9 +57,13 @@ libcerebro_la_SOURCES = cerebro.c \
 libcerebro_la_LDFLAGS = -version-info @LIBCEREBRO_VERSION_INFO@ \
 			$(CEREBRO_OTHER_FLAGS)
 libcerebro_la_LIBADD  = ../libcommon/libcommon.la \
+			../libmarshall/libmarshall.la \
 			$(STATIC_MODULE_LIBS)
 
 ../libcommon/libcommon.la : force-dependency-check
+	@cd `dirname $@` && make `basename $@`
+
+../libmarshall/libmarshall.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
 ../modules/clusterlist/libclusterlistmodules.la: force-dependency-check

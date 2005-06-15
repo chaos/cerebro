@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_cluster_data.c,v 1.6 2005-06-15 16:43:29 achu Exp $
+ *  $Id: cerebrod_cluster_data.c,v 1.7 2005-06-15 22:31:39 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -464,7 +464,7 @@ _cerebrod_node_data_metric_data_dump(void *data, const void *key, void *arg)
     case CEREBRO_METRIC_VALUE_TYPE_INT32:
       fprintf(stderr, "metric_value=%d", *((int32_t *)md->metric_value));
       break;
-    case CEREBRO_METRIC_VALUE_TYPE_UNSIGNED_INT32:
+    case CEREBRO_METRIC_VALUE_TYPE_U_INT32:
       fprintf(stderr, "metric_value=%u", *((u_int32_t *)md->metric_value));
       break;
     case CEREBRO_METRIC_VALUE_TYPE_FLOAT:

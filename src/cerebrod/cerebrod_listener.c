@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.79 2005-06-10 22:54:42 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.80 2005-06-15 22:31:39 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -19,7 +19,6 @@
 #include <netinet/in.h>
 
 #include "cerebro.h"
-#include "cerebro_marshalling.h"
 #include "cerebro_module.h"
 #include "cerebrod_heartbeat_protocol.h"
 #include "cerebro/cerebro_constants.h"
@@ -32,6 +31,8 @@
 #include "cerebrod_listener.h"
 #include "cerebrod_metric.h"
 #include "cerebrod_wrappers.h"
+
+#include "marshall.h"
 
 extern struct cerebrod_config conf;
 #if CEREBRO_DEBUG
@@ -187,10 +188,10 @@ _cerebrod_heartbeat_unmarshall(const char *buf, unsigned int buflen)
 
   memset(hb, '\0', sizeof(struct cerebrod_heartbeat));
   
-  if ((len = _cerebro_unmarshall_int32(&(hb->version),
-                                       buf + count,
-                                       buflen - count)) < 0)
-    cerebro_err_exit("%s(%s:%d): _cerebro_unmarshall_int32",
+  if ((len = unmarshall_int32(&(hb->version),
+                              buf + count,
+                              buflen - count)) < 0)
+    cerebro_err_exit("%s(%s:%d): unmarshall_int32",
 		     __FILE__, __FUNCTION__, __LINE__);
   if (!len)
     {
@@ -201,11 +202,11 @@ _cerebrod_heartbeat_unmarshall(const char *buf, unsigned int buflen)
   
   count += len;
 
-  if ((len = _cerebro_unmarshall_buffer(hb->nodename,
-                                        sizeof(hb->nodename),
-                                        buf + count,
-                                        buflen - count)) < 0)
-    cerebro_err_exit("%s(%s:%d): _cerebro_unmarshall_buffer",
+  if ((len = unmarshall_buffer(hb->nodename,
+                               sizeof(hb->nodename),
+                               buf + count,
+                               buflen - count)) < 0)
+    cerebro_err_exit("%s(%s:%d): unmarshall_buffer",
                      __FILE__, __FUNCTION__, __LINE__);
   if (!len)
     {
@@ -216,10 +217,10 @@ _cerebrod_heartbeat_unmarshall(const char *buf, unsigned int buflen)
   
   count += len;
   
-  if ((len = _cerebro_unmarshall_unsigned_int32(&(hb->metrics_len),
-                                                buf + count,
-                                                buflen - count)) < 0)
-    cerebro_err_exit("%s(%s:%d): _cerebro_unmarshall_unsigned_int32",
+  if ((len = unmarshall_u_int32(&(hb->metrics_len),
+                                buf + count,
+                                buflen - count)) < 0)
+    cerebro_err_exit("%s(%s:%d): unmarshall_u_int32",
                      __FILE__, __FUNCTION__, __LINE__);
   if (!len)
     {
@@ -240,11 +241,11 @@ _cerebrod_heartbeat_unmarshall(const char *buf, unsigned int buflen)
           hd = Malloc(sizeof(struct cerebrod_heartbeat_metric));
           memset(hd, '\0', sizeof(struct cerebrod_heartbeat_metric));
           
-          if ((len = _cerebro_unmarshall_buffer(hd->metric_name,
-                                                sizeof(hd->metric_name),
-                                                buf + count,
-                                                buflen - count)) < 0)
-            cerebro_err_exit("%s(%s:%d): _cerebro_unmarshall_buffer",
+          if ((len = unmarshall_buffer(hd->metric_name,
+                                       sizeof(hd->metric_name),
+                                       buf + count,
+                                       buflen - count)) < 0)
+            cerebro_err_exit("%s(%s:%d): unmarshall_buffer",
                              __FILE__, __FUNCTION__, __LINE__);
           if (!len)
             {
@@ -255,10 +256,10 @@ _cerebrod_heartbeat_unmarshall(const char *buf, unsigned int buflen)
           
           count += len;
           
-          if ((len = _cerebro_unmarshall_unsigned_int32(&(hd->metric_value_type),
-                                                        buf + count,
-                                                        buflen - count)) < 0)
-            cerebro_err_exit("%s(%s:%d): _cerebro_unmarshall_unsigned_int32",
+          if ((len = unmarshall_u_int32(&(hd->metric_value_type),
+                                        buf + count,
+                                        buflen - count)) < 0)
+            cerebro_err_exit("%s(%s:%d): unmarshall_u_int32",
                              __FILE__, __FUNCTION__, __LINE__);
           if (!len)
             {
@@ -269,10 +270,10 @@ _cerebrod_heartbeat_unmarshall(const char *buf, unsigned int buflen)
           
           count += len;
           
-          if ((len = _cerebro_unmarshall_unsigned_int32(&(hd->metric_value_len),
-                                                        buf + count,
-                                                        buflen - count)) < 0)
-            cerebro_err_exit("%s(%s:%d): _cerebro_unmarshall_unsigned_int32",
+          if ((len = unmarshall_u_int32(&(hd->metric_value_len),
+                                        buf + count,
+                                        buflen - count)) < 0)
+            cerebro_err_exit("%s(%s:%d): unmarshall_u_int32",
                              __FILE__, __FUNCTION__, __LINE__);
           if (!len)
             {
@@ -295,10 +296,10 @@ _cerebrod_heartbeat_unmarshall(const char *buf, unsigned int buflen)
                                     __FILE__, __FUNCTION__, __LINE__);
                   break;
                 case CEREBRO_METRIC_VALUE_TYPE_INT32:
-                  if ((len = _cerebro_unmarshall_int32((int32_t *)hd->metric_value,
-                                                       buf + count,
-                                                       buflen - count)) < 0)
-                    cerebro_err_exit("%s(%s:%d): _cerebro_unmarshall_int32",
+                  if ((len = unmarshall_int32((int32_t *)hd->metric_value,
+                                              buf + count,
+                                              buflen - count)) < 0)
+                    cerebro_err_exit("%s(%s:%d): unmarshall_int32",
                                      __FILE__, __FUNCTION__, __LINE__);
                   if (!len)
                     {
@@ -308,11 +309,11 @@ _cerebrod_heartbeat_unmarshall(const char *buf, unsigned int buflen)
                     }
                   count += len;
                   break;
-                case CEREBRO_METRIC_VALUE_TYPE_UNSIGNED_INT32:
-                  if ((len = _cerebro_unmarshall_unsigned_int32((u_int32_t *)hd->metric_value,
-                                                                buf + count,
-                                                                buflen - count)) < 0)
-                    cerebro_err_exit("%s(%s:%d): _cerebro_unmarshall_unsigned_int32",
+                case CEREBRO_METRIC_VALUE_TYPE_U_INT32:
+                  if ((len = unmarshall_u_int32((u_int32_t *)hd->metric_value,
+                                                buf + count,
+                                                buflen - count)) < 0)
+                    cerebro_err_exit("%s(%s:%d): unmarshall_u_int32",
                                      __FILE__, __FUNCTION__, __LINE__);
                   if (!len)
                     {
@@ -323,10 +324,10 @@ _cerebrod_heartbeat_unmarshall(const char *buf, unsigned int buflen)
                   count += len;
                   break;
                 case CEREBRO_METRIC_VALUE_TYPE_FLOAT:
-                  if ((len = _cerebro_unmarshall_float((float *)hd->metric_value,
-                                                       buf + count,
-                                                       buflen - count)) < 0)
-                    cerebro_err_exit("%s(%s:%d): _cerebro_unmarshall_float",
+                  if ((len = unmarshall_float((float *)hd->metric_value,
+                                              buf + count,
+                                              buflen - count)) < 0)
+                    cerebro_err_exit("%s(%s:%d): unmarshall_float",
                                      __FILE__, __FUNCTION__, __LINE__);
                   if (!len)
                     {
@@ -337,10 +338,10 @@ _cerebrod_heartbeat_unmarshall(const char *buf, unsigned int buflen)
                   count += len;
                   break;
                 case CEREBRO_METRIC_VALUE_TYPE_DOUBLE:
-                  if ((len = _cerebro_unmarshall_double((double *)hd->metric_value,
-                                                        buf + count,
-                                                        buflen - count)) < 0)
-                    cerebro_err_exit("%s(%s:%d): _cerebro_unmarshall_double",
+                  if ((len = unmarshall_double((double *)hd->metric_value,
+                                               buf + count,
+                                               buflen - count)) < 0)
+                    cerebro_err_exit("%s(%s:%d): unmarshall_double",
                                      __FILE__, __FUNCTION__, __LINE__);
                   if (!len)
                     {
@@ -352,11 +353,11 @@ _cerebrod_heartbeat_unmarshall(const char *buf, unsigned int buflen)
                   break;
                 case CEREBRO_METRIC_VALUE_TYPE_STRING:
                 case CEREBRO_METRIC_VALUE_TYPE_RAW:
-                  if ((len = _cerebro_unmarshall_buffer((char *)hd->metric_value,
-                                                        hd->metric_value_len,
-                                                        buf + count,
-                                                        buflen - count)) < 0)
-                    cerebro_err_exit("%s(%s:%d): _cerebro_unmarshall_buffer",
+                  if ((len = unmarshall_buffer((char *)hd->metric_value,
+                                               hd->metric_value_len,
+                                               buf + count,
+                                               buflen - count)) < 0)
+                    cerebro_err_exit("%s(%s:%d): unmarshall_buffer",
                                      __FILE__, __FUNCTION__, __LINE__);
                   if (!len)
                     {

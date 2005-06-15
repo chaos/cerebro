@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_heartbeat.c,v 1.36 2005-06-10 22:54:42 achu Exp $
+ *  $Id: cerebrod_heartbeat.c,v 1.37 2005-06-15 22:31:39 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -81,7 +81,7 @@ cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb)
               fprintf(stderr, "metric_value = %d", 
                       *((int32_t *)hb->metrics[i]->metric_value));
               break;
-            case CEREBRO_METRIC_VALUE_TYPE_UNSIGNED_INT32:
+            case CEREBRO_METRIC_VALUE_TYPE_U_INT32:
               fprintf(stderr, "metric_value = %u", 
                       *((u_int32_t *)hb->metrics[i]->metric_value));
               break;

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.43 2005-06-09 17:54:02 achu Exp $
+ *  $Id: cerebro.h,v 1.44 2005-06-15 22:31:39 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_H
@@ -56,13 +56,13 @@
 /* 
  * Cerebro Metric Value Types
  */
-#define CEREBRO_METRIC_VALUE_TYPE_NONE            0
-#define CEREBRO_METRIC_VALUE_TYPE_INT32           1
-#define CEREBRO_METRIC_VALUE_TYPE_UNSIGNED_INT32  2
-#define CEREBRO_METRIC_VALUE_TYPE_FLOAT           3
-#define CEREBRO_METRIC_VALUE_TYPE_DOUBLE          4
-#define CEREBRO_METRIC_VALUE_TYPE_STRING          5
-#define CEREBRO_METRIC_VALUE_TYPE_RAW             6
+#define CEREBRO_METRIC_VALUE_TYPE_NONE     0
+#define CEREBRO_METRIC_VALUE_TYPE_INT32    1
+#define CEREBRO_METRIC_VALUE_TYPE_U_INT32  2
+#define CEREBRO_METRIC_VALUE_TYPE_FLOAT    3
+#define CEREBRO_METRIC_VALUE_TYPE_DOUBLE   4
+#define CEREBRO_METRIC_VALUE_TYPE_STRING   5
+#define CEREBRO_METRIC_VALUE_TYPE_RAW      6
 
 typedef struct cerebro *cerebro_t;
 

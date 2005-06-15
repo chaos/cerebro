@@ -3,6 +3,11 @@
 	* Fixed static compilation bugs.
 
 	* Remove hostlist files.
+
+	* New libmarshall library.  Rework libcerebro and cerebrod around
+	new lib.
+
+	* Various cleanup fixes.
 	
 2005-06-14  Albert Chu  <chu11@llnl.gov>
 
