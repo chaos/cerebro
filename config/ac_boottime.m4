@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: ac_boottime.m4,v 1.1 2005-06-14 23:46:13 achu Exp $
+## $Id: ac_boottime.m4,v 1.2 2005-06-15 00:11:09 achu Exp $
 ##*****************************************************************************
 
 AC_DEFUN([AC_BOOTTIME],
@@ -16,7 +16,7 @@ AC_DEFUN([AC_BOOTTIME],
   )
   AC_MSG_RESULT([${ac_boottime_test=yes}])
 
-  if test "$ac_genders_test" = "yes"; then
+  if test "$ac_boottime_test" = "yes"; then
      MANPAGE_BOOTTIME=1
      ac_with_boottime=yes
   else

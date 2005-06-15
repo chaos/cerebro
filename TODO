@@ -18,6 +18,8 @@ Cleanup
    - base on update_flag
 - debug/lock race issue with cerebro_error functions??
 - debug around BUILDDIR stuff
+- test static build
+  - what if no clusterlist/metric modules?
 
 Audit
 - code review to reduce memory footprint

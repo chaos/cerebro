@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: ac_hostsfile.m4,v 1.5 2005-05-02 21:44:34 achu Exp $
+## $Id: ac_hostsfile.m4,v 1.6 2005-06-15 00:11:09 achu Exp $
 ##*****************************************************************************
 
 AC_DEFUN([AC_HOSTSFILE],
@@ -16,7 +16,7 @@ AC_DEFUN([AC_HOSTSFILE],
   )
   AC_MSG_RESULT([${ac_hostsfile_test=yes}])
 
-  if test "$ac_genders_test" = "yes"; then
+  if test "$ac_hostsfile_test" = "yes"; then
      MANPAGE_HOSTSFILE=1
      ac_with_hostsfile=yes
   else
