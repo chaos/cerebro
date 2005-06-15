@@ -17,7 +17,6 @@ Cleanup
 - run monitor modules w/o turning metric server on
    - base on update_flag
 - debug/lock race issue with cerebro_error functions??
-- debug around BUILDDIR stuff
 - test static build
   - what if no clusterlist/metric modules?
 
