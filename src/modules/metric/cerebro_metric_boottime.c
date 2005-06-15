@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_boottime.c,v 1.2 2005-06-13 23:05:54 achu Exp $
+ *  $Id: cerebro_metric_boottime.c,v 1.3 2005-06-15 22:46:08 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -152,7 +152,7 @@ boottime_metric_get_metric_name(void)
 static int
 boottime_metric_get_metric_value_type(void)
 {
-  return CEREBRO_METRIC_VALUE_TYPE_UNSIGNED_INT32;
+  return CEREBRO_METRIC_VALUE_TYPE_U_INT32;
 }
 
 /* 

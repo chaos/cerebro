@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_monitor_bootlog.c,v 1.4 2005-06-14 23:01:49 achu Exp $
+ *  $Id: cerebro_monitor_bootlog.c,v 1.5 2005-06-15 22:45:35 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -395,7 +395,7 @@ bootlog_monitor_metric_update(const char *nodename,
       return -1;
     }
 
-  if (metric_value_type != CEREBRO_METRIC_VALUE_TYPE_UNSIGNED_INT32)
+  if (metric_value_type != CEREBRO_METRIC_VALUE_TYPE_U_INT32)
     {
       cerebro_err_debug_module("%s(%s:%d): invalid metric_value_type: %d",
                                __FILE__, __FUNCTION__, __LINE__,
