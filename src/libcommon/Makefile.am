@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.12 2005-06-10 22:54:42 achu Exp $
+## $Id: Makefile.am,v 1.13 2005-06-15 18:00:34 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -8,7 +8,6 @@ noinst_HEADERS = conffile.h \
 		 error.h \
 		 fd.h \
 		 hash.h \
-		 hostlist.h \
 		 list.h \
 		 ltdl.h \
 		 thread.h
@@ -24,7 +23,6 @@ libcommon_la_SOURCES = conffile.c \
 		       error.c \
 		       fd.c \
 		       hash.c \
-		       hostlist.c \
 		       list.c \
 		       thread.c \
 		       $(LTDL_SOURCES)

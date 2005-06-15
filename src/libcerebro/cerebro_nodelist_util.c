@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_nodelist_util.c,v 1.14 2005-06-07 20:29:28 achu Exp $
+ *  $Id: cerebro_nodelist_util.c,v 1.15 2005-06-15 18:00:34 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -18,7 +18,6 @@
 #include "cerebro/cerebro_error.h"
 
 #include "list.h"
-#include "hostlist.h"
 
 int
 _cerebro_nodelist_check(cerebro_nodelist_t nodelist)
