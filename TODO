@@ -18,8 +18,6 @@ Cleanup
    - need structure to hold node locks without metric info?
 - debug/lock race issue with cerebro_error functions??
    - calling debug stuff even if debug_output is locked in cerebrod
-- test static build
-  - what if no clusterlist/metric modules?
 - metric modules can provide multiple metrics??
 - more statically compiled in libraries to reduce virt/res size?
   - wrappers lib
