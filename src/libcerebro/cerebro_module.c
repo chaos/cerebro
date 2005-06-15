@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.c,v 1.42 2005-06-15 00:23:10 achu Exp $
+ *  $Id: cerebro_module.c,v 1.43 2005-06-15 16:43:29 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -1091,8 +1091,8 @@ _cerebro_module_load_config_module(void)
 	  continue;
 	}
 
-      if ((rv = _load_config_module(name)) < 0)
-	  return -1;
+      if ((rv = _load_config_module(config_handle, name)) < 0)
+        goto cleanup;
 
       if (rv)
 	goto out;
@@ -1452,8 +1452,8 @@ _cerebro_module_load_metric_modules(unsigned int modules_max)
 
       if (rv)
         {
-          if (metric_handle->modules_count >= metric_modules->modules_max)
-            break;
+          if (metric_handle->modules_count >= metric_handle->modules_max)
+            goto out;
         }
 
       /* For metricing modules, we iterate through the whole list */
@@ -1867,8 +1867,8 @@ _cerebro_module_load_monitor_modules(unsigned int modules_max)
 
       if (rv)
         {
-          if (monitor_handle->modules_count >= monitor_modules->modules_max)
-            break;
+          if (monitor_handle->modules_count >= monitor_handle->modules_max)
+            goto out;
         }
 
       /* For monitoring modules, we iterate through the whole list */

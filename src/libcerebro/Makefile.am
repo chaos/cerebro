@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.56 2005-06-13 23:12:33 achu Exp $
+## $Id: Makefile.am,v 1.57 2005-06-15 16:43:29 achu Exp $
 ##*****************************************************************************
 
 if WITH_GNU_LD
@@ -67,6 +67,9 @@ libcerebro_la_LIBADD  = ../libcommon/libcommon.la \
 	@cd `dirname $@` && make `basename $@`
 
 ../modules/config/libconfigmodules.la: force-dependency-check
+	@cd `dirname $@` && make `basename $@`
+
+../modules/metric/libmetricmodules.la: force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
 force-dependency-check:

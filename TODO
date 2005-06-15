@@ -2,7 +2,6 @@ Documention
 - cerebro.1 manpage
 
 Testing
-- all protocol error conditions
 - fd leaking
 - mem-leaking
 
@@ -19,6 +18,13 @@ Cleanup
 - debug/lock race issue with cerebro_error functions??
 - test static build
   - what if no clusterlist/metric modules?
+- need structure to hold node locks without metric info?
+- metric modules can provide multiple metrics??
+- more statically compiled in libraries to reduce virt/res size?
+  - wrappers lib
+  - modules lib
+  - error lib
+  - marshalling lib
 
 Audit
 - code review to reduce memory footprint

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_cluster_data.c,v 1.5 2005-06-14 23:01:49 achu Exp $
+ *  $Id: cerebrod_cluster_data.c,v 1.6 2005-06-15 16:43:29 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -164,9 +164,12 @@ _cerebrod_node_data_create_and_init(const char *nodename)
 void 
 cerebrod_cluster_data_initialize(void)
 {
-  int i, numnodes = 0;
+  int numnodes = 0;
+#if !WITH_STATIC_MODULES
+  int i;
+#endif /* !WITH_STATIC_MODULES */
 
-  Pthread_mutex_lock(&cerebrod_cluster_data_initialization_complete_lock);
+  pthread_mutex_lock(&cerebrod_cluster_data_initialization_complete_lock);
   if (cerebrod_cluster_data_initialization_complete)
     goto out;
 
@@ -239,6 +242,7 @@ cerebrod_cluster_data_initialize(void)
         List_append(cerebrod_metric_name_list, Strdup(CEREBRO_METRIC_LAST_RECEIVED_TIME));
     }
 
+#if !WITH_STATIC_MODULES
   /* XXX is metric_max correct?? */
 
   if (!(monitor_handle = _cerebro_module_load_monitor_modules(conf.metric_max)))
@@ -372,6 +376,8 @@ cerebrod_cluster_data_initialize(void)
   goto done;
 
  done:
+#endif /* !WITH_STATIC_MODULES */
+
   cerebrod_cluster_data_initialization_complete++;
  out:
   Pthread_mutex_unlock(&cerebrod_cluster_data_initialization_complete_lock);
@@ -739,7 +745,9 @@ cerebrod_cluster_data_update(char *nodename,
       for (i = 0; i < hb->metrics_len; i++)
         {
           char metric_name_buf[CEREBRO_METRIC_NAME_MAXLEN+1];
+#if !WITH_STATIC_MODULES
           struct cerebrod_monitor_metric *monitor_metric;
+#endif /* !WITH_STATIC_MODULES */
 
           /* Guarantee ending '\0' character */
           memset(metric_name_buf, '\0', CEREBRO_METRIC_NAME_MAXLEN+1);
@@ -767,6 +775,7 @@ cerebrod_cluster_data_update(char *nodename,
                                        hb->metrics[i],
                                        received_time);
 
+#if !WITH_STATIC_MODULES
           if (monitor_index)
             {
               if ((monitor_metric = Hash_find(monitor_index, metric_name_buf)))
@@ -782,8 +791,9 @@ cerebrod_cluster_data_update(char *nodename,
                   Pthread_mutex_unlock(&monitor_metric->monitor->monitor_lock);
                 }
             }
+#endif /* !WITH_STATIC_MODULES */
         }
-      
+
       /* Can't call a debug output function in here, it can cause a
        * deadlock b/c the cerebrod_cluster_data_lock is not locked.  Use
        * a flag instead.

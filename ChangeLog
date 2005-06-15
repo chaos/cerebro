@@ -1,3 +1,7 @@
+2005-06-15  Albert Chu  <chu11@llnl.gov>
+
+	* Fixed static compilation bugs.
+	
 2005-06-14  Albert Chu  <chu11@llnl.gov>
 
 	* Added finishing touches to monitor support in cerebrod.
