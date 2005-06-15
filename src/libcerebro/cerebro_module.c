@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.c,v 1.43 2005-06-15 16:43:29 achu Exp $
+ *  $Id: cerebro_module.c,v 1.44 2005-06-15 20:21:18 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -56,7 +56,9 @@ extern struct cerebro_clusterlist_module_info genders_clusterlist_module_info;
 extern struct cerebro_clusterlist_module_info hostsfile_clusterlist_module_info;
 #endif /* WITH_HOSTSFILE */
 
+#if WITH_BOOTTIME
 extern struct cerebro_metric_module_info boottime_metric_module_info;
+#endif /* WITH_BOOTTIME */
 
 /*
  * static_clusterlist_modules
@@ -97,7 +99,9 @@ struct cerebro_config_module_info *static_config_modules[] =
  */
 struct cerebro_metric_module_info *static_metric_modules[] =
   {
+#if WITH_BOOTTIME
     &boottime_metric_module_info,
+#endif /* WITH_BOOTTIME */
     NULL
   };
 
