@@ -22,7 +22,6 @@ Cleanup
   - modules lib
   - error lib
   - marshalling lib
-- unsigned_int -> u_int
 
 Audit
 - code review to reduce memory footprint
