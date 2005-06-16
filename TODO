@@ -17,6 +17,7 @@ Cleanup
 - module returns pointer/buffer
   - and offer destroy function, so module need not malloc, could
     pointer to static buffer instead.
+- max on metric/monitor modules thing
 
 Audit
 - code review to reduce memory footprint
