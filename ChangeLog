@@ -17,6 +17,10 @@
 	* Various calculation tweaks and bug fixes.
 
 	* Monitor module tweaking.
+
+	* cerebrod speaker logic fixing.
+
+	* Metric module tweaking.
 	
 2005-06-15  Albert Chu  <chu11@llnl.gov>
 

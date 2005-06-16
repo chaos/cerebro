@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_heartbeat.c,v 1.37 2005-06-15 22:31:39 achu Exp $
+ *  $Id: cerebrod_heartbeat.c,v 1.38 2005-06-16 23:50:28 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -22,6 +22,11 @@ extern struct cerebrod_config conf;
 extern pthread_mutex_t debug_output_mutex;
 #endif /* CEREBRO_DEBUG */
 
+/*
+ * cerebrod_heartbeat_destroy
+ *
+ * destroy a heartbeat packet
+ */
 void
 cerebrod_heartbeat_destroy(struct cerebrod_heartbeat *hb)
 {

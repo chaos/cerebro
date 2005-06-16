@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_cluster_data.c,v 1.11 2005-06-16 22:31:42 achu Exp $
+ *  $Id: cerebrod_cluster_data.c,v 1.12 2005-06-16 23:50:28 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -114,7 +114,7 @@ cerebro_monitor_modules_t monitor_handle = NULL;
  * monitored by modules and what index they are.
  */
 hash_t monitor_index = NULL;
-int monitor_index_size;
+int monitor_index_size = 0;
 
 /* 
  * _cerebrod_node_data_strcmp
@@ -164,7 +164,7 @@ _cerebrod_node_data_create_and_init(const char *nodename)
 void 
 cerebrod_cluster_data_initialize(void)
 {
-  int i, numnodes = 0;
+  int i, monitor_index_len, numnodes = 0;
 
   pthread_mutex_lock(&cerebrod_cluster_data_initialization_complete_lock);
   if (cerebrod_cluster_data_initialization_complete)
@@ -247,7 +247,7 @@ cerebrod_cluster_data_initialize(void)
     }
 
 
-  if ((monitor_index_size = _cerebro_monitor_module_count(monitor_handle)) < 0)
+  if ((monitor_index_len = _cerebro_monitor_module_count(monitor_handle)) < 0)
     {
       cerebro_err_debug("%s(%s:%d): _cerebro_monitor_module_count failed",
                         __FILE__, __FUNCTION__, __LINE__);
@@ -256,7 +256,7 @@ cerebrod_cluster_data_initialize(void)
       goto done;
     }
 
-  if (!monitor_index_size)
+  if (!monitor_index_len)
     {
 #if CEREBRO_DEBUG
       if (conf.debug && conf.listen_debug)
@@ -273,12 +273,12 @@ cerebrod_cluster_data_initialize(void)
       goto done;
     }
   
-  monitor_index = Hash_create(monitor_index_size,
+  monitor_index = Hash_create(monitor_index_len,
                               (hash_key_f)hash_key_string,
                               (hash_cmp_f)strcmp,
                               (hash_del_f)_Free);
 
-  for (i = 0; i < monitor_index_size; i++)
+  for (i = 0; i < monitor_index_len; i++)
     {
       struct cerebrod_monitor_metric *monitor_metric;
       char *metric_name;
@@ -295,11 +295,13 @@ cerebrod_cluster_data_initialize(void)
         }
 #endif /* CEREBRO_DEBUG */
 
+      /* XXX need to call cleanup too */
+
       if (_cerebro_monitor_module_setup(monitor_handle, i) < 0)
         {
           cerebro_err_debug("%s(%s:%d): _cerebro_monitor_module_setup failed",
                             __FILE__, __FUNCTION__, __LINE__);
-          goto monitor_cleanup;
+          continue;
         }
 
       if (!(metric_name = _cerebro_monitor_module_metric_name(monitor_handle,
@@ -307,7 +309,7 @@ cerebrod_cluster_data_initialize(void)
         {
           cerebro_err_debug("%s(%s:%d): _cerebro_monitor_module_metric_name failed",
                             __FILE__, __FUNCTION__, __LINE__);
-          goto monitor_cleanup;
+          continue;
         }
 
       monitor_metric = Malloc(sizeof(struct cerebrod_monitor_metric));
@@ -316,7 +318,11 @@ cerebrod_cluster_data_initialize(void)
       Pthread_mutex_init(&(monitor_metric->monitor_lock), NULL);
 
       Hash_insert(monitor_index, monitor_metric->metric_name, monitor_metric);
+      monitor_index_size++;
     }
+
+  if (!monitor_index_size)
+    goto monitor_cleanup;
 
   goto done;
 

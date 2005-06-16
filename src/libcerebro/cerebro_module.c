@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.c,v 1.48 2005-06-16 22:31:42 achu Exp $
+ *  $Id: cerebro_module.c,v 1.49 2005-06-16 23:50:28 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -1100,23 +1100,16 @@ _load_metric_module(void *handle, char *module)
       goto cleanup;
     }
 
-  if (!module_info->get_metric_value_type)
-    {
-      cerebro_err_debug("metric module '%s': get_metric_value_type null",
-			module_info->metric_module_name);
-      goto cleanup;
-    }
-
-  if (!module_info->get_metric_value_len)
-    {
-      cerebro_err_debug("metric module '%s': get_metric_value_len null",
-			module_info->metric_module_name);
-      goto cleanup;
-    }
-
   if (!module_info->get_metric_value)
     {
       cerebro_err_debug("metric module '%s': get_metric_value null",
+			module_info->metric_module_name);
+      goto cleanup;
+    }
+
+  if (!module_info->destroy_metric_value)
+    {
+      cerebro_err_debug("metric module '%s': destroy_metric_value null",
 			module_info->metric_module_name);
       goto cleanup;
     }
@@ -1323,37 +1316,12 @@ _cerebro_metric_module_get_metric_name(cerebro_metric_modules_t metric_handle,
   return ((*(metric_handle->module_info[index])->get_metric_name)());
 }
 
-int
-_cerebro_metric_module_get_metric_value_type(cerebro_metric_modules_t metric_handle,
-                                             unsigned int index)
-{
-  if (_cerebro_module_metric_module_check(metric_handle) < 0)
-    return -1;
-  
-  if (!(index < metric_handle->modules_count))
-    return -1;
-
-  return ((*(metric_handle->module_info[index])->get_metric_value_type)());
-}
-
-int
-_cerebro_metric_module_get_metric_value_len(cerebro_metric_modules_t metric_handle,
-                                            unsigned int index)
-{
-  if (_cerebro_module_metric_module_check(metric_handle) < 0)
-    return -1;
-  
-  if (!(index < metric_handle->modules_count))
-    return -1;
-
-  return ((*(metric_handle->module_info[index])->get_metric_value_len)());
-}
-
 int 
 _cerebro_metric_module_get_metric_value(cerebro_metric_modules_t metric_handle,
                                         unsigned int index,
-                                        void *metric_value_buf,
-                                        unsigned int metric_value_buflen)
+                                        unsigned int *metric_value_type,
+                                        unsigned int *metric_value_len,
+                                        void **metric_value)
 {
   if (_cerebro_module_metric_module_check(metric_handle) < 0)
     return -1;
@@ -1361,8 +1329,23 @@ _cerebro_metric_module_get_metric_value(cerebro_metric_modules_t metric_handle,
   if (!(index < metric_handle->modules_count))
     return -1;
   
-  return ((*(metric_handle->module_info[index])->get_metric_value)(metric_value_buf,
-                                                                   metric_value_buflen));
+  return ((*(metric_handle->module_info[index])->get_metric_value)(metric_value_type,
+                                                                   metric_value_len,
+                                                                   metric_value));
+}
+
+int 
+_cerebro_metric_module_destroy_metric_value(cerebro_metric_modules_t metric_handle,
+                                            unsigned int index,
+                                            void *metric_value)
+{
+  if (_cerebro_module_metric_module_check(metric_handle) < 0)
+    return -1;
+  
+  if (!(index < metric_handle->modules_count))
+    return -1;
+  
+  return ((*(metric_handle->module_info[index])->destroy_metric_value)(metric_value));
 }
 
 /* 
@@ -1661,10 +1644,10 @@ _cerebro_monitor_module_metric_name(cerebro_monitor_modules_t monitor_handle,
                                     unsigned int index)
 {
   if (_cerebro_module_monitor_module_check(monitor_handle) < 0)
-    return -1;
+    return NULL;
   
   if (!(index < monitor_handle->modules_count))
-    return -1;
+    return NULL;
 
   return ((*(monitor_handle->module_info[index])->metric_name)());
 }

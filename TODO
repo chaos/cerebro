@@ -13,12 +13,8 @@ Cleanup
 - more statically compiled in libraries to reduce virt/res size?
   - wrappers lib
   - modules lib
-- metric modules can provide multiple metrics??
-- module returns pointer/buffer
-  - and offer destroy function, so module need not malloc, could
-    pointer to static buffer instead.
-- max on metric/monitor modules thing
 - Hash-destroys, not destroy key appropriately?  _Free not enough
+   - and call cleanups
 
 Audit
 - code review to reduce memory footprint
@@ -30,21 +26,12 @@ Portability
 Design
 - error output tricks like %m in pdsh, to save lines
 - Update time for each cerebro metric data?
-- behavior on module loading/read/get
-  - total fail, or only fail on one module
-  - inconsistency between module types??
-  - need module library to return module_info pointers??
-- thread safeness in monitor modules?
 - ability for data to be stored/not-stored in the internal hash
   i.e. passed directly to module and forgotten
 - speaker scheduler??
   - rework monitor module??
-- listening module
-- Data structure for list/index combination?
-- Move pthread_lock in cerebro_error to error lib??
 - metric to get available metrics
-- make cerebro calls pthread safe??
-- update thread for monitor module
+- update thread for monitor module??
 - nodelist
   - use own list instead of 'List' to store iterators?
 - how remove metric data?

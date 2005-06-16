@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_boottime.c,v 1.5 2005-06-16 21:35:34 achu Exp $
+ *  $Id: cerebro_metric_boottime.c,v 1.6 2005-06-16 23:50:29 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -143,58 +143,55 @@ boottime_metric_get_metric_name(void)
 }
 
 /* 
- * boottime_metric_get_metric_value_type
- *
- * boottime metric module get_metric_value_type function
- *
- * Returns value_type on success, -1 on error
- */
-static int
-boottime_metric_get_metric_value_type(void)
-{
-  return CEREBRO_METRIC_VALUE_TYPE_U_INT32;
-}
-
-/* 
- * boottime_metric_get_metric_value_len
- *
- * boottime metric module get_metric_value_len function
- *
- * Returns value_len on success, -1 on error
- */
-static int
-boottime_metric_get_metric_value_len(void)
-{
-  return sizeof(u_int32_t);
-}
-
-/* 
  * boottime_metric_get_metric_value
  *
  * boottime metric module get_metric_value function
  *
- * Returns length of data copied on success, -1 on error
+ * Returns 0 on success, -1 on error
  */
 static int
-boottime_metric_get_metric_value(void *metric_value_buf,
-                                  unsigned int metric_value_buflen)
+boottime_metric_get_metric_value(unsigned int *metric_value_type,
+                                 unsigned int *metric_value_len,
+                                 void **metric_value)
 {
-  if (!metric_value_buf)
+  if (!metric_value_type)
     {
-      cerebro_err_debug("%s(%s:%d): metric_value_buf null",
+      cerebro_err_debug("%s(%s:%d): metric_value_type null",
 			__FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
-  if (metric_value_buflen < sizeof(u_int32_t))
+  if (!metric_value_len)
     {
-      cerebro_err_debug("%s(%s:%d): metric_value_buflen invalid",
+      cerebro_err_debug("%s(%s:%d): metric_value_len null",
 			__FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
-  memcpy(metric_value_buf, &metric_boottime, sizeof(u_int32_t));
-  return sizeof(u_int32_t);
+  if (!metric_value)
+    {
+      cerebro_err_debug("%s(%s:%d): metric_value null",
+			__FILE__, __FUNCTION__, __LINE__);
+      return -1;
+    }
+
+  *metric_value_type = CEREBRO_METRIC_VALUE_TYPE_U_INT32;
+  *metric_value_len = sizeof(u_int32_t);
+  *metric_value = (void *)&metric_boottime;
+  return 0;
+}
+
+/* 
+ * boottime_metric_destroy_metric_value
+ *
+ * boottime metric module destroy_metric_value function
+ *
+ * Returns 0 on success, -1 on error
+ */
+static int
+boottime_metric_destroy_metric_value(void *metric_value)
+{
+  return 0;
 }
 
 struct cerebro_metric_module_info metric_module_info =
@@ -203,7 +200,6 @@ struct cerebro_metric_module_info metric_module_info =
     &boottime_metric_setup,
     &boottime_metric_cleanup,
     &boottime_metric_get_metric_name,
-    &boottime_metric_get_metric_value_type,
-    &boottime_metric_get_metric_value_len,
     &boottime_metric_get_metric_value,
+    &boottime_metric_destroy_metric_value,
   };

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.h,v 1.30 2005-06-16 22:31:42 achu Exp $
+ *  $Id: cerebro_module.h,v 1.31 2005-06-16 23:50:29 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_MODULE_H
@@ -186,36 +186,30 @@ int _cerebro_metric_module_cleanup(cerebro_metric_modules_t metric_handle,
 /*
  * _cerebro_metric_module_get_metric_name
  *
- * call metric module get all nodes function
+ * call metric module get_metric_name function
  */
 char *_cerebro_metric_module_get_metric_name(cerebro_metric_modules_t metric_handle,
                                              unsigned int index);
 
 /*
- * _cerebro_metric_module_get_metric_value_type
- *
- * call metric module get all nodes function
- */
-int _cerebro_metric_module_get_metric_value_type(cerebro_metric_modules_t metric_handle,
-                                                 unsigned int index);
-
-/*
- * _cerebro_metric_module_get_metric_value_len
- *
- * call metric module get all nodes function
- */
-int _cerebro_metric_module_get_metric_value_len(cerebro_metric_modules_t metric_handle,
-                                                unsigned int index);
-
-/*
  * _cerebro_metric_module_get_metric_value
  *
- * call metric module get all nodes function
+ * call metric module get_metric_value function
  */
 int _cerebro_metric_module_get_metric_value(cerebro_metric_modules_t metric_handle,
                                             unsigned int index,
-                                            void *metric_value_buf,
-                                            unsigned int metric_value_buflen);
+                                            unsigned int *metric_value_type,
+                                            unsigned int *metric_value_len,
+                                            void **metric_value);
+
+/*
+ * _cerebro_metric_module_destroy_metric_value
+ *
+ * call metric module destroy_metric_value function
+ */
+int _cerebro_metric_module_destroy_metric_value(cerebro_metric_modules_t metric_handle,
+                                                unsigned int index,
+                                                void *metric_value);
 
 /*
  * _cerebro_module_load_monitor_modules
