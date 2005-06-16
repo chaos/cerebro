@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_wrappers.h,v 1.1 2005-06-10 22:54:42 achu Exp $
+ *  $Id: cerebrod_wrappers.h,v 1.2 2005-06-16 00:24:25 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_WRAPPERS_H
@@ -54,6 +54,7 @@
 #endif
 #include "list.h"
 #include "hash.h"
+#include "marshall.h"
 
 /* 
  * Memory/String Wrappers 
@@ -300,4 +301,53 @@ int wrap_hash_delete_if(const char *file, const char *function, int line, hash_t
 int wrap_hash_for_each(const char *file, const char *function, int line, hash_t h, hash_arg_f argf, void *arg);
 void wrap_hash_destroy(const char *file, const char *function, int line, hash_t h);
 
+/* 
+ * Marshall wrappers
+ */
+
+#define Marshall_int8(val, buf, buflen) \
+        wrap_marshall_int8(__FILE__, __FUNCTION__, __LINE__, val, buf, buflen)
+#define Marshall_int32(val, buf, buflen) \
+        wrap_marshall_int32(__FILE__, __FUNCTION__, __LINE__, val, buf, buflen)
+#define Marshall_u_int8(val, buf, buflen) \
+        wrap_marshall_u_int8(__FILE__, __FUNCTION__, __LINE__, val, buf, buflen)
+#define Marshall_u_int32(val, buf, buflen) \
+        wrap_marshall_u_int32(__FILE__, __FUNCTION__, __LINE__, val, buf, buflen)
+#define Marshall_float(val, buf, buflen) \
+        wrap_marshall_float(__FILE__, __FUNCTION__, __LINE__, val, buf, buflen)
+#define Marshall_double(val, buf, buflen) \
+        wrap_marshall_double(__FILE__, __FUNCTION__, __LINE__, val, buf, buflen)
+#define Marshall_buffer(val, vallen, buf, buflen) \
+        wrap_marshall_buffer(__FILE__, __FUNCTION__, __LINE__, val, vallen, buf, buflen)
+#define Unmarshall_int8(val, buf, buflen) \
+        wrap_unmarshall_int8(__FILE__, __FUNCTION__, __LINE__, val, buf, buflen)
+#define Unmarshall_int32(val, buf, buflen) \
+        wrap_unmarshall_int32(__FILE__, __FUNCTION__, __LINE__, val, buf, buflen)
+#define Unmarshall_u_int8(val, buf, buflen) \
+        wrap_unmarshall_u_int8(__FILE__, __FUNCTION__, __LINE__, val, buf, buflen)
+#define Unmarshall_u_int32(val, buf, buflen) \
+        wrap_unmarshall_u_int32(__FILE__, __FUNCTION__, __LINE__, val, buf, buflen)
+#define Unmarshall_float(val, buf, buflen) \
+        wrap_unmarshall_float(__FILE__, __FUNCTION__, __LINE__, val, buf, buflen)
+#define Unmarshall_double(val, buf, buflen) \
+        wrap_unmarshall_double(__FILE__, __FUNCTION__, __LINE__, val, buf, buflen)
+#define Unmarshall_buffer(val, vallen, buf, buflen) \
+        wrap_unmarshall_buffer(__FILE__, __FUNCTION__, __LINE__, val, vallen, buf, buflen)
+
+int wrap_marshall_int8(const char *file, const char *function, int line, int8_t val, char *buf, unsigned int buflen);
+int wrap_marshall_int32(const char *file, const char *function, int line, int32_t val, char *buf, unsigned int buflen);
+int wrap_marshall_u_int8(const char *file, const char *function, int line, u_int8_t val, char *buf, unsigned int buflen);
+int wrap_marshall_u_int32(const char *file, const char *function, int line, u_int32_t val, char *buf, unsigned int buflen);
+int wrap_marshall_float(const char *file, const char *function, int line, float val, char *buf, unsigned int buflen);
+int wrap_marshall_double(const char *file, const char *function, int line, double val, char *buf, unsigned int buflen);
+int wrap_marshall_buffer(const char *file, const char *function, int line, const char *val, unsigned int vallen, char *buf, unsigned int buflen);
+int wrap_unmarshall_int8(const char *file, const char *function, int line, int8_t *val, const char *buf, unsigned int buflen);
+int wrap_unmarshall_int32(const char *file, const char *function, int line, int32_t *val, const char *buf, unsigned int buflen);
+int wrap_unmarshall_u_int8(const char *file, const char *function, int line, u_int8_t *val, const char *buf, unsigned int buflen);
+int wrap_unmarshall_u_int32(const char *file, const char *function, int line, u_int32_t *val, const char *buf, unsigned int buflen);
+int wrap_unmarshall_float(const char *file, const char *function, int line, float *val, const char *buf, unsigned int buflen);
+int wrap_unmarshall_double(const char *file, const char *function, int line, double *val, const char *buf, unsigned int buflen);
+int wrap_unmarshall_buffer(const char *file, const char *function, int line, char *val, unsigned int vallen, const char *buf, unsigned int buflen);
+
+   
 #endif /* _CEREBROD_WRAPPERS_H */

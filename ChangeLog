@@ -8,6 +8,8 @@
 	new lib.
 
 	* Various cleanup fixes.
+
+	* Implemented and use new marshall wrapper functions.
 	
 2005-06-14  Albert Chu  <chu11@llnl.gov>
 

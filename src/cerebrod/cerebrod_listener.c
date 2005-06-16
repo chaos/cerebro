@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.80 2005-06-15 22:31:39 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.81 2005-06-16 00:24:25 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -31,8 +31,6 @@
 #include "cerebrod_listener.h"
 #include "cerebrod_metric.h"
 #include "cerebrod_wrappers.h"
-
-#include "marshall.h"
 
 extern struct cerebrod_config conf;
 #if CEREBRO_DEBUG
@@ -188,46 +186,28 @@ _cerebrod_heartbeat_unmarshall(const char *buf, unsigned int buflen)
 
   memset(hb, '\0', sizeof(struct cerebrod_heartbeat));
   
-  if ((len = unmarshall_int32(&(hb->version),
-                              buf + count,
-                              buflen - count)) < 0)
-    cerebro_err_exit("%s(%s:%d): unmarshall_int32",
-		     __FILE__, __FUNCTION__, __LINE__);
+  len = Unmarshall_int32(&(hb->version),
+                         buf + count,
+                         buflen - count);
   if (!len)
-    {
-      cerebro_err_debug("%s(%s:%d): packet buffer length invalid",
-                        __FILE__, __FUNCTION__, __LINE__);
-      goto cleanup;
-    }
+    goto bad_len_cleanup;
   
   count += len;
 
-  if ((len = unmarshall_buffer(hb->nodename,
-                               sizeof(hb->nodename),
-                               buf + count,
-                               buflen - count)) < 0)
-    cerebro_err_exit("%s(%s:%d): unmarshall_buffer",
-                     __FILE__, __FUNCTION__, __LINE__);
+  len = Unmarshall_buffer(hb->nodename,
+                          sizeof(hb->nodename),
+                          buf + count,
+                          buflen - count);
   if (!len)
-    {
-      cerebro_err_debug("%s(%s:%d): packet buffer length invalid",
-                        __FILE__, __FUNCTION__, __LINE__);
-      goto cleanup;
-    }
+    goto bad_len_cleanup;
   
   count += len;
   
-  if ((len = unmarshall_u_int32(&(hb->metrics_len),
-                                buf + count,
-                                buflen - count)) < 0)
-    cerebro_err_exit("%s(%s:%d): unmarshall_u_int32",
-                     __FILE__, __FUNCTION__, __LINE__);
+  len = Unmarshall_u_int32(&(hb->metrics_len),
+                           buf + count,
+                           buflen - count);
   if (!len)
-    {
-      cerebro_err_debug("%s(%s:%d): packet buffer length invalid",
-                        __FILE__, __FUNCTION__, __LINE__);
-      goto cleanup;
-    }
+    goto bad_len_cleanup;
 
   count += len;
   
@@ -241,46 +221,28 @@ _cerebrod_heartbeat_unmarshall(const char *buf, unsigned int buflen)
           hd = Malloc(sizeof(struct cerebrod_heartbeat_metric));
           memset(hd, '\0', sizeof(struct cerebrod_heartbeat_metric));
           
-          if ((len = unmarshall_buffer(hd->metric_name,
-                                       sizeof(hd->metric_name),
-                                       buf + count,
-                                       buflen - count)) < 0)
-            cerebro_err_exit("%s(%s:%d): unmarshall_buffer",
-                             __FILE__, __FUNCTION__, __LINE__);
+          len = Unmarshall_buffer(hd->metric_name,
+                                  sizeof(hd->metric_name),
+                                  buf + count,
+                                  buflen - count);
           if (!len)
-            {
-              cerebro_err_debug("%s(%s:%d): packet buffer length invalid",
-                                __FILE__, __FUNCTION__, __LINE__);
-              goto cleanup;
-            }
+            goto bad_len_cleanup;
           
           count += len;
           
-          if ((len = unmarshall_u_int32(&(hd->metric_value_type),
-                                        buf + count,
-                                        buflen - count)) < 0)
-            cerebro_err_exit("%s(%s:%d): unmarshall_u_int32",
-                             __FILE__, __FUNCTION__, __LINE__);
+          len = Unmarshall_u_int32(&(hd->metric_value_type),
+                                   buf + count,
+                                   buflen - count);
           if (!len)
-            {
-              cerebro_err_debug("%s(%s:%d): packet buffer length invalid",
-                                __FILE__, __FUNCTION__, __LINE__);
-              goto cleanup;
-            }
+            goto bad_len_cleanup;
           
           count += len;
           
-          if ((len = unmarshall_u_int32(&(hd->metric_value_len),
-                                        buf + count,
-                                        buflen - count)) < 0)
-            cerebro_err_exit("%s(%s:%d): unmarshall_u_int32",
-                             __FILE__, __FUNCTION__, __LINE__);
+          len = Unmarshall_u_int32(&(hd->metric_value_len),
+                                   buf + count,
+                                   buflen - count);
           if (!len)
-            {
-              cerebro_err_debug("%s(%s:%d): packet buffer length invalid",
-                                __FILE__, __FUNCTION__, __LINE__);
-              goto cleanup;
-            }
+            goto bad_len_cleanup;
       
           count += len;
           
@@ -296,75 +258,45 @@ _cerebrod_heartbeat_unmarshall(const char *buf, unsigned int buflen)
                                     __FILE__, __FUNCTION__, __LINE__);
                   break;
                 case CEREBRO_METRIC_VALUE_TYPE_INT32:
-                  if ((len = unmarshall_int32((int32_t *)hd->metric_value,
-                                              buf + count,
-                                              buflen - count)) < 0)
-                    cerebro_err_exit("%s(%s:%d): unmarshall_int32",
-                                     __FILE__, __FUNCTION__, __LINE__);
+                  len = Unmarshall_int32((int32_t *)hd->metric_value,
+                                         buf + count,
+                                         buflen - count);
                   if (!len)
-                    {
-                      cerebro_err_debug("%s(%s:%d): packet buffer length invalid",
-                                        __FILE__, __FUNCTION__, __LINE__);
-                      goto cleanup;
-                    }
+                    goto bad_len_cleanup;
                   count += len;
                   break;
                 case CEREBRO_METRIC_VALUE_TYPE_U_INT32:
-                  if ((len = unmarshall_u_int32((u_int32_t *)hd->metric_value,
-                                                buf + count,
-                                                buflen - count)) < 0)
-                    cerebro_err_exit("%s(%s:%d): unmarshall_u_int32",
-                                     __FILE__, __FUNCTION__, __LINE__);
+                  len = Unmarshall_u_int32((u_int32_t *)hd->metric_value,
+                                           buf + count,
+                                           buflen - count);
                   if (!len)
-                    {
-                      cerebro_err_debug("%s(%s:%d): packet buffer length invalid",
-                                        __FILE__, __FUNCTION__, __LINE__);
-                      goto cleanup;
-                    }
+                    goto bad_len_cleanup;
                   count += len;
                   break;
                 case CEREBRO_METRIC_VALUE_TYPE_FLOAT:
-                  if ((len = unmarshall_float((float *)hd->metric_value,
-                                              buf + count,
-                                              buflen - count)) < 0)
-                    cerebro_err_exit("%s(%s:%d): unmarshall_float",
-                                     __FILE__, __FUNCTION__, __LINE__);
+                  len = Unmarshall_float((float *)hd->metric_value,
+                                         buf + count,
+                                         buflen - count);
                   if (!len)
-                    {
-                      cerebro_err_debug("%s(%s:%d): packet buffer length invalid",
-                                        __FILE__, __FUNCTION__, __LINE__);
-                      goto cleanup;
-                    }
+                    goto bad_len_cleanup;
                   count += len;
                   break;
                 case CEREBRO_METRIC_VALUE_TYPE_DOUBLE:
-                  if ((len = unmarshall_double((double *)hd->metric_value,
-                                               buf + count,
-                                               buflen - count)) < 0)
-                    cerebro_err_exit("%s(%s:%d): unmarshall_double",
-                                     __FILE__, __FUNCTION__, __LINE__);
+                  len = Unmarshall_double((double *)hd->metric_value,
+                                          buf + count,
+                                          buflen - count);
                   if (!len)
-                    {
-                      cerebro_err_debug("%s(%s:%d): packet buffer length invalid",
-                                        __FILE__, __FUNCTION__, __LINE__);
-                      goto cleanup;
-                    }
+                    goto bad_len_cleanup;
                   count += len;
                   break;
                 case CEREBRO_METRIC_VALUE_TYPE_STRING:
                 case CEREBRO_METRIC_VALUE_TYPE_RAW:
-                  if ((len = unmarshall_buffer((char *)hd->metric_value,
-                                               hd->metric_value_len,
-                                               buf + count,
-                                               buflen - count)) < 0)
-                    cerebro_err_exit("%s(%s:%d): unmarshall_buffer",
-                                     __FILE__, __FUNCTION__, __LINE__);
+                  len = Unmarshall_buffer((char *)hd->metric_value,
+                                          hd->metric_value_len,
+                                          buf + count,
+                                          buflen - count);
                   if (!len)
-                    {
-                      cerebro_err_debug("%s(%s:%d): packet buffer length invalid",
-                                        __FILE__, __FUNCTION__, __LINE__);
-                      goto cleanup;
-                    }
+                    goto bad_len_cleanup;
                   count += len;
                   break;
                 default:
@@ -380,6 +312,10 @@ _cerebrod_heartbeat_unmarshall(const char *buf, unsigned int buflen)
     }
 
   return hb;
+
+ bad_len_cleanup:
+  cerebro_err_debug("%s(%s:%d): packet buffer length invalid",
+                    __FILE__, __FUNCTION__, __LINE__);
 
  cleanup:
   if (hd)

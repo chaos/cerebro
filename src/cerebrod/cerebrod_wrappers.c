@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_wrappers.c,v 1.1 2005-06-10 22:54:42 achu Exp $
+ *  $Id: cerebrod_wrappers.c,v 1.2 2005-06-16 00:24:25 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -1268,4 +1268,263 @@ wrap_hash_destroy(const char *file, const char *function, int line, hash_t h)
   hash_destroy(h);
 
   return;
+}
+
+int 
+wrap_marshall_int8(const char *file, const char *function, int line, int8_t val, char *buf, unsigned int buflen)
+{
+  int rv;
+
+  assert(file);
+  assert(function);
+
+  if (!buf)
+    cerebro_err_exit("marshall_int8(%s(%s:%d)): null buf pointer", file, function, line);
+
+  if ((rv = marshall_int8(val, buf, buflen)) <= 0)
+    cerebro_err_exit("marshall_int8(%s(%s:%d)): %s\n", strerror(errno));
+
+  return rv;
+}
+
+int 
+wrap_marshall_int32(const char *file, const char *function, int line, int32_t val, char *buf, unsigned int buflen)
+{
+  int rv;
+
+  assert(file);
+  assert(function);
+
+  if (!buf)
+    cerebro_err_exit("marshall_int32(%s(%s:%d)): null buf pointer", file, function, line);
+
+  if ((rv = marshall_int32(val, buf, buflen)) <= 0)
+    cerebro_err_exit("marshall_int32(%s(%s:%d)): %s\n", strerror(errno));
+
+  return rv;
+}
+
+int 
+wrap_marshall_u_int8(const char *file, const char *function, int line, u_int8_t val, char *buf, unsigned int buflen)
+{
+  int rv;
+
+  assert(file);
+  assert(function);
+
+  if (!buf)
+    cerebro_err_exit("marshall_u_int8(%s(%s:%d)): null buf pointer", file, function, line);
+
+  if ((rv = marshall_u_int8(val, buf, buflen)) <= 0)
+    cerebro_err_exit("marshall_u_int8(%s(%s:%d)): %s\n", strerror(errno));
+
+  return rv;
+}
+
+int 
+wrap_marshall_u_int32(const char *file, const char *function, int line, u_int32_t val, char *buf, unsigned int buflen)
+{
+  int rv;
+
+  assert(file);
+  assert(function);
+
+  if (!buf)
+    cerebro_err_exit("marshall_u_int32(%s(%s:%d)): null buf pointer", file, function, line);
+
+  if ((rv = marshall_u_int32(val, buf, buflen)) <= 0)
+    cerebro_err_exit("marshall_u_int32(%s(%s:%d)): %s\n", strerror(errno));
+
+  return rv;
+}
+
+int 
+wrap_marshall_float(const char *file, const char *function, int line, float val, char *buf, unsigned int buflen)
+{
+  int rv;
+
+  assert(file);
+  assert(function);
+
+  if (!buf)
+    cerebro_err_exit("marshall_float(%s(%s:%d)): null buf pointer", file, function, line);
+
+  if ((rv = marshall_float(val, buf, buflen)) <= 0)
+    cerebro_err_exit("marshall_float(%s(%s:%d)): %s\n", strerror(errno));
+
+  return rv;
+}
+
+int 
+wrap_marshall_double(const char *file, const char *function, int line, double val, char *buf, unsigned int buflen)
+{
+  int rv;
+
+  assert(file);
+  assert(function);
+
+  if (!buf)
+    cerebro_err_exit("marshall_double(%s(%s:%d)): null buf pointer", file, function, line);
+
+  if ((rv = marshall_double(val, buf, buflen)) <= 0)
+    cerebro_err_exit("marshall_double(%s(%s:%d)): %s\n", strerror(errno));
+
+  return rv;
+}
+
+int 
+wrap_marshall_buffer(const char *file, const char *function, int line, const char *val, unsigned int vallen, char *buf, unsigned int buflen)
+{
+  int rv;
+
+  assert(file);
+  assert(function);
+
+  if (!buf)
+    cerebro_err_exit("marshall_buffer(%s(%s:%d)): null buf pointer", file, function, line);
+
+  if ((rv = marshall_buffer(val, vallen, buf, buflen)) <= 0)
+    cerebro_err_exit("marshall_buffer(%s(%s:%d)): %s\n", strerror(errno));
+
+  return rv;
+}
+
+int 
+wrap_unmarshall_int8(const char *file, const char *function, int line, int8_t *val, const char *buf, unsigned int buflen)
+{
+  int rv;
+
+  assert(file);
+  assert(function);
+
+  if (!val)
+    cerebro_err_exit("unmarshall_int8(%s(%s:%d)): null val pointer", file, function, line);
+
+  if (!buf)
+    cerebro_err_exit("unmarshall_int8(%s(%s:%d)): null buf pointer", file, function, line);
+
+  if ((rv = unmarshall_int8(val, buf, buflen)) < 0)
+    cerebro_err_exit("unmarshall_int8(%s(%s:%d)): %s\n", strerror(errno));
+
+  return rv;
+}
+
+int 
+wrap_unmarshall_int32(const char *file, const char *function, int line, int32_t *val, const char *buf, unsigned int buflen)
+{
+  int rv;
+
+  assert(file);
+  assert(function);
+
+  if (!val)
+    cerebro_err_exit("unmarshall_int32(%s(%s:%d)): null val pointer", file, function, line);
+
+  if (!buf)
+    cerebro_err_exit("unmarshall_int32(%s(%s:%d)): null buf pointer", file, function, line);
+
+  if ((rv = unmarshall_int32(val, buf, buflen)) < 0)
+    cerebro_err_exit("unmarshall_int32(%s(%s:%d)): %s\n", strerror(errno));
+
+  return rv;
+}
+
+int 
+wrap_unmarshall_u_int8(const char *file, const char *function, int line, u_int8_t *val, const char *buf, unsigned int buflen)
+{
+  int rv;
+
+  assert(file);
+  assert(function);
+
+  if (!val)
+    cerebro_err_exit("unmarshall_u_int8(%s(%s:%d)): null val pointer", file, function, line);
+
+  if (!buf)
+    cerebro_err_exit("unmarshall_u_int8(%s(%s:%d)): null buf pointer", file, function, line);
+
+  if ((rv = unmarshall_u_int8(val, buf, buflen)) < 0)
+    cerebro_err_exit("unmarshall_u_int8(%s(%s:%d)): %s\n", strerror(errno));
+
+  return rv;
+}
+
+int 
+wrap_unmarshall_u_int32(const char *file, const char *function, int line, u_int32_t *val, const char *buf, unsigned int buflen)
+{
+  int rv;
+
+  assert(file);
+  assert(function);
+
+  if (!val)
+    cerebro_err_exit("unmarshall_u_int32(%s(%s:%d)): null val pointer", file, function, line);
+
+  if (!buf)
+    cerebro_err_exit("unmarshall_u_int32(%s(%s:%d)): null buf pointer", file, function, line);
+
+  if ((rv = unmarshall_u_int32(val, buf, buflen)) < 0)
+    cerebro_err_exit("unmarshall_u_int32(%s(%s:%d)): %s\n", strerror(errno));
+
+  return rv;
+}
+
+int
+wrap_unmarshall_float(const char *file, const char *function, int line, float *val, const char *buf, unsigned int buflen)
+{
+  int rv;
+
+  assert(file);
+  assert(function);
+
+  if (!val)
+    cerebro_err_exit("unmarshall_float(%s(%s:%d)): null val pointer", file, function, line);
+
+  if (!buf)
+    cerebro_err_exit("unmarshall_float(%s(%s:%d)): null buf pointer", file, function, line);
+
+  if ((rv = unmarshall_float(val, buf, buflen)) < 0)
+    cerebro_err_exit("unmarshall_float(%s(%s:%d)): %s\n", strerror(errno));
+
+  return rv;
+}
+
+int 
+wrap_unmarshall_double(const char *file, const char *function, int line, double *val, const char *buf, unsigned int buflen)
+{
+  int rv;
+
+  assert(file);
+  assert(function);
+
+  if (!val)
+    cerebro_err_exit("unmarshall_double(%s(%s:%d)): null val pointer", file, function, line);
+
+  if (!buf)
+    cerebro_err_exit("unmarshall_double(%s(%s:%d)): null buf pointer", file, function, line);
+
+  if ((rv = unmarshall_double(val, buf, buflen)) < 0)
+    cerebro_err_exit("unmarshall_double(%s(%s:%d)): %s\n", strerror(errno));
+
+  return rv;
+}
+
+int 
+wrap_unmarshall_buffer(const char *file, const char *function, int line, char *val, unsigned int vallen, const char *buf, unsigned int buflen)
+{
+  int rv;
+
+  assert(file);
+  assert(function);
+
+  if (!val)
+    cerebro_err_exit("unmarshall_buffer(%s(%s:%d)): null val pointer", file, function, line);
+
+  if (!buf)
+    cerebro_err_exit("unmarshall_buffer(%s(%s:%d)): null buf pointer", file, function, line);
+
+  if ((rv = unmarshall_buffer(val, vallen, buf, buflen)) < 0)
+    cerebro_err_exit("unmarshall_buffer(%s(%s:%d)): %s\n", strerror(errno));
+
+  return rv;
 }
