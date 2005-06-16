@@ -16,7 +16,6 @@ Cleanup
 - more statically compiled in libraries to reduce virt/res size?
   - wrappers lib
   - modules lib
-- %m trick like in pdsh, save lines
 
 Audit
 - code review to reduce memory footprint
@@ -26,6 +25,7 @@ Portability
 - Non-pthreads support
 
 Design
+- error output tricks like %m in pdsh, to save lines
 - metric modules can provide multiple metrics??
 - Update time for each cerebro metric data?
 - behavior on module loading/read/get
