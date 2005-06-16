@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.58 2005-06-15 22:31:39 achu Exp $
+## $Id: Makefile.am,v 1.59 2005-06-16 15:45:32 achu Exp $
 ##*****************************************************************************
 
 if WITH_GNU_LD
@@ -42,8 +42,7 @@ libcerebro_la_CFLAGS  = -D_REENTRANT \
 			-DCEREBRO_CONFIG_MODULE_BUILDDIR=\"$(cerebro_config_module_builddir)\" \
 			-DCEREBRO_METRIC_MODULE_BUILDDIR=\"$(cerebro_metric_module_builddir)\" \
 			-DCEREBRO_MONITOR_MODULE_BUILDDIR=\"$(cerebro_monitor_module_builddir)\" \
-			-I$(srcdir)/../libcommon \
-			-I$(srcdir)/../libmarshall
+			-I$(srcdir)/../libcommon
 libcerebro_la_SOURCES = cerebro.c \
 			cerebro_clusterlist_util.c \
 			cerebro_config_util.c \
@@ -56,14 +55,10 @@ libcerebro_la_SOURCES = cerebro.c \
 			cerebro_util.c
 libcerebro_la_LDFLAGS = -version-info @LIBCEREBRO_VERSION_INFO@ \
 			$(CEREBRO_OTHER_FLAGS)
-libcerebro_la_LIBADD  = ../libcommon/libcommon.la \
-			../libmarshall/libmarshall.la \
+libcerebro_la_LIBADD  = ../libcommon/libcommon.la
 			$(STATIC_MODULE_LIBS)
 
 ../libcommon/libcommon.la : force-dependency-check
-	@cd `dirname $@` && make `basename $@`
-
-../libmarshall/libmarshall.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
 ../modules/clusterlist/libclusterlistmodules.la: force-dependency-check

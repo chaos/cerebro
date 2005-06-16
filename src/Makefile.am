@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.5 2005-06-15 22:31:39 achu Exp $
+## $Id: Makefile.am,v 1.6 2005-06-16 15:45:32 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -7,5 +7,4 @@
 SUBDIRS = cerebrod \
 	  modules \
 	  libcommon \
-	  libcerebro \
-	  libmarshall
+	  libcerebro

@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.13 2005-06-15 18:00:34 achu Exp $
+## $Id: Makefile.am,v 1.14 2005-06-16 15:45:32 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -10,6 +10,7 @@ noinst_HEADERS = conffile.h \
 		 hash.h \
 		 list.h \
 		 ltdl.h \
+		 marshall.h \
 		 thread.h
 
 if !WITH_STATIC_MODULES
@@ -24,6 +25,7 @@ libcommon_la_SOURCES = conffile.c \
 		       fd.c \
 		       hash.c \
 		       list.c \
+		       marshall.c \
 		       thread.c \
 		       $(LTDL_SOURCES)
 libcommon_la_LIBADD = $(LTDL_LIBADD)

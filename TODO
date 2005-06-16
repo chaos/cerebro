@@ -7,22 +7,15 @@ Testing
 - api again
 
 Cleanup
-- debug around all the checks
 - cleanup module loading stuff
 - new module documentation
 - metric max use
 - run monitor modules w/o turning metric server on
    - base on update_flag
    - need structure to hold node locks without metric info?
-- debug/lock race issue with cerebro_error functions??
-   - calling debug stuff even if debug_output is locked in cerebrod
-   - pointless, should only be for debug output, nothing more, nothing less
-- metric modules can provide multiple metrics??
 - more statically compiled in libraries to reduce virt/res size?
   - wrappers lib
   - modules lib
-  - error lib
-  - marshalling lib
 
 Audit
 - code review to reduce memory footprint
@@ -32,6 +25,7 @@ Portability
 - Non-pthreads support
 
 Design
+- metric modules can provide multiple metrics??
 - Update time for each cerebro metric data?
 - behavior on module loading/read/get
   - total fail, or only fail on one module
