@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.c,v 1.47 2005-06-16 21:39:55 achu Exp $
+ *  $Id: cerebro_module.c,v 1.48 2005-06-16 22:31:42 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -1453,9 +1453,9 @@ _load_monitor_module(void *handle, char *module)
       goto cleanup;
     }
 
-  if (!module_info->metric_names)
+  if (!module_info->metric_name)
     {
-      cerebro_err_debug("monitor module '%s': metric_names null",
+      cerebro_err_debug("monitor module '%s': metric_name null",
 			module_info->monitor_module_name);
       goto cleanup;
     }
@@ -1656,10 +1656,9 @@ _cerebro_monitor_module_cleanup(cerebro_monitor_modules_t monitor_handle,
   return ((*(monitor_handle->module_info[index])->cleanup)());
 }
 
-int 
-_cerebro_monitor_module_metric_names(cerebro_monitor_modules_t monitor_handle,
-                                     unsigned int index,
-                                     char ***metric_names)
+char *
+_cerebro_monitor_module_metric_name(cerebro_monitor_modules_t monitor_handle,
+                                    unsigned int index)
 {
   if (_cerebro_module_monitor_module_check(monitor_handle) < 0)
     return -1;
@@ -1667,7 +1666,7 @@ _cerebro_monitor_module_metric_names(cerebro_monitor_modules_t monitor_handle,
   if (!(index < monitor_handle->modules_count))
     return -1;
 
-  return ((*(monitor_handle->module_info[index])->metric_names)(metric_names));
+  return ((*(monitor_handle->module_info[index])->metric_name)());
 }
 
 int 

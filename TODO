@@ -18,6 +18,7 @@ Cleanup
   - and offer destroy function, so module need not malloc, could
     pointer to static buffer instead.
 - max on metric/monitor modules thing
+- Hash-destroys, not destroy key appropriately?  _Free not enough
 
 Audit
 - code review to reduce memory footprint

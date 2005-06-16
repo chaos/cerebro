@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.h,v 1.29 2005-06-13 23:05:54 achu Exp $
+ *  $Id: cerebro_module.h,v 1.30 2005-06-16 22:31:42 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_MODULE_H
@@ -267,13 +267,12 @@ int _cerebro_monitor_module_cleanup(cerebro_monitor_modules_t monitor_handle,
                                     unsigned int index);
 
 /*
- * _cerebro_monitor_module_metric_names
+ * _cerebro_monitor_module_metric_name
  *
  * call monitor module metric_names function
  */
-int _cerebro_monitor_module_metric_names(cerebro_monitor_modules_t monitor_handle, 
-                                         unsigned int index,
-                                         char ***metric_names);
+char * _cerebro_monitor_module_metric_name(cerebro_monitor_modules_t monitor_handle, 
+                                           unsigned int index);
 
 /*
  * _cerebro_monitor_module_metric_update

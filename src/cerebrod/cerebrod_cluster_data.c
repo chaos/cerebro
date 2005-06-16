@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_cluster_data.c,v 1.10 2005-06-16 22:02:47 achu Exp $
+ *  $Id: cerebrod_cluster_data.c,v 1.11 2005-06-16 22:31:42 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -105,13 +105,6 @@ pthread_mutex_t cerebrod_metric_name_lock = PTHREAD_MUTEX_INITIALIZER;
  * monitoring module handles
  */
 cerebro_monitor_modules_t monitor_handle = NULL;
-
-/*
- * monitor_list
- *
- * list of monitors
- */
-List monitor_list = NULL;
 
 /*
  * monitor_index
@@ -280,7 +273,6 @@ cerebrod_cluster_data_initialize(void)
       goto done;
     }
   
-  monitor_list = List_create((ListDelF)_Free);
   monitor_index = Hash_create(monitor_index_size,
                               (hash_key_f)hash_key_string,
                               (hash_cmp_f)strcmp,
@@ -288,18 +280,20 @@ cerebrod_cluster_data_initialize(void)
 
   for (i = 0; i < monitor_index_size; i++)
     {
-      struct cerebrod_monitor *monitor;
-      char *module_name;
-      char **metric_names;
-      int metric_count;
-      int j;
+      struct cerebrod_monitor_metric *monitor_metric;
+      char *metric_name;
 
-      if (!(module_name = _cerebro_monitor_module_name(monitor_handle, i)))
+#if CEREBRO_DEBUG
+      if (conf.debug && conf.listen_debug)
         {
-          cerebro_err_debug("%s(%s:%d): _cerebro_monitor_module_name failed",
-                            __FILE__, __FUNCTION__, __LINE__);
-          goto monitor_cleanup;
+          Pthread_mutex_lock(&debug_output_mutex);
+          fprintf(stderr, "**************************************\n");
+          fprintf(stderr, "* Settup up Monitor Module: %s\n",
+                  _cerebro_monitor_module_name(monitor_handle, i));
+          fprintf(stderr, "**************************************\n");
+          Pthread_mutex_unlock(&debug_output_mutex);
         }
+#endif /* CEREBRO_DEBUG */
 
       if (_cerebro_monitor_module_setup(monitor_handle, i) < 0)
         {
@@ -308,61 +302,25 @@ cerebrod_cluster_data_initialize(void)
           goto monitor_cleanup;
         }
 
-      monitor = Malloc(sizeof(struct cerebrod_monitor));
-      monitor->module_name = Strdup(module_name);
-      Pthread_mutex_init(&(monitor->monitor_lock), NULL);
-
-      List_append(monitor_list, monitor);
-
-      if ((metric_count = _cerebro_monitor_module_metric_names(monitor_handle,
-                                                               i,
-                                                               &metric_names)) < 0)
+      if (!(metric_name = _cerebro_monitor_module_metric_name(monitor_handle,
+                                                              i)) < 0)
         {
-          cerebro_err_debug("%s(%s:%d): _cerebro_monitor_module_metric_names failed",
+          cerebro_err_debug("%s(%s:%d): _cerebro_monitor_module_metric_name failed",
                             __FILE__, __FUNCTION__, __LINE__);
           goto monitor_cleanup;
         }
-      
-      for (j = 0; j < metric_count; j++)
-        {
-          struct cerebrod_monitor_metric *monitor_metric;
-      
-#if CEREBRO_DEBUG
-          if (conf.debug && conf.listen_debug)
-            {
-              Pthread_mutex_lock(&debug_output_mutex);
-              fprintf(stderr, "**************************************\n");
-              fprintf(stderr, "* Settup up Monitor Module/Metric: %s/%s\n",
-                      _cerebro_monitor_module_name(monitor_handle, i),
-                      metric_names[i]);
-              fprintf(stderr, "**************************************\n");
-              Pthread_mutex_unlock(&debug_output_mutex);
-            }
-#endif /* CEREBRO_DEBUG */
 
-          monitor_metric = Malloc(sizeof(struct cerebrod_monitor));
-          monitor_metric->metric_name = Strdup(metric_names[j]);
-          monitor_metric->index = i;
-          monitor_metric->monitor = monitor;
+      monitor_metric = Malloc(sizeof(struct cerebrod_monitor_metric));
+      monitor_metric->metric_name = Strdup(metric_name);
+      monitor_metric->index = i;
+      Pthread_mutex_init(&(monitor_metric->monitor_lock), NULL);
 
-          Hash_insert(monitor_index, 
-                      monitor_metric->metric_name,
-                      monitor_metric);
-        }
-
-      for (j = 0; j < metric_count; j++)
-        free(metric_names[j]);
-      free(metric_names);
+      Hash_insert(monitor_index, monitor_metric->metric_name, monitor_metric);
     }
 
   goto done;
 
  monitor_cleanup:
-  if (monitor_list)
-    {
-      List_destroy(monitor_list);
-      monitor_list = NULL;
-    }
   if (monitor_handle)
     {
       _cerebro_module_destroy_monitor_handle(monitor_handle);
@@ -790,7 +748,7 @@ cerebrod_cluster_data_update(char *nodename,
                 {
                   if ((monitor_metric = Hash_find(monitor_index, metric_name_buf)))
                     {
-                      Pthread_mutex_lock(&monitor_metric->monitor->monitor_lock);
+                      Pthread_mutex_lock(&monitor_metric->monitor_lock);
                       _cerebro_monitor_module_metric_update(monitor_handle,
                                                             monitor_metric->index,
                                                             nodename,
@@ -798,7 +756,7 @@ cerebrod_cluster_data_update(char *nodename,
                                                             hb->metrics[i]->metric_value_type,
                                                             hb->metrics[i]->metric_value_len,
                                                             hb->metrics[i]->metric_value);
-                      Pthread_mutex_unlock(&monitor_metric->monitor->monitor_lock);
+                      Pthread_mutex_unlock(&monitor_metric->monitor_lock);
                     }
                 }
             }

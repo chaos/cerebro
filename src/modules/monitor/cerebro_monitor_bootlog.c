@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_monitor_bootlog.c,v 1.7 2005-06-16 21:35:34 achu Exp $
+ *  $Id: cerebro_monitor_bootlog.c,v 1.8 2005-06-16 22:31:42 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -190,53 +190,16 @@ bootlog_monitor_cleanup(void)
 }
 
 /* 
- * bootlog_monitor_metric_names
+ * bootlog_monitor_metric_name
  *
- * bootlog monitor module metric_names function
+ * bootlog monitor module metric_name function
  *
  * Returns 0 on success, -1 on error
  */
-static int 
-bootlog_monitor_metric_names(char ***metric_names)
+static char *
+bootlog_monitor_metric_name(void)
 {
-  char **names = NULL;
-   
-  if (!metric_names)
-    {
-      cerebro_err_debug("%s(%s:%d): metric_names null",
-			__FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
- 
-  if (!(names = (char **)malloc(sizeof(char *) * 2)))
-    {
-      cerebro_err_debug("%s(%s:%d): malloc: %s",
-			__FILE__, __FUNCTION__, __LINE__,
-			strerror(errno));
-      goto cleanup;
-    }
-  memset(names, '\0', sizeof(char *) * 2);
-
-  if (!(names[0] = strdup(BOOTLOG_BOOTTIME_METRIC_NAME)))
-    {
-      cerebro_err_debug("%s(%s:%d): strdup: %s",
-			__FILE__, __FUNCTION__, __LINE__,
-			strerror(errno));
-      goto cleanup;
-    }
-  names[1] = NULL;
-
-  *metric_names = names;
-  return 1;
- 
- cleanup:
-  if (names)
-    {
-      if (names[0])
-        free(names[0]);
-      free(names);
-    }
-  return -1;
+  return BOOTLOG_BOOTTIME_METRIC_NAME;
 }
 
 /* 
@@ -329,9 +292,10 @@ _check_if_new_btime(const char *nodename, u_int32_t btime)
         }
 
       /* Rounding issue on some kernels that can change boottime +/-
-       * one.  This is the fix.
+       * one or two.  This is the fix.  Basically, we assume that a
+       * machine can't reboot within 2 seconds.
        */
-      if (btime > (stored_btime + 1))
+      if (btime > (stored_btime + 2))
         {
           if (_qsql_query("update last_btime set btime=%d where name='%s'",
                           btime, nodename) < 0)
@@ -446,6 +410,6 @@ struct cerebro_monitor_module_info monitor_module_info =
     BOOTLOG_MONITOR_MODULE_NAME,
     &bootlog_monitor_setup,
     &bootlog_monitor_cleanup,
-    &bootlog_monitor_metric_names,
+    &bootlog_monitor_metric_name,
     &bootlog_monitor_metric_update,
   };
