@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.36 2005-06-15 22:31:39 achu Exp $
+## $Id: configure.ac,v 1.37 2005-06-16 21:16:08 achu Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -163,8 +163,7 @@ AC_CONFIG_FILES( \
   src/modules/metric/Makefile \
   src/modules/monitor/Makefile \
   src/libcerebro/Makefile \
-  src/libcommon/Makefile \
-  src/libmarshall/Makefile \
+  src/libcommon/Makefile
 )
 AC_OUTPUT
 

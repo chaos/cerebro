@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_cluster_data.h,v 1.2 2005-06-14 00:43:48 achu Exp $
+ *  $Id: cerebrod_cluster_data.h,v 1.3 2005-06-16 21:16:08 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_CLUSTER_DATA_H
@@ -43,10 +43,10 @@ struct cerebrod_node_data
 {
   char *nodename;
   int discovered;
-  hash_t metric_data;
-  int metric_data_count;
   u_int32_t last_received_time;
   pthread_mutex_t node_data_lock;
+  hash_t metric_data;
+  int metric_data_count;
 };
 
 /*

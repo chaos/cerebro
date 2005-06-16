@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.81 2005-06-16 00:24:25 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.82 2005-06-16 21:16:08 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -158,7 +158,9 @@ _cerebrod_listener_initialize(void)
     cerebro_err_exit("%s(%s:%d): listener_fd setup failed",
                      __FILE__, __FUNCTION__, __LINE__);
   Pthread_mutex_unlock(&listener_fd_lock);
-  
+
+  cerebrod_cluster_data_initialize();
+
   cerebrod_listener_initialization_complete++;
   Pthread_cond_signal(&cerebrod_listener_initialization_complete_cond);
  out:

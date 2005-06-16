@@ -10,9 +10,6 @@ Cleanup
 - cleanup module loading stuff
 - new module documentation
 - metric max use
-- run monitor modules w/o turning metric server on
-   - base on update_flag
-   - need structure to hold node locks without metric info?
 - more statically compiled in libraries to reduce virt/res size?
   - wrappers lib
   - modules lib
