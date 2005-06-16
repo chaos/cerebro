@@ -3,6 +3,8 @@
 	* Fixed up locking issues.
 
 	* Marshall library cleanup.
+
+	* Error library cleanup.
 	
 2005-06-15  Albert Chu  <chu11@llnl.gov>
 

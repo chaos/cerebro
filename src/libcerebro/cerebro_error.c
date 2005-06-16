@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_error.c,v 1.10 2005-06-16 15:16:40 achu Exp $
+ *  $Id: cerebro_error.c,v 1.11 2005-06-16 17:17:16 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -67,50 +67,6 @@ cerebro_err_debug(const char *fmt, ...)
     return; 
 
   if (!fmt)
-    return;
-
-  va_start(ap, fmt);
-  vsnprintf(buffer, CEREBRO_ERROR_STRING_BUFLEN, fmt, ap);
-  va_end(ap);
-
-  err_debug(buffer);
-}
-
-void 
-cerebro_err_debug_lib(const char *fmt, ...)
-{
-  char buffer[CEREBRO_ERROR_STRING_BUFLEN];
-  va_list ap;
-
-  if (!cerebro_err_initialized)
-    return; 
-
-  if (!fmt)
-    return;
-
-  if (!(cerebro_flags & CEREBRO_ERROR_LIB))
-    return;
-
-  va_start(ap, fmt);
-  vsnprintf(buffer, CEREBRO_ERROR_STRING_BUFLEN, fmt, ap);
-  va_end(ap);
-
-  err_debug(buffer);
-}
-
-void 
-cerebro_err_debug_module(const char *fmt, ...)
-{
-  char buffer[CEREBRO_ERROR_STRING_BUFLEN];
-  va_list ap;
-
-  if (!cerebro_err_initialized)
-    return; 
-
-  if (!fmt)
-    return;
-
-  if (!(cerebro_flags & CEREBRO_ERROR_MODULE))
     return;
 
   va_start(ap, fmt);

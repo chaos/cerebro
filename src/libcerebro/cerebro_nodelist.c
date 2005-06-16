@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_nodelist.c,v 1.20 2005-06-08 22:54:38 achu Exp $
+ *  $Id: cerebro_nodelist.c,v 1.21 2005-06-16 17:17:16 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -284,24 +284,24 @@ _cerebro_nodelist_iterator_check(cerebro_nodelist_iterator_t nodelistItr)
 
   if (!nodelistItr->itr)
     {
-      cerebro_err_debug_lib("%s(%s:%d): itr null",
-                            __FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug("%s(%s:%d): itr null",
+			__FILE__, __FUNCTION__, __LINE__);
       nodelistItr->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
 
   if (!nodelistItr->nodelist)
     {
-      cerebro_err_debug_lib("%s(%s:%d): nodelist null",
-                            __FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug("%s(%s:%d): nodelist null",
+			__FILE__, __FUNCTION__, __LINE__);
       nodelistItr->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
   
   if (nodelistItr->nodelist->magic != CEREBRO_NODELIST_MAGIC_NUMBER)
     {
-      cerebro_err_debug_lib("%s(%s:%d): nodelist destroyed",
-                            __FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug("%s(%s:%d): nodelist destroyed",
+			__FILE__, __FUNCTION__, __LINE__);
       nodelistItr->errnum = CEREBRO_ERR_MAGIC_NUMBER;
       return -1;
     }

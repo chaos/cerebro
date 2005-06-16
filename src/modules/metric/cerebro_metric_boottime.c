@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_boottime.c,v 1.3 2005-06-15 22:46:08 achu Exp $
+ *  $Id: cerebro_metric_boottime.c,v 1.4 2005-06-16 17:17:16 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -60,17 +60,17 @@ boottime_metric_setup(void)
  
   if ((fd = open(BOOTTIME_FILE, O_RDONLY, 0)) < 0)
     {
-      cerebro_err_debug_module("%s(%s:%d): open: %s",
-                               __FILE__, __FUNCTION__, __LINE__,
-                               strerror(errno));
+      cerebro_err_debug("%s(%s:%d): open: %s",
+			__FILE__, __FUNCTION__, __LINE__,
+			strerror(errno));
       goto cleanup;
     }
 
   if ((len = read(fd, buf, BOOTTIME_BUFLEN)) < 0)
     {
-      cerebro_err_debug_module("%s(%s:%d): read: %s",
-                               __FILE__, __FUNCTION__, __LINE__,
-                               strerror(errno));
+      cerebro_err_debug("%s(%s:%d): read: %s",
+			__FILE__, __FUNCTION__, __LINE__,
+			strerror(errno));
       goto cleanup;
     }
                                                                                       
@@ -89,8 +89,8 @@ boottime_metric_setup(void)
     }
   else
     {
-      cerebro_err_debug_module("%s(%s:%d): boottime file parse error",
-                               __FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug("%s(%s:%d): boottime file parse error",
+			__FILE__, __FUNCTION__, __LINE__);
       goto cleanup;
     }
                                                                                       
@@ -98,14 +98,14 @@ boottime_metric_setup(void)
   bootval = (u_int32_t)strtol(bootvalptr, &endptr, 10);
   if ((bootval == LONG_MIN || bootval == LONG_MAX) && errno == ERANGE)
     {
-      cerebro_err_debug_module("%s(%s:%d): boottime out of range",
-                               __FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug("%s(%s:%d): boottime out of range",
+			__FILE__, __FUNCTION__, __LINE__);
       goto cleanup;
     }
   if ((bootvalptr + strlen(bootvalptr)) != endptr)
     {
-      cerebro_err_debug_module("%s(%s:%d): boottime value parse error",
-                               __FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug("%s(%s:%d): boottime value parse error",
+			__FILE__, __FUNCTION__, __LINE__);
       goto cleanup;
     }
                                                                                       
@@ -181,15 +181,15 @@ boottime_metric_get_metric_value(void *metric_value_buf,
 {
   if (!metric_value_buf)
     {
-      cerebro_err_debug_module("%s(%s:%d): metric_value_buf null",
-                               __FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug("%s(%s:%d): metric_value_buf null",
+			__FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
   if (metric_value_buflen < sizeof(u_int32_t))
     {
-      cerebro_err_debug_module("%s(%s:%d): metric_value_buflen invalid",
-                               __FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug("%s(%s:%d): metric_value_buflen invalid",
+			__FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 

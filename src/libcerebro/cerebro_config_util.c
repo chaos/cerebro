@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_util.c,v 1.12 2005-06-09 20:17:09 achu Exp $
+ *  $Id: cerebro_config_util.c,v 1.13 2005-06-16 17:17:16 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -384,8 +384,8 @@ _cerebro_config_load_config_file(struct cerebro_config *conf)
   
   if (!(cf = conffile_handle_create()))
     {
-      cerebro_err_debug_lib("%s(%s:%d): conffile_handle_create",
-			    __FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug("%s(%s:%d): conffile_handle_create",
+			__FILE__, __FUNCTION__, __LINE__);
       goto cleanup;
     }
   
@@ -410,13 +410,12 @@ _cerebro_config_load_config_file(struct cerebro_config *conf)
 	goto out;
 
       if (conffile_errmsg(cf, buf, CONFFILE_MAX_ERRMSGLEN) < 0)
-	cerebro_err_debug_lib("%s(%s:%d): conffile_parse: %d", 
-			      __FILE__, __FUNCTION__, __LINE__,
-			      conffile_errnum(cf));
+	cerebro_err_debug("%s(%s:%d): conffile_parse: %d", 
+			  __FILE__, __FUNCTION__, __LINE__,
+			  conffile_errnum(cf));
       else
-	cerebro_err_debug_lib("%s(%s:%d): conffile_parse: %s", 
-			      __FILE__, __FUNCTION__, __LINE__,
-			      buf);
+	cerebro_err_debug("%s(%s:%d): conffile_parse: %s", 
+			  __FILE__, __FUNCTION__, __LINE__, buf);
 	
       goto cleanup;
     }
@@ -440,22 +439,22 @@ _cerebro_config_merge_cerebro_config(struct cerebro_config *conf,
 
   if (!conf)
     {
-      cerebro_err_debug_lib("%s(%s:%d): conf null",
-			    __FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug("%s(%s:%d): conf null",
+			__FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
   if (!module_conf)
     {
-      cerebro_err_debug_lib("%s(%s:%d): module_conf null",
-			    __FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug("%s(%s:%d): module_conf null",
+			__FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
   if (!config_file_conf)
     {
-      cerebro_err_debug_lib("%s(%s:%d): config_file_conf null",
-			    __FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug("%s(%s:%d): config_file_conf null",
+			__FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
@@ -685,8 +684,8 @@ _cerebro_config_load(struct cerebro_config *conf)
 
   if (!conf)
     {
-      cerebro_err_debug_lib("%s(%s:%d): conf null",
-			    __FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug("%s(%s:%d): conf null",
+			__FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 

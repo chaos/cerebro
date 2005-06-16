@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.60 2005-06-16 15:16:40 achu Exp $
+ *  $Id: cerebrod.c,v 1.61 2005-06-16 17:17:16 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -79,9 +79,7 @@ main(int argc, char **argv)
   cerebro_err_init(argv[0]);
 #if CEREBRO_DEBUG
   cerebro_err_set_flags(CEREBRO_ERROR_STDERR 
-			| CEREBRO_ERROR_SYSLOG 
-			| CEREBRO_ERROR_LIB 
-			| CEREBRO_ERROR_MODULE);
+			| CEREBRO_ERROR_SYSLOG);
 #else  /* !CEREBRO_DEBUG */
   cerebro_err_set_flags(CEREBRO_ERROR_STDERR 
 			| CEREBRO_ERROR_SYSLOG);
@@ -95,13 +93,16 @@ main(int argc, char **argv)
 
 #if CEREBRO_DEBUG
   if (!conf.debug)
-    cerebrod_daemon_init();
+    {
+      cerebrod_daemon_init();
+      cerebro_err_set_flags(CEREBRO_ERROR_SYSLOG);
+    }
+  else
+    cerebro_err_set_flags(CEREBRO_ERROR_STDERR);
 #else  /* !CEREBRO_DEBUG */
   cerebrod_daemon_init();
+  cerebro_err_set_flags(CEREBRO_ERROR_SYSLOG);
 #endif /* !CEREBRO_DEBUG */
-  cerebro_err_set_flags(CEREBRO_ERROR_SYSLOG
-                        | CEREBRO_ERROR_LIB
-                        | CEREBRO_ERROR_MODULE);
 
   /* Call after daemonization, since daemonization closes currently
    * open fds 

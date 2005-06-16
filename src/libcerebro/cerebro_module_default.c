@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module_default.c,v 1.8 2005-05-10 18:19:54 achu Exp $
+ *  $Id: cerebro_module_default.c,v 1.9 2005-06-16 17:17:16 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -57,28 +57,25 @@ default_clusterlist_get_nodename(const char *node, char *buf, unsigned int bufle
 
   if (!node)
     {
-      cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: "
-			       "node null",
-			       DEFAULT_CLUSTERLIST_MODULE_NAME,
-			       __FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug("%s(%s:%d): %s clusterlist module: node null",
+			DEFAULT_CLUSTERLIST_MODULE_NAME,
+			__FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
   if (!buf)
     {
-      cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: "
-			       "buf null",
-			       DEFAULT_CLUSTERLIST_MODULE_NAME,
-			       __FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug("%s(%s:%d): %s clusterlist module: buf null",
+			DEFAULT_CLUSTERLIST_MODULE_NAME,
+			__FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
   if (!buflen)
     {
-      cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: "
-			       "buflen invalid",
-			       DEFAULT_CLUSTERLIST_MODULE_NAME,
-			       __FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug("%s(%s:%d): %s clusterlist module: buflen invalid",
+			DEFAULT_CLUSTERLIST_MODULE_NAME,
+			__FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
   
@@ -86,10 +83,10 @@ default_clusterlist_get_nodename(const char *node, char *buf, unsigned int bufle
  
   if ((len + 1) > buflen)
     {
-      cerebro_err_debug_module("%s(%s:%d): %s clusterlist module: "
-			       "buflen too small: %d %d",
-			       __FILE__, __FUNCTION__, __LINE__,
-			       DEFAULT_CLUSTERLIST_MODULE_NAME, len, buflen);
+      cerebro_err_debug("%s(%s:%d): %s clusterlist module: "
+			"buflen too small: %d %d",
+			__FILE__, __FUNCTION__, __LINE__,
+			DEFAULT_CLUSTERLIST_MODULE_NAME, len, buflen);
       return -1;
     }
  

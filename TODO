@@ -16,6 +16,7 @@ Cleanup
 - more statically compiled in libraries to reduce virt/res size?
   - wrappers lib
   - modules lib
+- %m trick like in pdsh, save lines
 
 Audit
 - code review to reduce memory footprint

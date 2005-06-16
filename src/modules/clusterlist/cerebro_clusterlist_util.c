@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_util.c,v 1.11 2005-05-05 16:12:57 achu Exp $
+ *  $Id: cerebro_clusterlist_util.c,v 1.12 2005-06-16 17:17:16 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -25,31 +25,31 @@ cerebro_clusterlist_copy_nodename(const char *node,
 
   if (!node)
     {
-      cerebro_err_debug_module("%s(%s:%d): node null",
-			       __FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug("%s(%s:%d): node null",
+			__FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
   if (!buf)
     {
-      cerebro_err_debug_module("%s(%s:%d): buf null",
-			       __FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug("%s(%s:%d): buf null",
+			__FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
   if (!buflen)
     {
-      cerebro_err_debug_module("%s(%s:%d): buflen invalid",
-			       __FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug("%s(%s:%d): buflen invalid",
+			__FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 
   len = strlen(node);
   if ((len + 1) > buflen)
     {
-      cerebro_err_debug_module("%s(%s:%d): buflen too small: len=%d buflen=%d", 
-			       __FILE__, __FUNCTION__, __LINE__,
-			       len, buflen);
+      cerebro_err_debug("%s(%s:%d): buflen too small: len=%d buflen=%d", 
+			__FILE__, __FUNCTION__, __LINE__,
+			len, buflen);
       return -1;
     }
 

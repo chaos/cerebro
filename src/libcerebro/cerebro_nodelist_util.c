@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_nodelist_util.c,v 1.15 2005-06-15 18:00:34 achu Exp $
+ *  $Id: cerebro_nodelist_util.c,v 1.16 2005-06-16 17:17:16 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -27,32 +27,32 @@ _cerebro_nodelist_check(cerebro_nodelist_t nodelist)
 
   if (!nodelist->nodes)
     {
-      cerebro_err_debug_lib("%s(%s:%d): nodelist null",
-                            __FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug("%s(%s:%d): nodelist null",
+			__FILE__, __FUNCTION__, __LINE__);
       nodelist->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
 
   if (!nodelist->iterators)
     {
-      cerebro_err_debug_lib("%s(%s:%d): iterators null",
-                            __FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug("%s(%s:%d): iterators null",
+			__FILE__, __FUNCTION__, __LINE__);
       nodelist->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
 
   if (!nodelist->handle)
     {
-      cerebro_err_debug_lib("%s(%s:%d): handle null",
-                            __FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug("%s(%s:%d): handle null",
+			__FILE__, __FUNCTION__, __LINE__);
       nodelist->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
 
   if (nodelist->handle->magic != CEREBRO_MAGIC_NUMBER)
     {
-      cerebro_err_debug_lib("%s(%s:%d): handle destroyed",
-                            __FILE__, __FUNCTION__, __LINE__);
+      cerebro_err_debug("%s(%s:%d): handle destroyed",
+			__FILE__, __FUNCTION__, __LINE__);
       nodelist->errnum = CEREBRO_ERR_MAGIC_NUMBER;
       return -1;
     }
