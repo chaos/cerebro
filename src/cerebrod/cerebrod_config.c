@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.102 2005-06-10 22:54:42 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.103 2005-06-16 22:02:47 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -78,6 +78,7 @@ _cerebrod_config_default(void)
   conf.metric_server = CEREBROD_METRIC_SERVER_DEFAULT;
   conf.metric_server_port = CEREBROD_METRIC_SERVER_PORT_DEFAULT;
   conf.metric_max = CEREBROD_METRIC_MAX_DEFAULT;
+  conf.monitor_max = CEREBROD_MONITOR_MAX_DEFAULT;
 #if CEREBRO_DEBUG
   conf.speak_debug = CEREBROD_SPEAK_DEBUG_DEFAULT;
   conf.listen_debug = CEREBROD_LISTEN_DEBUG_DEFAULT;
@@ -253,6 +254,8 @@ _cerebrod_config_setup(void)
     conf.metric_server_port = conf_l.cerebrod_metric_server_port;
   if (conf_l.cerebrod_metric_max_flag)
     conf.metric_max = conf_l.cerebrod_metric_max;
+  if (conf_l.cerebrod_monitor_max_flag)
+    conf.monitor_max = conf_l.cerebrod_monitor_max;
 #if CEREBRO_DEBUG
   if (conf_l.cerebrod_speak_debug_flag)
     conf.speak_debug = conf_l.cerebrod_speak_debug;

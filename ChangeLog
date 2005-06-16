@@ -13,6 +13,8 @@
 	* Removed everything related to static compilation.
 
 	* tagged post-static-compilation-remove-1
+
+	* Various calculation tweaks and bug fixes.
 	
 2005-06-15  Albert Chu  <chu11@llnl.gov>
 

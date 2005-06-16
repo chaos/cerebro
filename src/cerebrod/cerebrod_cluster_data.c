@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_cluster_data.c,v 1.9 2005-06-16 21:35:34 achu Exp $
+ *  $Id: cerebrod_cluster_data.c,v 1.10 2005-06-16 22:02:47 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -60,6 +60,13 @@ List cerebrod_cluster_data_list = NULL;
  * contains list of metrics currently known
  */
 List cerebrod_metric_name_list = NULL;
+
+/* 
+ * cerebrod_metric_name_list_default_count
+ *
+ * Number of default metrics
+ */
+int cerebrod_metric_name_list_default_count;
 
 /*
  * cerebrod_cluster_data_index
@@ -226,29 +233,20 @@ cerebrod_cluster_data_initialize(void)
     {
       cerebrod_metric_name_list = List_create((ListDelF)_Free);
 
-      if (conf.metric_max)
-        {
-          /* Initialize with the handle of default metrics */
-          if (List_count(cerebrod_metric_name_list) < conf.metric_max)
-            List_append(cerebrod_metric_name_list, Strdup(CEREBRO_METRIC_CLUSTER_NODES));
-          if (List_count(cerebrod_metric_name_list) < conf.metric_max)
-            List_append(cerebrod_metric_name_list, Strdup(CEREBRO_METRIC_UP_NODES));
-          if (List_count(cerebrod_metric_name_list) < conf.metric_max)
-            List_append(cerebrod_metric_name_list, Strdup(CEREBRO_METRIC_DOWN_NODES));
-          if (List_count(cerebrod_metric_name_list) < conf.metric_max)
-            List_append(cerebrod_metric_name_list, Strdup(CEREBRO_METRIC_UPDOWN_STATE));
-          if (List_count(cerebrod_metric_name_list) < conf.metric_max)
-            List_append(cerebrod_metric_name_list, Strdup(CEREBRO_METRIC_LAST_RECEIVED_TIME));
-        }
+      /* Initialize with the handle of default metrics */
+      List_append(cerebrod_metric_name_list, Strdup(CEREBRO_METRIC_CLUSTER_NODES));
+      List_append(cerebrod_metric_name_list, Strdup(CEREBRO_METRIC_UP_NODES));
+      List_append(cerebrod_metric_name_list, Strdup(CEREBRO_METRIC_DOWN_NODES));
+      List_append(cerebrod_metric_name_list, Strdup(CEREBRO_METRIC_UPDOWN_STATE));
+      List_append(cerebrod_metric_name_list, Strdup(CEREBRO_METRIC_LAST_RECEIVED_TIME));
+      cerebrod_metric_name_list_default_count = List_count(cerebrod_metric_name_list);
     }
-
-  /* XXX is metric_max correct?? */
 
   if (!conf.listen)
     cerebro_err_exit("%s(%s:%d): listen server not setup",
                      __FILE__, __FUNCTION__, __LINE__);
 
-  if (!(monitor_handle = _cerebro_module_load_monitor_modules(conf.metric_max)))
+  if (!(monitor_handle = _cerebro_module_load_monitor_modules(conf.monitor_max)))
     {
       cerebro_err_debug("%s(%s:%d): _cerebro_module_load_monitor_modules failed",
                         __FILE__, __FUNCTION__, __LINE__);
@@ -772,7 +770,7 @@ cerebrod_cluster_data_update(char *nodename,
                                        list_find_first_string,
                                        metric_name_buf))
                     {
-                      if (List_count(cerebrod_metric_name_list) >= conf.metric_max)
+                      if ((List_count(cerebrod_metric_name_list) - cerebrod_metric_name_list_default_count) >= conf.metric_max)
                         {
                           Pthread_mutex_unlock(&cerebrod_metric_name_lock);
                           continue;

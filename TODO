@@ -9,10 +9,14 @@ Testing
 Cleanup
 - cleanup module loading stuff
 - new module documentation
-- metric max use
+  - and various updates
 - more statically compiled in libraries to reduce virt/res size?
   - wrappers lib
   - modules lib
+- metric modules can provide multiple metrics??
+- module returns pointer/buffer
+  - and offer destroy function, so module need not malloc, could
+    pointer to static buffer instead.
 
 Audit
 - code review to reduce memory footprint
@@ -23,7 +27,6 @@ Portability
 
 Design
 - error output tricks like %m in pdsh, to save lines
-- metric modules can provide multiple metrics??
 - Update time for each cerebro metric data?
 - behavior on module loading/read/get
   - total fail, or only fail on one module

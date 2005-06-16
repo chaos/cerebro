@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_util.c,v 1.13 2005-06-16 17:17:16 achu Exp $
+ *  $Id: cerebro_config_util.c,v 1.14 2005-06-16 22:02:47 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -343,6 +343,17 @@ _cerebro_config_load_config_file(struct cerebro_config *conf)
 	&(conf->cerebrod_metric_max), 
 	0
       },
+      {
+	"cerebrod_monitor_max", 
+	CONFFILE_OPTION_INT, 
+	-1,
+	conffile_int, 
+	1, 
+	0, 
+	&(conf->cerebrod_monitor_max_flag),
+	&(conf->cerebrod_monitor_max), 
+	0
+      },
 #if CEREBRO_DEBUG
       {
 	"cerebrod_speak_debug", 
@@ -636,6 +647,28 @@ _cerebro_config_merge_cerebro_config(struct cerebro_config *conf,
     {
       conf->cerebrod_metric_server_port = module_conf->cerebrod_metric_server_port;
       conf->cerebrod_metric_server_port_flag++;
+    }
+
+  if (config_file_conf->cerebrod_metric_max_flag)
+    {
+      conf->cerebrod_metric_max = config_file_conf->cerebrod_metric_max;
+      conf->cerebrod_metric_max_flag++;
+    }
+  else if (module_conf->cerebrod_metric_max_flag)
+    {
+      conf->cerebrod_metric_max = module_conf->cerebrod_metric_max;
+      conf->cerebrod_metric_max_flag++;
+    }
+
+  if (config_file_conf->cerebrod_monitor_max_flag)
+    {
+      conf->cerebrod_monitor_max = config_file_conf->cerebrod_monitor_max;
+      conf->cerebrod_monitor_max_flag++;
+    }
+  else if (module_conf->cerebrod_monitor_max_flag)
+    {
+      conf->cerebrod_monitor_max = module_conf->cerebrod_monitor_max;
+      conf->cerebrod_monitor_max_flag++;
     }
 
 #if CEREBRO_DEBUG
