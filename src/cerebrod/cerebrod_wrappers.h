@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_wrappers.h,v 1.2 2005-06-16 00:24:25 achu Exp $
+ *  $Id: cerebrod_wrappers.h,v 1.3 2005-06-16 21:35:34 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_WRAPPERS_H
@@ -49,9 +49,7 @@
 #include <dirent.h>
 
 #include "error.h"
-#if !WITH_STATIC_MODULES
 #include "ltdl.h"
-#endif
 #include "list.h"
 #include "hash.h"
 #include "marshall.h"
@@ -217,7 +215,6 @@ pid_t wrap_fork(const char *file, const char *function, int line);
 Sighandler_t wrap_signal(const char *file, const char *function, int line, int signum, Sighandler_t handler);
 int wrap_gethostname(const char *file, const char *function, int line, char *name, size_t len);
 
-#if !WITH_STATIC_MODULES
 /*
  * ltdl wrappers
  */
@@ -238,7 +235,6 @@ int wrap_lt_dlexit(const char *file, const char *function, int line);
 lt_dlhandle wrap_lt_dlopen(const char *file, const char *function, int line, const char *filename);
 lt_ptr wrap_lt_dlsym(const char *file, const char *function, int line, void *handle, char *symbol);
 int wrap_lt_dlclose(const char *file, const char *function, int line, void *handle);
-#endif /* !WITH_STATIC_MODULES */
 
 /* 
  * List lib wrappers 

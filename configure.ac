@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.37 2005-06-16 21:16:08 achu Exp $
+## $Id: configure.ac,v 1.38 2005-06-16 21:35:34 achu Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -69,12 +69,6 @@ AC_CHECK_HEADERS( \
 #
 AC_CEREBRO_MODULE_DIR
 AC_CEREBRO_CONFIG_FILE
-
-#
-# Check for static module compilation
-#
-AC_STATIC_MODULES
-AM_CONDITIONAL(WITH_STATIC_MODULES, [test "$ac_with_static_modules" = "yes"])
 
 #
 # Check to build gendersllnl module(s)

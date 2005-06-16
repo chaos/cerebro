@@ -1,16 +1,10 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.59 2005-06-16 15:45:32 achu Exp $
+## $Id: Makefile.am,v 1.60 2005-06-16 21:35:34 achu Exp $
 ##*****************************************************************************
 
 if WITH_GNU_LD
 CEREBRO_VERSION_SCRIPT = $(srcdir)/cerebro.map
 CEREBRO_OTHER_FLAGS = -Wl,--version-script=$(CEREBRO_VERSION_SCRIPT)
-endif
-
-if WITH_STATIC_MODULES
-STATIC_MODULE_LIBS = ../modules/clusterlist/libclusterlistmodules.la \
-		     ../modules/config/libconfigmodules.la \
-		     ../modules/metric/libmetricmodules.la
 endif
 
 noinst_HEADERS	       = cerebro_api.h \
@@ -56,7 +50,6 @@ libcerebro_la_SOURCES = cerebro.c \
 libcerebro_la_LDFLAGS = -version-info @LIBCEREBRO_VERSION_INFO@ \
 			$(CEREBRO_OTHER_FLAGS)
 libcerebro_la_LIBADD  = ../libcommon/libcommon.la
-			$(STATIC_MODULE_LIBS)
 
 ../libcommon/libcommon.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`

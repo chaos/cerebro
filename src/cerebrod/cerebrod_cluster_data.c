@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_cluster_data.c,v 1.8 2005-06-16 21:16:08 achu Exp $
+ *  $Id: cerebrod_cluster_data.c,v 1.9 2005-06-16 21:35:34 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -92,7 +92,6 @@ pthread_mutex_t cerebrod_cluster_data_lock = PTHREAD_MUTEX_INITIALIZER;
  */
 pthread_mutex_t cerebrod_metric_name_lock = PTHREAD_MUTEX_INITIALIZER;
 
-#if !WITH_STATIC_MODULES
 /* 
  * monitor_handle
  *
@@ -116,8 +115,6 @@ List monitor_list = NULL;
  */
 hash_t monitor_index = NULL;
 int monitor_index_size;
-
-#endif /* !WITH_STATIC_MODULES */
 
 /* 
  * _cerebrod_node_data_strcmp
@@ -167,10 +164,7 @@ _cerebrod_node_data_create_and_init(const char *nodename)
 void 
 cerebrod_cluster_data_initialize(void)
 {
-  int numnodes = 0;
-#if !WITH_STATIC_MODULES
-  int i;
-#endif /* !WITH_STATIC_MODULES */
+  int i, numnodes = 0;
 
   pthread_mutex_lock(&cerebrod_cluster_data_initialization_complete_lock);
   if (cerebrod_cluster_data_initialization_complete)
@@ -248,7 +242,6 @@ cerebrod_cluster_data_initialize(void)
         }
     }
 
-#if !WITH_STATIC_MODULES
   /* XXX is metric_max correct?? */
 
   if (!conf.listen)
@@ -386,7 +379,6 @@ cerebrod_cluster_data_initialize(void)
   goto done;
 
  done:
-#endif /* !WITH_STATIC_MODULES */
 
   cerebrod_cluster_data_initialization_complete++;
  out:
@@ -759,19 +751,13 @@ cerebrod_cluster_data_update(char *nodename,
       nd->discovered = 1;
       nd->last_received_time = received_time;
 
-#if WITH_STATIC_MODULES
-      if (cerebrod_metric_name_list)
-#else  /* !WITH_STATIC_MODULES */
       if (cerebrod_metric_name_list || monitor_index)
-#endif /* !WITH_STATIC_MODULES */
         {
           
           for (i = 0; i < hb->metrics_len; i++)
             {
               char metric_name_buf[CEREBRO_METRIC_NAME_MAXLEN+1];
-#if !WITH_STATIC_MODULES
               struct cerebrod_monitor_metric *monitor_metric;
-#endif /* !WITH_STATIC_MODULES */
               
               /* Guarantee ending '\0' character */
               memset(metric_name_buf, '\0', CEREBRO_METRIC_NAME_MAXLEN+1);
@@ -802,7 +788,6 @@ cerebrod_cluster_data_update(char *nodename,
                                                received_time);
                 }
 
-#if !WITH_STATIC_MODULES
               if (monitor_index)
                 {
                   if ((monitor_metric = Hash_find(monitor_index, metric_name_buf)))
@@ -818,7 +803,6 @@ cerebrod_cluster_data_update(char *nodename,
                       Pthread_mutex_unlock(&monitor_metric->monitor->monitor_lock);
                     }
                 }
-#endif /* !WITH_STATIC_MODULES */
             }
         }
 

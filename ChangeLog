@@ -9,6 +9,10 @@
 	* Various bug fixing
 
 	* tagged pre-static-compilation-remove-1
+
+	* Removed everything related to static compilation.
+
+	* tagged post-static-compilation-remove-1
 	
 2005-06-15  Albert Chu  <chu11@llnl.gov>
 

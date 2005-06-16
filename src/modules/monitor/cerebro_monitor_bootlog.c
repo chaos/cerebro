@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_monitor_bootlog.c,v 1.6 2005-06-16 17:17:16 achu Exp $
+ *  $Id: cerebro_monitor_bootlog.c,v 1.7 2005-06-16 21:35:34 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -441,11 +441,7 @@ bootlog_monitor_metric_update(const char *nodename,
   return -1;
 }
 
-#if WITH_STATIC_MODULES
-struct cerebro_monitor_module_info bootlog_monitor_module_info =
-#else /* !WITH_STATIC_MODULES */
 struct cerebro_monitor_module_info monitor_module_info =
-#endif /* !WITH_STATIC_MODULES */
   {
     BOOTLOG_MONITOR_MODULE_NAME,
     &bootlog_monitor_setup,

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_gendersllnl.c,v 1.20 2005-06-16 17:17:16 achu Exp $
+ *  $Id: cerebro_clusterlist_gendersllnl.c,v 1.21 2005-06-16 21:35:34 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -256,11 +256,7 @@ gendersllnl_clusterlist_get_nodename(const char *node,
   return 0;
 }
 
-#if WITH_STATIC_MODULES
-struct cerebro_clusterlist_module_info gendersllnl_clusterlist_module_info =
-#else /* !WITH_STATIC_MODULES */
 struct cerebro_clusterlist_module_info clusterlist_module_info =
-#endif /* !WITH_STATIC_MODULES */
   {
     GENDERSLLNL_CLUSTERLIST_MODULE_NAME,
     &gendersllnl_clusterlist_setup,

@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro_module.3.in,v 1.3 2005-06-07 22:20:39 achu Exp $
+\."$Id: cerebro_module.3.in,v 1.4 2005-06-16 21:35:34 achu Exp $
 \."#############################################################################
 .TH LIBCEREBRO 3 "May 2005" "LLNL" "LIBCEREBRO"
 .SH "NAME"
@@ -42,18 +42,12 @@ non-default hostsfile database location.  The default hostsfile is
 located at @CEREBRO_CLUSTERLIST_HOSTSFILE_DEFAULT@.
 \}
 
-.ie @MANPAGE_STATIC_MODULES@ \{
-When a clusterlist module is not specified, the above clusterlist
-modules are searched for in the above order.
-\}
-.el \{
 Clusterlist modules are searched for in the
 .B Cerebro
 package library directory, @CEREBROD_MODULE_DIR@, in the above order.
 If none of the above are found,
 .B cerebrod
 will search for other clusterlist modules.
-\}
 
 If a clusterlist module cannot be found, a default module is loaded.
 
@@ -83,24 +77,16 @@ No configuration modules are searched in this build.
 
 \}
 
-.ie @MANPAGE_STATIC_MODULES@ \{
-When a config module is not specified, the above config modules are
-searched for in the above order.
-\}
-.el \{
 Configuration modules are searched for in the
 .B Cerebro
 package library directory, @CEREBRO_MODULE_DIR@, in the above order.
 If none of the above are found,
 .B cerebrod
 will search for other configuration modules.
-\}
 
 If a configuration module cannot be found, a default module is loaded.
 
 .SH "SEE ALSO"
 libcerebro(3), 
-.if !@WITH_STATIC_MODULES@ \{
 cerebro_module_devel(3),
-\}
 cerebro.conf(5)

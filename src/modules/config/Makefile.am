@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.8 2005-04-30 17:09:10 achu Exp $
+## $Id: Makefile.am,v 1.9 2005-06-16 21:35:34 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -11,24 +11,12 @@ endif
 
 if WITH_GENDERSLLNL
 GENDERSLLNL_CONFIG_MODULE = cerebro_config_gendersllnl.la
-GENDERSLLNL_STATIC_SOURCES = cerebro_config_gendersllnl.c
-GENDERSLLNL_STATIC_LIBS = $(GENDERSLLNL_LIBS)
 endif
 
-if WITH_STATIC_MODULES
-noinst_LTLIBRARIES = libconfigmodules.la
-else
 modulelibdir = $(CEREBRO_MODULE_DIR)
 modulelib_LTLIBRARIES = $(GENDERSLLNL_CONFIG_MODULE)
-endif
 
 MODULE_FLAGS = -module -avoid-version
-
-libconfigmodules_la_SOURCES = $(GENDERSLLNL_STATIC_SOURCES)
-libconfigmodules_la_CFLAGS  = -I$(srcdir)/../../libcerebro \
-                              -I$(srcdir)/../../libcommon
-libconfigmodules_la_LDFLAGS = $(GENDERSLLNL_STATIC_LIBS) \
-			      $(CONFIG_OTHER_FLAGS)
 
 cerebro_config_gendersllnl_la_SOURCES = cerebro_config_gendersllnl.c
 cerebro_config_gendersllnl_la_LDFLAGS = $(MODULE_FLAGS) \

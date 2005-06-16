@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_boottime.c,v 1.4 2005-06-16 17:17:16 achu Exp $
+ *  $Id: cerebro_metric_boottime.c,v 1.5 2005-06-16 21:35:34 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -197,11 +197,7 @@ boottime_metric_get_metric_value(void *metric_value_buf,
   return sizeof(u_int32_t);
 }
 
-#if WITH_STATIC_MODULES
-struct cerebro_metric_module_info boottime_metric_module_info =
-#else /* !WITH_STATIC_MODULES */
 struct cerebro_metric_module_info metric_module_info =
-#endif /* !WITH_STATIC_MODULES */
   {
     BOOTTIME_METRIC_MODULE_NAME,
     &boottime_metric_setup,

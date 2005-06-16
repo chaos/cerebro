@@ -1,12 +1,10 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.22 2005-06-08 00:10:49 achu Exp $
+## $Id: Makefile.am,v 1.23 2005-06-16 21:35:34 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
 
-if !WITH_STATIC_MODULES
 DYNAMIC_MODULES_MANPAGES = cerebro_module_devel.3
-endif
 
 man1_MANS  = cerebro.1
 

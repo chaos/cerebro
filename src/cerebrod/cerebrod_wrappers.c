@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_wrappers.c,v 1.2 2005-06-16 00:24:25 achu Exp $
+ *  $Id: cerebrod_wrappers.c,v 1.3 2005-06-16 21:35:34 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -849,7 +849,6 @@ wrap_gethostname(const char *file, const char *function, int line, char *name, s
   return rv;
 }
 
-#if !WITH_STATIC_MODULES
 int
 wrap_lt_dlinit(const char *file, const char *function, int line)
 {
@@ -939,7 +938,6 @@ wrap_lt_dlclose(const char *file, const char *function, int line, void *handle)
 
   return rv;
 }
-#endif /* !WITH_STATIC_MODULES */
 
 List 
 wrap_list_create(const char *file, const char *function, int line, ListDelF f)

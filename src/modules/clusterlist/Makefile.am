@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.10 2005-06-13 23:05:54 achu Exp $
+## $Id: Makefile.am,v 1.11 2005-06-16 21:35:34 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -14,47 +14,22 @@ noinst_HEADERS = cerebro_clusterlist_genders_util.h \
 
 if WITH_GENDERSLLNL
 GENDERSLLNL_CLUSTERLIST_MODULE = cerebro_clusterlist_gendersllnl.la
-GENDERSLLNL_STATIC_SOURCES = cerebro_clusterlist_gendersllnl.c
-GENDERS_STATIC_UTIL_SOURCES = cerebro_clusterlist_genders_util.c
-GENDERSLLNL_STATIC_LIBS = $(GENDERSLLNL_LIBS)
-CLUSTERLIST_UTIL_SOURCES = cerebro_clusterlist_util.c
 endif
 
 if WITH_GENDERS
 GENDERS_CLUSTERLIST_MODULE = cerebro_clusterlist_genders.la
-GENDERS_STATIC_SOURCES = cerebro_clusterlist_genders.c
-GENDERS_STATIC_UTIL_SOURCES = cerebro_clusterlist_genders_util.c
-GENDERS_STATIC_LIBS = $(GENDERS_LIBS)
-CLUSTERLIST_UTIL_SOURCES = cerebro_clusterlist_util.c
 endif
 
 if WITH_HOSTSFILE
 HOSTSFILE_CLUSTERLIST_MODULE = cerebro_clusterlist_hostsfile.la
-HOSTSFILE_STATIC_SOURCES = cerebro_clusterlist_hostsfile.c
-CLUSTERLIST_UTIL_SOURCES = cerebro_clusterlist_util.c
 endif
 
-if WITH_STATIC_MODULES
-noinst_LTLIBRARIES = libclusterlistmodules.la
-else
 modulelibdir = $(CEREBRO_MODULE_DIR)
 modulelib_LTLIBRARIES = $(GENDERSLLNL_CLUSTERLIST_MODULE) \
 		        $(GENDERS_CLUSTERLIST_MODULE) \
 		        $(HOSTSFILE_CLUSTERLIST_MODULE)
-endif
 
 MODULE_FLAGS = -module -avoid-version
-
-libclusterlistmodules_la_SOURCES = $(GENDERSLLNL_STATIC_SOURCES) \
-				   $(GENDERS_STATIC_SOURCES) \
-				   $(GENDERS_STATIC_UTIL_SOURCES) \
-				   $(HOSTSFILE_STATIC_SOURCES) \
-				   $(CLUSTERLIST_UTIL_SOURCES)
-libclusterlistmodules_la_CFLAGS  = -I$(srcdir)/../../libcerebro \
-				   -I$(srcdir)/../../libcommon
-libclusterlistmodules_la_LDFLAGS = $(GENDERSLLNL_STATIC_LIBS) \
-				   $(GENDERS_STATIC_LIBS) \
-				   $(CLUSTERLIST_OTHER_FLAGS)
 
 cerebro_clusterlist_gendersllnl_la_SOURCES = cerebro_clusterlist_gendersllnl.c \
 					     cerebro_clusterlist_genders_util.c \
