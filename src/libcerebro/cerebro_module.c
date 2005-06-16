@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.c,v 1.46 2005-06-16 21:35:34 achu Exp $
+ *  $Id: cerebro_module.c,v 1.47 2005-06-16 21:39:55 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -28,9 +28,8 @@
 #include "cerebro/cerebro_metric_module.h"
 #include "cerebro/cerebro_monitor_module.h"
 
-#include "ltdl.h"
-
 #include "list.h"
+#include "ltdl.h"
 
 /*  
  * cerebro_module_library_setup_count
