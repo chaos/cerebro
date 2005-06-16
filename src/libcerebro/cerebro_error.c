@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_error.c,v 1.9 2005-05-26 18:23:38 achu Exp $
+ *  $Id: cerebro_error.c,v 1.10 2005-06-16 15:16:40 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -19,12 +19,6 @@
 
 #define CEREBRO_ERROR_STRING_BUFLEN 1024
 
-/*  
- * If set, requires locking before output of stdout or stderr messages
- */
-static Cerebro_err_lock cerebro_err_lock = NULL;
-static Cerebro_err_unlock cerebro_err_unlock = NULL;
-
 static int cerebro_err_initialized = 0;
 
 static int cerebro_flags = 0;
@@ -38,17 +32,6 @@ cerebro_err_init(char *prog)
   err_init(prog);
 
   cerebro_err_initialized++;
-}
-
-void 
-cerebro_err_register_locking(Cerebro_err_lock lock,
-			     Cerebro_err_unlock unlock)
-{
-  if (!lock || !unlock)
-    return;
-
-  cerebro_err_lock = lock;
-  cerebro_err_unlock = unlock;
 }
 
 int 
@@ -78,7 +61,6 @@ void
 cerebro_err_debug(const char *fmt, ...)
 {
   char buffer[CEREBRO_ERROR_STRING_BUFLEN];
-  int flags;
   va_list ap;
 
   if (!cerebro_err_initialized)
@@ -91,26 +73,13 @@ cerebro_err_debug(const char *fmt, ...)
   vsnprintf(buffer, CEREBRO_ERROR_STRING_BUFLEN, fmt, ap);
   va_end(ap);
 
-  flags = cerebro_err_get_flags();
-  if ((cerebro_err_lock 
-       && cerebro_err_unlock)
-      && 
-      ((flags & CEREBRO_ERROR_STDOUT)
-       || (flags & CEREBRO_ERROR_STDERR)))
-    {
-      (*cerebro_err_lock)();
-      err_debug(buffer);
-      (*cerebro_err_unlock)();
-    }
-  else
-    err_debug(buffer);
+  err_debug(buffer);
 }
 
 void 
 cerebro_err_debug_lib(const char *fmt, ...)
 {
   char buffer[CEREBRO_ERROR_STRING_BUFLEN];
-  int flags;
   va_list ap;
 
   if (!cerebro_err_initialized)
@@ -126,26 +95,13 @@ cerebro_err_debug_lib(const char *fmt, ...)
   vsnprintf(buffer, CEREBRO_ERROR_STRING_BUFLEN, fmt, ap);
   va_end(ap);
 
-  flags = cerebro_err_get_flags();
-  if ((cerebro_err_lock 
-       && cerebro_err_unlock)
-      && 
-      ((flags & CEREBRO_ERROR_STDOUT)
-       || (flags & CEREBRO_ERROR_STDERR)))
-    {
-      (*cerebro_err_lock)();
-      err_debug(buffer);
-      (*cerebro_err_unlock)();
-    }
-  else
-    err_debug(buffer);
+  err_debug(buffer);
 }
 
 void 
 cerebro_err_debug_module(const char *fmt, ...)
 {
   char buffer[CEREBRO_ERROR_STRING_BUFLEN];
-  int flags;
   va_list ap;
 
   if (!cerebro_err_initialized)
@@ -161,26 +117,13 @@ cerebro_err_debug_module(const char *fmt, ...)
   vsnprintf(buffer, CEREBRO_ERROR_STRING_BUFLEN, fmt, ap);
   va_end(ap);
 
-  flags = cerebro_err_get_flags();
-  if ((cerebro_err_lock 
-       && cerebro_err_unlock)
-      && 
-      ((flags & CEREBRO_ERROR_STDOUT)
-       || (flags & CEREBRO_ERROR_STDERR)))
-    {
-      (*cerebro_err_lock)();
-      err_debug(buffer);
-      (*cerebro_err_unlock)();
-    }
-  else
-    err_debug(buffer);
+  err_debug(buffer);
 }
 
 void 
 cerebro_err_output(const char *fmt, ...)
 {
   char buffer[CEREBRO_ERROR_STRING_BUFLEN];
-  int flags;
   va_list ap;
 
   if (!cerebro_err_initialized)
@@ -193,26 +136,13 @@ cerebro_err_output(const char *fmt, ...)
   vsnprintf(buffer, CEREBRO_ERROR_STRING_BUFLEN, fmt, ap);
   va_end(ap);
 
-  flags = cerebro_err_get_flags();
-  if ((cerebro_err_lock 
-       && cerebro_err_unlock)
-      && 
-      ((flags & CEREBRO_ERROR_STDOUT)
-       || (flags & CEREBRO_ERROR_STDERR)))
-    {
-      (*cerebro_err_lock)();
-      err_output(buffer);
-      (*cerebro_err_unlock)();
-    }
-  else
-    err_output(buffer);
+  err_output(buffer);
 }
 
 void 
 cerebro_err_exit(const char *fmt, ...)
 {
   char buffer[CEREBRO_ERROR_STRING_BUFLEN];
-  int flags;
   va_list ap;
 
   if (!cerebro_err_initialized)
@@ -225,18 +155,5 @@ cerebro_err_exit(const char *fmt, ...)
   vsnprintf(buffer, CEREBRO_ERROR_STRING_BUFLEN, fmt, ap);
   va_end(ap);
 
-  flags = cerebro_err_get_flags();
-  if ((cerebro_err_lock 
-       && cerebro_err_unlock)
-      && 
-      ((flags & CEREBRO_ERROR_STDOUT)
-       || (flags & CEREBRO_ERROR_STDERR)))
-    {
-      (*cerebro_err_lock)();
-      err_exit(buffer);
-      /* NOT REACHED */
-      (*cerebro_err_unlock)();
-    }
-  else
-    err_exit(buffer);
+  err_exit(buffer);
 }

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.59 2005-06-10 22:54:42 achu Exp $
+ *  $Id: cerebrod.c,v 1.60 2005-06-16 15:16:40 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -45,30 +45,6 @@ extern pthread_mutex_t cerebrod_listener_initialization_complete_lock;
 extern int cerebrod_metric_initialization_complete;
 extern pthread_cond_t cerebrod_metric_initialization_complete_cond;
 extern pthread_mutex_t cerebrod_metric_initialization_complete_lock;
-
-#if CEREBRO_DEBUG
-/* 
- * _cerebrod_err_lock
- *
- * Locking function for cerebro error lib
- */
-static void
-_cerebrod_err_lock(void)
-{
-  Pthread_mutex_lock(&debug_output_mutex);
-}
-
-/* 
- * _cerebrod_err_unlock
- *
- * Unlock function for cerebro error lib
- */
-static void
-_cerebrod_err_unlock(void)
-{
-  Pthread_mutex_unlock(&debug_output_mutex);
-}
-#endif /* CEREBRO_DEBUG */
 
 /* 
  * _cerebrod_pre_config_initialization
@@ -119,26 +95,13 @@ main(int argc, char **argv)
 
 #if CEREBRO_DEBUG
   if (!conf.debug)
-    {
-      cerebrod_daemon_init();
-      cerebro_err_set_flags(CEREBRO_ERROR_SYSLOG
-			    | CEREBRO_ERROR_LIB
-			    | CEREBRO_ERROR_MODULE);
-    }
-  else
-    {
-      cerebro_err_register_locking(&_cerebrod_err_lock,
-				   &_cerebrod_err_unlock);
-      cerebro_err_set_flags(CEREBRO_ERROR_STDERR 
-			    | CEREBRO_ERROR_LIB
-			    | CEREBRO_ERROR_MODULE);
-    }
+    cerebrod_daemon_init();
 #else  /* !CEREBRO_DEBUG */
   cerebrod_daemon_init();
+#endif /* !CEREBRO_DEBUG */
   cerebro_err_set_flags(CEREBRO_ERROR_SYSLOG
                         | CEREBRO_ERROR_LIB
                         | CEREBRO_ERROR_MODULE);
-#endif /* !CEREBRO_DEBUG */
 
   /* Call after daemonization, since daemonization closes currently
    * open fds 
