@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module.c,v 1.49 2005-06-16 23:50:28 achu Exp $
+ *  $Id: cerebro_module.c,v 1.50 2005-06-17 16:59:30 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -21,6 +21,7 @@
 
 #include "cerebro.h"
 #include "cerebro_module.h"
+#include "cerebro_module_util.h"
 #include "cerebro/cerebro_clusterlist_module.h"
 #include "cerebro/cerebro_config_module.h"
 #include "cerebro/cerebro_constants.h"
@@ -28,15 +29,7 @@
 #include "cerebro/cerebro_metric_module.h"
 #include "cerebro/cerebro_monitor_module.h"
 
-#include "list.h"
 #include "ltdl.h"
-
-/*  
- * cerebro_module_library_setup_count
- *
- * indicates the number of times module setup function has been called
- */
-static int cerebro_module_library_setup_count = 0;
 
 /*
  * dynamic_clusterlist_modules
@@ -135,341 +128,7 @@ struct cerebro_monitor_module
 
 extern struct cerebro_clusterlist_module_info default_clusterlist_module_info;
 extern struct cerebro_config_module_info default_config_module_info;
-
-/*
- * Cerebro_load_module
- *
- * function prototype for loading a module. Passed a module handle and
- * file/module to load.
- *
- * Returns 1 on loading success, 0 on loading failure, -1 on fatal error
- */
-typedef int (*Cerebro_load_module)(void *, char *);
-
-/* 
- * _cerebro_module_find_known_module
- *
- * Try to find a known module from the modules list in the search
- * directory.
- *
- * - search_dir - directory to search
- * - modules_list - list of modules to search for
- * - modules_list_len - length of list
- * - load_module - function to call when a module is found
- * - handle - pointer to module handle
- *
- * Returns 1 if module is loaded, 0 if it isn't, -1 on fatal error
- */
-int
-_cerebro_module_find_known_module(char *search_dir,
-				  char **modules_list,
-				  int modules_list_len,
-				  Cerebro_load_module load_module,
-                                  void *handle)
-{
-  DIR *dir;
-  int i = 0, found = 0;
-
-  if (!search_dir)
-    {
-      cerebro_err_debug("%s(%s:%d): search_dir null", 
-			__FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
-
-  if (!modules_list)
-    {
-      cerebro_err_debug("%s(%s:%d): modules_list null", 
-			__FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
-
-  if (!(modules_list_len > 0))
-    {
-      cerebro_err_debug("%s(%s:%d): modules_list_len not valid",
-			__FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
-  
-  if (!load_module)
-    {
-      cerebro_err_debug("%s(%s:%d): load_module null", 
-			__FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
-
-  if (!handle)
-    {
-      cerebro_err_debug("%s(%s:%d): handle null", 
-			__FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
-
-  if (!(dir = opendir(search_dir)))
-    return 0;
-
-  for (i = 0; i < modules_list_len; i++)
-    {
-      struct dirent *dirent;
-
-      while ((dirent = readdir(dir)))
-        {
-          if (!strcmp(dirent->d_name, modules_list[i]))
-            {
-              char filebuf[CEREBRO_MAXPATHLEN+1];
-              int flag;
-
-              memset(filebuf, '\0', CEREBRO_MAXPATHLEN+1);
-              snprintf(filebuf, CEREBRO_MAXPATHLEN, "%s/%s",
-                       search_dir, modules_list[i]);
-
-              if ((flag = load_module(handle, filebuf)) < 0)
-		return -1;
-
-              if (flag)
-                {
-                  found++;
-                  goto out;
-                }
-            }
-        }
-      rewinddir(dir);
-    }
-
- out:
-  closedir(dir);
-  return (found) ? 1 : 0;
-}
-
-/*
- * _cerebro_module_find_unknown_module
- *
- * Search a directory for a module currently unknown.
- *
- * - search_dir - directory to search
- * - signature - filename signature indicating if the filename is a
- *               module we want to try and load
- * - load_module - function to call when a module is found
- * - handle - pointer to module handle
- *
- * Returns 1 when a module is found, 0 when one is not, -1 on fatal error
- */
-int 
-_cerebro_module_find_unknown_module(char *search_dir,
-				    char *signature,
-				    Cerebro_load_module load_module,
-                                    void *handle)
-{
-  DIR *dir;
-  struct dirent *dirent;
-  int found = 0;
-
-  if (!search_dir)
-    {
-      cerebro_err_debug("%s(%s:%d): search_dir null", 
-			__FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
-
-  if (!signature)
-    {
-      cerebro_err_debug("%s(%s:%d): signature null", 
-			__FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
- 
-  if (!load_module)
-    {
-      cerebro_err_debug("%s(%s:%d): load_module null", 
-			__FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
-
-  if (!handle)
-    {
-      cerebro_err_debug("%s(%s:%d): handle null", 
-			__FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
-
-  if (!(dir = opendir(search_dir)))
-    return 0;
-
-  while ((dirent = readdir(dir)))
-    {
-      char *ptr = strstr(dirent->d_name, signature);
-
-      if (ptr && ptr == &dirent->d_name[0])
-        {
-          char filebuf[CEREBRO_MAXPATHLEN+1];
-          int flag;
-
-          /*
-           * Don't bother trying to load unless its a shared object
-           * file
-           */
-          ptr = strchr(dirent->d_name, '.');
-          if (!ptr || strcmp(ptr, ".so"))
-            continue;
-
-          memset(filebuf, '\0', CEREBRO_MAXPATHLEN+1);
-          snprintf(filebuf, CEREBRO_MAXPATHLEN, "%s/%s",
-                   search_dir, dirent->d_name);
-
-          if ((flag = load_module(handle, filebuf)) < 0)
-	    return -1;
-
-          if (flag)
-            {
-              found++;
-              goto out;
-            }
-        }
-    }
-
- out:
-  closedir(dir);
-  return (found) ? 1 : 0;
-}
-
-/*
- * _cerebro_module_find_modules
- *
- * Search a directory for modules
- *
- * - search_dir - directory to search
- * - signature - filename signature indicating if the filename is a
- *               module we want to try and load
- * - load_module - function to call when a module is found
- * - handle - pointer to module handle
- * - modules_max - maximum modules that can be found
- *
- * Returns 1 when a module(s) are found, 0 if not, -1 on fatal error
- */
-int 
-_cerebro_module_find_modules(char *search_dir,
-                             char *signature,
-                             Cerebro_load_module load_module,
-                             void *handle,
-                             unsigned modules_max)
-{
-  DIR *dir;
-  struct dirent *dirent;
-  int found = 0;
-
-  if (!search_dir)
-    {
-      cerebro_err_debug("%s(%s:%d): search_dir null", 
-			__FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
-
-  if (!signature)
-    {
-      cerebro_err_debug("%s(%s:%d): signature null", 
-			__FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
- 
-  if (!load_module)
-    {
-      cerebro_err_debug("%s(%s:%d): load_module null", 
-			__FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
-
-  if (!handle)
-    {
-      cerebro_err_debug("%s(%s:%d): handle null", 
-			__FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
-
-  if (!modules_max)
-    {
-      cerebro_err_debug("%s(%s:%d): modules_max null", 
-			__FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
-
-  if (!(dir = opendir(search_dir)))
-    return 0;
-
-  while ((dirent = readdir(dir)))
-    {
-      char *ptr = strstr(dirent->d_name, signature);
-
-      if (ptr && ptr == &dirent->d_name[0])
-        {
-          char filebuf[CEREBRO_MAXPATHLEN+1];
-          int flag;
-
-          /*
-           * Don't bother trying to load unless its a shared object
-           * file
-           */
-          ptr = strchr(dirent->d_name, '.');
-          if (!ptr || strcmp(ptr, ".so"))
-            continue;
-
-          memset(filebuf, '\0', CEREBRO_MAXPATHLEN+1);
-          snprintf(filebuf, CEREBRO_MAXPATHLEN, "%s/%s",
-                   search_dir, dirent->d_name);
-
-          if ((flag = load_module(handle, filebuf)) < 0)
-	    return -1;
-
-          if (flag)
-            found++;
-
-          if (found >= modules_max)
-            goto out;
-        }
-    }
-
- out:
-  closedir(dir);
-  return (found) ? 1 : 0;
-}
-
-static int 
-_cerebro_module_setup(void)
-{
-  if (cerebro_module_library_setup_count)
-    goto out;
-
-  if (lt_dlinit() != 0)
-    {
-      cerebro_err_debug("%s(%s:%d): lt_dlinit: %s", 
-			__FILE__, __FUNCTION__, __LINE__, 
-			lt_dlerror());
-      return -1;
-    }
-
- out:
-  cerebro_module_library_setup_count++;
-  return 0;
-}
-
-static int 
-_cerebro_module_cleanup(void)
-{
-  if (cerebro_module_library_setup_count)
-    cerebro_module_library_setup_count--;
-
-  if (!cerebro_module_library_setup_count)
-    {
-      if (lt_dlexit() != 0)
-        {
-          cerebro_err_debug("%s(%s:%d): lt_dlexit: %s", 
-			    __FILE__, __FUNCTION__, __LINE__, 
-			    lt_dlerror());
-          return -1;
-        }
-    }
-
-  return 0;
-}
+extern int cerebro_module_library_setup_count;
 
 /* 
  * _load_clusterlist_module
@@ -633,10 +292,11 @@ _cerebro_module_load_clusterlist_module(void)
   if (rv)
     goto out;
   
-  if ((rv = _cerebro_module_find_unknown_module(CEREBRO_MODULE_DIR,
-						CEREBRO_CLUSTERLIST_FILENAME_SIGNATURE,
-						_load_clusterlist_module,
-                                                clusterlist_handle)) < 0)
+  if ((rv = _cerebro_module_find_modules(CEREBRO_MODULE_DIR,
+                                         CEREBRO_CLUSTERLIST_FILENAME_SIGNATURE,
+                                         _load_clusterlist_module,
+                                         clusterlist_handle,
+                                         1)) < 0)
     goto cleanup;
   
   if (rv)
@@ -905,10 +565,11 @@ _cerebro_module_load_config_module(void)
   if (rv)
     goto out;
 
-  if ((rv = _cerebro_module_find_unknown_module(CEREBRO_MODULE_DIR,
-						CEREBRO_CONFIG_FILENAME_SIGNATURE,
-						_load_config_module,
-                                                config_handle)) < 0)
+  if ((rv = _cerebro_module_find_modules(CEREBRO_MODULE_DIR,
+                                         CEREBRO_CONFIG_FILENAME_SIGNATURE,
+                                         _load_config_module,
+                                         config_handle,
+                                         1)) < 0)
     goto cleanup;
 
   if (rv)

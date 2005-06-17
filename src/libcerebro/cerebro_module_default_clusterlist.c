@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module_default.c,v 1.9 2005-06-16 17:17:16 achu Exp $
+ *  $Id: cerebro_module_default_clusterlist.c,v 1.1 2005-06-17 16:59:30 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -12,12 +12,10 @@
 #include <string.h>
 #endif /* STDC_HEADERS */
 
-#include "cerebro/cerebro_config_module.h"
 #include "cerebro/cerebro_clusterlist_module.h"
 #include "cerebro/cerebro_error.h"
 
 #define DEFAULT_CLUSTERLIST_MODULE_NAME "default"
-#define DEFAULT_CONFIG_MODULE_NAME "default"
 
 int
 default_clusterlist_setup(void)
@@ -104,30 +102,4 @@ struct cerebro_clusterlist_module_info default_clusterlist_module_info =
     &default_clusterlist_get_all_nodes,
     &default_clusterlist_node_in_cluster,
     &default_clusterlist_get_nodename,
-  };
-
-int
-default_config_setup(void)
-{
-  return 0;
-}
-
-int
-default_config_cleanup(void)
-{
-  return 0;
-}
-
-int
-default_config_load_default(struct cerebro_config *conf)
-{
-  return 0;
-}
-
-struct cerebro_config_module_info default_config_module_info =
-  {
-    DEFAULT_CONFIG_MODULE_NAME,
-    &default_config_setup,
-    &default_config_cleanup,
-    &default_config_load_default,
   };
