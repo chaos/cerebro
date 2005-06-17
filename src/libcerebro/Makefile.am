@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.61 2005-06-17 16:59:30 achu Exp $
+## $Id: Makefile.am,v 1.62 2005-06-17 17:45:39 achu Exp $
 ##*****************************************************************************
 
 if WITH_GNU_LD
@@ -11,7 +11,10 @@ noinst_HEADERS	       = cerebro_api.h \
 			 cerebro_clusterlist_util.h \
 			 cerebro_config_util.h \
 			 cerebro_metric_protocol.h \
-			 cerebro_module.h \
+			 cerebro_module_clusterlist.h \
+			 cerebro_module_config.h \
+			 cerebro_module_metric.h \
+			 cerebro_module_monitor.h \
 			 cerebro_module_util.h \
 			 cerebro_nodelist_util.h \
 			 cerebro_util.h \
@@ -43,9 +46,12 @@ libcerebro_la_SOURCES = cerebro.c \
 			cerebro_config_util.c \
 			cerebro_error.c \
 			cerebro_metric.c \
-			cerebro_module.c \
-			cerebro_module_default_clusterlist.c \
-			cerebro_module_default_config.c \
+			cerebro_module_clusterlist.c \
+			cerebro_module_clusterlist_default.c \
+			cerebro_module_config.c \
+			cerebro_module_config_default.c \
+			cerebro_module_metric.c \
+			cerebro_module_monitor.c \
 			cerebro_module_util.c \
 			cerebro_nodelist.c \
 			cerebro_nodelist_util.c \

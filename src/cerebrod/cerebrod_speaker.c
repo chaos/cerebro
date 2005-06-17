@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.51 2005-06-17 00:10:45 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.52 2005-06-17 17:45:39 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -19,7 +19,7 @@
 #include <netinet/in.h>
 
 #include "cerebro.h"
-#include "cerebro_module.h"
+#include "cerebro_module_metric.h"
 #include "cerebrod_heartbeat_protocol.h"
 #include "cerebro/cerebro_constants.h"
 #include "cerebro/cerebro_error.h"

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.62 2005-06-17 16:23:05 achu Exp $
+ *  $Id: cerebrod.c,v 1.63 2005-06-17 17:45:39 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -10,7 +10,6 @@
 #include <stdlib.h>
 #include <syslog.h>
 
-#include "cerebro_module.h"
 #include "cerebro/cerebro_error.h"
 
 #include "cerebrod.h"

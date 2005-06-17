@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_util.c,v 1.5 2005-06-09 20:17:09 achu Exp $
+ *  $Id: cerebro_clusterlist_util.c,v 1.6 2005-06-17 17:45:39 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -12,7 +12,7 @@
 #include "cerebro.h"
 #include "cerebro_api.h"
 #include "cerebro_clusterlist_util.h"
-#include "cerebro_module.h"
+#include "cerebro_module_clusterlist.h"
 #include "cerebro_util.h"
 
 int 

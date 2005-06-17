@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_nodelist.c,v 1.21 2005-06-16 17:17:16 achu Exp $
+ *  $Id: cerebro_nodelist.c,v 1.22 2005-06-17 17:45:39 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -14,7 +14,7 @@
 
 #include "cerebro.h"
 #include "cerebro_api.h"
-#include "cerebro_module.h"
+#include "cerebro_module_clusterlist.h"
 #include "cerebro_nodelist_util.h"
 #include "cerebro_util.h"
 #include "cerebro/cerebro_error.h"

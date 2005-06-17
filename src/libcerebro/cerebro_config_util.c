@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_util.c,v 1.14 2005-06-16 22:02:47 achu Exp $
+ *  $Id: cerebro_config_util.c,v 1.15 2005-06-17 17:45:39 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -14,7 +14,7 @@
 
 #include "cerebro_api.h"
 #include "cerebro_config_util.h"
-#include "cerebro_module.h"
+#include "cerebro_module_config.h"
 #include "cerebro_util.h"
 #include "cerebro/cerebro_config.h"
 #include "cerebro/cerebro_error.h"

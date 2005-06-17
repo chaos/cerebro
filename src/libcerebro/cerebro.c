@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.c,v 1.34 2005-06-08 22:54:38 achu Exp $
+ *  $Id: cerebro.c,v 1.35 2005-06-17 17:45:39 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -17,7 +17,6 @@
 #include "cerebro_clusterlist_util.h"
 #include "cerebro_config_util.h"
 #include "cerebro_metric_protocol.h"
-#include "cerebro_module.h"
 #include "cerebro_util.h"
 #include "cerebro/cerebro_config.h"
 
