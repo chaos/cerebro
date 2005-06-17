@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_nodelist_util.c,v 1.1 2005-06-17 20:54:08 achu Exp $
+ *  $Id: cerebro_nodelist_util.c,v 1.2 2005-06-17 23:21:22 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -136,7 +136,7 @@ _cerebro_nodelist_append(cerebro_nodelist_t nodelist,
                          u_int32_t metric_value_len,
                          void *metric_value)
 {
-  struct cerebro_nodelist_data *nd;
+  struct cerebro_nodelist_data *nd = NULL;
 
   if (_cerebro_nodelist_check(nodelist) < 0)
     return -1;

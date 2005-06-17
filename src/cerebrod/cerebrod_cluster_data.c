@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_cluster_data.c,v 1.15 2005-06-17 17:45:39 achu Exp $
+ *  $Id: cerebrod_cluster_data.c,v 1.16 2005-06-17 23:21:22 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -418,6 +418,7 @@ _cerebrod_cluster_data_output_update(struct cerebrod_node_data *nd)
 #endif /* CEREBRO_DEBUG */
 }
 
+#if CEREBRO_DEBUG
 /*
  * _cerebrod_node_data_metric_data_dump
  *
@@ -484,7 +485,6 @@ _cerebrod_node_data_metric_data_dump(void *data, const void *key, void *arg)
  *
  * callback function from list_for_each to dump node data
  */
-#if CEREBRO_DEBUG
 static int
 _cerebrod_node_data_item_dump(void *x, void *arg)
 {

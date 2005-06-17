@@ -837,7 +837,7 @@ cerebro_get_metric_data(cerebro_t handle,
 	  timeout_len = handle->config_data.cerebro_timeout_len;
 	}
       else
-	timeout_len = CEREBRO_METRIC_UPDOWN_TIMEOUT_LEN_DEFAULT;
+	timeout_len = CEREBRO_METRIC_TIMEOUT_LEN_DEFAULT;
     }
   else
     timeout_len = handle->timeout_len;
@@ -853,6 +853,7 @@ cerebro_get_metric_data(cerebro_t handle,
 	    }
 	  flags = handle->config_data.cerebro_flags;
 	}
+      flags = CEREBRO_METRIC_FLAGS_DEFAULT;
     }
   else
     flags = handle->flags;

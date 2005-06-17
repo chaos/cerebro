@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_protocol.h,v 1.1 2005-06-17 22:58:30 achu Exp $
+ *  $Id: cerebro_metric_protocol.h,v 1.2 2005-06-17 23:21:22 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_METRIC_PROTOCOL_H
@@ -50,9 +50,9 @@
 #define CEREBRO_METRIC_PROTOCOL_IS_LAST_RESPONSE           1
 #define CEREBRO_METRIC_PROTOCOL_IS_NOT_LAST_RESPONSE       0
 
-#define CEREBRO_METRIC_UPDOWN_TIMEOUT_LEN_DEFAULT 60
-
-#define CEREBRO_METRIC_SERVER_PORT                8852
+#define CEREBRO_METRIC_SERVER_PORT                         8852
+#define CEREBRO_METRIC_TIMEOUT_LEN_DEFAULT                 60
+#define CEREBRO_METRIC_FLAGS_DEFAULT                       0
 
 /*
  * struct cerebro_metric_request

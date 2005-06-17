@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.84 2005-06-17 22:58:30 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.85 2005-06-17 23:21:22 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -390,7 +390,7 @@ cerebrod_listener(void *arg)
       struct cerebrod_heartbeat *hb;
       char nodename_buf[CEREBRO_MAXNODENAMELEN+1];
       char nodename_key[CEREBRO_MAXNODENAMELEN+1];
-      int recv_len, heartbeat_len, flag, buflen;
+      int recv_len, flag, buflen;
       char *buf = NULL;
       
       Pthread_mutex_lock(&packet_buflen_max_lock);
@@ -467,9 +467,9 @@ cerebrod_listener(void *arg)
       if (recv_len < CEREBROD_HEARTBEAT_HEADER_LEN)
         {
           cerebro_err_debug("%s(%s:%d): received buf length "
-                            "unexpected size: expect %d, heartbeat_len %d",
+                            "unexpected size: expect %d, recv_len %d",
                             __FILE__, __FUNCTION__, __LINE__,
-                            CEREBROD_HEARTBEAT_HEADER_LEN, heartbeat_len);
+                            CEREBROD_HEARTBEAT_HEADER_LEN, recv_len);
           goto cleanup_continue;
         }
 

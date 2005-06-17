@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric.c,v 1.35 2005-06-17 22:58:30 achu Exp $
+ *  $Id: cerebrod_metric.c,v 1.36 2005-06-17 23:21:22 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -969,7 +969,7 @@ _cerebrod_metric_service_connection(void *arg)
   Pthread_mutex_unlock(&cerebrod_metric_name_lock);
 
   if (!req.timeout_len)
-    req.timeout_len = CEREBRO_METRIC_UPDOWN_TIMEOUT_LEN_DEFAULT;
+    req.timeout_len = CEREBRO_METRIC_TIMEOUT_LEN_DEFAULT;
 
   if (_cerebrod_metric_respond_with_nodes(client_fd, &req) < 0)
     goto cleanup;
