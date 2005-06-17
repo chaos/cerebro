@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_cluster_data.c,v 1.12 2005-06-16 23:50:28 achu Exp $
+ *  $Id: cerebrod_cluster_data.c,v 1.13 2005-06-17 00:10:45 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -154,11 +154,29 @@ _cerebrod_node_data_create_and_init(const char *nodename)
     nd->metric_data = Hash_create(conf.metric_max,
                                   (hash_key_f)hash_key_string,
                                   (hash_cmp_f)strcmp,
-                                  (hash_del_f)_Free);
+                                  (hash_del_f)NULL);
   else
     nd->metric_data = NULL;
   nd->metric_data_count = 0;
   return nd;
+}
+
+/* 
+ * _cerebrod_monitor_metric_destroy
+ *
+ * Destroy contents of a cerebrod_monitor_metric
+ */
+static void
+_cerebrod_monitor_metric_destroy(void *data)
+{
+  struct cerebrod_monitor_metric *monitor_metric;
+  
+  assert(data);
+
+  monitor_metric = (struct cerebrod_monitor_metric *)data;
+  if (monitor_metric->metric_name)
+    Free(monitor_metric->metric_name);
+  Free(monitor_metric);
 }
 
 void 
@@ -185,7 +203,7 @@ cerebrod_cluster_data_initialize(void)
       cerebrod_cluster_data_index_size = CEREBROD_CLUSTER_DATA_INDEX_SIZE_DEFAULT;
     }
 
-  cerebrod_cluster_data_list = List_create((ListDelF)_Free);
+  cerebrod_cluster_data_list = List_create((ListDelF)NULL);
   cerebrod_cluster_data_index = Hash_create(cerebrod_cluster_data_index_size,
                                             (hash_key_f)hash_key_string,
                                             (hash_cmp_f)strcmp,
@@ -224,7 +242,7 @@ cerebrod_cluster_data_initialize(void)
 
   if (conf.metric_server)
     {
-      cerebrod_metric_name_list = List_create((ListDelF)_Free);
+      cerebrod_metric_name_list = List_create((ListDelF)NULL);
 
       /* Initialize with the handle of default metrics */
       List_append(cerebrod_metric_name_list, Strdup(CEREBRO_METRIC_CLUSTER_NODES));
@@ -276,7 +294,7 @@ cerebrod_cluster_data_initialize(void)
   monitor_index = Hash_create(monitor_index_len,
                               (hash_key_f)hash_key_string,
                               (hash_cmp_f)strcmp,
-                              (hash_del_f)_Free);
+                              (hash_del_f)_cerebrod_monitor_metric_destroy);
 
   for (i = 0; i < monitor_index_len; i++)
     {

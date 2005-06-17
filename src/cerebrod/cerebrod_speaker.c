@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.50 2005-06-16 23:50:28 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.51 2005-06-17 00:10:45 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -154,6 +154,24 @@ _cerebrod_speaker_create_and_setup_socket(void)
 }
 
 /* 
+ * _cerebrod_metric_destroy
+ *
+ * Destroy a cerebrod_metric
+ */
+static void
+_cerebrod_metric_destroy(void *x)
+{
+  struct cerebrod_metric *metric;
+
+  assert(x);
+
+  metric = (struct cerebrod_metric *)x;
+  if (metric->metric_name)
+    Free(metric->metric_name);
+  Free(metric);
+}
+
+/* 
  * _cerebrod_speaker_initialize
  *
  * perform speaker initialization
@@ -192,8 +210,6 @@ _cerebrod_speaker_initialize(void)
    * Load and Setup metric modules
    */
 
-  metric_list = List_create((ListDelF)_Free);
-
   if (!(metric_handle = _cerebro_module_load_metric_modules(conf.metric_max)))
     {
       cerebro_err_debug("%s(%s:%d): _cerebro_module_load_metric_modules failed",
@@ -227,7 +243,7 @@ _cerebrod_speaker_initialize(void)
       return;
     }
 
-  metric_list = List_create((ListDelF)_Free);
+  metric_list = List_create((ListDelF)_cerebrod_metric_destroy);
 
   for (i = 0; i < modules_len; i++)
     {
