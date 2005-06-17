@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.39 2005-06-17 20:54:08 achu Exp $
+## $Id: configure.ac,v 1.40 2005-06-17 22:02:28 achu Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -22,7 +22,7 @@ AM_MAINTAINER_MODE
 
 # Update this information before a public release only!
  
-# libcerebro versioning
+# library versioning
 #
 # If library source code has changed at all increment rev
 # (current:rev:age) = (current:rev+1:age)
@@ -34,11 +34,18 @@ AM_MAINTAINER_MODE
 #
 # If any interfaces have been removed, set age = 0
 #
+
 LIBCEREBRO_CURRENT=0
 LIBCEREBRO_REVISION=0
 LIBCEREBRO_AGE=0
 LIBCEREBRO_VERSION_INFO=$LIBCEREBRO_CURRENT:$LIBCEREBRO_REVISION:$LIBCEREBRO_AGE
 AC_SUBST([LIBCEREBRO_VERSION_INFO])
+
+LIBCEREBRO_ERROR_CURRENT=0
+LIBCEREBRO_ERROR_REVISION=0
+LIBCEREBRO_ERROR_AGE=0
+LIBCEREBRO_ERROR_VERSION_INFO=$LIBCEREBRO_ERROR_CURRENT:$LIBCEREBRO_ERROR_REVISION:$LIBCEREBRO_ERROR_AGE
+AC_SUBST([LIBCEREBRO_ERROR_VERSION_INFO])
 
 ##
 # Checks for programs.
@@ -153,6 +160,7 @@ AC_CONFIG_FILES( \
   src/cerebrod/Makefile \
   src/libs/Makefile \
   src/libs/cerebro/Makefile \
+  src/libs/cerebro_error/Makefile \
   src/libs/common/Makefile \
   src/modules/Makefile \
   src/modules/clusterlist/Makefile \
