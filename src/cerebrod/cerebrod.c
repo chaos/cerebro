@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.61 2005-06-16 17:17:16 achu Exp $
+ *  $Id: cerebrod.c,v 1.62 2005-06-17 16:23:05 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -31,7 +31,8 @@
  * Locking Rule: Always lock data structure locks before grabbing
  * debugging locks.
  *
- * Locking Rule: Only lock around fprintf or similar statements.
+ * Locking Rule: Only lock around fprintf or similar statements.  Do
+ * not lock around cerebro_err_debug or similar statements.
  */
 pthread_mutex_t debug_output_mutex = PTHREAD_MUTEX_INITIALIZER;
 #endif /* CEREBRO_DEBUG */
@@ -54,7 +55,7 @@ extern pthread_mutex_t cerebrod_metric_initialization_complete_lock;
 static void
 _cerebrod_pre_config_initialization(void)
 {
-  /* Hmmm nothing to do */
+  /* Nothing to do */
 }
 
 /* 
@@ -77,13 +78,7 @@ int
 main(int argc, char **argv)
 {
   cerebro_err_init(argv[0]);
-#if CEREBRO_DEBUG
-  cerebro_err_set_flags(CEREBRO_ERROR_STDERR 
-			| CEREBRO_ERROR_SYSLOG);
-#else  /* !CEREBRO_DEBUG */
-  cerebro_err_set_flags(CEREBRO_ERROR_STDERR 
-			| CEREBRO_ERROR_SYSLOG);
-#endif /* !CEREBRO_DEBUG */
+  cerebro_err_set_flags(CEREBRO_ERROR_STDERR | CEREBRO_ERROR_SYSLOG);
 
   _cerebrod_pre_config_initialization();
 
@@ -109,10 +104,7 @@ main(int argc, char **argv)
    */
   openlog(argv[0], LOG_ODELAY | LOG_PID, LOG_DAEMON);
 
-  /* Start metric server.  Start before the listener begins receiving
-   * data.
-   */
-
+  /* Start metric before the listener begins receiving data. */
   if (conf.metric_server)
     {
       pthread_t thread;
@@ -131,9 +123,8 @@ main(int argc, char **argv)
       Pthread_mutex_unlock(&cerebrod_metric_initialization_complete_lock);
     }
 
-  /* Start listening server.  Start before speaker, since the listener
-   * may need to listen for packets from a later created speaker
-   * thread
+  /* Start listening server before speaker so that listener
+   * can receive packets from a later created speaker
    */
   if (conf.listen)
     {

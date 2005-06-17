@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_cluster_data.c,v 1.13 2005-06-17 00:10:45 achu Exp $
+ *  $Id: cerebrod_cluster_data.c,v 1.14 2005-06-17 16:23:05 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -50,23 +50,9 @@ pthread_mutex_t cerebrod_cluster_data_initialization_complete_lock = PTHREAD_MUT
 /* 
  * cerebrod_cluster_data_list
  *
- * contains list of nodes with cluster_data
+ * contains list of nodes and cluster_data
  */
 List cerebrod_cluster_data_list = NULL;
-
-/* 
- * cerebrod_metric_name_list
- *
- * contains list of metrics currently known
- */
-List cerebrod_metric_name_list = NULL;
-
-/* 
- * cerebrod_metric_name_list_default_count
- *
- * Number of default metrics
- */
-int cerebrod_metric_name_list_default_count;
 
 /*
  * cerebrod_cluster_data_index
@@ -89,13 +75,28 @@ int cerebrod_cluster_data_index_size;
  */
 pthread_mutex_t cerebrod_cluster_data_lock = PTHREAD_MUTEX_INITIALIZER;
 
+/* 
+ * cerebrod_metric_name_list
+ *
+ * contains list of currently known metrics
+ */
+List cerebrod_metric_name_list = NULL;
+
+/* 
+ * cerebrod_metric_name_list_default_count
+ *
+ * Number of default metrics, which don't count against the maximum
+ * number of metrics that can be monitored.
+ */
+int cerebrod_metric_name_list_default_count;
+
 /*  
  * cerebrod_metric_name_lock
  *
  * lock to protect pthread access to the metric_name list
  *
- * Locking rule: Can be locked within a lock struct cerebrod_node_data
- * node_data_lock, but not a the above 'cerebrod_cluster_data_lock'.
+ * Locking rule: Can be locked within a struct cerebrod_node_data
+ * node_data_lock locked region.
  */
 pthread_mutex_t cerebrod_metric_name_lock = PTHREAD_MUTEX_INITIALIZER;
 

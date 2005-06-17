@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_cluster_data.h,v 1.4 2005-06-16 22:31:42 achu Exp $
+ *  $Id: cerebrod_cluster_data.h,v 1.5 2005-06-17 16:23:05 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_CLUSTER_DATA_H
@@ -15,7 +15,6 @@
 
 #include <sys/types.h>
 
-#include "cerebro_metric_protocol.h"
 #include "cerebrod_heartbeat_protocol.h"
 
 #include "hash.h"
@@ -23,7 +22,7 @@
 /* 
  * struct cerebrod_metric_data
  *
- * Contains a single piece of metric data
+ * Contains metric data for a node
  */
 struct cerebrod_metric_data
 {
@@ -71,7 +70,7 @@ void cerebrod_cluster_data_initialize(void);
 /* 
  * cerebrod_cluster_data_update
  *
- * Update cluster_data with more up to date information
+ * Update cluster_data with information from a heartbeat
  */
 void cerebrod_cluster_data_update(char *nodename,
                                   struct cerebrod_heartbeat *hb,
