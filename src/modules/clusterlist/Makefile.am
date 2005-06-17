@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.12 2005-06-17 20:54:08 achu Exp $
+## $Id: Makefile.am,v 1.13 2005-06-17 20:59:17 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -53,7 +53,7 @@ cerebro_clusterlist_hostsfile_la_LDFLAGS = $(MODULE_FLAGS) \
 				   	   $(CLUSTERLIST_OTHER_FLAGS)
 cerebro_clusterlist_hostsfile_la_CFLAGS  = -I$(srcdir)/../../libs/cerebro \
 					   -I$(srcdir)/../../libs/common
-cerebro_clusterlist_hostsfile_la_LIBADD  = ../../libcommon/libcommon.la
+cerebro_clusterlist_hostsfile_la_LIBADD  = ../../libs/common/libcommon.la
 
 ../../libs/common/libcommon.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
