@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.62 2005-06-17 17:45:39 achu Exp $
+## $Id: Makefile.am,v 1.63 2005-06-17 18:11:33 achu Exp $
 ##*****************************************************************************
 
 if WITH_GNU_LD
@@ -61,15 +61,6 @@ libcerebro_la_LDFLAGS = -version-info @LIBCEREBRO_VERSION_INFO@ \
 libcerebro_la_LIBADD  = ../libcommon/libcommon.la
 
 ../libcommon/libcommon.la : force-dependency-check
-	@cd `dirname $@` && make `basename $@`
-
-../modules/clusterlist/libclusterlistmodules.la: force-dependency-check
-	@cd `dirname $@` && make `basename $@`
-
-../modules/config/libconfigmodules.la: force-dependency-check
-	@cd `dirname $@` && make `basename $@`
-
-../modules/metric/libmetricmodules.la: force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
 force-dependency-check:
