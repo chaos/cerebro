@@ -12,7 +12,6 @@ Cleanup
 - more statically compiled in libraries to reduce virt/res size?
   - modules lib
 - header cleanup/consistency
-- spec
 
 Audit
 - code review to reduce memory footprint
