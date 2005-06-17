@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.14 2005-06-17 22:22:33 achu Exp $
+## $Id: Makefile.am,v 1.15 2005-06-17 22:58:30 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -37,22 +37,21 @@ cerebro_clusterlist_gendersllnl_la_SOURCES = cerebro_clusterlist_gendersllnl.c \
 cerebro_clusterlist_gendersllnl_la_LDFLAGS = $(MODULE_FLAGS) \
 					     $(GENDERSLLNL_LIBS) \
 				   	     $(CLUSTERLIST_OTHER_FLAGS)
-cerebro_clusterlist_gendersllnl_la_CFLAGS  = -I$(srcdir)/../../libs/cerebro \
-					     -I$(srcdir)/../../libs/cerebro_error
+cerebro_clusterlist_gendersllnl_la_CFLAGS  = -I$(srcdir)/../../libs/include
+
 cerebro_clusterlist_genders_la_SOURCES = cerebro_clusterlist_genders.c \
 					 cerebro_clusterlist_genders_util.c \
 					 cerebro_clusterlist_util.c
 cerebro_clusterlist_genders_la_LDFLAGS = $(MODULE_FLAGS) \
 					 $(GENDERS_LIBS) \
 				   	 $(CLUSTERLIST_OTHER_FLAGS)
-cerebro_clusterlist_genders_la_CFLAGS  = -I$(srcdir)/../../libs/cerebro \
-					 -I$(srcdir)/../../libs/cerebro_error
+cerebro_clusterlist_genders_la_CFLAGS  = -I$(srcdir)/../../libs/include
+
 cerebro_clusterlist_hostsfile_la_SOURCES = cerebro_clusterlist_hostsfile.c \
 					   cerebro_clusterlist_util.c
 cerebro_clusterlist_hostsfile_la_LDFLAGS = $(MODULE_FLAGS) \
 				   	   $(CLUSTERLIST_OTHER_FLAGS)
-cerebro_clusterlist_hostsfile_la_CFLAGS  = -I$(srcdir)/../../libs/cerebro \
-					   -I$(srcdir)/../../libs/cerebro_error \
+cerebro_clusterlist_hostsfile_la_CFLAGS  = -I$(srcdir)/../../libs/include \
 					   -I$(srcdir)/../../libs/common
 cerebro_clusterlist_hostsfile_la_LIBADD  = ../../libs/common/libcommon.la
 

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.83 2005-06-17 17:45:39 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.84 2005-06-17 22:58:30 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -20,9 +20,10 @@
 
 #include "cerebro.h"
 #include "cerebro_module_clusterlist.h"
-#include "cerebrod_heartbeat_protocol.h"
 #include "cerebro/cerebro_constants.h"
 #include "cerebro/cerebro_error.h"
+
+#include "cerebrod_heartbeat_protocol.h"
 
 #include "cerebrod.h"
 #include "cerebrod_cluster_data.h"

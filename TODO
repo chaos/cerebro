@@ -7,11 +7,11 @@ Testing
 - api again
 
 Cleanup
-- cleanup module loading stuff
 - new module documentation
   - and various updates
 - more statically compiled in libraries to reduce virt/res size?
   - modules lib
+- header cleanup/consistency
 
 Audit
 - code review to reduce memory footprint

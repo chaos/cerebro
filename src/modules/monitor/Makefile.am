@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.8 2005-06-17 22:22:33 achu Exp $
+## $Id: Makefile.am,v 1.9 2005-06-17 22:58:30 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -22,8 +22,7 @@ cerebro_monitor_bootlog_la_SOURCES = cerebro_monitor_bootlog.c
 cerebro_monitor_bootlog_la_LDFLAGS = $(MODULE_FLAGS) \
 				     $(BOOTLOG_LIBS) \
 			             $(MONITOR_OTHER_FLAGS)
-cerebro_monitor_bootlog_la_CFLAGS  = -I$(srcdir)/../../libs/cerebro \
-				     -I$(srcdir)/../../libs/cerebro_error
+cerebro_monitor_bootlog_la_CFLAGS  = -I$(srcdir)/../../libs/include
 
 force-dependency-check:
 

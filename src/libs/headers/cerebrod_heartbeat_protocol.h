@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_heartbeat_protocol.h,v 1.1 2005-06-17 20:54:08 achu Exp $
+ *  $Id: cerebrod_heartbeat_protocol.h,v 1.1 2005-06-17 22:58:30 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_HEARTBEAT_PROTOCOL_H
