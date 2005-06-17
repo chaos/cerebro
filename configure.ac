@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.38 2005-06-16 21:35:34 achu Exp $
+## $Id: configure.ac,v 1.39 2005-06-17 20:54:08 achu Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -151,13 +151,14 @@ AC_CONFIG_FILES( \
   man/cerebro.conf.5 \
   src/Makefile \
   src/cerebrod/Makefile \
+  src/libs/Makefile \
+  src/libs/cerebro/Makefile \
+  src/libs/common/Makefile \
   src/modules/Makefile \
   src/modules/clusterlist/Makefile \
   src/modules/config/Makefile \
   src/modules/metric/Makefile \
   src/modules/monitor/Makefile \
-  src/libcerebro/Makefile \
-  src/libcommon/Makefile
 )
 AC_OUTPUT
 

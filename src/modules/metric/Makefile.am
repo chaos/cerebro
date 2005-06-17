@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.3 2005-06-16 21:35:34 achu Exp $
+## $Id: Makefile.am,v 1.4 2005-06-17 20:54:08 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -21,12 +21,7 @@ MODULE_FLAGS = -module -avoid-version
 cerebro_metric_boottime_la_SOURCES = cerebro_metric_boottime.c
 cerebro_metric_boottime_la_LDFLAGS = $(MODULE_FLAGS) \
 			             $(METRIC_OTHER_FLAGS)
-cerebro_metric_boottime_la_CFLAGS  = -I$(srcdir)/../../libcerebro \
-				     -I$(srcdir)/../../libcommon
-cerebro_metric_boottime_la_LIBADD  = ../../libcommon/libcommon.la
-
-../../libcommon/libcommon.la : force-dependency-check
-	@cd `dirname $@` && make `basename $@`
+cerebro_metric_boottime_la_CFLAGS  = -I$(srcdir)/../../libs/cerebro
 
 force-dependency-check:
 

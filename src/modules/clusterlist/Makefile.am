@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.11 2005-06-16 21:35:34 achu Exp $
+## $Id: Makefile.am,v 1.12 2005-06-17 20:54:08 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -37,9 +37,7 @@ cerebro_clusterlist_gendersllnl_la_SOURCES = cerebro_clusterlist_gendersllnl.c \
 cerebro_clusterlist_gendersllnl_la_LDFLAGS = $(MODULE_FLAGS) \
 					     $(GENDERSLLNL_LIBS) \
 				   	     $(CLUSTERLIST_OTHER_FLAGS)
-cerebro_clusterlist_gendersllnl_la_CFLAGS  = -I$(srcdir)/../../libcerebro \
-					     -I$(srcdir)/../../libcommon
-cerebro_clusterlist_gendersllnl_la_LIBADD  = ../../libcommon/libcommon.la
+cerebro_clusterlist_gendersllnl_la_CFLAGS  = -I$(srcdir)/../../libs/cerebro
 
 cerebro_clusterlist_genders_la_SOURCES = cerebro_clusterlist_genders.c \
 					 cerebro_clusterlist_genders_util.c \
@@ -47,19 +45,17 @@ cerebro_clusterlist_genders_la_SOURCES = cerebro_clusterlist_genders.c \
 cerebro_clusterlist_genders_la_LDFLAGS = $(MODULE_FLAGS) \
 					 $(GENDERS_LIBS) \
 				   	 $(CLUSTERLIST_OTHER_FLAGS)
-cerebro_clusterlist_genders_la_CFLAGS  = -I$(srcdir)/../../libcerebro \
-					 -I$(srcdir)/../../libcommon
-cerebro_clusterlist_genders_la_LIBADD  = ../../libcommon/libcommon.la
+cerebro_clusterlist_genders_la_CFLAGS  = -I$(srcdir)/../../libs/cerebro
 
 cerebro_clusterlist_hostsfile_la_SOURCES = cerebro_clusterlist_hostsfile.c \
 					   cerebro_clusterlist_util.c
 cerebro_clusterlist_hostsfile_la_LDFLAGS = $(MODULE_FLAGS) \
 				   	   $(CLUSTERLIST_OTHER_FLAGS)
-cerebro_clusterlist_hostsfile_la_CFLAGS  = -I$(srcdir)/../../libcerebro \
-					   -I$(srcdir)/../../libcommon
+cerebro_clusterlist_hostsfile_la_CFLAGS  = -I$(srcdir)/../../libs/cerebro \
+					   -I$(srcdir)/../../libs/common
 cerebro_clusterlist_hostsfile_la_LIBADD  = ../../libcommon/libcommon.la
 
-../../libcommon/libcommon.la : force-dependency-check
+../../libs/common/libcommon.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
 force-dependency-check:
