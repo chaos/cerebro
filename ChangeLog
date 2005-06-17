@@ -6,7 +6,7 @@
 
 	* tagged pre-library-reorg-1
 
-	* library code reorg
+	* library code reorg, new libcerebro_error library
 	
 2005-06-16  Albert Chu  <chu11@llnl.gov>
 
