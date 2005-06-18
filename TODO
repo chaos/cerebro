@@ -10,10 +10,6 @@ Cleanup
 - new module documentation
   - and various updates
 - limit maps
-- more statically compiled in libraries to reduce virt/res size?
-  - modules lib
-- header consistency
-- errnums in module handles
 
 Audit
 - code review to reduce memory footprint
