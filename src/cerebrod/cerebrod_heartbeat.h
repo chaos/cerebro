@@ -1,11 +1,11 @@
 /*****************************************************************************\
- *  $Id: cerebrod_heartbeat.h,v 1.12 2005-06-08 15:32:01 achu Exp $
+ *  $Id: cerebrod_heartbeat.h,v 1.13 2005-06-18 00:14:39 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_HEARTBEAT_H
 #define _CEREBROD_HEARTBEAT_H
 
-#include "cerebrod_heartbeat_protocol.h"
+#include "cerebro/cerebrod_heartbeat_protocol.h"
 
 /*
  * cerebrod_heartbeat_destroy

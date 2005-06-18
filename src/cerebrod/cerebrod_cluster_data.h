@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_cluster_data.h,v 1.5 2005-06-17 16:23:05 achu Exp $
+ *  $Id: cerebrod_cluster_data.h,v 1.6 2005-06-18 00:14:39 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_CLUSTER_DATA_H
@@ -15,7 +15,7 @@
 
 #include <sys/types.h>
 
-#include "cerebrod_heartbeat_protocol.h"
+#include "cerebro/cerebrod_heartbeat_protocol.h"
 
 #include "hash.h"
 

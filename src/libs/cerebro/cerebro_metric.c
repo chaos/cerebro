@@ -32,10 +32,10 @@
 #include "cerebro_api.h"
 #include "cerebro_clusterlist_util.h"
 #include "cerebro_config_util.h"
-#include "cerebro_metric_protocol.h"
 #include "cerebro_nodelist_util.h"
 #include "cerebro_util.h"
 #include "cerebro/cerebro_error.h"
+#include "cerebro/cerebro_metric_protocol.h"
 
 #include "fd.h"
 #include "marshall.h"

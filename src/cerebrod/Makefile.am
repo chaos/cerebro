@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.50 2005-06-17 22:58:30 achu Exp $
+## $Id: Makefile.am,v 1.51 2005-06-18 00:14:39 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -33,7 +33,6 @@ cerebrod_SOURCES = cerebrod.c \
 		   cerebrod_util.c \
 		   cerebrod_wrappers.c
 cerebrod_CFLAGS  = -I$(srcdir)/../libs/cerebro \
-		   -I$(srcdir)/../libs/headers \
 		   -I$(srcdir)/../libs/include \
 		   -I$(srcdir)/../libs/common
 cerebrod_LDADD   = ../libs/cerebro/libcerebro.la \
