@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_util.c,v 1.1 2005-06-17 20:54:08 achu Exp $
+ *  $Id: cerebro_config_util.c,v 1.2 2005-06-18 18:48:30 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -14,10 +14,12 @@
 
 #include "cerebro_api.h"
 #include "cerebro_config_util.h"
-#include "cerebro_module_config.h"
 #include "cerebro_util.h"
 #include "cerebro/cerebro_config.h"
 #include "cerebro/cerebro_error.h"
+
+#include "config_module.h"
+
 #include "conffile.h"
 
 #if CEREBRO_DEBUG
@@ -29,12 +31,12 @@ int
 _cerebro_config_load_config_module(struct cerebro_config *conf)
 {
   int rv = -1;
-  cerebro_config_module_t handle = NULL;
+  config_module_t config_handle = NULL;
 
-  if (!(handle = _cerebro_module_load_config_module()))
+  if (!(config_handle = config_module_load()))
     goto cleanup;
 
-  if (_cerebro_config_module_setup(handle) < 0)
+  if (config_module_setup(config_handle) < 0)
     goto cleanup;
 
 #if CEREBRO_DEBUG  
@@ -44,18 +46,18 @@ _cerebro_config_load_config_module(struct cerebro_config *conf)
       fprintf(stderr, "* Cerebro Config Configuration:\n");
       fprintf(stderr, "* -----------------------\n");
       fprintf(stderr, "* Loading config from module: %s\n",
-              _cerebro_config_module_name(handle));
+              config_module_name(config_handle));
       fprintf(stderr, "**************************************\n");
     }
 #endif /* CEREBRO_DEBUG */
 
-  if (_cerebro_config_module_load_default(handle, conf) < 0)
+  if (config_module_load_default(config_handle, conf) < 0)
     goto cleanup;
 
   rv = 0;
  cleanup:
-  _cerebro_config_module_cleanup(handle);
-  _cerebro_module_destroy_config_handle(handle);
+  config_module_cleanup(config_handle);
+  config_module_unload(config_handle);
   return rv;
 }
 

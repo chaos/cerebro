@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module_config.c,v 1.1 2005-06-18 06:47:06 achu Exp $
+ *  $Id: config_module.c,v 1.1 2005-06-18 18:48:30 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -13,38 +13,39 @@
 #endif /* STDC_HEADERS */
 
 #include "cerebro.h"
-#include "cerebro_module_config.h"
-#include "cerebro_module_util.h"
 #include "cerebro/cerebro_config_module.h"
 #include "cerebro/cerebro_constants.h"
 #include "cerebro/cerebro_error.h"
 
+#include "config_module.h"
+#include "module_util.h"
+
 #include "ltdl.h"
 
 /*
- * dynamic_config_modules
- * dynamic_config_modules_len
+ * config_modules
+ * config_modules_len
  *
  * dynamic configuration modules to search for by default
  */
-char *dynamic_config_modules[] = {
+char *config_modules[] = {
   "cerebro_config_gendersllnl.so",
   NULL
 };
-int dynamic_config_modules_len = 1;
+int config_modules_len = 1;
 
-#define CEREBRO_CONFIG_FILENAME_SIGNATURE      "cerebro_config_"
+#define CONFIG_FILENAME_SIGNATURE      "cerebro_config_"
 
-#define CEREBRO_CONFIG_MODULE_DIR      CEREBRO_CONFIG_MODULE_BUILDDIR "/.libs"
+#define CONFIG_MODULE_DIR              CONFIG_MODULE_BUILDDIR "/.libs"
 
-#define CEREBRO_CONFIG_MODULE_MAGIC_NUMBER      0x33882211
+#define CONFIG_MODULE_MAGIC_NUMBER     0x33882211
 
 /* 
- * struct cerebro_config_module
+ * struct config_module
  *
  * config module handle
  */
-struct cerebro_config_module
+struct config_module
 {
   int32_t magic;
   lt_dlhandle dl_handle;
@@ -52,10 +53,10 @@ struct cerebro_config_module
 };
 
 extern struct cerebro_config_module_info default_config_module_info;
-extern int cerebro_module_library_setup_count;
+extern int module_setup_count;
 
 /* 
- * _load_config_module
+ * _config_module_loader
  *
  * If compiled statically, attempt to load the module specified by the
  * module name.
@@ -66,13 +67,13 @@ extern int cerebro_module_library_setup_count;
  * Return 1 is module is loaded, 0 if not, -1 on fatal error
  */
 static int 
-_load_config_module(void *handle, char *module)
+_config_module_loader(void *handle, char *module)
 {
   lt_dlhandle dl_handle = NULL;
   struct cerebro_config_module_info *module_info = NULL;
-  cerebro_config_module_t config_handle = (cerebro_config_module_t)handle;
+  config_module_t config_handle = (config_module_t)handle;
 
-  if (!cerebro_module_library_setup_count)
+  if (!module_setup_count)
     {
       cerebro_err_debug("%s(%s:%d): cerebro_module_library uninitialized", 
 			__FILE__, __FUNCTION__, __LINE__);
@@ -86,7 +87,7 @@ _load_config_module(void *handle, char *module)
       return -1;
     }
                                                                                       
-  if (config_handle->magic != CEREBRO_CONFIG_MODULE_MAGIC_NUMBER)
+  if (config_handle->magic != CONFIG_MODULE_MAGIC_NUMBER)
     {
       cerebro_err_debug("%s(%s:%d): config_handle magic number invalid",
 			__FILE__, __FUNCTION__, __LINE__);
@@ -159,47 +160,47 @@ _load_config_module(void *handle, char *module)
   return 0;
 }
 
-cerebro_config_module_t
-_cerebro_module_load_config_module(void)
+config_module_t
+config_module_load(void)
 {
-  struct cerebro_config_module *config_handle = NULL;
+  struct config_module *config_handle = NULL;
   int rv;
 
-  if (_cerebro_module_setup() < 0)
+  if (module_setup() < 0)
     return NULL;
                                                                                       
-  if (!(config_handle = (struct cerebro_config_module *)malloc(sizeof(struct cerebro_config_module))))
+  if (!(config_handle = (struct config_module *)malloc(sizeof(struct config_module))))
     return NULL;
-  memset(config_handle, '\0', sizeof(struct cerebro_config_module));
-  config_handle->magic = CEREBRO_CONFIG_MODULE_MAGIC_NUMBER;
+  memset(config_handle, '\0', sizeof(struct config_module));
+  config_handle->magic = CONFIG_MODULE_MAGIC_NUMBER;
 
 #if CEREBRO_DEBUG
-  if ((rv = _cerebro_module_find_known_module(CEREBRO_CONFIG_MODULE_DIR,
-					      dynamic_config_modules,
-					      dynamic_config_modules_len,
-					      _load_config_module,
-                                              config_handle)) < 0)
+  if ((rv = find_known_module(CONFIG_MODULE_DIR,
+			      config_modules,
+			      config_modules_len,
+			      _config_module_loader,
+			      config_handle)) < 0)
     goto cleanup;
 
   if (rv)
     goto out;
 #endif /* CEREBRO_DEBUG */
 
-  if ((rv = _cerebro_module_find_known_module(CEREBRO_MODULE_DIR,
-					      dynamic_config_modules,
-					      dynamic_config_modules_len,
-					      _load_config_module,
-                                              config_handle)) < 0)
+  if ((rv = find_known_module(CEREBRO_MODULE_DIR,
+			      config_modules,
+			      config_modules_len,
+			      _config_module_loader,
+			      config_handle)) < 0)
     goto cleanup;
 
   if (rv)
     goto out;
 
-  if ((rv = _cerebro_module_find_modules(CEREBRO_MODULE_DIR,
-                                         CEREBRO_CONFIG_FILENAME_SIGNATURE,
-                                         _load_config_module,
-                                         config_handle,
-                                         1)) < 0)
+  if ((rv = find_modules(CEREBRO_MODULE_DIR,
+			 CONFIG_FILENAME_SIGNATURE,
+			 _config_module_loader,
+			 config_handle,
+			 1)) < 0)
     goto cleanup;
 
   if (rv)
@@ -217,22 +218,22 @@ _cerebro_module_load_config_module(void)
         lt_dlclose(config_handle->dl_handle);
       free(config_handle);
     }
-  _cerebro_module_cleanup();
+  module_cleanup();
   return NULL;
 }
 
 /*
- * _cerebro_module_config_module_check
+ * config_module_handle_check
  *
  * Check for proper config module handle
  *
  * Returns 0 on success, -1 on error
  */
 static int
-_cerebro_module_config_module_check(cerebro_config_module_t config_handle)
+config_module_handle_check(config_module_t config_handle)
 {
   if (!config_handle 
-      || config_handle->magic != CEREBRO_CONFIG_MODULE_MAGIC_NUMBER
+      || config_handle->magic != CONFIG_MODULE_MAGIC_NUMBER
       || !config_handle->module_info)
     {
       cerebro_err_debug("%s(%s:%d): cerebro config_handle invalid",
@@ -244,53 +245,53 @@ _cerebro_module_config_module_check(cerebro_config_module_t config_handle)
 }
 
 int
-_cerebro_module_destroy_config_handle(cerebro_config_module_t config_handle)
+config_module_unload(config_module_t config_handle)
 {
-  if (_cerebro_module_config_module_check(config_handle) < 0)
+  if (config_module_handle_check(config_handle) < 0)
     return -1;
   
-  config_handle->magic = ~CEREBRO_CONFIG_MODULE_MAGIC_NUMBER;
+  config_handle->magic = ~CONFIG_MODULE_MAGIC_NUMBER;
   if (config_handle->dl_handle)
     lt_dlclose(config_handle->dl_handle);
   config_handle->module_info = NULL;
   free(config_handle);
 
-  _cerebro_module_cleanup();
+  module_cleanup();
   return 0;
 }
 
 char *
-_cerebro_config_module_name(cerebro_config_module_t config_handle)
+config_module_name(config_module_t config_handle)
 {
-  if (_cerebro_module_config_module_check(config_handle) < 0)
+  if (config_module_handle_check(config_handle) < 0)
     return NULL;
 
   return (config_handle->module_info)->config_module_name;
 }
 
 int
-_cerebro_config_module_setup(cerebro_config_module_t config_handle)
+config_module_setup(config_module_t config_handle)
 {
-  if (_cerebro_module_config_module_check(config_handle) < 0)
+  if (config_module_handle_check(config_handle) < 0)
     return -1;
   
   return ((*(config_handle->module_info)->setup)());
 }
 
 int
-_cerebro_config_module_cleanup(cerebro_config_module_t config_handle)
+config_module_cleanup(config_module_t config_handle)
 {
-  if (_cerebro_module_config_module_check(config_handle) < 0)
+  if (config_module_handle_check(config_handle) < 0)
     return -1;
   
   return ((*(config_handle->module_info)->cleanup)());
 }
 
 int
-_cerebro_config_module_load_default(cerebro_config_module_t config_handle,
-                                    struct cerebro_config *conf)
+config_module_load_default(config_module_t config_handle,
+			   struct cerebro_config *conf)
 {
-  if (_cerebro_module_config_module_check(config_handle) < 0)
+  if (config_module_handle_check(config_handle) < 0)
     return -1;
   
   return ((*(config_handle->module_info)->load_default)(conf));

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_cluster_data.c,v 1.16 2005-06-17 23:21:22 achu Exp $
+ *  $Id: cerebrod_cluster_data.c,v 1.17 2005-06-18 18:48:30 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -15,8 +15,6 @@
 #include <assert.h>
 
 #include "cerebro.h"
-#include "cerebro_module_clusterlist.h"
-#include "cerebro_module_monitor.h"
 #include "cerebro/cerebro_constants.h"
 #include "cerebro/cerebro_error.h"
 
@@ -25,6 +23,10 @@
 #include "cerebrod_config.h"
 #include "cerebrod_util.h"
 #include "cerebrod_wrappers.h"
+
+#include "clusterlist_module.h"
+#include "monitor_module.h"
+
 #include "list.h"
 #include "hash.h"
 
@@ -37,7 +39,7 @@ extern struct cerebrod_config conf;
 extern pthread_mutex_t debug_output_mutex;
 #endif /* CEREBRO_DEBUG */
 
-extern cerebro_clusterlist_module_t clusterlist_handle;
+extern clusterlist_module_t clusterlist_handle;
 
 /*
  * cerebrod_cluster_data_initialization_complete
@@ -106,7 +108,7 @@ pthread_mutex_t cerebrod_metric_name_lock = PTHREAD_MUTEX_INITIALIZER;
  *
  * monitoring module handles
  */
-cerebro_monitor_modules_t monitor_handle = NULL;
+monitor_modules_t monitor_handle = NULL;
 
 /*
  * monitor_index
@@ -190,8 +192,8 @@ cerebrod_cluster_data_initialize(void)
   if (cerebrod_cluster_data_initialization_complete)
     goto out;
 
-  if ((numnodes = _cerebro_clusterlist_module_numnodes(clusterlist_handle)) < 0)
-    cerebro_err_exit("%s(%s:%d): _cerebro_clusterlist_module_numnodes",
+  if ((numnodes = clusterlist_module_numnodes(clusterlist_handle)) < 0)
+    cerebro_err_exit("%s(%s:%d): clusterlist_module_numnodes",
 		     __FILE__, __FUNCTION__, __LINE__);
 
   if (numnodes > 0)
@@ -220,9 +222,9 @@ cerebrod_cluster_data_initialize(void)
       int i;
       char **nodes;
 
-      if (_cerebro_clusterlist_module_get_all_nodes(clusterlist_handle,
-                                                    &nodes) < 0)
-        cerebro_err_exit("%s(%s:%d): _cerebro_clusterlist_module_get_all_nodes",
+      if (clusterlist_module_get_all_nodes(clusterlist_handle,
+					   &nodes) < 0)
+        cerebro_err_exit("%s(%s:%d): clusterlist_module_get_all_nodes",
                          __FILE__, __FUNCTION__, __LINE__);
 
       for (i = 0; i < numnodes; i++)
@@ -259,7 +261,7 @@ cerebrod_cluster_data_initialize(void)
     cerebro_err_exit("%s(%s:%d): listen server not setup",
                      __FILE__, __FUNCTION__, __LINE__);
 
-  if (!(monitor_handle = _cerebro_module_load_monitor_modules(conf.monitor_max)))
+  if (!(monitor_handle = monitor_modules_load(conf.monitor_max)))
     {
       cerebro_err_debug("%s(%s:%d): _cerebro_module_load_monitor_modules failed",
                         __FILE__, __FUNCTION__, __LINE__);
@@ -267,11 +269,11 @@ cerebrod_cluster_data_initialize(void)
     }
 
 
-  if ((monitor_index_len = _cerebro_monitor_module_count(monitor_handle)) < 0)
+  if ((monitor_index_len = monitor_modules_count(monitor_handle)) < 0)
     {
       cerebro_err_debug("%s(%s:%d): _cerebro_monitor_module_count failed",
                         __FILE__, __FUNCTION__, __LINE__);
-      _cerebro_module_destroy_monitor_handle(monitor_handle);
+      monitor_modules_unload(monitor_handle);
       monitor_handle = NULL;
       goto done;
     }
@@ -288,7 +290,7 @@ cerebrod_cluster_data_initialize(void)
           Pthread_mutex_unlock(&debug_output_mutex);
         }
 #endif /* CEREBRO_DEBUG */
-      _cerebro_module_destroy_monitor_handle(monitor_handle);
+      monitor_modules_unload(monitor_handle);
       monitor_handle = NULL;
       goto done;
     }
@@ -309,7 +311,7 @@ cerebrod_cluster_data_initialize(void)
           Pthread_mutex_lock(&debug_output_mutex);
           fprintf(stderr, "**************************************\n");
           fprintf(stderr, "* Settup up Monitor Module: %s\n",
-                  _cerebro_monitor_module_name(monitor_handle, i));
+                  monitor_module_name(monitor_handle, i));
           fprintf(stderr, "**************************************\n");
           Pthread_mutex_unlock(&debug_output_mutex);
         }
@@ -317,17 +319,17 @@ cerebrod_cluster_data_initialize(void)
 
       /* XXX need to call cleanup too */
 
-      if (_cerebro_monitor_module_setup(monitor_handle, i) < 0)
+      if (monitor_module_setup(monitor_handle, i) < 0)
         {
-          cerebro_err_debug("%s(%s:%d): _cerebro_monitor_module_setup failed",
+          cerebro_err_debug("%s(%s:%d): monitor_module_setup failed",
                             __FILE__, __FUNCTION__, __LINE__);
           continue;
         }
 
-      if (!(metric_name = _cerebro_monitor_module_metric_name(monitor_handle,
-                                                              i)) < 0)
+      if (!(metric_name = monitor_module_metric_name(monitor_handle,
+						     i)) < 0)
         {
-          cerebro_err_debug("%s(%s:%d): _cerebro_monitor_module_metric_name failed",
+          cerebro_err_debug("%s(%s:%d): monitor_module_metric_name failed",
                             __FILE__, __FUNCTION__, __LINE__);
           continue;
         }
@@ -349,7 +351,7 @@ cerebrod_cluster_data_initialize(void)
  monitor_cleanup:
   if (monitor_handle)
     {
-      _cerebro_module_destroy_monitor_handle(monitor_handle);
+      monitor_modules_unload(monitor_handle);
       monitor_handle = NULL;
     }
   if (monitor_index)
@@ -775,13 +777,13 @@ cerebrod_cluster_data_update(char *nodename,
                   if ((monitor_metric = Hash_find(monitor_index, metric_name_buf)))
                     {
                       Pthread_mutex_lock(&monitor_metric->monitor_lock);
-                      _cerebro_monitor_module_metric_update(monitor_handle,
-                                                            monitor_metric->index,
-                                                            nodename,
-                                                            metric_name_buf,
-                                                            hb->metrics[i]->metric_value_type,
-                                                            hb->metrics[i]->metric_value_len,
-                                                            hb->metrics[i]->metric_value);
+                      monitor_module_metric_update(monitor_handle,
+						   monitor_metric->index,
+						   nodename,
+						   metric_name_buf,
+						   hb->metrics[i]->metric_value_type,
+						   hb->metrics[i]->metric_value_len,
+						   hb->metrics[i]->metric_value);
                       Pthread_mutex_unlock(&monitor_metric->monitor_lock);
                     }
                 }

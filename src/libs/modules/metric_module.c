@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module_metric.c,v 1.1 2005-06-18 06:47:06 achu Exp $
+ *  $Id: metric_module.c,v 1.1 2005-06-18 18:48:30 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -13,26 +13,27 @@
 #endif /* STDC_HEADERS */
 
 #include "cerebro.h"
-#include "cerebro_module_metric.h"
-#include "cerebro_module_util.h"
 #include "cerebro/cerebro_constants.h"
 #include "cerebro/cerebro_error.h"
 #include "cerebro/cerebro_metric_module.h"
 
+#include "metric_module.h"
+#include "module_util.h"
+
 #include "ltdl.h"
 
-#define CEREBRO_METRIC_FILENAME_SIGNATURE      "cerebro_metric_"
+#define METRIC_FILENAME_SIGNATURE  "cerebro_metric_"
 
-#define CEREBRO_METRIC_MODULE_DIR      CEREBRO_METRIC_MODULE_BUILDDIR "/.libs"
+#define METRIC_MODULE_DIR          METRIC_MODULE_BUILDDIR "/.libs"
 
-#define CEREBRO_METRIC_MODULE_MAGIC_NUMBER      0x33882222
+#define METRIC_MODULE_MAGIC_NUMBER 0x33882222
 
 /* 
- * struct cerebro_metric_module
+ * struct metric_module
  *
  * metric module handle
  */
-struct cerebro_metric_module
+struct metric_module
 {
   int32_t magic;
   unsigned int modules_max;
@@ -41,10 +42,10 @@ struct cerebro_metric_module
   struct cerebro_metric_module_info **module_info;
 };
 
-extern int cerebro_module_library_setup_count;
+extern int module_setup_count;
 
 /* 
- * _load_metric_module
+ * _metric_module_loader
  *
  * If compiled statically, attempt to load the module specified by the
  * module name.
@@ -55,13 +56,13 @@ extern int cerebro_module_library_setup_count;
  * Return 1 if module is loaded, 0 if not, -1 on fatal error
  */
 static int 
-_load_metric_module(void *handle, char *module)
+_metric_module_loader(void *handle, char *module)
 {
   lt_dlhandle dl_handle = NULL;
   struct cerebro_metric_module_info *module_info = NULL;
-  cerebro_metric_modules_t metric_handle = (cerebro_metric_modules_t)handle;
+  metric_modules_t metric_handle = (metric_modules_t)handle;
 
-  if (!cerebro_module_library_setup_count)
+  if (!module_setup_count)
     {
       cerebro_err_debug("%s(%s:%d): cerebro_module_library uninitialized", 
 			__FILE__, __FUNCTION__, __LINE__);
@@ -75,7 +76,7 @@ _load_metric_module(void *handle, char *module)
       return -1;
     }
 
-  if (metric_handle->magic != CEREBRO_METRIC_MODULE_MAGIC_NUMBER)
+  if (metric_handle->magic != METRIC_MODULE_MAGIC_NUMBER)
     {
       cerebro_err_debug("%s(%s:%d): metric_handle magic number invalid",
 			__FILE__, __FUNCTION__, __LINE__);
@@ -166,10 +167,10 @@ _load_metric_module(void *handle, char *module)
   return 0;
 }
 
-cerebro_metric_modules_t 
-_cerebro_module_load_metric_modules(unsigned int modules_max)
+metric_modules_t 
+metric_modules_load(unsigned int modules_max)
 {
-  struct cerebro_metric_module *metric_handle = NULL;
+  struct metric_module *metric_handle = NULL;
   int rv;
                                                                                       
   if (!modules_max)
@@ -179,13 +180,13 @@ _cerebro_module_load_metric_modules(unsigned int modules_max)
       return NULL;
     }
 
-  if (_cerebro_module_setup() < 0)
+  if (module_setup() < 0)
     return NULL;
                                                                                     
-  if (!(metric_handle = (struct cerebro_metric_module *)malloc(sizeof(struct cerebro_metric_module))))
+  if (!(metric_handle = (struct metric_module *)malloc(sizeof(struct metric_module))))
     return NULL;
-  memset(metric_handle, '\0', sizeof(struct cerebro_metric_module));
-  metric_handle->magic = CEREBRO_METRIC_MODULE_MAGIC_NUMBER;
+  memset(metric_handle, '\0', sizeof(struct metric_module));
+  metric_handle->magic = METRIC_MODULE_MAGIC_NUMBER;
   metric_handle->modules_max = modules_max;
   metric_handle->modules_count = 0;
   if (!(metric_handle->dl_handle = (lt_dlhandle *)malloc(sizeof(lt_dlhandle)*metric_handle->modules_max)))
@@ -196,7 +197,7 @@ _cerebro_module_load_metric_modules(unsigned int modules_max)
     }
   memset(metric_handle->dl_handle, '\0', sizeof(lt_dlhandle)*metric_handle->modules_max);
   
-  if (!(metric_handle->module_info = (struct cerebro_metric_module_info * *)malloc(sizeof(struct cerebro_metric_module_info *)*metric_handle->modules_max)))
+  if (!(metric_handle->module_info = (struct cerebro_metric_module_info **)malloc(sizeof(struct cerebro_metric_module_info *)*metric_handle->modules_max)))
     {
       cerebro_err_debug("%s(%s:%d): out of memory",
 			__FILE__, __FUNCTION__, __LINE__);
@@ -205,22 +206,22 @@ _cerebro_module_load_metric_modules(unsigned int modules_max)
   memset(metric_handle->module_info, '\0', sizeof(struct cerebro_metric_module_info *)*metric_handle->modules_max);
 
 #if CEREBRO_DEBUG
-  if ((rv = _cerebro_module_find_modules(CEREBRO_METRIC_MODULE_DIR,
-                                         CEREBRO_METRIC_FILENAME_SIGNATURE,
-                                         _load_metric_module,
-                                         metric_handle,
-                                         metric_handle->modules_max)) < 0)
+  if ((rv = find_modules(METRIC_MODULE_DIR,
+			 METRIC_FILENAME_SIGNATURE,
+			 _metric_module_loader,
+			 metric_handle,
+			 metric_handle->modules_max)) < 0)
     goto cleanup;
 
   if (rv)
     goto out;
 #endif /* CEREBRO_DEBUG */
 
-  if ((rv = _cerebro_module_find_modules(CEREBRO_MODULE_DIR,
-                                         CEREBRO_METRIC_FILENAME_SIGNATURE,
-                                         _load_metric_module,
-                                         metric_handle,
-                                         metric_handle->modules_max)) < 0)
+  if ((rv = find_modules(CEREBRO_MODULE_DIR,
+			 METRIC_FILENAME_SIGNATURE,
+			 _metric_module_loader,
+			 metric_handle,
+			 metric_handle->modules_max)) < 0)
     goto cleanup;
                                                                                       
   if (rv)
@@ -243,22 +244,22 @@ _cerebro_module_load_metric_modules(unsigned int modules_max)
         free(metric_handle->module_info);
       free(metric_handle);
     }
-  _cerebro_module_cleanup();
+  module_cleanup();
   return NULL;
 }
                                                                                       
 /*
- * _cerebro_module_metric_module_check
+ * metric_module_handle_check
  *
  * Check for proper metric module handle
  *
  * Returns 0 on success, -1 on error
  */
 static int
-_cerebro_module_metric_module_check(cerebro_metric_modules_t metric_handle)
+metric_module_handle_check(metric_modules_t metric_handle)
 {
   if (!metric_handle 
-      || metric_handle->magic != CEREBRO_METRIC_MODULE_MAGIC_NUMBER)
+      || metric_handle->magic != METRIC_MODULE_MAGIC_NUMBER)
     {
       cerebro_err_debug("%s(%s:%d): cerebro metric_handle invalid",
 			__FILE__, __FUNCTION__, __LINE__);
@@ -269,12 +270,12 @@ _cerebro_module_metric_module_check(cerebro_metric_modules_t metric_handle)
 }
 
 int 
-_cerebro_module_destroy_metric_handle(cerebro_metric_modules_t metric_handle)
+metric_modules_unload(metric_modules_t metric_handle)
 {
-  if (_cerebro_module_metric_module_check(metric_handle) < 0)
+  if (metric_module_handle_check(metric_handle) < 0)
     return -1;
 
-  metric_handle->magic = ~CEREBRO_METRIC_MODULE_MAGIC_NUMBER;
+  metric_handle->magic = ~METRIC_MODULE_MAGIC_NUMBER;
   metric_handle->modules_max = 0;
   metric_handle->modules_count = 0;
   if (metric_handle->dl_handle)
@@ -288,25 +289,25 @@ _cerebro_module_destroy_metric_handle(cerebro_metric_modules_t metric_handle)
     free(metric_handle->module_info);
   free(metric_handle);
 
-  _cerebro_module_cleanup();
+  module_cleanup();
   return 0;
   
 }
 
 int 
-_cerebro_metric_module_count(cerebro_metric_modules_t metric_handle)
+metric_modules_count(metric_modules_t metric_handle)
 {
-  if (_cerebro_module_metric_module_check(metric_handle) < 0)
+  if (metric_module_handle_check(metric_handle) < 0)
     return -1;
 
   return metric_handle->modules_count;
 }
 
 char *
-_cerebro_metric_module_name(cerebro_metric_modules_t metric_handle,
-                            unsigned int index)
+metric_module_name(metric_modules_t metric_handle,
+		   unsigned int index)
 {
-  if (_cerebro_module_metric_module_check(metric_handle) < 0)
+  if (metric_module_handle_check(metric_handle) < 0)
     return NULL;
 
   if (!(index < metric_handle->modules_count))
@@ -316,10 +317,10 @@ _cerebro_metric_module_name(cerebro_metric_modules_t metric_handle,
 }
 
 int 
-_cerebro_metric_module_setup(cerebro_metric_modules_t metric_handle,
-                             unsigned int index)
+metric_module_setup(metric_modules_t metric_handle,
+		    unsigned int index)
 {
-  if (_cerebro_module_metric_module_check(metric_handle) < 0)
+  if (metric_module_handle_check(metric_handle) < 0)
     return -1;
   
   if (!(index < metric_handle->modules_count))
@@ -329,10 +330,10 @@ _cerebro_metric_module_setup(cerebro_metric_modules_t metric_handle,
 }
 
 int 
-_cerebro_metric_module_cleanup(cerebro_metric_modules_t metric_handle,
-                               unsigned int index)
+metric_module_cleanup(metric_modules_t metric_handle,
+		      unsigned int index)
 {
-  if (_cerebro_module_metric_module_check(metric_handle) < 0)
+  if (metric_module_handle_check(metric_handle) < 0)
     return -1;
   
   if (!(index < metric_handle->modules_count))
@@ -342,10 +343,10 @@ _cerebro_metric_module_cleanup(cerebro_metric_modules_t metric_handle,
 }
 
 char *
-_cerebro_metric_module_get_metric_name(cerebro_metric_modules_t metric_handle,
-                                       unsigned int index)
+metric_module_get_metric_name(metric_modules_t metric_handle,
+			      unsigned int index)
 {
-  if (_cerebro_module_metric_module_check(metric_handle) < 0)
+  if (metric_module_handle_check(metric_handle) < 0)
     return NULL;
   
   if (!(index < metric_handle->modules_count))
@@ -355,13 +356,13 @@ _cerebro_metric_module_get_metric_name(cerebro_metric_modules_t metric_handle,
 }
 
 int 
-_cerebro_metric_module_get_metric_value(cerebro_metric_modules_t metric_handle,
-                                        unsigned int index,
-                                        unsigned int *metric_value_type,
-                                        unsigned int *metric_value_len,
-                                        void **metric_value)
+metric_module_get_metric_value(metric_modules_t metric_handle,
+			       unsigned int index,
+			       unsigned int *metric_value_type,
+			       unsigned int *metric_value_len,
+			       void **metric_value)
 {
-  if (_cerebro_module_metric_module_check(metric_handle) < 0)
+  if (metric_module_handle_check(metric_handle) < 0)
     return -1;
   
   if (!(index < metric_handle->modules_count))
@@ -373,11 +374,11 @@ _cerebro_metric_module_get_metric_value(cerebro_metric_modules_t metric_handle,
 }
 
 int 
-_cerebro_metric_module_destroy_metric_value(cerebro_metric_modules_t metric_handle,
-                                            unsigned int index,
-                                            void *metric_value)
+metric_module_destroy_metric_value(metric_modules_t metric_handle,
+				   unsigned int index,
+				   void *metric_value)
 {
-  if (_cerebro_module_metric_module_check(metric_handle) < 0)
+  if (metric_module_handle_check(metric_handle) < 0)
     return -1;
   
   if (!(index < metric_handle->modules_count))

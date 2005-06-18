@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_module_monitor.c,v 1.1 2005-06-18 06:47:06 achu Exp $
+ *  $Id: monitor_module.c,v 1.1 2005-06-18 18:48:30 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -13,26 +13,27 @@
 #endif /* STDC_HEADERS */
 
 #include "cerebro.h"
-#include "cerebro_module_monitor.h"
-#include "cerebro_module_util.h"
 #include "cerebro/cerebro_constants.h"
 #include "cerebro/cerebro_error.h"
 #include "cerebro/cerebro_monitor_module.h"
 
+#include "monitor_module.h"
+#include "module_util.h"
+
 #include "ltdl.h"
 
-#define CEREBRO_MONITOR_FILENAME_SIGNATURE     "cerebro_monitor_"
+#define MONITOR_FILENAME_SIGNATURE  "cerebro_monitor_"
 
-#define CEREBRO_MONITOR_MODULE_DIR     CEREBRO_MONITOR_MODULE_BUILDDIR "/.libs"
+#define MONITOR_MODULE_DIR          MONITOR_MODULE_BUILDDIR "/.libs"
 
-#define CEREBRO_MONITOR_MODULE_MAGIC_NUMBER     0x33882233
+#define MONITOR_MODULE_MAGIC_NUMBER 0x33882233
 
 /* 
- * struct cerebro_monitor_module
+ * struct monitor_module
  *
  * monitor module handle
  */
-struct cerebro_monitor_module
+struct monitor_module
 {
   int32_t magic;
   unsigned int modules_max;
@@ -41,10 +42,10 @@ struct cerebro_monitor_module
   struct cerebro_monitor_module_info **module_info;
 };
 
-extern int cerebro_module_library_setup_count;
+extern int module_setup_count;
 
 /* 
- * _load_monitor_module
+ * _monitor_module_loader
  *
  * If compiled statically, attempt to load the module specified by the
  * module name.
@@ -55,13 +56,13 @@ extern int cerebro_module_library_setup_count;
  * Return 1 if module is loaded, 0 if not, -1 on fatal error
  */
 static int 
-_load_monitor_module(void *handle, char *module)
+_monitor_module_loader(void *handle, char *module)
 {
   lt_dlhandle dl_handle = NULL;
   struct cerebro_monitor_module_info *module_info = NULL;
-  cerebro_monitor_modules_t monitor_handle = (cerebro_monitor_modules_t)handle;
+  monitor_modules_t monitor_handle = (monitor_modules_t)handle;
 
-  if (!cerebro_module_library_setup_count)
+  if (!module_setup_count)
     {
       cerebro_err_debug("%s(%s:%d): cerebro_module_library uninitialized", 
 			__FILE__, __FUNCTION__, __LINE__);
@@ -75,7 +76,7 @@ _load_monitor_module(void *handle, char *module)
       return -1;
     }
 
-  if (monitor_handle->magic != CEREBRO_MONITOR_MODULE_MAGIC_NUMBER)
+  if (monitor_handle->magic != MONITOR_MODULE_MAGIC_NUMBER)
     {
       cerebro_err_debug("%s(%s:%d): monitor_handle magic number invalid",
 			__FILE__, __FUNCTION__, __LINE__);
@@ -159,10 +160,10 @@ _load_monitor_module(void *handle, char *module)
   return 0;
 }
 
-cerebro_monitor_modules_t 
-_cerebro_module_load_monitor_modules(unsigned int modules_max)
+monitor_modules_t 
+monitor_modules_load(unsigned int modules_max)
 {
-  struct cerebro_monitor_module *monitor_handle = NULL;
+  struct monitor_module *monitor_handle = NULL;
   int rv;
 
   if (!modules_max)
@@ -172,13 +173,13 @@ _cerebro_module_load_monitor_modules(unsigned int modules_max)
       return NULL;
     }
 
-  if (_cerebro_module_setup() < 0)
+  if (module_setup() < 0)
     return NULL;
                                                                                     
-  if (!(monitor_handle = (struct cerebro_monitor_module *)malloc(sizeof(struct cerebro_monitor_module))))
+  if (!(monitor_handle = (struct monitor_module *)malloc(sizeof(struct monitor_module))))
     return NULL;
-  memset(monitor_handle, '\0', sizeof(struct cerebro_monitor_module));
-  monitor_handle->magic = CEREBRO_MONITOR_MODULE_MAGIC_NUMBER;
+  memset(monitor_handle, '\0', sizeof(struct monitor_module));
+  monitor_handle->magic = MONITOR_MODULE_MAGIC_NUMBER;
   monitor_handle->modules_max = modules_max;
   monitor_handle->modules_count = 0;
   if (!(monitor_handle->dl_handle = (lt_dlhandle *)malloc(sizeof(lt_dlhandle)*monitor_handle->modules_max)))
@@ -198,22 +199,22 @@ _cerebro_module_load_monitor_modules(unsigned int modules_max)
   memset(monitor_handle->module_info, '\0', sizeof(struct cerebro_monitor_module_info *)*monitor_handle->modules_max);
 
 #if CEREBRO_DEBUG
-  if ((rv = _cerebro_module_find_modules(CEREBRO_MONITOR_MODULE_DIR,
-                                         CEREBRO_MONITOR_FILENAME_SIGNATURE,
-                                         _load_monitor_module,
-                                         monitor_handle,
-                                         monitor_handle->modules_max)) < 0)
+  if ((rv = find_modules(MONITOR_MODULE_DIR,
+			 MONITOR_FILENAME_SIGNATURE,
+			 _monitor_module_loader,
+			 monitor_handle,
+			 monitor_handle->modules_max)) < 0)
     goto cleanup;
 
   if (rv)
     goto out;
 #endif /* CEREBRO_DEBUG */
 
-  if ((rv = _cerebro_module_find_modules(CEREBRO_MODULE_DIR,
-                                         CEREBRO_MONITOR_FILENAME_SIGNATURE,
-                                         _load_monitor_module,
-                                         monitor_handle,
-                                         monitor_handle->modules_max)) < 0)
+  if ((rv = find_modules(CEREBRO_MODULE_DIR,
+			 MONITOR_FILENAME_SIGNATURE,
+			 _monitor_module_loader,
+			 monitor_handle,
+			 monitor_handle->modules_max)) < 0)
     goto cleanup;
 
   if (rv)
@@ -236,22 +237,22 @@ _cerebro_module_load_monitor_modules(unsigned int modules_max)
         free(monitor_handle->module_info);
       free(monitor_handle);
     }
-  _cerebro_module_cleanup();
+  module_cleanup();
   return NULL;
 }
                                                                                       
 /*
- * _cerebro_module_monitor_module_check
+ * monitor_module_handle_check
  *
  * Check for proper monitor module handle
  *
  * Returns 0 on success, -1 on error
  */
 static int
-_cerebro_module_monitor_module_check(cerebro_monitor_modules_t monitor_handle)
+monitor_module_handle_check(monitor_modules_t monitor_handle)
 {
   if (!monitor_handle 
-      || monitor_handle->magic != CEREBRO_MONITOR_MODULE_MAGIC_NUMBER)
+      || monitor_handle->magic != MONITOR_MODULE_MAGIC_NUMBER)
     {
       cerebro_err_debug("%s(%s:%d): cerebro monitor_handle invalid",
 			__FILE__, __FUNCTION__, __LINE__);
@@ -262,12 +263,12 @@ _cerebro_module_monitor_module_check(cerebro_monitor_modules_t monitor_handle)
 }
 
 int 
-_cerebro_module_destroy_monitor_handle(cerebro_monitor_modules_t monitor_handle)
+monitor_modules_unload(monitor_modules_t monitor_handle)
 {
-  if (_cerebro_module_monitor_module_check(monitor_handle) < 0)
+  if (monitor_module_handle_check(monitor_handle) < 0)
     return -1;
 
-  monitor_handle->magic = ~CEREBRO_MONITOR_MODULE_MAGIC_NUMBER;
+  monitor_handle->magic = ~MONITOR_MODULE_MAGIC_NUMBER;
   monitor_handle->modules_max = 0;
   monitor_handle->modules_count = 0;
   if (monitor_handle->dl_handle)
@@ -281,25 +282,25 @@ _cerebro_module_destroy_monitor_handle(cerebro_monitor_modules_t monitor_handle)
     free(monitor_handle->module_info);
   free(monitor_handle);
 
-  _cerebro_module_cleanup();
+  module_cleanup();
   return 0;
   
 }
 
 int 
-_cerebro_monitor_module_count(cerebro_monitor_modules_t monitor_handle)
+monitor_modules_count(monitor_modules_t monitor_handle)
 {
-  if (_cerebro_module_monitor_module_check(monitor_handle) < 0)
+  if (monitor_module_handle_check(monitor_handle) < 0)
     return -1;
 
   return monitor_handle->modules_count;
 }
 
 char *
-_cerebro_monitor_module_name(cerebro_monitor_modules_t monitor_handle,
-                             unsigned int index)
+monitor_module_name(monitor_modules_t monitor_handle,
+		    unsigned int index)
 {
-  if (_cerebro_module_monitor_module_check(monitor_handle) < 0)
+  if (monitor_module_handle_check(monitor_handle) < 0)
     return NULL;
 
   if (!(index < monitor_handle->modules_count))
@@ -309,10 +310,10 @@ _cerebro_monitor_module_name(cerebro_monitor_modules_t monitor_handle,
 }
 
 int 
-_cerebro_monitor_module_setup(cerebro_monitor_modules_t monitor_handle,
-                              unsigned int index)
+monitor_module_setup(monitor_modules_t monitor_handle,
+		     unsigned int index)
 {
-  if (_cerebro_module_monitor_module_check(monitor_handle) < 0)
+  if (monitor_module_handle_check(monitor_handle) < 0)
     return -1;
   
   if (!(index < monitor_handle->modules_count))
@@ -322,10 +323,10 @@ _cerebro_monitor_module_setup(cerebro_monitor_modules_t monitor_handle,
 }
 
 int 
-_cerebro_monitor_module_cleanup(cerebro_monitor_modules_t monitor_handle,
-                                unsigned int index)
+monitor_module_cleanup(monitor_modules_t monitor_handle,
+		       unsigned int index)
 {
-  if (_cerebro_module_monitor_module_check(monitor_handle) < 0)
+  if (monitor_module_handle_check(monitor_handle) < 0)
     return -1;
   
   if (!(index < monitor_handle->modules_count))
@@ -335,10 +336,10 @@ _cerebro_monitor_module_cleanup(cerebro_monitor_modules_t monitor_handle,
 }
 
 char *
-_cerebro_monitor_module_metric_name(cerebro_monitor_modules_t monitor_handle,
-                                    unsigned int index)
+monitor_module_metric_name(monitor_modules_t monitor_handle,
+			   unsigned int index)
 {
-  if (_cerebro_module_monitor_module_check(monitor_handle) < 0)
+  if (monitor_module_handle_check(monitor_handle) < 0)
     return NULL;
   
   if (!(index < monitor_handle->modules_count))
@@ -348,15 +349,15 @@ _cerebro_monitor_module_metric_name(cerebro_monitor_modules_t monitor_handle,
 }
 
 int 
-_cerebro_monitor_module_metric_update(cerebro_monitor_modules_t monitor_handle,
-                                      unsigned int index,
-                                      const char *nodename,
-                                      const char *metric_name,
-                                      unsigned int metric_value_type,
-                                      unsigned int metric_value_len,
-                                      void *metric_value)
+monitor_module_metric_update(monitor_modules_t monitor_handle,
+			     unsigned int index,
+			     const char *nodename,
+			     const char *metric_name,
+			     unsigned int metric_value_type,
+			     unsigned int metric_value_len,
+			     void *metric_value)
 {
-  if (_cerebro_module_monitor_module_check(monitor_handle) < 0)
+  if (monitor_module_handle_check(monitor_handle) < 0)
     return -1;
   
   if (!(index < monitor_handle->modules_count))
