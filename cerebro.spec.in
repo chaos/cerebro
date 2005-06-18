@@ -132,7 +132,7 @@ fi
 %config(noreplace) %{_sysconfdir}/init.d/cerebrod
 %{_sbindir}/*
 %{_includedir}/*
-%{_libdir}/libcerebro.*
+%{_libdir}/libcerebro*
 %{_mandir}/*
 %if %{?_with_chaos:1}%{!?_with_chaos:0}
 %{_libdir}/cerebro/cerebro_clusterlist*

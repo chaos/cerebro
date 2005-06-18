@@ -9,6 +9,7 @@ Testing
 Cleanup
 - new module documentation
   - and various updates
+- limit maps
 - more statically compiled in libraries to reduce virt/res size?
   - modules lib
 - header cleanup/consistency
