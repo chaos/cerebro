@@ -12,6 +12,7 @@ Cleanup
 - limit maps
 - more statically compiled in libraries to reduce virt/res size?
   - modules lib
+- header consistency
 
 Audit
 - code review to reduce memory footprint
