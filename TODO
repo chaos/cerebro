@@ -30,10 +30,7 @@ Design
   - Behlendo Request: Way to force most up to date data
   - Will require speaker to listen for "control" packets.
 - strerror_r and errormsg_r funcs
-- libcerebro set configfile, module, etc. functions
 - generic err message buffer in cerebro_t handle, i.e for conffile errors
-- pthreads locking for clusterlists/config modules?? (they are read only)
-- service up/down detection
 
 Before distribution
 - devel package?
