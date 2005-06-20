@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.103 2005-06-16 22:02:47 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.104 2005-06-20 16:53:24 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -25,7 +25,6 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 
-#include "cerebro_config_util.h"
 #include "cerebro/cerebro_error.h"
 #include "cerebro/cerebro_config.h"
 #include "cerebro/cerebro_config_module.h"
@@ -34,14 +33,16 @@
 #include "cerebrod_util.h"
 #include "cerebrod_wrappers.h"
 
+#include "config_util.h"
+
 #define MULTICAST_CLASS_MIN 224
 #define MULTICAST_CLASS_MAX 239
 #define IPADDR_BITS          32   
 #define IPADDR6_BITS        128
 
 #if CEREBRO_DEBUG
-extern char *cerebro_config_debug_config_file;
-extern int cerebro_config_debug_output;
+extern char *config_debug_config_file;
+extern int config_debug_output;
 #endif /* CEREBRO_DEBUG */
 
 /* 
@@ -218,11 +219,11 @@ _cerebrod_config_setup(void)
   struct cerebro_config conf_l;
 
 #if CEREBRO_DEBUG
-  cerebro_config_debug_config_file = conf.config_file;
-  cerebro_config_debug_output = conf.debug;
+  config_debug_config_file = conf.config_file;
+  config_debug_output = conf.debug;
 #endif /* CEREBRO_DEBUG */
 
-  if (_cerebro_config_load(&conf_l) < 0)
+  if (load_config(&conf_l) < 0)
     cerebro_err_exit("%s(%s:%d): cerebro_config_load",
 		     __FILE__, __FUNCTION__, __LINE__);
   

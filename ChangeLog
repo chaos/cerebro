@@ -1,3 +1,8 @@
+2005-06-20  Albert Chu  <chu11@llnl.gov>
+
+	* Split off cerebro utility functions and created libutil
+	convenience library.
+	
 2005-06-18  Albert Chu  <chu11@llnl.gov>
 
 	* Various minor fixes.

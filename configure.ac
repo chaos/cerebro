@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.43 2005-06-18 06:47:06 achu Exp $
+## $Id: configure.ac,v 1.44 2005-06-20 16:53:24 achu Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -164,6 +164,7 @@ AC_CONFIG_FILES( \
   src/libs/common/Makefile \
   src/libs/include/Makefile \
   src/libs/modules/Makefile \
+  src/libs/util/Makefile \
   src/modules/Makefile \
   src/modules/clusterlist/Makefile \
   src/modules/config/Makefile \
