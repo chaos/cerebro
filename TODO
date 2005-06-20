@@ -9,7 +9,6 @@ Testing
 Cleanup
 - new module documentation
   - and various updates
-- limit maps
 
 Audit
 - code review to reduce memory footprint
