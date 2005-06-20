@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: monitor_module.h,v 1.1 2005-06-18 18:48:30 achu Exp $
+ *  $Id: monitor_module.h,v 1.2 2005-06-20 18:46:02 achu Exp $
 \*****************************************************************************/
 
 #ifndef _MONITOR_MODULE_H
@@ -72,7 +72,6 @@ char * monitor_module_metric_name(monitor_modules_t monitor_handle,
 int monitor_module_metric_update(monitor_modules_t monitor_handle, 
 				 unsigned int index,
 				 const char *nodename,
-				 const char *metric_name,
 				 unsigned int metric_value_type,
 				 unsigned int metric_value_len,
 				 void *metric_value);

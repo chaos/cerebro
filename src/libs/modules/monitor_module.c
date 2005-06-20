@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: monitor_module.c,v 1.1 2005-06-18 18:48:30 achu Exp $
+ *  $Id: monitor_module.c,v 1.2 2005-06-20 18:46:02 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -352,7 +352,6 @@ int
 monitor_module_metric_update(monitor_modules_t monitor_handle,
 			     unsigned int index,
 			     const char *nodename,
-			     const char *metric_name,
 			     unsigned int metric_value_type,
 			     unsigned int metric_value_len,
 			     void *metric_value)
@@ -364,7 +363,6 @@ monitor_module_metric_update(monitor_modules_t monitor_handle,
     return -1;
 
   return ((*(monitor_handle->module_info[index])->metric_update)(nodename,
-                                                                 metric_name,
                                                                  metric_value_type,
                                                                  metric_value_len,
                                                                  metric_value));
