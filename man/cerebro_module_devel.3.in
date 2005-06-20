@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro_module_devel.3.in,v 1.7 2005-06-17 00:14:33 achu Exp $
+\."$Id: cerebro_module_devel.3.in,v 1.8 2005-06-20 18:34:58 achu Exp $
 \."#############################################################################
 .TH LIBCEREBRO 3 "May 2005" "LLNL" "LIBCEREBRO"
 .SH "NAME"
@@ -195,6 +195,10 @@ struct cerebro_config {
   int cerebrod_metric_server_flag;
   int cerebrod_metric_server_port;
   int cerebrod_metric_server_port_flag;
+  int cerebrod_metric_max;
+  int cerebrod_metric_max_flag;
+  int cerebrod_monitor_max;
+  int cerebrod_monitor_max_flag;
 .if 1 \{
   int cerebrod_speak_debug;
   int cerebrod_speak_debug_flag;
@@ -268,6 +272,17 @@ metric server to receive metric data requests.
 The 'cerebrod_metric_server_port' field stores the metric server
 port for 
 .BR cerebrod(8).
+
+The 'cerebrod_metric_max' field stores the maximum number of 
+additional metrics the 
+.BR cerebrod(8)
+speaker is allowed to distribute.
+
+The 'cerebrod_monitor_max' field stores the maximum number of 
+metric monitors the 
+.BR cerebrod(8)
+listener is allowed to load.
+
 .if @MANPAGE_DEBUG@ \{
 
 The 'cerebrod_speak_debug' field is a boolean that turns on speaker
@@ -288,6 +303,137 @@ Any parameter that is set in the configuration structure must have its
 respective flag set.  The 'hostnames' field must also have the
 'hostnames_len' field appropriately set to the number of hostnames
 loaded.
+
+.SH "METRIC MODULES"
+A cerebro metric module of the name 'foobar' can be written by
+compiling a shared object library with the filename
+cerebro_metric_foobar.so, and installing it in the cerebro
+package library directory @CEREBRO_MODULE_DIR@.
+
+The metric module should define a structure of the following
+type:
+
+.nf
+struct cerebro_metric_module_info {
+.in +2
+  char *metric_module_name;
+  Cerebro_metric_setup setup;
+  Cerebro_metric_cleanup cleanup;
+  Cerebro_metric_get_metric_name get_metric_name;
+  Cerebro_metric_get_metric_value get_metric_value;
+  Cerebro_metric_destroy_metric_value destroy_metric_value;
+.in -2
+};
+.fi
+
+The structure should be named 'metric_module_info' and be populated
+with the following information.
+
+The field 'metric_module_name' should indicate the name of the
+metric module.
+
+The field 'setup' should point to a function of the following type:
+
+typedef int (*Cerebro_metric_setup)(void);
+
+The 'setup' function sets up the metric module with whatever
+initialization is necessary.  It returns 0 on success, -1 on error.
+
+The field 'cleanup' should point to a function of the following type:
+
+typedef int (*Cerebro_metric_cleanup)(void);
+
+The 'cleanup' function cleans up the metric module from earlier
+initializations.  It returns 0 on success, -1 on error.
+
+The field 'get_metric_name' should point to a function of the following type:
+
+typedef char *(*Cerebro_metric_get_metric_name)(void);
+
+The 'get_metric_name' function returns the name of the metric to be
+monitored, or NULL on error.
+
+The field 'get_metric_value' should point to a function of the following type:
+
+typedef int (*Cerebro_metric_get_metric_value)(unsigned int *metric_value_type, unsigned int *metric_value_len, void **metric_value);
+
+The 'get_metric_value' function retrieves the value of the metric as
+well as the type and length.  If it is necessary, it is the
+responsibility of 'get_metric_value' to allocate an appropriate amount
+of memory for the returned value.  Returns the 0 on success, -1 on
+error.
+
+The field 'destroy_metric_value' should point to a function of the following type:
+
+typedef int (*Cerebro_metric_destroy_metric_value)(void *metric_value);
+
+The 'destroy_metric_value' function is passed the metric value pointer
+received from 'get_metric_value'.  If necessary,
+'destroy_metric_value' should free allocated memory.  Returns 0 on
+success, -1 on error.
+
+All of the above functions must be defined in the module and listed in
+the 'metric_module_info' structure.
+
+.SH "MONITOR MODULES"
+A cerebro monitor module of the name 'foobar' can be written by
+compiling a shared object library with the filename
+cerebro_monitor_foobar.so, and installing it in the cerebro
+package library directory @CEREBRO_MODULE_DIR@.
+
+The monitor module should define a structure of the following
+type:
+
+.nf
+struct cerebro_monitor_module_info {
+.in +2
+  char *monitor_module_name;
+  Cerebro_monitor_setup setup;
+  Cerebro_monitor_cleanup cleanup;
+  Cerebro_monitor_metric_name metric_name;
+  Cerebro_monitor_metric_update metric_update;
+.in -2
+};
+.fi
+
+The structure should be named 'monitor_module_info' and be populated
+with the following information.
+
+The field 'monitor_module_name' should indicate the name of the
+monitor module.
+
+The field 'setup' should point to a function of the following type:
+
+typedef int (*Cerebro_monitor_setup)(void);
+
+The 'setup' function sets up the monitor module with whatever
+initialization is necessary.  It returns 0 on success, -1 on error.
+
+The field 'cleanup' should point to a function of the following type:
+
+typedef int (*Cerebro_monitor_cleanup)(void);
+
+The 'cleanup' function cleans up the monitor module from earlier
+initializations.  It returns 0 on success, -1 on error.
+
+The field 'metric_name' should point to a function of the following type:
+
+typedef char *(*Cerebro_monitor_metric_name)(void);
+
+The 'metric_name' function returns the name of the metric the module
+wishes to monitor, or NULL on error.
+
+The field 'metric_update' should point to a function of the following type:
+
+typedef int (*Cerebro_monitor_metric_update)(const char *nodename, unsigned int metric_value_type, unsigned int metric_value_len, void *metric_value);
+
+The 'metric_update' function is called whenever the metric is received from a node.
+The nodename the metric was received from, metric value type, metric value length, and metric value are passed in as arguments.  
+Returns the 0 on success, -1 on error.
+
+All of the above functions must be defined in the module and listed in
+the 'monitor_module_info' structure.
+
 
 .SH "SEE ALSO"
 libcerebro(3), cerebro_module(3), cerebro.conf(5)

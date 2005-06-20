@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro_module.3.in,v 1.4 2005-06-16 21:35:34 achu Exp $
+\."$Id: cerebro_module.3.in,v 1.5 2005-06-20 18:34:58 achu Exp $
 \."#############################################################################
 .TH LIBCEREBRO 3 "May 2005" "LLNL" "LIBCEREBRO"
 .SH "NAME"
@@ -85,6 +85,53 @@ If none of the above are found,
 will search for other configuration modules.
 
 If a configuration module cannot be found, a default module is loaded.
+
+.SH "METRIC MODULES"
+
+Metric modules provide a way for the
+.B cerebrod
+daemon to retrieve system data so that other additional
+system data can be propogated.  Multiple metric modules can be
+opened by a speaking
+.B cerebrod
+daemon.  The maximum is set by the configuration option 'metric_max'.
+
+The following metric modules are distributed:
+
+.ie @MANPAGE_BOOTTIME@ \{
+boottime - Retrieves the system boottime.
+\}
+.el \{
+No metric modules are built.
+
+\}
+
+Metric modules are searched for in the
+.B Cerebro
+package library directory, @CEREBRO_MODULE_DIR@.
+
+.SH "MONITOR MODULES"
+
+Monitor modules provide a way for additional tasks to be executed done
+while monitoring some metric.  For example, if logging to a database
+is required for some unique metric handled by a metric module, a
+monitoring module could be written to log that data to database
+whenever a packet with that metric is read.
+
+The following monitoring modules are distributed:
+
+.ie @MANPAGE_BOOTLOG@ \{
+bootlog - Stores boottime and last received time into a SQL database
+in a format for Quadrics diagnostics tools to utilize.
+\}
+.el \{
+No monitoring modules are built.
+
+\}
+
+Metric modules are searched for in the
+.B Cerebro
+package library directory, @CEREBRO_MODULE_DIR@.
 
 .SH "SEE ALSO"
 libcerebro(3), 

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_monitor_bootlog.c,v 1.8 2005-06-16 22:31:42 achu Exp $
+ *  $Id: cerebro_monitor_bootlog.c,v 1.9 2005-06-20 18:34:59 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -322,7 +322,6 @@ _check_if_new_btime(const char *nodename, u_int32_t btime)
 
 static int 
 bootlog_monitor_metric_update(const char *nodename,
-                              const char *metric_name,
                               unsigned int metric_value_type,
                               unsigned int metric_value_len,
                               void *metric_value)
@@ -341,21 +340,6 @@ bootlog_monitor_metric_update(const char *nodename,
     {
       cerebro_err_debug("%s(%s:%d): nodename null",
 			__FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
-
-  if (!metric_name)
-    {
-      cerebro_err_debug("%s(%s:%d): metric_name null",
-			__FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
-
-  if (strcmp(metric_name, BOOTLOG_BOOTTIME_METRIC_NAME))
-    {
-      cerebro_err_debug("%s(%s:%d): metric_name invalid: %s",
-			__FILE__, __FUNCTION__, __LINE__,
-			metric_name);
       return -1;
     }
 

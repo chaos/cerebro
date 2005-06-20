@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_cluster_data.c,v 1.17 2005-06-18 18:48:30 achu Exp $
+ *  $Id: cerebrod_cluster_data.c,v 1.18 2005-06-20 18:34:58 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -780,7 +780,6 @@ cerebrod_cluster_data_update(char *nodename,
                       monitor_module_metric_update(monitor_handle,
 						   monitor_metric->index,
 						   nodename,
-						   metric_name_buf,
 						   hb->metrics[i]->metric_value_type,
 						   hb->metrics[i]->metric_value_len,
 						   hb->metrics[i]->metric_value);

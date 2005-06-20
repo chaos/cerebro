@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_monitor_module.h,v 1.1 2005-06-17 22:58:30 achu Exp $
+ *  $Id: cerebro_monitor_module.h,v 1.2 2005-06-20 18:34:58 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_MONITOR_MODULE_H
@@ -44,7 +44,6 @@ typedef char *(*Cerebro_monitor_metric_name)(void);
  * Returns 0 on success, -1 on error
  */
 typedef int (*Cerebro_monitor_metric_update)(const char *nodename,
-                                             const char *metric_name,
                                              unsigned int metric_value_type,
                                              unsigned int metric_value_len,
                                              void *metric_value);
