@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.7 2005-06-20 16:53:24 achu Exp $
+## $Id: Makefile.am,v 1.8 2005-06-20 19:46:05 achu Exp $
 ##*****************************************************************************
 
 if WITH_GNU_LD
@@ -29,17 +29,9 @@ libcerebro_la_SOURCES = cerebro.c \
 libcerebro_la_LDFLAGS = -version-info @LIBCEREBRO_VERSION_INFO@ \
 			$(CEREBRO_OTHER_FLAGS)
 libcerebro_la_LIBADD  = ../cerebro_error/libcerebro_error.la \
-			../common/libcommon.la \
-			../modules/libmodules.la \
 			../util/libutil.la
 
 ../cerebro_error/libcerebro_error.la : force-dependency-check
-	@cd `dirname $@` && make `basename $@`
-
-../common/libcommon.la : force-dependency-check
-	@cd `dirname $@` && make `basename $@`
-
-../modules/libmodules.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
 ../util/libutil.la : force-dependency-check
