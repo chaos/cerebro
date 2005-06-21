@@ -22,7 +22,6 @@ Design
 - speaker scheduler??
   - rework monitor module??
 - metric to get available metrics
-- metric period/frequency sent, something??
 - update thread for monitor module??
 - nodelist
   - use own list instead of 'List' to store iterators?
