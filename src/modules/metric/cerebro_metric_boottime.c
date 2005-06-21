@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_boottime.c,v 1.6 2005-06-16 23:50:29 achu Exp $
+ *  $Id: cerebro_metric_boottime.c,v 1.7 2005-06-21 19:16:56 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -143,6 +143,22 @@ boottime_metric_get_metric_name(void)
 }
 
 /* 
+ * boottime_metric_get_metric_period
+ *
+ * boottime metric module get_metric_period function
+ *
+ * Returns period on success, -1 on error
+ */
+static int
+boottime_metric_get_metric_period(void)
+{
+  /* Propogated all of the time, b/c we want to detect boottime
+   * changes 
+   */
+  return 0;
+}
+
+/* 
  * boottime_metric_get_metric_value
  *
  * boottime metric module get_metric_value function
@@ -200,6 +216,7 @@ struct cerebro_metric_module_info metric_module_info =
     &boottime_metric_setup,
     &boottime_metric_cleanup,
     &boottime_metric_get_metric_name,
+    &boottime_metric_get_metric_period,
     &boottime_metric_get_metric_value,
     &boottime_metric_destroy_metric_value,
   };

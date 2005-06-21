@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.55 2005-06-18 18:48:30 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.56 2005-06-21 19:16:56 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -331,12 +331,10 @@ _cerebrod_heartbeat_create(int *heartbeat_len)
       return hb;
     }
 
-  hb->metrics_len = metric_list_size;
-
   *heartbeat_len += CEREBROD_HEARTBEAT_HEADER_LEN;
 
-  hb->metrics = Malloc(sizeof(struct cerebrod_heartbeat_metric *)*(hb->metrics_len + 1));
-  memset(hb->metrics, '\0', sizeof(struct cerebrod_heartbeat_metric *)*(hb->metrics_len + 1));
+  hb->metrics = Malloc(sizeof(struct cerebrod_heartbeat_metric *)*(metric_list_size + 1));
+  memset(hb->metrics, '\0', sizeof(struct cerebrod_heartbeat_metric *)*(metric_list_size + 1));
 
   itr = List_iterator_create(metric_list);
 

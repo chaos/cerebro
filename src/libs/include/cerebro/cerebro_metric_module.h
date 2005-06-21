@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_module.h,v 1.1 2005-06-17 22:58:30 achu Exp $
+ *  $Id: cerebro_metric_module.h,v 1.2 2005-06-21 19:16:56 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_METRIC_MODULE_H
@@ -35,6 +35,17 @@ typedef int (*Cerebro_metric_cleanup)(void);
  */
 typedef char *(*Cerebro_metric_get_metric_name)(void);
 
+/* 
+ * Cerebro_metric_get_metric_period
+ *
+ * Returns the period in seconds that the metric value should be read
+ * and propogated.  If the period is 0, the metric will be read and
+ * propogated with every cerebro heartbeat.
+ *
+ * Returns period on success, -1 on error
+ */
+typedef int (*Cerebro_metric_get_metric_period)(void);
+
 /*
  * Cerebro_metric_get_metric_value
  *
@@ -69,6 +80,7 @@ struct cerebro_metric_module_info
   Cerebro_metric_setup setup;
   Cerebro_metric_cleanup cleanup;
   Cerebro_metric_get_metric_name get_metric_name;
+  Cerebro_metric_get_metric_period get_metric_period;
   Cerebro_metric_get_metric_value get_metric_value;
   Cerebro_metric_destroy_metric_value destroy_metric_value;
 };

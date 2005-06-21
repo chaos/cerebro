@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: monitor_module.c,v 1.2 2005-06-20 18:46:02 achu Exp $
+ *  $Id: monitor_module.c,v 1.3 2005-06-21 19:16:56 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -265,21 +265,31 @@ monitor_module_handle_check(monitor_modules_t monitor_handle)
 int 
 monitor_modules_unload(monitor_modules_t monitor_handle)
 {
+  int i;
+
   if (monitor_module_handle_check(monitor_handle) < 0)
     return -1;
+
+  for (i = 0; i < monitor_handle->modules_count; i++)
+    monitor_module_cleanup(monitor_handle, i);
+
+  if (monitor_handle->dl_handle)
+    {
+      for (i = 0; i < monitor_handle->modules_count; i++)
+        lt_dlclose(monitor_handle->dl_handle[i]);
+      free(monitor_handle->dl_handle);
+      monitor_handle->dl_handle = NULL;
+    }
+  if (monitor_handle->module_info)
+    {
+      free(monitor_handle->module_info);
+      monitor_handle->module_info = NULL;
+    }
 
   monitor_handle->magic = ~MONITOR_MODULE_MAGIC_NUMBER;
   monitor_handle->modules_max = 0;
   monitor_handle->modules_count = 0;
-  if (monitor_handle->dl_handle)
-    {
-      int i;
-      for (i = 0; i < monitor_handle->modules_count; i++)
-        lt_dlclose(monitor_handle->dl_handle[i]);
-      free(monitor_handle->dl_handle);
-    }
-  if (monitor_handle->module_info)
-    free(monitor_handle->module_info);
+
   free(monitor_handle);
 
   module_cleanup();

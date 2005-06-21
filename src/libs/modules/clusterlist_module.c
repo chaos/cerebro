@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: clusterlist_module.c,v 1.1 2005-06-18 18:48:30 achu Exp $
+ *  $Id: clusterlist_module.c,v 1.2 2005-06-21 19:16:56 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -272,6 +272,8 @@ clusterlist_module_unload(clusterlist_module_t clusterlist_handle)
 {
   if (clusterlist_module_handle_check(clusterlist_handle) < 0)
     return -1;
+
+  clusterlist_module_cleanup(clusterlist_handle);
 
   clusterlist_handle->magic = ~CLUSTERLIST_MODULE_MAGIC_NUMBER;
   if (clusterlist_handle->dl_handle)

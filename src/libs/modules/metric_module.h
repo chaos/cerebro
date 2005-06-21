@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: metric_module.h,v 1.1 2005-06-18 18:48:30 achu Exp $
+ *  $Id: metric_module.h,v 1.2 2005-06-21 19:16:56 achu Exp $
 \*****************************************************************************/
 
 #ifndef _METRIC_MODULE_H
@@ -63,6 +63,14 @@ int metric_module_cleanup(metric_modules_t metric_handle,
  */
 char *metric_module_get_metric_name(metric_modules_t metric_handle,
 				    unsigned int index);
+
+/*
+ * metric_module_get_metric_period
+ *
+ * call metric module get_metric_period function
+ */
+int metric_module_get_metric_period(metric_modules_t metric_handle,
+                                    unsigned int index);
 
 /*
  * metric_module_get_metric_value

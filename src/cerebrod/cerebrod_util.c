@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_util.c,v 1.20 2005-06-10 22:54:42 achu Exp $
+ *  $Id: cerebrod_util.c,v 1.21 2005-06-21 19:16:56 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -133,7 +133,7 @@ _cerebrod_create_and_setup_socket(unsigned int port,
                                   unsigned int backlog)
 {
   struct sockaddr_in server_addr;
-  int temp_fd;
+  int temp_fd, optval = 1;
 
   if ((temp_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
@@ -169,25 +169,19 @@ _cerebrod_create_and_setup_socket(unsigned int port,
       return -1;
     }
 
-#if CEREBRO_DEBUG
-  if (conf.debug)
-    {
-      int optval = 1;
 
-      /* For quick start/restart debugging purposes */
-      if (setsockopt(temp_fd,
-                     SOL_SOCKET,
-                     SO_REUSEADDR,
-                     &optval,
-                     sizeof(int)) < 0)
-        {
-          cerebro_err_debug("%s(%s:%d): setsockopt: %s",
-                            __FILE__, __FUNCTION__, __LINE__,
-                            strerror(errno));
-          return -1;
-        }
+  /* For quick start/restart */
+  if (setsockopt(temp_fd,
+                 SOL_SOCKET,
+                 SO_REUSEADDR,
+                 &optval,
+                 sizeof(int)) < 0)
+    {
+      cerebro_err_debug("%s(%s:%d): setsockopt: %s",
+                        __FILE__, __FUNCTION__, __LINE__,
+                        strerror(errno));
+      return -1;
     }
-#endif /* CEREBRO_DEBUG */
 
   return temp_fd;
 }

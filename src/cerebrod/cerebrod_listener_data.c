@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.1 2005-06-21 17:02:22 achu Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.2 2005-06-21 19:16:56 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -166,21 +166,19 @@ _cerebrod_node_data_create_and_init(const char *nodename)
 }
 
 /* 
- * _cerebrod_metric_monitor_destroy
+ * _cerebrod_monitor_module_destroy
  *
- * Destroy contents of a cerebrod_metric_monitor
+ * Destroy contents of a cerebrod_monitor_module structure
  */
 static void
-_cerebrod_metric_monitor_destroy(void *data)
+_cerebrod_monitor_module_destroy(void *data)
 {
-  struct cerebrod_metric_monitor *monitor_metric;
+  struct cerebrod_monitor_module *monitor_module;
   
   assert(data);
 
-  monitor_metric = (struct cerebrod_metric_monitor *)data;
-  if (monitor_metric->metric_name)
-    Free(monitor_metric->metric_name);
-  Free(monitor_metric);
+  monitor_module = (struct cerebrod_monitor_module *)data;
+  Free(monitor_module);
 }
 
 void 
@@ -298,11 +296,11 @@ cerebrod_listener_data_initialize(void)
   monitor_index = Hash_create(monitor_index_len,
                               (hash_key_f)hash_key_string,
                               (hash_cmp_f)strcmp,
-                              (hash_del_f)_cerebrod_metric_monitor_destroy);
+                              (hash_del_f)_cerebrod_monitor_module_destroy);
 
   for (i = 0; i < monitor_index_len; i++)
     {
-      struct cerebrod_metric_monitor *monitor_metric;
+      struct cerebrod_monitor_module *monitor_module;
       char *metric_name;
 
 #if CEREBRO_DEBUG
@@ -334,12 +332,12 @@ cerebrod_listener_data_initialize(void)
           continue;
         }
 
-      monitor_metric = Malloc(sizeof(struct cerebrod_metric_monitor));
-      monitor_metric->metric_name = Strdup(metric_name);
-      monitor_metric->index = i;
-      Pthread_mutex_init(&(monitor_metric->monitor_lock), NULL);
+      monitor_module = Malloc(sizeof(struct cerebrod_monitor_module));
+      monitor_module->metric_name = metric_name;
+      monitor_module->index = i;
+      Pthread_mutex_init(&(monitor_module->monitor_lock), NULL);
 
-      Hash_insert(monitor_index, monitor_metric->metric_name, monitor_metric);
+      Hash_insert(monitor_index, monitor_module->metric_name, monitor_module);
       monitor_index_size++;
     }
 
@@ -429,7 +427,7 @@ _cerebrod_listener_data_output_update(struct cerebrod_node_data *nd)
 static int
 _cerebrod_node_data_metric_data_dump(void *data, const void *key, void *arg)
 {
-  struct cerebrod_metric_data *md;
+  struct cerebrod_listener_metric_data *md;
   char *buf;
   char *nodename;
  
@@ -437,7 +435,7 @@ _cerebrod_node_data_metric_data_dump(void *data, const void *key, void *arg)
   assert(key);
   assert(arg);
  
-  md = (struct cerebrod_metric_data *)data;
+  md = (struct cerebrod_listener_metric_data *)data;
   nodename = (char *)arg;
  
   fprintf(stderr, "* %s: metric_name=%s metric_value_type=%d metric_value_len=%d ",
@@ -614,18 +612,18 @@ _cerebrod_metric_name_list_dump(void)
 }
 
 /* 
- * _cerebrod_metric_data_update
+ * _cerebrod_listener_metric_data_update
  *
  * Update the data of a particular metric.  The struct
  * cerebrod_node_data lock should already be locked.
  */
 static void
-_cerebrod_metric_data_update(struct cerebrod_node_data *nd,
-                             char *metric_name,
-                             struct cerebrod_heartbeat_metric *hd,
-                             u_int32_t received_time)
+_cerebrod_listener_metric_data_update(struct cerebrod_node_data *nd,
+                                      char *metric_name,
+                                      struct cerebrod_heartbeat_metric *hd,
+                                      u_int32_t received_time)
 {
-  struct cerebrod_metric_data *md;
+  struct cerebrod_listener_metric_data *md;
 #if CEREBRO_DEBUG
   int rv;
 #endif /* CEREBRO_DEBUG */
@@ -655,8 +653,8 @@ _cerebrod_metric_data_update(struct cerebrod_node_data *nd,
           return;
         }
       
-      md = (struct cerebrod_metric_data *)Malloc(sizeof(struct cerebrod_metric_data));
-      memset(md, '\0', sizeof(struct cerebrod_metric_data));
+      md = (struct cerebrod_listener_metric_data *)Malloc(sizeof(struct cerebrod_listener_metric_data));
+      memset(md, '\0', sizeof(struct cerebrod_listener_metric_data));
       md->metric_name = Strdup(metric_name);
       Hash_insert(nd->metric_data, md->metric_name, md);
       nd->metric_data_count++;
@@ -698,9 +696,9 @@ cerebrod_listener_data_update(char *nodename,
   assert(nodename);
   assert(hb);
 
-  /* It is possible no servers are turned on */
   if (!cerebrod_listener_data_initialization_complete)
-    return;
+    cerebro_err_exit("%s(%s:%d): initialization not complete",
+                     __FILE__, __FUNCTION__, __LINE__);
 
   if (!cerebrod_listener_data_list || !cerebrod_listener_data_index)
     cerebro_err_exit("%s(%s:%d): initialization not complete",
@@ -741,7 +739,7 @@ cerebrod_listener_data_update(char *nodename,
           for (i = 0; i < hb->metrics_len; i++)
             {
               char metric_name_buf[CEREBRO_METRIC_NAME_MAXLEN+1];
-              struct cerebrod_metric_monitor *monitor_metric;
+              struct cerebrod_monitor_module *monitor_module;
               
               /* Guarantee ending '\0' character */
               memset(metric_name_buf, '\0', CEREBRO_METRIC_NAME_MAXLEN+1);
@@ -766,24 +764,24 @@ cerebrod_listener_data_update(char *nodename,
                     }
                   Pthread_mutex_unlock(&cerebrod_metric_name_lock);
                   
-                  _cerebrod_metric_data_update(nd,
-                                               metric_name_buf,
-                                               hb->metrics[i],
-                                               received_time);
+                  _cerebrod_listener_metric_data_update(nd,
+                                                        metric_name_buf,
+                                                        hb->metrics[i],
+                                                        received_time);
                 }
 
               if (monitor_index)
                 {
-                  if ((monitor_metric = Hash_find(monitor_index, metric_name_buf)))
+                  if ((monitor_module = Hash_find(monitor_index, metric_name_buf)))
                     {
-                      Pthread_mutex_lock(&monitor_metric->monitor_lock);
+                      Pthread_mutex_lock(&monitor_module->monitor_lock);
                       monitor_module_metric_update(monitor_handle,
-						   monitor_metric->index,
+						   monitor_module->index,
 						   nodename,
 						   hb->metrics[i]->metric_value_type,
 						   hb->metrics[i]->metric_value_len,
 						   hb->metrics[i]->metric_value);
-                      Pthread_mutex_unlock(&monitor_metric->monitor_lock);
+                      Pthread_mutex_unlock(&monitor_module->monitor_lock);
                     }
                 }
             }

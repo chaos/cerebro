@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.h,v 1.1 2005-06-21 17:02:22 achu Exp $
+ *  $Id: cerebrod_listener_data.h,v 1.2 2005-06-21 19:16:56 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_LISTENER_DATA_H
@@ -20,11 +20,11 @@
 #include "hash.h"
 
 /* 
- * struct cerebrod_metric_data
+ * struct cerebrod_listener_metric_data
  *
  * Contains metric data for a node
  */
-struct cerebrod_metric_data
+struct cerebrod_listener_metric_data
 {
   char *metric_name;
   u_int32_t last_received_time;
@@ -49,11 +49,11 @@ struct cerebrod_node_data
 };
 
 /*
- * struct cerebrod_metric_monitor
+ * struct cerebrod_monitor_module
  *
  * contains cerebrod monitor module metric information
  */
-struct cerebrod_metric_monitor
+struct cerebrod_monitor_module
 {
   char *metric_name;
   int index;
@@ -63,14 +63,14 @@ struct cerebrod_metric_monitor
 /* 
  * cerebrod_listener_data_initialize
  *
- * Initialize cluster_data structures
+ * Initialize listener_data structures
  */
 void cerebrod_listener_data_initialize(void);
 
 /* 
  * cerebrod_listener_data_update
  *
- * Update cluster_data with information from a heartbeat
+ * Update listener_data with information from a heartbeat
  */
 void cerebrod_listener_data_update(char *nodename,
                                    struct cerebrod_heartbeat *hb,

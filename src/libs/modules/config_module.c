@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: config_module.c,v 1.1 2005-06-18 18:48:30 achu Exp $
+ *  $Id: config_module.c,v 1.2 2005-06-21 19:16:56 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -250,6 +250,8 @@ config_module_unload(config_module_t config_handle)
   if (config_module_handle_check(config_handle) < 0)
     return -1;
   
+  config_module_cleanup(config_handle);
+
   config_handle->magic = ~CONFIG_MODULE_MAGIC_NUMBER;
   if (config_handle->dl_handle)
     lt_dlclose(config_handle->dl_handle);

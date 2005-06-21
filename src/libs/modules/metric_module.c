@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: metric_module.c,v 1.1 2005-06-18 18:48:30 achu Exp $
+ *  $Id: metric_module.c,v 1.2 2005-06-21 19:16:56 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -139,6 +139,13 @@ _metric_module_loader(void *handle, char *module)
       goto cleanup;
     }
 
+  if (!module_info->get_metric_period)
+    {
+      cerebro_err_debug("metric module '%s': get_metric_period null",
+			module_info->metric_module_name);
+      goto cleanup;
+    }
+
   if (!module_info->get_metric_value)
     {
       cerebro_err_debug("metric module '%s': get_metric_value null",
@@ -272,21 +279,31 @@ metric_module_handle_check(metric_modules_t metric_handle)
 int 
 metric_modules_unload(metric_modules_t metric_handle)
 {
+  int i;
+
   if (metric_module_handle_check(metric_handle) < 0)
     return -1;
+
+  for (i = 0; i < metric_handle->modules_count; i++)
+    metric_module_cleanup(metric_handle, i);
+
+  if (metric_handle->dl_handle)
+    {
+      for (i = 0; i < metric_handle->modules_count; i++)
+        lt_dlclose(metric_handle->dl_handle[i]);
+      free(metric_handle->dl_handle);
+      metric_handle->dl_handle = NULL;
+    }
+  if (metric_handle->module_info)
+    {
+      free(metric_handle->module_info);
+      metric_handle->module_info = NULL;
+    }
 
   metric_handle->magic = ~METRIC_MODULE_MAGIC_NUMBER;
   metric_handle->modules_max = 0;
   metric_handle->modules_count = 0;
-  if (metric_handle->dl_handle)
-    {
-      int i;
-      for (i = 0; i < metric_handle->modules_count; i++)
-        lt_dlclose(metric_handle->dl_handle[i]);
-      free(metric_handle->dl_handle);
-    }
-  if (metric_handle->module_info)
-    free(metric_handle->module_info);
+
   free(metric_handle);
 
   module_cleanup();
@@ -353,6 +370,19 @@ metric_module_get_metric_name(metric_modules_t metric_handle,
     return NULL;
 
   return ((*(metric_handle->module_info[index])->get_metric_name)());
+}
+
+int
+metric_module_get_metric_period(metric_modules_t metric_handle,
+                                unsigned int index)
+{
+  if (metric_module_handle_check(metric_handle) < 0)
+    return -1;
+  
+  if (!(index < metric_handle->modules_count))
+    return -1;
+
+  return ((*(metric_handle->module_info[index])->get_metric_period)());
 }
 
 int 
