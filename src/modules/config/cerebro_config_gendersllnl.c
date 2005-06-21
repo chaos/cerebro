@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_gendersllnl.c,v 1.19 2005-06-16 21:35:34 achu Exp $
+ *  $Id: cerebro_config_gendersllnl.c,v 1.20 2005-06-21 20:56:28 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -93,11 +93,7 @@ static int
 gendersllnl_config_cleanup(void)
 {
   if (!gendersllnl_handle)
-    {
-      cerebro_err_debug("%s(%s:%d): gendersllnl_handle null",
-			__FILE__, __FUNCTION__, __LINE__);
-      return 0;
-    }
+    return 0;
 
   if (genders_handle_destroy(gendersllnl_handle) < 0)
     {

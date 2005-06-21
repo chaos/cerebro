@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_gendersllnl.c,v 1.21 2005-06-16 21:35:34 achu Exp $
+ *  $Id: cerebro_clusterlist_gendersllnl.c,v 1.22 2005-06-21 20:56:28 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -73,11 +73,7 @@ static int
 gendersllnl_clusterlist_cleanup(void)
 {
   if (!gendersllnl_handle)
-    {
-      cerebro_err_debug("%s(%s:%d): gendersllnl_handle null",
-			__FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
+    return 0;
 
   return cerebro_clusterlist_genders_cleanup(&gendersllnl_handle);
 }

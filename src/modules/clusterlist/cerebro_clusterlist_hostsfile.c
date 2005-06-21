@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_hostsfile.c,v 1.21 2005-06-16 21:35:34 achu Exp $
+ *  $Id: cerebro_clusterlist_hostsfile.c,v 1.22 2005-06-21 20:56:28 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -324,11 +324,7 @@ static int
 hostsfile_clusterlist_cleanup(void)
 {
   if (!hosts)
-    {
-      cerebro_err_debug("%s(%s:%d): hosts null", 
-			__FILE__, __FUNCTION__, __LINE__);
-      return 0;
-    }
+    return 0;
 
   list_destroy(hosts);
   hosts = NULL;

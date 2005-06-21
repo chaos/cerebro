@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_monitor_bootlog.c,v 1.9 2005-06-20 18:34:59 achu Exp $
+ *  $Id: cerebro_monitor_bootlog.c,v 1.10 2005-06-21 20:56:28 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -183,8 +183,10 @@ bootlog_monitor_setup(void)
 static int
 bootlog_monitor_cleanup(void)
 {
-  if (qsql_handle)
-    qsql_close(qsql_handle);
+  if (!qsql_handle)
+    return 0;
+
+  qsql_close(qsql_handle);
   qsql_handle = NULL;
   return 0;
 }
