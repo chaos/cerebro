@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker_data.c,v 1.2 2005-06-21 20:29:10 achu Exp $
+ *  $Id: cerebrod_speaker_data.c,v 1.3 2005-06-21 20:49:02 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -62,22 +62,6 @@ int metric_list_size = 0;
 /*
  * _cerebrod_speaker_metric_module_destroy
  *
- * Destroy a cerebrod_speaker_metric_module structure
- */
-static void
-_cerebrod_speaker_metric_module_destroy(void *x)
-{
-  struct cerebrod_speaker_metric_module *metric_module;
-
-  assert(x);
-
-  metric_module = (struct cerebrod_speaker_metric_module *)x;
-  Free(metric_module);
-}
-
-/*
- * _cerebrod_speaker_metric_module_destroy
- *
  * Destroy a cerebrod_speaker_metric_module
  */
 static void
@@ -94,7 +78,7 @@ _cerebrod_speaker_metric_module_destroy(void *x)
 void
 cerebrod_speaker_data_initialize(void)
 {
-  int i, metric_index_len, numnodes = 0;
+  int i, metric_index_len;
 
   pthread_mutex_lock(&cerebrod_speaker_data_initialization_complete_lock);
   if (cerebrod_speaker_data_initialization_complete)
@@ -189,7 +173,7 @@ cerebrod_speaker_data_initialize(void)
       metric_module->index = i;
       /* Initialize to 0, so data is sent on the first heartbeat */
       metric_module->next_call_time = 0;
-      List_append(metric_list, metric);
+      List_append(metric_list, metric_module);
       metric_list_size++;
     }
   
@@ -255,11 +239,11 @@ cerebrod_speaker_data_get_metric_data(struct cerebrod_heartbeat *hb,
       memset(hd, '\0', sizeof(struct cerebrod_heartbeat_metric));
 
       if (!(metric_name = metric_module_get_metric_name(metric_handle,
-                                                        metric->index)))
+                                                        metric_module->index)))
         {
           cerebro_err_debug("%s(%s:%d): metric_module_get_metric_name "
                             "failed: index = %d",
-                            __FILE__, __FUNCTION__, __LINE__, metric->index);
+                            __FILE__, __FUNCTION__, __LINE__, metric_module->index);
           Free(hd);
           goto continue_loop;
         }
@@ -268,7 +252,7 @@ cerebrod_speaker_data_get_metric_data(struct cerebrod_heartbeat *hb,
       strncpy(hd->metric_name, metric_name, CEREBRO_METRIC_NAME_MAXLEN);
       
       if (metric_module_get_metric_value(metric_handle,
-                                         metric->index,
+                                         metric_module->index,
                                          &(hd->metric_value_type),
                                          &(hd->metric_value_len),
                                          &temp) < 0)
@@ -276,7 +260,8 @@ cerebrod_speaker_data_get_metric_data(struct cerebrod_heartbeat *hb,
           cerebro_err_debug("%s(%s:%d): "
                             "metric_module_get_metric_value "
                             "failed: index = %d",
-                            __FILE__, __FUNCTION__, __LINE__, metric->index);
+                            __FILE__, __FUNCTION__, __LINE__, 
+                            metric_module->index);
           Free(hd->metric_value);
           Free(hd);
           goto continue_loop;
@@ -286,10 +271,13 @@ cerebrod_speaker_data_get_metric_data(struct cerebrod_heartbeat *hb,
           && !hd->metric_value_len)
         {
           cerebro_err_debug("%s(%s:%d): bogus metric information",
-                            __FILE__, __FUNCTION__, __LINE__, metric->index);
+                            __FILE__, __FUNCTION__, __LINE__, 
+                            metric_module->index);
           Free(hd->metric_value);
           Free(hd);
-          metric_module_destroy_metric_value(metric_handle, metric->index, temp);
+          metric_module_destroy_metric_value(metric_handle, 
+                                             metric_module->index, 
+                                             temp);
           goto continue_loop;
         }
 
@@ -300,17 +288,19 @@ cerebrod_speaker_data_get_metric_data(struct cerebrod_heartbeat *hb,
                             "metric_module_get_metric_value "
                             "invalid type: %d %d"
                             __FILE__, __FUNCTION__, __LINE__,
-                            hd->metric_value_type, metric->index);
+                            hd->metric_value_type, metric_module->index);
           Free(hd->metric_value);
           Free(hd);
-          metric_module_destroy_metric_value(metric_handle, metric->index, temp);
+          metric_module_destroy_metric_value(metric_handle, 
+                                             metric_module->index, 
+                                             temp);
           goto continue_loop;
         }
 
       hd->metric_value = Malloc(hd->metric_value_len);
       memcpy(hd->metric_value, temp, hd->metric_value_len);
 
-      metric_module_destroy_metric_value(metric_handle, metric->index, temp);
+      metric_module_destroy_metric_value(metric_handle, metric_module->index, temp);
 
       *heartbeat_len += CEREBROD_HEARTBEAT_METRIC_HEADER_LEN;
       *heartbeat_len += hd->metric_value_len;

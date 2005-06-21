@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker_data.h,v 1.1 2005-06-21 19:16:56 achu Exp $
+ *  $Id: cerebrod_speaker_data.h,v 1.2 2005-06-21 20:49:02 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_SPEAKER_DATA_H
@@ -23,10 +23,18 @@ struct cerebrod_speaker_metric_module
 };
 
 /*
+ * cerebrod_speaker_data_initialize
+ *
+ * Initialize speaker_data structures
+ */
+void cerebrod_speaker_data_initialize(void);
+
+/*
  * cerebrod_speaker_data_get_metric_data
  *
  * Store metric data into the heartbeat
  */
-void cerebrod_speaker_data_get_metric_data(struct cerebrod_heartbeat *hb);
+void cerebrod_speaker_data_get_metric_data(struct cerebrod_heartbeat *hb, 
+                                           unsigned int *heartbeat_len);
 
 #endif /* _CEREBROD_SPEAKER_DATA_H */

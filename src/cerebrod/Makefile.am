@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.54 2005-06-21 17:02:22 achu Exp $
+## $Id: Makefile.am,v 1.55 2005-06-21 20:49:02 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -13,6 +13,7 @@ noinst_HEADERS = cerebrod.h \
 		 cerebrod_listener_data.h \
 		 cerebrod_metric.h \
 		 cerebrod_speaker.h \
+		 cerebrod_speaker_data.h \
 		 cerebrod_util.h \
 		 cerebrod_wrappers.h
 
@@ -30,6 +31,7 @@ cerebrod_SOURCES = cerebrod.c \
 		   cerebrod_listener_data.c \
 		   cerebrod_metric.c \
 		   cerebrod_speaker.c\
+		   cerebrod_speaker_data.c\
 		   cerebrod_util.c \
 		   cerebrod_wrappers.c
 cerebrod_CFLAGS  = -I$(srcdir)/../libs/cerebro \
