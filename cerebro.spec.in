@@ -73,6 +73,7 @@ Metric module to monitor boottime.
 Summary: bootlog module(s)
 Group: System Environment/Base
 Requires: cerebro
+Requires: qsqsql
 %description bootlog
 Bootlog monitoring module(s).
 %endif
