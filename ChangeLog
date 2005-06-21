@@ -9,6 +9,8 @@
 	* integrate speakder-data
 	
 	* tagged post-speaker-data-integration-1
+
+	* Split off wrappers off into a library.
 	
 2005-06-20  Albert Chu  <chu11@llnl.gov>
 

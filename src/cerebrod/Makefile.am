@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.55 2005-06-21 20:49:02 achu Exp $
+## $Id: Makefile.am,v 1.56 2005-06-21 22:29:07 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -14,8 +14,7 @@ noinst_HEADERS = cerebrod.h \
 		 cerebrod_metric.h \
 		 cerebrod_speaker.h \
 		 cerebrod_speaker_data.h \
-		 cerebrod_util.h \
-		 cerebrod_wrappers.h
+		 cerebrod_util.h
 
 #
 # cerebrod daemon
@@ -32,18 +31,19 @@ cerebrod_SOURCES = cerebrod.c \
 		   cerebrod_metric.c \
 		   cerebrod_speaker.c\
 		   cerebrod_speaker_data.c\
-		   cerebrod_util.c \
-		   cerebrod_wrappers.c
+		   cerebrod_util.c
 cerebrod_CFLAGS  = -I$(srcdir)/../libs/cerebro \
 		   -I$(srcdir)/../libs/common \
 		   -I$(srcdir)/../libs/include \
 		   -I$(srcdir)/../libs/modules \
-		   -I$(srcdir)/../libs/util
+		   -I$(srcdir)/../libs/util \
+		   -I$(srcdir)/../libs/wrappers
 cerebrod_LDADD   = ../libs/cerebro/libcerebro.la \
 		   ../libs/cerebro_error/libcerebro_error.la \
 		   ../libs/common/libcommon.la \
 		   ../libs/modules/libmodules.la \
-		   ../libs/util/libutil.la
+		   ../libs/util/libutil.la \
+		   ../libs/wrappers/libwrappers.la
 
 ../libs/cerebro/libcerebro.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
@@ -58,6 +58,9 @@ cerebrod_LDADD   = ../libs/cerebro/libcerebro.la \
 	@cd `dirname $@` && make `basename $@`
 
 ../libs/util/libutil.la : force-dependency-check
+	@cd `dirname $@` && make `basename $@`
+
+../libs/wrappers/libwrappers.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
 force-dependency-check:

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.2 2005-06-21 19:16:56 achu Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.3 2005-06-21 22:29:07 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -22,13 +22,14 @@
 #include "cerebrod_config.h"
 #include "cerebrod_listener_data.h"
 #include "cerebrod_util.h"
-#include "cerebrod_wrappers.h"
 
 #include "clusterlist_module.h"
 #include "monitor_module.h"
 
 #include "list.h"
 #include "hash.h"
+
+#include "wrappers.h"
 
 #define CEREBROD_LISTENER_DATA_INDEX_SIZE_DEFAULT   1024
 #define CEREBROD_LISTENER_DATA_INDEX_SIZE_INCREMENT 1024

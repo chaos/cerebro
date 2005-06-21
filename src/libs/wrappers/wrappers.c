@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_wrappers.c,v 1.6 2005-06-17 18:16:32 achu Exp $
+ *  $Id: wrappers.c,v 1.1 2005-06-21 22:29:07 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -12,7 +12,7 @@
 
 #include "cerebro/cerebro_error.h"
 
-#include "cerebrod_wrappers.h"
+#include "wrappers.h"
 
 #include "fd.h"
 

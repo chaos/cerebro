@@ -1,9 +1,9 @@
 /*****************************************************************************\
- *  $Id: cerebrod_wrappers.h,v 1.5 2005-06-17 18:13:19 achu Exp $
+ *  $Id: wrappers.h,v 1.1 2005-06-21 22:29:07 achu Exp $
 \*****************************************************************************/
 
-#ifndef _CEREBROD_WRAPPERS_H
-#define _CEREBROD_WRAPPERS_H
+#ifndef _WRAPPERS_H
+#define _WRAPPERS_H
 
 #if HAVE_CONFIG_H
 #include "config.h"
@@ -346,4 +346,4 @@ int wrap_unmarshall_double(const char *file, const char *function, int line, dou
 int wrap_unmarshall_buffer(const char *file, const char *function, int line, char *val, unsigned int vallen, const char *buf, unsigned int buflen);
 
    
-#endif /* _CEREBROD_WRAPPERS_H */
+#endif /* _WRAPPERS_H */

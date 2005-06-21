@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric.c,v 1.39 2005-06-21 19:16:56 achu Exp $
+ *  $Id: cerebrod_metric.c,v 1.40 2005-06-21 22:29:07 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -24,9 +24,9 @@
 #include "cerebrod_listener_data.h"
 #include "cerebrod_metric.h"
 #include "cerebrod_util.h"
-#include "cerebrod_wrappers.h"
 #include "fd.h"
 #include "list.h"
+#include "wrappers.h"
 
 #define CEREBROD_METRIC_BACKLOG           10
 #define CEREBROD_METRIC_REINITIALIZE_WAIT 2
