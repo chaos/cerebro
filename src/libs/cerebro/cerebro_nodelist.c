@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_nodelist.c,v 1.2 2005-06-18 18:48:30 achu Exp $
+ *  $Id: cerebro_nodelist.c,v 1.3 2005-06-21 23:32:31 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -18,9 +18,9 @@
 #include "cerebro_util.h"
 #include "cerebro/cerebro_error.h"
 
-#include "clusterlist_module.h"
-
 #include "list.h"
+
+#include "clusterlist_module.h"
 
 char *
 cerebro_nodelist_metric_name(cerebro_nodelist_t nodelist)

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_api.h,v 1.3 2005-06-18 18:48:30 achu Exp $
+ *  $Id: cerebro_api.h,v 1.4 2005-06-21 23:32:31 achu Exp $
 \*****************************************************************************/
  
 #ifndef _CEREBRO_API_H
@@ -10,9 +10,9 @@
 #include "cerebro/cerebro_config.h"
 #include "cerebro/cerebro_constants.h"
 
-#include "clusterlist_module.h"
-
 #include "list.h"
+
+#include "clusterlist_module.h"
 
 /* 
  * CEREBRO_MAGIC_NUMBER

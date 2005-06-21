@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: config_util.c,v 1.1 2005-06-20 16:53:24 achu Exp $
+ *  $Id: config_util.c,v 1.2 2005-06-21 23:32:31 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -15,10 +15,11 @@
 #include "cerebro/cerebro_constants.h"
 #include "cerebro/cerebro_error.h"
 
-#include "config_module.h"
 #include "config_util.h"
 
 #include "conffile.h"
+
+#include "config_module.h"
 
 #if CEREBRO_DEBUG
 char *config_debug_config_file = NULL;

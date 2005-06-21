@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.3 2005-06-21 22:29:07 achu Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.4 2005-06-21 23:32:31 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -23,11 +23,11 @@
 #include "cerebrod_listener_data.h"
 #include "cerebrod_util.h"
 
-#include "clusterlist_module.h"
-#include "monitor_module.h"
-
 #include "list.h"
 #include "hash.h"
+
+#include "clusterlist_module.h"
+#include "monitor_module.h"
 
 #include "wrappers.h"
 
