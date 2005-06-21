@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_module.h,v 1.2 2005-06-21 19:16:56 achu Exp $
+ *  $Id: cerebro_metric_module.h,v 1.3 2005-06-21 20:29:10 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_METRIC_MODULE_H
@@ -40,7 +40,10 @@ typedef char *(*Cerebro_metric_get_metric_name)(void);
  *
  * Returns the period in seconds that the metric value should be read
  * and propogated.  If the period is 0, the metric will be read and
- * propogated with every cerebro heartbeat.
+ * propogated with every cerebro heartbeat.  Note that the period is
+ * not precise, and is only an approximation.  Data is only propogated
+ * in cerebro heartbeats, therefore the period time granularity will
+ * be related to the cerebro heartbeat period.
  *
  * Returns period on success, -1 on error
  */

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.56 2005-06-21 19:16:56 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.57 2005-06-21 20:29:10 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -155,20 +155,18 @@ _cerebrod_speaker_create_and_setup_socket(void)
 }
 
 /* 
- * _cerebrod_metric_destroy
+ * _cerebrod_metric_module_destroy
  *
- * Destroy a cerebrod_metric
+ * Destroy a cerebrod_metric_module
  */
 static void
-_cerebrod_metric_destroy(void *x)
+_cerebrod_metric_module_destroy(void *x)
 {
-  struct cerebrod_metric *metric;
+  struct cerebrod_metric_module *metric;
 
   assert(x);
 
-  metric = (struct cerebrod_metric *)x;
-  if (metric->metric_name)
-    Free(metric->metric_name);
+  metric = (struct cerebrod_metric_module *)x;
   Free(metric);
 }
 
@@ -244,11 +242,11 @@ _cerebrod_speaker_initialize(void)
       return;
     }
 
-  metric_list = List_create((ListDelF)_cerebrod_metric_destroy);
+  metric_list = List_create((ListDelF)_cerebrod_metric_module_destroy);
 
   for (i = 0; i < modules_len; i++)
     {
-      struct cerebrod_metric *metric;
+      struct cerebrod_metric_module *metric;
       char *metric_name;
 
 #if CEREBRO_DEBUG
@@ -281,8 +279,8 @@ _cerebrod_speaker_initialize(void)
           continue;
         }
 
-      metric = Malloc(sizeof(struct cerebrod_metric));
-      metric->metric_name = Strdup(metric_name);
+      metric = Malloc(sizeof(struct cerebrod_metric_module));
+      metric->metric_name = metric_name;
       metric->index = i;
 
       List_append(metric_list, metric);
@@ -308,10 +306,10 @@ _cerebrod_speaker_initialize(void)
  * construct a heartbeat packet
  */
 static struct cerebrod_heartbeat *
-_cerebrod_heartbeat_create(int *heartbeat_len)
+_cerebrod_heartbeat_create(unsigned int *heartbeat_len)
 {
   struct cerebrod_heartbeat *hb = NULL;
-  struct cerebrod_metric *metric;
+  struct cerebrod_metric_module *metric;
   ListIterator itr = NULL;
   int hbindex = 0;
   assert(heartbeat_len);
@@ -322,16 +320,14 @@ _cerebrod_heartbeat_create(int *heartbeat_len)
 
   hb->version = CEREBROD_HEARTBEAT_PROTOCOL_VERSION;
   memcpy(hb->nodename, cerebrod_nodename, CEREBRO_MAXNODENAMELEN);
+  *heartbeat_len += CEREBROD_HEARTBEAT_HEADER_LEN;
 
   if (!metric_list_size)
     {
       hb->metrics_len = 0;
       hb->metrics = NULL;
-      *heartbeat_len = CEREBROD_HEARTBEAT_HEADER_LEN;
       return hb;
     }
-
-  *heartbeat_len += CEREBROD_HEARTBEAT_HEADER_LEN;
 
   hb->metrics = Malloc(sizeof(struct cerebrod_heartbeat_metric *)*(metric_list_size + 1));
   memset(hb->metrics, '\0', sizeof(struct cerebrod_heartbeat_metric *)*(metric_list_size + 1));
@@ -584,7 +580,8 @@ cerebrod_speaker(void *arg)
     {
       struct sockaddr_in heartbeat_destination_addr;
       struct cerebrod_heartbeat* hb;
-      int send_len, heartbeat_len, sleep_time, buflen;
+      int send_len, heartbeat_len, sleep_time;
+      unsigned int buflen;
       char *buf = NULL;
 
       /* Algorithm from srand(3) manpage */
