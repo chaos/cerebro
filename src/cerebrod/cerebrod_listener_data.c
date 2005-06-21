@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_cluster_data.c,v 1.18 2005-06-20 18:34:58 achu Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.1 2005-06-21 17:02:22 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -19,8 +19,8 @@
 #include "cerebro/cerebro_error.h"
 
 #include "cerebrod.h"
-#include "cerebrod_cluster_data.h"
 #include "cerebrod_config.h"
+#include "cerebrod_listener_data.h"
 #include "cerebrod_util.h"
 #include "cerebrod_wrappers.h"
 
@@ -30,9 +30,9 @@
 #include "list.h"
 #include "hash.h"
 
-#define CEREBROD_CLUSTER_DATA_INDEX_SIZE_DEFAULT   1024
-#define CEREBROD_CLUSTER_DATA_INDEX_SIZE_INCREMENT 1024
-#define CEREBROD_CLUSTER_DATA_REHASH_LIMIT         (cerebrod_cluster_data_index_size*2)
+#define CEREBROD_LISTENER_DATA_INDEX_SIZE_DEFAULT   1024
+#define CEREBROD_LISTENER_DATA_INDEX_SIZE_INCREMENT 1024
+#define CEREBROD_LISTENER_DATA_REHASH_LIMIT         (cerebrod_listener_data_index_size*2)
 
 extern struct cerebrod_config conf;
 #if CEREBRO_DEBUG
@@ -42,41 +42,41 @@ extern pthread_mutex_t debug_output_mutex;
 extern clusterlist_module_t clusterlist_handle;
 
 /*
- * cerebrod_cluster_data_initialization_complete
- * cerebrod_cluster_data_initialization_complete_lock
+ * cerebrod_listener_data_initialization_complete
+ * cerebrod_listener_data_initialization_complete_lock
  *
  * variables for synchronizing initialization between different pthreads
  */
-int cerebrod_cluster_data_initialization_complete = 0;
-pthread_mutex_t cerebrod_cluster_data_initialization_complete_lock = PTHREAD_MUTEX_INITIALIZER;
+int cerebrod_listener_data_initialization_complete = 0;
+pthread_mutex_t cerebrod_listener_data_initialization_complete_lock = PTHREAD_MUTEX_INITIALIZER;
 
 /* 
- * cerebrod_cluster_data_list
+ * cerebrod_listener_data_list
  *
  * contains list of nodes and cluster_data
  */
-List cerebrod_cluster_data_list = NULL;
+List cerebrod_listener_data_list = NULL;
 
 /*
- * cerebrod_cluster_data_index
- * cerebrod_cluster_data_index_numnodes
- * cerebrod_cluster_data_index_size
+ * cerebrod_listener_data_index
+ * cerebrod_listener_data_index_numnodes
+ * cerebrod_listener_data_index_size
  *
- * hash index into cerebrod_cluster_data list for faster access, number of
+ * hash index into cerebrod_listener_data list for faster access, number of
  * currently indexed entries, and index size
  */
-hash_t cerebrod_cluster_data_index = NULL;
-int cerebrod_cluster_data_index_numnodes;
-int cerebrod_cluster_data_index_size;
+hash_t cerebrod_listener_data_index = NULL;
+int cerebrod_listener_data_index_numnodes;
+int cerebrod_listener_data_index_size;
 
 /*  
- * cerebrod_cluster_data_lock
+ * cerebrod_listener_data_lock
  *
  * lock to protect pthread access to both the cluster_data list and
  * cluster_data_index
  *
  */
-pthread_mutex_t cerebrod_cluster_data_lock = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t cerebrod_listener_data_lock = PTHREAD_MUTEX_INITIALIZER;
 
 /* 
  * cerebrod_metric_name_list
@@ -166,30 +166,30 @@ _cerebrod_node_data_create_and_init(const char *nodename)
 }
 
 /* 
- * _cerebrod_monitor_metric_destroy
+ * _cerebrod_metric_monitor_destroy
  *
- * Destroy contents of a cerebrod_monitor_metric
+ * Destroy contents of a cerebrod_metric_monitor
  */
 static void
-_cerebrod_monitor_metric_destroy(void *data)
+_cerebrod_metric_monitor_destroy(void *data)
 {
-  struct cerebrod_monitor_metric *monitor_metric;
+  struct cerebrod_metric_monitor *monitor_metric;
   
   assert(data);
 
-  monitor_metric = (struct cerebrod_monitor_metric *)data;
+  monitor_metric = (struct cerebrod_metric_monitor *)data;
   if (monitor_metric->metric_name)
     Free(monitor_metric->metric_name);
   Free(monitor_metric);
 }
 
 void 
-cerebrod_cluster_data_initialize(void)
+cerebrod_listener_data_initialize(void)
 {
   int i, monitor_index_len, numnodes = 0;
 
-  pthread_mutex_lock(&cerebrod_cluster_data_initialization_complete_lock);
-  if (cerebrod_cluster_data_initialization_complete)
+  pthread_mutex_lock(&cerebrod_listener_data_initialization_complete_lock);
+  if (cerebrod_listener_data_initialization_complete)
     goto out;
 
   if ((numnodes = clusterlist_module_numnodes(clusterlist_handle)) < 0)
@@ -198,23 +198,23 @@ cerebrod_cluster_data_initialize(void)
 
   if (numnodes > 0)
     {
-      cerebrod_cluster_data_index_numnodes = numnodes;
-      cerebrod_cluster_data_index_size = numnodes;
+      cerebrod_listener_data_index_numnodes = numnodes;
+      cerebrod_listener_data_index_size = numnodes;
     }
   else
     {
-      cerebrod_cluster_data_index_numnodes = 0;
-      cerebrod_cluster_data_index_size = CEREBROD_CLUSTER_DATA_INDEX_SIZE_DEFAULT;
+      cerebrod_listener_data_index_numnodes = 0;
+      cerebrod_listener_data_index_size = CEREBROD_LISTENER_DATA_INDEX_SIZE_DEFAULT;
     }
 
-  cerebrod_cluster_data_list = List_create((ListDelF)NULL);
-  cerebrod_cluster_data_index = Hash_create(cerebrod_cluster_data_index_size,
-                                            (hash_key_f)hash_key_string,
-                                            (hash_cmp_f)strcmp,
-                                            (hash_del_f)NULL);
+  cerebrod_listener_data_list = List_create((ListDelF)NULL);
+  cerebrod_listener_data_index = Hash_create(cerebrod_listener_data_index_size,
+                                             (hash_key_f)hash_key_string,
+                                             (hash_cmp_f)strcmp,
+                                             (hash_del_f)NULL);
   
   /* If the clusterlist module contains nodes, retrieve all of these
-   * nodes and put them into the cerebrod_cluster_data list.  All updates
+   * nodes and put them into the cerebrod_listener_data list.  All updates
    * will involve updating data rather than involve insertion.
    */
   if (numnodes > 0)
@@ -233,13 +233,13 @@ cerebrod_cluster_data_initialize(void)
           
           nd = _cerebrod_node_data_create_and_init(nodes[i]);
 
-          List_append(cerebrod_cluster_data_list, nd);
-          Hash_insert(cerebrod_cluster_data_index, nd->nodename, nd);
+          List_append(cerebrod_listener_data_list, nd);
+          Hash_insert(cerebrod_listener_data_index, nd->nodename, nd);
 
           free(nodes[i]);
         }
 
-      list_sort(cerebrod_cluster_data_list, (ListCmpF)_cerebrod_node_data_strcmp);
+      list_sort(cerebrod_listener_data_list, (ListCmpF)_cerebrod_node_data_strcmp);
 
       free(nodes);
     }
@@ -298,11 +298,11 @@ cerebrod_cluster_data_initialize(void)
   monitor_index = Hash_create(monitor_index_len,
                               (hash_key_f)hash_key_string,
                               (hash_cmp_f)strcmp,
-                              (hash_del_f)_cerebrod_monitor_metric_destroy);
+                              (hash_del_f)_cerebrod_metric_monitor_destroy);
 
   for (i = 0; i < monitor_index_len; i++)
     {
-      struct cerebrod_monitor_metric *monitor_metric;
+      struct cerebrod_metric_monitor *monitor_metric;
       char *metric_name;
 
 #if CEREBRO_DEBUG
@@ -334,7 +334,7 @@ cerebrod_cluster_data_initialize(void)
           continue;
         }
 
-      monitor_metric = Malloc(sizeof(struct cerebrod_monitor_metric));
+      monitor_metric = Malloc(sizeof(struct cerebrod_metric_monitor));
       monitor_metric->metric_name = Strdup(metric_name);
       monitor_metric->index = i;
       Pthread_mutex_init(&(monitor_metric->monitor_lock), NULL);
@@ -364,18 +364,18 @@ cerebrod_cluster_data_initialize(void)
 
  done:
 
-  cerebrod_cluster_data_initialization_complete++;
+  cerebrod_listener_data_initialization_complete++;
  out:
-  Pthread_mutex_unlock(&cerebrod_cluster_data_initialization_complete_lock);
+  Pthread_mutex_unlock(&cerebrod_listener_data_initialization_complete_lock);
 }
 
 /*  
- * _cerebrod_cluster_data_output_insert
+ * _cerebrod_listener_data_output_insert
  *
  * Output debugging info about a recently inserted node
  */
 static void
-_cerebrod_cluster_data_output_insert(struct cerebrod_node_data *nd)
+_cerebrod_listener_data_output_insert(struct cerebrod_node_data *nd)
 {
 #if CEREBRO_DEBUG
   assert(nd);
@@ -392,12 +392,12 @@ _cerebrod_cluster_data_output_insert(struct cerebrod_node_data *nd)
 }
 
 /*  
- * _cerebrod_cluster_data_output_update
+ * _cerebrod_listener_data_output_update
  *
  * Output debugging info about a recently updated node
  */
 static void
-_cerebrod_cluster_data_output_update(struct cerebrod_node_data *nd)
+_cerebrod_listener_data_output_update(struct cerebrod_node_data *nd)
 {
 #if CEREBRO_DEBUG
   assert(nd);
@@ -527,44 +527,44 @@ _cerebrod_node_data_item_dump(void *x, void *arg)
 #endif /* CEREBRO_DEBUG */
 
 /*
- * _cerebrod_cluster_data_list_dump
+ * _cerebrod_listener_data_list_dump
  *
  * Dump contents of node data list
  */
 static void
-_cerebrod_cluster_data_list_dump(void)
+_cerebrod_listener_data_list_dump(void)
 {
 #if CEREBRO_DEBUG
   if (conf.debug && conf.listen_debug)
     {
-      Pthread_mutex_lock(&cerebrod_cluster_data_lock);
+      Pthread_mutex_lock(&cerebrod_listener_data_lock);
       Pthread_mutex_lock(&debug_output_mutex);
       fprintf(stderr, "**************************************\n");
       fprintf(stderr, "* Node Data List State\n");
       fprintf(stderr, "* -----------------------\n");
-      fprintf(stderr, "* Listed Nodes: %d\n", cerebrod_cluster_data_index_numnodes);
+      fprintf(stderr, "* Listed Nodes: %d\n", cerebrod_listener_data_index_numnodes);
       fprintf(stderr, "* -----------------------\n");
-      if (cerebrod_cluster_data_index_numnodes > 0)
+      if (cerebrod_listener_data_index_numnodes > 0)
         {
           int num;
 
-          num = List_for_each(cerebrod_cluster_data_list,
+          num = List_for_each(cerebrod_listener_data_list,
 			      _cerebrod_node_data_item_dump,
 			      NULL);
-          if (num != cerebrod_cluster_data_index_numnodes)
+          if (num != cerebrod_listener_data_index_numnodes)
 	    {
               fprintf(stderr, "%s(%s:%d): invalid dump count: num=%d numnodes=%d",
                       __FILE__, __FUNCTION__, __LINE__, 
-                      num, cerebrod_cluster_data_index_numnodes);
+                      num, cerebrod_listener_data_index_numnodes);
 	      exit(1);
 	    }
         }
       else
-        fprintf(stderr, "_cerebrod_cluster_data_list_dump: "
+        fprintf(stderr, "_cerebrod_listener_data_list_dump: "
                 "called with empty list\n");
       fprintf(stderr, "**************************************\n");
       Pthread_mutex_unlock(&debug_output_mutex);
-      Pthread_mutex_unlock(&cerebrod_cluster_data_lock);
+      Pthread_mutex_unlock(&cerebrod_listener_data_lock);
     }
 #endif /* CEREBRO_DEBUG */
 }
@@ -645,7 +645,7 @@ _cerebrod_metric_data_update(struct cerebrod_node_data *nd,
   if (!(md = Hash_find(nd->metric_data, metric_name)))
     {
       /* Should be impossible to hit due to checks in
-       * cerebrod_cluster_data_update()
+       * cerebrod_listener_data_update()
        */
       if (nd->metric_data_count >= conf.metric_max)
         {
@@ -688,9 +688,9 @@ _cerebrod_metric_data_update(struct cerebrod_node_data *nd,
 }
 
 void 
-cerebrod_cluster_data_update(char *nodename,
-                             struct cerebrod_heartbeat *hb,
-                             u_int32_t received_time)
+cerebrod_listener_data_update(char *nodename,
+                              struct cerebrod_heartbeat *hb,
+                              u_int32_t received_time)
 {
   struct cerebrod_node_data *nd;
   int i, update_output_flag = 0;
@@ -699,35 +699,35 @@ cerebrod_cluster_data_update(char *nodename,
   assert(hb);
 
   /* It is possible no servers are turned on */
-  if (!cerebrod_cluster_data_initialization_complete)
+  if (!cerebrod_listener_data_initialization_complete)
     return;
 
-  if (!cerebrod_cluster_data_list || !cerebrod_cluster_data_index)
+  if (!cerebrod_listener_data_list || !cerebrod_listener_data_index)
     cerebro_err_exit("%s(%s:%d): initialization not complete",
                      __FILE__, __FUNCTION__, __LINE__);
 
-  Pthread_mutex_lock(&cerebrod_cluster_data_lock);
-  if (!(nd = Hash_find(cerebrod_cluster_data_index, nodename)))
+  Pthread_mutex_lock(&cerebrod_listener_data_lock);
+  if (!(nd = Hash_find(cerebrod_listener_data_index, nodename)))
     {
       /* Re-hash if our hash is getting too small */
-      if ((cerebrod_cluster_data_index_numnodes + 1) > CEREBROD_CLUSTER_DATA_REHASH_LIMIT)
-	cerebrod_rehash(&cerebrod_cluster_data_index,
-			&cerebrod_cluster_data_index_size,
-			CEREBROD_CLUSTER_DATA_INDEX_SIZE_INCREMENT,
-			cerebrod_cluster_data_index_numnodes,
-			&cerebrod_cluster_data_lock);
+      if ((cerebrod_listener_data_index_numnodes + 1) > CEREBROD_LISTENER_DATA_REHASH_LIMIT)
+	cerebrod_rehash(&cerebrod_listener_data_index,
+			&cerebrod_listener_data_index_size,
+			CEREBROD_LISTENER_DATA_INDEX_SIZE_INCREMENT,
+			cerebrod_listener_data_index_numnodes,
+			&cerebrod_listener_data_lock);
 
       nd = _cerebrod_node_data_create_and_init(nodename);
-      List_append(cerebrod_cluster_data_list, nd);
-      Hash_insert(cerebrod_cluster_data_index, nd->nodename, nd);
-      cerebrod_cluster_data_index_numnodes++;
+      List_append(cerebrod_listener_data_list, nd);
+      Hash_insert(cerebrod_listener_data_index, nd->nodename, nd);
+      cerebrod_listener_data_index_numnodes++;
 
       /* Ok to call debug output function, since
-       * cerebrod_cluster_data_lock is locked.
+       * cerebrod_listener_data_lock is locked.
        */
-      _cerebrod_cluster_data_output_insert(nd);
+      _cerebrod_listener_data_output_insert(nd);
     }
-  Pthread_mutex_unlock(&cerebrod_cluster_data_lock);
+  Pthread_mutex_unlock(&cerebrod_listener_data_lock);
   
   Pthread_mutex_lock(&(nd->node_data_lock));
   if (received_time >= nd->last_received_time)
@@ -741,7 +741,7 @@ cerebrod_cluster_data_update(char *nodename,
           for (i = 0; i < hb->metrics_len; i++)
             {
               char metric_name_buf[CEREBRO_METRIC_NAME_MAXLEN+1];
-              struct cerebrod_monitor_metric *monitor_metric;
+              struct cerebrod_metric_monitor *monitor_metric;
               
               /* Guarantee ending '\0' character */
               memset(metric_name_buf, '\0', CEREBRO_METRIC_NAME_MAXLEN+1);
@@ -790,7 +790,7 @@ cerebrod_cluster_data_update(char *nodename,
         }
 
       /* Can't call a debug output function in here, it can cause a
-       * deadlock b/c the cerebrod_cluster_data_lock is not locked.  Use
+       * deadlock b/c the cerebrod_listener_data_lock is not locked.  Use
        * a flag instead.
        */
       update_output_flag++;
@@ -799,9 +799,9 @@ cerebrod_cluster_data_update(char *nodename,
 
 
   if (update_output_flag)
-    _cerebrod_cluster_data_output_update(nd);
+    _cerebrod_listener_data_output_update(nd);
 
-  _cerebrod_cluster_data_list_dump();
+  _cerebrod_listener_data_list_dump();
   _cerebrod_metric_name_list_dump();
 }
 

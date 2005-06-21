@@ -1,3 +1,7 @@
+2005-06-21  Albert Chu  <chu11@llnl.gov>
+
+	* Begin work on speaker scheduler.
+	
 2005-06-20  Albert Chu  <chu11@llnl.gov>
 
 	* Split off cerebro utility functions and created libutil

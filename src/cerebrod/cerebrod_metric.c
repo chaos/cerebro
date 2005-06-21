@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric.c,v 1.37 2005-06-18 00:14:39 achu Exp $
+ *  $Id: cerebrod_metric.c,v 1.38 2005-06-21 17:02:22 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -20,8 +20,8 @@
 #include "cerebro/cerebro_metric_protocol.h"
 
 #include "cerebrod.h"
-#include "cerebrod_cluster_data.h"
 #include "cerebrod_config.h"
+#include "cerebrod_listener_data.h"
 #include "cerebrod_metric.h"
 #include "cerebrod_util.h"
 #include "cerebrod_wrappers.h"
@@ -36,12 +36,12 @@ extern struct cerebrod_config conf;
 extern pthread_mutex_t debug_output_mutex;
 #endif /* CEREBRO_DEBUG */
 
-extern List cerebrod_cluster_data_list;
+extern List cerebrod_listener_data_list;
 extern List cerebrod_metric_name_list;
-extern hash_t cerebrod_cluster_data_index;
-extern int cerebrod_cluster_data_index_numnodes;
-extern int cerebrod_cluster_data_index_size;
-extern pthread_mutex_t cerebrod_cluster_data_lock;
+extern hash_t cerebrod_listener_data_index;
+extern int cerebrod_listener_data_index_numnodes;
+extern int cerebrod_listener_data_index_size;
+extern pthread_mutex_t cerebrod_listener_data_lock;
 extern pthread_mutex_t cerebrod_metric_name_lock;
 
 /*
@@ -68,7 +68,7 @@ _cerebrod_metric_initialize(void)
   if (cerebrod_metric_initialization_complete)
     goto out;
 
-  cerebrod_cluster_data_initialize();
+  /* Hmmm, I guess nothing to do */
 
   cerebrod_metric_initialization_complete++;
   Pthread_cond_signal(&cerebrod_metric_initialization_complete_cond);
@@ -646,7 +646,7 @@ _cerebrod_metric_evaluate(void *x, void *arg)
   
 #if CEREBRO_DEBUG
   /* Should be called with lock already set */
-  rv = Pthread_mutex_trylock(&cerebrod_cluster_data_lock);
+  rv = Pthread_mutex_trylock(&cerebrod_listener_data_lock);
   if (rv != EBUSY)
     cerebro_err_exit("%s(%s:%d): mutex not locked: rv=%d",	
                      __FILE__, __FUNCTION__, __LINE__, rv);
@@ -823,11 +823,11 @@ _cerebrod_metric_respond_with_nodes(int client_fd, struct cerebro_metric_request
 
   memset(&ed, '\0', sizeof(struct cerebrod_metric_evaluation_data));
 
-  Pthread_mutex_lock(&cerebrod_cluster_data_lock);
+  Pthread_mutex_lock(&cerebrod_listener_data_lock);
   
-  if (!List_count(cerebrod_cluster_data_list))
+  if (!List_count(cerebrod_listener_data_list))
     {
-      Pthread_mutex_unlock(&cerebrod_cluster_data_lock);
+      Pthread_mutex_unlock(&cerebrod_listener_data_lock);
       goto end_response;
     }
 
@@ -836,7 +836,7 @@ _cerebrod_metric_respond_with_nodes(int client_fd, struct cerebro_metric_request
       cerebro_err_debug("%s(%s:%d): list_create: %s", 
                         __FILE__, __FUNCTION__, __LINE__,
                         strerror(errno));
-      Pthread_mutex_unlock(&cerebrod_cluster_data_lock);
+      Pthread_mutex_unlock(&cerebrod_listener_data_lock);
       _cerebrod_metric_respond_with_error(client_fd,
                                           req->version,
 					  CEREBRO_METRIC_PROTOCOL_ERR_INTERNAL_SYSTEM_ERROR);
@@ -849,11 +849,11 @@ _cerebrod_metric_respond_with_nodes(int client_fd, struct cerebro_metric_request
   ed.time_now = tv.tv_sec;
   ed.node_responses = node_responses;
 
-  if (list_for_each(cerebrod_cluster_data_list,
+  if (list_for_each(cerebrod_listener_data_list,
 		    _cerebrod_metric_evaluate, 
 		    &ed) < 0)
     {
-      Pthread_mutex_unlock(&cerebrod_cluster_data_lock);
+      Pthread_mutex_unlock(&cerebrod_listener_data_lock);
       _cerebrod_metric_respond_with_error(client_fd,
                                           req->version,
 					  CEREBRO_METRIC_PROTOCOL_ERR_INTERNAL_SYSTEM_ERROR);
@@ -863,7 +863,7 @@ _cerebrod_metric_respond_with_nodes(int client_fd, struct cerebro_metric_request
   /* Evaluation is done.  Transmission of the results can be done
    * without this lock.
    */
-  Pthread_mutex_unlock(&cerebrod_cluster_data_lock);
+  Pthread_mutex_unlock(&cerebrod_listener_data_lock);
 
   if (List_count(node_responses))
     {

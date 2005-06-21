@@ -1,9 +1,9 @@
 /*****************************************************************************\
- *  $Id: cerebrod_cluster_data.h,v 1.6 2005-06-18 00:14:39 achu Exp $
+ *  $Id: cerebrod_listener_data.h,v 1.1 2005-06-21 17:02:22 achu Exp $
 \*****************************************************************************/
 
-#ifndef _CEREBROD_CLUSTER_DATA_H
-#define _CEREBROD_CLUSTER_DATA_H
+#ifndef _CEREBROD_LISTENER_DATA_H
+#define _CEREBROD_LISTENER_DATA_H
 
 #if HAVE_CONFIG_H
 #include "config.h"
@@ -49,11 +49,11 @@ struct cerebrod_node_data
 };
 
 /*
- * struct cerebrod_monitor_metric
+ * struct cerebrod_metric_monitor
  *
  * contains cerebrod monitor module metric information
  */
-struct cerebrod_monitor_metric
+struct cerebrod_metric_monitor
 {
   char *metric_name;
   int index;
@@ -61,19 +61,19 @@ struct cerebrod_monitor_metric
 };
 
 /* 
- * cerebrod_cluster_data_initialize
+ * cerebrod_listener_data_initialize
  *
  * Initialize cluster_data structures
  */
-void cerebrod_cluster_data_initialize(void);
+void cerebrod_listener_data_initialize(void);
 
 /* 
- * cerebrod_cluster_data_update
+ * cerebrod_listener_data_update
  *
  * Update cluster_data with information from a heartbeat
  */
-void cerebrod_cluster_data_update(char *nodename,
-                                  struct cerebrod_heartbeat *hb,
-                                  u_int32_t received_time);
+void cerebrod_listener_data_update(char *nodename,
+                                   struct cerebrod_heartbeat *hb,
+                                   u_int32_t received_time);
 
-#endif /* _CEREBROD_CLUSTER_DATA_H */
+#endif /* _CEREBROD_LISTENER_DATA_H */
