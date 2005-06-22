@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_gendersllnl.c,v 1.22 2005-06-21 20:56:28 achu Exp $
+ *  $Id: cerebro_clusterlist_gendersllnl.c,v 1.23 2005-06-22 15:56:13 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -24,18 +24,8 @@
 
 #define GENDERSLLNL_CLUSTERLIST_MODULE_NAME "gendersllnl"
 
-/* 
- * gendersllnl_handle
- *
- * genders handle
- */
 static genders_t gendersllnl_handle = NULL;
 
-/* 
- * gendersllnl_clusterlist_setup
- *
- * gendersllnl clusterlist module setup function
- */
 static int
 gendersllnl_clusterlist_setup(void)
 {
@@ -64,11 +54,6 @@ gendersllnl_clusterlist_setup(void)
   return rv;
 }
 
-/* 
- * gendersllnl_clusterlist_cleanup
- *
- * gendersllnl clusterlist module cleanup function
- */
 static int
 gendersllnl_clusterlist_cleanup(void)
 {
@@ -78,11 +63,6 @@ gendersllnl_clusterlist_cleanup(void)
   return cerebro_clusterlist_genders_cleanup(&gendersllnl_handle);
 }
 
-/*
- * gendersllnl_clusterlist_numnodes
- *
- * gendersllnl clusterlist module numnodes function
- */
 static int
 gendersllnl_clusterlist_numnodes(void)
 {
@@ -96,11 +76,6 @@ gendersllnl_clusterlist_numnodes(void)
   return cerebro_clusterlist_genders_numnodes(gendersllnl_handle);
 }
 
-/*
- * gendersllnl_clusterlist_get_all_nodes
- *
- * gendersllnl clusterlist module get all nodes function
- */
 static int
 gendersllnl_clusterlist_get_all_nodes(char ***nodes)
 {
@@ -122,11 +97,6 @@ gendersllnl_clusterlist_get_all_nodes(char ***nodes)
                                                    nodes);
 }
 
-/*
- * gendersllnl_clusterlist_node_in_cluster
- *
- * gendersllnl clusterlist module node in cluster function
- */
 static int
 gendersllnl_clusterlist_node_in_cluster(const char *node)
 {
@@ -173,11 +143,6 @@ gendersllnl_clusterlist_node_in_cluster(const char *node)
   return flag;
 }
 
-/*
- * gendersllnl_clusterlist_get_nodename
- *
- * gendersllnl clusterlist module get nodename function
- */
 static int
 gendersllnl_clusterlist_get_nodename(const char *node, 
 				     char *buf, 

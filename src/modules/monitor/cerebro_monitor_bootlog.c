@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_monitor_bootlog.c,v 1.10 2005-06-21 20:56:28 achu Exp $
+ *  $Id: cerebro_monitor_bootlog.c,v 1.11 2005-06-22 15:56:13 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -78,7 +78,8 @@ _qsql_query(char *fmt, ...)
 /*
  * bootlog_monitor_setup
  *
- * bootlog monitor module setup function
+ * bootlog monitor module setup function.  Setup and connect to the
+ * database through qsql.
  */
 static int
 bootlog_monitor_setup(void)
@@ -90,6 +91,12 @@ bootlog_monitor_setup(void)
   int last_btime_created = 0;
 
   qsql_init(QSQL_USE_MYSQL);
+
+  /* 
+   * Host/user/password/database are defined by Quadrics
+   * documentation.
+   */
+
   if (!(qsql_handle = qsql_connect_and_select(BOOTLOG_MYSQL_HOST, 
                                               BOOTLOG_USER, 
                                               BOOTLOG_PASSWORD,
@@ -175,11 +182,6 @@ bootlog_monitor_setup(void)
   return -1;
 }
 
-/*
- * bootlog_monitor_cleanup
- *
- * bootlog monitor module cleanup function
- */
 static int
 bootlog_monitor_cleanup(void)
 {
@@ -191,13 +193,6 @@ bootlog_monitor_cleanup(void)
   return 0;
 }
 
-/* 
- * bootlog_monitor_metric_name
- *
- * bootlog monitor module metric_name function
- *
- * Returns 0 on success, -1 on error
- */
 static char *
 bootlog_monitor_metric_name(void)
 {
@@ -207,9 +202,9 @@ bootlog_monitor_metric_name(void)
 /* 
  * _check_if_new_btime
  *
- * Check of the boottime recently received is new
+ * Check of the boottime recently received is new or old
  *
- * Returns 1 if it is new, 0 if not, -1 on error
+ * Returns 1 if it is new, 0 if it is old, -1 on error
  */
 static int
 _check_if_new_btime(const char *nodename, u_int32_t btime)
@@ -294,8 +289,8 @@ _check_if_new_btime(const char *nodename, u_int32_t btime)
         }
 
       /* Rounding issue on some kernels that can change boottime +/-
-       * one or two.  This is the fix.  Basically, we assume that a
-       * machine can't reboot within 2 seconds.
+       * one or two.  This is the fix.  We have to assume that a
+       * machine can't fully reboot within 2 seconds.
        */
       if (btime > (stored_btime + 2))
         {

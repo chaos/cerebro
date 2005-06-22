@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_genders_util.c,v 1.16 2005-06-16 17:17:16 achu Exp $
+ *  $Id: cerebro_clusterlist_genders_util.c,v 1.17 2005-06-22 15:56:13 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -26,7 +26,6 @@ cerebro_clusterlist_genders_setup(genders_t *handle)
 			__FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
-
 
   *handle = NULL;
 

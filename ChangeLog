@@ -1,3 +1,7 @@
+2005-06-22  Albert Chu  <chu11@llnl.gov>
+
+	* Remove pointless comments.
+
 2005-06-21  Albert Chu  <chu11@llnl.gov>
 
 	* Begin work on speaker scheduler.

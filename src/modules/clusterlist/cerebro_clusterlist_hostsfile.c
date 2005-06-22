@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_hostsfile.c,v 1.22 2005-06-21 20:56:28 achu Exp $
+ *  $Id: cerebro_clusterlist_hostsfile.c,v 1.23 2005-06-22 15:56:13 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -34,7 +34,7 @@
 /* 
  * hosts
  *
- * list of all hosts
+ * Store all of the hosts found in the hostsfile
  */
 static List hosts = NULL;
 
@@ -315,11 +315,6 @@ hostsfile_clusterlist_setup(void)
   return -1;
 }
 
-/* 
- * hostsfile_clusterlist_cleanup
- *
- * hostsfile clusterlist module cleanup function
- */
 static int
 hostsfile_clusterlist_cleanup(void)
 {
@@ -332,11 +327,6 @@ hostsfile_clusterlist_cleanup(void)
   return 0;
 }
 
-/*
- * hostsfile_clusterlist_numnodes
- *
- * hostsfile clusterlist module numnodes function
- */
 static int 
 hostsfile_clusterlist_numnodes(void)
 {
@@ -350,11 +340,6 @@ hostsfile_clusterlist_numnodes(void)
   return list_count(hosts);
 }
 
-/*
- * hostsfile_clusterlist_get_all_nodes
- *
- * hostsfile clusterlist module get all nodes function
- */
 static int
 hostsfile_clusterlist_get_all_nodes(char ***nodes)
 {
@@ -434,11 +419,6 @@ hostsfile_clusterlist_get_all_nodes(char ***nodes)
   return -1;
 }
 
-/*
- * hostsfile_clusterlist_node_in_cluster
- *
- * hostsfile clusterlist module node in cluster function
- */
 static int
 hostsfile_clusterlist_node_in_cluster(const char *node)
 {
@@ -479,11 +459,6 @@ hostsfile_clusterlist_node_in_cluster(const char *node)
   return ((ptr) ? 1: 0);
 }
 
-/*
- * hostsfile_clusterlist_get_nodename
- *
- * hostsfile clusterlist module get nodename function
- */
 static int
 hostsfile_clusterlist_get_nodename(const char *node, 
 				   char *buf, 

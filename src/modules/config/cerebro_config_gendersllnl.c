@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_gendersllnl.c,v 1.20 2005-06-21 20:56:28 achu Exp $
+ *  $Id: cerebro_config_gendersllnl.c,v 1.21 2005-06-22 15:56:13 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -28,18 +28,9 @@ extern int h_errno;
 #define GENDERSLLNL_CONFIG_MODULE_NAME "gendersllnl"
 
 #define GENDERSLLNL_LARGE_CLUSTER_SIZE 512
-/*
- * gendersllnl_handle
- *
- * genders handle
- */
+
 static genders_t gendersllnl_handle = NULL;
 
-/*
- * gendersllnl_config_setup
- *
- * gendersllnl config module setup function
- */
 static int
 gendersllnl_config_setup(void)
 {
@@ -84,11 +75,6 @@ gendersllnl_config_setup(void)
 
 }
 
-/*
- * gendersllnl_config_cleanup
- *
- * gendersllnl config module cleanup function
- */
 static int
 gendersllnl_config_cleanup(void)
 {
@@ -111,8 +97,9 @@ gendersllnl_config_cleanup(void)
  *
  * config specifically for use on LLNL clusters. 'mgmt' nodes listen
  * and speak, while compute nodes only speak.  We always speak on the
- * private management network interface.  Non-mgmt nodes connect to
- * mgmt nodes to receive data.
+ * private management network interface (the 'e' interface).  Compute
+ * nodes connect to mgmt nodes via the private management network to
+ * retrieve metric data.
  *
  * Returns 0 on success, -1 on error
  */

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_boottime.c,v 1.7 2005-06-21 19:16:56 achu Exp $
+ *  $Id: cerebro_metric_boottime.c,v 1.8 2005-06-22 15:56:13 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -48,7 +48,8 @@ static u_int32_t metric_boottime = 0;
 /*
  * boottime_metric_setup
  *
- * boottime metric module setup function
+ * boottime metric module setup function.  Read and store the boottime
+ * out of /proc.
  */
 static int
 boottime_metric_setup(void)
@@ -73,16 +74,16 @@ boottime_metric_setup(void)
 			strerror(errno));
       goto cleanup;
     }
-                                                                                      
+
   bootvalptr = strstr(buf, BOOTTIME_KEYWORD);
   bootvalptr += strlen(BOOTTIME_KEYWORD);
   if (bootvalptr < (buf + BOOTTIME_BUFLEN))
     {
       while(isspace(*bootvalptr))
         bootvalptr++;
-                                                                                      
+
       tempptr = bootvalptr;
-                                                                                      
+
       while(!isspace(*tempptr) && *tempptr != '\0')
         tempptr++;
       *tempptr = '\0';
@@ -93,7 +94,7 @@ boottime_metric_setup(void)
 			__FILE__, __FUNCTION__, __LINE__);
       goto cleanup;
     }
-                                                                                      
+
   errno = 0;
   bootval = (u_int32_t)strtol(bootvalptr, &endptr, 10);
   if ((bootval == LONG_MIN || bootval == LONG_MAX) && errno == ERANGE)
@@ -108,7 +109,7 @@ boottime_metric_setup(void)
 			__FILE__, __FUNCTION__, __LINE__);
       goto cleanup;
     }
-                                                                                      
+
   metric_boottime = (u_int32_t)bootval;
   return 0;
 
@@ -117,11 +118,6 @@ boottime_metric_setup(void)
   return -1;
 }
 
-/*
- * boottime_metric_cleanup
- *
- * boottime metric module cleanup function
- */
 static int
 boottime_metric_cleanup(void)
 {
@@ -129,42 +125,22 @@ boottime_metric_cleanup(void)
   return 0;
 }
 
-/* 
- * boottime_metric_get_metric_name
- *
- * boottime metric module get_metric_name function
- *
- * Returns string on success, -1 on error
- */
 static char *
 boottime_metric_get_metric_name(void)
 {
   return BOOTTIME_METRIC_NAME;
 }
 
-/* 
- * boottime_metric_get_metric_period
- *
- * boottime metric module get_metric_period function
- *
- * Returns period on success, -1 on error
- */
 static int
 boottime_metric_get_metric_period(void)
 {
-  /* Propogated all of the time, b/c we want to detect boottime
-   * changes 
+  /* The boottime is propogated all of the time so that
+   * programs/modules monitoring it will immediately know when a
+   * machine has been rebooted and brought straight back up.
    */
   return 0;
 }
 
-/* 
- * boottime_metric_get_metric_value
- *
- * boottime metric module get_metric_value function
- *
- * Returns 0 on success, -1 on error
- */
 static int
 boottime_metric_get_metric_value(unsigned int *metric_value_type,
                                  unsigned int *metric_value_len,
@@ -197,13 +173,6 @@ boottime_metric_get_metric_value(unsigned int *metric_value_type,
   return 0;
 }
 
-/* 
- * boottime_metric_destroy_metric_value
- *
- * boottime metric module destroy_metric_value function
- *
- * Returns 0 on success, -1 on error
- */
 static int
 boottime_metric_destroy_metric_value(void *metric_value)
 {

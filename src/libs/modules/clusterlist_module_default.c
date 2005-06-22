@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: clusterlist_module_default.c,v 1.1 2005-06-18 18:48:30 achu Exp $
+ *  $Id: clusterlist_module_default.c,v 1.2 2005-06-22 15:56:13 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -92,7 +92,7 @@ default_clusterlist_get_nodename(const char *node, char *buf, unsigned int bufle
 
   return 0;
 }
-                                                                                     
+
 struct cerebro_clusterlist_module_info default_clusterlist_module_info =
   {
     DEFAULT_CLUSTERLIST_MODULE_NAME,
