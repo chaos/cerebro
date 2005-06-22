@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_slurm_state.c,v 1.1 2005-06-22 23:28:08 achu Exp $
+ *  $Id: cerebro_metric_slurm_state.c,v 1.2 2005-06-22 23:52:54 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -40,7 +40,10 @@
 
 #define SLURM_STATE_METRIC_MODULE_NAME      "slurm_state"
 #define SLURM_STATE_METRIC_NAME             "slurm_state"
-#define SLURM_STATE_UNIX_PATH               CEREBRO_MODULE_DIR "/slurm_state_metric"
+/* #define SLURM_STATE_UNIX_PATH               CEREBRO_MODULE_DIR "/slurm_state_metric" */
+
+#define SLURM_STATE_UNIX_PATH               "/tmp/slurm_state"
+
 #define SLURM_STATE_BACKLOG                 5
 #define SLURM_STATE_REINITIALIZE_WAIT_TIME  5
 
