@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.45 2005-06-21 22:29:07 achu Exp $
+## $Id: configure.ac,v 1.46 2005-06-22 23:28:08 achu Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -101,6 +101,12 @@ AM_CONDITIONAL(WITH_HOSTSFILE, [test "$ac_with_hostsfile" = "yes"])
 #
 AC_BOOTTIME
 AM_CONDITIONAL(WITH_BOOTTIME, [test "$ac_with_boottime" = "yes"])
+
+#
+# Check to build slurm_state module(s)
+#
+AC_SLURM_STATE
+AM_CONDITIONAL(WITH_SLURM_STATE, [test "$ac_with_slurm_state" = "yes"])
 
 #
 # Check to build bootlog module(s)

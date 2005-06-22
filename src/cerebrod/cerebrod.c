@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.66 2005-06-22 20:30:09 achu Exp $
+ *  $Id: cerebrod.c,v 1.67 2005-06-22 23:28:08 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -71,8 +71,7 @@ _cerebrod_post_config_setup_initialization(void)
     cerebro_err_exit("%s(%s:%d): clusterlist_module_setup",
                      __FILE__, __FUNCTION__, __LINE__);
 
-  if (conf.metric_server)
-    Signal(SIGPIPE, SIG_IGN);
+  Signal(SIGPIPE, SIG_IGN);
 }
 
 int 

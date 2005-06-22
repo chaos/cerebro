@@ -8,6 +8,8 @@
 
 	* Added metric thread support.
 
+	* Added slurm_state metric module.
+
 2005-06-21  Albert Chu  <chu11@llnl.gov>
 
 	* Begin work on speaker scheduler.

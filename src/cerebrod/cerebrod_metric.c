@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric.c,v 1.43 2005-06-22 20:51:25 achu Exp $
+ *  $Id: cerebrod_metric.c,v 1.44 2005-06-22 23:28:08 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -305,8 +305,9 @@ _cerebrod_metric_request_receive(int client_fd,
 	  int n;
 
           /* Don't use fd_read_n b/c it loops until exactly
-           * CEREBRO_METRIC_REQUEST_PACKET_LEN is read.  Due to version
-           * incompatability, we may want to read a smaller packet.
+           * CEREBRO_METRIC_REQUEST_PACKET_LEN is read.  Due to
+           * version incompatability, we may want to read a smaller
+           * packet.
            */
 	  if ((n = read(client_fd, 
                         buf + bytes_read, 
