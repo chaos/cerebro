@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.65 2005-06-22 18:11:00 achu Exp $
+ *  $Id: cerebrod.c,v 1.66 2005-06-22 20:30:09 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -14,11 +14,12 @@
 
 #include "cerebrod.h"
 #include "cerebrod_daemon.h"
-#include "cerebrod_clusterlist.h"
 #include "cerebrod_config.h"
 #include "cerebrod_listener.h"
 #include "cerebrod_metric.h"
 #include "cerebrod_speaker.h"
+
+#include "clusterlist_module.h"
 
 #include "wrappers.h"
 
@@ -54,13 +55,13 @@ extern int cerebrod_metric_initialization_complete;
 extern pthread_cond_t cerebrod_metric_initialization_complete_cond;
 extern pthread_mutex_t cerebrod_metric_initialization_complete_lock;
 
-/* 
- * _cerebrod_post_config_initialization
+/*
+ * _cerebrod_post_config_setup_initialization
  *
  * Perform initialization routines after configuration is determined
  */
 static void
-_cerebrod_post_config_initialization(void)
+_cerebrod_post_config_setup_initialization(void)
 {
   if (!(clusterlist_handle = clusterlist_module_load()))
     cerebro_err_exit("%s(%s:%d): clusterlist_module_load",
@@ -80,11 +81,9 @@ main(int argc, char **argv)
   cerebro_err_init(argv[0]);
   cerebro_err_set_flags(CEREBRO_ERROR_STDERR | CEREBRO_ERROR_SYSLOG);
 
-  _cerebrod_pre_config_initialization();
-
   cerebrod_config_setup(argc, argv);
 
-  _cerebrod_post_config_initialization();
+  _cerebrod_post_config_setup_initialization();
 
 #if CEREBRO_DEBUG
   if (!conf.debug)

@@ -16,6 +16,7 @@ Portability
 - Non-pthreads support
 
 Design
+- Use multipel clusterlist modules, 1 total is not threadsafe
 - Update time for each cerebro metric data?
 - ability for data to be stored/not-stored in the internal hash
   i.e. passed directly to module and forgotten

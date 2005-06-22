@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_gendersllnl.c,v 1.21 2005-06-22 15:56:13 achu Exp $
+ *  $Id: cerebro_config_gendersllnl.c,v 1.22 2005-06-22 20:30:09 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -29,8 +29,18 @@ extern int h_errno;
 
 #define GENDERSLLNL_LARGE_CLUSTER_SIZE 512
 
+/*
+ * gendersllnl_handle
+ *
+ * genders handle
+ */
 static genders_t gendersllnl_handle = NULL;
 
+/*
+ * gendersllnl_config_setup
+ *
+ * gendersllnl config module setup function
+ */
 static int
 gendersllnl_config_setup(void)
 {
@@ -75,6 +85,11 @@ gendersllnl_config_setup(void)
 
 }
 
+/*
+ * gendersllnl_config_cleanup
+ *
+ * gendersllnl config module cleanup function
+ */
 static int
 gendersllnl_config_cleanup(void)
 {

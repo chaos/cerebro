@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.h,v 1.48 2005-06-18 00:14:39 achu Exp $
+ *  $Id: cerebrod_config.h,v 1.49 2005-06-22 20:30:09 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_CONFIG_H
@@ -12,10 +12,6 @@
 #include <netinet/in.h>
 
 #include "cerebro/cerebro_metric_protocol.h"
-
-/*
- * Cerebrod default configuration values
- */
 
 #define CEREBROD_DEBUG_DEFAULT                        0
 #define CEREBROD_HEARTBEAT_FREQUENCY_MIN_DEFAULT      10
@@ -48,8 +44,8 @@ struct cerebrod_config
   /* Set by the user on the command line */
 #if CEREBRO_DEBUG
   int debug;
-#endif /* CEREBRO_DEBUG */
   char *config_file;
+#endif /* CEREBRO_DEBUG */
 
   /* Set by the user in the configuration file */
   int heartbeat_frequency_min;

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_boottime.c,v 1.8 2005-06-22 15:56:13 achu Exp $
+ *  $Id: cerebro_metric_boottime.c,v 1.9 2005-06-22 20:30:09 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -118,6 +118,11 @@ boottime_metric_setup(void)
   return -1;
 }
 
+/*
+ * boottime_metric_cleanup
+ *
+ * boottime metric module cleanup function
+ */
 static int
 boottime_metric_cleanup(void)
 {
@@ -125,12 +130,22 @@ boottime_metric_cleanup(void)
   return 0;
 }
 
+/*
+ * boottime_metric_get_metric_name
+ *
+ * boottime metric module get_metric_name function
+ */
 static char *
 boottime_metric_get_metric_name(void)
 {
   return BOOTTIME_METRIC_NAME;
 }
 
+/*
+ * boottime_metric_get_metric_period
+ *
+ * boottime metric module get_metric_period function
+ */
 static int
 boottime_metric_get_metric_period(void)
 {
@@ -141,6 +156,11 @@ boottime_metric_get_metric_period(void)
   return 0;
 }
 
+/*
+ * boottime_metric_get_metric_value
+ *
+ * boottime metric module get_metric_value function
+ */
 static int
 boottime_metric_get_metric_value(unsigned int *metric_value_type,
                                  unsigned int *metric_value_len,
@@ -173,6 +193,11 @@ boottime_metric_get_metric_value(unsigned int *metric_value_type,
   return 0;
 }
 
+/*
+ * boottime_metric_destroy_metric_value
+ *
+ * boottime metric module destroy_metric_value function
+ */
 static int
 boottime_metric_destroy_metric_value(void *metric_value)
 {

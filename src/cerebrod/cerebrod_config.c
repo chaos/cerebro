@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.106 2005-06-22 18:11:00 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.107 2005-06-22 20:30:09 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -33,7 +33,6 @@
 #include "cerebrod_util.h"
 
 #include "config_util.h"
-#include "error_util.h"
 
 #include "wrappers.h"
 
@@ -54,13 +53,13 @@ extern int config_debug_output;
  */
 struct cerebrod_config conf;
 
-/* 
- * _cerebrod_config_default 
+/*
+ * _cerebrod_set_config_default
  *
  * initialize conf structure with default values.
  */
 static void
-_cerebrod_config_default(void)
+_cerebrod_set_config_default(void)
 {
   memset(&conf, '\0', sizeof(struct cerebrod_config));
 
@@ -89,9 +88,9 @@ _cerebrod_config_default(void)
 #endif /* CEREBRO_DEBUG */
 }
 
-/* 
- * _usage 
- * 
+/*
+ * _usage
+ *
  * output usage and exit
  */
 static void
@@ -109,9 +108,9 @@ _usage(void)
   exit(0);
 }
 
-/* 
- * _version 
- * 
+/*
+ * _version
+ *
  * output version and exit
  */
 static void
@@ -121,13 +120,13 @@ _version(void)
   exit(0);
 }
 
-/* 
- * _cerebrod_cmdline
+/*
+ * _cerebrod_cmdline_arguments_parse
  *
  * parse command line options
  */
 static void
-_cerebrod_cmdline(int argc, char **argv)
+_cerebrod_cmdline_arguments_parse(int argc, char **argv)
 { 
   char c;
   char options[100];
@@ -184,14 +183,15 @@ _cerebrod_cmdline(int argc, char **argv)
     }
 }
 
-/* 
- * _cerebrod_cmdline_check:
+/*
+ * _cerebrod_cmdline_arguments_error_check
  *
- * check validity of command line parameters
+ * check validity of command line arguments
  */
 static void
-_cerebrod_cmdline_check(void)
+_cerebrod_cmdline_arguments_error_check(void)
 {
+#if CEREBRO_DEBUG
   /* Check if the configuration file exists */
   if (conf.config_file)
     {
@@ -206,17 +206,16 @@ _cerebrod_cmdline_check(void)
             cerebro_err_exit("config file '%s' not found", conf.config_file);
         }
     }
-
-  return;
+#endif /* CEREBRO_DEBUG */
 }
 
 /*
- * _cerebrod_config_setup
+ * _cerebrod_load_config
  *
- * load configuration module.
+ * load configuration data
  */
 static void
-_cerebrod_config_setup(void)
+_cerebrod_load_config(void)
 {
   struct cerebro_config conf_l;
 
@@ -226,8 +225,8 @@ _cerebrod_config_setup(void)
 #endif /* CEREBRO_DEBUG */
 
   if (load_config(&conf_l) < 0)
-    cerebro_err_exit("%s(%s:%d): cerebro_config_load",
-		     __FILE__, __FUNCTION__, __LINE__);
+    cerebro_err_exit("%s(%s:%d): load_config", 
+                     __FILE__, __FUNCTION__, __LINE__);
   
   if (conf_l.cerebrod_heartbeat_frequency_flag)
     {
@@ -270,13 +269,12 @@ _cerebrod_config_setup(void)
 }
 
 /*
- * _cerebrod_pre_calculate_config_check
- * 
- * Check configuration settings for errors before analyzing
- * configuration data.
+ * _cerebrod_config_error_check
+ *
+ * Check configuration for errors
  */
 static void
-_cerebrod_pre_calculate_config_check(void)
+_cerebrod_config_error_check(void)
 {
   struct in_addr addr_temp;
   
@@ -342,15 +340,18 @@ _cerebrod_pre_calculate_config_check(void)
 
   if (conf.metric_max <= 0)
     cerebro_err_exit("metric max '%d' invalid", conf.metric_max);
+
+  if (conf.monitor_max <= 0)
+    cerebro_err_exit("monitor max '%d' invalid", conf.monitor_max);
 }
 
 /*
- * _cerebrod_calculate_multicast
- * 
+ * _cerebrod_calculate_multicast_setting
+ *
  * Determine if the heartbeat_destination_ip is a multicast address
  */
 static void
-_cerebrod_calculate_multicast(void)
+_cerebrod_calculate_multicast_setting(void)
 {
   if (strchr(conf.heartbeat_destination_ip, '.'))
     {
@@ -375,12 +376,12 @@ _cerebrod_calculate_multicast(void)
 }
 
 /*
- * _cerebrod_calculate_heartbeat_frequency_ranged
- * 
- * Determine if the heartbeat frequencey is static or ranged
+ * _cerebrod_calculate_heartbeat_frequency_ranged_setting
+ *
+ * Determine if the heartbeat frequency is static or ranged
  */
 static void
-_cerebrod_calculate_heartbeat_frequency_ranged(void)
+_cerebrod_calculate_heartbeat_frequency_ranged_setting(void)
 {
   if (conf.heartbeat_frequency_max > 0)
     conf.heartbeat_frequency_ranged = 1;
@@ -390,7 +391,7 @@ _cerebrod_calculate_heartbeat_frequency_ranged(void)
 
 /*
  * _cerebrod_calculate_heartbeat_destination_ip_in_addr
- * 
+ *
  * Convert the destination ip address from presentable to network order
  */
 static void
@@ -762,8 +763,7 @@ _cerebrod_calculate_in_addr_and_index(char *network_interface,
 /*
  * _cerebrod_calculate_heartbeat_network_interface_in_addr_and_index
  *
- * Calculate the heartbeat ip address and interface index based on the
- * network interface passed in the configuration file.
+ * Calculate the heartbeat ip address and interface index
  */
 static void
 _cerebrod_calculate_heartbeat_network_interface_in_addr_and_index(void)
@@ -774,18 +774,18 @@ _cerebrod_calculate_heartbeat_network_interface_in_addr_and_index(void)
 }
 
 /*
- * _cerebrod_calculate_config
+ * _cerebrod_calculate_configuration_data
  *
- * analyze and calculate configuration based on settings
+ * analyze and calculate configuration data based on values input
  */
 static void
-_cerebrod_calculate_config(void)
+_cerebrod_calculate_configuration_data(void)
 {
   /* Determine if the heartbeat is single or multi casted */
-  _cerebrod_calculate_multicast();
+  _cerebrod_calculate_multicast_setting();
 
   /* Determine if the heartbeat frequencey is ranged or fixed */
-  _cerebrod_calculate_heartbeat_frequency_ranged();
+  _cerebrod_calculate_heartbeat_frequency_ranged_setting();
 
   /* Calculate the destination ip */
   _cerebrod_calculate_heartbeat_destination_ip_in_addr();
@@ -803,13 +803,12 @@ _cerebrod_calculate_config(void)
 }
 
 /*
- * _cerebrod_post_calculate_config_check
- * 
- * Check configuration settings for errors after configuration data
- * has been analyzed.
+ * _cerebrod_configuration_data_error_check
+ *
+ * Check configuration data for errors
  */
 static void
-_cerebrod_post_calculate_config_check(void)
+_cerebrod_configuration_data_error_check(void)
 {
   if (!conf.multicast && conf.listen)
     {
@@ -869,9 +868,9 @@ _cerebrod_post_calculate_config_check(void)
     }
 }
 
-/* 
+/*
  * _cerebrod_config_dump
- * 
+ *
  * Dump configuration data
  */
 static void 
@@ -923,13 +922,12 @@ cerebrod_config_setup(int argc, char **argv)
 {
   assert(argv);
 
-  _cerebrod_config_default();
-  _cerebrod_cmdline(argc, argv);
-  _cerebrod_cmdline_check();
-  _cerebrod_config_setup();
-  _cerebrod_pre_calculate_config_check();
-  _cerebrod_calculate_config();
-  _cerebrod_post_calculate_config_check();
+  _cerebrod_set_config_default();
+  _cerebrod_cmdline_arguments_parse(argc, argv);
+  _cerebrod_cmdline_arguments_error_check();
+  _cerebrod_load_config();
+  _cerebrod_config_error_check();
+  _cerebrod_calculate_configuration_data();
+  _cerebrod_configuration_data_error_check();
   _cerebrod_config_dump();
 }
-

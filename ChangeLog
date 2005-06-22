@@ -1,8 +1,8 @@
 2005-06-22  Albert Chu  <chu11@llnl.gov>
 
-	* Remove pointless comments.
+	* Removed raw data metric.
 
-	* tagged pre-metric-update-thread-1
+	* Various cleanup.
 
 2005-06-21  Albert Chu  <chu11@llnl.gov>
 

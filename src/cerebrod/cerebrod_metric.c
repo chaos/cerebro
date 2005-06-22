@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric.c,v 1.40 2005-06-21 22:29:07 achu Exp $
+ *  $Id: cerebrod_metric.c,v 1.41 2005-06-22 20:30:09 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -151,7 +151,6 @@ _cerebrod_metric_response_marshall(struct cerebro_metric_response *res,
           count += len;
           break;
         case CEREBRO_METRIC_VALUE_TYPE_STRING:
-        case CEREBRO_METRIC_VALUE_TYPE_RAW:
           len = Marshall_buffer(res->metric_value,
                                 res->metric_value_len,
                                 buf + count,

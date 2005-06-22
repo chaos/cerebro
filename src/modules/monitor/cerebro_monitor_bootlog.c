@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_monitor_bootlog.c,v 1.12 2005-06-22 18:11:00 achu Exp $
+ *  $Id: cerebro_monitor_bootlog.c,v 1.13 2005-06-22 20:30:09 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -182,6 +182,11 @@ bootlog_monitor_setup(void)
   return -1;
 }
 
+/*
+ * bootlog_monitor_cleanup
+ *
+ * bootlog monitor module cleanup function
+ */
 static int
 bootlog_monitor_cleanup(void)
 {
@@ -193,6 +198,11 @@ bootlog_monitor_cleanup(void)
   return 0;
 }
 
+/*
+ * bootlog_monitor_metric_name
+ *
+ * bootlog monitor module metric_name function
+ */
 static char *
 bootlog_monitor_metric_name(void)
 {
@@ -317,6 +327,13 @@ _check_if_new_btime(const char *nodename, u_int32_t btime)
   return -1;
 }
 
+
+/*
+ * bootlog_monitor_metric_name
+ *
+ * bootlog monitor module metric_name function.  Store results the
+ * bootlog database appropriately.
+ */
 static int 
 bootlog_monitor_metric_update(const char *nodename,
                               unsigned int metric_value_type,

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_heartbeat.c,v 1.39 2005-06-21 22:29:07 achu Exp $
+ *  $Id: cerebrod_heartbeat.c,v 1.40 2005-06-22 20:30:09 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -23,11 +23,6 @@ extern struct cerebrod_config conf;
 extern pthread_mutex_t debug_output_mutex;
 #endif /* CEREBRO_DEBUG */
 
-/*
- * cerebrod_heartbeat_destroy
- *
- * destroy a heartbeat packet
- */
 void
 cerebrod_heartbeat_destroy(struct cerebrod_heartbeat *hb)
 {
@@ -109,8 +104,6 @@ cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb)
               fprintf(stderr, "metric_value = %s", buf);
               Free(buf);
               break;
-            case CEREBRO_METRIC_VALUE_TYPE_RAW:
-              /* Don't output raw data */
             default:
               break;
             }

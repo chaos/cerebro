@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker_data.c,v 1.4 2005-06-21 22:29:07 achu Exp $
+ *  $Id: cerebrod_speaker_data.c,v 1.5 2005-06-22 20:30:09 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -283,7 +283,7 @@ cerebrod_speaker_data_get_metric_data(struct cerebrod_heartbeat *hb,
         }
 
       if (!(hd->metric_value_type >= CEREBRO_METRIC_VALUE_TYPE_NONE
-            && hd->metric_value_type <= CEREBRO_METRIC_VALUE_TYPE_RAW))
+            && hd->metric_value_type <= CEREBRO_METRIC_VALUE_TYPE_STRING))
         {
           cerebro_err_debug("%s(%s:%d): "
                             "metric_module_get_metric_value "

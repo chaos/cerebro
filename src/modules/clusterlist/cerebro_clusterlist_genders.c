@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_genders.c,v 1.25 2005-06-22 15:56:13 achu Exp $
+ *  $Id: cerebro_clusterlist_genders.c,v 1.26 2005-06-22 20:30:09 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -24,8 +24,18 @@
 
 #define GENDERS_CLUSTERLIST_MODULE_NAME "genders"
 
+/*
+ * genders_handle
+ *
+ * genders handle
+ */
 static genders_t genders_handle = NULL;
 
+/*
+ * genders_clusterlist_setup
+ *
+ * genders clusterlist module setup function
+ */
 static int 
 genders_clusterlist_setup(void)
 {
@@ -39,6 +49,11 @@ genders_clusterlist_setup(void)
   return cerebro_clusterlist_genders_setup(&genders_handle);
 }
 
+/*
+ * genders_clusterlist_cleanup
+ *
+ * genders clusterlist module cleanup function
+ */
 static int
 genders_clusterlist_cleanup(void)
 {
@@ -48,6 +63,11 @@ genders_clusterlist_cleanup(void)
   return cerebro_clusterlist_genders_cleanup(&genders_handle);
 }
 
+/*
+ * genders_clusterlist_numnodes
+ *
+ * genders clusterlist module numnodes function
+ */
 static int 
 genders_clusterlist_numnodes(void)
 {
@@ -61,6 +81,11 @@ genders_clusterlist_numnodes(void)
   return cerebro_clusterlist_genders_numnodes(genders_handle);
 }
 
+/*
+ * genders_clusterlist_get_all_nodes
+ *
+ * genders clusterlist module get_all_nodes function
+ */
 static int
 genders_clusterlist_get_all_nodes(char ***nodes)
 {
@@ -82,6 +107,11 @@ genders_clusterlist_get_all_nodes(char ***nodes)
                                                    nodes);
 }
 
+/*
+ * genders_clusterlist_node_in_cluster
+ *
+ * genders clusterlist module node_in_cluster function
+ */
 static int
 genders_clusterlist_node_in_cluster(const char *node)
 {
@@ -128,6 +158,11 @@ genders_clusterlist_node_in_cluster(const char *node)
   return flag;
 }
 
+/*
+ * genders_clusterlist_get_nodename
+ *
+ * genders clusterlist module get_nodename function
+ */
 static int
 genders_clusterlist_get_nodename(const char *node, 
 				 char *buf, 

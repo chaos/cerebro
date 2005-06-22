@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.1 2005-06-17 22:58:30 achu Exp $
+ *  $Id: cerebro.h,v 1.2 2005-06-22 20:30:09 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_H
@@ -62,7 +62,6 @@
 #define CEREBRO_METRIC_VALUE_TYPE_FLOAT    3
 #define CEREBRO_METRIC_VALUE_TYPE_DOUBLE   4
 #define CEREBRO_METRIC_VALUE_TYPE_STRING   5
-#define CEREBRO_METRIC_VALUE_TYPE_RAW      6
 
 typedef struct cerebro *cerebro_t;
 
