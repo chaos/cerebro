@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_monitor_bootlog.c,v 1.11 2005-06-22 15:56:13 achu Exp $
+ *  $Id: cerebro_monitor_bootlog.c,v 1.12 2005-06-22 18:11:00 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -49,7 +49,7 @@ _qsql_query(char *fmt, ...)
   if (!qsql_handle)
     {
       cerebro_err_debug("%s(%s:%d): qsql_handle null",
-			__FILE__, __FUNCTION__, __LINE__);
+                        __FILE__, __FUNCTION__, __LINE__);
       return -1;
     }
 

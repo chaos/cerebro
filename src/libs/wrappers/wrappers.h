@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.h,v 1.1 2005-06-21 22:29:07 achu Exp $
+ *  $Id: wrappers.h,v 1.2 2005-06-22 18:11:00 achu Exp $
 \*****************************************************************************/
 
 #ifndef _WRAPPERS_H
@@ -66,10 +66,10 @@
 #define Strncpy(dest, src, n) \
         wrap_strncpy(__FILE__, __FUNCTION__, __LINE__, dest, src, n)
 
-void * wrap_malloc(const char *file, const char *function, int line, size_t size);
-void wrap_free(const char *file, const char *function, int line, void *ptr);
-char * wrap_strdup(const char *file, const char *function, int line, const char *s);
-char * wrap_strncpy(const char *file, const char *function, int line, char *dest, const char *src, size_t n);
+void * wrap_malloc(const char *file, const char *function, unsigned int line, size_t size);
+void wrap_free(const char *file, const char *function, unsigned int line, void *ptr);
+char * wrap_strdup(const char *file, const char *function, unsigned int line, const char *s);
+char * wrap_strncpy(const char *file, const char *function, unsigned int line, char *dest, const char *src, size_t n);
 
 /* Special wrapper for List/Hash libraries */
 void _Free(void *ptr);
@@ -96,15 +96,15 @@ void _Free(void *ptr);
 #define Closedir(dir) \
         wrap_closedir(__FILE__, __FUNCTION__, __LINE__, dir)
 
-int wrap_open(const char *file, const char *function, int line, const char *pathname, int flags, int mode);
-int wrap_close(const char *file, const char *function, int line, int fd);
-ssize_t wrap_read(const char *file, const char *function, int line, int fd, void *buf, size_t count);
-ssize_t wrap_write(const char *file, const char *function, int line, int fd, const void *buf, size_t count);
-int wrap_chdir(const char *file, const char *function, int line, const char *path);
-int wrap_stat(const char *file, const char *function, int line, const char *path, struct stat *buf);
-mode_t wrap_umask(const char *file, const char *function, int line, mode_t mask);
-DIR *wrap_opendir(const char *file, const char *function, int line, const char *name);
-int wrap_closedir(const char *file, const char *function, int line, DIR *dir);
+int wrap_open(const char *file, const char *function, unsigned int line, const char *pathname, int flags, int mode);
+int wrap_close(const char *file, const char *function, unsigned int line, int fd);
+ssize_t wrap_read(const char *file, const char *function, unsigned int line, int fd, void *buf, size_t count);
+ssize_t wrap_write(const char *file, const char *function, unsigned int line, int fd, const void *buf, size_t count);
+int wrap_chdir(const char *file, const char *function, unsigned int line, const char *path);
+int wrap_stat(const char *file, const char *function, unsigned int line, const char *path, struct stat *buf);
+mode_t wrap_umask(const char *file, const char *function, unsigned int line, mode_t mask);
+DIR *wrap_opendir(const char *file, const char *function, unsigned int line, const char *name);
+int wrap_closedir(const char *file, const char *function, unsigned int line, DIR *dir);
 
 /* 
  * Networking Wrappers 
@@ -134,18 +134,18 @@ int wrap_closedir(const char *file, const char *function, int line, DIR *dir);
 #define Inet_pton(af, src, dst) \
         wrap_inet_pton(__FILE__, __FUNCTION__, __LINE__, af, src, dst)
 
-int wrap_socket(const char *file, const char *function, int line, int domain, int type, int protocol);
-int wrap_bind(const char *file, const char *function, int line, int sockfd, struct sockaddr *my_addr, socklen_t addrlen);
-int wrap_connect(const char *file, const char *function, int line, int sockfd, struct sockaddr *serv_addr, socklen_t addrlen);
-int wrap_listen(const char *file, const char *function, int line, int s, int backlog);
-int wrap_accept(const char *file, const char *function, int line, int s, struct sockaddr *addr, socklen_t *addrlen);
-int wrap_select(const char *file, const char *function, int line, int n, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout);
-int wrap_poll(const char *file, const char *function, int line, struct pollfd *ufds, unsigned int nfds, int timeout);
-int wrap_getsockopt(const char *file, const char *function, int line, int s, int level, int optname, void *optval, socklen_t *optlen);
-int wrap_setsockopt(const char *file, const char *function, int line, int s, int level, int optname, const void *optval, socklen_t optlen);
-struct hostent *wrap_gethostbyname(const char *file, const char *function, int line, const char *name);
-const char *wrap_inet_ntop(const char *file, const char *function, int line, int af, const void *src, char *dst, socklen_t cnt);
-int wrap_inet_pton(const char *file, const char *function, int line, int af, const char *src, void *dst);
+int wrap_socket(const char *file, const char *function, unsigned int line, int domain, int type, int protocol);
+int wrap_bind(const char *file, const char *function, unsigned int line, int sockfd, struct sockaddr *my_addr, socklen_t addrlen);
+int wrap_connect(const char *file, const char *function, unsigned int line, int sockfd, struct sockaddr *serv_addr, socklen_t addrlen);
+int wrap_listen(const char *file, const char *function, unsigned int line, int s, int backlog);
+int wrap_accept(const char *file, const char *function, unsigned int line, int s, struct sockaddr *addr, socklen_t *addrlen);
+int wrap_select(const char *file, const char *function, unsigned int line, int n, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout);
+int wrap_poll(const char *file, const char *function, unsigned int line, struct pollfd *ufds, unsigned int nfds, int timeout);
+int wrap_getsockopt(const char *file, const char *function, unsigned int line, int s, int level, int optname, void *optval, socklen_t *optlen);
+int wrap_setsockopt(const char *file, const char *function, unsigned int line, int s, int level, int optname, const void *optval, socklen_t optlen);
+struct hostent *wrap_gethostbyname(const char *file, const char *function, unsigned int line, const char *name);
+const char *wrap_inet_ntop(const char *file, const char *function, unsigned int line, int af, const void *src, char *dst, socklen_t cnt);
+int wrap_inet_pton(const char *file, const char *function, unsigned int line, int af, const char *src, void *dst);
 
 /* 
  * Time Wrappers 
@@ -159,10 +159,10 @@ int wrap_inet_pton(const char *file, const char *function, int line, int af, con
 #define Gettimeofday(tv, tz) \
         wrap_gettimeofday(__FILE__, __FUNCTION__, __LINE__, tv, tz)
 
-int wrap_gettimeofday(const char *file, const char *function, int line, struct timeval *tv, struct timezone *tz);
-time_t wrap_time(const char *file, const char *function, int line, time_t *t);
-struct tm *wrap_localtime(const char *file, const char *function, int line, const time_t *timep);
-struct tm *wrap_localtime_r(const char *file, const char *function, int line, const time_t *timep, struct tm *result);
+int wrap_gettimeofday(const char *file, const char *function, unsigned int line, struct timeval *tv, struct timezone *tz);
+time_t wrap_time(const char *file, const char *function, unsigned int line, time_t *t);
+struct tm *wrap_localtime(const char *file, const char *function, unsigned int line, const time_t *timep);
+struct tm *wrap_localtime_r(const char *file, const char *function, unsigned int line, const time_t *timep, struct tm *result);
 
 /* 
  * Pthread Wrappers 
@@ -188,16 +188,16 @@ struct tm *wrap_localtime_r(const char *file, const char *function, int line, co
 #define Pthread_cond_wait(cond, mutex) \
         wrap_pthread_cond_wait(__FILE__, __FUNCTION__, __LINE__, cond, mutex)
 
-int wrap_pthread_create(const char *file, const char *function, int line, pthread_t *thread, pthread_attr_t *attr, void *(*start_routine)(void *), void *arg);
-int wrap_pthread_attr_init(const char *file, const char *function, int line, pthread_attr_t *attr);
-int wrap_pthread_attr_destroy(const char *file, const char *function, int line, pthread_attr_t *attr);
-int wrap_pthread_attr_setdetachstate(const char *file, const char *function, int line, pthread_attr_t *attr, int detachstate);
-int wrap_pthread_mutex_lock(const char *file, const char *function, int line, pthread_mutex_t *mutex);
-int wrap_pthread_mutex_trylock(const char *file, const char *function, int line, pthread_mutex_t *mutex);
-int wrap_pthread_mutex_unlock(const char *file, const char *function, int line, pthread_mutex_t *mutex);
-int wrap_pthread_mutex_init(const char *file, const char *function, int line, pthread_mutex_t *mutex, const pthread_mutexattr_t *mutexattr);
-int wrap_pthread_cond_signal(const char *file, const char *function, int line, pthread_cond_t *cond);
-int wrap_pthread_cond_wait(const char *file, const char *function, int line, pthread_cond_t *cond, pthread_mutex_t *mutex);
+int wrap_pthread_create(const char *file, const char *function, unsigned int line, pthread_t *thread, pthread_attr_t *attr, void *(*start_routine)(void *), void *arg);
+int wrap_pthread_attr_init(const char *file, const char *function, unsigned int line, pthread_attr_t *attr);
+int wrap_pthread_attr_destroy(const char *file, const char *function, unsigned int line, pthread_attr_t *attr);
+int wrap_pthread_attr_setdetachstate(const char *file, const char *function, unsigned int line, pthread_attr_t *attr, int detachstate);
+int wrap_pthread_mutex_lock(const char *file, const char *function, unsigned int line, pthread_mutex_t *mutex);
+int wrap_pthread_mutex_trylock(const char *file, const char *function, unsigned int line, pthread_mutex_t *mutex);
+int wrap_pthread_mutex_unlock(const char *file, const char *function, unsigned int line, pthread_mutex_t *mutex);
+int wrap_pthread_mutex_init(const char *file, const char *function, unsigned int line, pthread_mutex_t *mutex, const pthread_mutexattr_t *mutexattr);
+int wrap_pthread_cond_signal(const char *file, const char *function, unsigned int line, pthread_cond_t *cond);
+int wrap_pthread_cond_wait(const char *file, const char *function, unsigned int line, pthread_cond_t *cond, pthread_mutex_t *mutex);
 
 /* 
  * Misc System Call Wrappers 
@@ -211,9 +211,9 @@ int wrap_pthread_cond_wait(const char *file, const char *function, int line, pth
 
 typedef void (*Sighandler_t)(int);
 
-pid_t wrap_fork(const char *file, const char *function, int line);
-Sighandler_t wrap_signal(const char *file, const char *function, int line, int signum, Sighandler_t handler);
-int wrap_gethostname(const char *file, const char *function, int line, char *name, size_t len);
+pid_t wrap_fork(const char *file, const char *function, unsigned int line);
+Sighandler_t wrap_signal(const char *file, const char *function, unsigned int line, int signum, Sighandler_t handler);
+int wrap_gethostname(const char *file, const char *function, unsigned int line, char *name, size_t len);
 
 /*
  * ltdl wrappers
@@ -230,11 +230,11 @@ int wrap_gethostname(const char *file, const char *function, int line, char *nam
 #define Lt_dlclose(handle) \
         wrap_lt_dlclose(__FILE__, __FUNCTION__, __LINE__, handle)
 
-int wrap_lt_dlinit(const char *file, const char *function, int line);
-int wrap_lt_dlexit(const char *file, const char *function, int line);
-lt_dlhandle wrap_lt_dlopen(const char *file, const char *function, int line, const char *filename);
-lt_ptr wrap_lt_dlsym(const char *file, const char *function, int line, void *handle, char *symbol);
-int wrap_lt_dlclose(const char *file, const char *function, int line, void *handle);
+int wrap_lt_dlinit(const char *file, const char *function, unsigned int line);
+int wrap_lt_dlexit(const char *file, const char *function, unsigned int line);
+lt_dlhandle wrap_lt_dlopen(const char *file, const char *function, unsigned int line, const char *filename);
+lt_ptr wrap_lt_dlsym(const char *file, const char *function, unsigned int line, void *handle, char *symbol);
+int wrap_lt_dlclose(const char *file, const char *function, unsigned int line, void *handle);
 
 /* 
  * List lib wrappers 
@@ -258,15 +258,15 @@ int wrap_lt_dlclose(const char *file, const char *function, int line, void *hand
 #define List_iterator_destroy(i) \
         wrap_list_iterator_destroy(__FILE__, __FUNCTION__, __LINE__, i)
 
-List wrap_list_create(const char *file, const char *function, int line, ListDelF f);
-void wrap_list_destroy(const char *file, const char *function, int line, List l);
-int wrap_list_count(const char *file, const char *function, int line, List l);
-void *wrap_list_append (const char *file, const char *function, int line, List l, void *x);
-void * wrap_list_find_first (const char *file, const char *function, int line, List l, ListFindF f, void *key);
-int wrap_list_delete_all(const char *file, const char *function, int line, List l, ListFindF f, void *key);
-int wrap_list_for_each(const char *file, const char *function, int line, List l, ListForF f, void *arg);
-ListIterator wrap_list_iterator_create(const char *file, const char *function, int line, List l);
-void wrap_list_iterator_destroy(const char *file, const char *function, int line, ListIterator i);
+List wrap_list_create(const char *file, const char *function, unsigned int line, ListDelF f);
+void wrap_list_destroy(const char *file, const char *function, unsigned int line, List l);
+int wrap_list_count(const char *file, const char *function, unsigned int line, List l);
+void *wrap_list_append (const char *file, const char *function, unsigned int line, List l, void *x);
+void * wrap_list_find_first (const char *file, const char *function, unsigned int line, List l, ListFindF f, void *key);
+int wrap_list_delete_all(const char *file, const char *function, unsigned int line, List l, ListFindF f, void *key);
+int wrap_list_for_each(const char *file, const char *function, unsigned int line, List l, ListForF f, void *arg);
+ListIterator wrap_list_iterator_create(const char *file, const char *function, unsigned int line, List l);
+void wrap_list_iterator_destroy(const char *file, const char *function, unsigned int line, ListIterator i);
 
 /* 
  * Hash lib wrappers 
@@ -288,14 +288,14 @@ void wrap_list_iterator_destroy(const char *file, const char *function, int line
 #define Hash_destroy(h) \
         wrap_hash_destroy(__FILE__, __FUNCTION__, __LINE__, h)
 
-hash_t wrap_hash_create (const char *file, const char *function, int line, int size, hash_key_f key_f, hash_cmp_f cmp_f, hash_del_f del_f);
-int wrap_hash_count(const char *file, const char *function, int line, hash_t h);
-void *wrap_hash_find(const char *file, const char *function, int line, hash_t h, const void *key);
-void *wrap_hash_insert(const char *file, const char *function, int line, hash_t h, const void *key, void *data);
-void *wrap_hash_remove (const char *file, const char *function, int line, hash_t h, const void *key);
-int wrap_hash_delete_if(const char *file, const char *function, int line, hash_t h, hash_arg_f argf, void *arg);
-int wrap_hash_for_each(const char *file, const char *function, int line, hash_t h, hash_arg_f argf, void *arg);
-void wrap_hash_destroy(const char *file, const char *function, int line, hash_t h);
+hash_t wrap_hash_create (const char *file, const char *function, unsigned int line, int size, hash_key_f key_f, hash_cmp_f cmp_f, hash_del_f del_f);
+int wrap_hash_count(const char *file, const char *function, unsigned int line, hash_t h);
+void *wrap_hash_find(const char *file, const char *function, unsigned int line, hash_t h, const void *key);
+void *wrap_hash_insert(const char *file, const char *function, unsigned int line, hash_t h, const void *key, void *data);
+void *wrap_hash_remove (const char *file, const char *function, unsigned int line, hash_t h, const void *key);
+int wrap_hash_delete_if(const char *file, const char *function, unsigned int line, hash_t h, hash_arg_f argf, void *arg);
+int wrap_hash_for_each(const char *file, const char *function, unsigned int line, hash_t h, hash_arg_f argf, void *arg);
+void wrap_hash_destroy(const char *file, const char *function, unsigned int line, hash_t h);
 
 /* 
  * Marshall wrappers
@@ -330,20 +330,20 @@ void wrap_hash_destroy(const char *file, const char *function, int line, hash_t 
 #define Unmarshall_buffer(val, vallen, buf, buflen) \
         wrap_unmarshall_buffer(__FILE__, __FUNCTION__, __LINE__, val, vallen, buf, buflen)
 
-int wrap_marshall_int8(const char *file, const char *function, int line, int8_t val, char *buf, unsigned int buflen);
-int wrap_marshall_int32(const char *file, const char *function, int line, int32_t val, char *buf, unsigned int buflen);
-int wrap_marshall_u_int8(const char *file, const char *function, int line, u_int8_t val, char *buf, unsigned int buflen);
-int wrap_marshall_u_int32(const char *file, const char *function, int line, u_int32_t val, char *buf, unsigned int buflen);
-int wrap_marshall_float(const char *file, const char *function, int line, float val, char *buf, unsigned int buflen);
-int wrap_marshall_double(const char *file, const char *function, int line, double val, char *buf, unsigned int buflen);
-int wrap_marshall_buffer(const char *file, const char *function, int line, const char *val, unsigned int vallen, char *buf, unsigned int buflen);
-int wrap_unmarshall_int8(const char *file, const char *function, int line, int8_t *val, const char *buf, unsigned int buflen);
-int wrap_unmarshall_int32(const char *file, const char *function, int line, int32_t *val, const char *buf, unsigned int buflen);
-int wrap_unmarshall_u_int8(const char *file, const char *function, int line, u_int8_t *val, const char *buf, unsigned int buflen);
-int wrap_unmarshall_u_int32(const char *file, const char *function, int line, u_int32_t *val, const char *buf, unsigned int buflen);
-int wrap_unmarshall_float(const char *file, const char *function, int line, float *val, const char *buf, unsigned int buflen);
-int wrap_unmarshall_double(const char *file, const char *function, int line, double *val, const char *buf, unsigned int buflen);
-int wrap_unmarshall_buffer(const char *file, const char *function, int line, char *val, unsigned int vallen, const char *buf, unsigned int buflen);
+int wrap_marshall_int8(const char *file, const char *function, unsigned int line, int8_t val, char *buf, unsigned int buflen);
+int wrap_marshall_int32(const char *file, const char *function, unsigned int line, int32_t val, char *buf, unsigned int buflen);
+int wrap_marshall_u_int8(const char *file, const char *function, unsigned int line, u_int8_t val, char *buf, unsigned int buflen);
+int wrap_marshall_u_int32(const char *file, const char *function, unsigned int line, u_int32_t val, char *buf, unsigned int buflen);
+int wrap_marshall_float(const char *file, const char *function, unsigned int line, float val, char *buf, unsigned int buflen);
+int wrap_marshall_double(const char *file, const char *function, unsigned int line, double val, char *buf, unsigned int buflen);
+int wrap_marshall_buffer(const char *file, const char *function, unsigned int line, const char *val, unsigned int vallen, char *buf, unsigned int buflen);
+int wrap_unmarshall_int8(const char *file, const char *function, unsigned int line, int8_t *val, const char *buf, unsigned int buflen);
+int wrap_unmarshall_int32(const char *file, const char *function, unsigned int line, int32_t *val, const char *buf, unsigned int buflen);
+int wrap_unmarshall_u_int8(const char *file, const char *function, unsigned int line, u_int8_t *val, const char *buf, unsigned int buflen);
+int wrap_unmarshall_u_int32(const char *file, const char *function, unsigned int line, u_int32_t *val, const char *buf, unsigned int buflen);
+int wrap_unmarshall_float(const char *file, const char *function, unsigned int line, float *val, const char *buf, unsigned int buflen);
+int wrap_unmarshall_double(const char *file, const char *function, unsigned int line, double *val, const char *buf, unsigned int buflen);
+int wrap_unmarshall_buffer(const char *file, const char *function, unsigned int line, char *val, unsigned int vallen, const char *buf, unsigned int buflen);
 
    
 #endif /* _WRAPPERS_H */

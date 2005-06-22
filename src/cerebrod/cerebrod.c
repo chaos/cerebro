@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.64 2005-06-21 22:29:07 achu Exp $
+ *  $Id: cerebrod.c,v 1.65 2005-06-22 18:11:00 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -37,6 +37,13 @@
 pthread_mutex_t debug_output_mutex = PTHREAD_MUTEX_INITIALIZER;
 #endif /* CEREBRO_DEBUG */
 
+/*
+ * clusterlist_handle
+ *
+ * Handle for clusterlist module
+ */
+clusterlist_module_t clusterlist_handle;
+
 extern struct cerebrod_config conf;
 
 extern int cerebrod_listener_initialization_complete;
@@ -48,17 +55,6 @@ extern pthread_cond_t cerebrod_metric_initialization_complete_cond;
 extern pthread_mutex_t cerebrod_metric_initialization_complete_lock;
 
 /* 
- * _cerebrod_pre_config_initialization
- *
- * Perform initialization routines prior to configuring cerebrod
- */
-static void
-_cerebrod_pre_config_initialization(void)
-{
-  /* Nothing to do */
-}
-
-/* 
  * _cerebrod_post_config_initialization
  *
  * Perform initialization routines after configuration is determined
@@ -66,8 +62,12 @@ _cerebrod_pre_config_initialization(void)
 static void
 _cerebrod_post_config_initialization(void)
 {
-  if (cerebrod_clusterlist_module_setup() < 0)
-    cerebro_err_exit("%s(%s:%d): cerebrod_clusterlist_module_setup",
+  if (!(clusterlist_handle = clusterlist_module_load()))
+    cerebro_err_exit("%s(%s:%d): clusterlist_module_load",
+                     __FILE__, __FUNCTION__, __LINE__);
+  
+  if (clusterlist_module_setup(clusterlist_handle) < 0)
+    cerebro_err_exit("%s(%s:%d): clusterlist_module_setup",
                      __FILE__, __FUNCTION__, __LINE__);
 
   if (conf.metric_server)

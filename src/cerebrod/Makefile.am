@@ -1,11 +1,10 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.56 2005-06-21 22:29:07 achu Exp $
+## $Id: Makefile.am,v 1.57 2005-06-22 18:11:00 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
 
 noinst_HEADERS = cerebrod.h \
-		 cerebrod_clusterlist.h \
 		 cerebrod_config.h \
                  cerebrod_daemon.h \
 		 cerebrod_heartbeat.h \
@@ -22,7 +21,6 @@ noinst_HEADERS = cerebrod.h \
 
 sbin_PROGRAMS    = cerebrod
 cerebrod_SOURCES = cerebrod.c \
-		   cerebrod_clusterlist.c \
 		   cerebrod_config.c \
                    cerebrod_daemon.c \
 		   cerebrod_heartbeat.c \
