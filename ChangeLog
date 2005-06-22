@@ -4,6 +4,8 @@
 
 	* Various cleanup.
 
+	* tagged pre-metric-thread-1
+
 2005-06-21  Albert Chu  <chu11@llnl.gov>
 
 	* Begin work on speaker scheduler.
