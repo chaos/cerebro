@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: metric_module.h,v 1.2 2005-06-21 19:16:56 achu Exp $
+ *  $Id: metric_module.h,v 1.3 2005-06-22 21:40:44 achu Exp $
 \*****************************************************************************/
 
 #ifndef _METRIC_MODULE_H
@@ -91,5 +91,15 @@ int metric_module_get_metric_value(metric_modules_t metric_handle,
 int metric_module_destroy_metric_value(metric_modules_t metric_handle,
 				       unsigned int index,
 				       void *metric_value);
+
+/*
+ * metric_module_get_metric_thread
+ *
+ * call metric module get_metric_thread function
+ *
+ * Returns 0 on success, -1 on error
+ */
+Cerebro_metric_thread_pointer metric_module_get_metric_thread(metric_modules_t metric_handle,
+                                                              unsigned int index);
 
 #endif /* _METRIC_MODULE_H */

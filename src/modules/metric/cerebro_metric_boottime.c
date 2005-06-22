@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_boottime.c,v 1.9 2005-06-22 20:30:09 achu Exp $
+ *  $Id: cerebro_metric_boottime.c,v 1.10 2005-06-22 21:40:44 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -204,6 +204,17 @@ boottime_metric_destroy_metric_value(void *metric_value)
   return 0;
 }
 
+/*
+ * boottime_metric_get_metric_thread
+ *
+ * boottime metric module get_metric_thread function
+ */
+static Cerebro_metric_thread_pointer
+boottime_metric_get_metric_thread(void)
+{
+  return NULL;
+}
+
 struct cerebro_metric_module_info metric_module_info =
   {
     BOOTTIME_METRIC_MODULE_NAME,
@@ -213,4 +224,5 @@ struct cerebro_metric_module_info metric_module_info =
     &boottime_metric_get_metric_period,
     &boottime_metric_get_metric_value,
     &boottime_metric_destroy_metric_value,
+    &boottime_metric_get_metric_thread,
   };

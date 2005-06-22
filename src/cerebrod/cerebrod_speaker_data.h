@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker_data.h,v 1.2 2005-06-21 20:49:02 achu Exp $
+ *  $Id: cerebrod_speaker_data.h,v 1.3 2005-06-22 21:40:44 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_SPEAKER_DATA_H
@@ -7,6 +7,7 @@
 
 #include <sys/types.h>
  
+#include "cerebro/cerebro_metric_module.h"
 #include "cerebro/cerebrod_heartbeat_protocol.h"
 
 /*
@@ -18,6 +19,7 @@ struct cerebrod_speaker_metric_module
 {
   char *metric_name;
   u_int32_t metric_period;
+  Cerebro_metric_thread_pointer thread_pointer;
   int index;
   u_int32_t next_call_time;
 };

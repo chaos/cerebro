@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: metric_module.c,v 1.2 2005-06-21 19:16:56 achu Exp $
+ *  $Id: metric_module.c,v 1.3 2005-06-22 21:40:44 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -160,6 +160,13 @@ _metric_module_loader(void *handle, char *module)
       goto cleanup;
     }
 
+  if (!module_info->get_metric_thread)
+    {
+      cerebro_err_debug("metric module '%s': get_metric_thread null",
+			module_info->metric_module_name);
+      goto cleanup;
+    }
+
   if (metric_handle->modules_count < metric_handle->modules_max)
     {
       metric_handle->dl_handle[metric_handle->modules_count] = dl_handle;
@@ -179,7 +186,7 @@ metric_modules_load(unsigned int modules_max)
 {
   struct metric_module *metric_handle = NULL;
   int rv;
-                                                                                      
+
   if (!modules_max)
     {
       cerebro_err_debug("%s(%s:%d): modules_max invalid",
@@ -416,3 +423,17 @@ metric_module_destroy_metric_value(metric_modules_t metric_handle,
   
   return ((*(metric_handle->module_info[index])->destroy_metric_value)(metric_value));
 }
+
+Cerebro_metric_thread_pointer 
+metric_module_get_metric_thread(metric_modules_t metric_handle,
+                                unsigned int index)
+{
+  if (metric_module_handle_check(metric_handle) < 0)
+    return NULL;
+  
+  if (!(index < metric_handle->modules_count))
+    return NULL;
+  
+  return ((*(metric_handle->module_info[index])->get_metric_thread)());
+}
+

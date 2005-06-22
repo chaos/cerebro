@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker_data.c,v 1.5 2005-06-22 20:30:09 achu Exp $
+ *  $Id: cerebrod_speaker_data.c,v 1.6 2005-06-22 21:40:44 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -129,7 +129,8 @@ cerebrod_speaker_data_initialize(void)
       struct cerebrod_speaker_metric_module *metric_module;
       char *metric_name;
       int metric_period;
-
+      Cerebro_metric_thread_pointer thread_pointer;
+      
 #if CEREBRO_DEBUG
       if (conf.debug && conf.speak_debug)
         {
@@ -168,14 +169,28 @@ cerebrod_speaker_data_initialize(void)
           continue;
         }
 
+      thread_pointer = metric_module_get_metric_thread(metric_handle, i);
+      
       metric_module = Malloc(sizeof(struct cerebrod_speaker_metric_module));
       metric_module->metric_name = metric_name;
       metric_module->metric_period = metric_period;
+      metric_module->thread_pointer = thread_pointer;
       metric_module->index = i;
       /* Initialize to 0, so data is sent on the first heartbeat */
       metric_module->next_call_time = 0;
       List_append(metric_list, metric_module);
       metric_list_size++;
+
+      if (metric_module->thread_pointer)
+        {          
+          pthread_t thread;
+          pthread_attr_t attr;
+          
+          Pthread_attr_init(&attr);
+          Pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+          Pthread_create(&thread, &attr, metric_module->thread_pointer, NULL);
+          Pthread_attr_destroy(&attr);
+        }
     }
   
   if (!metric_list_size)

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_module.h,v 1.3 2005-06-21 20:29:10 achu Exp $
+ *  $Id: cerebro_metric_module.h,v 1.4 2005-06-22 21:40:44 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_METRIC_MODULE_H
@@ -71,6 +71,30 @@ typedef int (*Cerebro_metric_get_metric_value)(unsigned int *metric_value_type,
  */
 typedef int (*Cerebro_metric_destroy_metric_value)(void *metric_value);
 
+/* 
+ * Cerebro_metric_thread_pointer
+ *
+ * function prototype for a thread which can be passed to
+ * pthread_create
+ */
+typedef void *(*Cerebro_metric_thread_pointer)(void *arg);
+
+/*
+ * Cerebro_metric_get_metric_thread
+ *
+ * function prototype for metric module function that will return a
+ * pointer to function that will be executed as a detached thread.
+ * This thread can perform any metric monitoring duties it pleases.
+ * Typically the thread is used to watch or monitor for some event,
+ * and after that occurs, it will update the metric value that the
+ * cerebrod daemon should then propogate. If a metric_thread is not
+ * needed, this function can return NULL.  Required to be defined by
+ * each metric module.
+ *
+ * Returns 0 on success, -1 on error
+ */
+typedef Cerebro_metric_thread_pointer (*Cerebro_metric_get_metric_thread)(void);
+
 /*
  * struct cerebro_metric_module_info 
  * 
@@ -86,6 +110,7 @@ struct cerebro_metric_module_info
   Cerebro_metric_get_metric_period get_metric_period;
   Cerebro_metric_get_metric_value get_metric_value;
   Cerebro_metric_destroy_metric_value destroy_metric_value;
+  Cerebro_metric_get_metric_thread get_metric_thread;
 };
 
 #endif /* _CEREBRO_METRIC_MODULE_H */
