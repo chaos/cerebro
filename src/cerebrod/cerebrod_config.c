@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.107 2005-06-22 20:30:09 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.108 2005-06-22 23:37:10 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -65,8 +65,8 @@ _cerebrod_set_config_default(void)
 
 #if CEREBRO_DEBUG
   conf.debug = CEREBROD_DEBUG_DEFAULT;
-#endif /* CEREBRO_DEBUG */
   conf.config_file = CEREBRO_CONFIG_FILE_DEFAULT;
+#endif /* CEREBRO_DEBUG */
   conf.heartbeat_frequency_min = CEREBROD_HEARTBEAT_FREQUENCY_MIN_DEFAULT;
   conf.heartbeat_frequency_max = CEREBROD_HEARTBEAT_FREQUENCY_MAX_DEFAULT;
   conf.heartbeat_source_port = CEREBROD_HEARTBEAT_SOURCE_PORT_DEFAULT;
