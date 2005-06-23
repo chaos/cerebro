@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_nodelist_util.c,v 1.2 2005-06-17 23:21:22 achu Exp $
+ *  $Id: cerebro_nodelist_util.c,v 1.3 2005-06-23 22:54:05 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -154,7 +154,7 @@ _cerebro_nodelist_append(cerebro_nodelist_t nodelist,
     }
   memset(nd, '\0', sizeof(struct cerebro_nodelist_data));
 
-  strcpy(nd->nodename, nodename);
+  strncpy(nd->nodename, nodename, CEREBRO_MAXNODENAMELEN);
   nd->metric_value_type = metric_value_type;
   nd->metric_value_len = metric_value_len;
   nd->metric_value = metric_value;

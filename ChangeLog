@@ -9,6 +9,8 @@
 	* tagged pre-metric-names-metric-1
 
 	* Begin work to support metric_names metric
+
+	* Begin work on metriclist API.
 	
 2005-06-22  Albert Chu  <chu11@llnl.gov>
 

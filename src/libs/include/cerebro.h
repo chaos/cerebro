@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.3 2005-06-23 21:37:22 achu Exp $
+ *  $Id: cerebro.h,v 1.4 2005-06-23 22:54:05 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_H
@@ -10,27 +10,29 @@
  */
 #define CEREBRO_ERR_SUCCESS                   0
 #define CEREBRO_ERR_NULLHANDLE                1
-#define CEREBRO_ERR_NULLNODELIST              2
-#define CEREBRO_ERR_NULLITERATOR              3
-#define CEREBRO_ERR_MAGIC_NUMBER              4
-#define CEREBRO_ERR_PARAMETERS                5
-#define CEREBRO_ERR_HOSTNAME                  6
-#define CEREBRO_ERR_CONNECT                   7
-#define CEREBRO_ERR_CONNECT_TIMEOUT           8
-#define CEREBRO_ERR_PROTOCOL                  9
-#define CEREBRO_ERR_PROTOCOL_TIMEOUT         10 
-#define CEREBRO_ERR_VERSION_INCOMPATIBLE     11 
-#define CEREBRO_ERR_OVERFLOW                 12
-#define CEREBRO_ERR_NODE_NOTFOUND            13
-#define CEREBRO_ERR_METRIC_UNKNOWN           14
-#define CEREBRO_ERR_END_OF_LIST              15
-#define CEREBRO_ERR_CONFIG_FILE              16
-#define CEREBRO_ERR_CONFIG_MODULE            17
-#define CEREBRO_ERR_CONFIG_INPUT             18
-#define CEREBRO_ERR_CLUSTERLIST_MODULE       19
-#define CEREBRO_ERR_OUTMEM                   20
-#define CEREBRO_ERR_INTERNAL                 21
-#define CEREBRO_ERR_ERRNUMRANGE              22
+#define CEREBRO_ERR_NULLMETRICLIST            2
+#define CEREBRO_ERR_NULLMETRICLIST_ITERATOR   3
+#define CEREBRO_ERR_NULLNODELIST              4
+#define CEREBRO_ERR_NULLNODELIST_ITERATOR     5
+#define CEREBRO_ERR_MAGIC_NUMBER              6
+#define CEREBRO_ERR_PARAMETERS                7
+#define CEREBRO_ERR_HOSTNAME                  8
+#define CEREBRO_ERR_CONNECT                   9
+#define CEREBRO_ERR_CONNECT_TIMEOUT          10 
+#define CEREBRO_ERR_PROTOCOL                 11
+#define CEREBRO_ERR_PROTOCOL_TIMEOUT         12 
+#define CEREBRO_ERR_VERSION_INCOMPATIBLE     13
+#define CEREBRO_ERR_OVERFLOW                 14
+#define CEREBRO_ERR_NODE_NOTFOUND            15
+#define CEREBRO_ERR_METRIC_UNKNOWN           16
+#define CEREBRO_ERR_END_OF_LIST              17
+#define CEREBRO_ERR_CONFIG_FILE              18
+#define CEREBRO_ERR_CONFIG_MODULE            19
+#define CEREBRO_ERR_CONFIG_INPUT             20
+#define CEREBRO_ERR_CLUSTERLIST_MODULE       21
+#define CEREBRO_ERR_OUTMEM                   22
+#define CEREBRO_ERR_INTERNAL                 23
+#define CEREBRO_ERR_ERRNUMRANGE              24
 
 /* 
  * Cerebro Flags
@@ -66,6 +68,10 @@
 
 typedef struct cerebro *cerebro_t;
 
+typedef struct cerebro_metriclist *cerebro_metriclist_t;
+
+typedef struct cerebro_metriclist_iterator *cerebro_metriclist_iterator_t;
+
 typedef struct cerebro_nodelist *cerebro_nodelist_t;
 
 typedef struct cerebro_nodelist_iterator *cerebro_nodelist_iterator_t;
@@ -95,6 +101,26 @@ int cerebro_handle_destroy(cerebro_t handle);
  * Returns error number on success
  */
 int cerebro_errnum(cerebro_t handle);
+
+/*
+ * cerebro_metriclist_errnum
+ *
+ * Return the most recent error number from a cerebro_metriclist_t
+ * metriclist
+ *
+ * Returns error number on success
+ */
+int cerebro_metriclist_errnum(cerebro_metriclist_t metriclist);
+
+/*
+ * cerebro_metriclist_iterator_errnum
+ *
+ * Return the most recent error number from a
+ * cerebro_metriclist_iterator_t iterator
+ *
+ * Returns error number on success
+ */
+int cerebro_metriclist_iterator_errnum(cerebro_metriclist_iterator_t metriclistItr);
 
 /*
  * cerebro_nodelist_errnum
@@ -211,6 +237,15 @@ int cerebro_set_flags(cerebro_t handle, unsigned int flags);
  */
 
 /* 
+ * cerebro_get_metric_names
+ *
+ * Get a metriclist of currently available metrics
+ *
+ * Returns metriclist on success, -1 on error
+ */
+cerebro_metriclist_t cerebro_get_metric_name(cerebro_t handle);
+
+/* 
  * cerebro_get_metric_data
  *
  * Get nodelist of nodes and values for a certain metric
@@ -219,6 +254,82 @@ int cerebro_set_flags(cerebro_t handle, unsigned int flags);
  */
 cerebro_nodelist_t cerebro_get_metric_data(cerebro_t handle,
 					   const char *metric_name);
+
+/* 
+ * Metriclist API
+ *
+ */
+
+/* 
+ * cerebro_metriclist_length
+ *
+ * Determine the length of the metriclist.
+ *
+ * Returns the length of the metriclist on success, -1 on error
+ */
+int cerebro_metriclist_length(cerebro_metriclist_t metriclist);
+
+/* 
+ * cerebro_metriclist_destroy
+ *
+ * Destroy a metriclist
+ *
+ * Return 0 on success, -1 on error
+ */
+int cerebro_metriclist_destroy(cerebro_metriclist_t metriclist);
+
+/* 
+ * cerebro_metriclist_iterator_create
+ *
+ * Create a metriclist iterator
+ *
+ * Return iterator on success, NULL on error
+ */
+cerebro_metriclist_iterator_t cerebro_metriclist_iterator_create(cerebro_metriclist_t metriclist);
+
+/* 
+ * cerebro_metriclist_iterator_metric_name
+ *
+ * Retrieve a pointer to the current metric_name
+ *
+ * Returns 0 on success, -1 on error
+ */
+int cerebro_metriclist_iterator_nodename(cerebro_metriclist_iterator_t metriclistItr, 
+                                         char **metric_name);
+
+/*
+ * cerebro_metriclist_iterator_next
+ *
+ * Move the iterator pointer forward
+ *
+ * Return 1 if more data exists, 0 if the end of list has been
+ * reached, -1 on error
+ */
+int cerebro_metriclist_iterator_next(cerebro_metriclist_iterator_t metriclistItr);
+
+/* 
+ * cerebro_metriclist_iterator_reset
+ *
+ * Reset the metriclist iterator to the beginning.
+ * 
+ * Returns 0 on success, -1 on error
+ */
+int cerebro_metriclist_iterator_reset(cerebro_metriclist_iterator_t metriclistItr);
+
+/* 
+ * cerebro_metriclist_iterator_at_end
+ *
+ * Returns 1 if the end of the list has been reached, 0 if not, -1 on
+ * error
+ */
+int cerebro_metriclist_iterator_at_end(cerebro_metriclist_iterator_t metriclistItr);
+
+/* 
+ * cerebro_metriclist_iterator_destroy
+ *
+ * Returns 0 on success, -1 on error
+ */
+int cerebro_metriclist_iterator_destroy(cerebro_metriclist_iterator_t metriclistItr);
 
 /* 
  * Nodelist API

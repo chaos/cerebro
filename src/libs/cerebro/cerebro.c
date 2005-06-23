@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.c,v 1.2 2005-06-18 00:14:39 achu Exp $
+ *  $Id: cerebro.c,v 1.3 2005-06-23 22:54:05 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -23,6 +23,8 @@ static char *cerebro_error_messages[] =
   {
     "success",
     "null cerebro_t handle",
+    "null cerebro_metriclist_t metriclist",
+    "null cerebro_metriclist_iterator_t iterator",
     "null cerebro_nodelist_t nodelist",
     "null cerebro_nodelist_iterator_t iterator",
     "invalid magic number found",
@@ -64,9 +66,12 @@ cerebro_handle_create(void)
   handle->loaded_state = 0;
   memset(&(handle->config_data), '\0', sizeof(struct cerebro_config));
   
+  if (!(handle->metriclists = list_create((ListDelF)cerebro_metriclist_destroy)))
+    goto cleanup;
+
   if (!(handle->nodelists = list_create((ListDelF)cerebro_nodelist_destroy)))
     goto cleanup;
-  
+
   return handle;
 
  cleanup:
@@ -105,9 +110,11 @@ cerebro_handle_destroy(cerebro_t handle)
         }
     }
 
+  list_destroy(handle->metriclists);
+  handle->metriclists = NULL;
   list_destroy(handle->nodelists);
   handle->nodelists = NULL;
-
+  
   handle->errnum = CEREBRO_ERR_SUCCESS;
   handle->magic = ~CEREBRO_MAGIC_NUMBER;
   free(handle);
@@ -125,6 +132,27 @@ cerebro_errnum(cerebro_t handle)
     return handle->errnum;
 }
 
+int 
+cerebro_metriclist_errnum(cerebro_metriclist_t metriclist)
+{
+  if (!metriclist)
+    return CEREBRO_ERR_NULLMETRICLIST;
+  else if (metriclist->magic != CEREBRO_METRICLIST_MAGIC_NUMBER)
+    return CEREBRO_ERR_MAGIC_NUMBER;
+  else
+    return metriclist->errnum;
+}
+
+int 
+cerebro_metriclist_iterator_errnum(cerebro_metriclist_iterator_t metriclistItr)
+{
+  if (!metriclistItr)
+    return CEREBRO_ERR_NULLMETRICLIST_ITERATOR;
+  else if (metriclistItr->magic != CEREBRO_METRICLIST_ITERATOR_MAGIC_NUMBER)
+    return CEREBRO_ERR_MAGIC_NUMBER;
+  else
+    return metriclistItr->errnum;
+}
 
 int 
 cerebro_nodelist_errnum(cerebro_nodelist_t nodelist)
@@ -141,7 +169,7 @@ int
 cerebro_nodelist_iterator_errnum(cerebro_nodelist_iterator_t nodelistItr)
 {
   if (!nodelistItr)
-    return CEREBRO_ERR_NULLITERATOR;
+    return CEREBRO_ERR_NULLMETRICLIST_ITERATOR;
   else if (nodelistItr->magic != CEREBRO_NODELIST_ITERATOR_MAGIC_NUMBER)
     return CEREBRO_ERR_MAGIC_NUMBER;
   else
@@ -248,4 +276,3 @@ cerebro_set_flags(cerebro_t handle, unsigned int flags)
   handle->flags = flags;
   return 0;
 }
-
