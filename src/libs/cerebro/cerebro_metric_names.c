@@ -722,20 +722,19 @@ _cerebro_metric_name_response_receive_all(cerebro_t handle,
 }
 
 /*  
- * _cerebro_metric_get_metric_value
+ * _cerebro_metric_get_metric_names
  *
- * Get metric data and store it appropriately into the metric_value
- * structure.
+ * Get metric names and store it appropriately into the metriclist
  *
  * Returns 0 on success, -1 on error
  */
 static int
 _cerebro_metric_get_metric_names(cerebro_t handle,
-                                cerebro_metriclist_t metriclist,
-                                const char *hostname,
-                                unsigned int port,
-                                unsigned int timeout_len,
-                                int flags)
+                                 cerebro_metriclist_t metriclist,
+                                 const char *hostname,
+                                 unsigned int port,
+                                 unsigned int timeout_len,
+                                 int flags)
 {
   int fd = -1, rv = -1;
 
@@ -747,7 +746,7 @@ _cerebro_metric_get_metric_names(cerebro_t handle,
 
   if (_cerebro_metric_request_send(handle, 
 				   fd, 
-				   metric_name,
+				   CEREBRO_METRIC_METRIC_NAMES,
 				   timeout_len, 
 				   flags) < 0)
     goto cleanup;

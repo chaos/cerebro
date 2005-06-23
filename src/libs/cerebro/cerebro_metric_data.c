@@ -724,8 +724,7 @@ _cerebro_node_metric_response_receive_all(cerebro_t handle,
 /*  
  * _cerebro_metric_get_metric_value
  *
- * Get metric data and store it appropriately into the metric_value
- * structure.
+ * Get metric data and store it appropriately into the nodelist
  *
  * Returns 0 on success, -1 on error
  */
