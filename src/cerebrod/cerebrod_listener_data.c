@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.6 2005-06-23 16:54:23 achu Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.7 2005-06-23 21:37:22 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -252,6 +252,7 @@ cerebrod_listener_data_initialize(void)
       cerebrod_metric_name_list = List_create((ListDelF)NULL);
 
       /* Initialize with the handle of default metrics */
+      List_append(cerebrod_metric_name_list, Strdup(CEREBRO_METRIC_METRIC_NAMES));
       List_append(cerebrod_metric_name_list, Strdup(CEREBRO_METRIC_CLUSTER_NODES));
       List_append(cerebrod_metric_name_list, Strdup(CEREBRO_METRIC_UP_NODES));
       List_append(cerebrod_metric_name_list, Strdup(CEREBRO_METRIC_DOWN_NODES));

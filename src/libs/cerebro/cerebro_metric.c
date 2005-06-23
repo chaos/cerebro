@@ -147,17 +147,17 @@ _cerebro_metric_request_marshall(cerebro_t handle,
 }
 
 /* 
- * _cerebro_metric_response_header_unmarshall
+ * _cerebro_node_metric_response_header_unmarshall
  *
  * Unmarshall contents of a metric server response header
  *
  * Returns 0 on success, -1 on error
  */
 static int
-_cerebro_metric_response_header_unmarshall(cerebro_t handle,
-                                           struct cerebro_metric_response *res,
-                                           const char *buf,
-                                           unsigned int buflen)
+_cerebro_node_metric_response_header_unmarshall(cerebro_t handle,
+                                                struct cerebro_node_metric_response *res,
+                                                const char *buf,
+                                                unsigned int buflen)
 {
   int len, count = 0;
 
@@ -254,17 +254,17 @@ _cerebro_metric_response_header_unmarshall(cerebro_t handle,
 }
 
 /* 
- * _cerebro_metric_response_metric_value_unmarshall
+ * _cerebro_node_metric_response_metric_value_unmarshall
  *
  * Unmarshall contents of a metric server response
  *
  * Returns 0 on success, -1 on error
  */
 static int
-_cerebro_metric_response_metric_value_unmarshall(cerebro_t handle,
-                                                 struct cerebro_metric_response *res,
-                                                 const char *buf,
-                                                 unsigned int buflen)
+_cerebro_node_metric_response_metric_value_unmarshall(cerebro_t handle,
+                                                      struct cerebro_node_metric_response *res,
+                                                      const char *buf,
+                                                      unsigned int buflen)
 {
   int len, count = 0;
 
@@ -449,7 +449,7 @@ _cerebro_metric_request_send(cerebro_t handle,
 }
 
 /* 
- * _cerebro_metric_response_receive_data
+ * _cerebro_node_metric_response_receive_data
  *
  * Receive a certain amount of data
  *
@@ -457,11 +457,11 @@ _cerebro_metric_request_send(cerebro_t handle,
  * 
  */
 static int
-_cerebro_metric_response_receive_data(cerebro_t handle,
-                                      int fd,
-                                      unsigned int bytes_to_read,
-                                      char *buf,
-                                      unsigned int buflen)
+_cerebro_node_metric_response_receive_data(cerebro_t handle,
+                                           int fd,
+                                           unsigned int bytes_to_read,
+                                           char *buf,
+                                           unsigned int buflen)
 {
   int bytes_read = 0;
 
@@ -529,7 +529,7 @@ _cerebro_metric_response_receive_data(cerebro_t handle,
           int n;
 
           /* Don't use fd_read_n b/c it loops until exactly
-           * CEREBRO_METRIC_RESPONSE_PACKET_LEN is read.  Due to version
+           * CEREBRO_NODE_METRIC_RESPONSE_PACKET_LEN is read.  Due to version
            * incompatability or error packets, we may want to read a
            * smaller packet.
            */
@@ -570,7 +570,7 @@ _cerebro_metric_response_receive_data(cerebro_t handle,
 }
 
 /* 
- * _cerebro_metric_response_receive_one
+ * _cerebro_node_metric_response_receive_one
  *
  * Receive a single response
  *
@@ -578,28 +578,28 @@ _cerebro_metric_response_receive_data(cerebro_t handle,
  * success, -1 on error
  */
 static int
-_cerebro_metric_response_receive_one(cerebro_t handle,
-				     int fd,
-				     struct cerebro_metric_response *res)
+_cerebro_node_metric_response_receive_one(cerebro_t handle,
+                                          int fd,
+                                          struct cerebro_node_metric_response *res)
 {
   int header_count = 0, metric_value_count = 0, bytes_read;
   char header_buf[CEREBRO_PACKET_BUFLEN];
   char *buf = NULL;
   
-  if ((bytes_read = _cerebro_metric_response_receive_data(handle,
-                                                          fd,
-                                                          CEREBRO_METRIC_RESPONSE_HEADER_LEN,
-                                                          header_buf,
-                                                          CEREBRO_PACKET_BUFLEN)) < 0)
+  if ((bytes_read = _cerebro_node_metric_response_receive_data(handle,
+                                                               fd,
+                                                               CEREBRO_NODE_METRIC_RESPONSE_HEADER_LEN,
+                                                               header_buf,
+                                                               CEREBRO_PACKET_BUFLEN)) < 0)
     goto cleanup;
   
   if (!bytes_read)
     return bytes_read;
   
-  if ((header_count = _cerebro_metric_response_header_unmarshall(handle, 
-                                                                 res, 
-                                                                 header_buf, 
-                                                                 bytes_read)) < 0)
+  if ((header_count = _cerebro_node_metric_response_header_unmarshall(handle, 
+                                                                      res, 
+                                                                      header_buf, 
+                                                                      bytes_read)) < 0)
     goto cleanup;
 
   if (!header_count)
@@ -621,17 +621,17 @@ _cerebro_metric_response_receive_one(cerebro_t handle,
           goto cleanup;
         }
 
-      if ((bytes_read = _cerebro_metric_response_receive_data(handle,
-                                                              fd,
-                                                              res->metric_value_len,
-                                                              buf,
-                                                              buflen)) < 0)
+      if ((bytes_read = _cerebro_node_metric_response_receive_data(handle,
+                                                                   fd,
+                                                                   res->metric_value_len,
+                                                                   buf,
+                                                                   buflen)) < 0)
         goto cleanup;
       
-      if ((metric_value_count = _cerebro_metric_response_metric_value_unmarshall(handle,
-                                                                                 res,
-                                                                                 buf,
-                                                                                 bytes_read)) < 0)
+      if ((metric_value_count = _cerebro_node_metric_response_metric_value_unmarshall(handle,
+                                                                                      res,
+                                                                                      buf,
+                                                                                      bytes_read)) < 0)
         goto cleanup;
     }
   else
@@ -646,31 +646,31 @@ _cerebro_metric_response_receive_one(cerebro_t handle,
 }
 
 /* 
- * _cerebro_metric_response_receive_all
+ * _cerebro_node_metric_response_receive_all
  *
  * Receive all of the metric server responses.
  * 
  * Returns 0 on success, -1 on error
  */
 static int
-_cerebro_metric_response_receive_all(cerebro_t handle,
+_cerebro_node_metric_response_receive_all(cerebro_t handle,
 				     struct cerebro_nodelist *nodelist,
 				     int fd,
 				     int flags)
 {
-  struct cerebro_metric_response res;
+  struct cerebro_node_metric_response res;
   int res_len;
 
   /* XXX the cleanup here is disgusting */
   while (1)
     {
-      memset(&res, '\0', sizeof(struct cerebro_metric_response));
-      if ((res_len = _cerebro_metric_response_receive_one(handle,
-							  fd, 
-							  &res)) < 0)
+      memset(&res, '\0', sizeof(struct cerebro_node_metric_response));
+      if ((res_len = _cerebro_node_metric_response_receive_one(handle,
+                                                               fd, 
+                                                               &res)) < 0)
         goto cleanup;
       
-      if (res_len < CEREBRO_METRIC_RESPONSE_HEADER_LEN)
+      if (res_len < CEREBRO_NODE_METRIC_RESPONSE_HEADER_LEN)
         {
           if (res_len == CEREBRO_METRIC_ERR_RESPONSE_LEN)
             {
@@ -708,7 +708,7 @@ _cerebro_metric_response_receive_all(cerebro_t handle,
 	goto cleanup;
     }
 
-  memset(&res, '\0', sizeof(struct cerebro_metric_response));
+  memset(&res, '\0', sizeof(struct cerebro_node_metric_response));
   
   if (_cerebro_nodelist_sort(nodelist) < 0)
     goto cleanup;
@@ -753,10 +753,10 @@ _cerebro_metric_get_metric_data(cerebro_t handle,
 				   flags) < 0)
     goto cleanup;
 
-  if (_cerebro_metric_response_receive_all(handle, 
-					   nodelist, 
-					   fd, 
-					   flags) < 0)
+  if (_cerebro_node_metric_response_receive_all(handle, 
+                                                nodelist, 
+                                                fd, 
+                                                flags) < 0)
     goto cleanup;
 
   rv = 0;

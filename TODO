@@ -19,7 +19,6 @@ Design
 - Update time for each cerebro metric data?
 - ability for data to be stored/not-stored in the internal hash
   i.e. passed directly to module and forgotten
-- metric to get available metrics
 - nodelist
   - use own list instead of 'List' to store iterators?
 - how remove metric data?

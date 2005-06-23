@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_protocol.h,v 1.1 2005-06-18 00:14:39 achu Exp $
+ *  $Id: cerebro_metric_protocol.h,v 1.2 2005-06-23 21:37:22 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_METRIC_PROTOCOL_H
@@ -14,20 +14,16 @@
  * - Metric request.
  * 
  * Server -> Client
- * - Stream of responses indicating nodenames and metric values.
- *   Nodes returned will depend on the request flags.  After the stream of
- *   nodes is complete, an "end of responses" response will indicate the
- *   end of stream and completion of the request.  This "end of
- *   responses" response will be sent even if no nodes are returned
- *   (i.e. only down nodes are requested, but all nodes are up, or no
- *   nodes are monitoring the indicated metric).
+
+ * - Stream of responses indicating metric_names or nodenames and
+ *   metric values.  Respones may depend on the request flags.  After
+ *   the stream of is complete, an "end of responses" response will
+ *   indicate the end of stream and completion of the request.  This
+ *   "end of responses" response will be sent even if no data is
+ *   returned (i.e. only down nodes are requested, but all nodes are up,
+ *   or no nodes are monitoring the indicated metric).
  *
- * - On "normal" errors, the "end of responses" packet will contain 
- *   the error code.
- *
- * - On version incompatability errors and invalid packet format
- *   errors, an eight byte packet containing only the version and error
- *   code will be the response.
+ * - On errors, an error packet will contain the error code.
  *
  * Notes:
  * - Require a smaller timeout len for the server than the client, 
@@ -35,7 +31,7 @@
  *   message.
  */
 
-#define CEREBRO_METRIC_PROTOCOL_VERSION                    2
+#define CEREBRO_METRIC_PROTOCOL_VERSION                    3
 #define CEREBRO_METRIC_PROTOCOL_SERVER_TIMEOUT_LEN         3
 #define CEREBRO_METRIC_PROTOCOL_CLIENT_TIMEOUT_LEN         5
 #define CEREBRO_METRIC_PROTOCOL_CONNECT_TIMEOUT_LEN        5
@@ -73,11 +69,29 @@ struct cerebro_metric_request
                                             + sizeof(u_int32_t))
 
 /*
- * struct cerebro_metric_response
+ * struct cerebro_metric_name_response
  *
  * defines a metric server data response
  */
-struct cerebro_metric_response
+struct cerebro_metric_name_response
+{
+  int32_t version;
+  u_int32_t metric_err_code;
+  u_int8_t end_of_responses;
+  char metric_name[CEREBRO_METRIC_NAME_MAXLEN];
+};
+  
+#define CEREBRO_METRIC_NAME_RESPONSE_LEN  (sizeof(int32_t) \
+                                           + sizeof(u_int32_t) \
+                                           + sizeof(u_int8_t) \
+                                           + CEREBRO_METRIC_NAME_MAXLEN)
+
+/*
+ * struct cerebro_node_metric_response
+ *
+ * defines a metric server data response
+ */
+struct cerebro_node_metric_response
 {
   int32_t version;
   u_int32_t metric_err_code;
@@ -88,12 +102,12 @@ struct cerebro_metric_response
   void *metric_value;
 };
   
-#define CEREBRO_METRIC_RESPONSE_HEADER_LEN  (sizeof(int32_t) \
-                                             + sizeof(u_int32_t) \
-                                             + sizeof(u_int8_t) \
-                                             + CEREBRO_MAXNODENAMELEN \
-                                             + sizeof(u_int32_t) \
-                                             + sizeof(u_int32_t))
+#define CEREBRO_NODE_METRIC_RESPONSE_HEADER_LEN  (sizeof(int32_t) \
+                                                  + sizeof(u_int32_t) \
+                                                  + sizeof(u_int8_t) \
+                                                  + CEREBRO_MAXNODENAMELEN \
+                                                  + sizeof(u_int32_t) \
+                                                  + sizeof(u_int32_t))
 
 /*
  * struct cerebro_metric_err_response
