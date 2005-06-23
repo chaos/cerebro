@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.4 2005-06-23 22:54:05 achu Exp $
+ *  $Id: cerebro.h,v 1.5 2005-06-23 23:00:48 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_H
@@ -243,7 +243,7 @@ int cerebro_set_flags(cerebro_t handle, unsigned int flags);
  *
  * Returns metriclist on success, -1 on error
  */
-cerebro_metriclist_t cerebro_get_metric_name(cerebro_t handle);
+cerebro_metriclist_t cerebro_get_metric_names(cerebro_t handle);
 
 /* 
  * cerebro_get_metric_data

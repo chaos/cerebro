@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metriclist_util.c,v 1.1 2005-06-23 22:54:05 achu Exp $
+ *  $Id: cerebro_metriclist_util.c,v 1.2 2005-06-23 23:00:48 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -61,7 +61,7 @@ _cerebro_metriclist_check(cerebro_metriclist_t metriclist)
 }
 
 cerebro_metriclist_t 
-_cerebro_metriclist_create(cerebro_t handle, const char *metric_name)
+_cerebro_metriclist_create(cerebro_t handle)
 {
   cerebro_metriclist_t metriclist = NULL;
 
