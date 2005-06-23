@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.90 2005-06-22 20:30:09 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.91 2005-06-23 16:54:23 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -61,6 +61,13 @@ pthread_mutex_t cerebrod_listener_initialization_complete_lock = PTHREAD_MUTEX_I
  */
 int listener_fd = 0;
 pthread_mutex_t listener_fd_lock = PTHREAD_MUTEX_INITIALIZER;
+
+/*
+ * clusterlist_handle
+ *
+ * Handle for clusterlist module
+ */
+clusterlist_module_t clusterlist_handle;
 
 /* 
  * _cerebrod_listener_create_and_setup_socket
@@ -151,6 +158,14 @@ _cerebrod_listener_initialize(void)
     cerebro_err_exit("%s(%s:%d): listener_fd setup failed",
                      __FILE__, __FUNCTION__, __LINE__);
   Pthread_mutex_unlock(&listener_fd_lock);
+
+  if (!(clusterlist_handle = clusterlist_module_load()))
+    cerebro_err_exit("%s(%s:%d): clusterlist_module_load",
+                     __FILE__, __FUNCTION__, __LINE__);
+  
+  if (clusterlist_module_setup(clusterlist_handle) < 0)
+    cerebro_err_exit("%s(%s:%d): clusterlist_module_setup",
+                     __FILE__, __FUNCTION__, __LINE__);
 
   cerebrod_listener_data_initialize();
 

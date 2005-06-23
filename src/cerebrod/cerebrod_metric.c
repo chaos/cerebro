@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric.c,v 1.44 2005-06-22 23:28:08 achu Exp $
+ *  $Id: cerebrod_metric.c,v 1.45 2005-06-23 16:54:23 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -68,7 +68,7 @@ _cerebrod_metric_initialize(void)
   if (cerebrod_metric_initialization_complete)
     goto out;
 
-  /* Hmmm, I guess nothing to do */
+  Signal(SIGPIPE, SIG_IGN);
 
   cerebrod_metric_initialization_complete++;
   Pthread_cond_signal(&cerebrod_metric_initialization_complete_cond);

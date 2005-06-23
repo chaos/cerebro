@@ -3,6 +3,8 @@
 	* Fixed slurm_state metric bugs.
 
 	* cerebro.spec.in: Updated for slurm_state metric.
+
+	* Various minor bug fixes.
 	
 2005-06-22  Albert Chu  <chu11@llnl.gov>
 

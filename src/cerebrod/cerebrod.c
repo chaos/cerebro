@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.67 2005-06-22 23:28:08 achu Exp $
+ *  $Id: cerebrod.c,v 1.68 2005-06-23 16:54:23 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -19,8 +19,6 @@
 #include "cerebrod_metric.h"
 #include "cerebrod_speaker.h"
 
-#include "clusterlist_module.h"
-
 #include "wrappers.h"
 
 #if CEREBRO_DEBUG
@@ -38,13 +36,6 @@
 pthread_mutex_t debug_output_mutex = PTHREAD_MUTEX_INITIALIZER;
 #endif /* CEREBRO_DEBUG */
 
-/*
- * clusterlist_handle
- *
- * Handle for clusterlist module
- */
-clusterlist_module_t clusterlist_handle;
-
 extern struct cerebrod_config conf;
 
 extern int cerebrod_listener_initialization_complete;
@@ -55,25 +46,6 @@ extern int cerebrod_metric_initialization_complete;
 extern pthread_cond_t cerebrod_metric_initialization_complete_cond;
 extern pthread_mutex_t cerebrod_metric_initialization_complete_lock;
 
-/*
- * _cerebrod_post_config_setup_initialization
- *
- * Perform initialization routines after configuration is determined
- */
-static void
-_cerebrod_post_config_setup_initialization(void)
-{
-  if (!(clusterlist_handle = clusterlist_module_load()))
-    cerebro_err_exit("%s(%s:%d): clusterlist_module_load",
-                     __FILE__, __FUNCTION__, __LINE__);
-  
-  if (clusterlist_module_setup(clusterlist_handle) < 0)
-    cerebro_err_exit("%s(%s:%d): clusterlist_module_setup",
-                     __FILE__, __FUNCTION__, __LINE__);
-
-  Signal(SIGPIPE, SIG_IGN);
-}
-
 int 
 main(int argc, char **argv)
 {
@@ -81,8 +53,6 @@ main(int argc, char **argv)
   cerebro_err_set_flags(CEREBRO_ERROR_STDERR | CEREBRO_ERROR_SYSLOG);
 
   cerebrod_config_setup(argc, argv);
-
-  _cerebrod_post_config_setup_initialization();
 
 #if CEREBRO_DEBUG
   if (!conf.debug)

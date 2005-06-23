@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.5 2005-06-22 20:30:09 achu Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.6 2005-06-23 16:54:23 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -190,6 +190,10 @@ cerebrod_listener_data_initialize(void)
   pthread_mutex_lock(&cerebrod_listener_data_initialization_complete_lock);
   if (cerebrod_listener_data_initialization_complete)
     goto out;
+  
+  if (!clusterlist_handle)
+    cerebro_err_exit("%s(%s:%d): clusterlist_handle null",
+		     __FILE__, __FUNCTION__, __LINE__);
 
   if ((numnodes = clusterlist_module_numnodes(clusterlist_handle)) < 0)
     cerebro_err_exit("%s(%s:%d): clusterlist_module_numnodes",
