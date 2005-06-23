@@ -5,6 +5,8 @@
 	* cerebro.spec.in: Updated for slurm_state metric.
 
 	* Various minor bug fixes.
+
+	* tagged pre-metric-names-metric-1
 	
 2005-06-22  Albert Chu  <chu11@llnl.gov>
 
