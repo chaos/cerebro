@@ -23,6 +23,7 @@ Cerebro is a collection of cluster monitoring tools and libraries.
 %define _with_gendersllnl  --with-gendersllnl
 %define _without_genders   --without-genders
 %define _without_hostsfile --without-hostsfile
+%define _with_slurm_state  --with-slurm-state
 %ifarch ia64
 %define _with_boottime     --with-boottime
 %define _with_bootlog      --with-bootlog
@@ -67,6 +68,13 @@ Group: System Environment/Base
 Requires: cerebro
 %description metric-boottime
 Metric module to monitor boottime.
+
+%package metric-slurm-state
+Summary: slurm_state module(s)
+Group: System Environment/Base
+Requires: cerebro
+%description metric-slurm-state
+Metric module to monitor slurm_state.
 
 %if %{?_with_chaos:1}%{!?_with_chaos:0}
 %package bootlog
@@ -138,6 +146,7 @@ fi
 %if %{?_with_chaos:1}%{!?_with_chaos:0}
 %{_libdir}/cerebro/cerebro_clusterlist*
 %{_libdir}/cerebro/cerebro_config*
+%{_libdir}/cerebro/cerebro_metric_slurm_state*
 %endif
 
 %if %{?_with_chaos:0}%{!?_with_chaos:1}
@@ -162,9 +171,15 @@ fi
 %endif
 
 %if %{?_with_boottime:1}%{!?_with_boottime:0}
-%files boottime
+%files metric-boottime
 %defattr(-,root,root)
 %{_libdir}/cerebro/cerebro_metric_boottime.*
+%endif
+
+%if %{?_with_slurm_state:1}%{!?_with_slurm_state:0}
+%files metric-slurm-state
+%defattr(-,root,root)
+%{_libdir}/cerebro/cerebro_metric_slurm-state.*
 %endif
 
 %endif

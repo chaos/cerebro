@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_slurm_state.c,v 1.2 2005-06-22 23:52:54 achu Exp $
+ *  $Id: cerebro_metric_slurm_state.c,v 1.3 2005-06-23 16:46:18 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -40,10 +40,11 @@
 
 #define SLURM_STATE_METRIC_MODULE_NAME      "slurm_state"
 #define SLURM_STATE_METRIC_NAME             "slurm_state"
-/* #define SLURM_STATE_UNIX_PATH               CEREBRO_MODULE_DIR "/slurm_state_metric" */
-
-#define SLURM_STATE_UNIX_PATH               "/tmp/slurm_state"
-
+#if CEREBRO_DEBUG
+#define SLURM_STATE_UNIX_PATH               "/tmp/cerebro_metric_slurm_state"
+#else  /* !CEREBRO_DEBUG */
+#define SLURM_STATE_UNIX_PATH               CEREBRO_MODULE_DIR "/cerebro_metric_slurm_state"
+#endif  /* !CEREBRO_DEBUG */
 #define SLURM_STATE_BACKLOG                 5
 #define SLURM_STATE_REINITIALIZE_WAIT_TIME  5
 
@@ -321,6 +322,7 @@ slurm_state_metric_thread(void *arg)
                 {
                   /* Break and we'll try again */
                   sleep(SLURM_STATE_REINITIALIZE_WAIT_TIME);
+                  close(slurm_fd);
                   break;
                 }
             }
@@ -331,6 +333,7 @@ slurm_state_metric_thread(void *arg)
               cerebro_err_debug("%s(%s:%d): select invalid return",
                                 __FILE__, __FUNCTION__, __LINE__);
               sleep(SLURM_STATE_REINITIALIZE_WAIT_TIME);
+              close(slurm_fd);
               break;
             }
 
@@ -346,22 +349,27 @@ slurm_state_metric_thread(void *arg)
                                     __FILE__, __FUNCTION__, __LINE__,
                                     strerror(errno));
                   sleep(SLURM_STATE_REINITIALIZE_WAIT_TIME);
+                  close(slurm_fd);
                   break;
                 }
 
               /* Normally should be 0, but perhaps somehow something
-               * could get read.  We'll assume the connection died.
+               * could get read.  We'll assume the connection died if
+               * partial data was read.
                */
-              if (n < CEREBRO_PACKET_BUFLEN)
+              if (n > 0 && n < CEREBRO_PACKET_BUFLEN)
                 {
-                  cerebro_err_debug("%s(%s:%d): unintended read: %s",
+                  cerebro_err_debug("%s(%s:%d): unintended read: %d",
                                     __FILE__, __FUNCTION__, __LINE__,
-                                    strerror(errno));
+                                    n);
                   n = 0;
                 }
 
               if (!n)
                 {
+                  /* Its not the end of the world if the lock fails, just keep on
+                   * going
+                   */
                   if ((rv = pthread_mutex_lock(&metric_slurm_state_lock)) != 0)
                     cerebro_err_debug("%s(%s:%d): pthread_mutex_lock: %s",
                                       __FILE__, __FUNCTION__, __LINE__,
@@ -376,6 +384,9 @@ slurm_state_metric_thread(void *arg)
                                           __FILE__, __FUNCTION__, __LINE__,
                                           strerror(rv));
                     }
+                  
+                  close(slurm_fd);
+                  break;
                 }
             }
           else
@@ -384,6 +395,7 @@ slurm_state_metric_thread(void *arg)
               cerebro_err_debug("%s(%s:%d): select invalid return",
                                 __FILE__, __FUNCTION__, __LINE__);
               sleep(SLURM_STATE_REINITIALIZE_WAIT_TIME);
+              close(slurm_fd);
               break;
             }
           
