@@ -304,127 +304,6 @@ _cerebro_node_metric_response_metric_value_unmarshall(cerebro_t handle,
 }
 
 /* 
- * _cerebro_node_metric_response_receive_data
- *
- * Receive a certain amount of data
- *
- * Returns 0 on success, -1 on error
- * 
- */
-static int
-_cerebro_node_metric_response_receive_data(cerebro_t handle,
-                                           int fd,
-                                           unsigned int bytes_to_read,
-                                           char *buf,
-                                           unsigned int buflen)
-{
-  int bytes_read = 0;
-
-  memset(buf, '\0', buflen);
-
-  if (!bytes_to_read)
-    {
-      cerebro_err_debug("%s(%s:%d): invalid bytes_to_read",
-			__FILE__, __FUNCTION__, __LINE__);
-      handle->errnum = CEREBRO_ERR_INTERNAL;
-      goto cleanup;
-    }
-
-  if (buflen < bytes_to_read)
-    {
-      cerebro_err_debug("%s(%s:%d): invalid buflen: "
-			"bytes_to_read = %d buflen = %d",
-			__FILE__, __FUNCTION__, __LINE__,
-			bytes_to_read, buflen);
-      handle->errnum = CEREBRO_ERR_INTERNAL;
-      goto cleanup;
-    }
-
-  while (bytes_read < bytes_to_read)
-    {
-      fd_set rfds;
-      struct timeval tv;
-      int num;
-
-      tv.tv_sec = CEREBRO_METRIC_PROTOCOL_CLIENT_TIMEOUT_LEN;
-      tv.tv_usec = 0;
-
-      FD_ZERO(&rfds);
-      FD_SET(fd, &rfds);
-
-      if ((num = select(fd + 1, &rfds, NULL, NULL, &tv)) < 0)
-        {
-	  cerebro_err_debug("%s(%s:%d): select: %s",
-			    __FILE__, __FUNCTION__, __LINE__,
-			    strerror(errno));
-          handle->errnum = CEREBRO_ERR_INTERNAL;
-          goto cleanup;
-        }
-      
-      if (!num)
-        {
-          /* Timed out.  If atleast some bytes were read, return data
-           * back to the caller to let them possibly unmarshall the
-           * data.  Its possible we are expecting more bytes than the
-           * client is sending, perhaps because we are using a
-           * different protocol version.  This will allow the server
-           * to return a invalid version number back to the user.
-           */
-          if (!bytes_read) 
-            {
-              handle->errnum = CEREBRO_ERR_PROTOCOL_TIMEOUT;
-              goto cleanup;
-            }
-          else
-            goto out;
-        }
-
-      if (FD_ISSET(fd, &rfds))
-        {
-          int n;
-
-          /* Don't use fd_read_n b/c it loops until exactly
-           * CEREBRO_NODE_METRIC_RESPONSE_PACKET_LEN is read.  Due to version
-           * incompatability or error packets, we may want to read a
-           * smaller packet.
-           */
-          if ((n = read(fd,
-                        buf + bytes_read,
-                        bytes_to_read - bytes_read)) < 0)
-            {
-	      cerebro_err_debug("%s(%s:%d): read: %s",
-				__FILE__, __FUNCTION__, __LINE__,
-				strerror(errno));
-              handle->errnum = CEREBRO_ERR_INTERNAL;
-              goto cleanup;
-            }
-
-          if (!n)
-            {
-              /* Pipe closed */
-              handle->errnum = CEREBRO_ERR_PROTOCOL;
-              goto cleanup;
-            }
-
-          bytes_read += n;
-        }
-      else
-        {
-	  cerebro_err_debug("%s(%s:%d): select returned bad data",
-			    __FILE__, __FUNCTION__, __LINE__);
-          handle->errnum = CEREBRO_ERR_INTERNAL;
-          goto cleanup;
-        }
-    }
-  
- out:
-  return bytes_read;
-
- cleanup:
-  return -1;
-}
-
-/* 
  * _cerebro_node_metric_response_receive_one
  *
  * Receive a single response
@@ -441,11 +320,11 @@ _cerebro_node_metric_response_receive_one(cerebro_t handle,
   char header_buf[CEREBRO_PACKET_BUFLEN];
   char *buf = NULL;
   
-  if ((bytes_read = _cerebro_node_metric_response_receive_data(handle,
-                                                               fd,
-                                                               CEREBRO_NODE_METRIC_RESPONSE_HEADER_LEN,
-                                                               header_buf,
-                                                               CEREBRO_PACKET_BUFLEN)) < 0)
+  if ((bytes_read = _cerebro_metric_receive_data(handle,
+						 fd,
+						 CEREBRO_NODE_METRIC_RESPONSE_HEADER_LEN,
+						 header_buf,
+						 CEREBRO_PACKET_BUFLEN)) < 0)
     goto cleanup;
   
   if (!bytes_read)
@@ -476,11 +355,11 @@ _cerebro_node_metric_response_receive_one(cerebro_t handle,
           goto cleanup;
         }
 
-      if ((bytes_read = _cerebro_node_metric_response_receive_data(handle,
-                                                                   fd,
-                                                                   res->metric_value_len,
-                                                                   buf,
-                                                                   buflen)) < 0)
+      if ((bytes_read = _cerebro_metric_receive_data(handle,
+						     fd,
+						     res->metric_value_len,
+						     buf,
+						     buflen)) < 0)
         goto cleanup;
       
       if ((metric_value_count = _cerebro_node_metric_response_metric_value_unmarshall(handle,
@@ -564,8 +443,6 @@ _cerebro_node_metric_response_receive_all(cerebro_t handle,
                                    res.metric_value) < 0)
 	goto cleanup;
     }
-
-  memset(&res, '\0', sizeof(struct cerebro_node_metric_response));
   
   if (_cerebro_nodelist_sort(nodelist) < 0)
     goto cleanup;

@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.10 2005-06-23 23:15:48 achu Exp $
+## $Id: Makefile.am,v 1.11 2005-06-24 15:11:05 achu Exp $
 ##*****************************************************************************
 
 if WITH_GNU_LD
@@ -24,6 +24,7 @@ libcerebro_la_SOURCES = cerebro.c \
 			cerebro_clusterlist_util.c \
 			cerebro_config_util.c \
 			cerebro_metric_data.c \
+			cerebro_metric_names.c \
 			cerebro_metriclist.c \
 			cerebro_metriclist_util.c \
 			cerebro_nodelist.c \

@@ -1,3 +1,7 @@
+2005-06-24  Albert Chu  <chu11@llnl.gov>
+
+	* Continued worked on metric_names metric.
+	
 2005-06-23  Albert Chu  <chu11@llnl.gov>
 
 	* Fixed slurm_state metric bugs.
