@@ -118,14 +118,14 @@ _cerebro_metric_name_response_receive_one(cerebro_t handle,
                                           int fd,
                                           struct cerebro_metric_name_response *res)
 {
-  char buf[CEREBRO_PACKET_BUFLEN];
+  char buf[CEREBRO_MAX_PACKET_LEN];
   int bytes_read, count;
   
   if ((bytes_read = _cerebro_metric_receive_data(handle,
 						 fd,
 						 CEREBRO_METRIC_NAME_RESPONSE_LEN,
 						 buf,
-						 CEREBRO_PACKET_BUFLEN)) < 0)
+						 CEREBRO_MAX_PACKET_LEN)) < 0)
     goto cleanup;
   
   if (!bytes_read)
@@ -157,6 +157,7 @@ _cerebro_metric_name_response_receive_all(cerebro_t handle,
                                           int flags)
 {
   struct cerebro_metric_name_response res;
+  char metric_name_buf[CEREBRO_MAX_METRIC_NAME_LEN+1];
   int res_len;
 
   /* XXX the cleanup here is disgusting */
@@ -200,7 +201,10 @@ _cerebro_metric_name_response_receive_all(cerebro_t handle,
       if (res.end_of_responses == CEREBRO_METRIC_PROTOCOL_IS_LAST_RESPONSE)
         break;
 
-      /* XXX need to ensure null termination */
+      /* Guarantee ending '\0' character */
+      memset(metric_name_buf, '\0', CEREBRO_MAX_METRIC_NAME_LEN+1);
+      memcpy(metric_name_buf, res.metric_name, CEREBRO_MAX_METRIC_NAME_LEN);
+
       if (_cerebro_metriclist_append(metriclist, res.metric_name) < 0)
 	goto cleanup;
     }

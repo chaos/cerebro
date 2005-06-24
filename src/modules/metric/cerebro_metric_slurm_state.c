@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_slurm_state.c,v 1.3 2005-06-23 16:46:18 achu Exp $
+ *  $Id: cerebro_metric_slurm_state.c,v 1.4 2005-06-24 20:42:28 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -305,7 +305,7 @@ slurm_state_metric_thread(void *arg)
       
       while (1)
         {
-          char buffer[CEREBRO_PACKET_BUFLEN];
+          char buffer[CEREBRO_MAX_PACKET_LEN];
           fd_set rfds;
 
           FD_ZERO(&rfds);
@@ -343,7 +343,7 @@ slurm_state_metric_thread(void *arg)
               
               if ((n = read(slurm_fd,
                             buffer,
-                            CEREBRO_PACKET_BUFLEN)) < 0)
+                            CEREBRO_MAX_PACKET_LEN)) < 0)
                 {
                   cerebro_err_debug("%s(%s:%d): read: %s",
                                     __FILE__, __FUNCTION__, __LINE__,
@@ -357,7 +357,7 @@ slurm_state_metric_thread(void *arg)
                * could get read.  We'll assume the connection died if
                * partial data was read.
                */
-              if (n > 0 && n < CEREBRO_PACKET_BUFLEN)
+              if (n > 0 && n < CEREBRO_MAX_PACKET_LEN)
                 {
                   cerebro_err_debug("%s(%s:%d): unintended read: %d",
                                     __FILE__, __FUNCTION__, __LINE__,

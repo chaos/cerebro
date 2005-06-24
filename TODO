@@ -7,7 +7,9 @@ Testing
 - api again
 
 Cleanup
-- nodename/metric_name length copying/passing everywhere
+- common receiving loop?
+- common receive data func?
+- no need to malloc values in heartbeats and destroy em??
 
 Audit
 - code review to reduce memory footprint

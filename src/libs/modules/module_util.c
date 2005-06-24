@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: module_util.c,v 1.1 2005-06-18 18:48:30 achu Exp $
+ *  $Id: module_util.c,v 1.2 2005-06-24 20:42:28 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -90,11 +90,11 @@ find_known_module(char *search_dir,
         {
           if (!strcmp(dirent->d_name, modules_list[i]))
             {
-              char filebuf[CEREBRO_MAXPATHLEN+1];
+              char filebuf[CEREBRO_MAX_PATH_LEN+1];
               int flag;
 
-              memset(filebuf, '\0', CEREBRO_MAXPATHLEN+1);
-              snprintf(filebuf, CEREBRO_MAXPATHLEN, "%s/%s",
+              memset(filebuf, '\0', CEREBRO_MAX_PATH_LEN+1);
+              snprintf(filebuf, CEREBRO_MAX_PATH_LEN, "%s/%s",
                        search_dir, modules_list[i]);
 
               if ((flag = module_loader(handle, filebuf)) < 0)
@@ -170,7 +170,7 @@ find_modules(char *search_dir,
 
       if (ptr && ptr == &dirent->d_name[0])
         {
-          char filebuf[CEREBRO_MAXPATHLEN+1];
+          char filebuf[CEREBRO_MAX_PATH_LEN+1];
           int flag;
 
           /*
@@ -181,8 +181,8 @@ find_modules(char *search_dir,
           if (!ptr || strcmp(ptr, ".so"))
             continue;
 
-          memset(filebuf, '\0', CEREBRO_MAXPATHLEN+1);
-          snprintf(filebuf, CEREBRO_MAXPATHLEN, "%s/%s",
+          memset(filebuf, '\0', CEREBRO_MAX_PATH_LEN+1);
+          snprintf(filebuf, CEREBRO_MAX_PATH_LEN, "%s/%s",
                    search_dir, dirent->d_name);
 
           if ((flag = module_loader(handle, filebuf)) < 0)

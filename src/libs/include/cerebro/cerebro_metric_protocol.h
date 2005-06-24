@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_protocol.h,v 1.2 2005-06-23 21:37:22 achu Exp $
+ *  $Id: cerebro_metric_protocol.h,v 1.3 2005-06-24 20:42:28 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_METRIC_PROTOCOL_H
@@ -58,13 +58,13 @@
 struct cerebro_metric_request
 {
   int32_t version;
-  char metric_name[CEREBRO_METRIC_NAME_MAXLEN];
+  char metric_name[CEREBRO_MAX_METRIC_NAME_LEN];
   u_int32_t timeout_len;
   u_int32_t flags;
 };
   
 #define CEREBRO_METRIC_REQUEST_PACKET_LEN  (sizeof(int32_t) \
-                                            + CEREBRO_METRIC_NAME_MAXLEN \
+                                            + CEREBRO_MAX_METRIC_NAME_LEN \
                                             + sizeof(u_int32_t) \
                                             + sizeof(u_int32_t))
 
@@ -78,13 +78,13 @@ struct cerebro_metric_name_response
   int32_t version;
   u_int32_t metric_err_code;
   u_int8_t end_of_responses;
-  char metric_name[CEREBRO_METRIC_NAME_MAXLEN];
+  char metric_name[CEREBRO_MAX_METRIC_NAME_LEN];
 };
   
 #define CEREBRO_METRIC_NAME_RESPONSE_LEN  (sizeof(int32_t) \
                                            + sizeof(u_int32_t) \
                                            + sizeof(u_int8_t) \
-                                           + CEREBRO_METRIC_NAME_MAXLEN)
+                                           + CEREBRO_MAX_METRIC_NAME_LEN)
 
 /*
  * struct cerebro_node_metric_response
@@ -96,7 +96,7 @@ struct cerebro_node_metric_response
   int32_t version;
   u_int32_t metric_err_code;
   u_int8_t end_of_responses;
-  char nodename[CEREBRO_MAXNODENAMELEN];
+  char nodename[CEREBRO_MAX_NODENAME_LEN];
   u_int32_t metric_value_type;
   u_int32_t metric_value_len;
   void *metric_value;
@@ -105,7 +105,7 @@ struct cerebro_node_metric_response
 #define CEREBRO_NODE_METRIC_RESPONSE_HEADER_LEN  (sizeof(int32_t) \
                                                   + sizeof(u_int32_t) \
                                                   + sizeof(u_int8_t) \
-                                                  + CEREBRO_MAXNODENAMELEN \
+                                                  + CEREBRO_MAX_NODENAME_LEN \
                                                   + sizeof(u_int32_t) \
                                                   + sizeof(u_int32_t))
 

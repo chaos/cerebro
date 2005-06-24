@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric.c,v 1.47 2005-06-24 16:26:19 achu Exp $
+ *  $Id: cerebrod_metric.c,v 1.48 2005-06-24 20:42:28 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -295,12 +295,12 @@ _cerebrod_metric_request_receive(int client_fd,
 				 struct cerebro_metric_request *req)
 {
   int count, bytes_read = 0;
-  char buf[CEREBRO_PACKET_BUFLEN];
+  char buf[CEREBRO_MAX_PACKET_LEN];
   
   assert(client_fd >= 0);
   assert(req);
   
-  memset(buf, '\0', CEREBRO_PACKET_BUFLEN);
+  memset(buf, '\0', CEREBRO_MAX_PACKET_LEN);
   
   /* Wait for request from client */
   while (bytes_read < CEREBRO_METRIC_REQUEST_PACKET_LEN)
@@ -421,7 +421,7 @@ static int
 _cerebrod_metric_err_response_send(int client_fd, 
                                    struct cerebro_metric_err_response *err_res)
 {
-  char buf[CEREBRO_PACKET_BUFLEN];
+  char buf[CEREBRO_MAX_PACKET_LEN];
   int err_res_len;
 
   assert(client_fd >= 0);
@@ -429,7 +429,7 @@ _cerebrod_metric_err_response_send(int client_fd,
 
   if ((err_res_len = _cerebrod_metric_err_response_marshall(err_res, 
                                                             buf, 
-                                                            CEREBRO_PACKET_BUFLEN)) < 0)
+                                                            CEREBRO_MAX_PACKET_LEN)) < 0)
     {
       cerebro_err_debug("%s(%s:%d): _cerebrod_metric_err_response_marshall",
                         __FILE__, __FUNCTION__, __LINE__);
@@ -616,14 +616,14 @@ _cerebrod_metric_name_response_create(char *metric_name,
   res->metric_err_code = CEREBRO_METRIC_PROTOCOL_ERR_SUCCESS;
   res->end_of_responses = CEREBRO_METRIC_PROTOCOL_IS_NOT_LAST_RESPONSE;
 #if CEREBRO_DEBUG
-  if (metric_name && strlen(metric_name) > CEREBRO_METRIC_NAME_MAXLEN)
+  if (metric_name && strlen(metric_name) > CEREBRO_MAX_METRIC_NAME_LEN)
     cerebro_err_debug("%s(%s:%d): invalid node name length: %s", 
                       __FILE__, __FUNCTION__, __LINE__,
                       metric_name);
 #endif /* CEREBRO_DEBUG */
       
   /* strncpy, b/c terminating character not required */
-  strncpy(res->metric_name, metric_name, CEREBRO_METRIC_NAME_MAXLEN);
+  strncpy(res->metric_name, metric_name, CEREBRO_MAX_METRIC_NAME_LEN);
  
   if (!list_append(metric_name_responses, res))
     {
@@ -842,14 +842,14 @@ _cerebrod_node_metric_response_create(char *nodename,
   res->metric_err_code = CEREBRO_METRIC_PROTOCOL_ERR_SUCCESS;
   res->end_of_responses = CEREBRO_METRIC_PROTOCOL_IS_NOT_LAST_RESPONSE;
 #if CEREBRO_DEBUG
-  if (nodename && strlen(nodename) > CEREBRO_MAXNODENAMELEN)
+  if (nodename && strlen(nodename) > CEREBRO_MAX_NODENAME_LEN)
     cerebro_err_debug("%s(%s:%d): invalid node name length: %s", 
                       __FILE__, __FUNCTION__, __LINE__,
                       nodename);
 #endif /* CEREBRO_DEBUG */
       
   /* strncpy, b/c terminating character not required */
-  strncpy(res->nodename, nodename, CEREBRO_MAXNODENAMELEN);
+  strncpy(res->nodename, nodename, CEREBRO_MAX_NODENAME_LEN);
       
   res->metric_value_type = metric_value_type;
   res->metric_value_len = metric_value_len;
@@ -1076,16 +1076,18 @@ _cerebrod_node_metric_response_destroy(void *x)
  * Return 0 on success, -1 on error
  */
 static int
-_cerebrod_metric_respond_with_nodes(int client_fd, struct cerebro_metric_request *req)
+_cerebrod_metric_respond_with_nodes(int client_fd, 
+                                    struct cerebro_metric_request *req,
+                                    char *metric_name)
 {
   struct cerebrod_node_metric_evaluation_data ed;
   struct cerebro_node_metric_response end_res;
   struct timeval tv;
-  char metric_name_buf[CEREBRO_METRIC_NAME_MAXLEN+1];
   List node_responses = NULL;
 
   assert(client_fd >= 0);
   assert(req);
+  assert(metric_name);
 
   memset(&ed, '\0', sizeof(struct cerebrod_node_metric_evaluation_data));
 
@@ -1109,17 +1111,11 @@ _cerebrod_metric_respond_with_nodes(int client_fd, struct cerebro_metric_request
       goto cleanup;
     }
 
-  /* Guarantee ending '\0' character */
-  memset(metric_name_buf, '\0', CEREBRO_METRIC_NAME_MAXLEN+1);
-  memcpy(metric_name_buf,
-         req->metric_name,
-         CEREBRO_METRIC_NAME_MAXLEN);
-
   Gettimeofday(&tv, NULL);
   ed.client_fd = client_fd;
   ed.req = req;
   ed.time_now = tv.tv_sec;
-  ed.metric_name = metric_name_buf;
+  ed.metric_name = metric_name;
   ed.node_responses = node_responses;
 
   if (list_for_each(cerebrod_listener_data_list,
@@ -1186,7 +1182,7 @@ _cerebrod_metric_service_connection(void *arg)
 {
   int client_fd, req_len;
   struct cerebro_metric_request req;
-  char metric_name_buf[CEREBRO_METRIC_NAME_MAXLEN+1];
+  char metric_name_buf[CEREBRO_MAX_METRIC_NAME_LEN+1];
   client_fd = *((int *)arg);
 
   memset(&req, '\0', sizeof(struct cerebro_metric_request));
@@ -1228,10 +1224,16 @@ _cerebrod_metric_service_connection(void *arg)
       goto cleanup;
     }
 
+  /* Guarantee ending '\0' character */
+  memset(metric_name_buf, '\0', CEREBRO_MAX_METRIC_NAME_LEN+1);
+  memcpy(metric_name_buf,
+         req.metric_name,
+         CEREBRO_MAX_METRIC_NAME_LEN);
+
   Pthread_mutex_lock(&cerebrod_metric_name_lock);
   if (!List_find_first(cerebrod_metric_name_list, 
                        list_find_first_string,
-                       req.metric_name))
+                       metric_name_buf))
     {
       Pthread_mutex_unlock(&cerebrod_metric_name_lock);
       _cerebrod_metric_respond_with_error(client_fd,
@@ -1244,12 +1246,6 @@ _cerebrod_metric_service_connection(void *arg)
   if (!req.timeout_len)
     req.timeout_len = CEREBRO_METRIC_TIMEOUT_LEN_DEFAULT;
 
-  /* Guarantee ending '\0' character */
-  memset(metric_name_buf, '\0', CEREBRO_METRIC_NAME_MAXLEN+1);
-  memcpy(metric_name_buf,
-         req.metric_name,
-         CEREBRO_METRIC_NAME_MAXLEN);
-
   if (!strcmp(metric_name_buf, CEREBRO_METRIC_METRIC_NAMES))
     {
       if (_cerebrod_metric_respond_with_metric_names(client_fd, &req) < 0)
@@ -1257,7 +1253,9 @@ _cerebrod_metric_service_connection(void *arg)
     }
   else
     {
-      if (_cerebrod_metric_respond_with_nodes(client_fd, &req) < 0)
+      if (_cerebrod_metric_respond_with_nodes(client_fd, 
+                                              &req, 
+                                              metric_name_buf) < 0)
         goto cleanup;
     }
 

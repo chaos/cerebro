@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker_data.c,v 1.6 2005-06-22 21:40:44 achu Exp $
+ *  $Id: cerebrod_speaker_data.c,v 1.7 2005-06-24 20:42:28 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -265,7 +265,7 @@ cerebrod_speaker_data_get_metric_data(struct cerebrod_heartbeat *hb,
         }
 
       /* need not overflow */
-      strncpy(hd->metric_name, metric_name, CEREBRO_METRIC_NAME_MAXLEN);
+      strncpy(hd->metric_name, metric_name, CEREBRO_MAX_METRIC_NAME_LEN);
       
       if (metric_module_get_metric_value(metric_handle,
                                          metric_module->index,

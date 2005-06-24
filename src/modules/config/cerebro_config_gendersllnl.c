@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_gendersllnl.c,v 1.22 2005-06-22 20:30:09 achu Exp $
+ *  $Id: cerebro_config_gendersllnl.c,v 1.23 2005-06-24 20:42:28 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -121,7 +121,7 @@ gendersllnl_config_cleanup(void)
 int
 gendersllnl_config_load_default(struct cerebro_config *conf)
 {
-  char altnamebuf[CEREBRO_MAXNODENAMELEN+1];
+  char altnamebuf[CEREBRO_MAX_NODENAME_LEN+1];
   int flag, numnodes;
 
   if (!gendersllnl_handle)
@@ -211,7 +211,7 @@ gendersllnl_config_load_default(struct cerebro_config *conf)
       
       for (i = 0 ; i < mgmt_len; i++)
 	{
-	  if (strlen(altnodelist[i]) > CEREBRO_MAXNODENAMELEN)
+	  if (strlen(altnodelist[i]) > CEREBRO_MAX_NODENAME_LEN)
 	    {
 	      cerebro_err_debug("%s(%s:%d): genders_getnodes: %s",
 				__FILE__, __FUNCTION__, __LINE__,
@@ -227,12 +227,12 @@ gendersllnl_config_load_default(struct cerebro_config *conf)
       genders_altnodelist_destroy(gendersllnl_handle, altnodelist);      
     }
   
-  memset(altnamebuf, '\0', CEREBRO_MAXNODENAMELEN+1);
+  memset(altnamebuf, '\0', CEREBRO_MAX_NODENAME_LEN+1);
   if ((flag = genders_testattr(gendersllnl_handle, 
 			       NULL, 
 			       GENDERS_ALTNAME_ATTRIBUTE,
 			       altnamebuf,
-			       CEREBRO_MAXNODENAMELEN)) < 0)
+			       CEREBRO_MAX_NODENAME_LEN)) < 0)
     {
       cerebro_err_debug("%s(%s:%d): genders_testattr: %s",
 			__FILE__, __FUNCTION__, __LINE__,
@@ -270,10 +270,10 @@ gendersllnl_config_load_default(struct cerebro_config *conf)
       
       memset(conf->cerebrod_heartbeat_network_interface, 
 	     '\0', 
-	     CEREBRO_MAXNETWORKINTERFACELEN+1);
+	     CEREBRO_MAX_NETWORK_INTERFACE_LEN+1);
       strncpy(conf->cerebrod_heartbeat_network_interface, 
 	      heartbeat_network_interface, 
-	      CEREBRO_MAXNETWORKINTERFACELEN);
+	      CEREBRO_MAX_NETWORK_INTERFACE_LEN);
       conf->cerebrod_heartbeat_network_interface_flag++;
     }
 

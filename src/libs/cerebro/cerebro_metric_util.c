@@ -216,18 +216,18 @@ _cerebro_metric_request_send(cerebro_t handle,
                              int flags)
 {
   struct cerebro_metric_request req;
-  char buf[CEREBRO_PACKET_BUFLEN];
+  char buf[CEREBRO_MAX_PACKET_LEN];
   int req_len;
 
   req.version = CEREBRO_METRIC_PROTOCOL_VERSION;
-  strncpy(req.metric_name, metric_name, CEREBRO_METRIC_NAME_MAXLEN);
+  strncpy(req.metric_name, metric_name, CEREBRO_MAX_METRIC_NAME_LEN);
   req.flags = flags;
   req.timeout_len = timeout_len;
 
   if ((req_len = _cerebro_metric_request_marshall(handle,
                                                   &req,
                                                   buf,
-                                                  CEREBRO_PACKET_BUFLEN)) < 0)
+                                                  CEREBRO_MAX_PACKET_LEN)) < 0)
     return -1;
 
   if (fd_write_n(fd, buf, req_len) < 0)

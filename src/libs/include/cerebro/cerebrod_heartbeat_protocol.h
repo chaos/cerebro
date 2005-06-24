@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_heartbeat_protocol.h,v 1.1 2005-06-18 00:14:39 achu Exp $
+ *  $Id: cerebrod_heartbeat_protocol.h,v 1.2 2005-06-24 20:42:28 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_HEARTBEAT_PROTOCOL_H
@@ -18,13 +18,13 @@
  */
 struct cerebrod_heartbeat_metric
 {
-  char metric_name[CEREBRO_METRIC_NAME_MAXLEN];
+  char metric_name[CEREBRO_MAX_METRIC_NAME_LEN];
   u_int32_t metric_value_type;
   u_int32_t metric_value_len;
   void *metric_value;
 };
 
-#define CEREBROD_HEARTBEAT_METRIC_HEADER_LEN  (CEREBRO_METRIC_NAME_MAXLEN \
+#define CEREBROD_HEARTBEAT_METRIC_HEADER_LEN  (CEREBRO_MAX_METRIC_NAME_LEN \
                                                + sizeof(u_int32_t) \
                                                + sizeof(u_int32_t))
 
@@ -36,13 +36,13 @@ struct cerebrod_heartbeat_metric
 struct cerebrod_heartbeat 
 {
   int32_t version;
-  char nodename[CEREBRO_MAXNODENAMELEN];
+  char nodename[CEREBRO_MAX_NODENAME_LEN];
   u_int32_t metrics_len;
   struct cerebrod_heartbeat_metric **metrics;
 };
 
 #define CEREBROD_HEARTBEAT_HEADER_LEN  (sizeof(int32_t) \
-                                        + CEREBRO_MAXNODENAMELEN \
+                                        + CEREBRO_MAX_NODENAME_LEN \
                                         + sizeof(u_int32_t))
 
 #endif /* _CEREBROD_HEARTBEAT_PROTOCOL_H */

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.91 2005-06-23 16:54:23 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.92 2005-06-24 20:42:28 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -394,15 +394,15 @@ cerebrod_listener(void *arg)
   for (;;)
     {
       struct cerebrod_heartbeat *hb;
-      char nodename_buf[CEREBRO_MAXNODENAMELEN+1];
-      char nodename_key[CEREBRO_MAXNODENAMELEN+1];
+      char nodename_buf[CEREBRO_MAX_NODENAME_LEN+1];
+      char nodename_key[CEREBRO_MAX_NODENAME_LEN+1];
       int recv_len, flag;
-      char buf[CEREBRO_PACKET_BUFLEN];
+      char buf[CEREBRO_MAX_PACKET_LEN];
       
       Pthread_mutex_lock(&listener_fd_lock);
       if ((recv_len = recvfrom(listener_fd, 
 			       buf, 
-			       CEREBRO_PACKET_BUFLEN, 
+			       CEREBRO_MAX_PACKET_LEN, 
 			       0, 
 			       NULL, 
 			       NULL)) < 0)
@@ -489,15 +489,15 @@ cerebrod_listener(void *arg)
 	}
       
       /* Guarantee ending '\0' character */
-      memset(nodename_buf, '\0', CEREBRO_MAXNODENAMELEN+1);
-      memcpy(nodename_buf, hb->nodename, CEREBRO_MAXNODENAMELEN);
+      memset(nodename_buf, '\0', CEREBRO_MAX_NODENAME_LEN+1);
+      memcpy(nodename_buf, hb->nodename, CEREBRO_MAX_NODENAME_LEN);
 
-      memset(nodename_key, '\0', CEREBRO_MAXNODENAMELEN+1);
+      memset(nodename_key, '\0', CEREBRO_MAX_NODENAME_LEN+1);
 
       if (clusterlist_module_get_nodename(clusterlist_handle,
 					  nodename_buf,
 					  nodename_key, 
-					  CEREBRO_MAXNODENAMELEN+1) < 0)
+					  CEREBRO_MAX_NODENAME_LEN+1) < 0)
 	{
 	  cerebro_err_debug("%s(%s:%d): clusterlist_module_get_nodename: %s",
 			    __FILE__, __FUNCTION__, __LINE__,

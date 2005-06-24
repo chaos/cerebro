@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_gendersllnl.c,v 1.24 2005-06-22 20:30:09 achu Exp $
+ *  $Id: cerebro_clusterlist_gendersllnl.c,v 1.25 2005-06-24 20:42:28 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -130,7 +130,7 @@ gendersllnl_clusterlist_get_all_nodes(char ***nodes)
 static int
 gendersllnl_clusterlist_node_in_cluster(const char *node)
 {
-  char nodebuf[CEREBRO_MAXNODENAMELEN+1];
+  char nodebuf[CEREBRO_MAX_NODENAME_LEN+1];
   char *nodePtr = NULL;
   int flag;
 
@@ -153,8 +153,8 @@ gendersllnl_clusterlist_node_in_cluster(const char *node)
     {
       char *p;
 
-      memset(nodebuf, '\0', CEREBRO_MAXNODENAMELEN+1);
-      strncpy(nodebuf, node, CEREBRO_MAXNODENAMELEN);
+      memset(nodebuf, '\0', CEREBRO_MAX_NODENAME_LEN+1);
+      strncpy(nodebuf, node, CEREBRO_MAX_NODENAME_LEN);
       p = strchr(nodebuf, '.');
       *p = '\0';
       nodePtr = nodebuf;
@@ -183,7 +183,7 @@ gendersllnl_clusterlist_get_nodename(const char *node,
 				     char *buf, 
 				     unsigned int buflen)
 {
-  char nodebuf[CEREBRO_MAXNODENAMELEN+1];
+  char nodebuf[CEREBRO_MAX_NODENAME_LEN+1];
   char *nodePtr = NULL;
   int rv;
 
@@ -220,8 +220,8 @@ gendersllnl_clusterlist_get_nodename(const char *node,
     {
       char *p;
 
-      memset(nodebuf, '\0', CEREBRO_MAXNODENAMELEN+1);
-      strncpy(nodebuf, node, CEREBRO_MAXNODENAMELEN);
+      memset(nodebuf, '\0', CEREBRO_MAX_NODENAME_LEN+1);
+      strncpy(nodebuf, node, CEREBRO_MAX_NODENAME_LEN);
       p = strchr(nodebuf, '.');
       *p = '\0';
       nodePtr = nodebuf;

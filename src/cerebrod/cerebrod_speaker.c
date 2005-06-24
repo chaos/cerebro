@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.60 2005-06-22 20:30:09 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.61 2005-06-24 20:42:28 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -42,7 +42,7 @@ extern pthread_mutex_t debug_output_mutex;
  *
  * cached system nodename
  */
-static char cerebrod_nodename[CEREBRO_MAXNODENAMELEN+1];
+static char cerebrod_nodename[CEREBRO_MAX_NODENAME_LEN+1];
 
 /* 
  * _cerebrod_speaker_create_and_setup_socket
@@ -155,8 +155,8 @@ _cerebrod_speaker_initialize(void)
    * Setup Nodename
    */
 
-  memset(cerebrod_nodename, '\0', CEREBRO_MAXNODENAMELEN+1);
-  Gethostname(cerebrod_nodename, CEREBRO_MAXNODENAMELEN);
+  memset(cerebrod_nodename, '\0', CEREBRO_MAX_NODENAME_LEN+1);
+  Gethostname(cerebrod_nodename, CEREBRO_MAX_NODENAME_LEN);
 
   /* 
    * Seed random number generator
@@ -195,7 +195,7 @@ _cerebrod_heartbeat_create(unsigned int *heartbeat_len)
   hb = Malloc(sizeof(struct cerebrod_heartbeat));
 
   hb->version = CEREBROD_HEARTBEAT_PROTOCOL_VERSION;
-  memcpy(hb->nodename, cerebrod_nodename, CEREBRO_MAXNODENAMELEN);
+  memcpy(hb->nodename, cerebrod_nodename, CEREBRO_MAX_NODENAME_LEN);
   *heartbeat_len += CEREBROD_HEARTBEAT_HEADER_LEN;
 
   cerebrod_speaker_data_get_metric_data(hb, heartbeat_len);

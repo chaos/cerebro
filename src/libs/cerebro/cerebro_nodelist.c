@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_nodelist.c,v 1.3 2005-06-21 23:32:31 achu Exp $
+ *  $Id: cerebro_nodelist.c,v 1.4 2005-06-24 20:42:28 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -66,7 +66,7 @@ cerebro_nodelist_find(cerebro_nodelist_t nodelist,
                       void **metric_value)
 {
   struct cerebro_nodelist_data *nd;
-  char nodebuf[CEREBRO_MAXNODENAMELEN+1];
+  char nodebuf[CEREBRO_MAX_NODENAME_LEN+1];
   char *nodename;
 
   if (_cerebro_nodelist_check(nodelist) < 0)
@@ -95,12 +95,12 @@ cerebro_nodelist_find(cerebro_nodelist_t nodelist,
           return -1;
         }
       
-      memset(nodebuf, '\0', CEREBRO_MAXNODENAMELEN+1);
+      memset(nodebuf, '\0', CEREBRO_MAX_NODENAME_LEN+1);
 
       if (clusterlist_module_get_nodename(nodelist->handle->clusterlist_handle,
 					  node,
 					  nodebuf,
-					  CEREBRO_MAXNODENAMELEN+1) < 0)
+					  CEREBRO_MAX_NODENAME_LEN+1) < 0)
         {
           nodelist->errnum = CEREBRO_ERR_INTERNAL;
           return -1;

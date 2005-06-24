@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config.h,v 1.1 2005-06-17 22:58:30 achu Exp $
+ *  $Id: cerebro_config.h,v 1.2 2005-06-24 20:42:28 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_CONFIG_H
@@ -19,7 +19,7 @@ struct cerebro_config
   /* 
    * Libcerebro configuration
    */
-  char cerebro_hostnames[CEREBRO_CONFIG_HOSTNAMES_MAX][CEREBRO_MAXHOSTNAMELEN+1];
+  char cerebro_hostnames[CEREBRO_CONFIG_HOSTNAMES_MAX][CEREBRO_MAX_HOSTNAME_LEN+1];
   int cerebro_hostnames_len;
   int cerebro_hostnames_flag;
   unsigned int cerebro_port;
@@ -39,9 +39,9 @@ struct cerebro_config
   int cerebrod_heartbeat_source_port_flag;
   int cerebrod_heartbeat_destination_port;
   int cerebrod_heartbeat_destination_port_flag;
-  char cerebrod_heartbeat_destination_ip[CEREBRO_MAXIPADDRLEN+1];
+  char cerebrod_heartbeat_destination_ip[CEREBRO_MAX_IPADDR_LEN+1];
   int cerebrod_heartbeat_destination_ip_flag;
-  char cerebrod_heartbeat_network_interface[CEREBRO_MAXNETWORKINTERFACELEN+1];
+  char cerebrod_heartbeat_network_interface[CEREBRO_MAX_NETWORK_INTERFACE_LEN+1];
   int cerebrod_heartbeat_network_interface_flag;
   int cerebrod_heartbeat_ttl;
   int cerebrod_heartbeat_ttl_flag;

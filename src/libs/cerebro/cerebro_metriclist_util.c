@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metriclist_util.c,v 1.2 2005-06-23 23:00:48 achu Exp $
+ *  $Id: cerebro_metriclist_util.c,v 1.3 2005-06-24 20:42:28 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -120,13 +120,12 @@ _cerebro_metriclist_append(cerebro_metriclist_t metriclist,
   if (_cerebro_metriclist_check(metriclist) < 0)
     return -1;
 
-  if (!metric_name || strlen(metric_name) > CEREBRO_METRIC_NAME_MAXLEN)
+  if (!metric_name || strlen(metric_name) > CEREBRO_MAX_METRIC_NAME_LEN)
     {
       metriclist->errnum = CEREBRO_ERR_INTERNAL;
       goto cleanup;
     }
 
-  /* XXX not safe */
   if (!(str = strdup(metric_name)))
     {
       metriclist->errnum = CEREBRO_ERR_OUTMEM;

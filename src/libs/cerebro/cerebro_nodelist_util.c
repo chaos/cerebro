@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_nodelist_util.c,v 1.3 2005-06-23 22:54:05 achu Exp $
+ *  $Id: cerebro_nodelist_util.c,v 1.4 2005-06-24 20:42:28 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -141,7 +141,7 @@ _cerebro_nodelist_append(cerebro_nodelist_t nodelist,
   if (_cerebro_nodelist_check(nodelist) < 0)
     return -1;
 
-  if (!nodename || strlen(nodename) > CEREBRO_MAXNODENAMELEN)
+  if (!nodename || strlen(nodename) > CEREBRO_MAX_NODENAME_LEN)
     {
       nodelist->errnum = CEREBRO_ERR_INTERNAL;
       goto cleanup;
@@ -154,7 +154,7 @@ _cerebro_nodelist_append(cerebro_nodelist_t nodelist,
     }
   memset(nd, '\0', sizeof(struct cerebro_nodelist_data));
 
-  strncpy(nd->nodename, nodename, CEREBRO_MAXNODENAMELEN);
+  strncpy(nd->nodename, nodename, CEREBRO_MAX_NODENAME_LEN);
   nd->metric_value_type = metric_value_type;
   nd->metric_value_len = metric_value_len;
   nd->metric_value = metric_value;

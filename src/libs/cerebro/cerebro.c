@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.c,v 1.3 2005-06-23 22:54:05 achu Exp $
+ *  $Id: cerebro.c,v 1.4 2005-06-24 20:42:28 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -59,7 +59,7 @@ cerebro_handle_create(void)
   memset(handle, '\0', sizeof(struct cerebro));
   handle->magic = CEREBRO_MAGIC_NUMBER;
   handle->errnum = CEREBRO_ERR_SUCCESS;
-  memset(&(handle->hostname), '\0', CEREBRO_MAXHOSTNAMELEN+1);
+  memset(&(handle->hostname), '\0', CEREBRO_MAX_HOSTNAME_LEN+1);
   handle->port = 0;
   handle->timeout_len = 0;
   handle->flags = 0;
@@ -200,7 +200,7 @@ cerebro_set_hostname(cerebro_t handle, const char *hostname)
   if (_cerebro_handle_check(handle) < 0)
     return -1;
 
-  if (hostname && strlen(hostname) > CEREBRO_MAXHOSTNAMELEN)
+  if (hostname && strlen(hostname) > CEREBRO_MAX_HOSTNAME_LEN)
     {
       handle->errnum = CEREBRO_ERR_OVERFLOW;
       return -1;
@@ -209,7 +209,7 @@ cerebro_set_hostname(cerebro_t handle, const char *hostname)
   if (hostname)
     strcpy(handle->hostname, hostname);
   else
-    memset(handle->hostname, '\0', CEREBRO_MAXHOSTNAMELEN+1);
+    memset(handle->hostname, '\0', CEREBRO_MAX_HOSTNAME_LEN+1);
 
   return 0;
 }

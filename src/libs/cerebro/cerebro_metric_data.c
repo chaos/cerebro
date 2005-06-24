@@ -300,14 +300,14 @@ _cerebro_node_metric_response_receive_one(cerebro_t handle,
                                           struct cerebro_node_metric_response *res)
 {
   int header_count = 0, metric_value_count = 0, bytes_read;
-  char header_buf[CEREBRO_PACKET_BUFLEN];
+  char header_buf[CEREBRO_MAX_PACKET_LEN];
   char *buf = NULL;
   
   if ((bytes_read = _cerebro_metric_receive_data(handle,
 						 fd,
 						 CEREBRO_NODE_METRIC_RESPONSE_HEADER_LEN,
 						 header_buf,
-						 CEREBRO_PACKET_BUFLEN)) < 0)
+						 CEREBRO_MAX_PACKET_LEN)) < 0)
     goto cleanup;
   
   if (!bytes_read)
@@ -371,11 +371,12 @@ _cerebro_node_metric_response_receive_one(cerebro_t handle,
  */
 static int
 _cerebro_node_metric_response_receive_all(cerebro_t handle,
-				     struct cerebro_nodelist *nodelist,
-				     int fd,
-				     int flags)
+                                          struct cerebro_nodelist *nodelist,
+                                          int fd,
+                                          int flags)
 {
   struct cerebro_node_metric_response res;
+  char nodename_buf[CEREBRO_MAX_NODENAME_LEN+1];
   int res_len;
 
   /* XXX the cleanup here is disgusting */
@@ -419,8 +420,15 @@ _cerebro_node_metric_response_receive_all(cerebro_t handle,
       if (res.end_of_responses == CEREBRO_METRIC_PROTOCOL_IS_LAST_RESPONSE)
         break;
 
+      /* Guarantee ending '\0' character */
+      memset(nodename_buf, '\0', CEREBRO_MAX_NODENAME_LEN+1);
+      memcpy(nodename_buf, res.nodename, CEREBRO_MAX_NODENAME_LEN);
+
+      /* XXX function above mallocs, then we pass malloc to append,
+       * that isn't good
+       */
       if (_cerebro_nodelist_append(nodelist, 
-				   res.nodename,
+                                   nodename_buf,
                                    res.metric_value_type,
                                    res.metric_value_len,
                                    res.metric_value) < 0)
@@ -493,7 +501,7 @@ cerebro_get_metric_data(cerebro_t handle,
   if (_cerebro_handle_check(handle) < 0)
     goto cleanup;
 
-  if (!metric_name || strlen(metric_name) > CEREBRO_METRIC_NAME_MAXLEN)
+  if (!metric_name || strlen(metric_name) > CEREBRO_MAX_METRIC_NAME_LEN)
     {
       handle->errnum = CEREBRO_ERR_PARAMETERS;
       goto cleanup;

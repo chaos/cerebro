@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: config_util.c,v 1.2 2005-06-21 23:32:31 achu Exp $
+ *  $Id: config_util.c,v 1.3 2005-06-24 20:42:28 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -141,7 +141,7 @@ _cb_cerebro_hostnames(conffile_t cf, struct conffile_data *data,
       
       for (i = 0; i < data->stringlist_len; i++)
         {
-	  if (strlen(data->stringlist[i]) > CEREBRO_MAXNODENAMELEN)
+	  if (strlen(data->stringlist[i]) > CEREBRO_MAX_NODENAME_LEN)
 	    {
 	      conffile_seterrnum(cf, CONFFILE_ERR_PARSE_OVERFLOW_ARGLEN);
 	      return -1;
@@ -254,7 +254,7 @@ load_config_file(struct cerebro_config *conf)
 	0, 
 	&(conf->cerebrod_heartbeat_destination_ip_flag),
 	conf->cerebrod_heartbeat_destination_ip, 
-	CEREBRO_MAXIPADDRLEN
+	CEREBRO_MAX_IPADDR_LEN
       },
       {
 	"cerebrod_heartbeat_network_interface", 
@@ -265,7 +265,7 @@ load_config_file(struct cerebro_config *conf)
 	0, 
 	&(conf->cerebrod_heartbeat_network_interface_flag),
 	conf->cerebrod_heartbeat_network_interface, 
-	CEREBRO_MAXNETWORKINTERFACELEN
+	CEREBRO_MAX_NETWORK_INTERFACE_LEN
       },
       {
 	"cerebrod_heartbeat_ttl", 

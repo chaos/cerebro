@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.7 2005-06-23 21:37:22 achu Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.8 2005-06-24 20:42:28 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -741,14 +741,14 @@ cerebrod_listener_data_update(char *nodename,
           
           for (i = 0; i < hb->metrics_len; i++)
             {
-              char metric_name_buf[CEREBRO_METRIC_NAME_MAXLEN+1];
+              char metric_name_buf[CEREBRO_MAX_METRIC_NAME_LEN+1];
               struct cerebrod_monitor_module *monitor_module;
               
               /* Guarantee ending '\0' character */
-              memset(metric_name_buf, '\0', CEREBRO_METRIC_NAME_MAXLEN+1);
+              memset(metric_name_buf, '\0', CEREBRO_MAX_METRIC_NAME_LEN+1);
               memcpy(metric_name_buf, 
                      hb->metrics[i]->metric_name, 
-                     CEREBRO_METRIC_NAME_MAXLEN);
+                     CEREBRO_MAX_METRIC_NAME_LEN);
               
               if (cerebrod_metric_name_list)
                 {

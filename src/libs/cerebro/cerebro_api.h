@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_api.h,v 1.5 2005-06-23 22:54:05 achu Exp $
+ *  $Id: cerebro_api.h,v 1.6 2005-06-24 20:42:28 achu Exp $
 \*****************************************************************************/
  
 #ifndef _CEREBRO_API_H
@@ -39,7 +39,7 @@
 struct cerebro {
   int32_t magic;
   int32_t errnum;
-  char hostname[CEREBRO_MAXHOSTNAMELEN+1];
+  char hostname[CEREBRO_MAX_HOSTNAME_LEN+1];
   unsigned int port;
   unsigned int timeout_len;
   unsigned int flags;
@@ -82,7 +82,7 @@ struct cerebro_metriclist_iterator {
  * Stores a nodename and a value
  */
 struct cerebro_nodelist_data {
-  char nodename[CEREBRO_MAXNODENAMELEN+1];
+  char nodename[CEREBRO_MAX_NODENAME_LEN+1];
   u_int32_t metric_value_type;
   u_int32_t metric_value_len;
   void *metric_value;
@@ -96,7 +96,7 @@ struct cerebro_nodelist_data {
 struct cerebro_nodelist {
   int32_t magic;
   int32_t errnum;
-  char metric_name[CEREBRO_METRIC_NAME_MAXLEN+1];
+  char metric_name[CEREBRO_MAX_METRIC_NAME_LEN+1];
   List nodes;
   List iterators;
   struct cerebro *handle;
