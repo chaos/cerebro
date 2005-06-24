@@ -509,9 +509,9 @@ _cerebro_metric_name_response_receive_one(cerebro_t handle,
  */
 static int
 _cerebro_metric_name_response_receive_all(cerebro_t handle,
-				     struct cerebro_metriclist *metriclist,
-				     int fd,
-				     int flags)
+                                          struct cerebro_metriclist *metriclist,
+                                          int fd,
+                                          int flags)
 {
   struct cerebro_metric_name_response res;
   int res_len;
@@ -525,7 +525,7 @@ _cerebro_metric_name_response_receive_all(cerebro_t handle,
                                                                &res)) < 0)
         goto cleanup;
       
-      if (res_len < CEREBRO_METRIC_NAME_RESPONSE_HEADER_LEN)
+      if (res_len < CEREBRO_METRIC_NAME_RESPONSE_LEN)
         {
           if (res_len == CEREBRO_METRIC_ERR_RESPONSE_LEN)
             {
@@ -540,12 +540,14 @@ _cerebro_metric_name_response_receive_all(cerebro_t handle,
           goto cleanup;
         }
 
+      /* XXX possible? */
       if (res.version != CEREBRO_METRIC_PROTOCOL_VERSION)
         {
           handle->errnum = CEREBRO_ERR_VERSION_INCOMPATIBLE;
           goto cleanup;
         }
       
+      /* XXX possible? */
       if (res.metric_err_code != CEREBRO_METRIC_PROTOCOL_ERR_SUCCESS)
         {
           handle->errnum = _cerebro_metric_protocol_err_conversion(res.metric_err_code);
@@ -555,24 +557,16 @@ _cerebro_metric_name_response_receive_all(cerebro_t handle,
       if (res.end_of_responses == CEREBRO_METRIC_PROTOCOL_IS_LAST_RESPONSE)
         break;
 
-      if (_cerebro_metriclist_append(metriclist, 
-				   res.nodename,
-                                   res.metric_value_type,
-                                   res.metric_value_len,
-                                   res.metric_value) < 0)
+      /* XXX need to ensure null termination */
+      if (_cerebro_metriclist_append(metriclist, res.metric_name) < 0)
 	goto cleanup;
     }
 
   memset(&res, '\0', sizeof(struct cerebro_metric_name_response));
-  
-  if (_cerebro_metriclist_sort(metriclist) < 0)
-    goto cleanup;
 
   return 0;
 
  cleanup:
-  if (res.metric_value)
-    free(res.metric_value);
   return -1;
 }
 

@@ -540,12 +540,14 @@ _cerebro_node_metric_response_receive_all(cerebro_t handle,
           goto cleanup;
         }
 
+      /* XXX possible? */
       if (res.version != CEREBRO_METRIC_PROTOCOL_VERSION)
         {
           handle->errnum = CEREBRO_ERR_VERSION_INCOMPATIBLE;
           goto cleanup;
         }
       
+      /* XXX possible? */
       if (res.metric_err_code != CEREBRO_METRIC_PROTOCOL_ERR_SUCCESS)
         {
           handle->errnum = _cerebro_metric_protocol_err_conversion(res.metric_err_code);
