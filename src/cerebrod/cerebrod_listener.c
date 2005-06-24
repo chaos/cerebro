@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.92 2005-06-24 20:42:28 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.93 2005-06-24 23:32:11 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -188,7 +188,7 @@ _cerebrod_heartbeat_unmarshall_and_create(const char *buf, unsigned int buflen)
 {
   struct cerebrod_heartbeat *hb = NULL;
   struct cerebrod_heartbeat_metric *hd = NULL;
-  int i, len, count = 0;
+  int i, n, len = 0;
 
   assert(buf);
   
@@ -196,30 +196,20 @@ _cerebrod_heartbeat_unmarshall_and_create(const char *buf, unsigned int buflen)
 
   memset(hb, '\0', sizeof(struct cerebrod_heartbeat));
   
-  len = Unmarshall_int32(&(hb->version),
-                         buf + count,
-                         buflen - count);
-  if (!len)
+  if (!(n = Unmarshall_int32(&(hb->version), buf + len, buflen - len)))
     goto bad_len_cleanup;
-  
-  count += len;
+  len += n;
 
-  len = Unmarshall_buffer(hb->nodename,
-                          sizeof(hb->nodename),
-                          buf + count,
-                          buflen - count);
-  if (!len)
+  if (!(n = Unmarshall_buffer(hb->nodename,
+                              sizeof(hb->nodename),
+                              buf + len,
+                              buflen - len)))
     goto bad_len_cleanup;
+  len += n;
   
-  count += len;
-  
-  len = Unmarshall_u_int32(&(hb->metrics_len),
-                           buf + count,
-                           buflen - count);
-  if (!len)
+  if (!(n = Unmarshall_u_int32(&(hb->metrics_len), buf + len, buflen - len)))
     goto bad_len_cleanup;
-
-  count += len;
+  len += n;
   
   if (hb->metrics_len)
     {
@@ -231,30 +221,24 @@ _cerebrod_heartbeat_unmarshall_and_create(const char *buf, unsigned int buflen)
           hd = Malloc(sizeof(struct cerebrod_heartbeat_metric));
           memset(hd, '\0', sizeof(struct cerebrod_heartbeat_metric));
           
-          len = Unmarshall_buffer(hd->metric_name,
-                                  sizeof(hd->metric_name),
-                                  buf + count,
-                                  buflen - count);
-          if (!len)
+          if (!(n = Unmarshall_buffer(hd->metric_name,
+                                      sizeof(hd->metric_name),
+                                      buf + len,
+                                      buflen - len)))
             goto bad_len_cleanup;
+          len += n;
           
-          count += len;
-          
-          len = Unmarshall_u_int32(&(hd->metric_value_type),
-                                   buf + count,
-                                   buflen - count);
-          if (!len)
+          if (!(n = Unmarshall_u_int32(&(hd->metric_value_type),
+                                       buf + len,
+                                       buflen - len)))
             goto bad_len_cleanup;
+          len += n;
           
-          count += len;
-          
-          len = Unmarshall_u_int32(&(hd->metric_value_len),
-                                   buf + count,
-                                   buflen - count);
-          if (!len)
+          if (!(n = Unmarshall_u_int32(&(hd->metric_value_len),
+                                       buf + len,
+                                       buflen - len)))
             goto bad_len_cleanup;
-      
-          count += len;
+          len += n;
           
           if (hd->metric_value_len)
             {
@@ -268,45 +252,40 @@ _cerebrod_heartbeat_unmarshall_and_create(const char *buf, unsigned int buflen)
                                     __FILE__, __FUNCTION__, __LINE__);
                   break;
                 case CEREBRO_METRIC_VALUE_TYPE_INT32:
-                  len = Unmarshall_int32((int32_t *)hd->metric_value,
-                                         buf + count,
-                                         buflen - count);
-                  if (!len)
+                  if (!(n = Unmarshall_int32((int32_t *)hd->metric_value,
+                                             buf + len,
+                                             buflen - len)))
                     goto bad_len_cleanup;
-                  count += len;
+                  len += n;
                   break;
                 case CEREBRO_METRIC_VALUE_TYPE_U_INT32:
-                  len = Unmarshall_u_int32((u_int32_t *)hd->metric_value,
-                                           buf + count,
-                                           buflen - count);
-                  if (!len)
+                  if (!(n = Unmarshall_u_int32((u_int32_t *)hd->metric_value,
+                                               buf + len,
+                                               buflen - len)))
                     goto bad_len_cleanup;
-                  count += len;
+                  len += n;
                   break;
                 case CEREBRO_METRIC_VALUE_TYPE_FLOAT:
-                  len = Unmarshall_float((float *)hd->metric_value,
-                                         buf + count,
-                                         buflen - count);
-                  if (!len)
+                  if (!(n = Unmarshall_float((float *)hd->metric_value,
+                                             buf + len,
+                                             buflen - len)))
                     goto bad_len_cleanup;
-                  count += len;
+                  len += n;
                   break;
                 case CEREBRO_METRIC_VALUE_TYPE_DOUBLE:
-                  len = Unmarshall_double((double *)hd->metric_value,
-                                          buf + count,
-                                          buflen - count);
-                  if (!len)
+                  if (!(n = Unmarshall_double((double *)hd->metric_value,
+                                              buf + len,
+                                              buflen - len)))
                     goto bad_len_cleanup;
-                  count += len;
+                  len += n;
                   break;
                 case CEREBRO_METRIC_VALUE_TYPE_STRING:
-                  len = Unmarshall_buffer((char *)hd->metric_value,
-                                          hd->metric_value_len,
-                                          buf + count,
-                                          buflen - count);
-                  if (!len)
+                  if (!(n = Unmarshall_buffer((char *)hd->metric_value,
+                                              hd->metric_value_len,
+                                              buf + len,
+                                              buflen - len)))
                     goto bad_len_cleanup;
-                  count += len;
+                  len += n;
                   break;
                 default:
                   cerebro_err_debug("%s(%s:%d): packet metric_value_type invalid: %d",
@@ -319,13 +298,13 @@ _cerebrod_heartbeat_unmarshall_and_create(const char *buf, unsigned int buflen)
         }
       hd = NULL;
     }
-
+  
   return hb;
 
  bad_len_cleanup:
   cerebro_err_debug("%s(%s:%d): packet buffer length invalid",
                     __FILE__, __FUNCTION__, __LINE__);
-
+  
  cleanup:
   if (hd)
     {

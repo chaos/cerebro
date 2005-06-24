@@ -11,6 +11,8 @@ Cleanup
 - common receive data func?
 - no need to malloc values in heartbeats and destroy em??
 - packet buflen max len issue with number of metrics supportable
+- string length issue with packet buflen fixed in listener
+- type -> len function
 
 Audit
 - code review to reduce memory footprint

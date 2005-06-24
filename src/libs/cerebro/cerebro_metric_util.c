@@ -146,7 +146,7 @@ _cerebro_metric_request_marshall(cerebro_t handle,
                                  char *buf,
                                  unsigned int buflen)
 {
-  int len, count = 0;
+  int n, len = 0;
 
 #if CEREBRO_DEBUG
   if (!buf)
@@ -168,44 +168,38 @@ _cerebro_metric_request_marshall(cerebro_t handle,
 
   memset(buf, '\0', buflen);
 
-  if ((len = marshall_int32(req->version,
-                            buf + count,
-                            buflen - count)) <= 0)
+  if ((n = marshall_int32(req->version, buf + len, buflen - len)) <= 0)
     {
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
-  count += len;
+  len += n;
 
-  if ((len = marshall_buffer(req->metric_name,
-                             sizeof(req->metric_name),
-                             buf + count,
-                             buflen - count)) <= 0)
+  if ((n = marshall_buffer(req->metric_name,
+                           sizeof(req->metric_name),
+                           buf + len,
+                           buflen - len)) <= 0)
     {
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
-  count += len;
+  len += n;
 
-  if ((len = marshall_u_int32(req->timeout_len,
-                              buf + count,
-                              buflen - count)) <= 0)
+  if ((n = marshall_u_int32(req->timeout_len, buf + len, buflen - len)) <= 0)
     {
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
-  count += len;
+  len += n;
 
-  if ((len = marshall_u_int32(req->flags,
-                              buf + count,
-                              buflen - count)) <= 0)
+  if ((n = marshall_u_int32(req->flags, buf + len, buflen - len)) <= 0)
     {
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
-  count += len;
+  len += n;
 
-  return count;
+  return len;
 }
 
 int

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.61 2005-06-24 20:42:28 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.62 2005-06-24 23:32:11 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -215,46 +215,37 @@ _cerebrod_heartbeat_marshall(struct cerebrod_heartbeat *hb,
 			     char *buf,
 			     unsigned int buflen)
 {
-  int i, len, count = 0;
+  int i, len = 0;
  
   assert(hb);
   assert(buf);
   assert(buflen >= CEREBROD_HEARTBEAT_HEADER_LEN);
   
   memset(buf, '\0', buflen);
-  len = Marshall_int32(hb->version, buf + count, buflen - count);
-  count += len;
-  
-  len = Marshall_buffer(hb->nodename, 
-                        sizeof(hb->nodename),
-                        buf + count,
-                        buflen - count);
-  count += len;
-  
-  len = Marshall_u_int32(hb->metrics_len, buf + count, buflen - count);
-  count += len;
+  len += Marshall_int32(hb->version, buf + len, buflen - len);
+  len += Marshall_buffer(hb->nodename, 
+                         sizeof(hb->nodename),
+                         buf + len,
+                         buflen - len);
+  len += Marshall_u_int32(hb->metrics_len, buf + len, buflen - len);
   
   if (hb->metrics_len)
     {
       for (i = 0; i < hb->metrics_len; i++)
         {
-          len = Marshall_buffer(hb->metrics[i]->metric_name,
-                                sizeof(hb->metrics[i]->metric_name),
-                                buf + count,
-                                buflen - count);
-          count += len;
+          len += Marshall_buffer(hb->metrics[i]->metric_name,
+                                 sizeof(hb->metrics[i]->metric_name),
+                                 buf + len,
+                                 buflen - len);
           
-          len = Marshall_u_int32(hb->metrics[i]->metric_value_type,
-                                 buf + count,
-                                 buflen - count);
-          count += len;
+          len += Marshall_u_int32(hb->metrics[i]->metric_value_type,
+                                  buf + len,
+                                  buflen - len);
           
-          len = Marshall_u_int32(hb->metrics[i]->metric_value_len,
-                                 buf + count,
-                                 buflen - count);
-          count += len;
+          len += Marshall_u_int32(hb->metrics[i]->metric_value_len,
+                                  buf + len,
+                                  buflen - len);
           
-          len = 0;
           switch(hb->metrics[i]->metric_value_type)
             {
             case CEREBRO_METRIC_VALUE_TYPE_NONE:
@@ -263,30 +254,30 @@ _cerebrod_heartbeat_marshall(struct cerebrod_heartbeat *hb,
                                 __FILE__, __FUNCTION__, __LINE__);
               break;
             case CEREBRO_METRIC_VALUE_TYPE_INT32:
-              len = Marshall_int32(*((int32_t *)hb->metrics[i]->metric_value),
-                                   buf + count,
-                                   buflen - count);
+              len += Marshall_int32(*((int32_t *)hb->metrics[i]->metric_value),
+                                    buf + len,
+                                    buflen - len);
               break;
             case CEREBRO_METRIC_VALUE_TYPE_U_INT32:
-              len = Marshall_u_int32(*((u_int32_t *)hb->metrics[i]->metric_value),
-                                     buf + count,
-                                     buflen - count);
+              len += Marshall_u_int32(*((u_int32_t *)hb->metrics[i]->metric_value),
+                                      buf + len,
+                                      buflen - len);
               break;
             case CEREBRO_METRIC_VALUE_TYPE_FLOAT:
-              len = Marshall_float(*((float *)hb->metrics[i]->metric_value),
-                                   buf + count,
-                                   buflen - count);
+              len += Marshall_float(*((float *)hb->metrics[i]->metric_value),
+                                    buf + len,
+                                    buflen - len);
               break;
             case CEREBRO_METRIC_VALUE_TYPE_DOUBLE:
-              len = Marshall_double(*((double *)hb->metrics[i]->metric_value),
-                                    buf + count,
-                                    buflen - count);
+              len += Marshall_double(*((double *)hb->metrics[i]->metric_value),
+                                     buf + len,
+                                     buflen - len);
               break;
             case CEREBRO_METRIC_VALUE_TYPE_STRING:
-              len = Marshall_buffer((char *)hb->metrics[i]->metric_value,
-                                    hb->metrics[i]->metric_value_len,
-                                    buf + count,
-                                    buflen - count);
+              len += Marshall_buffer((char *)hb->metrics[i]->metric_value,
+                                     hb->metrics[i]->metric_value_len,
+                                     buf + len,
+                                     buflen - len);
               break;
             default:
               cerebro_err_exit("%s(%s:%d): invalid metric type: %d",
@@ -294,11 +285,10 @@ _cerebrod_heartbeat_marshall(struct cerebrod_heartbeat *hb,
                                hb->metrics[i]->metric_value_type);
               break;
             }
-          count += len;
         }
     }
   
-  return count;
+  return len;
 }
 
 /* 

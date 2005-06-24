@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric.c,v 1.48 2005-06-24 20:42:28 achu Exp $
+ *  $Id: cerebrod_metric.c,v 1.49 2005-06-24 23:32:11 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -88,7 +88,7 @@ _cerebrod_metric_name_response_marshall(struct cerebro_metric_name_response *res
                                         char *buf, 
                                         unsigned int buflen)
 {
-  int len, count = 0;
+  int len = 0;
 
   assert(res);
   assert(buf);
@@ -96,22 +96,15 @@ _cerebrod_metric_name_response_marshall(struct cerebro_metric_name_response *res
 
   memset(buf, '\0', buflen);
 
-  len = Marshall_int32(res->version, buf + count, buflen - count);
-  count += len;
- 
-  len = Marshall_u_int32(res->metric_err_code, buf + count, buflen - count);
-  count += len;
+  len += Marshall_int32(res->version, buf + len, buflen - len);
+  len += Marshall_u_int32(res->err_code, buf + len, buflen - len);
+  len += Marshall_u_int8(res->end, buf + len, buflen - len);
+  len += Marshall_buffer(res->metric_name,
+                         sizeof(res->metric_name),
+                         buf + len,
+                         buflen - len);
 
-  len = Marshall_u_int8(res->end_of_responses, buf + count, buflen - count);
-  count += len;
-
-  len = Marshall_buffer(res->metric_name,
-                        sizeof(res->metric_name),
-                        buf + count,
-                        buflen - count);
-  count += len;
-
-  return count;
+  return len;
 }
 
 /*
@@ -126,7 +119,7 @@ _cerebrod_node_metric_response_marshall(struct cerebro_node_metric_response *res
                                         char *buf, 
                                         unsigned int buflen)
 {
-  int len, count = 0;
+  int len = 0;
 
   assert(res);
   assert(buf);
@@ -134,26 +127,15 @@ _cerebrod_node_metric_response_marshall(struct cerebro_node_metric_response *res
 
   memset(buf, '\0', buflen);
 
-  len = Marshall_int32(res->version, buf + count, buflen - count);
-  count += len;
- 
-  len = Marshall_u_int32(res->metric_err_code, buf + count, buflen - count);
-  count += len;
-
-  len = Marshall_u_int8(res->end_of_responses, buf + count, buflen - count);
-  count += len;
-
-  len = Marshall_buffer(res->nodename,
-                        sizeof(res->nodename),
-                        buf + count,
-                        buflen - count);
-  count += len;
-
-  len = Marshall_u_int32(res->metric_value_type, buf + count, buflen - count);
-  count += len;
-
-  len = Marshall_u_int32(res->metric_value_len, buf + count, buflen - count);
-  count += len;
+  len += Marshall_int32(res->version, buf + len, buflen - len);
+  len += Marshall_u_int32(res->err_code, buf + len, buflen - len);
+  len += Marshall_u_int8(res->end, buf + len, buflen - len);
+  len += Marshall_buffer(res->nodename,
+                         sizeof(res->nodename),
+                         buf + len,
+                         buflen - len);
+  len += Marshall_u_int32(res->metric_value_type, buf + len, buflen - len);
+  len += Marshall_u_int32(res->metric_value_len, buf + len, buflen - len);
   
   if (res->metric_value_len)
     {
@@ -165,35 +147,30 @@ _cerebrod_node_metric_response_marshall(struct cerebro_node_metric_response *res
                             __FILE__, __FUNCTION__, __LINE__);
           break;
         case CEREBRO_METRIC_VALUE_TYPE_INT32:
-          len = Marshall_int32(*((int32_t *)res->metric_value),
-                               buf + count,
-                               buflen - count);
-          count += len;
+          len += Marshall_int32(*((int32_t *)res->metric_value),
+                                buf + len,
+                                buflen - len);
           break;
         case CEREBRO_METRIC_VALUE_TYPE_U_INT32:
-          len = Marshall_u_int32(*((u_int32_t *)res->metric_value),
-                                 buf + count,
-                                 buflen - count);
-          count += len;
+          len += Marshall_u_int32(*((u_int32_t *)res->metric_value),
+                                  buf + len,
+                                  buflen - len);
           break;
         case CEREBRO_METRIC_VALUE_TYPE_FLOAT:
-          len = Marshall_float(*((float *)res->metric_value), 
-                               buf + count,
-                               buflen - count);
-          count += len;
+          len += Marshall_float(*((float *)res->metric_value), 
+                                buf + len,
+                                buflen - len);
           break;
         case CEREBRO_METRIC_VALUE_TYPE_DOUBLE:
-          len = Marshall_double(*((double *)res->metric_value), 
-                                buf + count,
-                                buflen - count);
-          count += len;
+          len += Marshall_double(*((double *)res->metric_value), 
+                                 buf + len,
+                                 buflen - len);
           break;
         case CEREBRO_METRIC_VALUE_TYPE_STRING:
-          len = Marshall_buffer(res->metric_value,
-                                res->metric_value_len,
-                                buf + count,
-                                buflen - count);
-          count += len;
+          len += Marshall_buffer(res->metric_value,
+                                 res->metric_value_len,
+                                 buf + len,
+                                 buflen - len);
           break;
         default:
           cerebro_err_debug("%s(%s:%d): invalid type: %d",
@@ -203,7 +180,7 @@ _cerebrod_node_metric_response_marshall(struct cerebro_node_metric_response *res
         }
     }
 
-  return count;
+  return len;
 }
 
 
@@ -219,21 +196,16 @@ _cerebrod_metric_err_response_marshall(struct cerebro_metric_err_response *err_r
                                        char *buf, 
                                        unsigned int buflen)
 {
-  int len, count = 0;
+  int len = 0;
  
   assert(err_res);
   assert(buf);
   assert(buflen >= CEREBRO_METRIC_ERR_RESPONSE_LEN);
 
   memset(buf, '\0', buflen);
-
-  len = Marshall_int32(err_res->version, buf + count, buflen - count);
-  count += len;
- 
-  len = Marshall_u_int32(err_res->metric_err_code, buf + count, buflen - count);
-  count += len;
-
-  return count;
+  len += Marshall_int32(err_res->version, buf + len, buflen - len);
+  len += Marshall_u_int32(err_res->err_code, buf + len, buflen - len);
+  return len;
 }
 
 /*
@@ -248,38 +220,31 @@ _cerebrod_metric_request_unmarshall(struct cerebro_metric_request *req,
 				    const char *buf, 
                                     unsigned int buflen)
 {
-  int len, count = 0;
+  int n, len = 0;
 
   assert(req);
   assert(buf);
  
-  len = Unmarshall_int32(&(req->version), buf + count, buflen - count);
-
-  if (!len)
-    return count;
-  count += len;
-
-  len = Unmarshall_buffer(req->metric_name,
-                          sizeof(req->metric_name),
-                          buf + count,
-                          buflen - count);
-  if (!len)
-    return count;
-  count += len;
-
-  len = Unmarshall_u_int32(&(req->timeout_len), buf + count, buflen - count);
-
-  if (!len)
-    return count;
-  count += len;
-
-  len = Unmarshall_u_int32(&(req->flags), buf + count, buflen - count);
-
-  if (!len)
-    return count;
-  count += len;
-   
-  return count;
+  if (!(n = Unmarshall_int32(&(req->version), buf + len, buflen - len)))
+    return len;
+  len += n;
+  
+  if (!(n = Unmarshall_buffer(req->metric_name,
+                              sizeof(req->metric_name),
+                              buf + len,
+                              buflen - len)))
+    return len;
+  len += n;
+  
+  if (!(n = Unmarshall_u_int32(&(req->timeout_len), buf + len, buflen - len)))
+    return len;
+  len += n;
+  
+  if (!(n = Unmarshall_u_int32(&(req->flags), buf + len, buflen - len)))
+    return len;
+  len += n;
+  
+  return len;
 }
 
 /*
@@ -540,21 +505,21 @@ _cerebrod_node_metric_response_send_one(int client_fd,
 static int
 _cerebrod_metric_respond_with_error(int client_fd, 
                                     int32_t version,
-                                    u_int32_t metric_err_code)
+                                    u_int32_t err_code)
 {
   struct cerebro_metric_err_response err_res;
 
   assert(client_fd >= 0);
-  assert(metric_err_code == CEREBRO_METRIC_PROTOCOL_ERR_VERSION_INVALID
-	 || metric_err_code == CEREBRO_METRIC_PROTOCOL_ERR_METRIC_UNKNOWN
-	 || metric_err_code == CEREBRO_METRIC_PROTOCOL_ERR_PARAMETER_INVALID
-         || metric_err_code == CEREBRO_METRIC_PROTOCOL_ERR_PACKET_INVALID
-	 || metric_err_code == CEREBRO_METRIC_PROTOCOL_ERR_INTERNAL_SYSTEM_ERROR);
+  assert(err_code == CEREBRO_METRIC_PROTOCOL_ERR_VERSION_INVALID
+	 || err_code == CEREBRO_METRIC_PROTOCOL_ERR_METRIC_UNKNOWN
+	 || err_code == CEREBRO_METRIC_PROTOCOL_ERR_PARAMETER_INVALID
+         || err_code == CEREBRO_METRIC_PROTOCOL_ERR_PACKET_INVALID
+	 || err_code == CEREBRO_METRIC_PROTOCOL_ERR_INTERNAL_SYSTEM_ERROR);
   
   memset(&err_res, '\0', CEREBRO_METRIC_ERR_RESPONSE_LEN);
   
   err_res.version = version;
-  err_res.metric_err_code = metric_err_code;
+  err_res.err_code = err_code;
 
   if (_cerebrod_metric_err_response_send(client_fd, &err_res) < 0)
     return -1;
@@ -613,8 +578,8 @@ _cerebrod_metric_name_response_create(char *metric_name,
   memset(res, '\0', sizeof(struct cerebro_metric_name_response));
 
   res->version = CEREBRO_METRIC_PROTOCOL_VERSION;
-  res->metric_err_code = CEREBRO_METRIC_PROTOCOL_ERR_SUCCESS;
-  res->end_of_responses = CEREBRO_METRIC_PROTOCOL_IS_NOT_LAST_RESPONSE;
+  res->err_code = CEREBRO_METRIC_PROTOCOL_ERR_SUCCESS;
+  res->end = CEREBRO_METRIC_PROTOCOL_IS_NOT_LAST_RESPONSE;
 #if CEREBRO_DEBUG
   if (metric_name && strlen(metric_name) > CEREBRO_MAX_METRIC_NAME_LEN)
     cerebro_err_debug("%s(%s:%d): invalid node name length: %s", 
@@ -752,8 +717,8 @@ _cerebrod_metric_respond_with_metric_names(int client_fd, struct cerebro_metric_
   /* Send end response */
   memset(&end_res, '\0', sizeof(struct cerebro_metric_name_response));
   end_res.version = CEREBRO_METRIC_PROTOCOL_VERSION;
-  end_res.metric_err_code = CEREBRO_METRIC_PROTOCOL_ERR_SUCCESS;
-  end_res.end_of_responses = CEREBRO_METRIC_PROTOCOL_IS_LAST_RESPONSE;
+  end_res.err_code = CEREBRO_METRIC_PROTOCOL_ERR_SUCCESS;
+  end_res.end = CEREBRO_METRIC_PROTOCOL_IS_LAST_RESPONSE;
 
   if (_cerebrod_metric_name_response_send_one(client_fd, &end_res) < 0)
     return -1;
@@ -839,8 +804,8 @@ _cerebrod_node_metric_response_create(char *nodename,
   memset(res, '\0', sizeof(struct cerebro_node_metric_response));
 
   res->version = CEREBRO_METRIC_PROTOCOL_VERSION;
-  res->metric_err_code = CEREBRO_METRIC_PROTOCOL_ERR_SUCCESS;
-  res->end_of_responses = CEREBRO_METRIC_PROTOCOL_IS_NOT_LAST_RESPONSE;
+  res->err_code = CEREBRO_METRIC_PROTOCOL_ERR_SUCCESS;
+  res->end = CEREBRO_METRIC_PROTOCOL_IS_NOT_LAST_RESPONSE;
 #if CEREBRO_DEBUG
   if (nodename && strlen(nodename) > CEREBRO_MAX_NODENAME_LEN)
     cerebro_err_debug("%s(%s:%d): invalid node name length: %s", 
@@ -1151,8 +1116,8 @@ _cerebrod_metric_respond_with_nodes(int client_fd,
   /* Send end response */
   memset(&end_res, '\0', sizeof(struct cerebro_node_metric_response));
   end_res.version = CEREBRO_METRIC_PROTOCOL_VERSION;
-  end_res.metric_err_code = CEREBRO_METRIC_PROTOCOL_ERR_SUCCESS;
-  end_res.end_of_responses = CEREBRO_METRIC_PROTOCOL_IS_LAST_RESPONSE;
+  end_res.err_code = CEREBRO_METRIC_PROTOCOL_ERR_SUCCESS;
+  end_res.end = CEREBRO_METRIC_PROTOCOL_IS_LAST_RESPONSE;
 
   if (_cerebrod_node_metric_response_send_one(client_fd, &end_res) < 0)
     return -1;

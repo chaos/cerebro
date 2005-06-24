@@ -37,7 +37,7 @@ _cerebro_metric_name_response_unmarshall(cerebro_t handle,
 					 const char *buf,
 					 unsigned int buflen)
 {
-  int len, count = 0;
+  int n, len = 0;
 
 #if CEREBRO_DEBUG
   if (!buf)
@@ -49,60 +49,50 @@ _cerebro_metric_name_response_unmarshall(cerebro_t handle,
     }
 #endif /* CEREBRO_DEBUG */
 
-  if ((len = unmarshall_int32(&(res->version),
-                              buf + count,
-                              buflen - count)) < 0)
+  if ((n = unmarshall_int32(&(res->version), buf + len, buflen - len)) < 0)
+    {
+      handle->errnum = CEREBRO_ERR_INTERNAL;
+      return -1;
+    }
+  
+  if (!n)
+    return len;
+  len += n;
+
+  if ((n = unmarshall_u_int32(&(res->err_code), buf + len, buflen - len)) < 0)
     {
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
 
-  if (!len)
-    return count;
+  if (!n)
+    return len;
+  len += n;
 
-  count += len;
-
-  if ((len = unmarshall_u_int32(&(res->metric_err_code),
-                                buf + count,
-                                buflen - count)) < 0)
+  if ((n = unmarshall_u_int8(&(res->end), buf + len, buflen - len)) < 0)
     {
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
 
-  if (!len)
-    return count;
+  if (!n)
+    return len;
+  len += n;
 
-  count += len;
-
-  if ((len = unmarshall_u_int8(&(res->end_of_responses),
-                               buf + count,
-                               buflen - count)) < 0)
+  if ((n = unmarshall_buffer(res->metric_name,
+                             sizeof(res->metric_name),
+                             buf + len,
+                             buflen - len)) < 0)
     {
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
 
-  if (!len)
-    return count;
+  if (!n)
+    return len;
+  len += n;
 
-  count += len;
-
-  if ((len = unmarshall_buffer(res->metric_name,
-                               sizeof(res->metric_name),
-                               buf + count,
-                               buflen - count)) < 0)
-    {
-      handle->errnum = CEREBRO_ERR_INTERNAL;
-      return -1;
-    }
-
-  if (!len)
-    return count;
-
-  count += len;
-
-  return count;
+  return len;
 }
 
 /* 
@@ -173,9 +163,9 @@ _cerebro_metric_name_response_receive_all(cerebro_t handle,
         {
           if (res_len == CEREBRO_METRIC_ERR_RESPONSE_LEN)
             {
-              if (res.metric_err_code != CEREBRO_METRIC_PROTOCOL_ERR_SUCCESS)
+              if (res.err_code != CEREBRO_METRIC_PROTOCOL_ERR_SUCCESS)
                 {
-                  handle->errnum = _cerebro_metric_protocol_err_conversion(res.metric_err_code);
+                  handle->errnum = _cerebro_metric_protocol_err_conversion(res.err_code);
                   goto cleanup;
                 }
             }
@@ -192,13 +182,13 @@ _cerebro_metric_name_response_receive_all(cerebro_t handle,
         }
       
       /* XXX possible? */
-      if (res.metric_err_code != CEREBRO_METRIC_PROTOCOL_ERR_SUCCESS)
+      if (res.err_code != CEREBRO_METRIC_PROTOCOL_ERR_SUCCESS)
         {
-          handle->errnum = _cerebro_metric_protocol_err_conversion(res.metric_err_code);
+          handle->errnum = _cerebro_metric_protocol_err_conversion(res.err_code);
           goto cleanup;
         }
 
-      if (res.end_of_responses == CEREBRO_METRIC_PROTOCOL_IS_LAST_RESPONSE)
+      if (res.end == CEREBRO_METRIC_PROTOCOL_IS_LAST_RESPONSE)
         break;
 
       /* Guarantee ending '\0' character */

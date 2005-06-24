@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_protocol.h,v 1.3 2005-06-24 20:42:28 achu Exp $
+ *  $Id: cerebro_metric_protocol.h,v 1.4 2005-06-24 23:32:11 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_METRIC_PROTOCOL_H
@@ -76,8 +76,8 @@ struct cerebro_metric_request
 struct cerebro_metric_name_response
 {
   int32_t version;
-  u_int32_t metric_err_code;
-  u_int8_t end_of_responses;
+  u_int32_t err_code;
+  u_int8_t end;
   char metric_name[CEREBRO_MAX_METRIC_NAME_LEN];
 };
   
@@ -94,8 +94,8 @@ struct cerebro_metric_name_response
 struct cerebro_node_metric_response
 {
   int32_t version;
-  u_int32_t metric_err_code;
-  u_int8_t end_of_responses;
+  u_int32_t err_code;
+  u_int8_t end;
   char nodename[CEREBRO_MAX_NODENAME_LEN];
   u_int32_t metric_value_type;
   u_int32_t metric_value_len;
@@ -117,7 +117,7 @@ struct cerebro_node_metric_response
 struct cerebro_metric_err_response
 {
   int32_t version;
-  u_int32_t metric_err_code;
+  u_int32_t err_code;
 };
   
 #define CEREBRO_METRIC_ERR_RESPONSE_LEN  (sizeof(int32_t) \
