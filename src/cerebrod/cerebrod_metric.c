@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric.c,v 1.46 2005-06-23 21:37:22 achu Exp $
+ *  $Id: cerebrod_metric.c,v 1.47 2005-06-24 16:26:19 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -694,8 +694,7 @@ _cerebrod_metric_respond_with_metric_names(int client_fd, struct cerebro_metric_
   assert(client_fd >= 0);
   assert(req);
 
-  memset(&ed, '\0', sizeof(struct cerebrod_node_metric_evaluation_data));
-
+  memset(&ed, '\0', sizeof(struct cerebrod_metric_name_evaluation_data));
   Pthread_mutex_lock(&cerebrod_metric_name_lock);
   
   if (!List_count(cerebrod_metric_name_list))
@@ -749,6 +748,7 @@ _cerebrod_metric_respond_with_metric_names(int client_fd, struct cerebro_metric_
     }
 
  end_response:
+
   /* Send end response */
   memset(&end_res, '\0', sizeof(struct cerebro_metric_name_response));
   end_res.version = CEREBRO_METRIC_PROTOCOL_VERSION;

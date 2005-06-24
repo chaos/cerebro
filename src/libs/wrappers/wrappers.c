@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.c,v 1.2 2005-06-22 18:11:00 achu Exp $
+ *  $Id: wrappers.c,v 1.3 2005-06-24 16:26:19 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -60,11 +60,9 @@ wrap_free(const char *file, const char *function, unsigned int line, void *ptr)
         cerebro_err_exit("free(%s(%s:%d)): memory corruption", file, function, line);
 
       size = *((int *)(p + sizeof(int)));
-      
       c = (char *)(p + 2*sizeof(int) + size);
       for (i = 0; i < MALLOC_PAD_LEN; i++)
         assert(c[i] == (char)MALLOC_PAD_DATA);
-      
       free(p);
     }
 }

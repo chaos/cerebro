@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.57 2005-06-22 18:11:00 achu Exp $
+## $Id: Makefile.am,v 1.58 2005-06-24 16:26:19 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -30,21 +30,16 @@ cerebrod_SOURCES = cerebrod.c \
 		   cerebrod_speaker.c\
 		   cerebrod_speaker_data.c\
 		   cerebrod_util.c
-cerebrod_CFLAGS  = -I$(srcdir)/../libs/cerebro \
-		   -I$(srcdir)/../libs/common \
+cerebrod_CFLAGS  = -I$(srcdir)/../libs/common \
 		   -I$(srcdir)/../libs/include \
 		   -I$(srcdir)/../libs/modules \
 		   -I$(srcdir)/../libs/util \
 		   -I$(srcdir)/../libs/wrappers
-cerebrod_LDADD   = ../libs/cerebro/libcerebro.la \
-		   ../libs/cerebro_error/libcerebro_error.la \
+cerebrod_LDADD   = ../libs/cerebro_error/libcerebro_error.la \
 		   ../libs/common/libcommon.la \
 		   ../libs/modules/libmodules.la \
 		   ../libs/util/libutil.la \
 		   ../libs/wrappers/libwrappers.la
-
-../libs/cerebro/libcerebro.la : force-dependency-check
-	@cd `dirname $@` && make `basename $@`
 
 ../libs/cerebro_error/libcerebro_error.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`

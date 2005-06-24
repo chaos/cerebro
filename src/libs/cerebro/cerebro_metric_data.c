@@ -11,27 +11,10 @@
 #if STDC_HEADERS
 #include <string.h>
 #endif /* STDC_HEADERS */
-#include <sys/select.h>
-#if TIME_WITH_SYS_TIME
-# include <sys/time.h>
-# include <time.h>
-#else  /* !TIME_WITH_SYS_TIME */
-# if HAVE_SYS_TIME_H
-#  include <sys/time.h>
-# else /* !HAVE_SYS_TIME_H */
-#  include <time.h>
-# endif /* !HAVE_SYS_TIME_H */
-#endif /* !TIME_WITH_SYS_TIME */
-#include <sys/types.h>
-#if HAVE_UNISTD_H
-#include <unistd.h>
-#endif /* HAVE_UNISTD_H */
-#include <errno.h>
 
 #include "cerebro.h"
 #include "cerebro_api.h"
 #include "cerebro_clusterlist_util.h"
-#include "cerebro_config_util.h"
 #include "cerebro_nodelist_util.h"
 #include "cerebro_util.h"
 #include "cerebro/cerebro_error.h"
