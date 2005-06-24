@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric.c,v 1.49 2005-06-24 23:32:11 achu Exp $
+ *  $Id: cerebrod_metric.c,v 1.50 2005-06-24 23:53:30 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -19,7 +19,6 @@
 #include "cerebro/cerebro_error.h"
 #include "cerebro/cerebro_metric_protocol.h"
 
-#include "cerebrod.h"
 #include "cerebrod_config.h"
 #include "cerebrod_listener_data.h"
 #include "cerebrod_metric.h"

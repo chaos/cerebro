@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.h,v 1.2 2005-06-22 18:11:00 achu Exp $
+ *  $Id: wrappers.h,v 1.3 2005-06-24 23:53:30 achu Exp $
 \*****************************************************************************/
 
 #ifndef _WRAPPERS_H
@@ -150,19 +150,10 @@ int wrap_inet_pton(const char *file, const char *function, unsigned int line, in
 /* 
  * Time Wrappers 
  */
-#define Time(t) \
-        wrap_time(__FILE__, __FUNCTION__, __LINE__, t)
-#define Localtime(timep) \
-        wrap_localtime(__FILE__, __FUNCTION__, __LINE__, timep)
-#define Localtime_r(timep, result) \
-        wrap_localtime_r(__FILE__, __FUNCTION__, __LINE__, timep, result)
 #define Gettimeofday(tv, tz) \
         wrap_gettimeofday(__FILE__, __FUNCTION__, __LINE__, tv, tz)
 
 int wrap_gettimeofday(const char *file, const char *function, unsigned int line, struct timeval *tv, struct timezone *tz);
-time_t wrap_time(const char *file, const char *function, unsigned int line, time_t *t);
-struct tm *wrap_localtime(const char *file, const char *function, unsigned int line, const time_t *timep);
-struct tm *wrap_localtime_r(const char *file, const char *function, unsigned int line, const time_t *timep, struct tm *result);
 
 /* 
  * Pthread Wrappers 

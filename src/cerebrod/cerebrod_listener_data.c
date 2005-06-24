@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.8 2005-06-24 20:42:28 achu Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.9 2005-06-24 23:53:30 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -18,7 +18,6 @@
 #include "cerebro/cerebro_constants.h"
 #include "cerebro/cerebro_error.h"
 
-#include "cerebrod.h"
 #include "cerebrod_config.h"
 #include "cerebrod_listener_data.h"
 #include "cerebrod_util.h"
@@ -408,16 +407,10 @@ _cerebrod_listener_data_output_update(struct cerebrod_node_data *nd)
  
   if (conf.debug && conf.listen_debug)
     {
-      struct tm tm;
-      char strbuf[CEREBROD_STRING_BUFLEN];
- 
-      Localtime_r((time_t *)&(nd->last_received_time), &tm);
-      strftime(strbuf, CEREBROD_STRING_BUFLEN, "%H:%M:%S", &tm);
- 
       Pthread_mutex_lock(&debug_output_mutex);
       fprintf(stderr, "**************************************\n");
-      fprintf(stderr, "* cluster_data Update: Node=%s Last_Received_Time=%s\n", 
-	      nd->nodename, strbuf);
+      fprintf(stderr, "* cluster_data Update: Node=%s Last_Received_Time=%u\n", 
+	      nd->nodename, nd->last_received_time);
       fprintf(stderr, "**************************************\n");
       Pthread_mutex_unlock(&debug_output_mutex);
     }

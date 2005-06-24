@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.68 2005-06-23 16:54:23 achu Exp $
+ *  $Id: cerebrod.c,v 1.69 2005-06-24 23:53:30 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -12,7 +12,6 @@
 
 #include "cerebro/cerebro_error.h"
 
-#include "cerebrod.h"
 #include "cerebrod_daemon.h"
 #include "cerebrod_config.h"
 #include "cerebrod_listener.h"

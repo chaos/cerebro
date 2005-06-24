@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.c,v 1.3 2005-06-24 16:26:19 achu Exp $
+ *  $Id: wrappers.c,v 1.4 2005-06-24 23:53:30 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -558,59 +558,6 @@ wrap_gettimeofday(const char *file, const char *function, unsigned int line, str
     cerebro_err_exit("gettimeofday(%s(%s:%d)): %s", file, function, line, strerror(errno));
 
   return rv;
-}
-
-time_t 
-wrap_time(const char *file, const char *function, unsigned int line, time_t *t)
-{
-  time_t rv;
-
-  assert(file);
-  assert(function);
-
-  /* t can be null */
-
-  if ((rv = time(t)) == ((time_t)-1))
-    cerebro_err_exit("time(%s(%s:%d)): %s", file, function, line, strerror(errno));
-
-  return rv;
-}
-
-struct tm *
-wrap_localtime(const char *file, const char *function, unsigned int line, const time_t *timep)
-{
-  struct tm *tmptr;
-  
-  assert(file);
-  assert(function);
-
-  if (!timep)
-    cerebro_err_exit("localtime(%s(%s:%d)): null timep pointer", file, function, line);
-
-  if (!(tmptr = localtime(timep)))
-    cerebro_err_exit("localtime(%s(%s:%d))", file, function, line);
-
-  return tmptr;
-}
-
-struct tm *
-wrap_localtime_r(const char *file, const char *function, unsigned int line, const time_t *timep, struct tm *result)
-{
-  struct tm *tmptr;
-  
-  assert(file);
-  assert(function);
-
-  if (!timep)
-    cerebro_err_exit("localtime_r(%s(%s:%d)): null timep pointer", file, function, line);
-
-  if (!result)
-    cerebro_err_exit("localtime_r(%s(%s:%d)): null result pointer", file, function, line);
-
-  if (!(tmptr = localtime_r(timep, result)))
-    cerebro_err_exit("localtime(%s(%s:%d))", file, function, line);
-
-  return tmptr;
 }
 
 int 

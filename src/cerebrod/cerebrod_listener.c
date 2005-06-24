@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.93 2005-06-24 23:32:11 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.94 2005-06-24 23:53:30 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -23,7 +23,6 @@
 #include "cerebro/cerebro_error.h"
 #include "cerebro/cerebrod_heartbeat_protocol.h"
 
-#include "cerebrod.h"
 #include "cerebrod_config.h"
 #include "cerebrod_heartbeat.h"
 #include "cerebrod_listener.h"
@@ -344,17 +343,9 @@ _cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb)
 
   if (conf.debug && conf.listen_debug)
     {
-      time_t t;
-      struct tm tm;
-      char strbuf[CEREBROD_STRING_BUFLEN];
-
-      t = Time(NULL);
-      Localtime_r(&t, &tm);
-      strftime(strbuf, CEREBROD_STRING_BUFLEN, "%H:%M:%S", &tm);
-
       Pthread_mutex_lock(&debug_output_mutex);
       fprintf(stderr, "**************************************\n");
-      fprintf(stderr, "* Received Heartbeat: %s\n", strbuf);     
+      fprintf(stderr, "* Received Heartbeat\n");
       fprintf(stderr, "* -----------------------\n");
       cerebrod_heartbeat_dump(hb);
       fprintf(stderr, "**************************************\n");
