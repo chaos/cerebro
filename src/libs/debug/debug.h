@@ -1,9 +1,9 @@
 /*****************************************************************************\
- *  $Id: error_util.h,v 1.3 2005-06-25 00:01:48 achu Exp $
+ *  $Id: debug.h,v 1.1 2005-06-25 00:14:28 achu Exp $
 \*****************************************************************************/
 
-#ifndef _ERROR_UTIL_H
-#define _ERROR_UTIL_H
+#ifndef _DEBUG_H
+#define _DEBUG_H
 
 #if HAVE_CONFIG_H
 #include "config.h"
@@ -11,10 +11,10 @@
 
 #if CEREBRO_DEBUG
 
-#include stdio.h>
-#include stdlib.h>
+#include <stdio.h>
+#include <stdlib.h>
 #if STDC_HEADERS
-#include string.h>
+#include <string.h>
 #endif /* STDC_HEADERS */
 #include <errno.h>
 
@@ -41,7 +41,7 @@
         if ((msgbuf = error_msg_create msg)) \
           { \
             strncat(errbuf, msgbuf, ERROR_BUFFER_LEN - len - 1); \
-            len += strlen(msgbuf);
+            len += strlen(msgbuf); \
             free(msgbuf); \
           } \
       }
@@ -65,13 +65,13 @@
     } while(0)
 
 /*
- * error_msg_create
+ * debug_msg_create
  *
  * create a buffer and put the a mesage inside it
  *
  * Returns message buffer or NULL on error
  */
-char *error_msg_create(char *fmt, ...);
+char *debug_msg_create(const char *fmt, ...);
     
 #else /* !CEREBRO_DEBUG */
 
@@ -81,4 +81,4 @@ char *error_msg_create(char *fmt, ...);
 
 #endif /* !CEREBRO_DEBUG */
 
-#endif /* _ERROR_UTIL_H */
+#endif /* _DEBUG_H */

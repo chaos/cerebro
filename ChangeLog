@@ -5,6 +5,8 @@
 	* tagged post-metric-names-metric-1
 
 	* Various code cleanup and corner case fixing.
+
+	* Added debug library.
 	
 2005-06-23  Albert Chu  <chu11@llnl.gov>
 

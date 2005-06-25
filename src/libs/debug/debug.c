@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: error_util.c,v 1.3 2005-06-25 00:01:48 achu Exp $
+ *  $Id: debug.c,v 1.1 2005-06-25 00:14:28 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -12,10 +12,10 @@
 #include <stdarg.h>
 #endif /* STDC_HEADERS */
 
-#include "error_util.h"
+#include "debug.h"
 
 char *
-error_msg_create(const char *fmt, ...)
+debug_msg_create(const char *fmt, ...)
 {
   char *buffer;
   va_list ap;

@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.46 2005-06-22 23:28:08 achu Exp $
+## $Id: configure.ac,v 1.47 2005-06-25 00:14:28 achu Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -168,6 +168,7 @@ AC_CONFIG_FILES( \
   src/libs/cerebro/Makefile \
   src/libs/cerebro_error/Makefile \
   src/libs/common/Makefile \
+  src/libs/debug/Makefile \
   src/libs/include/Makefile \
   src/libs/modules/Makefile \
   src/libs/util/Makefile \
