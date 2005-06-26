@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: config_util.c,v 1.3 2005-06-24 20:42:28 achu Exp $
+ *  $Id: config_util.c,v 1.4 2005-06-26 19:02:17 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -13,13 +13,14 @@
 #endif /* STDC_HEADERS */
 
 #include "cerebro/cerebro_constants.h"
-#include "cerebro/cerebro_error.h"
 
 #include "config_util.h"
 
 #include "conffile.h"
 
 #include "config_module.h"
+
+#include "debug.h"
 
 #if CEREBRO_DEBUG
 char *config_debug_config_file = NULL;
@@ -396,8 +397,7 @@ load_config_file(struct cerebro_config *conf)
   
   if (!(cf = conffile_handle_create()))
     {
-      cerebro_err_debug("%s(%s:%d): conffile_handle_create",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_ERR_DEBUG(("conffile_handle_create"));
       goto cleanup;
     }
   
@@ -422,12 +422,9 @@ load_config_file(struct cerebro_config *conf)
 	goto out;
 
       if (conffile_errmsg(cf, buf, CONFFILE_MAX_ERRMSGLEN) < 0)
-	cerebro_err_debug("%s(%s:%d): conffile_parse: %d", 
-			  __FILE__, __FUNCTION__, __LINE__,
-			  conffile_errnum(cf));
+	CEREBRO_ERR_DEBUG(("conffile_parse: %d", conffile_errnum(cf)));
       else
-	cerebro_err_debug("%s(%s:%d): conffile_parse: %s", 
-			  __FILE__, __FUNCTION__, __LINE__, buf);
+	CEREBRO_ERR_DEBUG(("conffile_parse: %s", buf));
 	
       goto cleanup;
     }
@@ -451,22 +448,19 @@ merge_cerebro_configs(struct cerebro_config *conf,
 
   if (!conf)
     {
-      cerebro_err_debug("%s(%s:%d): conf null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_ERR_DEBUG(("conf null"));
       return -1;
     }
 
   if (!module_conf)
     {
-      cerebro_err_debug("%s(%s:%d): module_conf null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_ERR_DEBUG(("module_conf null"));
       return -1;
     }
 
   if (!config_file_conf)
     {
-      cerebro_err_debug("%s(%s:%d): config_file_conf null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_ERR_DEBUG(("config_file_conf null"));
       return -1;
     }
 
@@ -480,8 +474,8 @@ merge_cerebro_configs(struct cerebro_config *conf,
   if (config_file_conf->cerebro_hostnames_flag)
     {
       for (i = 0; i < config_file_conf->cerebro_hostnames_len; i++)
-	strcpy(conf->cerebro_hostnames[i],
-	       config_file_conf->cerebro_hostnames[i]);
+	strcpy(conf->cerebro_hostnames[i], 
+               config_file_conf->cerebro_hostnames[i]);
       conf->cerebro_hostnames_len = config_file_conf->cerebro_hostnames_len;
       conf->cerebro_hostnames_flag++;
     }
@@ -718,8 +712,7 @@ load_config(struct cerebro_config *conf)
 
   if (!conf)
     {
-      cerebro_err_debug("%s(%s:%d): conf null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_ERR_DEBUG(("conf null"));
       return -1;
     }
 

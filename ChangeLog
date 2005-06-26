@@ -1,6 +1,6 @@
 2005-06-26  Albert Chu  <chu11@llnl.gov>
 
-	* Re-work modules lib to use debug library.
+	* Re-work modules and util libs to use debug library.
 
 	* cerebro.spec.in: Support debug build.
 	
