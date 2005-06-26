@@ -1,3 +1,9 @@
+2005-06-26  Albert Chu  <chu11@llnl.gov>
+
+	* Re-work modules lib to use debug library.
+
+	* cerebro.spec.in: Support debug build.
+	
 2005-06-24  Albert Chu  <chu11@llnl.gov>
 
 	* Continued worked on metric_names metric.

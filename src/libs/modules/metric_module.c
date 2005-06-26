@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: metric_module.c,v 1.3 2005-06-22 21:40:44 achu Exp $
+ *  $Id: metric_module.c,v 1.4 2005-06-26 18:39:13 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -14,12 +14,12 @@
 
 #include "cerebro.h"
 #include "cerebro/cerebro_constants.h"
-#include "cerebro/cerebro_error.h"
 #include "cerebro/cerebro_metric_module.h"
 
 #include "metric_module.h"
 #include "module_util.h"
 
+#include "debug.h"
 #include "ltdl.h"
 
 #define METRIC_FILENAME_SIGNATURE  "cerebro_metric_"
@@ -64,37 +64,31 @@ _metric_module_loader(void *handle, char *module)
 
   if (!module_setup_count)
     {
-      cerebro_err_debug("%s(%s:%d): cerebro_module_library uninitialized", 
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_ERR_DEBUG(("cerebro_module_library uninitialized"));
       return -1;
     }
 
   if (!metric_handle)
     {
-      cerebro_err_debug("%s(%s:%d): metric_handle null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_ERR_DEBUG(("metric_handle null"));
       return -1;
     }
 
   if (metric_handle->magic != METRIC_MODULE_MAGIC_NUMBER)
     {
-      cerebro_err_debug("%s(%s:%d): metric_handle magic number invalid",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_ERR_DEBUG(("metric_handle magic number invalid"));
       return -1;
     }
 
   if (!module)
     {
-      cerebro_err_debug("%s(%s:%d): module null", 
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_ERR_DEBUG(("module null"));
       return -1;
     }
   
   if (!(dl_handle = lt_dlopen(module)))
     {
-      cerebro_err_debug("%s(%s:%d): lt_dlopen: module=%s, %s",
-			__FILE__, __FUNCTION__, __LINE__,
-			module, lt_dlerror());
+      CEREBRO_ERR_DEBUG(("lt_dlopen: module=%s, %s", module, lt_dlerror()));
       goto cleanup;
     }
 
@@ -105,65 +99,55 @@ _metric_module_loader(void *handle, char *module)
     {
       const char *err = lt_dlerror();
       if (err)
-	cerebro_err_debug("%s(%s:%d): lt_dlsym: module=%s, %s",
-			  __FILE__, __FUNCTION__, __LINE__,
-			  module, err);
+	CEREBRO_ERR_DEBUG(("lt_dlsym: module=%s, %s", module, err));
       goto cleanup;
     }
 
   if (!module_info->metric_module_name)
     {
-      cerebro_err_debug("metric module '%s': metric_module_name null",
-			module_info->metric_module_name);
+      CEREBRO_ERR_DEBUG(("metric_module_name null"));
       goto cleanup;
     }
 
   if (!module_info->setup)
     {
-      cerebro_err_debug("metric module '%s': setup null",
-			module_info->metric_module_name);
+      CEREBRO_ERR_DEBUG(("setup null"));
       goto cleanup;
     }
 
   if (!module_info->cleanup)
     {
-      cerebro_err_debug("metric module '%s': cleanup null",
-			module_info->metric_module_name);
+      CEREBRO_ERR_DEBUG(("cleanup null"));
       goto cleanup;
     }
 
   if (!module_info->get_metric_name)
     {
-      cerebro_err_debug("metric module '%s': get_metric_name null",
-			module_info->metric_module_name);
+      CEREBRO_ERR_DEBUG(("get_metric_name null"));
       goto cleanup;
     }
 
   if (!module_info->get_metric_period)
     {
-      cerebro_err_debug("metric module '%s': get_metric_period null",
-			module_info->metric_module_name);
+      CEREBRO_ERR_DEBUG(("get_metric_period null"));
       goto cleanup;
     }
 
   if (!module_info->get_metric_value)
     {
-      cerebro_err_debug("metric module '%s': get_metric_value null",
-			module_info->metric_module_name);
+      CEREBRO_ERR_DEBUG(("get_metric_value null"));
       goto cleanup;
     }
 
   if (!module_info->destroy_metric_value)
     {
-      cerebro_err_debug("metric module '%s': destroy_metric_value null",
-			module_info->metric_module_name);
+      CEREBRO_ERR_DEBUG(("destroy_metric_value null"));
       goto cleanup;
     }
 
   if (!module_info->get_metric_thread)
     {
-      cerebro_err_debug("metric module '%s': get_metric_thread null",
-			module_info->metric_module_name);
+      CEREBRO_ERR_DEBUG(("get_metric_thread null"));
       goto cleanup;
     }
 
@@ -189,8 +173,7 @@ metric_modules_load(unsigned int modules_max)
 
   if (!modules_max)
     {
-      cerebro_err_debug("%s(%s:%d): modules_max invalid",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_ERR_DEBUG(("modules_max invalid"));
       return NULL;
     }
 
@@ -198,23 +181,24 @@ metric_modules_load(unsigned int modules_max)
     return NULL;
                                                                                     
   if (!(metric_handle = (struct metric_module *)malloc(sizeof(struct metric_module))))
-    return NULL;
+    {
+      CEREBRO_ERR_DEBUG(("out of memory"));
+      return NULL;
+    }
   memset(metric_handle, '\0', sizeof(struct metric_module));
   metric_handle->magic = METRIC_MODULE_MAGIC_NUMBER;
   metric_handle->modules_max = modules_max;
   metric_handle->modules_count = 0;
   if (!(metric_handle->dl_handle = (lt_dlhandle *)malloc(sizeof(lt_dlhandle)*metric_handle->modules_max)))
     {
-      cerebro_err_debug("%s(%s:%d): out of memory",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_ERR_DEBUG(("out of memory"));
       goto cleanup;
     }
   memset(metric_handle->dl_handle, '\0', sizeof(lt_dlhandle)*metric_handle->modules_max);
   
   if (!(metric_handle->module_info = (struct cerebro_metric_module_info **)malloc(sizeof(struct cerebro_metric_module_info *)*metric_handle->modules_max)))
     {
-      cerebro_err_debug("%s(%s:%d): out of memory",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_ERR_DEBUG(("out of memory"));
       goto cleanup;
     }
   memset(metric_handle->module_info, '\0', sizeof(struct cerebro_metric_module_info *)*metric_handle->modules_max);
@@ -261,7 +245,7 @@ metric_modules_load(unsigned int modules_max)
   module_cleanup();
   return NULL;
 }
-                                                                                      
+
 /*
  * metric_module_handle_check
  *
@@ -272,11 +256,9 @@ metric_modules_load(unsigned int modules_max)
 static int
 metric_module_handle_check(metric_modules_t metric_handle)
 {
-  if (!metric_handle 
-      || metric_handle->magic != METRIC_MODULE_MAGIC_NUMBER)
+  if (!metric_handle || metric_handle->magic != METRIC_MODULE_MAGIC_NUMBER)
     {
-      cerebro_err_debug("%s(%s:%d): cerebro metric_handle invalid",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_ERR_DEBUG(("cerebro metric_handle invalid"));
       return -1;
     }
 

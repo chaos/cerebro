@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: module_util.c,v 1.2 2005-06-24 20:42:28 achu Exp $
+ *  $Id: module_util.c,v 1.3 2005-06-26 18:39:13 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -21,10 +21,10 @@
 
 #include "cerebro.h"
 #include "cerebro/cerebro_constants.h"
-#include "cerebro/cerebro_error.h"
 
 #include "module_util.h"
 
+#include "debug.h"
 #include "ltdl.h"
 
 /*  
@@ -46,41 +46,40 @@ find_known_module(char *search_dir,
 
   if (!search_dir)
     {
-      cerebro_err_debug("%s(%s:%d): search_dir null", 
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_ERR_DEBUG(("search_dir null"));
       return -1;
     }
 
   if (!modules_list)
     {
-      cerebro_err_debug("%s(%s:%d): modules_list null", 
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_ERR_DEBUG(("modules_list null"));
       return -1;
     }
 
   if (!(modules_list_len > 0))
     {
-      cerebro_err_debug("%s(%s:%d): modules_list_len not valid",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_ERR_DEBUG(("modules_list_len not valid"));
       return -1;
     }
   
   if (!module_loader)
     {
-      cerebro_err_debug("%s(%s:%d): module_loader null", 
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_ERR_DEBUG(("module_loader null"));
       return -1;
     }
 
   if (!handle)
     {
-      cerebro_err_debug("%s(%s:%d): handle null", 
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_ERR_DEBUG(("handle null"));
       return -1;
     }
 
   if (!(dir = opendir(search_dir)))
-    return 0;
+    {
+      /* Return 0, since dir may simply not exist */
+      CEREBRO_ERR_DEBUG(("opendir: %s", strerror(errno)));
+      return 0;
+    }
 
   for (i = 0; i < modules_list_len; i++)
     {
@@ -128,41 +127,40 @@ find_modules(char *search_dir,
 
   if (!search_dir)
     {
-      cerebro_err_debug("%s(%s:%d): search_dir null", 
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_ERR_DEBUG(("%s(%s:%d): search_dir null"));
       return -1;
     }
 
   if (!signature)
     {
-      cerebro_err_debug("%s(%s:%d): signature null", 
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_ERR_DEBUG(("%s(%s:%d): signature null"));
       return -1;
     }
  
   if (!module_loader)
     {
-      cerebro_err_debug("%s(%s:%d): module_loader null", 
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_ERR_DEBUG(("%s(%s:%d): module_loader null"));
       return -1;
     }
 
   if (!handle)
     {
-      cerebro_err_debug("%s(%s:%d): handle null", 
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_ERR_DEBUG(("%s(%s:%d): handle null"));
       return -1;
     }
 
   if (!modules_max)
     {
-      cerebro_err_debug("%s(%s:%d): modules_max null", 
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_ERR_DEBUG(("%s(%s:%d): modules_max null"));
       return -1;
     }
 
   if (!(dir = opendir(search_dir)))
-    return 0;
+    {
+      /* Return 0, since dir may simply not exist */
+      CEREBRO_ERR_DEBUG(("opendir: %s", strerror(errno)));
+      return 0;
+    }
 
   while ((dirent = readdir(dir)))
     {
@@ -209,9 +207,7 @@ module_setup(void)
 
   if (lt_dlinit() != 0)
     {
-      cerebro_err_debug("%s(%s:%d): lt_dlinit: %s", 
-			__FILE__, __FUNCTION__, __LINE__, 
-			lt_dlerror());
+      CEREBRO_ERR_DEBUG(("lt_dlinit: %s", lt_dlerror()));
       return -1;
     }
 
@@ -230,9 +226,7 @@ module_cleanup(void)
     {
       if (lt_dlexit() != 0)
         {
-          cerebro_err_debug("%s(%s:%d): lt_dlexit: %s", 
-			    __FILE__, __FUNCTION__, __LINE__, 
-			    lt_dlerror());
+          CEREBRO_ERR_DEBUG(("lt_dlexit: %s", lt_dlerror()));
           return -1;
         }
     }

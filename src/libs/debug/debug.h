@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: debug.h,v 1.1 2005-06-25 00:14:28 achu Exp $
+ *  $Id: debug.h,v 1.2 2005-06-26 18:39:13 achu Exp $
 \*****************************************************************************/
 
 #ifndef _DEBUG_H
@@ -20,27 +20,27 @@
 
 #include "cerebro/cerebro_error.h"
 
-#define ERROR_BUFFER_LEN 8192
+#define DEBUG_BUFFER_LEN 8192
 
 #define CEREBRO_MSG_CREATE(msg) \
-    char errbuf[ERROR_BUFFER_LEN]; \
+    char errbuf[DEBUG_BUFFER_LEN]; \
     int len; \
     \
-    memset(errbuf, '\0', ERROR_BUFFER_LEN); \
+    memset(errbuf, '\0', DEBUG_BUFFER_LEN); \
     \
     len = snprintf(errbuf, \
-                   ERROR_BUFFER_LEN, \
+                   DEBUG_BUFFER_LEN, \
                    "(%s, %s, %d): ", \
                    __FILE__, \
                    __FUNCTION__, \
                    __LINE__); \
     \
-    if (len < ERROR_BUFFER_LEN) \
+    if (len < DEBUG_BUFFER_LEN) \
       { \
         char *msgbuf; \
-        if ((msgbuf = error_msg_create msg)) \
+        if ((msgbuf = debug_msg_create msg)) \
           { \
-            strncat(errbuf, msgbuf, ERROR_BUFFER_LEN - len - 1); \
+            strncat(errbuf, msgbuf, DEBUG_BUFFER_LEN - len - 1); \
             len += strlen(msgbuf); \
             free(msgbuf); \
           } \
@@ -55,11 +55,11 @@
 #define CEREBRO_ERR_DEBUG_ERRNO(msg) \
     do { \
       CEREBRO_MSG_CREATE(msg) \
-      if (len < ERROR_BUFFER_LEN) \
+      if (len < DEBUG_BUFFER_LEN) \
         { \
-          char errnobuf[ERROR_BUFFER_LEN]; \
-          snprintf(errnobuf, ERROR_BUFFER_LEN, ": %s", strerror(errno)); \
-          strncat(errbuf, errnobuf, ERROR_BUFFER_LEN - len -1); \
+          char errnobuf[DEBUG_BUFFER_LEN]; \
+          snprintf(errnobuf, DEBUG_BUFFER_LEN, ": %s", strerror(errno)); \
+          strncat(errbuf, errnobuf, DEBUG_BUFFER_LEN - len -1); \
           cerebro_err_debug(errbuf); \
         } \
     } while(0)

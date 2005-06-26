@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: debug.c,v 1.1 2005-06-25 00:14:28 achu Exp $
+ *  $Id: debug.c,v 1.2 2005-06-26 18:39:13 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -23,11 +23,11 @@ debug_msg_create(const char *fmt, ...)
   if (!fmt)
     return NULL;
 
-  if (!(buffer = malloc(ERROR_BUFFER_LEN)))
+  if (!(buffer = malloc(DEBUG_BUFFER_LEN)))
     return NULL;
 
   va_start(ap, fmt);
-  vsnprintf(buffer, ERROR_BUFFER_LEN, fmt, ap);
+  vsnprintf(buffer, DEBUG_BUFFER_LEN, fmt, ap);
   va_end(ap);
 
   return buffer;

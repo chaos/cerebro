@@ -1,10 +1,19 @@
 Name:    @PROJECT@ 
 Version: @VERSION@
 %if %{?_with_chaos:1}%{!?_with_chaos:0}
-Release: @RELEASE@chaos
+%if %{?_with_debug:1}%{!?_with_debug:0}
+%define release @RELEASE@chaos.debug
 %else
-Release: @RELEASE@
+%define release @RELEASE@chaos
 %endif
+%else
+%if %{?_with_debug:1}%{!?_with_debug:0}
+%define release @RELEASE@.debug
+%else
+%define release @RELEASE@
+%endif
+%endif
+
 Summary: Cerebro cluster monitoring tools and libraries
 Group: System Environment/Base
 License: GPL
@@ -37,6 +46,10 @@ Cerebro is a collection of cluster monitoring tools and libraries.
 %{!?_with_hostsfile: %{!?_without_hostsfile: %define _with_hostsfile --with-hostsfile}}
 %{!?_with_boottime: %{!?_without_boottime: %define _with_boottime --with-boottime}}
 %{!?_with_bootlog: %{!?_without_bootlog: %define _without_bootlog --without-bootlog}}
+%endif
+
+%if %{?_with_debug:1}%{!?_with_debug:0}
+%define _enable_debug --enable-debug
 %endif
 
 %package gendersllnl
@@ -100,7 +113,8 @@ Bootlog monitoring module(s).
            %{?_with_boottime} \
            %{?_without_boottime} \
            %{?_with_bootlog} \
-           %{?_without_bootlog}
+           %{?_without_bootlog} \
+           %{?_enable_debug}
 make 
 
 %install

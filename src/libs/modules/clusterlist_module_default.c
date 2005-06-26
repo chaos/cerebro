@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: clusterlist_module_default.c,v 1.2 2005-06-22 15:56:13 achu Exp $
+ *  $Id: clusterlist_module_default.c,v 1.3 2005-06-26 18:39:13 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -13,7 +13,8 @@
 #endif /* STDC_HEADERS */
 
 #include "cerebro/cerebro_clusterlist_module.h"
-#include "cerebro/cerebro_error.h"
+
+#include "debug.h"
 
 #define DEFAULT_CLUSTERLIST_MODULE_NAME "default"
 
@@ -55,25 +56,19 @@ default_clusterlist_get_nodename(const char *node, char *buf, unsigned int bufle
 
   if (!node)
     {
-      cerebro_err_debug("%s(%s:%d): %s clusterlist module: node null",
-			DEFAULT_CLUSTERLIST_MODULE_NAME,
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_ERR_DEBUG(("node null"));
       return -1;
     }
 
   if (!buf)
     {
-      cerebro_err_debug("%s(%s:%d): %s clusterlist module: buf null",
-			DEFAULT_CLUSTERLIST_MODULE_NAME,
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_ERR_DEBUG(("buf null"));
       return -1;
     }
 
   if (!buflen)
     {
-      cerebro_err_debug("%s(%s:%d): %s clusterlist module: buflen invalid",
-			DEFAULT_CLUSTERLIST_MODULE_NAME,
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_ERR_DEBUG(("buflen invalid"));
       return -1;
     }
   
@@ -81,10 +76,7 @@ default_clusterlist_get_nodename(const char *node, char *buf, unsigned int bufle
  
   if ((len + 1) > buflen)
     {
-      cerebro_err_debug("%s(%s:%d): %s clusterlist module: "
-			"buflen too small: %d %d",
-			__FILE__, __FUNCTION__, __LINE__,
-			DEFAULT_CLUSTERLIST_MODULE_NAME, len, buflen);
+      CEREBRO_ERR_DEBUG(("buflen too small: %d %d", len, buflen));
       return -1;
     }
  

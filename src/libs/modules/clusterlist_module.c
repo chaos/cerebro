@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: clusterlist_module.c,v 1.2 2005-06-21 19:16:56 achu Exp $
+ *  $Id: clusterlist_module.c,v 1.3 2005-06-26 18:39:13 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -15,11 +15,11 @@
 #include "cerebro.h"
 #include "cerebro/cerebro_clusterlist_module.h"
 #include "cerebro/cerebro_constants.h"
-#include "cerebro/cerebro_error.h"
 
 #include "clusterlist_module.h"
 #include "module_util.h"
 
+#include "debug.h"
 #include "ltdl.h"
 
 /*
@@ -77,37 +77,31 @@ _clusterlist_module_loader(void *handle, char *module)
 
   if (!module_setup_count)
     {
-      cerebro_err_debug("%s(%s:%d): cerebro_module_library uninitialized", 
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_ERR_DEBUG(("cerebro_module_library uninitialized"));
       return -1;
     }
 
   if (!clusterlist_handle)
     {
-      cerebro_err_debug("%s(%s:%d): clusterlist_handle null", 
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_ERR_DEBUG(("clusterlist_handle null"));
       return -1;
     }
 
   if (clusterlist_handle->magic != CLUSTERLIST_MODULE_MAGIC_NUMBER)
     {
-      cerebro_err_debug("%s(%s:%d): clusterlist_handle magic number invalid", 
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_ERR_DEBUG(("clusterlist_handle magic number invalid"));
       return -1;
     }
 
   if (!module)
     {
-      cerebro_err_debug("%s(%s:%d): module null", 
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_ERR_DEBUG(("module null"));
       return -1;
     }
 
   if (!(dl_handle = lt_dlopen(module)))
     {
-      cerebro_err_debug("%s(%s:%d): lt_dlopen: module=%s, %s",
-			__FILE__, __FUNCTION__, __LINE__,
-			module, lt_dlerror());
+      CEREBRO_ERR_DEBUG(("lt_dlopen: module=%s, %s", module, lt_dlerror()));
       goto cleanup;
     }
   
@@ -118,58 +112,49 @@ _clusterlist_module_loader(void *handle, char *module)
     {
       const char *err = lt_dlerror();
       if (err)
-	cerebro_err_debug("%s(%s:%d): lt_dlsym: module=%s, %s",
-			  __FILE__, __FUNCTION__, __LINE__,
-			  module, err);
+	CEREBRO_ERR_DEBUG(("lt_dlsym: module=%s, %s", module, err));
       goto cleanup;
     }
 
   if (!module_info->clusterlist_module_name)
     {
-      cerebro_err_debug("clusterlist module '%s': name null",
-			module_info->clusterlist_module_name);
+      CEREBRO_ERR_DEBUG(("name null"));
       goto cleanup;
     }
 
   if (!module_info->setup)
     {
-      cerebro_err_debug("clusterlist module '%s': setup null",
-			module_info->clusterlist_module_name);
+      CEREBRO_ERR_DEBUG(("setup null"));
       goto cleanup;
     }
   
   if (!module_info->cleanup)
     {
-      cerebro_err_debug("clusterlist module '%s': cleanup null",
-			module_info->clusterlist_module_name);
+      CEREBRO_ERR_DEBUG(("cleanup null"));
       goto cleanup;
     }
   
   if (!module_info->numnodes)
     {
-      cerebro_err_debug("clusterlist module '%s': numnodes null",
-			module_info->clusterlist_module_name);
+      CEREBRO_ERR_DEBUG(("numnodes null"));
       goto cleanup;
     }
   
   if (!module_info->get_all_nodes)
     {
-      cerebro_err_debug("clusterlist module '%s': get_all_nodes null",
-			module_info->clusterlist_module_name);
+      CEREBRO_ERR_DEBUG(("get_all_nodes null"));
       goto cleanup;
     }
 
   if (!module_info->node_in_cluster)
     {
-      cerebro_err_debug("clusterlist module '%s': node_in_cluster null",
-			module_info->clusterlist_module_name);
+      CEREBRO_ERR_DEBUG(("node_in_cluster null"));
       goto cleanup;
     }
 
   if (!module_info->get_nodename)
     {
-      cerebro_err_debug("clusterlist module '%s': get_nodename null",
-			module_info->clusterlist_module_name);
+      CEREBRO_ERR_DEBUG(("get_nodename null"));
       goto cleanup;
     }
 
@@ -193,7 +178,10 @@ clusterlist_module_load(void)
     return NULL;
 
   if (!(clusterlist_handle = (struct clusterlist_module *)malloc(sizeof(struct clusterlist_module))))
-    return NULL;
+    {
+      CEREBRO_ERR_DEBUG(("out of memory"));
+      return NULL;
+    }
   memset(clusterlist_handle, '\0', sizeof(struct clusterlist_module));
   clusterlist_handle->magic = CLUSTERLIST_MODULE_MAGIC_NUMBER;
       
@@ -259,8 +247,7 @@ clusterlist_module_handle_check(clusterlist_module_t clusterlist_handle)
       || clusterlist_handle->magic != CLUSTERLIST_MODULE_MAGIC_NUMBER
       || !clusterlist_handle->module_info)
     {
-      cerebro_err_debug("%s(%s:%d): cerebro handle invalid", 
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_ERR_DEBUG(("cerebro handle invalid"));
       return -1;
     }
 

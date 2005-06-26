@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.3 2005-06-20 19:46:05 achu Exp $
+## $Id: Makefile.am,v 1.4 2005-06-26 18:39:13 achu Exp $
 ##*****************************************************************************
 
 noinst_HEADERS	       = clusterlist_module.h \
@@ -19,6 +19,7 @@ libmodules_la_CFLAGS  = -DCLUSTERLIST_MODULE_BUILDDIR=\"$(clusterlist_module_bui
 			-DMETRIC_MODULE_BUILDDIR=\"$(metric_module_builddir)\" \
 			-DMONITOR_MODULE_BUILDDIR=\"$(monitor_module_builddir)\" \
 			-I$(srcdir)/../common \
+			-I$(srcdir)/../debug \
 			-I$(srcdir)/../include
 libmodules_la_SOURCES = clusterlist_module.c \
 			clusterlist_module_default.c \
@@ -27,13 +28,13 @@ libmodules_la_SOURCES = clusterlist_module.c \
 			metric_module.c \
 			monitor_module.c \
 			module_util.c
-libmodules_la_LIBADD  = ../cerebro_error/libcerebro_error.la \
-			../common/libcommon.la
-
-../cerebro_error/libcerebro_error.la : force-dependency-check
-	@cd `dirname $@` && make `basename $@`
+libmodules_la_LIBADD  = ../common/libcommon.la \
+			../debug/libdebug.la
 
 ../common/libcommon.la : force-dependency-check
+	@cd `dirname $@` && make `basename $@`
+
+../debug/libdebug.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
 force-dependency-check:

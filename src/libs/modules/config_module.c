@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: config_module.c,v 1.2 2005-06-21 19:16:56 achu Exp $
+ *  $Id: config_module.c,v 1.3 2005-06-26 18:39:13 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -20,6 +20,7 @@
 #include "config_module.h"
 #include "module_util.h"
 
+#include "debug.h"
 #include "ltdl.h"
 
 /*
@@ -75,37 +76,31 @@ _config_module_loader(void *handle, char *module)
 
   if (!module_setup_count)
     {
-      cerebro_err_debug("%s(%s:%d): cerebro_module_library uninitialized", 
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_ERR_DEBUG(("cerebro_module_library uninitialized"));
       return -1;
     }
 
   if (!config_handle)
     {
-      cerebro_err_debug("%s(%s:%d): config_handle null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_ERR_DEBUG(("config_handle null"));
       return -1;
     }
                                                                                       
   if (config_handle->magic != CONFIG_MODULE_MAGIC_NUMBER)
     {
-      cerebro_err_debug("%s(%s:%d): config_handle magic number invalid",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_ERR_DEBUG(("config_handle magic number invalid"));
       return -1;
     }
 
   if (!module)
     {
-      cerebro_err_debug("%s(%s:%d): module null", 
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_ERR_DEBUG(("module null"));
       return -1;
     }
   
   if (!(dl_handle = lt_dlopen(module)))
     {
-      cerebro_err_debug("%s(%s:%d): lt_dlopen: module=%s, %s",
-			__FILE__, __FUNCTION__, __LINE__,
-			module, lt_dlerror());
+      CEREBRO_ERR_DEBUG(("lt_dlopen: module=%s, %s", module, lt_dlerror()));
       goto cleanup;
     }
 
@@ -116,37 +111,31 @@ _config_module_loader(void *handle, char *module)
     {
       const char *err = lt_dlerror();
       if (err)
-	cerebro_err_debug("%s(%s:%d): lt_dlsym: module=%s, %s",
-			  __FILE__, __FUNCTION__, __LINE__,
-			  module, err);
+	CEREBRO_ERR_DEBUG(("lt_dlsym: module=%s, %s", module, err));
       goto cleanup;
     }
 
   if (!module_info->config_module_name)
     {
-      cerebro_err_debug("config module '%s': config_module_name null",
-			module_info->config_module_name);
+      CEREBRO_ERR_DEBUG(("config_module_name null"));
       goto cleanup;
     }
 
   if (!module_info->setup)
     {
-      cerebro_err_debug("config module '%s': setup null",
-			module_info->config_module_name);
+      CEREBRO_ERR_DEBUG(("setup null"));
       goto cleanup;
     }
 
   if (!module_info->cleanup)
     {
-      cerebro_err_debug("config module '%s': cleanup null",
-			module_info->config_module_name);
+      CEREBRO_ERR_DEBUG(("cleanup null"));
       goto cleanup;
     }
 
   if (!module_info->load_default)
     {
-      cerebro_err_debug("config module '%s': load_default null",
-			module_info->config_module_name);
+      CEREBRO_ERR_DEBUG(("load_default null"));
       goto cleanup;
     }
 
@@ -168,9 +157,12 @@ config_module_load(void)
 
   if (module_setup() < 0)
     return NULL;
-                                                                                      
+
   if (!(config_handle = (struct config_module *)malloc(sizeof(struct config_module))))
-    return NULL;
+    {
+      CEREBRO_ERR_DEBUG(("out of memory"));
+      return NULL;
+    }
   memset(config_handle, '\0', sizeof(struct config_module));
   config_handle->magic = CONFIG_MODULE_MAGIC_NUMBER;
 
@@ -236,8 +228,7 @@ config_module_handle_check(config_module_t config_handle)
       || config_handle->magic != CONFIG_MODULE_MAGIC_NUMBER
       || !config_handle->module_info)
     {
-      cerebro_err_debug("%s(%s:%d): cerebro config_handle invalid",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_ERR_DEBUG(("cerebro config_handle invalid"));
       return -1;
     }
 
