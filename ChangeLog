@@ -1,6 +1,8 @@
 2005-06-27  Albert Chu  <chu11@llnl.gov>
 
 	* Re-work cerebrod and libcerebro to use debug lib.
+
+	* Various bug fixes and code enhancement..
 	
 2005-06-26  Albert Chu  <chu11@llnl.gov>
 

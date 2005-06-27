@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: clusterlist_module.c,v 1.7 2005-06-27 20:53:01 achu Exp $
+ *  $Id: clusterlist_module.c,v 1.8 2005-06-27 23:27:06 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -38,9 +38,8 @@ char *clusterlist_modules[] = {
 int clusterlist_modules_len = 3;
 
 #define CLUSTERLIST_FILENAME_SIGNATURE  "cerebro_clusterlist_"
-
+#define CLUSTERLIST_MODULE_INFO_SYM     "clusterlist_module_info"
 #define CLUSTERLIST_MODULE_DIR          CLUSTERLIST_MODULE_BUILDDIR "/.libs"
-
 #define CLUSTERLIST_MODULE_MAGIC_NUMBER 0x33882200
 
 /* 
@@ -56,73 +55,52 @@ struct clusterlist_module
 };
 
 extern struct cerebro_clusterlist_module_info default_clusterlist_module_info;
-extern int module_setup_count;
 
 /* 
- * _clusterlist_module_loader
+ * _clusterlist_module_cb
  *
- * Attempt to load the module specified by the module_path.
+ * Check and store module
  *
- * Return 1 is module is loaded, 0 if not, -1 on fatal error
+ * Return 1 is module is stored, 0 if not, -1 on fatal error
  */
 static int
-_clusterlist_module_loader(void *handle, char *module_path)
+_clusterlist_module_cb(void *handle, void *dl_handle, void *module_info)
 {
-  lt_dlhandle dl_handle = NULL;
-  struct cerebro_clusterlist_module_info *module_info = NULL;
-  clusterlist_module_t clusterlist_handle = (clusterlist_module_t)handle;
+  clusterlist_module_t clusterlist_handle;
+  struct cerebro_clusterlist_module_info *clusterlist_module_info;
+  lt_dlhandle clusterlist_dl_handle;
 
-  if (!module_setup_count)
-    {
-      CEREBRO_DBG(("cerebro_module_library uninitialized"));
-      return -1;
-    }
-
-  if (!clusterlist_handle
-      || clusterlist_handle->magic != CLUSTERLIST_MODULE_MAGIC_NUMBER
-      || !module_path)
+  if (!handle || !dl_handle || !module_info)
     {
       CEREBRO_DBG(("invalid parameters"));
       return -1;
     }
 
-  if (!(dl_handle = lt_dlopen(module_path)))
+  clusterlist_handle = handle;
+  clusterlist_module_info = module_info;
+  clusterlist_dl_handle = dl_handle;
+    
+  if (clusterlist_handle->magic != CLUSTERLIST_MODULE_MAGIC_NUMBER)
     {
-      CEREBRO_DBG(("lt_dlopen: module=%s, %s", module_path, lt_dlerror()));
-      goto cleanup;
-    }
-  
-  /* clear lt_dlerror */
-  lt_dlerror();
-
-  if (!(module_info = lt_dlsym(dl_handle, "clusterlist_module_info")))
-    {
-      const char *err = lt_dlerror();
-      if (err)
-	CEREBRO_DBG(("lt_dlsym: module=%s, %s", module_path, err));
-      goto cleanup;
+      CEREBRO_DBG(("invalid handle"));
+      return -1;
     }
 
-  if (!module_info->clusterlist_module_name
-      || !module_info->setup
-      || !module_info->cleanup
-      || !module_info->numnodes
-      || !module_info->get_all_nodes
-      || !module_info->node_in_cluster
-      || !module_info->get_nodename)
+  if (!clusterlist_module_info->clusterlist_module_name
+      || !clusterlist_module_info->setup
+      || !clusterlist_module_info->cleanup
+      || !clusterlist_module_info->numnodes
+      || !clusterlist_module_info->get_all_nodes
+      || !clusterlist_module_info->node_in_cluster
+      || !clusterlist_module_info->get_nodename)
     {
       CEREBRO_DBG(("invalid module info"));
-      goto cleanup;
+      return 0;
     }
 
-  clusterlist_handle->dl_handle = dl_handle;
-  clusterlist_handle->module_info = module_info;
+  clusterlist_handle->dl_handle = clusterlist_dl_handle;
+  clusterlist_handle->module_info = clusterlist_module_info;
   return 1;
-
- cleanup:
-  if (dl_handle)
-    lt_dlclose(dl_handle);
-  return 0;
 }
 
 clusterlist_module_t 
@@ -142,33 +120,14 @@ clusterlist_module_load(void)
   memset(clusterlist_handle, '\0', sizeof(struct clusterlist_module));
   clusterlist_handle->magic = CLUSTERLIST_MODULE_MAGIC_NUMBER;
       
-#if CEREBRO_DEBUG
-  if ((rv = find_known_module(CLUSTERLIST_MODULE_DIR,
-			      clusterlist_modules,
-			      clusterlist_modules_len,
-			      _clusterlist_module_loader,
-			      clusterlist_handle)) < 0)
-    goto cleanup;
-
-  if (rv)
-    goto out;
-#endif /* CEREBRO_DEBUG */
-
-  if ((rv = find_known_module(CEREBRO_MODULE_DIR,
-			      clusterlist_modules,
-			      clusterlist_modules_len,
-			      _clusterlist_module_loader,
-			      clusterlist_handle)) < 0)
-    goto cleanup;
-
-  if (rv)
-    goto out;
-  
-  if ((rv = find_modules(CEREBRO_MODULE_DIR,
-			 CLUSTERLIST_FILENAME_SIGNATURE,
-			 _clusterlist_module_loader,
-			 clusterlist_handle,
-			 1)) < 0)
+  if ((rv = find_and_load_modules(CLUSTERLIST_MODULE_DIR,
+                                  clusterlist_modules,
+                                  clusterlist_modules_len,
+                                  CLUSTERLIST_FILENAME_SIGNATURE,
+                                  _clusterlist_module_cb,
+                                  CLUSTERLIST_MODULE_INFO_SYM,
+                                  clusterlist_handle,
+                                  1)) < 0)
     goto cleanup;
   
   if (rv)

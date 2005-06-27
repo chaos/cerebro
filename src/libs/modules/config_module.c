@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: config_module.c,v 1.7 2005-06-27 20:53:01 achu Exp $
+ *  $Id: config_module.c,v 1.8 2005-06-27 23:27:06 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -37,9 +37,8 @@ char *config_modules[] = {
 int config_modules_len = 1;
 
 #define CONFIG_FILENAME_SIGNATURE      "cerebro_config_"
-
+#define CONFIG_MODULE_INFO_SYM         "config_module_info"
 #define CONFIG_MODULE_DIR              CONFIG_MODULE_BUILDDIR "/.libs"
-
 #define CONFIG_MODULE_MAGIC_NUMBER     0x33882211
 
 /* 
@@ -55,70 +54,49 @@ struct config_module
 };
 
 extern struct cerebro_config_module_info default_config_module_info;
-extern int module_setup_count;
 
-/* 
- * _config_module_loader
+/*
+ * _config_module_cb
  *
- * Attempt to load the module specified by the module_path.
+ * Check and store module
  *
- * Return 1 is module is loaded, 0 if not, -1 on fatal error
+ * Return 1 is module is stored, 0 if not, -1 on fatal error
  */
-static int 
-_config_module_loader(void *handle, char *module_path)
+static int
+_config_module_cb(void *handle, void *dl_handle, void *module_info)
 {
-  lt_dlhandle dl_handle = NULL;
-  struct cerebro_config_module_info *module_info = NULL;
-  config_module_t config_handle = (config_module_t)handle;
-
-  if (!module_setup_count)
-    {
-      CEREBRO_DBG(("cerebro_module_library uninitialized"));
-      return -1;
-    }
-
-  if (!config_handle
-      || config_handle->magic != CONFIG_MODULE_MAGIC_NUMBER
-      || !module_path)
+  config_module_t config_handle;
+  struct cerebro_config_module_info *config_module_info;
+  lt_dlhandle config_dl_handle;
+  
+  if (!handle || !dl_handle || !module_info)
     {
       CEREBRO_DBG(("invalid parameters"));
       return -1;
     }
-  
-  if (!(dl_handle = lt_dlopen(module_path)))
+
+  config_handle = handle;
+  config_module_info = module_info;
+  config_dl_handle = dl_handle;
+
+  if (config_handle->magic != CONFIG_MODULE_MAGIC_NUMBER)
     {
-      CEREBRO_DBG(("lt_dlopen: module=%s, %s", module_path, lt_dlerror()));
-      goto cleanup;
+      CEREBRO_DBG(("invalid handle"));
+      return -1;
     }
 
-  /* clear lt_dlerror */
-  lt_dlerror();
-
-  if (!(module_info = lt_dlsym(dl_handle, "config_module_info")))
-    {
-      const char *err = lt_dlerror();
-      if (err)
-	CEREBRO_DBG(("lt_dlsym: module=%s, %s", module_path, err));
-      goto cleanup;
-    }
-
-  if (!module_info->config_module_name
-      || !module_info->setup
-      || !module_info->cleanup
-      || !module_info->load_default)
+  if (!config_module_info->config_module_name
+      || !config_module_info->setup
+      || !config_module_info->cleanup
+      || !config_module_info->load_default)
     {
       CEREBRO_DBG(("invalid module info"));
-      goto cleanup;
+      return 0;
     }
 
-  config_handle->dl_handle = dl_handle;
-  config_handle->module_info = module_info;
+  config_handle->dl_handle = config_dl_handle;
+  config_handle->module_info = config_module_info;
   return 1;
-
- cleanup:
-  if (dl_handle)
-    lt_dlclose(dl_handle);
-  return 0;
 }
 
 config_module_t
@@ -138,34 +116,14 @@ config_module_load(void)
   memset(config_handle, '\0', sizeof(struct config_module));
   config_handle->magic = CONFIG_MODULE_MAGIC_NUMBER;
 
-#if CEREBRO_DEBUG
-  if ((rv = find_known_module(CONFIG_MODULE_DIR,
-			      config_modules,
-			      config_modules_len,
-			      _config_module_loader,
-			      config_handle)) < 0)
-    goto cleanup;
-
-  if (rv)
-    goto out;
-#endif /* CEREBRO_DEBUG */
-
-  if ((rv = find_known_module(CEREBRO_MODULE_DIR,
-			      config_modules,
-			      config_modules_len,
-			      _config_module_loader,
-			      config_handle)) < 0)
-    goto cleanup;
-
-  if (rv)
-    goto out;
-
-  if ((rv = find_modules(CEREBRO_MODULE_DIR,
-			 CONFIG_FILENAME_SIGNATURE,
-			 _config_module_loader,
-			 config_handle,
-			 1)) < 0)
-    goto cleanup;
+  if ((rv = find_and_load_modules(CONFIG_MODULE_DIR,
+                                  config_modules,
+                                  config_modules_len,
+                                  CONFIG_FILENAME_SIGNATURE,
+                                  _config_module_cb,
+                                  CONFIG_MODULE_INFO_SYM,
+                                  config_handle,
+                                  1)) < 0)
 
   if (rv)
     goto out;

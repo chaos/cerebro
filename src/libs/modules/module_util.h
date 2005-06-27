@@ -1,59 +1,35 @@
 /*****************************************************************************\
- *  $Id: module_util.h,v 1.1 2005-06-18 18:48:30 achu Exp $
+ *  $Id: module_util.h,v 1.2 2005-06-27 23:27:06 achu Exp $
 \*****************************************************************************/
 
 #ifndef _MODULE_UTIL_H
 #define _MODULE_UTIL_H
 
 /*
- * Module_loader
+ * Module_callback
  *
- * function prototype for loading a module. Passed a module handle and
- * file/module to load.
+ * function prototype for checking and storing module info. Passed a
+ * module handle, dl_handle and module_info.
  *
- * Returns 1 on loading success, 0 on loading failure, -1 on fatal error
+ * Returns 1 on success, 0 on failure, -1 on fatal error
  */
-typedef int (*Module_loader)(void *, char *);
+typedef int (*Module_callback)(void *handle, void *dl_handle, void *module_info);
 
 /*
- * find_known_module
+ * find_and_load_modules
  *
- * Try to find a known module from the modules list in the search
- * directory.
+ * Find and load modules
  *
- * - search_dir - directory to search
- * - modules_list - list of modules to search for
- * - modules_list_len - length of list
- * - load_module - function to call when a module is found
- * - handle - pointer to module handle
- *
- * Returns 1 if module is loaded, 0 if it isn't, -1 on fatal error
+ * Returns 1 if modules are loaded, 0 if not, -1 on error
  */
-int find_known_module(char *search_dir,
-		      char **modules_list,
-		      int modules_list_len,
-		      Module_loader load_module,
-		      void *handle);
-
-/*
- * find_modules
- *
- * Search a directory for modules
- *
- * - search_dir - directory to search
- * - signature - filename signature indicating if the filename is a
- *               module we want to try and load
- * - load_module - function to call when a module is found
- * - handle - pointer to module handle
- * - modules_max - maximum modules that can be found
- *
- * Returns 1 when a module(s) are found, 0 if not, -1 on fatal error
- */
-int find_modules(char *search_dir,
-		 char *signature,
-		 Module_loader load_module,
-		 void *handle,
-		 unsigned int modules_max);
+int find_and_load_modules(char *module_dir,
+                          char **modules_list,
+                          int modules_list_len,
+                          char *signature,
+                          Module_callback module_cb,
+                          char *module_info_sym,
+                          void *handle,
+                          unsigned int modules_max);
 
 /* 
  * module_setup

@@ -7,8 +7,10 @@ Testing
 - api again
 
 Cleanup
+- limit max number of metrics listener can parse
 - common receiving loop?
 - common receive data func?
+- common module loading func
 - no need to malloc values in heartbeats and destroy em??
 - packet buflen max len issue with number of metrics supportable
 - string length issue with packet buflen fixed in listener
