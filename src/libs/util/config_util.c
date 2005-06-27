@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: config_util.c,v 1.5 2005-06-27 04:44:49 achu Exp $
+ *  $Id: config_util.c,v 1.6 2005-06-27 21:16:55 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -439,28 +439,166 @@ load_config_file(struct cerebro_config *conf)
   return -1;
 }
 
+/* 
+ * _set_cerebro_config
+ *
+ * Set the dest cerebro_config based on its current settings and the
+ * settings in the src.
+ */
+int
+_set_cerebro_config(struct cerebro_config *dest, struct cerebro_config *src)
+{
+  if (!dest || !src)
+    {
+      CEREBRO_DBG(("invalid parameters"));
+      return -1;
+    }
+
+  if (!dest->cerebro_hostnames_flag && src->cerebro_hostnames_flag)
+    {
+      int i;
+      for (i = 0; i < src->cerebro_hostnames_len; i++)
+	strcpy(dest->cerebro_hostnames[i], src->cerebro_hostnames[i]);
+      dest->cerebro_hostnames_len = src->cerebro_hostnames_len;
+      dest->cerebro_hostnames_flag++;
+    }
+
+  if (!dest->cerebro_port_flag && src->cerebro_port_flag)
+    {
+      dest->cerebro_port = src->cerebro_port;
+      dest->cerebro_port_flag++;
+    }
+
+  if (!dest->cerebro_timeout_len && src->cerebro_timeout_len_flag)
+    {
+      dest->cerebro_timeout_len = src->cerebro_timeout_len;
+      dest->cerebro_timeout_len_flag++;
+    }
+
+  if (!dest->cerebro_flags_flag && src->cerebro_flags_flag)
+    {
+      dest->cerebro_flags = src->cerebro_flags;
+      dest->cerebro_flags_flag++;
+    }
+
+  if (!dest->cerebrod_heartbeat_frequency_flag 
+      && src->cerebrod_heartbeat_frequency_flag)
+    {
+      dest->cerebrod_heartbeat_frequency_min = src->cerebrod_heartbeat_frequency_min;
+      dest->cerebrod_heartbeat_frequency_max = src->cerebrod_heartbeat_frequency_max;
+      dest->cerebrod_heartbeat_frequency_flag++;
+    }
+
+  if (!dest->cerebrod_heartbeat_source_port_flag
+      && src->cerebrod_heartbeat_source_port_flag)
+    {
+      dest->cerebrod_heartbeat_source_port = src->cerebrod_heartbeat_source_port;
+      dest->cerebrod_heartbeat_source_port_flag++;
+    }
+
+  if (!dest->cerebrod_heartbeat_destination_port_flag
+      && src->cerebrod_heartbeat_destination_port_flag)
+    {
+      dest->cerebrod_heartbeat_destination_port = src->cerebrod_heartbeat_destination_port;
+      dest->cerebrod_heartbeat_destination_port_flag++;
+    }
+
+  if (!dest->cerebrod_heartbeat_destination_ip_flag
+      && src->cerebrod_heartbeat_destination_ip_flag)
+    {
+      strcpy(dest->cerebrod_heartbeat_destination_ip, src->cerebrod_heartbeat_destination_ip);
+      dest->cerebrod_heartbeat_destination_ip_flag++;
+    }
+
+  if (!dest->cerebrod_heartbeat_network_interface_flag
+      && src->cerebrod_heartbeat_network_interface_flag)
+    {
+      strcpy(dest->cerebrod_heartbeat_network_interface, 
+             src->cerebrod_heartbeat_network_interface);
+      dest->cerebrod_heartbeat_network_interface_flag++;
+    }
+
+  if (!dest->cerebrod_heartbeat_ttl_flag && src->cerebrod_heartbeat_ttl_flag)
+    {
+      dest->cerebrod_heartbeat_ttl = src->cerebrod_heartbeat_ttl;
+      dest->cerebrod_heartbeat_ttl_flag++;
+    }
+
+  if (!dest->cerebrod_speak_flag && src->cerebrod_speak_flag)
+    {
+      dest->cerebrod_speak = src->cerebrod_speak;
+      dest->cerebrod_speak_flag++;
+    }
+
+  if (!dest->cerebrod_listen_flag && src->cerebrod_listen_flag)
+    {
+      dest->cerebrod_listen = src->cerebrod_listen;
+      dest->cerebrod_listen_flag++;
+    }
+
+  if (!dest->cerebrod_listen_threads_flag && src->cerebrod_listen_threads_flag)
+    {
+      dest->cerebrod_listen_threads = src->cerebrod_listen_threads;
+      dest->cerebrod_listen_threads_flag++;
+    }
+
+  if (!dest->cerebrod_metric_server_flag && src->cerebrod_metric_server_flag)
+    {
+      dest->cerebrod_metric_server = src->cerebrod_metric_server;
+      dest->cerebrod_metric_server_flag++;
+    }
+
+  if (!dest->cerebrod_metric_server_port_flag
+      && src->cerebrod_metric_server_port_flag) 
+    {
+      dest->cerebrod_metric_server_port = src->cerebrod_metric_server_port;
+      dest->cerebrod_metric_server_port_flag++;
+    }
+
+  if (!dest->cerebrod_metric_max_flag && src->cerebrod_metric_max_flag)
+    {
+      dest->cerebrod_metric_max = src->cerebrod_metric_max;
+      dest->cerebrod_metric_max_flag++;
+    }
+
+  if (!dest->cerebrod_monitor_max_flag && src->cerebrod_monitor_max_flag)
+    {
+      dest->cerebrod_monitor_max = src->cerebrod_monitor_max;
+      dest->cerebrod_monitor_max_flag++;
+    }
+
+#if CEREBRO_DEBUG
+  if (!dest->cerebrod_speak_debug_flag && src->cerebrod_speak_debug_flag)
+    {
+      dest->cerebrod_speak_debug = src->cerebrod_speak_debug;
+      dest->cerebrod_speak_debug_flag++;
+    }
+
+  if (!dest->cerebrod_listen_debug_flag && src->cerebrod_listen_debug_flag)
+    {
+      dest->cerebrod_listen_debug = src->cerebrod_listen_debug;
+      dest->cerebrod_listen_debug_flag++;
+    }
+
+  if (!dest->cerebrod_metric_server_debug_flag
+      && src->cerebrod_metric_server_debug_flag)
+    {
+      dest->cerebrod_metric_server_debug = src->cerebrod_metric_server_debug;
+      dest->cerebrod_metric_server_debug_flag++;
+    }
+#endif /* CEREBRO_DEBUG */
+
+  return 0;
+}
+
 int 
 merge_cerebro_configs(struct cerebro_config *conf,
 		      struct cerebro_config *module_conf,
 		      struct cerebro_config *config_file_conf)
 {
-  int i;
-
-  if (!conf)
+  if (!conf || !module_conf || !config_file_conf)
     {
-      CEREBRO_DBG(("conf null"));
-      return -1;
-    }
-
-  if (!module_conf)
-    {
-      CEREBRO_DBG(("module_conf null"));
-      return -1;
-    }
-
-  if (!config_file_conf)
-    {
-      CEREBRO_DBG(("config_file_conf null"));
+      CEREBRO_DBG(("invalid parameters"));
       return -1;
     }
 
@@ -471,235 +609,11 @@ merge_cerebro_configs(struct cerebro_config *conf,
 
   memset(conf, '\0', sizeof(struct cerebro_config));
 
-  if (config_file_conf->cerebro_hostnames_flag)
-    {
-      for (i = 0; i < config_file_conf->cerebro_hostnames_len; i++)
-	strcpy(conf->cerebro_hostnames[i], 
-               config_file_conf->cerebro_hostnames[i]);
-      conf->cerebro_hostnames_len = config_file_conf->cerebro_hostnames_len;
-      conf->cerebro_hostnames_flag++;
-    }
-  else if (module_conf->cerebro_hostnames_flag)
-    {
-      for (i = 0; i < module_conf->cerebro_hostnames_len; i++)
-	strcpy(conf->cerebro_hostnames[i],
-	       module_conf->cerebro_hostnames[i]);
-      conf->cerebro_hostnames_len = module_conf->cerebro_hostnames_len;
-      conf->cerebro_hostnames_flag++;
-    }
+  if (_set_cerebro_config(conf, config_file_conf) < 0)
+    return -1;
 
-  if (config_file_conf->cerebro_port_flag)
-    {
-      conf->cerebro_port = config_file_conf->cerebro_port;
-      conf->cerebro_port_flag++;
-    }
-  else if (module_conf->cerebro_port_flag)
-    {
-      conf->cerebro_port = module_conf->cerebro_port;
-      conf->cerebro_port_flag++;
-    }
-
-  if (config_file_conf->cerebro_timeout_len_flag)
-    {
-      conf->cerebro_timeout_len = config_file_conf->cerebro_timeout_len;
-      conf->cerebro_timeout_len_flag++;
-    }
-  else if (module_conf->cerebro_timeout_len_flag)
-    {
-      conf->cerebro_timeout_len = module_conf->cerebro_timeout_len;
-      conf->cerebro_timeout_len_flag++;
-    }
-
-  if (config_file_conf->cerebro_flags_flag)
-    {
-      conf->cerebro_flags = config_file_conf->cerebro_flags;
-      conf->cerebro_flags_flag++;
-    }
-  else if (module_conf->cerebro_flags_flag)
-    {
-      conf->cerebro_flags = module_conf->cerebro_flags;
-      conf->cerebro_flags_flag++;
-    }
-
-  if (config_file_conf->cerebrod_heartbeat_frequency_flag)
-    {
-      conf->cerebrod_heartbeat_frequency_min = config_file_conf->cerebrod_heartbeat_frequency_min;
-      conf->cerebrod_heartbeat_frequency_max = config_file_conf->cerebrod_heartbeat_frequency_max;
-      conf->cerebrod_heartbeat_frequency_flag++;
-    }
-  else if (module_conf->cerebrod_heartbeat_frequency_flag)
-    {
-      conf->cerebrod_heartbeat_frequency_min = module_conf->cerebrod_heartbeat_frequency_min;
-      conf->cerebrod_heartbeat_frequency_max = module_conf->cerebrod_heartbeat_frequency_max;
-      conf->cerebrod_heartbeat_frequency_flag++;
-    }
-
-  if (config_file_conf->cerebrod_heartbeat_source_port_flag)
-    {
-      conf->cerebrod_heartbeat_source_port = config_file_conf->cerebrod_heartbeat_source_port;
-      conf->cerebrod_heartbeat_source_port_flag++;
-    }
-  else if (module_conf->cerebrod_heartbeat_source_port_flag)
-    {
-      conf->cerebrod_heartbeat_source_port = module_conf->cerebrod_heartbeat_source_port;
-      conf->cerebrod_heartbeat_source_port_flag++;
-    }
-
-  if (config_file_conf->cerebrod_heartbeat_destination_port_flag)
-    {
-      conf->cerebrod_heartbeat_destination_port = config_file_conf->cerebrod_heartbeat_destination_port;
-      conf->cerebrod_heartbeat_destination_port_flag++;
-    }
-  else if (module_conf->cerebrod_heartbeat_destination_port_flag)
-    {
-      conf->cerebrod_heartbeat_destination_port = module_conf->cerebrod_heartbeat_destination_port;
-      conf->cerebrod_heartbeat_destination_port_flag++;
-    }
-
-  if (config_file_conf->cerebrod_heartbeat_destination_ip_flag)
-    {
-      strcpy(conf->cerebrod_heartbeat_destination_ip, config_file_conf->cerebrod_heartbeat_destination_ip);
-      conf->cerebrod_heartbeat_destination_ip_flag++;
-    }
-  else if (module_conf->cerebrod_heartbeat_destination_ip_flag)
-    {
-      strcpy(conf->cerebrod_heartbeat_destination_ip, module_conf->cerebrod_heartbeat_destination_ip);
-      conf->cerebrod_heartbeat_destination_ip_flag++;
-    }
-
-  if (config_file_conf->cerebrod_heartbeat_network_interface_flag)
-    {
-      strcpy(conf->cerebrod_heartbeat_network_interface, config_file_conf->cerebrod_heartbeat_network_interface);
-      conf->cerebrod_heartbeat_network_interface_flag++;
-    }
-  else if (module_conf->cerebrod_heartbeat_network_interface_flag)
-    {
-      strcpy(conf->cerebrod_heartbeat_network_interface, module_conf->cerebrod_heartbeat_network_interface);
-      conf->cerebrod_heartbeat_network_interface_flag++;
-    }
-
-  if (config_file_conf->cerebrod_heartbeat_ttl_flag)
-    {
-      conf->cerebrod_heartbeat_ttl = config_file_conf->cerebrod_heartbeat_ttl;
-      conf->cerebrod_heartbeat_ttl_flag++;
-    }
-  else if (module_conf->cerebrod_heartbeat_ttl_flag)
-    {
-      conf->cerebrod_heartbeat_ttl = module_conf->cerebrod_heartbeat_ttl;
-      conf->cerebrod_heartbeat_ttl_flag++;
-    }
-
-  if (config_file_conf->cerebrod_speak_flag)
-    {
-      conf->cerebrod_speak = config_file_conf->cerebrod_speak;
-      conf->cerebrod_speak_flag++;
-    }
-  else if (module_conf->cerebrod_speak_flag)
-    {
-      conf->cerebrod_speak = module_conf->cerebrod_speak;
-      conf->cerebrod_speak_flag++;
-    }
-
-  if (config_file_conf->cerebrod_listen_flag)
-    {
-      conf->cerebrod_listen = config_file_conf->cerebrod_listen;
-      conf->cerebrod_listen_flag++;
-    }
-  else if (module_conf->cerebrod_listen_flag)
-    {
-      conf->cerebrod_listen = module_conf->cerebrod_listen;
-      conf->cerebrod_listen_flag++;
-    }
-
-  if (config_file_conf->cerebrod_listen_threads_flag)
-    {
-      conf->cerebrod_listen_threads = config_file_conf->cerebrod_listen_threads;
-      conf->cerebrod_listen_threads_flag++;
-    }
-  else if (module_conf->cerebrod_listen_threads_flag)
-    {
-      conf->cerebrod_listen_threads = module_conf->cerebrod_listen_threads;
-      conf->cerebrod_listen_threads_flag++;
-    }
-
-  if (config_file_conf->cerebrod_metric_server_flag)
-    {
-      conf->cerebrod_metric_server = config_file_conf->cerebrod_metric_server;
-      conf->cerebrod_metric_server_flag++;
-    }
-  else if (module_conf->cerebrod_metric_server_flag)
-    {
-      conf->cerebrod_metric_server = module_conf->cerebrod_metric_server;
-      conf->cerebrod_metric_server_flag++;
-    }
-
-  if (config_file_conf->cerebrod_metric_server_port_flag)
-    {
-      conf->cerebrod_metric_server_port = config_file_conf->cerebrod_metric_server_port;
-      conf->cerebrod_metric_server_port_flag++;
-    }
-  else if (module_conf->cerebrod_metric_server_port_flag)
-    {
-      conf->cerebrod_metric_server_port = module_conf->cerebrod_metric_server_port;
-      conf->cerebrod_metric_server_port_flag++;
-    }
-
-  if (config_file_conf->cerebrod_metric_max_flag)
-    {
-      conf->cerebrod_metric_max = config_file_conf->cerebrod_metric_max;
-      conf->cerebrod_metric_max_flag++;
-    }
-  else if (module_conf->cerebrod_metric_max_flag)
-    {
-      conf->cerebrod_metric_max = module_conf->cerebrod_metric_max;
-      conf->cerebrod_metric_max_flag++;
-    }
-
-  if (config_file_conf->cerebrod_monitor_max_flag)
-    {
-      conf->cerebrod_monitor_max = config_file_conf->cerebrod_monitor_max;
-      conf->cerebrod_monitor_max_flag++;
-    }
-  else if (module_conf->cerebrod_monitor_max_flag)
-    {
-      conf->cerebrod_monitor_max = module_conf->cerebrod_monitor_max;
-      conf->cerebrod_monitor_max_flag++;
-    }
-
-#if CEREBRO_DEBUG
-  if (config_file_conf->cerebrod_speak_debug_flag)
-    {
-      conf->cerebrod_speak_debug = config_file_conf->cerebrod_speak_debug;
-      conf->cerebrod_speak_debug_flag++;
-    }
-  else if (module_conf->cerebrod_speak_debug_flag)
-    {
-      conf->cerebrod_speak_debug = module_conf->cerebrod_speak_debug;
-      conf->cerebrod_speak_debug_flag++;
-    }
-
-  if (config_file_conf->cerebrod_listen_debug_flag)
-    {
-      conf->cerebrod_listen_debug = config_file_conf->cerebrod_listen_debug;
-      conf->cerebrod_listen_debug_flag++;
-    }
-  else if (module_conf->cerebrod_listen_debug_flag)
-    {
-      conf->cerebrod_listen_debug = module_conf->cerebrod_listen_debug;
-      conf->cerebrod_listen_debug_flag++;
-    }
-
-  if (config_file_conf->cerebrod_metric_server_debug_flag)
-    {
-      conf->cerebrod_metric_server_debug = config_file_conf->cerebrod_metric_server_debug;
-      conf->cerebrod_metric_server_debug_flag++;
-    }
-  else if (module_conf->cerebrod_metric_server_debug_flag)
-    {
-      conf->cerebrod_metric_server_debug = module_conf->cerebrod_metric_server_debug;
-      conf->cerebrod_metric_server_debug_flag++;
-    }
-#endif /* CEREBRO_DEBUG */
+  if (_set_cerebro_config(conf, module_conf) < 0)
+    return -1;
 
   return 0;
 }
