@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.9 2005-06-24 23:53:30 achu Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.10 2005-06-27 17:24:09 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -16,7 +16,6 @@
 
 #include "cerebro.h"
 #include "cerebro/cerebro_constants.h"
-#include "cerebro/cerebro_error.h"
 
 #include "cerebrod_config.h"
 #include "cerebrod_listener_data.h"
@@ -24,6 +23,8 @@
 
 #include "list.h"
 #include "hash.h"
+
+#include "debug.h"
 
 #include "clusterlist_module.h"
 #include "monitor_module.h"
@@ -191,12 +192,10 @@ cerebrod_listener_data_initialize(void)
     goto out;
   
   if (!clusterlist_handle)
-    cerebro_err_exit("%s(%s:%d): clusterlist_handle null",
-		     __FILE__, __FUNCTION__, __LINE__);
+    CEREBRO_EXIT(("clusterlist_handle null"));
 
   if ((numnodes = clusterlist_module_numnodes(clusterlist_handle)) < 0)
-    cerebro_err_exit("%s(%s:%d): clusterlist_module_numnodes",
-		     __FILE__, __FUNCTION__, __LINE__);
+    CEREBRO_EXIT(("clusterlist_module_numnodes"));
 
   if (numnodes > 0)
     {
@@ -226,8 +225,7 @@ cerebrod_listener_data_initialize(void)
 
       if (clusterlist_module_get_all_nodes(clusterlist_handle,
 					   &nodes) < 0)
-        cerebro_err_exit("%s(%s:%d): clusterlist_module_get_all_nodes",
-                         __FILE__, __FUNCTION__, __LINE__);
+        CEREBRO_EXIT(("clusterlist_module_get_all_nodes"));
 
       for (i = 0; i < numnodes; i++)
         {
@@ -261,21 +259,18 @@ cerebrod_listener_data_initialize(void)
     }
 
   if (!conf.listen)
-    cerebro_err_exit("%s(%s:%d): listen server not setup",
-                     __FILE__, __FUNCTION__, __LINE__);
+    CEREBRO_EXIT(("listen server not setup"));
 
   if (!(monitor_handle = monitor_modules_load(conf.monitor_max)))
     {
-      cerebro_err_debug("%s(%s:%d): _cerebro_module_load_monitor_modules failed",
-                        __FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("monitor_modules_load"));
       goto done;
     }
 
 
   if ((monitor_index_len = monitor_modules_count(monitor_handle)) < 0)
     {
-      cerebro_err_debug("%s(%s:%d): _cerebro_monitor_module_count failed",
-                        __FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("monitor_modules_count"));
       monitor_modules_unload(monitor_handle);
       monitor_handle = NULL;
       goto done;
@@ -324,16 +319,14 @@ cerebrod_listener_data_initialize(void)
 
       if (monitor_module_setup(monitor_handle, i) < 0)
         {
-          cerebro_err_debug("%s(%s:%d): monitor_module_setup failed",
-                            __FILE__, __FUNCTION__, __LINE__);
+          CEREBRO_DBG(("monitor_module_setup failed"));
           continue;
         }
 
       if (!(metric_name = monitor_module_metric_name(monitor_handle,
 						     i)) < 0)
         {
-          cerebro_err_debug("%s(%s:%d): monitor_module_metric_name failed",
-                            __FILE__, __FUNCTION__, __LINE__);
+          CEREBRO_DBG(("monitor_module_metric_name failed"));
           continue;
         }
 
@@ -466,10 +459,8 @@ _cerebrod_node_data_metric_data_dump(void *data, const void *key, void *arg)
       Free(buf);
       break;
     default:
-      cerebro_err_debug("%s(%s:%d): nodename=%s invalid metric_value_type=%d",
-                        __FILE__, __FUNCTION__, __LINE__,
-                        (char *)key,
-                        md->metric_value_type);
+      fprintf(stderr, "nodename=%s metric_value_type=%d",
+              (char *)key, md->metric_value_type);
     }
   fprintf(stderr, "\n");
 
@@ -632,8 +623,7 @@ _cerebrod_listener_metric_data_update(struct cerebrod_node_data *nd,
   /* Should be called with lock already set */
   rv = Pthread_mutex_trylock(&nd->node_data_lock);
   if (rv != EBUSY)
-    cerebro_err_exit("%s(%s:%d): mutex not locked: rv=%d",
-                     __FILE__, __FUNCTION__, __LINE__, rv);
+    CEREBRO_EXIT(("mutex not locked: rv=%d", rv));
 #endif /* CEREBRO_DEBUG */
   
   if (!(md = Hash_find(nd->metric_data, metric_name)))
@@ -643,9 +633,7 @@ _cerebrod_listener_metric_data_update(struct cerebrod_node_data *nd,
        */
       if (nd->metric_data_count >= conf.metric_max)
         {
-          cerebro_err_debug("%s(%s:%d): too many metrics: nodename=%s",
-                            __FILE__, __FUNCTION__, __LINE__,
-                            nd->nodename);
+          CEREBRO_DBG(("too many metrics: nodename=%s", nd->nodename));
           return;
         }
       
@@ -658,9 +646,8 @@ _cerebrod_listener_metric_data_update(struct cerebrod_node_data *nd,
   else
     {
       if (md->metric_value_type != hd->metric_value_type)
-        cerebro_err_debug("%s(%s:%d): metric type modified: old=%d new=%d",
-                          __FILE__, __FUNCTION__, __LINE__,
-                          md->metric_value_type, hd->metric_value_type);
+        CEREBRO_DBG(("metric type modified: old=%d new=%d",
+                     md->metric_value_type, hd->metric_value_type));
     }
   
   md->last_received_time = received_time;
@@ -670,9 +657,8 @@ _cerebrod_listener_metric_data_update(struct cerebrod_node_data *nd,
     {
       if (md->metric_value)
         {
-          cerebro_err_debug("%s(%s:%d): metric length modified: old=%d new=%d",
-                            __FILE__, __FUNCTION__, __LINE__,
-                            md->metric_value_len, hd->metric_value_len);
+          CEREBRO_DBG(("metric length modified: old=%d new=%d",
+                       md->metric_value_len, hd->metric_value_len));
           Free(md->metric_value);
         }
       md->metric_value = Malloc(hd->metric_value_len);
@@ -693,12 +679,10 @@ cerebrod_listener_data_update(char *nodename,
   assert(hb);
 
   if (!cerebrod_listener_data_initialization_complete)
-    cerebro_err_exit("%s(%s:%d): initialization not complete",
-                     __FILE__, __FUNCTION__, __LINE__);
+    CEREBRO_EXIT(("initialization not complete"));
 
   if (!cerebrod_listener_data_list || !cerebrod_listener_data_index)
-    cerebro_err_exit("%s(%s:%d): initialization not complete",
-                     __FILE__, __FUNCTION__, __LINE__);
+    CEREBRO_EXIT(("initialization not complete"));
 
   Pthread_mutex_lock(&cerebrod_listener_data_lock);
   if (!(nd = Hash_find(cerebrod_listener_data_index, nodename)))

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: monitor_module.c,v 1.5 2005-06-27 04:44:49 achu Exp $
+ *  $Id: monitor_module.c,v 1.6 2005-06-27 17:24:09 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -11,6 +11,7 @@
 #if STDC_HEADERS
 #include <string.h>
 #endif /* STDC_HEADERS */
+#include <errno.h>
 
 #include "cerebro.h"
 #include "cerebro/cerebro_constants.h"
@@ -164,7 +165,7 @@ monitor_modules_load(unsigned int modules_max)
                                                                                     
   if (!(monitor_handle = (struct monitor_module *)malloc(sizeof(struct monitor_module))))
     {
-      CEREBRO_DBG(("out of memory"));
+      CEREBRO_DBG(("malloc: %s", strerror(errno)));
       return NULL;
     }
   memset(monitor_handle, '\0', sizeof(struct monitor_module));
@@ -173,14 +174,14 @@ monitor_modules_load(unsigned int modules_max)
   monitor_handle->modules_count = 0;
   if (!(monitor_handle->dl_handle = (lt_dlhandle *)malloc(sizeof(lt_dlhandle)*monitor_handle->modules_max)))
     {
-      CEREBRO_DBG(("out of memory"));
+      CEREBRO_DBG(("malloc: %s", strerror(errno)));
       goto cleanup;
     }
   memset(monitor_handle->dl_handle, '\0', sizeof(lt_dlhandle)*monitor_handle->modules_max);
   
   if (!(monitor_handle->module_info = (struct cerebro_monitor_module_info * *)malloc(sizeof(struct cerebro_monitor_module_info *)*monitor_handle->modules_max)))
     {
-      CEREBRO_DBG(("out of memory"));
+      CEREBRO_DBG(("malloc: %s", strerror(errno)));
       goto cleanup;
     }
   memset(monitor_handle->module_info, '\0', sizeof(struct cerebro_monitor_module_info *)*monitor_handle->modules_max);

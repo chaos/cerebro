@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.108 2005-06-22 23:37:10 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.109 2005-06-27 17:24:09 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -33,6 +33,8 @@
 #include "cerebrod_util.h"
 
 #include "config_util.h"
+
+#include "debug.h"
 
 #include "wrappers.h"
 
@@ -225,8 +227,7 @@ _cerebrod_load_config(void)
 #endif /* CEREBRO_DEBUG */
 
   if (load_config(&conf_l) < 0)
-    cerebro_err_exit("%s(%s:%d): load_config", 
-                     __FILE__, __FUNCTION__, __LINE__);
+    CEREBRO_EXIT(("load_config"));
   
   if (conf_l.cerebrod_heartbeat_frequency_flag)
     {
@@ -428,9 +429,7 @@ _get_if_conf(void **buf, struct ifconf *ifc, int fd)
       ifc->ifc_buf = *buf;
 
       if (ioctl(fd, SIOCGIFCONF, ifc) < 0)
-        cerebro_err_exit("%s(%s:%d): ioctl: %s", 
-                         __FILE__, __FUNCTION__, __LINE__,
-                         strerror(errno));
+        CEREBRO_EXIT(("ioctl: %s", strerror(errno)));
 
       if (ifc->ifc_len == lastlen)
         break;
@@ -536,9 +535,7 @@ _cerebrod_calculate_in_addr_and_index(char *network_interface,
 	      strncpy(ifr_tmp.ifr_name, ifr->ifr_name, IFNAMSIZ);
 
 	      if(ioctl(fd, SIOCGIFFLAGS, &ifr_tmp) < 0)
-		cerebro_err_exit("%s(%s:%d): ioctl: %s",
-                                 __FILE__, __FUNCTION__, __LINE__,
-                                 strerror(errno));
+		CEREBRO_EXIT(("ioctl: %s", strerror(errno)));
 
 	      if (!(ifr_tmp.ifr_flags & IFF_UP)
 		  || !(ifr_tmp.ifr_flags & IFF_MULTICAST))
@@ -549,9 +546,7 @@ _cerebrod_calculate_in_addr_and_index(char *network_interface,
 	      strncpy(ifr_tmp.ifr_name, ifr->ifr_name, IFNAMSIZ);
 
 	      if(ioctl(fd, SIOCGIFINDEX, &ifr_tmp) < 0)
-		cerebro_err_exit("%s(%s:%d): ioctl: %s",
-                                 __FILE__, __FUNCTION__, __LINE__,
-                                 strerror(errno));
+		CEREBRO_EXIT(("ioctl: %s", strerror(errno)));
 	      
 	      sinptr = (struct sockaddr_in *)&ifr->ifr_addr;
 	      interface_in_addr->s_addr = sinptr->sin_addr.s_addr;
@@ -645,9 +640,7 @@ _cerebrod_calculate_in_addr_and_index(char *network_interface,
 	  strncpy(ifr_tmp.ifr_name, ifr->ifr_name, IFNAMSIZ);
 
 	  if (ioctl(fd, SIOCGIFFLAGS, &ifr_tmp) < 0)
-	    cerebro_err_exit("%s(%s:%d): ioctl: %s",
-                             __FILE__, __FUNCTION__, __LINE__,
-                             strerror(errno));
+	    CEREBRO_EXIT(("ioctl: %s", strerror(errno)));
           
 	  if (!(ifr_tmp.ifr_flags & IFF_UP))
 	    continue;
@@ -662,9 +655,7 @@ _cerebrod_calculate_in_addr_and_index(char *network_interface,
 	      strncpy(ifr_tmp.ifr_name, ifr->ifr_name, IFNAMSIZ);
 
 	      if(ioctl(fd, SIOCGIFINDEX, &ifr_tmp) < 0)
-		cerebro_err_exit("%s(%s:%d): ioctl: %s",
-                                 __FILE__, __FUNCTION__, __LINE__,
-                                 strerror(errno));
+		CEREBRO_EXIT(("ioctl: %s", strerror(errno)));
 
 	      interface_in_addr->s_addr = sinptr->sin_addr.s_addr;
 	      *interface_index = ifr_tmp.ifr_ifindex;
@@ -721,9 +712,7 @@ _cerebrod_calculate_in_addr_and_index(char *network_interface,
 	      strncpy(ifr_tmp.ifr_name, ifr->ifr_name, IFNAMSIZ);
 
 	      if(ioctl(fd, SIOCGIFFLAGS, &ifr_tmp) < 0)
-		cerebro_err_exit("%s(%s:%d): ioctl: %s",
-                                 __FILE__, __FUNCTION__, __LINE__,
-                                 strerror(errno));
+		CEREBRO_EXIT(("ioctl: %s", strerror(errno)));
 
 	      if (!(ifr_tmp.ifr_flags & IFF_UP))
 		cerebro_err_exit("network interface '%s' not up",
@@ -739,9 +728,7 @@ _cerebrod_calculate_in_addr_and_index(char *network_interface,
 	      strncpy(ifr_tmp.ifr_name, ifr->ifr_name, IFNAMSIZ);
 
 	      if(ioctl(fd, SIOCGIFINDEX, &ifr_tmp) < 0)
-		cerebro_err_exit("%s(%s:%d): ioctl: %s",
-                                 __FILE__, __FUNCTION__, __LINE__,
-                                 strerror(errno));
+		CEREBRO_EXIT(("ioctl: %s", strerror(errno)));
 
 	      sinptr = (struct sockaddr_in *)&ifr->ifr_addr;
 	      interface_in_addr->s_addr = sinptr->sin_addr.s_addr;

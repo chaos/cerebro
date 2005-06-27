@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.63 2005-06-24 23:53:30 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.64 2005-06-27 17:24:09 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -20,7 +20,6 @@
 
 #include "cerebro.h"
 #include "cerebro/cerebro_constants.h"
-#include "cerebro/cerebro_error.h"
 #include "cerebro/cerebrod_heartbeat_protocol.h"
 
 #include "cerebrod_config.h"
@@ -28,6 +27,7 @@
 #include "cerebrod_speaker.h"
 #include "cerebrod_speaker_data.h"
 
+#include "debug.h"
 #include "metric_module.h"
 #include "wrappers.h"
 
@@ -60,9 +60,7 @@ _cerebrod_speaker_create_and_setup_socket(void)
 
   if ((temp_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {
-      cerebro_err_debug("%s(%s:%d): socket: %s", 
-                        __FILE__, __FUNCTION__, __LINE__,
-                        strerror(errno));
+      CEREBRO_DBG(("socket: %s", strerror(errno)));
       return -1;
     }
 
@@ -87,9 +85,7 @@ _cerebrod_speaker_create_and_setup_socket(void)
 		     &imr,
 		     sizeof(struct ip_mreqn)) < 0)
 	{
-	  cerebro_err_debug("%s(%s:%d): setsockopt: %s", 
-                            __FILE__, __FUNCTION__, __LINE__,
-                            strerror(errno));
+	  CEREBRO_DBG(("setsockopt: %s", strerror(errno)));
 	  return -1;
 	}
 
@@ -100,9 +96,7 @@ _cerebrod_speaker_create_and_setup_socket(void)
 		     &optval, 
 		     sizeof(optval)) < 0)
 	{
-	  cerebro_err_debug("%s(%s:%d): setsockopt: %s", 
-                            __FILE__, __FUNCTION__, __LINE__,
-                            strerror(errno));
+	  CEREBRO_DBG(("setsockopt: %s", strerror(errno)));
 	  return -1;
 	}
 
@@ -113,9 +107,7 @@ _cerebrod_speaker_create_and_setup_socket(void)
 		     &optval,
 		     sizeof(optval)) < 0)
 	{
-	  cerebro_err_debug("%s(%s:%d): setsockopt: %s", 
-                            __FILE__, __FUNCTION__, __LINE__,
-                            strerror(errno));
+	  CEREBRO_DBG(("setsockopt: %s", strerror(errno)));
 	  return -1;
 	}
     }
@@ -130,9 +122,7 @@ _cerebrod_speaker_create_and_setup_socket(void)
 	   (struct sockaddr *)&heartbeat_addr, 
 	   sizeof(struct sockaddr_in)) < 0) 
     {
-      cerebro_err_debug("%s(%s:%d): bind: %s", 
-                        __FILE__, __FUNCTION__, __LINE__,
-                        strerror(errno));
+      CEREBRO_DBG(("bind: %s", strerror(errno)));
       return -1;
     }
 
@@ -250,9 +240,7 @@ _cerebrod_heartbeat_marshall(struct cerebrod_heartbeat *hb,
           switch(hb->metrics[i]->metric_value_type)
             {
             case CEREBRO_METRIC_VALUE_TYPE_NONE:
-              cerebro_err_debug("%s(%s:%d): packet metric_value_len > 0 "
-                                "for metric_value_type NONE",
-                                __FILE__, __FUNCTION__, __LINE__);
+              CEREBRO_DBG(("metric value len > 0 for type NONE"));
               break;
             case CEREBRO_METRIC_VALUE_TYPE_INT32:
               len += Marshall_int32(*((int32_t *)hb->metrics[i]->metric_value),
@@ -281,9 +269,7 @@ _cerebrod_heartbeat_marshall(struct cerebrod_heartbeat *hb,
                                      buflen - len);
               break;
             default:
-              cerebro_err_exit("%s(%s:%d): invalid metric type: %d",
-                               __FILE__, __FUNCTION__, __LINE__,
-                               hb->metrics[i]->metric_value_type);
+              CEREBRO_EXIT(("invalid type %d", hb->metrics[i]->metric_value_type));
               break;
             }
         }
@@ -323,8 +309,7 @@ cerebrod_speaker(void *arg)
 
   _cerebrod_speaker_initialize();
   if ((fd = _cerebrod_speaker_create_and_setup_socket()) < 0)
-    cerebro_err_exit("%s(%s:%d): fd setup failed",
-                     __FILE__, __FUNCTION__, __LINE__);
+    CEREBRO_EXIT(("fd setup failed"));
 
   while (1)
     {
@@ -385,25 +370,17 @@ cerebrod_speaker(void *arg)
                     close(fd);	/* no-wrapper, make best effort */
                   
                   if ((fd = _cerebrod_speaker_create_and_setup_socket()) < 0)
-                    cerebro_err_debug("%s(%s:%d): error re-initializing socket",
-                                      __FILE__, __FUNCTION__, __LINE__);
+                    CEREBRO_DBG(("error re-initializing socket"));
                   else
-                    cerebro_err_debug("%s(%s:%d): success re-initializing "
-                                      "socket",
-                                      __FILE__, __FUNCTION__, __LINE__);
+                    CEREBRO_DBG(("success re-initializing socket"));
                 }
               else if (errno == EINTR)
-                cerebro_err_debug("%s(%s:%d): sendto: %s", 
-                                  __FILE__, __FUNCTION__, __LINE__,
-                                  strerror(errno));
+                CEREBRO_DBG(("sendto: %s", strerror(errno)));
               else
-                cerebro_err_exit("%s(%s:%d): sendto: %s", 
-                                 __FILE__, __FUNCTION__, __LINE__,
-                                 strerror(errno));
+                CEREBRO_EXIT(("sendto: %s", strerror(errno)));
             }
           else
-            cerebro_err_debug("%s(%s:%d): sendto: invalid bytes sent", 
-                              __FILE__, __FUNCTION__, __LINE__);
+            CEREBRO_DBG(("sendto: invalid bytes sent"));
         }
 
       cerebrod_heartbeat_destroy(hb);

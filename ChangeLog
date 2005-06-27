@@ -1,3 +1,7 @@
+2005-06-27  Albert Chu  <chu11@llnl.gov>
+
+	* Re-work cerebrod to use debug lib.
+	
 2005-06-26  Albert Chu  <chu11@llnl.gov>
 
 	* Re-work modules lib and util lib to use debug library.

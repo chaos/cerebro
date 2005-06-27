@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: config_module.c,v 1.4 2005-06-27 04:44:49 achu Exp $
+ *  $Id: config_module.c,v 1.5 2005-06-27 17:24:09 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -11,6 +11,7 @@
 #if STDC_HEADERS
 #include <string.h>
 #endif /* STDC_HEADERS */
+#include <errno.h>
 
 #include "cerebro.h"
 #include "cerebro/cerebro_config_module.h"
@@ -160,7 +161,7 @@ config_module_load(void)
 
   if (!(config_handle = (struct config_module *)malloc(sizeof(struct config_module))))
     {
-      CEREBRO_DBG(("out of memory"));
+      CEREBRO_DBG(("malloc: %s", strerror(errno)));
       return NULL;
     }
   memset(config_handle, '\0', sizeof(struct config_module));

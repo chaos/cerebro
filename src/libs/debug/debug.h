@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: debug.h,v 1.4 2005-06-27 05:05:20 achu Exp $
+ *  $Id: debug.h,v 1.5 2005-06-27 17:24:09 achu Exp $
 \*****************************************************************************/
 
 #ifndef _DEBUG_H
@@ -8,8 +8,6 @@
 #if HAVE_CONFIG_H
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
-
-#if CEREBRO_DEBUG
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -45,12 +43,6 @@
           } \
       }
 
-#define CEREBRO_DBG(msg) \
-    do { \
-      CEREBRO_MSG_CREATE(msg) \
-      cerebro_err_debug(errbuf); \
-    } while(0)
-
 /*
  * debug_msg_create
  *
@@ -59,12 +51,29 @@
  * Returns message buffer or NULL on error
  */
 char *debug_msg_create(const char *fmt, ...);
-    
+
+#if CEREBRO_DEBUG
+
+#define CEREBRO_DBG(msg) \
+    do { \
+      CEREBRO_MSG_CREATE(msg) \
+      cerebro_err_debug(errbuf); \
+    } while(0)
+
+#define CEREBRO_EXIT(msg) \
+    do { \
+      CEREBRO_MSG_CREATE(msg) \
+      cerebro_err_exit(errbuf); \
+    } while(0)
+   
 #else /* !CEREBRO_DEBUG */
 
 #define CEREBRO_DBG(msg)
 
-#define CEREBRO_DBG_ERRNO(msg)
+#define CEREBRO_EXIT(msg) \
+    do { \
+      cerebro_err_exit msg; \
+    } while(0)
 
 #endif /* !CEREBRO_DEBUG */
 

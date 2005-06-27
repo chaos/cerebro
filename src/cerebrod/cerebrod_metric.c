@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric.c,v 1.50 2005-06-24 23:53:30 achu Exp $
+ *  $Id: cerebrod_metric.c,v 1.51 2005-06-27 17:24:09 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -16,7 +16,6 @@
 
 #include "cerebro.h"
 #include "cerebro/cerebro_constants.h"
-#include "cerebro/cerebro_error.h"
 #include "cerebro/cerebro_metric_protocol.h"
 
 #include "cerebrod_config.h"
@@ -25,6 +24,7 @@
 #include "cerebrod_util.h"
 #include "fd.h"
 #include "list.h"
+#include "debug.h"
 #include "wrappers.h"
 
 #define CEREBROD_METRIC_BACKLOG           10
@@ -141,9 +141,7 @@ _cerebrod_node_metric_response_marshall(struct cerebro_node_metric_response *res
       switch(res->metric_value_type)
         {
         case CEREBRO_METRIC_VALUE_TYPE_NONE:
-          cerebro_err_debug("%s(%s:%d): packet metric_value_len > 0 "
-                            "for metric_value_type NONE",
-                            __FILE__, __FUNCTION__, __LINE__);
+          CEREBRO_DBG(("metric value len > 0 for type NONE"));
           break;
         case CEREBRO_METRIC_VALUE_TYPE_INT32:
           len += Marshall_int32(*((int32_t *)res->metric_value),
@@ -172,9 +170,7 @@ _cerebrod_node_metric_response_marshall(struct cerebro_node_metric_response *res
                                  buflen - len);
           break;
         default:
-          cerebro_err_debug("%s(%s:%d): invalid type: %d",
-                            __FILE__, __FUNCTION__, __LINE__,
-                            res->metric_value_type);
+          CEREBRO_DBG(("invalid type %d", res->metric_value_type));
           return -1;
         }
     }
@@ -281,9 +277,7 @@ _cerebrod_metric_request_receive(int client_fd,
   
       if ((num = select(client_fd + 1, &rfds, NULL, NULL, &tv)) < 0)
 	{
-	  cerebro_err_debug("%s(%s:%d): select: %s", 
-                            __FILE__, __FUNCTION__, __LINE__,
-                            strerror(errno));
+	  CEREBRO_DBG(("select: %s", strerror(errno)));
 	  goto cleanup;
 	}
 
@@ -315,9 +309,7 @@ _cerebrod_metric_request_receive(int client_fd,
                         buf + bytes_read, 
                         CEREBRO_METRIC_REQUEST_PACKET_LEN - bytes_read)) < 0)
 	    {
-	      cerebro_err_debug("%s(%s:%d): read: %s", 
-                                __FILE__, __FUNCTION__, __LINE__,
-                                strerror(errno));
+	      CEREBRO_DBG(("read: %s", strerror(errno)));
 	      goto cleanup;
 	    }
 
@@ -331,8 +323,7 @@ _cerebrod_metric_request_receive(int client_fd,
 	}
       else
 	{
-	  cerebro_err_debug("%s(%s:%d): num != 0 but fd not set",
-                            __FILE__, __FUNCTION__, __LINE__);
+	  CEREBRO_DBG(("num != 0 but fd not set"));
 	  goto cleanup;
 	}
     }
@@ -394,17 +385,11 @@ _cerebrod_metric_err_response_send(int client_fd,
   if ((err_res_len = _cerebrod_metric_err_response_marshall(err_res, 
                                                             buf, 
                                                             CEREBRO_MAX_PACKET_LEN)) < 0)
-    {
-      cerebro_err_debug("%s(%s:%d): _cerebrod_metric_err_response_marshall",
-                        __FILE__, __FUNCTION__, __LINE__);
-      return -1;
-    }
+    return -1;
   
   if (fd_write_n(client_fd, buf, err_res_len) < 0)
     {
-      cerebro_err_debug("%s(%s:%d): fd_write_n: %s",
-                        __FILE__, __FUNCTION__, __LINE__,
-                        strerror(errno));
+      CEREBRO_DBG(("fd_write_n: %s", strerror(errno)));
       return -1;
     }
 
@@ -432,17 +417,11 @@ _cerebrod_metric_name_response_send_one(int client_fd,
   if ((res_len = _cerebrod_metric_name_response_marshall(res, 
                                                          buf, 
                                                          CEREBRO_METRIC_NAME_RESPONSE_LEN)) < 0)
-    {
-      cerebro_err_debug("%s(%s:%d): _cerebrod_metric_name_response_marshall",
-                        __FILE__, __FUNCTION__, __LINE__);
-      goto cleanup;
-    }
+    goto cleanup;
 
   if (fd_write_n(client_fd, buf, res_len) < 0)
     {
-      cerebro_err_debug("%s(%s:%d): fd_write_n: %s",
-                        __FILE__, __FUNCTION__, __LINE__,
-                        strerror(errno));
+      CEREBRO_DBG(("fd_write_n: %s", strerror(errno)));
       goto cleanup;
     }
   
@@ -474,17 +453,11 @@ _cerebrod_node_metric_response_send_one(int client_fd,
   if ((res_len = _cerebrod_node_metric_response_marshall(res, 
                                                          buf, 
                                                          buflen)) < 0)
-    {
-      cerebro_err_debug("%s(%s:%d): _cerebrod_node_metric_response_marshall",
-                        __FILE__, __FUNCTION__, __LINE__);
-      goto cleanup;
-    }
+    goto cleanup;
 
   if (fd_write_n(client_fd, buf, res_len) < 0)
     {
-      cerebro_err_debug("%s(%s:%d): fd_write_n: %s",
-                        __FILE__, __FUNCTION__, __LINE__,
-                        strerror(errno));
+      CEREBRO_DBG(("fd_write_n: %s", strerror(errno)));
       goto cleanup;
     }
 
@@ -570,8 +543,7 @@ _cerebrod_metric_name_response_create(char *metric_name,
   
   if (!(res = malloc(sizeof(struct cerebro_metric_name_response))))
     {
-      cerebro_err_debug("%s(%s:%d): out of memory",
-                        __FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("malloc: %s", strerror(errno)));
       return -1;
     }
   memset(res, '\0', sizeof(struct cerebro_metric_name_response));
@@ -581,9 +553,7 @@ _cerebrod_metric_name_response_create(char *metric_name,
   res->end = CEREBRO_METRIC_PROTOCOL_IS_NOT_LAST_RESPONSE;
 #if CEREBRO_DEBUG
   if (metric_name && strlen(metric_name) > CEREBRO_MAX_METRIC_NAME_LEN)
-    cerebro_err_debug("%s(%s:%d): invalid node name length: %s", 
-                      __FILE__, __FUNCTION__, __LINE__,
-                      metric_name);
+    CEREBRO_DBG(("invalid node name length: %s", metric_name));
 #endif /* CEREBRO_DEBUG */
       
   /* strncpy, b/c terminating character not required */
@@ -591,9 +561,7 @@ _cerebrod_metric_name_response_create(char *metric_name,
  
   if (!list_append(metric_name_responses, res))
     {
-      cerebro_err_debug("%s(%s:%d): list_append: %s", 
-                        __FILE__, __FUNCTION__, __LINE__,
-                        strerror(errno));
+      CEREBRO_DBG(("list_append: %s", strerror(errno)));
       goto cleanup;
     }
 
@@ -632,8 +600,7 @@ _cerebrod_metric_name_evaluate(void *x, void *arg)
   /* Should be called with lock already set */
   rv = Pthread_mutex_trylock(&cerebrod_metric_name_lock);
   if (rv != EBUSY)
-    cerebro_err_exit("%s(%s:%d): mutex not locked: rv=%d",	
-                     __FILE__, __FUNCTION__, __LINE__, rv);
+    CEREBRO_EXIT(("mutex not locked: rv=%d", rv));
 #endif /* CEREBRO_DEBUG */
 
   if (_cerebrod_metric_name_response_create(metric_name,
@@ -669,9 +636,7 @@ _cerebrod_metric_respond_with_metric_names(int client_fd, struct cerebro_metric_
 
   if (!(metric_name_responses = list_create((ListDelF)free)))
     {
-      cerebro_err_debug("%s(%s:%d): list_create: %s", 
-                        __FILE__, __FUNCTION__, __LINE__,
-                        strerror(errno));
+      CEREBRO_DBG(("list_create: %s", strerror(errno)));
       Pthread_mutex_unlock(&cerebrod_metric_name_lock);
       _cerebrod_metric_respond_with_error(client_fd,
                                           req->version,
@@ -779,25 +744,22 @@ _cerebrod_node_metric_response_create(char *nodename,
   if ((metric_value_type == CEREBRO_METRIC_VALUE_TYPE_NONE && metric_value_len)
       || (metric_value_type != CEREBRO_METRIC_VALUE_TYPE_NONE && !metric_value_len))
     {
-      cerebro_err_debug("%s(%s:%d): metric_value_type = %d, metric_value_len = %d",
-                        __FILE__, __FUNCTION__, __LINE__, 
-                        metric_value_type, metric_value_len);
+      CEREBRO_DBG(("metric value type = %d, len = %d",
+                   metric_value_type, metric_value_len));
       return -1;
     }
 
   if ((metric_value_len && !metric_value)
       || (!metric_value_len && metric_value))
     {
-      cerebro_err_debug("%s(%s:%d): metric_value_len = %d, metric_value = %p",
-                        __FILE__, __FUNCTION__, __LINE__, 
-                        metric_value_len, metric_value);
+      CEREBRO_DBG(("metric value len = %d, value = %p",
+                   metric_value_len, metric_value));
       return -1;
     }
 
   if (!(res = malloc(sizeof(struct cerebro_node_metric_response))))
     {
-      cerebro_err_debug("%s(%s:%d): out of memory",
-                        __FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("malloc: %s", strerror(errno)));
       return -1;
     }
   memset(res, '\0', sizeof(struct cerebro_node_metric_response));
@@ -807,9 +769,7 @@ _cerebrod_node_metric_response_create(char *nodename,
   res->end = CEREBRO_METRIC_PROTOCOL_IS_NOT_LAST_RESPONSE;
 #if CEREBRO_DEBUG
   if (nodename && strlen(nodename) > CEREBRO_MAX_NODENAME_LEN)
-    cerebro_err_debug("%s(%s:%d): invalid node name length: %s", 
-                      __FILE__, __FUNCTION__, __LINE__,
-                      nodename);
+    CEREBRO_DBG(("invalid node name length: %s", nodename));
 #endif /* CEREBRO_DEBUG */
       
   /* strncpy, b/c terminating character not required */
@@ -822,8 +782,7 @@ _cerebrod_node_metric_response_create(char *nodename,
     {
       if (!(res->metric_value = (void *)malloc(metric_value_len)))
         {
-          cerebro_err_debug("%s(%s:%d): out of memory",
-                            __FILE__, __FUNCTION__, __LINE__);
+          CEREBRO_DBG(("malloc: %s", strerror(errno)));
           return -1;
         }
       memcpy(res->metric_value, metric_value, metric_value_len);
@@ -831,9 +790,7 @@ _cerebrod_node_metric_response_create(char *nodename,
   
   if (!list_append(node_responses, res))
     {
-      cerebro_err_debug("%s(%s:%d): list_append: %s", 
-                        __FILE__, __FUNCTION__, __LINE__,
-                        strerror(errno));
+      CEREBRO_DBG(("list_append: %s", strerror(errno)));
       goto cleanup;
     }
 
@@ -877,8 +834,7 @@ _cerebrod_node_metric_evaluate(void *x, void *arg)
   /* Should be called with lock already set */
   rv = Pthread_mutex_trylock(&cerebrod_listener_data_lock);
   if (rv != EBUSY)
-    cerebro_err_exit("%s(%s:%d): mutex not locked: rv=%d",	
-                     __FILE__, __FUNCTION__, __LINE__, rv);
+    CEREBRO_EXIT(("mutex not locked: rv=%d", rv));
 #endif /* CEREBRO_DEBUG */
 
   Pthread_mutex_lock(&(nd->node_data_lock));
@@ -888,8 +844,7 @@ _cerebrod_node_metric_evaluate(void *x, void *arg)
    * greater than the time stored in any last_received time.
    */
   if (ed->time_now < nd->last_received_time)
-    cerebro_err_debug("%s(%s:%d): last_received time later than time_now time",
-                      __FILE__, __FUNCTION__, __LINE__);
+    CEREBRO_DBG(("last_received time later than time_now time"));
 #endif /* CEREBRO_DEBUG */
 
   if (!strcmp(ed->metric_name, CEREBRO_METRIC_CLUSTER_NODES))
@@ -1065,9 +1020,7 @@ _cerebrod_metric_respond_with_nodes(int client_fd,
 
   if (!(node_responses = list_create((ListDelF)_cerebrod_node_metric_response_destroy)))
     {
-      cerebro_err_debug("%s(%s:%d): list_create: %s", 
-                        __FILE__, __FUNCTION__, __LINE__,
-                        strerror(errno));
+      CEREBRO_DBG(("list_create: %s", strerror(errno)));
       Pthread_mutex_unlock(&cerebrod_listener_data_lock);
       _cerebrod_metric_respond_with_error(client_fd,
                                           req->version,
@@ -1160,10 +1113,8 @@ _cerebrod_metric_service_connection(void *arg)
 
   if (req_len != CEREBRO_METRIC_REQUEST_PACKET_LEN)
     {
-      cerebro_err_debug("%s(%s:%d): received packet unexpected size: "
-                        "expect %d, req_len %d", 
-                        __FILE__, __FUNCTION__, __LINE__,
-                        CEREBRO_METRIC_REQUEST_PACKET_LEN, req_len);
+      CEREBRO_DBG(("packet_len: expect %d, req_len %d", 
+                   CEREBRO_METRIC_REQUEST_PACKET_LEN, req_len));
 
       if (req_len >= sizeof(req.version)
           && req.version != CEREBRO_METRIC_PROTOCOL_VERSION)

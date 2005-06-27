@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.94 2005-06-24 23:53:30 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.95 2005-06-27 17:24:09 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -20,7 +20,6 @@
 
 #include "cerebro.h"
 #include "cerebro/cerebro_constants.h"
-#include "cerebro/cerebro_error.h"
 #include "cerebro/cerebrod_heartbeat_protocol.h"
 
 #include "cerebrod_config.h"
@@ -30,6 +29,8 @@
 #include "cerebrod_metric.h"
 
 #include "clusterlist_module.h"
+
+#include "debug.h"
 
 #include "wrappers.h"
 
@@ -85,9 +86,7 @@ _cerebrod_listener_create_and_setup_socket(void)
 
   if ((temp_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {
-      cerebro_err_debug("%s(%s:%d): socket: %s",
-                        __FILE__, __FUNCTION__, __LINE__,
-                        strerror(errno));
+      CEREBRO_DBG(("socket: %s", strerror(errno)));
       return -1;
     }
 
@@ -111,9 +110,7 @@ _cerebrod_listener_create_and_setup_socket(void)
 		     &imr,
 		     sizeof(struct ip_mreqn)) < 0)
 	{
-	  cerebro_err_debug("%s(%s:%d): setsockopt: %s",
-                            __FILE__, __FUNCTION__, __LINE__,
-                            strerror(errno));
+	  CEREBRO_DBG(("setsockopt: %s", strerror(errno)));
 	  return -1;
 	}
     }
@@ -131,9 +128,7 @@ _cerebrod_listener_create_and_setup_socket(void)
 	   (struct sockaddr *)&heartbeat_addr, 
 	   sizeof(struct sockaddr_in)) < 0)
     {
-      cerebro_err_debug("%s(%s:%d): bind: %s",
-                        __FILE__, __FUNCTION__, __LINE__,
-                        strerror(errno));
+      CEREBRO_DBG(("bind: %s", strerror(errno)));
       return -1;
     }
 
@@ -154,17 +149,14 @@ _cerebrod_listener_initialize(void)
 
   Pthread_mutex_lock(&listener_fd_lock);
   if ((listener_fd = _cerebrod_listener_create_and_setup_socket()) < 0)
-    cerebro_err_exit("%s(%s:%d): listener_fd setup failed",
-                     __FILE__, __FUNCTION__, __LINE__);
+    CEREBRO_EXIT(("listener_fd setup failed"));
   Pthread_mutex_unlock(&listener_fd_lock);
 
   if (!(clusterlist_handle = clusterlist_module_load()))
-    cerebro_err_exit("%s(%s:%d): clusterlist_module_load",
-                     __FILE__, __FUNCTION__, __LINE__);
+    CEREBRO_EXIT(("clusterlist_module_load"));
   
   if (clusterlist_module_setup(clusterlist_handle) < 0)
-    cerebro_err_exit("%s(%s:%d): clusterlist_module_setup",
-                     __FILE__, __FUNCTION__, __LINE__);
+    CEREBRO_EXIT(("clusterlist_module_setup"));
 
   cerebrod_listener_data_initialize();
 
@@ -246,9 +238,7 @@ _cerebrod_heartbeat_unmarshall_and_create(const char *buf, unsigned int buflen)
               switch(hd->metric_value_type)
                 {
                 case CEREBRO_METRIC_VALUE_TYPE_NONE:
-                  cerebro_err_debug("%s(%s:%d): packet metric_value_len > 0 "
-                                    "for metric_value_type NONE",
-                                    __FILE__, __FUNCTION__, __LINE__);
+                  CEREBRO_DBG(("metric value len > 0 for type NONE"));
                   break;
                 case CEREBRO_METRIC_VALUE_TYPE_INT32:
                   if (!(n = Unmarshall_int32((int32_t *)hd->metric_value,
@@ -287,9 +277,7 @@ _cerebrod_heartbeat_unmarshall_and_create(const char *buf, unsigned int buflen)
                   len += n;
                   break;
                 default:
-                  cerebro_err_debug("%s(%s:%d): packet metric_value_type invalid: %d",
-                                    __FILE__, __FUNCTION__, __LINE__,
-                                    hd->metric_value_type);
+                  CEREBRO_DBG(("invalid type %d", hd->metric_value_type));
                   goto cleanup;
                 }
             }
@@ -301,8 +289,7 @@ _cerebrod_heartbeat_unmarshall_and_create(const char *buf, unsigned int buflen)
   return hb;
 
  bad_len_cleanup:
-  cerebro_err_debug("%s(%s:%d): packet buffer length invalid",
-                    __FILE__, __FUNCTION__, __LINE__);
+  CEREBRO_DBG(("packet buffer length invalid"));
   
  cleanup:
   if (hd)
@@ -397,24 +384,18 @@ cerebrod_listener(void *arg)
 
               if ((listener_fd = _cerebrod_listener_create_and_setup_socket()) < 0)
 		{
-		  cerebro_err_debug("%s(%s:%d): error re-initializing socket",
-                                    __FILE__, __FUNCTION__, __LINE__);
+		  CEREBRO_DBG(("error re-initializing socket"));
                   
 		  /* Wait a bit, so we don't spin */
 		  sleep(CEREBROD_LISTENER_REINITIALIZE_WAIT);
 		}
               else
-                cerebro_err_debug("%s(%s:%d): success re-initializing socket",
-                                  __FILE__, __FUNCTION__, __LINE__);
+                CEREBRO_DBG(("success re-initializing socket"));
             }
           else if (errno == EINTR)
-            cerebro_err_debug("%s(%s:%d): recvfrom: %s", 
-                              __FILE__, __FUNCTION__, __LINE__,
-                              strerror(errno));
+            CEREBRO_DBG(("recvfrom: %s", strerror(errno)));
           else
-            cerebro_err_exit("%s(%s:%d): recvfrom: %s", 
-                             __FILE__, __FUNCTION__, __LINE__,
-                             strerror(errno));
+            CEREBRO_EXIT(("recvfrom: %s", strerror(errno)));
 	}
       Pthread_mutex_unlock(&listener_fd_lock);
 
@@ -424,10 +405,8 @@ cerebrod_listener(void *arg)
 
       if (recv_len < CEREBROD_HEARTBEAT_HEADER_LEN)
         {
-          cerebro_err_debug("%s(%s:%d): received buf length too small, "
-                            "expect header %d, recv_len %d",
-                            __FILE__, __FUNCTION__, __LINE__,
-                            CEREBROD_HEARTBEAT_HEADER_LEN, recv_len);
+          CEREBRO_DBG(("expect hb_len = %d, recv_len = %d",
+                       CEREBROD_HEARTBEAT_HEADER_LEN, recv_len));
           continue;
         }
 
@@ -438,23 +417,8 @@ cerebrod_listener(void *arg)
 
       if (hb->version != CEREBROD_HEARTBEAT_PROTOCOL_VERSION)
 	{
-	  cerebro_err_debug("%s(%s:%d): invalid cerebrod packet version read:"
-                            "expect %d, version %d",
-                            __FILE__, __FUNCTION__, __LINE__,
-                            CEREBROD_HEARTBEAT_PROTOCOL_VERSION, hb->version);
-	  continue;
-	}
-      
-      if ((flag = clusterlist_module_node_in_cluster(clusterlist_handle,
-						     hb->nodename)) < 0)
-	cerebro_err_exit("%s(%s:%d): clusterlist_module_node_in_cluster: %s",
-			 __FILE__, __FUNCTION__, __LINE__, hb->nodename);
-      
-      if (!flag)
-	{
-	  cerebro_err_debug("%s(%s:%d): received non-cluster packet from: %s",
-			    __FILE__, __FUNCTION__, __LINE__,
-			    hb->nodename);
+	  CEREBRO_DBG(("invalid hb version: expect = %d, version = %d",
+                       CEREBROD_HEARTBEAT_PROTOCOL_VERSION, hb->version));
 	  continue;
 	}
       
@@ -462,6 +426,16 @@ cerebrod_listener(void *arg)
       memset(nodename_buf, '\0', CEREBRO_MAX_NODENAME_LEN+1);
       memcpy(nodename_buf, hb->nodename, CEREBRO_MAX_NODENAME_LEN);
 
+      if ((flag = clusterlist_module_node_in_cluster(clusterlist_handle,
+						     nodename_buf)) < 0)
+	CEREBRO_EXIT(("clusterlist_module_node_in_cluster: %s", nodename_buf));
+      
+      if (!flag)
+	{
+	  CEREBRO_DBG(("received non-cluster packet from: %s", nodename_buf));
+	  continue;
+	}
+      
       memset(nodename_key, '\0', CEREBRO_MAX_NODENAME_LEN+1);
 
       if (clusterlist_module_get_nodename(clusterlist_handle,
@@ -469,9 +443,7 @@ cerebrod_listener(void *arg)
 					  nodename_key, 
 					  CEREBRO_MAX_NODENAME_LEN+1) < 0)
 	{
-	  cerebro_err_debug("%s(%s:%d): clusterlist_module_get_nodename: %s",
-			    __FILE__, __FUNCTION__, __LINE__,
-			    hb->nodename);
+	  CEREBRO_DBG(("clusterlist_module_get_nodename: %s", nodename_buf));
 	  continue;
 	}
 

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker_data.c,v 1.8 2005-06-24 23:53:30 achu Exp $
+ *  $Id: cerebrod_speaker_data.c,v 1.9 2005-06-27 17:24:09 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -20,14 +20,13 @@
 
 #include "cerebro.h"
 #include "cerebro/cerebro_constants.h"
-#include "cerebro/cerebro_error.h"
 #include "cerebro/cerebrod_heartbeat_protocol.h"
 
 #include "cerebrod_config.h"
 #include "cerebrod_speaker_data.h"
 
 #include "metric_module.h"
-
+#include "debug.h"
 #include "wrappers.h"
 
 extern struct cerebrod_config conf;
@@ -90,15 +89,13 @@ cerebrod_speaker_data_initialize(void)
 
   if (!(metric_handle = metric_modules_load(conf.metric_max)))
     {
-      cerebro_err_debug("%s(%s:%d): metric_modules_load",
-                        __FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("metric_modules_load"));
       return;
     }
 
   if ((metric_index_len = metric_modules_count(metric_handle)) < 0)
     {
-      cerebro_err_debug("%s(%s:%d): metric_module_count failed",
-                        __FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("metric_module_count failed"));
       metric_modules_unload(metric_handle);
       metric_handle = NULL;
       return;
@@ -143,18 +140,15 @@ cerebrod_speaker_data_initialize(void)
 #endif /* CEREBRO_DEBUG */
       if (metric_module_setup(metric_handle, i) < 0)
         {
-          cerebro_err_debug("%s(%s:%d): metric_module_setup failed: "
-                            "metric_module = %s",
-                            __FILE__, __FUNCTION__, __LINE__,
-                            metric_module_name(metric_handle, i));
+          CEREBRO_DBG(("metric_module_setup: %s",
+                       metric_module_name(metric_handle, i)));
           continue;
         }
 
       if (!(metric_name = metric_module_get_metric_name(metric_handle,
                                                         i)))
         {
-          cerebro_err_debug("%s(%s:%d): metric_module_get_metric_name failed",
-                            __FILE__, __FUNCTION__, __LINE__);
+          CEREBRO_DBG(("metric_module_get_metric_name"));
           metric_module_cleanup(metric_handle, i);
           continue;
         }
@@ -162,8 +156,7 @@ cerebrod_speaker_data_initialize(void)
       if ((metric_period = metric_module_get_metric_period(metric_handle,
                                                         i)) < 0)
         {
-          cerebro_err_debug("%s(%s:%d): metric_module_get_metric_period failed",
-                            __FILE__, __FUNCTION__, __LINE__);
+          CEREBRO_DBG(("metric_module_get_metric_period"));
           metric_module_cleanup(metric_handle, i);
           continue;
         }
@@ -223,8 +216,7 @@ cerebrod_speaker_data_get_metric_data(struct cerebrod_heartbeat *hb,
   assert(heartbeat_len);
 
   if (!cerebrod_speaker_data_initialization_complete)
-    cerebro_err_exit("%s(%s:%d): initialization not complete",
-                     __FILE__, __FUNCTION__, __LINE__);
+    CEREBRO_EXIT(("initialization not complete"));
 
   /* Could be no metric modules */
   if (!metric_handle || !metric_list || !metric_list_size)
@@ -256,9 +248,8 @@ cerebrod_speaker_data_get_metric_data(struct cerebrod_heartbeat *hb,
       if (!(metric_name = metric_module_get_metric_name(metric_handle,
                                                         metric_module->index)))
         {
-          cerebro_err_debug("%s(%s:%d): metric_module_get_metric_name "
-                            "failed: index = %d",
-                            __FILE__, __FUNCTION__, __LINE__, metric_module->index);
+          CEREBRO_DBG(("metric_module_get_metric_name: %d", 
+                       metric_module->index));
           Free(hd);
           goto continue_loop;
         }
@@ -272,11 +263,8 @@ cerebrod_speaker_data_get_metric_data(struct cerebrod_heartbeat *hb,
                                          &(hd->metric_value_len),
                                          &temp) < 0)
         {
-          cerebro_err_debug("%s(%s:%d): "
-                            "metric_module_get_metric_value "
-                            "failed: index = %d",
-                            __FILE__, __FUNCTION__, __LINE__, 
-                            metric_module->index);
+          CEREBRO_DBG(("metric_module_get_metric_value: %d", 
+                       metric_module->index));
           Free(hd->metric_value);
           Free(hd);
           goto continue_loop;
@@ -285,9 +273,7 @@ cerebrod_speaker_data_get_metric_data(struct cerebrod_heartbeat *hb,
       if (hd->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_NONE
           && !hd->metric_value_len)
         {
-          cerebro_err_debug("%s(%s:%d): bogus metric information",
-                            __FILE__, __FUNCTION__, __LINE__, 
-                            metric_module->index);
+          CEREBRO_DBG(("bogus metric information: %d", metric_module->index));
           Free(hd->metric_value);
           Free(hd);
           metric_module_destroy_metric_value(metric_handle, 
@@ -299,11 +285,8 @@ cerebrod_speaker_data_get_metric_data(struct cerebrod_heartbeat *hb,
       if (!(hd->metric_value_type >= CEREBRO_METRIC_VALUE_TYPE_NONE
             && hd->metric_value_type <= CEREBRO_METRIC_VALUE_TYPE_STRING))
         {
-          cerebro_err_debug("%s(%s:%d): "
-                            "metric_module_get_metric_value "
-                            "invalid type: %d %d"
-                            __FILE__, __FUNCTION__, __LINE__,
-                            hd->metric_value_type, metric_module->index);
+          CEREBRO_DBG(("metric_module_get_metric_value: %d %d ",
+                       hd->metric_value_type, metric_module->index));
           Free(hd->metric_value);
           Free(hd);
           metric_module_destroy_metric_value(metric_handle, 

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: metric_module.c,v 1.5 2005-06-27 04:44:49 achu Exp $
+ *  $Id: metric_module.c,v 1.6 2005-06-27 17:24:09 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -11,6 +11,7 @@
 #if STDC_HEADERS
 #include <string.h>
 #endif /* STDC_HEADERS */
+#include <errno.h>
 
 #include "cerebro.h"
 #include "cerebro/cerebro_constants.h"
@@ -182,7 +183,7 @@ metric_modules_load(unsigned int modules_max)
                                                                                     
   if (!(metric_handle = (struct metric_module *)malloc(sizeof(struct metric_module))))
     {
-      CEREBRO_DBG(("out of memory"));
+      CEREBRO_DBG(("malloc: %s", strerror(errno)));
       return NULL;
     }
   memset(metric_handle, '\0', sizeof(struct metric_module));
@@ -191,14 +192,14 @@ metric_modules_load(unsigned int modules_max)
   metric_handle->modules_count = 0;
   if (!(metric_handle->dl_handle = (lt_dlhandle *)malloc(sizeof(lt_dlhandle)*metric_handle->modules_max)))
     {
-      CEREBRO_DBG(("out of memory"));
+      CEREBRO_DBG(("malloc: %s", strerror(errno)));
       goto cleanup;
     }
   memset(metric_handle->dl_handle, '\0', sizeof(lt_dlhandle)*metric_handle->modules_max);
   
   if (!(metric_handle->module_info = (struct cerebro_metric_module_info **)malloc(sizeof(struct cerebro_metric_module_info *)*metric_handle->modules_max)))
     {
-      CEREBRO_DBG(("out of memory"));
+      CEREBRO_DBG(("malloc: %s", strerror(errno)));
       goto cleanup;
     }
   memset(metric_handle->module_info, '\0', sizeof(struct cerebro_metric_module_info *)*metric_handle->modules_max);

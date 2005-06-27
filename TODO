@@ -13,6 +13,8 @@ Cleanup
 - packet buflen max len issue with number of metrics supportable
 - string length issue with packet buflen fixed in listener
 - type -> len function
+- header consistency
+- Makefile libs/include dirs consistency
 
 Audit
 - code review to reduce memory footprint

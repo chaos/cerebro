@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: module_util.c,v 1.4 2005-06-27 04:44:49 achu Exp $
+ *  $Id: module_util.c,v 1.5 2005-06-27 17:24:09 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -77,7 +77,7 @@ find_known_module(char *search_dir,
   if (!(dir = opendir(search_dir)))
     {
       /* Return 0, since dir may simply not exist */
-      CEREBRO_DBG(("opendir: %s", strerror(errno)));
+      CEREBRO_DBG(("opendir: %s: %s", search_dir, strerror(errno)));
       return 0;
     }
 
@@ -158,7 +158,7 @@ find_modules(char *search_dir,
   if (!(dir = opendir(search_dir)))
     {
       /* Return 0, since dir may simply not exist */
-      CEREBRO_DBG(("opendir: %s", strerror(errno)));
+      CEREBRO_DBG(("opendir: %s: %s", search_dir, strerror(errno)));
       return 0;
     }
 

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_util.c,v 1.22 2005-06-21 22:29:07 achu Exp $
+ *  $Id: cerebrod_util.c,v 1.23 2005-06-27 17:24:09 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -18,11 +18,10 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
-#include "cerebro/cerebro_error.h"
-
 #include "cerebrod_config.h"
 #include "cerebrod_util.h"
 
+#include "debug.h"
 #include "wrappers.h"
 
 extern struct cerebrod_config conf;
@@ -91,8 +90,8 @@ cerebrod_rehash(hash_t *old_hash,
     {
       int rv = Pthread_mutex_trylock(hash_mutex);
       if (rv != EBUSY)
-        cerebro_err_exit("%s(%s:%d): mutex not locked: rv=%d",
-                         __FILE__, __FUNCTION__, __LINE__, rv);
+        CEREBRO_EXIT(("%s(%s:%d): mutex not locked: rv=%d",
+                      __FILE__, __FUNCTION__, __LINE__, rv));
     }
 #endif /* CEREBRO_DEBUG */
 
@@ -105,15 +104,11 @@ cerebrod_rehash(hash_t *old_hash,
   
   num = Hash_for_each(*old_hash, _hash_reinsert, &new_hash);
   if (num != hash_num)
-    cerebro_err_exit("%s(%s:%d): invalid reinsert count: num=%d hash_num=%d",
-                     __FILE__, __FUNCTION__, __LINE__,
-                     num, hash_num);
+    CEREBRO_EXIT(("invalid reinsert: num=%d hash_num=%d", num, hash_num));
 
   num = Hash_delete_if(*old_hash, _hash_removeall, NULL);
   if (num != hash_num)
-    cerebro_err_exit("%s(%s:%d): invalid removeall count: num=%d hash_num=%d",
-                     __FILE__, __FUNCTION__, __LINE__,
-                     num, hash_num);
+    CEREBRO_EXIT(("invalid removeall: num=%d hash_num=%d", num, hash_num));
 
   Hash_destroy(*old_hash);
 
@@ -138,9 +133,7 @@ _cerebrod_create_and_setup_socket(unsigned int port,
 
   if ((temp_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
-      cerebro_err_debug("%s(%s:%d): socket: %s",
-                        __FILE__, __FUNCTION__, __LINE__,
-                        strerror(errno));
+      CEREBRO_DBG(("socket: %s", strerror(errno)));
       return -1;
     }
 
@@ -156,17 +149,13 @@ _cerebrod_create_and_setup_socket(unsigned int port,
            (struct sockaddr *)&server_addr,
            sizeof(struct sockaddr_in)) < 0)
     {
-      cerebro_err_debug("%s(%s:%d): bind: %s",
-                        __FILE__, __FUNCTION__, __LINE__,
-                        strerror(errno));
+      CEREBRO_DBG(("bind: %s", strerror(errno)));
       return -1;
     }
 
   if (listen(temp_fd, backlog) < 0)
     {
-      cerebro_err_debug("%s(%s:%d): listen: %s",
-                        __FILE__, __FUNCTION__, __LINE__,
-                        strerror(errno));
+      CEREBRO_DBG(("listen: %s", strerror(errno)));
       return -1;
     }
 
@@ -178,9 +167,7 @@ _cerebrod_create_and_setup_socket(unsigned int port,
                  &optval,
                  sizeof(int)) < 0)
     {
-      cerebro_err_debug("%s(%s:%d): setsockopt: %s",
-                        __FILE__, __FUNCTION__, __LINE__,
-                        strerror(errno));
+      CEREBRO_DBG(("setsockopt: %s", strerror(errno)));
       return -1;
     }
 
@@ -201,8 +188,7 @@ cerebrod_tcp_data_server(Cerebrod_service_connection service_connection,
   assert(reinitialize_wait_time);
 
   if ((server_fd = _cerebrod_create_and_setup_socket(port, backlog)) < 0)
-    cerebro_err_exit("%s(%s:%d): server_fd setup failed",
-                     __FILE__, __FUNCTION__, __LINE__);
+    CEREBRO_EXIT(("server_fd setup failed"));
   
   for (;;)
     {
@@ -237,24 +223,18 @@ cerebrod_tcp_data_server(Cerebrod_service_connection service_connection,
               if ((server_fd = _cerebrod_create_and_setup_socket(port,
                                                                  backlog)) < 0)
 		{
-		  cerebro_err_debug("%s(%s:%d): error re-initializing socket",
-                                    __FILE__, __FUNCTION__, __LINE__);
+		  CEREBRO_DBG(("error re-initializing socket"));
 
 		  /* Wait a bit, so we don't spin */
 		  sleep(reinitialize_wait_time);
 		}
               else
-                cerebro_err_debug("%s(%s:%d): success re-initializing socket",
-                                  __FILE__, __FUNCTION__, __LINE__);
+                CEREBRO_DBG(("success re-initializing socket"));
             }
           else if (errno == EINTR)
-            cerebro_err_debug("%s(%s:%d): accept: %s", 
-                              __FILE__, __FUNCTION__, __LINE__,
-                              strerror(errno));
+            CEREBRO_DBG(("accept: %s", strerror(errno)));
           else
-            cerebro_err_exit("%s(%s:%d): accept: %s", 
-                             __FILE__, __FUNCTION__, __LINE__,
-                             strerror(errno));
+            CEREBRO_EXIT(("accept: %s", strerror(errno)));
 	}
 
       if (client_fd < 0)
