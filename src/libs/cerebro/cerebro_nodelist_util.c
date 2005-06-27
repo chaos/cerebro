@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_nodelist_util.c,v 1.4 2005-06-24 20:42:28 achu Exp $
+ *  $Id: cerebro_nodelist_util.c,v 1.5 2005-06-27 17:59:45 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -11,12 +11,13 @@
 #if STDC_HEADERS
 #include <string.h>
 #endif /* STDC_HEADERS */
+#include <errno.h>
 
 #include "cerebro.h"
 #include "cerebro_api.h"
 #include "cerebro_nodelist_util.h"
-#include "cerebro/cerebro_error.h"
 
+#include "debug.h"
 #include "list.h"
 
 int
@@ -27,32 +28,28 @@ _cerebro_nodelist_check(cerebro_nodelist_t nodelist)
 
   if (!nodelist->nodes)
     {
-      cerebro_err_debug("%s(%s:%d): nodelist null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("nodelist null"));
       nodelist->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
 
   if (!nodelist->iterators)
     {
-      cerebro_err_debug("%s(%s:%d): iterators null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("iterators null"));
       nodelist->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
 
   if (!nodelist->handle)
     {
-      cerebro_err_debug("%s(%s:%d): handle null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("handle null"));
       nodelist->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
 
   if (nodelist->handle->magic != CEREBRO_MAGIC_NUMBER)
     {
-      cerebro_err_debug("%s(%s:%d): handle destroyed",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("handle destroyed"));
       nodelist->errnum = CEREBRO_ERR_MAGIC_NUMBER;
       return -1;
     }
@@ -109,6 +106,7 @@ _cerebro_nodelist_create(cerebro_t handle, const char *metric_name)
 
   if (!list_append(handle->nodelists, nodelist))
     {
+      CEREBRO_DBG(("list_append: %s", strerror(errno)));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       goto cleanup;
     }
@@ -143,6 +141,7 @@ _cerebro_nodelist_append(cerebro_nodelist_t nodelist,
 
   if (!nodename || strlen(nodename) > CEREBRO_MAX_NODENAME_LEN)
     {
+      CEREBRO_DBG(("nodename invalid"));
       nodelist->errnum = CEREBRO_ERR_INTERNAL;
       goto cleanup;
     }
@@ -161,6 +160,7 @@ _cerebro_nodelist_append(cerebro_nodelist_t nodelist,
 
   if (!list_append(nodelist->nodes, nd))
     {
+      CEREBRO_DBG(("list_append: %s", strerror(errno)));
       nodelist->errnum = CEREBRO_ERR_INTERNAL;
       goto cleanup;
     }

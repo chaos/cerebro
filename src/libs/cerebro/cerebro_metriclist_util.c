@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metriclist_util.c,v 1.3 2005-06-24 20:42:28 achu Exp $
+ *  $Id: cerebro_metriclist_util.c,v 1.4 2005-06-27 17:59:45 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -11,12 +11,13 @@
 #if STDC_HEADERS
 #include <string.h>
 #endif /* STDC_HEADERS */
+#include <errno.h>
 
 #include "cerebro.h"
 #include "cerebro_api.h"
 #include "cerebro_metriclist_util.h"
-#include "cerebro/cerebro_error.h"
 
+#include "debug.h"
 #include "list.h"
 
 int
@@ -27,32 +28,28 @@ _cerebro_metriclist_check(cerebro_metriclist_t metriclist)
 
   if (!metriclist->metric_names)
     {
-      cerebro_err_debug("%s(%s:%d): metriclist null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("metriclist null"));
       metriclist->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
 
   if (!metriclist->iterators)
     {
-      cerebro_err_debug("%s(%s:%d): iterators null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("iterators null"));
       metriclist->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
 
   if (!metriclist->handle)
     {
-      cerebro_err_debug("%s(%s:%d): handle null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("handle null"));
       metriclist->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
 
   if (metriclist->handle->magic != CEREBRO_MAGIC_NUMBER)
     {
-      cerebro_err_debug("%s(%s:%d): handle destroyed",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("handle destroyed"));
       metriclist->errnum = CEREBRO_ERR_MAGIC_NUMBER;
       return -1;
     }
@@ -91,6 +88,7 @@ _cerebro_metriclist_create(cerebro_t handle)
 
   if (!list_append(handle->metriclists, metriclist))
     {
+      CEREBRO_DBG(("list_append: %s", strerror(errno)));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       goto cleanup;
     }
@@ -122,6 +120,7 @@ _cerebro_metriclist_append(cerebro_metriclist_t metriclist,
 
   if (!metric_name || strlen(metric_name) > CEREBRO_MAX_METRIC_NAME_LEN)
     {
+      CEREBRO_DBG(("metric_name invalid"));
       metriclist->errnum = CEREBRO_ERR_INTERNAL;
       goto cleanup;
     }
@@ -134,6 +133,7 @@ _cerebro_metriclist_append(cerebro_metriclist_t metriclist,
 
   if (!list_append(metriclist->metric_names, str))
     {
+      CEREBRO_DBG(("list_append: %s", strerror(errno)));
       metriclist->errnum = CEREBRO_ERR_INTERNAL;
       goto cleanup;
     }

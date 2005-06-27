@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_util.c,v 1.2 2005-06-24 23:53:30 achu Exp $
+ *  $Id: cerebro_util.c,v 1.3 2005-06-27 17:59:45 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -27,7 +27,8 @@
 #include "cerebro.h"
 #include "cerebro_api.h"
 #include "cerebro_util.h"
-#include "cerebro/cerebro_error.h"
+
+#include "debug.h"
 
 int 
 _cerebro_handle_check(cerebro_t handle)
@@ -37,16 +38,14 @@ _cerebro_handle_check(cerebro_t handle)
 
   if (!handle->metriclists)
     {
-      cerebro_err_debug("%s(%s:%d): metriclists null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("metriclists null"));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
 
   if (!handle->nodelists)
     {
-      cerebro_err_debug("%s(%s:%d): nodelists null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("nodelists null"));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
@@ -66,22 +65,19 @@ _cerebro_low_timeout_connect(cerebro_t handle,
  
   if (!hostname)
     {
-      cerebro_err_debug("%s(%s:%d): hostname null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("hostname null"));
       return -1;
     }
 
   if (!port)
     {
-      cerebro_err_debug("%s(%s:%d): port invalid",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("port invalid"));
       return -1;
     }
 
   if (!connect_timeout)
     {
-      cerebro_err_debug("%s(%s:%d): connect_timeout invalid",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("connect_timeout invalid"));
       return -1;
     }
 
@@ -96,9 +92,7 @@ _cerebro_low_timeout_connect(cerebro_t handle,
  
   if ((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
-      cerebro_err_debug("%s(%s:%d): socket: %s",
-			__FILE__, __FUNCTION__, __LINE__, 
-			    strerror(errno));
+      CEREBRO_DBG(("socket: %s", strerror(errno)));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       goto cleanup;
     }
@@ -110,18 +104,14 @@ _cerebro_low_timeout_connect(cerebro_t handle,
 
   if ((old_flags = fcntl(fd, F_GETFL, 0)) < 0)
     {
-      cerebro_err_debug("%s(%s:%d): fcntl: %s",
-			__FILE__, __FUNCTION__, __LINE__, 
-			strerror(errno));
+      CEREBRO_DBG(("fcntl: %s", strerror(errno)));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       goto cleanup;
     }
    
   if (fcntl(fd, F_SETFL, old_flags | O_NONBLOCK) < 0)
     {
-      cerebro_err_debug("%s(%s:%d): fcntl: %s",
-			__FILE__, __FUNCTION__, __LINE__, 
-			strerror(errno));
+      CEREBRO_DBG(("fcntl: %s", strerror(errno)));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       goto cleanup;
     }
@@ -148,9 +138,7 @@ _cerebro_low_timeout_connect(cerebro_t handle,
        
       if ((rv = select(fd+1, &rset, &wset, NULL, &tval)) < 0)
         { 
-	  cerebro_err_debug("%s(%s:%d): select: %s",
-			    __FILE__, __FUNCTION__, __LINE__, 
-			    strerror(errno));
+	  CEREBRO_DBG(("select: %s", strerror(errno)));
 	  handle->errnum = CEREBRO_ERR_INTERNAL;
           goto cleanup;
         }
@@ -170,9 +158,7 @@ _cerebro_low_timeout_connect(cerebro_t handle,
                
               if (getsockopt(fd, SOL_SOCKET, SO_ERROR, &error, &len) < 0)
                 {
-		  cerebro_err_debug("%s(%s:%d): getsockopt: %s",
-				    __FILE__, __FUNCTION__, __LINE__, 
-				    strerror(errno));
+		  CEREBRO_DBG(("getsockopt: %s", strerror(errno)));
                   handle->errnum = CEREBRO_ERR_INTERNAL;
                   goto cleanup;
                 }
@@ -187,8 +173,7 @@ _cerebro_low_timeout_connect(cerebro_t handle,
             }
           else
             {
-	      cerebro_err_debug("%s(%s:%d): select returned bad data",
-				__FILE__, __FUNCTION__, __LINE__);
+	      CEREBRO_DBG(("select returned bad data"));
               handle->errnum = CEREBRO_ERR_INTERNAL;
               goto cleanup;
             }
@@ -198,9 +183,7 @@ _cerebro_low_timeout_connect(cerebro_t handle,
   /* reset flags */
   if (fcntl(fd, F_SETFL, old_flags) < 0)
     {
-      cerebro_err_debug("%s(%s:%d): fcntl: %s",
-			__FILE__, __FUNCTION__, __LINE__,
-			strerror(errno));
+      CEREBRO_DBG(("fcntl: %s", strerror(errno)));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       goto cleanup;
     }

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_nodelist.c,v 1.4 2005-06-24 20:42:28 achu Exp $
+ *  $Id: cerebro_nodelist.c,v 1.5 2005-06-27 17:59:45 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -11,16 +11,18 @@
 #if STDC_HEADERS
 #include <string.h>
 #endif /* STDC_HEADERS */
+#include <errno.h>
 
 #include "cerebro.h"
 #include "cerebro_api.h"
 #include "cerebro_nodelist_util.h"
 #include "cerebro_util.h"
-#include "cerebro/cerebro_error.h"
 
 #include "list.h"
 
 #include "clusterlist_module.h"
+
+#include "debug.h"
 
 char *
 cerebro_nodelist_metric_name(cerebro_nodelist_t nodelist)
@@ -85,6 +87,7 @@ cerebro_nodelist_find(cerebro_nodelist_t nodelist,
       if ((flag = clusterlist_module_node_in_cluster(nodelist->handle->clusterlist_handle,
 						     node)) < 0)
         {
+          CEREBRO_DBG(("clusterlist_module_node_in_cluster"));
           nodelist->errnum = CEREBRO_ERR_INTERNAL;
           return -1;
         }
@@ -102,6 +105,7 @@ cerebro_nodelist_find(cerebro_nodelist_t nodelist,
 					  nodebuf,
 					  CEREBRO_MAX_NODENAME_LEN+1) < 0)
         {
+          CEREBRO_DBG(("clusterlist_module_get_nodename"));
           nodelist->errnum = CEREBRO_ERR_INTERNAL;
           return -1;
         }
@@ -250,6 +254,7 @@ cerebro_nodelist_iterator_create(cerebro_nodelist_t nodelist)
   
   if (!list_append(nodelist->iterators, nodelistItr))
     {
+      CEREBRO_DBG(("list_append: %s", strerror(errno)));
       nodelist->errnum = CEREBRO_ERR_INTERNAL;
       goto cleanup;
     }
@@ -285,24 +290,21 @@ _cerebro_nodelist_iterator_check(cerebro_nodelist_iterator_t nodelistItr)
 
   if (!nodelistItr->itr)
     {
-      cerebro_err_debug("%s(%s:%d): itr null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("itr null"));
       nodelistItr->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
 
   if (!nodelistItr->nodelist)
     {
-      cerebro_err_debug("%s(%s:%d): nodelist null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("nodelist null"));
       nodelistItr->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
   
   if (nodelistItr->nodelist->magic != CEREBRO_NODELIST_MAGIC_NUMBER)
     {
-      cerebro_err_debug("%s(%s:%d): nodelist destroyed",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("nodelist destroyed"));
       nodelistItr->errnum = CEREBRO_ERR_MAGIC_NUMBER;
       return -1;
     }

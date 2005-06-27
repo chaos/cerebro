@@ -29,13 +29,13 @@
 #include <errno.h>
 
 #include "cerebro.h"
-#include "cerebro/cerebro_error.h"
 #include "cerebro/cerebro_metric_protocol.h"
 
 #include "cerebro_api.h"
 #include "cerebro_config_util.h"
 #include "cerebro_util.h"
 
+#include "debug.h"
 #include "fd.h"
 #include "marshall.h"
 
@@ -53,11 +53,12 @@ _cerebro_metric_protocol_err_conversion(u_int32_t protocol_error)
     case CEREBRO_METRIC_PROTOCOL_ERR_METRIC_UNKNOWN:
       return CEREBRO_ERR_METRIC_UNKNOWN;
     case CEREBRO_METRIC_PROTOCOL_ERR_PARAMETER_INVALID:
+      return CEREBRO_ERR_PROTOCOL;
     case CEREBRO_METRIC_PROTOCOL_ERR_INTERNAL_SYSTEM_ERROR:
+      CEREBRO_DBG(("server internal system error"));
       return CEREBRO_ERR_INTERNAL;
     default:
-      cerebro_err_debug("%s(%s:%d): invalid protocol error code: %d",
-                        __FILE__, __FUNCTION__, __LINE__, protocol_error);
+      CEREBRO_DBG(("invalid protocol error code: %d", protocol_error));
       return CEREBRO_ERR_INTERNAL;
     }
 }
@@ -73,6 +74,7 @@ _cerebro_metric_config(cerebro_t handle,
 
   if (!port || !timeout_len || !flags)
     {
+      CEREBRO_DBG(("invalid pointers"));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
@@ -151,16 +153,14 @@ _cerebro_metric_request_marshall(cerebro_t handle,
 #if CEREBRO_DEBUG
   if (!buf)
     {
-      cerebro_err_debug("%s(%s:%d): buf null",
-                        __FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("buf null"));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
 
   if (buflen < CEREBRO_METRIC_REQUEST_PACKET_LEN)
     {
-      cerebro_err_debug("%s(%s:%d): buflen invalid",
-                        __FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("buflen invalid"));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
@@ -170,6 +170,7 @@ _cerebro_metric_request_marshall(cerebro_t handle,
 
   if ((n = marshall_int32(req->version, buf + len, buflen - len)) <= 0)
     {
+      CEREBRO_DBG(("marshall_int32"));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
@@ -180,6 +181,7 @@ _cerebro_metric_request_marshall(cerebro_t handle,
                            buf + len,
                            buflen - len)) <= 0)
     {
+      CEREBRO_DBG(("marshall_buffer"));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
@@ -187,6 +189,7 @@ _cerebro_metric_request_marshall(cerebro_t handle,
 
   if ((n = marshall_u_int32(req->timeout_len, buf + len, buflen - len)) <= 0)
     {
+      CEREBRO_DBG(("marshall_u_int32"));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
@@ -194,6 +197,7 @@ _cerebro_metric_request_marshall(cerebro_t handle,
 
   if ((n = marshall_u_int32(req->flags, buf + len, buflen - len)) <= 0)
     {
+      CEREBRO_DBG(("marshall_u_int32"));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
@@ -226,9 +230,7 @@ _cerebro_metric_request_send(cerebro_t handle,
 
   if (fd_write_n(fd, buf, req_len) < 0)
     {
-      cerebro_err_debug("%s(%s:%d): fd_write_n: %s",
-                        __FILE__, __FUNCTION__, __LINE__,
-                        strerror(errno));
+      CEREBRO_DBG(("fd_write_n: %s", strerror(errno)));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
@@ -249,18 +251,15 @@ _cerebro_metric_receive_data(cerebro_t handle,
 
   if (!bytes_to_read)
     {
-      cerebro_err_debug("%s(%s:%d): invalid bytes_to_read",
-                        __FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("invalid bytes_to_read"));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       goto cleanup;
     }
 
   if (buflen < bytes_to_read)
     {
-      cerebro_err_debug("%s(%s:%d): invalid buflen: "
-                        "bytes_to_read = %d buflen = %d",
-                        __FILE__, __FUNCTION__, __LINE__,
-                        bytes_to_read, buflen);
+      CEREBRO_DBG(("invalid buflen: bytes_to_read = %d buflen = %d",
+                   bytes_to_read, buflen));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       goto cleanup;
     }
@@ -279,9 +278,7 @@ _cerebro_metric_receive_data(cerebro_t handle,
 
       if ((num = select(fd + 1, &rfds, NULL, NULL, &tv)) < 0)
         {
-          cerebro_err_debug("%s(%s:%d): select: %s",
-                            __FILE__, __FUNCTION__, __LINE__,
-                            strerror(errno));
+          CEREBRO_DBG(("select: %s", strerror(errno)));
           handle->errnum = CEREBRO_ERR_INTERNAL;
           goto cleanup;
         }
@@ -317,9 +314,7 @@ _cerebro_metric_receive_data(cerebro_t handle,
                         buf + bytes_read,
                         bytes_to_read - bytes_read)) < 0)
             {
-              cerebro_err_debug("%s(%s:%d): read: %s",
-                                __FILE__, __FUNCTION__, __LINE__,
-                                strerror(errno));
+              CEREBRO_DBG(("read: %s", strerror(errno)));
               handle->errnum = CEREBRO_ERR_INTERNAL;
               goto cleanup;
             }
@@ -335,8 +330,7 @@ _cerebro_metric_receive_data(cerebro_t handle,
         }
       else
         {
-          cerebro_err_debug("%s(%s:%d): select returned bad data",
-                            __FILE__, __FUNCTION__, __LINE__);
+          CEREBRO_DBG(("select returned bad data"));
           handle->errnum = CEREBRO_ERR_INTERNAL;
           goto cleanup;
         }

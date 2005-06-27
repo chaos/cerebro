@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.12 2005-06-24 16:26:19 achu Exp $
+## $Id: Makefile.am,v 1.13 2005-06-27 17:59:45 achu Exp $
 ##*****************************************************************************
 
 if WITH_GNU_LD
@@ -17,6 +17,7 @@ noinst_HEADERS	       = cerebro_api.h \
 lib_LTLIBRARIES       = libcerebro.la
 libcerebro_la_CFLAGS  = -D_REENTRANT \
 			-I$(srcdir)/../common \
+			-I$(srcdir)/../debug \
 			-I$(srcdir)/../include \
 			-I$(srcdir)/../modules \
 			-I$(srcdir)/../util

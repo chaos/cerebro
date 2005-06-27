@@ -17,11 +17,11 @@
 #include "cerebro_clusterlist_util.h"
 #include "cerebro_nodelist_util.h"
 #include "cerebro_util.h"
-#include "cerebro/cerebro_error.h"
 #include "cerebro/cerebro_metric_protocol.h"
 
 #include "cerebro_metric_util.h"
 
+#include "debug.h"
 #include "fd.h"
 #include "marshall.h"
 
@@ -41,10 +41,9 @@ _cerebro_node_metric_response_header_unmarshall(cerebro_t handle,
   int n, len = 0;
 
 #if CEREBRO_DEBUG
-  if (!buf)
+  if (!res || !buf)
     {
-      cerebro_err_debug("%s(%s:%d): buf null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("invalid pointers"));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
@@ -52,6 +51,7 @@ _cerebro_node_metric_response_header_unmarshall(cerebro_t handle,
 
   if ((n = unmarshall_int32(&(res->version), buf + len, buflen - len)) < 0)
     {
+      CEREBRO_DBG(("unmarshall_int32"));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
@@ -62,6 +62,7 @@ _cerebro_node_metric_response_header_unmarshall(cerebro_t handle,
 
   if ((n = unmarshall_u_int32(&(res->err_code), buf + len, buflen - len)) < 0)
     {
+      CEREBRO_DBG(("unmarshall_u_int32"));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
@@ -72,6 +73,7 @@ _cerebro_node_metric_response_header_unmarshall(cerebro_t handle,
 
   if ((n = unmarshall_u_int8(&(res->end), buf + len, buflen - len)) < 0)
     {
+      CEREBRO_DBG(("unmarshall_u_int8"));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
@@ -85,6 +87,7 @@ _cerebro_node_metric_response_header_unmarshall(cerebro_t handle,
                              buf + len,
                              buflen - len)) < 0)
     {
+      CEREBRO_DBG(("unmarshall_buffer"));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
@@ -97,6 +100,7 @@ _cerebro_node_metric_response_header_unmarshall(cerebro_t handle,
                               buf + len, 
                               buflen - len)) < 0)
     {
+      CEREBRO_DBG(("unmarshall_u_int32"));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
@@ -109,6 +113,7 @@ _cerebro_node_metric_response_header_unmarshall(cerebro_t handle,
                               buf + len,
                               buflen - len)) < 0)
     {
+      CEREBRO_DBG(("unmarshall_u_int32"));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
@@ -136,10 +141,9 @@ _cerebro_node_metric_response_metric_value_unmarshall(cerebro_t handle,
   int malloc_len = 0, err_flag = 0;
 
 #if CEREBRO_DEBUG
-  if (!buf)
+  if (!res || !buf)
     {
-      cerebro_err_debug("%s(%s:%d): buf null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("invalid pointers"));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
@@ -197,26 +201,41 @@ _cerebro_node_metric_response_metric_value_unmarshall(cerebro_t handle,
     {
     case CEREBRO_METRIC_VALUE_TYPE_INT32:
       if (unmarshall_int32((int32_t *)res->metric_value, buf, buflen) < 0)
-        err_flag++;
+        {
+          CEREBRO_DBG(("unmarshall_int32"));
+          err_flag++;
+        }
       break;
     case CEREBRO_METRIC_VALUE_TYPE_U_INT32:
       if (unmarshall_u_int32((u_int32_t *)res->metric_value, buf, buflen) < 0)
-        err_flag++;
+        {
+          CEREBRO_DBG(("unmarshall_u_int32"));
+          err_flag++;
+        }
       break;
     case CEREBRO_METRIC_VALUE_TYPE_FLOAT:
       if (unmarshall_float((float *)res->metric_value, buf, buflen) < 0)
-        err_flag++;
+        {
+          CEREBRO_DBG(("unmarshall_float"));
+          err_flag++;
+        }
       break;
     case CEREBRO_METRIC_VALUE_TYPE_DOUBLE:
       if (unmarshall_double((double *)res->metric_value, buf, buflen) < 0)
-        err_flag++;
+        {
+          CEREBRO_DBG(("unmarshall_double"));
+          err_flag++;
+        }
       break;
     case CEREBRO_METRIC_VALUE_TYPE_STRING:
       if (unmarshall_buffer((char *)res->metric_value,
                             res->metric_value_len,
                             buf,
                             buflen) < 0)
-        err_flag++;
+        {
+          CEREBRO_DBG(("unmarshall_buffer"));
+          err_flag++;
+        }
       break;
     default:
       err_flag++;

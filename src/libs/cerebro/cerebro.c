@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.c,v 1.4 2005-06-24 20:42:28 achu Exp $
+ *  $Id: cerebro.c,v 1.5 2005-06-27 17:59:45 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -18,6 +18,8 @@
 #include "cerebro_config_util.h"
 #include "cerebro_util.h"
 #include "cerebro/cerebro_config.h"
+
+#include "debug.h"
 
 static char *cerebro_error_messages[] =
   {
@@ -93,6 +95,7 @@ cerebro_handle_destroy(cerebro_t handle)
 
       if (handle->loaded_state & CEREBRO_CONFIG_LOADED)
         {
+          CEREBRO_DBG(("loaded_state invalid"));
           handle->errnum = CEREBRO_ERR_INTERNAL;
           return -1;
         }
@@ -105,6 +108,7 @@ cerebro_handle_destroy(cerebro_t handle)
       
       if (handle->loaded_state & CEREBRO_CLUSTERLIST_MODULE_LOADED)
         {
+          CEREBRO_DBG(("loaded_state invalid"));
           handle->errnum = CEREBRO_ERR_INTERNAL;
           return -1;
         }

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metriclist.c,v 1.1 2005-06-23 22:54:05 achu Exp $
+ *  $Id: cerebro_metriclist.c,v 1.2 2005-06-27 17:59:45 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -11,13 +11,14 @@
 #if STDC_HEADERS
 #include <string.h>
 #endif /* STDC_HEADERS */
+#include <errno.h>
 
 #include "cerebro.h"
 #include "cerebro_api.h"
 #include "cerebro_metriclist_util.h"
 #include "cerebro_util.h"
-#include "cerebro/cerebro_error.h"
 
+#include "debug.h"
 #include "list.h"
 
 int 
@@ -108,6 +109,7 @@ cerebro_metriclist_iterator_create(cerebro_metriclist_t metriclist)
   
   if (!list_append(metriclist->iterators, metriclistItr))
     {
+      CEREBRO_DBG(("list_append: %s", strerror(errno)));
       metriclist->errnum = CEREBRO_ERR_INTERNAL;
       goto cleanup;
     }
@@ -143,24 +145,21 @@ _cerebro_metriclist_iterator_check(cerebro_metriclist_iterator_t metriclistItr)
 
   if (!metriclistItr->itr)
     {
-      cerebro_err_debug("%s(%s:%d): itr null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("itr null"));
       metriclistItr->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
 
   if (!metriclistItr->metriclist)
     {
-      cerebro_err_debug("%s(%s:%d): metriclist null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("metriclist null"));
       metriclistItr->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
   
   if (metriclistItr->metriclist->magic != CEREBRO_METRICLIST_MAGIC_NUMBER)
     {
-      cerebro_err_debug("%s(%s:%d): metriclist destroyed",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("metriclist destroyed"));
       metriclistItr->errnum = CEREBRO_ERR_MAGIC_NUMBER;
       return -1;
     }

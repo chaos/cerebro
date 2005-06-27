@@ -16,13 +16,13 @@
 #include "cerebro_api.h"
 #include "cerebro_metriclist_util.h"
 #include "cerebro_util.h"
-#include "cerebro/cerebro_error.h"
 #include "cerebro/cerebro_metric_protocol.h"
 
 #include "cerebro_metric_util.h"
 
 #include "fd.h"
 #include "marshall.h"
+#include "debug.h"
 
 /* 
  * _cerebro_metric_name_response_unmarshall
@@ -40,10 +40,9 @@ _cerebro_metric_name_response_unmarshall(cerebro_t handle,
   int n, len = 0;
 
 #if CEREBRO_DEBUG
-  if (!buf)
+  if (!res || !buf)
     {
-      cerebro_err_debug("%s(%s:%d): buf null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("invalid pointers"));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
@@ -51,6 +50,7 @@ _cerebro_metric_name_response_unmarshall(cerebro_t handle,
 
   if ((n = unmarshall_int32(&(res->version), buf + len, buflen - len)) < 0)
     {
+      CEREBRO_DBG(("unmarshall_int32"));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
@@ -61,6 +61,7 @@ _cerebro_metric_name_response_unmarshall(cerebro_t handle,
 
   if ((n = unmarshall_u_int32(&(res->err_code), buf + len, buflen - len)) < 0)
     {
+      CEREBRO_DBG(("unmarshall_u_int32"));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
@@ -71,6 +72,7 @@ _cerebro_metric_name_response_unmarshall(cerebro_t handle,
 
   if ((n = unmarshall_u_int8(&(res->end), buf + len, buflen - len)) < 0)
     {
+      CEREBRO_DBG(("unmarshall_u_int8"));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
@@ -84,6 +86,7 @@ _cerebro_metric_name_response_unmarshall(cerebro_t handle,
                              buf + len,
                              buflen - len)) < 0)
     {
+      CEREBRO_DBG(("unmarshall_buffer"));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
