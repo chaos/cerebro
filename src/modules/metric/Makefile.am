@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.7 2005-06-22 23:28:08 achu Exp $
+## $Id: Makefile.am,v 1.8 2005-06-27 05:05:20 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -26,12 +26,16 @@ MODULE_FLAGS = -module -avoid-version
 cerebro_metric_boottime_la_SOURCES = cerebro_metric_boottime.c
 cerebro_metric_boottime_la_LDFLAGS = $(MODULE_FLAGS) \
 			             $(METRIC_OTHER_FLAGS)
-cerebro_metric_boottime_la_CFLAGS  = -I$(srcdir)/../../libs/include
+cerebro_metric_boottime_la_CFLAGS  = -I$(srcdir)/../../libs/include \
+				     -I$(srcdir)/../../libs/debug
+cerebro_metric_boottime_la_LIBADD  = ../../libs/debug/libdebug.la
 
 cerebro_metric_slurm_state_la_SOURCES = cerebro_metric_slurm_state.c
 cerebro_metric_slurm_state_la_LDFLAGS = $(MODULE_FLAGS) \
 					$(METRIC_OTHER_FLAGS)
-cerebro_metric_slurm_state_la_CFLAGS  = -I$(srcdir)/../../libs/include
+cerebro_metric_slurm_state_la_CFLAGS  = -I$(srcdir)/../../libs/include \
+				        -I$(srcdir)/../../libs/debug
+cerebro_metric_slurm_state_la_LIBADD  = ../../libs/debug/libdebug.la
 
 force-dependency-check:
 

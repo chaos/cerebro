@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_boottime.c,v 1.10 2005-06-22 21:40:44 achu Exp $
+ *  $Id: cerebro_metric_boottime.c,v 1.11 2005-06-27 05:05:20 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -25,8 +25,9 @@
 
 #include "cerebro.h"
 #include "cerebro/cerebro_constants.h"
-#include "cerebro/cerebro_error.h"
 #include "cerebro/cerebro_metric_module.h"
+
+#include "debug.h"
 
 #define BOOTTIME_FILE                "/proc/stat"
 #define BOOTTIME_BUFLEN              4096
@@ -61,17 +62,13 @@ boottime_metric_setup(void)
  
   if ((fd = open(BOOTTIME_FILE, O_RDONLY, 0)) < 0)
     {
-      cerebro_err_debug("%s(%s:%d): open: %s",
-			__FILE__, __FUNCTION__, __LINE__,
-			strerror(errno));
+      CEREBRO_DBG(("open: %s", strerror(errno)));
       goto cleanup;
     }
 
   if ((len = read(fd, buf, BOOTTIME_BUFLEN)) < 0)
     {
-      cerebro_err_debug("%s(%s:%d): read: %s",
-			__FILE__, __FUNCTION__, __LINE__,
-			strerror(errno));
+      CEREBRO_DBG(("read: %s", strerror(errno)));
       goto cleanup;
     }
 
@@ -90,8 +87,7 @@ boottime_metric_setup(void)
     }
   else
     {
-      cerebro_err_debug("%s(%s:%d): boottime file parse error",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("boottime file parse error"));
       goto cleanup;
     }
 
@@ -99,14 +95,12 @@ boottime_metric_setup(void)
   bootval = (u_int32_t)strtol(bootvalptr, &endptr, 10);
   if ((bootval == LONG_MIN || bootval == LONG_MAX) && errno == ERANGE)
     {
-      cerebro_err_debug("%s(%s:%d): boottime out of range",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("boottime out of range"));
       goto cleanup;
     }
   if ((bootvalptr + strlen(bootvalptr)) != endptr)
     {
-      cerebro_err_debug("%s(%s:%d): boottime value parse error",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("boottime value parse error"));
       goto cleanup;
     }
 
@@ -168,22 +162,19 @@ boottime_metric_get_metric_value(unsigned int *metric_value_type,
 {
   if (!metric_value_type)
     {
-      cerebro_err_debug("%s(%s:%d): metric_value_type null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("metric_value_type null"));
       return -1;
     }
 
   if (!metric_value_len)
     {
-      cerebro_err_debug("%s(%s:%d): metric_value_len null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("metric_value_len null"));
       return -1;
     }
 
   if (!metric_value)
     {
-      cerebro_err_debug("%s(%s:%d): metric_value null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("metric_value null"));
       return -1;
     }
 

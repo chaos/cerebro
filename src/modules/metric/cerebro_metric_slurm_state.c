@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_slurm_state.c,v 1.4 2005-06-24 20:42:28 achu Exp $
+ *  $Id: cerebro_metric_slurm_state.c,v 1.5 2005-06-27 05:05:20 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -35,8 +35,9 @@
 
 #include "cerebro.h"
 #include "cerebro/cerebro_constants.h"
-#include "cerebro/cerebro_error.h"
 #include "cerebro/cerebro_metric_module.h"
+
+#include "debug.h"
 
 #define SLURM_STATE_METRIC_MODULE_NAME      "slurm_state"
 #define SLURM_STATE_METRIC_NAME             "slurm_state"
@@ -84,17 +85,13 @@ _slurm_state_create_and_setup_socket(void)
 
   if ((temp_fd = socket(AF_LOCAL, SOCK_STREAM, 0)) < 0)
     {      
-      cerebro_err_debug("%s(%s:%d): socket: %s",
-                        __FILE__, __FUNCTION__, __LINE__,
-                        strerror(errno));
+      CEREBRO_DBG(("socket: %s", strerror(errno)));
       goto cleanup;
     }
   
   if (strlen(SLURM_STATE_UNIX_PATH) >= sizeof(addr.sun_path))
     {
-      cerebro_err_debug("%s(%s:%d): path '%s' too long",
-                        __FILE__, __FUNCTION__, __LINE__,
-                        SLURM_STATE_UNIX_PATH);
+      CEREBRO_DBG(("path '%s' too long", SLURM_STATE_UNIX_PATH));
       goto cleanup;
     }
   
@@ -108,17 +105,13 @@ _slurm_state_create_and_setup_socket(void)
            (struct sockaddr *)&addr, 
            sizeof(struct sockaddr_un)) < 0)
     {
-      cerebro_err_debug("%s(%s:%d): bind: %s",
-                        __FILE__, __FUNCTION__, __LINE__,
-                        strerror(errno));
+      CEREBRO_DBG(("bind: %s", strerror(errno)));
       goto cleanup;
     }
   
   if (listen(temp_fd, SLURM_STATE_BACKLOG) < 0)
     {
-      cerebro_err_debug("%s(%s:%d): listen: %s",
-                        __FILE__, __FUNCTION__, __LINE__,
-                        strerror(errno));
+      CEREBRO_DBG(("listen: %s", strerror(errno)));
       goto cleanup;
     }
   
@@ -195,22 +188,19 @@ slurm_state_metric_get_metric_value(unsigned int *metric_value_type,
 
   if (!metric_value_type)
     {
-      cerebro_err_debug("%s(%s:%d): metric_value_type null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("metric_value_type null"));
       return -1;
     }
 
   if (!metric_value_len)
     {
-      cerebro_err_debug("%s(%s:%d): metric_value_len null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("metric_value_len null"));
       return -1;
     }
 
   if (!metric_value)
     {
-      cerebro_err_debug("%s(%s:%d): metric_value null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("metric_value null"));
       return -1;
     }
 
@@ -221,18 +211,14 @@ slurm_state_metric_get_metric_value(unsigned int *metric_value_type,
    * going
    */
   if ((rv = pthread_mutex_lock(&metric_slurm_state_lock)) != 0)
-    cerebro_err_debug("%s(%s:%d): pthread_mutex_lock: %s",
-                      __FILE__, __FUNCTION__, __LINE__,
-                      strerror(rv));
+    CEREBRO_DBG(("pthread_mutex_lock: %s", strerror(rv)));
 
   *metric_value = (void *)&metric_slurm_state;
 
   if (!rv)
     {
       if ((rv = pthread_mutex_unlock(&metric_slurm_state_lock)) != 0)
-        cerebro_err_debug("%s(%s:%d): pthread_mutex_unlock: %s",
-                          __FILE__, __FUNCTION__, __LINE__,
-                          strerror(rv));
+        CEREBRO_DBG(("pthread_mutex_unlock: %s", strerror(rv)));
     }
 
   return 0;
@@ -269,9 +255,7 @@ slurm_state_metric_thread(void *arg)
                              (struct sockaddr *)&addr,
                              &addrlen)) < 0)
         {
-          cerebro_err_debug("%s(%s:%d): accept: %s",
-                            __FILE__, __FUNCTION__, __LINE__,
-                            strerror(errno));
+          CEREBRO_DBG(("accept: %s", strerror(errno)));
           if (errno == EINTR)
             continue;
           else
@@ -289,18 +273,14 @@ slurm_state_metric_thread(void *arg)
        * going
        */
       if ((rv = pthread_mutex_lock(&metric_slurm_state_lock)) != 0)
-        cerebro_err_debug("%s(%s:%d): pthread_mutex_lock: %s",
-                          __FILE__, __FUNCTION__, __LINE__,
-                          strerror(rv));
+        CEREBRO_DBG(("pthread_mutex_lock: %s", strerror(rv)));
 
       metric_slurm_state = 1;
       
       if (!rv)
         {
           if ((rv = pthread_mutex_unlock(&metric_slurm_state_lock)) != 0)
-            cerebro_err_debug("%s(%s:%d): pthread_mutex_unlock: %s",
-                              __FILE__, __FUNCTION__, __LINE__,
-                              strerror(rv));
+            CEREBRO_DBG(("pthread_mutex_unlock: %s", strerror(rv)));
         }
       
       while (1)
@@ -313,9 +293,7 @@ slurm_state_metric_thread(void *arg)
           
           if ((num = select(slurm_fd + 1, &rfds, NULL, NULL, NULL)) < 0)
             {
-              cerebro_err_debug("%s(%s:%d): select: %s",
-                                __FILE__, __FUNCTION__, __LINE__,
-                                strerror(errno));
+              CEREBRO_DBG(("select: %s", strerror(errno)));
               if (errno == EINTR)
                 continue;
               else
@@ -330,8 +308,7 @@ slurm_state_metric_thread(void *arg)
           if (!num)
             {
               /* Umm, I'm not sure how this would even happen, lets break */
-              cerebro_err_debug("%s(%s:%d): select invalid return",
-                                __FILE__, __FUNCTION__, __LINE__);
+              CEREBRO_DBG(("select invalid return"));
               sleep(SLURM_STATE_REINITIALIZE_WAIT_TIME);
               close(slurm_fd);
               break;
@@ -345,9 +322,7 @@ slurm_state_metric_thread(void *arg)
                             buffer,
                             CEREBRO_MAX_PACKET_LEN)) < 0)
                 {
-                  cerebro_err_debug("%s(%s:%d): read: %s",
-                                    __FILE__, __FUNCTION__, __LINE__,
-                                    strerror(errno));
+                  CEREBRO_DBG(("read: %s", strerror(errno)));
                   sleep(SLURM_STATE_REINITIALIZE_WAIT_TIME);
                   close(slurm_fd);
                   break;
@@ -359,9 +334,7 @@ slurm_state_metric_thread(void *arg)
                */
               if (n > 0 && n < CEREBRO_MAX_PACKET_LEN)
                 {
-                  cerebro_err_debug("%s(%s:%d): unintended read: %d",
-                                    __FILE__, __FUNCTION__, __LINE__,
-                                    n);
+                  CEREBRO_DBG(("unintended read: %d", n));
                   n = 0;
                 }
 
@@ -371,18 +344,14 @@ slurm_state_metric_thread(void *arg)
                    * going
                    */
                   if ((rv = pthread_mutex_lock(&metric_slurm_state_lock)) != 0)
-                    cerebro_err_debug("%s(%s:%d): pthread_mutex_lock: %s",
-                                      __FILE__, __FUNCTION__, __LINE__,
-                                      strerror(rv));
+                    CEREBRO_DBG(("pthread_mutex_lock: %s", strerror(rv)));
 
                   metric_slurm_state = 0;
 
                   if (!rv)
                     {
                       if ((rv = pthread_mutex_unlock(&metric_slurm_state_lock)) != 0)
-                        cerebro_err_debug("%s(%s:%d): pthread_mutex_unlock: %s",
-                                          __FILE__, __FUNCTION__, __LINE__,
-                                          strerror(rv));
+                        CEREBRO_DBG(("pthread_mutex_unlock: %s", strerror(rv)));
                     }
                   
                   close(slurm_fd);
@@ -392,8 +361,7 @@ slurm_state_metric_thread(void *arg)
           else
             {
               /* Umm, I'm not sure how this would even happen, lets break */
-              cerebro_err_debug("%s(%s:%d): select invalid return",
-                                __FILE__, __FUNCTION__, __LINE__);
+              CEREBRO_DBG(("select invalid return"));
               sleep(SLURM_STATE_REINITIALIZE_WAIT_TIME);
               close(slurm_fd);
               break;

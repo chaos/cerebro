@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: debug.h,v 1.3 2005-06-27 04:44:49 achu Exp $
+ *  $Id: debug.h,v 1.4 2005-06-27 05:05:20 achu Exp $
 \*****************************************************************************/
 
 #ifndef _DEBUG_H
@@ -16,7 +16,6 @@
 #if STDC_HEADERS
 #include <string.h>
 #endif /* STDC_HEADERS */
-#include <errno.h>
 
 #include "cerebro/cerebro_error.h"
 
@@ -50,18 +49,6 @@
     do { \
       CEREBRO_MSG_CREATE(msg) \
       cerebro_err_debug(errbuf); \
-    } while(0)
-
-#define CEREBRO_DBG_ERRNO(msg) \
-    do { \
-      CEREBRO_MSG_CREATE(msg) \
-      if (len < DEBUG_BUFFER_LEN) \
-        { \
-          char errnobuf[DEBUG_BUFFER_LEN]; \
-          snprintf(errnobuf, DEBUG_BUFFER_LEN, ": %s", strerror(errno)); \
-          strncat(errbuf, errnobuf, DEBUG_BUFFER_LEN - len -1); \
-          cerebro_err_debug(errbuf); \
-        } \
     } while(0)
 
 /*

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_monitor_bootlog.c,v 1.13 2005-06-22 20:30:09 achu Exp $
+ *  $Id: cerebro_monitor_bootlog.c,v 1.14 2005-06-27 05:05:20 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -16,8 +16,9 @@
 #include <errno.h>
 
 #include "cerebro.h"
-#include "cerebro/cerebro_error.h"
 #include "cerebro/cerebro_monitor_module.h"
+
+#include "debug.h"
 
 #define BOOTLOG_MONITOR_MODULE_NAME  "bootlog"
 #define BOOTLOG_BOOTTIME_METRIC_NAME "boottime"
@@ -48,15 +49,13 @@ _qsql_query(char *fmt, ...)
 
   if (!qsql_handle)
     {
-      cerebro_err_debug("%s(%s:%d): qsql_handle null",
-                        __FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("qsql_handle null"));
       return -1;
     }
 
   if (!fmt)
     {
-      cerebro_err_debug("%s(%s:%d): fmt null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("fmt null"));
       return -1;
     }
 
@@ -66,9 +65,7 @@ _qsql_query(char *fmt, ...)
 
   if (qsql_query(qsql_handle, buf) < 0)
     {
-      cerebro_err_debug("%s(%s:%d): %s query failed: %s",
-			__FILE__, __FUNCTION__, __LINE__,
-			buf, qsql_error(qsql_handle));
+      CEREBRO_DBG(("%s query failed: %s", buf, qsql_error(qsql_handle)));
       return -1;
     }
 
@@ -105,24 +102,19 @@ bootlog_monitor_setup(void)
                                               NULL, 
                                               0)))
     {
-      cerebro_err_debug("%s(%s:%d): failed to connect to database",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("failed to connect to database"));
       goto cleanup;
     }
 
   if (!(res = qsql_list_tables(qsql_handle)))
     {
-      cerebro_err_debug("%s(%s:%d): qsql_list_tables: %s",
-			__FILE__, __FUNCTION__, __LINE__,
-			qsql_error(qsql_handle));
+      CEREBRO_DBG(("qsql_list_tables: %s",	qsql_error(qsql_handle)));
       goto cleanup;
     }
 
   if ((rows = qsql_num_rows(res)) < 0)
     {
-      cerebro_err_debug("%s(%s:%d): qsql_num_rows: %s",
-			__FILE__, __FUNCTION__, __LINE__,
-			qsql_error(qsql_handle));
+      CEREBRO_DBG(("qsql_num_rows: %s", qsql_error(qsql_handle)));
       goto cleanup;
     }
 
@@ -130,17 +122,13 @@ bootlog_monitor_setup(void)
     {
       if ((fields = qsql_num_fields(res)) < 0)
         {
-          cerebro_err_debug("%s(%s:%d): qsql_num_fields: %s",
-			    __FILE__, __FUNCTION__, __LINE__,
-			    qsql_error(qsql_handle));
+          CEREBRO_DBG(("qsql_num_fields: %s", qsql_error(qsql_handle)));
           goto cleanup;
         }
 
       if (fields != 1)
         {
-          cerebro_err_debug("%s(%s:%d): fields = %d != 1",
-			    __FILE__, __FUNCTION__, __LINE__,
-			    fields);
+          CEREBRO_DBG(("fields = %d != 1", fields));
           goto cleanup;
         }
 
@@ -228,8 +216,7 @@ _check_if_new_btime(const char *nodename, u_int32_t btime)
 
   if (!nodename)
     {
-      cerebro_err_debug("%s(%s:%d): nodename null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("nodename null"));
       return -1;
     }
 
@@ -238,17 +225,13 @@ _check_if_new_btime(const char *nodename, u_int32_t btime)
 
   if (!(res = qsql_store_result(qsql_handle)))
     {
-      cerebro_err_debug("%s(%s:%d): qsql_store_result: %s",
-			__FILE__, __FUNCTION__, __LINE__,
-			qsql_error(qsql_handle));
+      CEREBRO_DBG(("qsql_store_result: %s", qsql_error(qsql_handle)));
       goto cleanup;
     }
 
   if ((rows = qsql_num_rows(res)) < 0)
     {
-      cerebro_err_debug("%s(%s:%d): qsql_num_rows: %s",
-			__FILE__, __FUNCTION__, __LINE__,
-			qsql_error(qsql_handle));
+      CEREBRO_DBG(("qsql_num_rows: %s", qsql_error(qsql_handle)));
       goto cleanup;
     }
 
@@ -262,17 +245,13 @@ _check_if_new_btime(const char *nodename, u_int32_t btime)
     {
       if ((fields = qsql_num_fields(res)) < 0)
         {
-          cerebro_err_debug("%s(%s:%d): qsql_num_fields: %s",
-			    __FILE__, __FUNCTION__, __LINE__,
-			    qsql_error(qsql_handle));
+          CEREBRO_DBG(("qsql_num_fields: %s", qsql_error(qsql_handle)));
           goto cleanup;
         }
 
       if (fields != 1)
         {
-          cerebro_err_debug("%s(%s:%d): fields = %d != 1",
-			    __FILE__, __FUNCTION__, __LINE__,
-			    fields);
+          CEREBRO_DBG(("fields = %d != 1", fields));
           goto cleanup;
         }
 
@@ -283,17 +262,13 @@ _check_if_new_btime(const char *nodename, u_int32_t btime)
               stored_btime = strtol(row[0], &ptr, 10);
               if (ptr != (row[0] + strlen(row[0])))
                 {
-                  cerebro_err_debug("%s(%s:%d): strtol: %s",
-				    __FILE__, __FUNCTION__, __LINE__,
-				    strerror(errno));
+                  CEREBRO_DBG(("strtol: %s", strerror(errno)));
                   goto cleanup;
                 }
             }
           else
             {
-              cerebro_err_debug("%s(%s:%d): %s btime null",
-				__FILE__, __FUNCTION__, __LINE__,
-				nodename);
+              CEREBRO_DBG(("%s btime null", nodename));
               goto cleanup;
             }
         }
@@ -312,9 +287,7 @@ _check_if_new_btime(const char *nodename, u_int32_t btime)
     }
   else
     {
-      cerebro_err_debug("%s(%s:%d): %s has multiple name entries",
-			__FILE__, __FUNCTION__, __LINE__,
-			nodename);
+      CEREBRO_DBG(("%s has multiple name entries", nodename));
       goto cleanup;
     }
 
@@ -345,38 +318,31 @@ bootlog_monitor_metric_update(const char *nodename,
 
   if (!qsql_handle)
     {
-      cerebro_err_debug("%s(%s:%d): qsql_handle null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("qsql_handle null"));
       return -1;
     }
 
   if (!nodename)
     {
-      cerebro_err_debug("%s(%s:%d): nodename null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("nodename null"));
       return -1;
     }
 
   if (metric_value_type != CEREBRO_METRIC_VALUE_TYPE_U_INT32)
     {
-      cerebro_err_debug("%s(%s:%d): invalid metric_value_type: %d",
-			__FILE__, __FUNCTION__, __LINE__,
-			metric_value_type);
+      CEREBRO_DBG(("invalid metric_value_type: %d", metric_value_type));
       return -1;
     }
 
   if (metric_value_len != sizeof(u_int32_t))
     {
-      cerebro_err_debug("%s(%s:%d): invalid metric_value_len: %d",
-			__FILE__, __FUNCTION__, __LINE__,
-			metric_value_len);
+      CEREBRO_DBG(("invalid metric_value_len: %d", metric_value_len));
       return -1;
     }
 
   if (!metric_value)
     {
-      cerebro_err_debug("%s(%s:%d): metric_value null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("metric_value null"));
       return -1;
     }
 

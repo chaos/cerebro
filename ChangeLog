@@ -2,7 +2,7 @@
 
 	* Re-work modules lib and util lib to use debug library.
 
-	* Re-work clusterlist modules and config modules to use debug library.
+	* Re-work modules to use debug library.
 
 	* cerebro.spec.in: Support debug build.
 	
