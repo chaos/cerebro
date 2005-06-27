@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: config_util.c,v 1.6 2005-06-27 21:16:55 achu Exp $
+ *  $Id: config_util.c,v 1.7 2005-06-27 21:22:23 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -444,8 +444,10 @@ load_config_file(struct cerebro_config *conf)
  *
  * Set the dest cerebro_config based on its current settings and the
  * settings in the src.
+ *
+ * Returns 0 on success, -1 on error
  */
-int
+static int
 _set_cerebro_config(struct cerebro_config *dest, struct cerebro_config *src)
 {
   if (!dest || !src)
