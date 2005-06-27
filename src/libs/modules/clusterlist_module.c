@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: clusterlist_module.c,v 1.5 2005-06-27 17:24:09 achu Exp $
+ *  $Id: clusterlist_module.c,v 1.6 2005-06-27 20:23:38 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -117,45 +117,15 @@ _clusterlist_module_loader(void *handle, char *module)
       goto cleanup;
     }
 
-  if (!module_info->clusterlist_module_name)
+  if (!module_info->clusterlist_module_name
+      || !module_info->setup
+      || !module_info->cleanup
+      || !module_info->numnodes
+      || !module_info->get_all_nodes
+      || !module_info->node_in_cluster
+      || !module_info->get_nodename)
     {
-      CEREBRO_DBG(("name null"));
-      goto cleanup;
-    }
-
-  if (!module_info->setup)
-    {
-      CEREBRO_DBG(("setup null"));
-      goto cleanup;
-    }
-  
-  if (!module_info->cleanup)
-    {
-      CEREBRO_DBG(("cleanup null"));
-      goto cleanup;
-    }
-  
-  if (!module_info->numnodes)
-    {
-      CEREBRO_DBG(("numnodes null"));
-      goto cleanup;
-    }
-  
-  if (!module_info->get_all_nodes)
-    {
-      CEREBRO_DBG(("get_all_nodes null"));
-      goto cleanup;
-    }
-
-  if (!module_info->node_in_cluster)
-    {
-      CEREBRO_DBG(("node_in_cluster null"));
-      goto cleanup;
-    }
-
-  if (!module_info->get_nodename)
-    {
-      CEREBRO_DBG(("get_nodename null"));
+      CEREBRO_DBG(("invalid module info"));
       goto cleanup;
     }
 
@@ -248,7 +218,7 @@ clusterlist_module_handle_check(clusterlist_module_t clusterlist_handle)
       || clusterlist_handle->magic != CLUSTERLIST_MODULE_MAGIC_NUMBER
       || !clusterlist_handle->module_info)
     {
-      CEREBRO_DBG(("cerebro handle invalid"));
+      CEREBRO_DBG(("invalid clusterlist_handle"));
       return -1;
     }
 

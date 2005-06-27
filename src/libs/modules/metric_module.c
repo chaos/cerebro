@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: metric_module.c,v 1.6 2005-06-27 17:24:09 achu Exp $
+ *  $Id: metric_module.c,v 1.7 2005-06-27 20:23:38 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -104,51 +104,16 @@ _metric_module_loader(void *handle, char *module)
       goto cleanup;
     }
 
-  if (!module_info->metric_module_name)
+  if (!module_info->metric_module_name
+      || !module_info->setup
+      || !module_info->cleanup
+      || !module_info->get_metric_name
+      || !module_info->get_metric_period
+      || !module_info->get_metric_value
+      || !module_info->destroy_metric_value
+      || !module_info->get_metric_thread)
     {
-      CEREBRO_DBG(("metric_module_name null"));
-      goto cleanup;
-    }
-
-  if (!module_info->setup)
-    {
-      CEREBRO_DBG(("setup null"));
-      goto cleanup;
-    }
-
-  if (!module_info->cleanup)
-    {
-      CEREBRO_DBG(("cleanup null"));
-      goto cleanup;
-    }
-
-  if (!module_info->get_metric_name)
-    {
-      CEREBRO_DBG(("get_metric_name null"));
-      goto cleanup;
-    }
-
-  if (!module_info->get_metric_period)
-    {
-      CEREBRO_DBG(("get_metric_period null"));
-      goto cleanup;
-    }
-
-  if (!module_info->get_metric_value)
-    {
-      CEREBRO_DBG(("get_metric_value null"));
-      goto cleanup;
-    }
-
-  if (!module_info->destroy_metric_value)
-    {
-      CEREBRO_DBG(("destroy_metric_value null"));
-      goto cleanup;
-    }
-
-  if (!module_info->get_metric_thread)
-    {
-      CEREBRO_DBG(("get_metric_thread null"));
+      CEREBRO_DBG(("invalid module info"));
       goto cleanup;
     }
 
@@ -259,7 +224,7 @@ metric_module_handle_check(metric_modules_t metric_handle)
 {
   if (!metric_handle || metric_handle->magic != METRIC_MODULE_MAGIC_NUMBER)
     {
-      CEREBRO_DBG(("cerebro metric_handle invalid"));
+      CEREBRO_DBG(("invalid metric_handle"));
       return -1;
     }
 

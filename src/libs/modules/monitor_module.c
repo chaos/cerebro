@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: monitor_module.c,v 1.6 2005-06-27 17:24:09 achu Exp $
+ *  $Id: monitor_module.c,v 1.7 2005-06-27 20:23:38 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -104,33 +104,13 @@ _monitor_module_loader(void *handle, char *module)
       goto cleanup;
     }
 
-  if (!module_info->monitor_module_name)
+  if (!module_info->monitor_module_name
+      || !module_info->setup
+      || !module_info->cleanup
+      || !module_info->metric_name
+      || !module_info->metric_update)
     {
-      CEREBRO_DBG(("monitor_module_name null"));
-      goto cleanup;
-    }
-
-  if (!module_info->setup)
-    {
-      CEREBRO_DBG(("setup null"));
-      goto cleanup;
-    }
-
-  if (!module_info->cleanup)
-    {
-      CEREBRO_DBG(("cleanup null"));
-      goto cleanup;
-    }
-
-  if (!module_info->metric_name)
-    {
-      CEREBRO_DBG(("metric_name null"));
-      goto cleanup;
-    }
-
-  if (!module_info->metric_update)
-    {
-      CEREBRO_DBG(("metric_update null"));
+      CEREBRO_DBG(("invalid module info"));
       goto cleanup;
     }
 
@@ -241,7 +221,7 @@ monitor_module_handle_check(monitor_modules_t monitor_handle)
 {
   if (!monitor_handle || monitor_handle->magic != MONITOR_MODULE_MAGIC_NUMBER)
     {
-      CEREBRO_DBG(("cerebro monitor_handle invalid"));
+      CEREBRO_DBG(("invalid monitor_handle"));
       return -1;
     }
 

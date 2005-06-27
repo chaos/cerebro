@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: config_module.c,v 1.5 2005-06-27 17:24:09 achu Exp $
+ *  $Id: config_module.c,v 1.6 2005-06-27 20:23:38 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -86,7 +86,7 @@ _config_module_loader(void *handle, char *module)
       CEREBRO_DBG(("config_handle null"));
       return -1;
     }
-                                                                                      
+
   if (config_handle->magic != CONFIG_MODULE_MAGIC_NUMBER)
     {
       CEREBRO_DBG(("config_handle magic number invalid"));
@@ -116,27 +116,12 @@ _config_module_loader(void *handle, char *module)
       goto cleanup;
     }
 
-  if (!module_info->config_module_name)
+  if (!module_info->config_module_name
+      || !module_info->setup
+      || !module_info->cleanup
+      || !module_info->load_default)
     {
-      CEREBRO_DBG(("config_module_name null"));
-      goto cleanup;
-    }
-
-  if (!module_info->setup)
-    {
-      CEREBRO_DBG(("setup null"));
-      goto cleanup;
-    }
-
-  if (!module_info->cleanup)
-    {
-      CEREBRO_DBG(("cleanup null"));
-      goto cleanup;
-    }
-
-  if (!module_info->load_default)
-    {
-      CEREBRO_DBG(("load_default null"));
+      CEREBRO_DBG(("invalid module info"));
       goto cleanup;
     }
 
@@ -229,7 +214,7 @@ config_module_handle_check(config_module_t config_handle)
       || config_handle->magic != CONFIG_MODULE_MAGIC_NUMBER
       || !config_handle->module_info)
     {
-      CEREBRO_DBG(("cerebro config_handle invalid"));
+      CEREBRO_DBG(("invalid config_handle"));
       return -1;
     }
 
