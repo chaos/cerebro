@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: module_util.c,v 1.7 2005-06-27 23:27:06 achu Exp $
+ *  $Id: module_util.c,v 1.8 2005-06-27 23:32:18 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -53,11 +53,7 @@ _load_module(char *search_dir,
   void *module_info;
   int flag, rv = -1;
 
-  if (!search_dir
-      || !filename
-      || !module_cb
-      || !module_info_sym 
-      || !handle)
+  if (!search_dir || !filename || !module_cb || !module_info_sym || !handle)
     {
       CEREBRO_DBG(("invalid parameters"));
       return -1;
@@ -313,6 +309,7 @@ find_and_load_modules(char *module_dir,
   if (rv)
     return 1;
 #endif /* CEREBRO_DEBUG */
+
   if ((rv = _find_unknown_modules(CEREBRO_MODULE_DIR,
                                   signature,
                                   module_cb,
