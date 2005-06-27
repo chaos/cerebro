@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: module_util.c,v 1.5 2005-06-27 17:24:09 achu Exp $
+ *  $Id: module_util.c,v 1.6 2005-06-27 20:53:01 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -44,33 +44,13 @@ find_known_module(char *search_dir,
   DIR *dir;
   int i = 0, found = 0;
 
-  if (!search_dir)
+  if (!search_dir
+      || !modules_list
+      || !(modules_list_len > 0)
+      || !module_loader
+      || !handle)
     {
-      CEREBRO_DBG(("search_dir null"));
-      return -1;
-    }
-
-  if (!modules_list)
-    {
-      CEREBRO_DBG(("modules_list null"));
-      return -1;
-    }
-
-  if (!(modules_list_len > 0))
-    {
-      CEREBRO_DBG(("modules_list_len not valid"));
-      return -1;
-    }
-  
-  if (!module_loader)
-    {
-      CEREBRO_DBG(("module_loader null"));
-      return -1;
-    }
-
-  if (!handle)
-    {
-      CEREBRO_DBG(("handle null"));
+      CEREBRO_DBG(("invalid parameters"));
       return -1;
     }
 
@@ -125,33 +105,13 @@ find_modules(char *search_dir,
   struct dirent *dirent;
   int found = 0;
 
-  if (!search_dir)
+  if (!search_dir
+      || !signature
+      || !module_loader
+      || !handle
+      || !modules_max)
     {
       CEREBRO_DBG(("search_dir null"));
-      return -1;
-    }
-
-  if (!signature)
-    {
-      CEREBRO_DBG(("signature null"));
-      return -1;
-    }
- 
-  if (!module_loader)
-    {
-      CEREBRO_DBG(("module_loader null"));
-      return -1;
-    }
-
-  if (!handle)
-    {
-      CEREBRO_DBG(("handle null"));
-      return -1;
-    }
-
-  if (!modules_max)
-    {
-      CEREBRO_DBG(("modules_max null"));
       return -1;
     }
 

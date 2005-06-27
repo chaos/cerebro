@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: monitor_module.c,v 1.7 2005-06-27 20:23:38 achu Exp $
+ *  $Id: monitor_module.c,v 1.8 2005-06-27 20:53:01 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -48,16 +48,12 @@ extern int module_setup_count;
 /* 
  * _monitor_module_loader
  *
- * If compiled statically, attempt to load the module specified by the
- * module name.
- *
- * If compiled dynamically, attempt to load the module specified by
- * the module_path.
+ * Attempt to load the module specified by the module_path.
  *
  * Return 1 if module is loaded, 0 if not, -1 on fatal error
  */
 static int 
-_monitor_module_loader(void *handle, char *module)
+_monitor_module_loader(void *handle, char *module_path)
 {
   lt_dlhandle dl_handle = NULL;
   struct cerebro_monitor_module_info *module_info = NULL;
@@ -69,27 +65,17 @@ _monitor_module_loader(void *handle, char *module)
       return -1;
     }
 
-  if (!monitor_handle)
+  if (!monitor_handle
+      || monitor_handle->magic != MONITOR_MODULE_MAGIC_NUMBER
+      || !module_path)
     {
-      CEREBRO_DBG(("monitor_handle null"));
-      return -1;
-    }
-
-  if (monitor_handle->magic != MONITOR_MODULE_MAGIC_NUMBER)
-    {
-      CEREBRO_DBG(("monitor_handle magic number invalid"));
-      return -1;
-    }
-
-  if (!module)
-    {
-      CEREBRO_DBG(("module null"));
+      CEREBRO_DBG(("invalid parameters"));
       return -1;
     }
   
-  if (!(dl_handle = lt_dlopen(module)))
+  if (!(dl_handle = lt_dlopen(module_path)))
     {
-      CEREBRO_DBG(("lt_dlopen: module=%s, %s", module, lt_dlerror()));
+      CEREBRO_DBG(("lt_dlopen: module=%s, %s", module_path, lt_dlerror()));
       goto cleanup;
     }
 
@@ -100,7 +86,7 @@ _monitor_module_loader(void *handle, char *module)
     {
       const char *err = lt_dlerror();
       if (err)
-	CEREBRO_DBG(("lt_dlsym: module=%s, %s", module, err));
+	CEREBRO_DBG(("lt_dlsym: module=%s, %s", module_path, err));
       goto cleanup;
     }
 

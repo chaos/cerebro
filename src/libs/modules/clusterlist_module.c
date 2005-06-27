@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: clusterlist_module.c,v 1.6 2005-06-27 20:23:38 achu Exp $
+ *  $Id: clusterlist_module.c,v 1.7 2005-06-27 20:53:01 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -61,16 +61,12 @@ extern int module_setup_count;
 /* 
  * _clusterlist_module_loader
  *
- * If compiled statically, attempt to load the module specified by the
- * module name.
- *
- * If compiled dynamically, attempt to load the module specified by
- * the module_path.
+ * Attempt to load the module specified by the module_path.
  *
  * Return 1 is module is loaded, 0 if not, -1 on fatal error
  */
 static int
-_clusterlist_module_loader(void *handle, char *module)
+_clusterlist_module_loader(void *handle, char *module_path)
 {
   lt_dlhandle dl_handle = NULL;
   struct cerebro_clusterlist_module_info *module_info = NULL;
@@ -82,27 +78,17 @@ _clusterlist_module_loader(void *handle, char *module)
       return -1;
     }
 
-  if (!clusterlist_handle)
+  if (!clusterlist_handle
+      || clusterlist_handle->magic != CLUSTERLIST_MODULE_MAGIC_NUMBER
+      || !module_path)
     {
-      CEREBRO_DBG(("clusterlist_handle null"));
+      CEREBRO_DBG(("invalid parameters"));
       return -1;
     }
 
-  if (clusterlist_handle->magic != CLUSTERLIST_MODULE_MAGIC_NUMBER)
+  if (!(dl_handle = lt_dlopen(module_path)))
     {
-      CEREBRO_DBG(("clusterlist_handle magic number invalid"));
-      return -1;
-    }
-
-  if (!module)
-    {
-      CEREBRO_DBG(("module null"));
-      return -1;
-    }
-
-  if (!(dl_handle = lt_dlopen(module)))
-    {
-      CEREBRO_DBG(("lt_dlopen: module=%s, %s", module, lt_dlerror()));
+      CEREBRO_DBG(("lt_dlopen: module=%s, %s", module_path, lt_dlerror()));
       goto cleanup;
     }
   
@@ -113,7 +99,7 @@ _clusterlist_module_loader(void *handle, char *module)
     {
       const char *err = lt_dlerror();
       if (err)
-	CEREBRO_DBG(("lt_dlsym: module=%s, %s", module, err));
+	CEREBRO_DBG(("lt_dlsym: module=%s, %s", module_path, err));
       goto cleanup;
     }
 
