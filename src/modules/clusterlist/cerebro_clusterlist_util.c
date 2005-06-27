@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_util.c,v 1.12 2005-06-16 17:17:16 achu Exp $
+ *  $Id: cerebro_clusterlist_util.c,v 1.13 2005-06-27 04:44:49 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -12,9 +12,9 @@
 #include <string.h>
 #endif /* STDC_HEADERS */
 
-#include "cerebro/cerebro_error.h"
-
 #include "cerebro_clusterlist_util.h"
+
+#include "debug.h"
 
 int 
 cerebro_clusterlist_copy_nodename(const char *node, 
@@ -25,31 +25,26 @@ cerebro_clusterlist_copy_nodename(const char *node,
 
   if (!node)
     {
-      cerebro_err_debug("%s(%s:%d): node null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("node null"));
       return -1;
     }
 
   if (!buf)
     {
-      cerebro_err_debug("%s(%s:%d): buf null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("buf null"));
       return -1;
     }
 
   if (!buflen)
     {
-      cerebro_err_debug("%s(%s:%d): buflen invalid",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("buflen invalid"));
       return -1;
     }
 
   len = strlen(node);
   if ((len + 1) > buflen)
     {
-      cerebro_err_debug("%s(%s:%d): buflen too small: len=%d buflen=%d", 
-			__FILE__, __FUNCTION__, __LINE__,
-			len, buflen);
+      CEREBRO_DBG(("buflen too small: len=%d buflen=%d", len, buflen));
       return -1;
     }
 

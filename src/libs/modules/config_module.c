@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: config_module.c,v 1.3 2005-06-26 18:39:13 achu Exp $
+ *  $Id: config_module.c,v 1.4 2005-06-27 04:44:49 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -76,31 +76,31 @@ _config_module_loader(void *handle, char *module)
 
   if (!module_setup_count)
     {
-      CEREBRO_ERR_DEBUG(("cerebro_module_library uninitialized"));
+      CEREBRO_DBG(("cerebro_module_library uninitialized"));
       return -1;
     }
 
   if (!config_handle)
     {
-      CEREBRO_ERR_DEBUG(("config_handle null"));
+      CEREBRO_DBG(("config_handle null"));
       return -1;
     }
                                                                                       
   if (config_handle->magic != CONFIG_MODULE_MAGIC_NUMBER)
     {
-      CEREBRO_ERR_DEBUG(("config_handle magic number invalid"));
+      CEREBRO_DBG(("config_handle magic number invalid"));
       return -1;
     }
 
   if (!module)
     {
-      CEREBRO_ERR_DEBUG(("module null"));
+      CEREBRO_DBG(("module null"));
       return -1;
     }
   
   if (!(dl_handle = lt_dlopen(module)))
     {
-      CEREBRO_ERR_DEBUG(("lt_dlopen: module=%s, %s", module, lt_dlerror()));
+      CEREBRO_DBG(("lt_dlopen: module=%s, %s", module, lt_dlerror()));
       goto cleanup;
     }
 
@@ -111,31 +111,31 @@ _config_module_loader(void *handle, char *module)
     {
       const char *err = lt_dlerror();
       if (err)
-	CEREBRO_ERR_DEBUG(("lt_dlsym: module=%s, %s", module, err));
+	CEREBRO_DBG(("lt_dlsym: module=%s, %s", module, err));
       goto cleanup;
     }
 
   if (!module_info->config_module_name)
     {
-      CEREBRO_ERR_DEBUG(("config_module_name null"));
+      CEREBRO_DBG(("config_module_name null"));
       goto cleanup;
     }
 
   if (!module_info->setup)
     {
-      CEREBRO_ERR_DEBUG(("setup null"));
+      CEREBRO_DBG(("setup null"));
       goto cleanup;
     }
 
   if (!module_info->cleanup)
     {
-      CEREBRO_ERR_DEBUG(("cleanup null"));
+      CEREBRO_DBG(("cleanup null"));
       goto cleanup;
     }
 
   if (!module_info->load_default)
     {
-      CEREBRO_ERR_DEBUG(("load_default null"));
+      CEREBRO_DBG(("load_default null"));
       goto cleanup;
     }
 
@@ -160,7 +160,7 @@ config_module_load(void)
 
   if (!(config_handle = (struct config_module *)malloc(sizeof(struct config_module))))
     {
-      CEREBRO_ERR_DEBUG(("out of memory"));
+      CEREBRO_DBG(("out of memory"));
       return NULL;
     }
   memset(config_handle, '\0', sizeof(struct config_module));
@@ -228,7 +228,7 @@ config_module_handle_check(config_module_t config_handle)
       || config_handle->magic != CONFIG_MODULE_MAGIC_NUMBER
       || !config_handle->module_info)
     {
-      CEREBRO_ERR_DEBUG(("cerebro config_handle invalid"));
+      CEREBRO_DBG(("cerebro config_handle invalid"));
       return -1;
     }
 

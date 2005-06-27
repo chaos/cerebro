@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: debug.h,v 1.2 2005-06-26 18:39:13 achu Exp $
+ *  $Id: debug.h,v 1.3 2005-06-27 04:44:49 achu Exp $
 \*****************************************************************************/
 
 #ifndef _DEBUG_H
@@ -46,13 +46,13 @@
           } \
       }
 
-#define CEREBRO_ERR_DEBUG(msg) \
+#define CEREBRO_DBG(msg) \
     do { \
       CEREBRO_MSG_CREATE(msg) \
       cerebro_err_debug(errbuf); \
     } while(0)
 
-#define CEREBRO_ERR_DEBUG_ERRNO(msg) \
+#define CEREBRO_DBG_ERRNO(msg) \
     do { \
       CEREBRO_MSG_CREATE(msg) \
       if (len < DEBUG_BUFFER_LEN) \
@@ -75,9 +75,9 @@ char *debug_msg_create(const char *fmt, ...);
     
 #else /* !CEREBRO_DEBUG */
 
-#define CEREBRO_ERR_DEBUG(msg)
+#define CEREBRO_DBG(msg)
 
-#define CEREBRO_ERR_DEBUG_ERRNO(msg)
+#define CEREBRO_DBG_ERRNO(msg)
 
 #endif /* !CEREBRO_DEBUG */
 

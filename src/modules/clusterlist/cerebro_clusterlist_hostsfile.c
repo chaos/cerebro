@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_hostsfile.c,v 1.25 2005-06-24 20:42:28 achu Exp $
+ *  $Id: cerebro_clusterlist_hostsfile.c,v 1.26 2005-06-27 04:44:49 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -27,6 +27,8 @@
 
 #include "fd.h"
 #include "list.h"
+
+#include "debug.h"
 
 #define HOSTSFILE_CLUSTERLIST_MODULE_NAME "hostsfile"
 #define HOSTSFILE_PARSE_BUFLEN            4096
@@ -57,38 +59,32 @@ _readline(int fd, char *buf, unsigned int buflen)
 
   if (fd <= 0)
     {
-      cerebro_err_debug("%s(%s:%d): fd invalid",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("fd invalid"));
       return -1;
     }
 
   if (!buf)
     {
-      cerebro_err_debug("%s(%s:%d): buf null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("buf null"));
       return -1;
     }
 
   if (!buflen)
     {
-      cerebro_err_debug("%s(%s:%d): buflen invalid",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("buflen invalid"));
       return -1;
     }
 
   if ((len = fd_read_line(fd, buf, buflen)) < 0)
     {
-      cerebro_err_debug("%s(%s:%d): fd_read_line: %s", 
-			__FILE__, __FUNCTION__, __LINE__,
-			strerror(errno));
+      CEREBRO_DBG(("fd_read_line: %s", strerror(errno)));
       return -1;
     }
   
   /* buflen - 1 b/c fd_read_line guarantees null termination */
   if (len >= (buflen-1))
     {
-      cerebro_err_debug("%s(%s:%d): fd_read_line: line truncation",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("fd_read_line: line truncation"));
       return -1;
     }
 
@@ -113,8 +109,7 @@ _remove_comments(char *buf, int buflen)
 
   if (!buf)
     {
-      cerebro_err_debug("%s(%s:%d): buf null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("buf null"));
       return -1;
     }
 
@@ -162,8 +157,7 @@ _remove_trailing_whitespace(char *buf, int buflen)
   
   if (!buf)
     {
-      cerebro_err_debug("%s(%s:%d): buf null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("buf null"));
       return -1;
     }
 
@@ -195,8 +189,7 @@ _move_past_whitespace(char *buf)
 {
   if (!buf)
     {
-      cerebro_err_debug("%s(%s:%d): buf null", 
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("buf null"));
       return NULL;
     }
 
@@ -221,24 +214,21 @@ hostsfile_clusterlist_setup(void)
 
   if (hosts)
     {
-      cerebro_err_debug("%s(%s:%d): hosts non-null", 
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("hosts non-null"));
       return 0;
     }
 
   if (!(hosts = list_create((ListDelF)free)))
     {
-      cerebro_err_debug("%s(%s:%d): list_create: %s", 
-			__FILE__, __FUNCTION__, __LINE__, 
-			strerror(errno));
+      CEREBRO_DBG(("list_create: %s", strerror(errno)));
       goto cleanup;
     }
 
   if ((fd = open(CEREBRO_CLUSTERLIST_HOSTSFILE_DEFAULT, O_RDONLY)) < 0)
     {
-      cerebro_err_debug("hostsfile '%s' cannot be opened: %s", 
-			CEREBRO_CLUSTERLIST_HOSTSFILE_DEFAULT, 
-			strerror(errno));
+      cerebro_err_output("hostsfile '%s' cannot be opened: %s", 
+                         CEREBRO_CLUSTERLIST_HOSTSFILE_DEFAULT, 
+                         strerror(errno));
       goto cleanup;
     }
  
@@ -267,16 +257,13 @@ hostsfile_clusterlist_setup(void)
 
       if (strchr(hostPtr, ' ') || strchr(hostPtr, '\t'))
         {
-          cerebro_err_debug("hostsfile parse error: "
-			    "host contains whitespace");
+          cerebro_err_output("hostsfile host contains whitespace");
           goto cleanup;
         }
 
       if (strlen(hostPtr) > CEREBRO_MAX_NODENAME_LEN)
         {
-          cerebro_err_debug("hostsfile parse error: "
-			    "nodename '%s' exceeds maximum length", 
-			    hostPtr);
+          cerebro_err_output("hostsfile node '%s' exceeds max length", hostPtr);
           goto cleanup;
         }
       
@@ -286,17 +273,13 @@ hostsfile_clusterlist_setup(void)
 
       if (!(str = strdup(hostPtr)))
         {
-          cerebro_err_debug("%s(%s:%d): strdup: %s", 
-			    __FILE__, __FUNCTION__, __LINE__,
-			    strerror(errno));
+          CEREBRO_DBG(("strdup: %s", strerror(errno)));
           goto cleanup;
         }
 
       if (!list_append(hosts, str))
         {
-          cerebro_err_debug("%s(%s:%d): list_append: %s", 
-			    __FILE__, __FUNCTION__, __LINE__,
-			    strerror(errno));
+          CEREBRO_DBG(("list_append: %s", strerror(errno)));
           goto cleanup;
         }
     }
@@ -342,8 +325,7 @@ hostsfile_clusterlist_numnodes(void)
 {
   if (!hosts)
     {
-      cerebro_err_debug("%s(%s:%d): hosts null", 
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("hosts null"));
       return -1;
     }
 
@@ -365,15 +347,13 @@ hostsfile_clusterlist_get_all_nodes(char ***nodes)
 
   if (!hosts)
     {
-      cerebro_err_debug("%s(%s:%d): hosts null", 
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("hosts null"));
       return -1;
     }
 
   if (!nodes)
     {     
-      cerebro_err_debug("%s(%s:%d): nodes null"
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("nodes null"));
       return -1;
     }
 
@@ -382,17 +362,13 @@ hostsfile_clusterlist_get_all_nodes(char ***nodes)
 
   if (!(itr = list_iterator_create(hosts)))
     {
-      cerebro_err_debug("%s(%s:%d): list_iterator_create: %s", 
-			__FILE__, __FUNCTION__, __LINE__,
-			strerror(errno));
+      CEREBRO_DBG(("list_iterator_create: %s", strerror(errno)));
       goto cleanup;
     }
 
   if (!(nodelist = (char **)malloc(sizeof(char *) * (numnodes + 1))))
     {
-      cerebro_err_debug("%s(%s:%d): malloc: %s", 
-			__FILE__, __FUNCTION__, __LINE__,
-			strerror(errno));
+      CEREBRO_DBG(("malloc: %s", strerror(errno)));
       goto cleanup;
     }
   memset(nodelist, '\0', sizeof(char *) * (numnodes + 1));
@@ -401,9 +377,7 @@ hostsfile_clusterlist_get_all_nodes(char ***nodes)
     {
       if (!(nodelist[i] = strdup(node)))
         {
-          cerebro_err_debug("%s(%s:%d): strdup: %s", 
-			    __FILE__, __FUNCTION__, __LINE__,
-			    strerror(errno));
+          CEREBRO_DBG(("strdup: %s", strerror(errno)));
           goto cleanup;
         }
       i++;
@@ -411,8 +385,7 @@ hostsfile_clusterlist_get_all_nodes(char ***nodes)
 
   if (i > numnodes)
     {
-      cerebro_err_debug("%s(%s:%d): iterator count error",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("iterator count error"));
       goto cleanup;
     }
 
@@ -448,15 +421,13 @@ hostsfile_clusterlist_node_in_cluster(const char *node)
 
   if (!hosts)
     {
-      cerebro_err_debug("%s(%s:%d): hosts null", 
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("hosts null"));
       return -1;
     }
 
   if (!node)
     {     
-      cerebro_err_debug("%s(%s:%d): node null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("node null"));
       return -1;
     }
 
@@ -494,29 +465,25 @@ hostsfile_clusterlist_get_nodename(const char *node,
 
   if (!hosts)
     {
-      cerebro_err_debug("%s(%s:%d): hosts null", 
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("hosts null"));
       return -1;
     }
 
   if (!node)
     {     
-      cerebro_err_debug("%s(%s:%d): node null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("node null"));
       return -1;
     }
 
   if (!buf)
     {     
-      cerebro_err_debug("%s(%s:%d): buf null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("buf null"));
       return -1;
     }
 
   if (!buflen)
     {
-      cerebro_err_debug("%s(%s:%d): buflen invalid",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("buflen invalid"));
       return -1;
     }
 

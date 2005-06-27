@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: clusterlist_module.c,v 1.3 2005-06-26 18:39:13 achu Exp $
+ *  $Id: clusterlist_module.c,v 1.4 2005-06-27 04:44:49 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -77,31 +77,31 @@ _clusterlist_module_loader(void *handle, char *module)
 
   if (!module_setup_count)
     {
-      CEREBRO_ERR_DEBUG(("cerebro_module_library uninitialized"));
+      CEREBRO_DBG(("cerebro_module_library uninitialized"));
       return -1;
     }
 
   if (!clusterlist_handle)
     {
-      CEREBRO_ERR_DEBUG(("clusterlist_handle null"));
+      CEREBRO_DBG(("clusterlist_handle null"));
       return -1;
     }
 
   if (clusterlist_handle->magic != CLUSTERLIST_MODULE_MAGIC_NUMBER)
     {
-      CEREBRO_ERR_DEBUG(("clusterlist_handle magic number invalid"));
+      CEREBRO_DBG(("clusterlist_handle magic number invalid"));
       return -1;
     }
 
   if (!module)
     {
-      CEREBRO_ERR_DEBUG(("module null"));
+      CEREBRO_DBG(("module null"));
       return -1;
     }
 
   if (!(dl_handle = lt_dlopen(module)))
     {
-      CEREBRO_ERR_DEBUG(("lt_dlopen: module=%s, %s", module, lt_dlerror()));
+      CEREBRO_DBG(("lt_dlopen: module=%s, %s", module, lt_dlerror()));
       goto cleanup;
     }
   
@@ -112,49 +112,49 @@ _clusterlist_module_loader(void *handle, char *module)
     {
       const char *err = lt_dlerror();
       if (err)
-	CEREBRO_ERR_DEBUG(("lt_dlsym: module=%s, %s", module, err));
+	CEREBRO_DBG(("lt_dlsym: module=%s, %s", module, err));
       goto cleanup;
     }
 
   if (!module_info->clusterlist_module_name)
     {
-      CEREBRO_ERR_DEBUG(("name null"));
+      CEREBRO_DBG(("name null"));
       goto cleanup;
     }
 
   if (!module_info->setup)
     {
-      CEREBRO_ERR_DEBUG(("setup null"));
+      CEREBRO_DBG(("setup null"));
       goto cleanup;
     }
   
   if (!module_info->cleanup)
     {
-      CEREBRO_ERR_DEBUG(("cleanup null"));
+      CEREBRO_DBG(("cleanup null"));
       goto cleanup;
     }
   
   if (!module_info->numnodes)
     {
-      CEREBRO_ERR_DEBUG(("numnodes null"));
+      CEREBRO_DBG(("numnodes null"));
       goto cleanup;
     }
   
   if (!module_info->get_all_nodes)
     {
-      CEREBRO_ERR_DEBUG(("get_all_nodes null"));
+      CEREBRO_DBG(("get_all_nodes null"));
       goto cleanup;
     }
 
   if (!module_info->node_in_cluster)
     {
-      CEREBRO_ERR_DEBUG(("node_in_cluster null"));
+      CEREBRO_DBG(("node_in_cluster null"));
       goto cleanup;
     }
 
   if (!module_info->get_nodename)
     {
-      CEREBRO_ERR_DEBUG(("get_nodename null"));
+      CEREBRO_DBG(("get_nodename null"));
       goto cleanup;
     }
 
@@ -179,7 +179,7 @@ clusterlist_module_load(void)
 
   if (!(clusterlist_handle = (struct clusterlist_module *)malloc(sizeof(struct clusterlist_module))))
     {
-      CEREBRO_ERR_DEBUG(("out of memory"));
+      CEREBRO_DBG(("out of memory"));
       return NULL;
     }
   memset(clusterlist_handle, '\0', sizeof(struct clusterlist_module));
@@ -247,7 +247,7 @@ clusterlist_module_handle_check(clusterlist_module_t clusterlist_handle)
       || clusterlist_handle->magic != CLUSTERLIST_MODULE_MAGIC_NUMBER
       || !clusterlist_handle->module_info)
     {
-      CEREBRO_ERR_DEBUG(("cerebro handle invalid"));
+      CEREBRO_DBG(("cerebro handle invalid"));
       return -1;
     }
 

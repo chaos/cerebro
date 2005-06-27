@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: metric_module.c,v 1.4 2005-06-26 18:39:13 achu Exp $
+ *  $Id: metric_module.c,v 1.5 2005-06-27 04:44:49 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -64,31 +64,31 @@ _metric_module_loader(void *handle, char *module)
 
   if (!module_setup_count)
     {
-      CEREBRO_ERR_DEBUG(("cerebro_module_library uninitialized"));
+      CEREBRO_DBG(("cerebro_module_library uninitialized"));
       return -1;
     }
 
   if (!metric_handle)
     {
-      CEREBRO_ERR_DEBUG(("metric_handle null"));
+      CEREBRO_DBG(("metric_handle null"));
       return -1;
     }
 
   if (metric_handle->magic != METRIC_MODULE_MAGIC_NUMBER)
     {
-      CEREBRO_ERR_DEBUG(("metric_handle magic number invalid"));
+      CEREBRO_DBG(("metric_handle magic number invalid"));
       return -1;
     }
 
   if (!module)
     {
-      CEREBRO_ERR_DEBUG(("module null"));
+      CEREBRO_DBG(("module null"));
       return -1;
     }
   
   if (!(dl_handle = lt_dlopen(module)))
     {
-      CEREBRO_ERR_DEBUG(("lt_dlopen: module=%s, %s", module, lt_dlerror()));
+      CEREBRO_DBG(("lt_dlopen: module=%s, %s", module, lt_dlerror()));
       goto cleanup;
     }
 
@@ -99,55 +99,55 @@ _metric_module_loader(void *handle, char *module)
     {
       const char *err = lt_dlerror();
       if (err)
-	CEREBRO_ERR_DEBUG(("lt_dlsym: module=%s, %s", module, err));
+	CEREBRO_DBG(("lt_dlsym: module=%s, %s", module, err));
       goto cleanup;
     }
 
   if (!module_info->metric_module_name)
     {
-      CEREBRO_ERR_DEBUG(("metric_module_name null"));
+      CEREBRO_DBG(("metric_module_name null"));
       goto cleanup;
     }
 
   if (!module_info->setup)
     {
-      CEREBRO_ERR_DEBUG(("setup null"));
+      CEREBRO_DBG(("setup null"));
       goto cleanup;
     }
 
   if (!module_info->cleanup)
     {
-      CEREBRO_ERR_DEBUG(("cleanup null"));
+      CEREBRO_DBG(("cleanup null"));
       goto cleanup;
     }
 
   if (!module_info->get_metric_name)
     {
-      CEREBRO_ERR_DEBUG(("get_metric_name null"));
+      CEREBRO_DBG(("get_metric_name null"));
       goto cleanup;
     }
 
   if (!module_info->get_metric_period)
     {
-      CEREBRO_ERR_DEBUG(("get_metric_period null"));
+      CEREBRO_DBG(("get_metric_period null"));
       goto cleanup;
     }
 
   if (!module_info->get_metric_value)
     {
-      CEREBRO_ERR_DEBUG(("get_metric_value null"));
+      CEREBRO_DBG(("get_metric_value null"));
       goto cleanup;
     }
 
   if (!module_info->destroy_metric_value)
     {
-      CEREBRO_ERR_DEBUG(("destroy_metric_value null"));
+      CEREBRO_DBG(("destroy_metric_value null"));
       goto cleanup;
     }
 
   if (!module_info->get_metric_thread)
     {
-      CEREBRO_ERR_DEBUG(("get_metric_thread null"));
+      CEREBRO_DBG(("get_metric_thread null"));
       goto cleanup;
     }
 
@@ -173,7 +173,7 @@ metric_modules_load(unsigned int modules_max)
 
   if (!modules_max)
     {
-      CEREBRO_ERR_DEBUG(("modules_max invalid"));
+      CEREBRO_DBG(("modules_max invalid"));
       return NULL;
     }
 
@@ -182,7 +182,7 @@ metric_modules_load(unsigned int modules_max)
                                                                                     
   if (!(metric_handle = (struct metric_module *)malloc(sizeof(struct metric_module))))
     {
-      CEREBRO_ERR_DEBUG(("out of memory"));
+      CEREBRO_DBG(("out of memory"));
       return NULL;
     }
   memset(metric_handle, '\0', sizeof(struct metric_module));
@@ -191,14 +191,14 @@ metric_modules_load(unsigned int modules_max)
   metric_handle->modules_count = 0;
   if (!(metric_handle->dl_handle = (lt_dlhandle *)malloc(sizeof(lt_dlhandle)*metric_handle->modules_max)))
     {
-      CEREBRO_ERR_DEBUG(("out of memory"));
+      CEREBRO_DBG(("out of memory"));
       goto cleanup;
     }
   memset(metric_handle->dl_handle, '\0', sizeof(lt_dlhandle)*metric_handle->modules_max);
   
   if (!(metric_handle->module_info = (struct cerebro_metric_module_info **)malloc(sizeof(struct cerebro_metric_module_info *)*metric_handle->modules_max)))
     {
-      CEREBRO_ERR_DEBUG(("out of memory"));
+      CEREBRO_DBG(("out of memory"));
       goto cleanup;
     }
   memset(metric_handle->module_info, '\0', sizeof(struct cerebro_metric_module_info *)*metric_handle->modules_max);
@@ -258,7 +258,7 @@ metric_module_handle_check(metric_modules_t metric_handle)
 {
   if (!metric_handle || metric_handle->magic != METRIC_MODULE_MAGIC_NUMBER)
     {
-      CEREBRO_ERR_DEBUG(("cerebro metric_handle invalid"));
+      CEREBRO_DBG(("cerebro metric_handle invalid"));
       return -1;
     }
 

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_gendersllnl.c,v 1.25 2005-06-24 20:42:28 achu Exp $
+ *  $Id: cerebro_clusterlist_gendersllnl.c,v 1.26 2005-06-27 04:44:49 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -17,10 +17,11 @@
 
 #include "cerebro/cerebro_clusterlist_module.h"
 #include "cerebro/cerebro_constants.h"
-#include "cerebro/cerebro_error.h"
 
 #include "cerebro_clusterlist_genders_util.h"
 #include "cerebro_clusterlist_util.h"
+
+#include "debug.h"
 
 #define GENDERSLLNL_CLUSTERLIST_MODULE_NAME "gendersllnl"
 
@@ -43,8 +44,7 @@ gendersllnl_clusterlist_setup(void)
 
   if (gendersllnl_handle)
     {
-      cerebro_err_debug("%s(%s:%d): gendersllnl_handle non-null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("gendersllnl_handle non-null"));
       return 0;
     }
 
@@ -88,8 +88,7 @@ gendersllnl_clusterlist_numnodes(void)
 {
   if (!gendersllnl_handle)
     {
-      cerebro_err_debug("%s(%s:%d): gendersllnl_handle null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("gendersllnl_handle null"));
       return -1;
     }
 
@@ -106,15 +105,13 @@ gendersllnl_clusterlist_get_all_nodes(char ***nodes)
 {
   if (!gendersllnl_handle)
     {
-      cerebro_err_debug("%s(%s:%d): gendersllnl_handle null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("gendersllnl_handle null"));
       return -1;
     }
 
   if (!nodes)
     {
-      cerebro_err_debug("%s(%s:%d): nodes null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("nodes null"));
       return -1;
     }
 
@@ -136,15 +133,13 @@ gendersllnl_clusterlist_node_in_cluster(const char *node)
 
   if (!gendersllnl_handle)
     {
-      cerebro_err_debug("%s(%s:%d): gendersllnl_handle null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("gendersllnl_handle null"));
       return -1;
     }
 
   if (!node)
     {
-      cerebro_err_debug("%s(%s:%d): node null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("node null"));
       return -1;
     }
 
@@ -164,9 +159,8 @@ gendersllnl_clusterlist_node_in_cluster(const char *node)
 
   if ((flag = genders_isnode_or_altnode(gendersllnl_handle, nodePtr)) < 0)
     {
-      cerebro_err_debug("%s(%s:%d): genders_isnode_or_altnode: %s",
-			__FILE__, __FUNCTION__, __LINE__, 
-			genders_errormsg(gendersllnl_handle));
+      CEREBRO_DBG(("genders_isnode_or_altnode: %s", 
+                   genders_errormsg(gendersllnl_handle)));
       return -1;
     }
   
@@ -189,29 +183,25 @@ gendersllnl_clusterlist_get_nodename(const char *node,
 
   if (!gendersllnl_handle)
     {
-      cerebro_err_debug("%s(%s:%d): gendersllnl_handle null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("gendersllnl_handle null"));
       return -1;
     }
 
   if (!node)
     {
-      cerebro_err_debug("%s(%s:%d): node null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("node null"));
       return -1;
     }
 
   if (!buf)
     {
-      cerebro_err_debug("%s(%s:%d): buf null",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("buf null"));
       return -1;
     }
 
   if (!buflen)
     {
-      cerebro_err_debug("%s(%s:%d): buflen invalid",
-			__FILE__, __FUNCTION__, __LINE__);
+      CEREBRO_DBG(("buflen invalid"));
       return -1;
     }
 
@@ -242,9 +232,8 @@ gendersllnl_clusterlist_get_nodename(const char *node,
     {
       if (genders_to_gendname(gendersllnl_handle, nodePtr, buf, buflen) < 0)
 	{
-	  cerebro_err_debug("%s(%s:%d): genders_to_gendname: %s",
-			    __FILE__, __FUNCTION__, __LINE__,
-			    genders_errormsg(gendersllnl_handle));
+	  CEREBRO_DBG(("genders_to_gendname: %s",
+                       genders_errormsg(gendersllnl_handle)));
 	  return -1;
 	}
     }

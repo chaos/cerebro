@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.12 2005-06-18 05:52:23 achu Exp $
+## $Id: Makefile.am,v 1.13 2005-06-27 04:44:49 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -22,7 +22,12 @@ cerebro_config_gendersllnl_la_SOURCES = cerebro_config_gendersllnl.c
 cerebro_config_gendersllnl_la_LDFLAGS = $(MODULE_FLAGS) \
 				 	$(GENDERSLLNL_LIBS) \
 				 	$(CONFIG_OTHER_FLAGS)
-cerebro_config_gendersllnl_la_CFLAGS  = -I$(srcdir)/../../libs/include
+cerebro_config_gendersllnl_la_CFLAGS  = -I$(srcdir)/../../libs/include \
+					-I$(srcdir)/../../libs/debug
+cerebro_config_gendersllnl_la_LIBADD  = ../../libs/debug/libdebug.la
+
+../../libs/debug/libdebug.la : force-dependency-check
+	@cd `dirname $@` && make `basename $@`
 
 force-dependency-check:
 

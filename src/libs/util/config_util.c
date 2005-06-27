@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: config_util.c,v 1.4 2005-06-26 19:02:17 achu Exp $
+ *  $Id: config_util.c,v 1.5 2005-06-27 04:44:49 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -397,7 +397,7 @@ load_config_file(struct cerebro_config *conf)
   
   if (!(cf = conffile_handle_create()))
     {
-      CEREBRO_ERR_DEBUG(("conffile_handle_create"));
+      CEREBRO_DBG(("conffile_handle_create"));
       goto cleanup;
     }
   
@@ -422,9 +422,9 @@ load_config_file(struct cerebro_config *conf)
 	goto out;
 
       if (conffile_errmsg(cf, buf, CONFFILE_MAX_ERRMSGLEN) < 0)
-	CEREBRO_ERR_DEBUG(("conffile_parse: %d", conffile_errnum(cf)));
+	CEREBRO_DBG(("conffile_parse: %d", conffile_errnum(cf)));
       else
-	CEREBRO_ERR_DEBUG(("conffile_parse: %s", buf));
+	CEREBRO_DBG(("conffile_parse: %s", buf));
 	
       goto cleanup;
     }
@@ -448,19 +448,19 @@ merge_cerebro_configs(struct cerebro_config *conf,
 
   if (!conf)
     {
-      CEREBRO_ERR_DEBUG(("conf null"));
+      CEREBRO_DBG(("conf null"));
       return -1;
     }
 
   if (!module_conf)
     {
-      CEREBRO_ERR_DEBUG(("module_conf null"));
+      CEREBRO_DBG(("module_conf null"));
       return -1;
     }
 
   if (!config_file_conf)
     {
-      CEREBRO_ERR_DEBUG(("config_file_conf null"));
+      CEREBRO_DBG(("config_file_conf null"));
       return -1;
     }
 
@@ -712,7 +712,7 @@ load_config(struct cerebro_config *conf)
 
   if (!conf)
     {
-      CEREBRO_ERR_DEBUG(("conf null"));
+      CEREBRO_DBG(("conf null"));
       return -1;
     }
 

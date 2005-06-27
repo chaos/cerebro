@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: module_util.c,v 1.3 2005-06-26 18:39:13 achu Exp $
+ *  $Id: module_util.c,v 1.4 2005-06-27 04:44:49 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -46,38 +46,38 @@ find_known_module(char *search_dir,
 
   if (!search_dir)
     {
-      CEREBRO_ERR_DEBUG(("search_dir null"));
+      CEREBRO_DBG(("search_dir null"));
       return -1;
     }
 
   if (!modules_list)
     {
-      CEREBRO_ERR_DEBUG(("modules_list null"));
+      CEREBRO_DBG(("modules_list null"));
       return -1;
     }
 
   if (!(modules_list_len > 0))
     {
-      CEREBRO_ERR_DEBUG(("modules_list_len not valid"));
+      CEREBRO_DBG(("modules_list_len not valid"));
       return -1;
     }
   
   if (!module_loader)
     {
-      CEREBRO_ERR_DEBUG(("module_loader null"));
+      CEREBRO_DBG(("module_loader null"));
       return -1;
     }
 
   if (!handle)
     {
-      CEREBRO_ERR_DEBUG(("handle null"));
+      CEREBRO_DBG(("handle null"));
       return -1;
     }
 
   if (!(dir = opendir(search_dir)))
     {
       /* Return 0, since dir may simply not exist */
-      CEREBRO_ERR_DEBUG(("opendir: %s", strerror(errno)));
+      CEREBRO_DBG(("opendir: %s", strerror(errno)));
       return 0;
     }
 
@@ -127,38 +127,38 @@ find_modules(char *search_dir,
 
   if (!search_dir)
     {
-      CEREBRO_ERR_DEBUG(("%s(%s:%d): search_dir null"));
+      CEREBRO_DBG(("search_dir null"));
       return -1;
     }
 
   if (!signature)
     {
-      CEREBRO_ERR_DEBUG(("%s(%s:%d): signature null"));
+      CEREBRO_DBG(("signature null"));
       return -1;
     }
  
   if (!module_loader)
     {
-      CEREBRO_ERR_DEBUG(("%s(%s:%d): module_loader null"));
+      CEREBRO_DBG(("module_loader null"));
       return -1;
     }
 
   if (!handle)
     {
-      CEREBRO_ERR_DEBUG(("%s(%s:%d): handle null"));
+      CEREBRO_DBG(("handle null"));
       return -1;
     }
 
   if (!modules_max)
     {
-      CEREBRO_ERR_DEBUG(("%s(%s:%d): modules_max null"));
+      CEREBRO_DBG(("modules_max null"));
       return -1;
     }
 
   if (!(dir = opendir(search_dir)))
     {
       /* Return 0, since dir may simply not exist */
-      CEREBRO_ERR_DEBUG(("opendir: %s", strerror(errno)));
+      CEREBRO_DBG(("opendir: %s", strerror(errno)));
       return 0;
     }
 
@@ -207,7 +207,7 @@ module_setup(void)
 
   if (lt_dlinit() != 0)
     {
-      CEREBRO_ERR_DEBUG(("lt_dlinit: %s", lt_dlerror()));
+      CEREBRO_DBG(("lt_dlinit: %s", lt_dlerror()));
       return -1;
     }
 
@@ -226,7 +226,7 @@ module_cleanup(void)
     {
       if (lt_dlexit() != 0)
         {
-          CEREBRO_ERR_DEBUG(("lt_dlexit: %s", lt_dlerror()));
+          CEREBRO_DBG(("lt_dlexit: %s", lt_dlerror()));
           return -1;
         }
     }
