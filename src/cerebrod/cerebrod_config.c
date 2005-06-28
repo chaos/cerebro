@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.109 2005-06-27 17:24:09 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.110 2005-06-28 19:47:22 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -296,12 +296,11 @@ _cerebrod_config_error_check(void)
                      conf.heartbeat_destination_port); 
 
   if (conf.heartbeat_destination_port == conf.heartbeat_source_port)
-    cerebro_err_exit("heartbeat destination and source ports '%d' "
-		      "cannot be identical",
+    cerebro_err_exit("heartbeat destination and source ports '%d' identical",
 		      conf.heartbeat_destination_port);
 
   if (!Inet_pton(AF_INET, conf.heartbeat_destination_ip, &addr_temp))
-    cerebro_err_exit("heartbeat destination IP address '%s' improperly format",
+    cerebro_err_exit("heartbeat destination IP address '%s' invalid",
                      conf.heartbeat_destination_ip);
 
   if (conf.heartbeat_network_interface
@@ -314,8 +313,7 @@ _cerebrod_config_error_check(void)
 
 	  tok = strtok(ipaddr_cpy, "/");
 	  if (!Inet_pton(AF_INET, tok, &addr_temp))
-	    cerebro_err_exit("network interface IP address '%s' "
-                             "improperly format", 
+	    cerebro_err_exit("network interface IP address '%s' invalid", 
                              conf.heartbeat_network_interface);
 	  
 	  Free(ipaddr_cpy);
@@ -323,8 +321,7 @@ _cerebrod_config_error_check(void)
       else
 	{
 	  if (!Inet_pton(AF_INET, conf.heartbeat_network_interface, &addr_temp))
-	    cerebro_err_exit("network interface IP address '%s' "
-                             "improperly format", 
+	    cerebro_err_exit("network interface IP address '%s' invalid",
                              conf.heartbeat_network_interface);
 	}
     }
@@ -336,8 +333,7 @@ _cerebrod_config_error_check(void)
     cerebro_err_exit("listen threads '%d' invalid", conf.listen_threads);
 
   if (conf.metric_server_port <= 0)
-    cerebro_err_exit("metric server port '%d' invalid", 
-                     conf.metric_server_port);
+    cerebro_err_exit("metric server port '%d' invalid", conf.metric_server_port);
 
   if (conf.metric_max <= 0)
     cerebro_err_exit("metric max '%d' invalid", conf.metric_max);
@@ -363,12 +359,10 @@ _cerebrod_calculate_multicast_setting(void)
       tok = strtok(ipaddr_cpy, ".");
       ip_class = strtol(tok, &ptr, 10);
       if (ptr != (tok + strlen(tok)))
-	cerebro_err_exit("heartbeat destination IP address '%s' "
-                         "improperly format",
+	cerebro_err_exit("heartbeat destination IP address '%s' invalid"
                          conf.heartbeat_destination_ip);
       
-      if (ip_class >= MULTICAST_CLASS_MIN
-	  && ip_class <= MULTICAST_CLASS_MAX)
+      if (ip_class >= MULTICAST_CLASS_MIN && ip_class <= MULTICAST_CLASS_MAX)
 	conf.multicast = 1;
       else
 	conf.multicast = 0;
@@ -401,8 +395,7 @@ _cerebrod_calculate_heartbeat_destination_ip_in_addr(void)
   if (!Inet_pton(AF_INET, 
                  conf.heartbeat_destination_ip, 
                  &conf.heartbeat_destination_ip_in_addr))
-    cerebro_err_exit("heartbeat destination IP address '%s' "
-                     "improperly format",
+    cerebro_err_exit("heartbeat destination IP address '%s' invalid",
                      conf.heartbeat_destination_ip);
 }
 
@@ -530,18 +523,18 @@ _cerebrod_calculate_in_addr_and_index(char *network_interface,
 
 	      ptr += sizeof(ifr->ifr_name) + len;
           
-	      /* Null termination not required, don't use strncpy() wrapper */
+	      /* NUL termination not required, don't use strncpy() wrapper */
 	      memset(&ifr_tmp, '\0', sizeof(struct ifreq));
 	      strncpy(ifr_tmp.ifr_name, ifr->ifr_name, IFNAMSIZ);
 
 	      if(ioctl(fd, SIOCGIFFLAGS, &ifr_tmp) < 0)
 		CEREBRO_EXIT(("ioctl: %s", strerror(errno)));
 
-	      if (!(ifr_tmp.ifr_flags & IFF_UP)
-		  || !(ifr_tmp.ifr_flags & IFF_MULTICAST))
+	      if (!(ifr_tmp.ifr_flags & IFF_UP) 
+                  || !(ifr_tmp.ifr_flags & IFF_MULTICAST))
 		continue;
 
-	      /* Null termination not required, don't use strncpy() wrapper */
+	      /* NUL termination not required, don't use strncpy() wrapper */
 	      memset(&ifr_tmp, '\0', sizeof(struct ifreq));
 	      strncpy(ifr_tmp.ifr_name, ifr->ifr_name, IFNAMSIZ);
 
@@ -586,8 +579,8 @@ _cerebrod_calculate_in_addr_and_index(char *network_interface,
 
 	  tok = strtok(network_interface_cpy, "/");
 	  if (!Inet_pton(AF_INET, tok, &addr_temp))
-            cerebro_err_exit("network interface IP address '%s' "
-                             "improperly format", network_interface);
+            cerebro_err_exit("network interface IP address '%s' invalid",
+                             network_interface);
           
 	  if (!(snm = strtok(NULL, "")))
 	    cerebro_err_exit("network interface '%s' subnet mask not specified",
@@ -595,12 +588,9 @@ _cerebrod_calculate_in_addr_and_index(char *network_interface,
 	  else
 	    {
 	      mask = strtol(snm, &ptr, 10);
-	      if (ptr != (snm + strlen(snm)))
-		cerebro_err_exit("network interface '%s' subnet mask improper",
-                                 network_interface);
-	      else if (mask < 1 || mask > IPADDR_BITS)
-		cerebro_err_exit("network interface '%s' subnet mask size "
-                                 "invalid",
+	      if ((ptr != (snm + strlen(snm))) 
+                  || (mask < 1 || mask > IPADDR_BITS))
+		cerebro_err_exit("network interface '%s' subnet mask invalid",
                                  network_interface);
 	    }
 
@@ -635,7 +625,7 @@ _cerebrod_calculate_in_addr_and_index(char *network_interface,
           
 	  intf_masked_ip = htonl((sinptr->sin_addr).s_addr) >> (32 - mask);
           
-	  /* Null termination not required, don't use wrapper */
+	  /* NUL termination not required, don't use wrapper */
 	  memset(&ifr_tmp, '\0', sizeof(struct ifreq));
 	  strncpy(ifr_tmp.ifr_name, ifr->ifr_name, IFNAMSIZ);
 
@@ -650,7 +640,7 @@ _cerebrod_calculate_in_addr_and_index(char *network_interface,
           
 	  if (conf_masked_ip == intf_masked_ip)
 	    {
-	      /* Null termination not required, don't use strncpy() wrapper */
+	      /* NUL termination not required, don't use strncpy() wrapper */
 	      memset(&ifr_tmp, '\0', sizeof(struct ifreq));
 	      strncpy(ifr_tmp.ifr_name, ifr->ifr_name, IFNAMSIZ);
 
@@ -667,8 +657,8 @@ _cerebrod_calculate_in_addr_and_index(char *network_interface,
       if (!found_interface)
 	{
 	  if (conf.multicast)
-	    cerebro_err_exit("network interface '%s' with multicast "
-                             "not found", network_interface);
+	    cerebro_err_exit("network interface '%s' with multicast not found",
+                             network_interface);
 	  else
 	    cerebro_err_exit("network interface '%s' not found", 
                              network_interface);
@@ -707,7 +697,7 @@ _cerebrod_calculate_in_addr_and_index(char *network_interface,
 	      struct sockaddr_in *sinptr;
 	      struct ifreq ifr_tmp;
 
-	      /* Null termination not required, don't use wrapper */
+	      /* NUL termination not required, don't use wrapper */
 	      memset(&ifr_tmp, '\0', sizeof(struct ifreq));
 	      strncpy(ifr_tmp.ifr_name, ifr->ifr_name, IFNAMSIZ);
 
@@ -719,11 +709,10 @@ _cerebrod_calculate_in_addr_and_index(char *network_interface,
                                  network_interface);
 	      
 	      if (conf.multicast && !(ifr_tmp.ifr_flags & IFF_MULTICAST))
-		cerebro_err_exit("network interface '%s' not a multicast "
-                                 "interface",
+		cerebro_err_exit("network interface '%s' cannot multicast",
                                  network_interface);
 
-	      /* Null termination not required, don't use strncpy() wrapper */
+	      /* NUL termination not required, don't use strncpy() wrapper */
 	      memset(&ifr_tmp, '\0', sizeof(struct ifreq));
 	      strncpy(ifr_tmp.ifr_name, ifr->ifr_name, IFNAMSIZ);
 
@@ -739,8 +728,7 @@ _cerebrod_calculate_in_addr_and_index(char *network_interface,
 	}
 
       if (!found_interface)
-	cerebro_err_exit("network interface '%s' not found",
-                         network_interface);
+	cerebro_err_exit("network interface '%s' not found", network_interface);
 
       Free(buf);
       Close(fd);

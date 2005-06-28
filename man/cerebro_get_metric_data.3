@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro_get_metric_data.3,v 1.7 2005-06-15 22:32:34 achu Exp $
+\."$Id: cerebro_get_metric_data.3,v 1.8 2005-06-28 19:47:22 achu Exp $
 \."#############################################################################
 .TH CEREBRO_GET_METRIC_DATA 3 "May 2005" "LLNL" "LIBCEREBRO"
 .SH "NAME"
@@ -34,28 +34,11 @@ CEREBRO_METRIC_CLUSTER_NODES - Retrieve all nodes known to
 .B cerebrod.  
 No metric value is returned for this metric.
 
-CEREBRO_METRIC_UP_NODES - Retrieve all up nodes in the cluster. 
-Up vs. down nodes are determined through the configured timeout_len.
-No metric value is returned for this metric.
-
-CEREBRO_METRIC_DOWN_NODES - Retrieve all down nodes in the cluster.
-in the cluster.  Up vs. down nodes are determined through the
-configured timeout_len.  No metric value is returned for this metric.
-
 CEREBRO_METRIC_UPDOWN_STATE - Retrieve the up vs. down state of all
 nodes in the cluster.  The metric type returned for this metric is a
 CEREBRO_METRIC_VALUE_TYPE_U_INT32.  The value is set to
 CEREBRO_METRIC_UPDOWN_STATE_NODE_UP if the node is up and set to
 CEREBRO_METRIC_UPDOWN_STATE_NODE_DOWN if the node is down.
-
-CEREBRO_METRIC_LAST_RECEIVED_TIME - Retrieve the last received time
-of all nodes in the cluster. The metric type returned for this metric is a
-CEREBRO_METRIC_VALUE_TYPE_U_INT32.  The value is set to the
-seconds returned by
-.BR gettimeofday(2) 
-on the 
-.BR cerebrod
-server.
 
 .br
 .SH "RETURN VALUES"

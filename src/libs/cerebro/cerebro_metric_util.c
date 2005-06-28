@@ -319,9 +319,9 @@ _cerebro_metric_receive_data(cerebro_t handle,
               goto cleanup;
             }
 
+          /* Pipe closed */
           if (!n)
             {
-              /* Pipe closed */
               handle->errnum = CEREBRO_ERR_PROTOCOL;
               goto cleanup;
             }

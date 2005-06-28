@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.96 2005-06-28 00:32:12 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.97 2005-06-28 19:47:22 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -204,7 +204,9 @@ _cerebrod_heartbeat_unmarshall_and_create(const char *buf, unsigned int buflen)
   if (hb->metrics_len)
     {
       hb->metrics = Malloc(sizeof(struct cerebrod_heartbeat_metric *)*(hb->metrics_len + 1));
-      memset(hb->metrics, '\0', sizeof(struct cerebrod_heartbeat_metric *)*(hb->metrics_len + 1));
+      memset(hb->metrics, 
+             '\0', 
+             sizeof(struct cerebrod_heartbeat_metric *)*(hb->metrics_len + 1));
       
       for (i = 0; i < hb->metrics_len; i++)
         {

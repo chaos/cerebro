@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.5 2005-06-23 23:00:48 achu Exp $
+ *  $Id: cerebro.h,v 1.6 2005-06-28 19:47:22 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_H
@@ -48,10 +48,7 @@
  */
 #define CEREBRO_METRIC_METRIC_NAMES               "metric_names"
 #define CEREBRO_METRIC_CLUSTER_NODES              "cluster_nodes"
-#define CEREBRO_METRIC_UP_NODES                   "up_nodes"
-#define CEREBRO_METRIC_DOWN_NODES                 "down_nodes"
 #define CEREBRO_METRIC_UPDOWN_STATE               "updown_state"
-#define CEREBRO_METRIC_LAST_RECEIVED_TIME         "last_received_time"
 
 #define CEREBRO_METRIC_UPDOWN_STATE_NODE_UP       1
 #define CEREBRO_METRIC_UPDOWN_STATE_NODE_DOWN     0

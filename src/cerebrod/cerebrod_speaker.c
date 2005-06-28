@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.65 2005-06-28 00:32:12 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.66 2005-06-28 19:47:22 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -45,7 +45,7 @@ extern pthread_mutex_t debug_output_mutex;
 static char cerebrod_nodename[CEREBRO_MAX_NODENAME_LEN+1];
 
 /* 
- * _speaker_setup_socketet
+ * _speaker_socket_setup
  *
  * Create and setup the speaker socket.  Do not use wrappers in this
  * function.  We want to give the daemon additional chances to
@@ -54,7 +54,7 @@ static char cerebrod_nodename[CEREBRO_MAX_NODENAME_LEN+1];
  * Returns file descriptor on success, -1 on error
  */
 static int
-_speaker_setup_socketet(void)
+_speaker_socket_setup(void)
 {
   struct sockaddr_in addr;
   int fd;
@@ -81,7 +81,7 @@ _speaker_setup_socketet(void)
       imr.imr_ifindex = conf.heartbeat_interface_index;
       
       if (setsockopt(fd,
-		     SOL_IP,
+                     SOL_IP,
 		     IP_MULTICAST_IF,
 		     &imr,
 		     sizeof(struct ip_mreqn)) < 0)
@@ -129,12 +129,12 @@ _speaker_setup_socketet(void)
 }
 
 /* 
- * _cerebrod_speaker_initialize
+ * _speaker_initialize
  *
  * perform speaker initialization
  */
 static void
-_cerebrod_speaker_initialize(void)
+_speaker_initialize(void)
 {
   unsigned int seed;
   struct timeval tv;
@@ -155,9 +155,9 @@ _cerebrod_speaker_initialize(void)
   seed = tv.tv_sec;
 
   /* If an entire cluster is re-booted at the same time, each cluster
-   * node could potentially be seeded with the same time.  In order to
+   * node could be potentially seeded with the same time.  In order to
    * avoid this, we'll add the cluster nodename to the seed to give
-   * every cluster node a constant different offset.
+   * every cluster node atleast a constant different offset.
    */
   len = strlen(cerebrod_nodename);
   for (i = 0; i < len; i++)
@@ -201,9 +201,9 @@ _cerebrod_heartbeat_create(unsigned int *heartbeat_len)
  * Returns length written to buffer on success, -1 on error
  */
 int
-_cerebrod_heartbeat_marshall(struct cerebrod_heartbeat *hb,
-			     char *buf,
-			     unsigned int buflen)
+_cerebrod_heartbeat_marshall(struct cerebrod_heartbeat *hb, 
+                             char *buf,
+                             unsigned int buflen)
 {
   int i, len = 0;
  
@@ -214,8 +214,8 @@ _cerebrod_heartbeat_marshall(struct cerebrod_heartbeat *hb,
   memset(buf, '\0', buflen);
   len += Marshall_int32(hb->version, buf + len, buflen - len);
   len += Marshall_buffer(hb->nodename, 
-                         sizeof(hb->nodename),
-                         buf + len,
+                         sizeof(hb->nodename), 
+                         buf + len, 
                          buflen - len);
   len += Marshall_u_int32(hb->metrics_len, buf + len, buflen - len);
   
@@ -306,8 +306,8 @@ cerebrod_speaker(void *arg)
 {
   int fd;
 
-  _cerebrod_speaker_initialize();
-  if ((fd = _speaker_setup_socketet()) < 0)
+  _speaker_initialize();
+  if ((fd = _speaker_socket_setup()) < 0)
     CEREBRO_EXIT(("fd setup failed"));
 
   while (1)
@@ -328,9 +328,7 @@ cerebrod_speaker(void *arg)
   
       buf = Malloc(buflen + 1);
 
-      heartbeat_len = _cerebrod_heartbeat_marshall(hb, 
-						   buf, 
-						   buflen);
+      heartbeat_len = _cerebrod_heartbeat_marshall(hb, buf, buflen);
 
       _cerebrod_heartbeat_dump(hb);
       
@@ -349,8 +347,8 @@ cerebrod_speaker(void *arg)
 			     sizeof(struct sockaddr_in))) != heartbeat_len)
         {
           if (send_len < 0)
-            fd = cerebrod_reinitialize_socket(fd,
-                                              _speaker_setup_socketet,
+            fd = cerebrod_reinitialize_socket(fd, 
+                                              _speaker_socket_setup,
                                               "speaker: sendto");
           else
             CEREBRO_DBG(("sendto: invalid bytes sent"));

@@ -19,6 +19,8 @@ Cleanup
 - Makefile libs/include dirs consistency
 - check version earlier during unmarshalling, otherwise who knows what
 data you're unmarshalling.
+- static funcs don't need prefix rule
+- metric name index instead of list
 
 Audit
 - code review to reduce memory footprint

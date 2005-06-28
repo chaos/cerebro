@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: clusterlist_module_default.c,v 1.4 2005-06-27 04:44:49 achu Exp $
+ *  $Id: clusterlist_module_default.c,v 1.5 2005-06-28 19:47:22 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -54,21 +54,9 @@ default_clusterlist_get_nodename(const char *node, char *buf, unsigned int bufle
 {
   int len;
 
-  if (!node)
+  if (!node || !buf || !buflen)
     {
-      CEREBRO_DBG(("node null"));
-      return -1;
-    }
-
-  if (!buf)
-    {
-      CEREBRO_DBG(("buf null"));
-      return -1;
-    }
-
-  if (!buflen)
-    {
-      CEREBRO_DBG(("buflen invalid"));
+      CEREBRO_DBG(("invalid parameters"));
       return -1;
     }
   
