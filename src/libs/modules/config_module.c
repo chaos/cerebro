@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: config_module.c,v 1.8 2005-06-27 23:27:06 achu Exp $
+ *  $Id: config_module.c,v 1.9 2005-06-28 21:15:01 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -124,6 +124,7 @@ config_module_load(void)
                                   CONFIG_MODULE_INFO_SYM,
                                   config_handle,
                                   1)) < 0)
+    goto cleanup;
 
   if (rv)
     goto out;

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.110 2005-06-28 19:47:22 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.111 2005-06-28 21:15:01 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -359,7 +359,7 @@ _cerebrod_calculate_multicast_setting(void)
       tok = strtok(ipaddr_cpy, ".");
       ip_class = strtol(tok, &ptr, 10);
       if (ptr != (tok + strlen(tok)))
-	cerebro_err_exit("heartbeat destination IP address '%s' invalid"
+	cerebro_err_exit("heartbeat destination IP address '%s' invalid",
                          conf.heartbeat_destination_ip);
       
       if (ip_class >= MULTICAST_CLASS_MIN && ip_class <= MULTICAST_CLASS_MAX)

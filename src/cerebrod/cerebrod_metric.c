@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric.c,v 1.53 2005-06-28 19:47:22 achu Exp $
+ *  $Id: cerebrod_metric.c,v 1.54 2005-06-28 21:15:01 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -1124,7 +1124,7 @@ _metric_service_connection(void *arg)
  *
  * Returns file descriptor on success, -1 on error
  */
-static
+static int
 _metric_setup_socket(void)
 {
   struct sockaddr_in addr;
