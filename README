@@ -3,15 +3,23 @@ This project as been named after a part of the central nervous system
 to pay homage to the the Ganglia project
 (http://ganglia.sourceforge.net).  A heavily modified version of
 Ganglia was once used at Lawrence Livermore National Laboratory to
-support our Linux clusters. Over time, it was apparent that an
-internally developed monitoring tool was needed instead of a heavily
-modified Ganglia.
+support a number of small features on our Linux clusters. 
 
-- things made better
-   - not sleep(1)
-   - not need to modify code to monitor new things
-   - with library interface rather than gmetric
-   - and module interface
+Over time, it became more and more difficult to support a heavily
+modified Ganglia, so the Cerebro project was born.  The Cerebro
+project provides:
+
+- Less CPU interruption
+- No need to modify code to monitor new metrics
+- A C API to send and retrieve metric data
+- A dynamic module interface that allows new metrics to be added into
+  a cluster without any software updates.
+
+The Cerebro project should not be mistaken as a host monitoring system
+like Ganglia or Supermon.  The goal of Cerebro was to provide a simple
+scalable tool to propogate a small amount of monitoring information
+across a cluster.  The tool is particularly useful for debugging on a
+cluster, where a new metric needs to be temporarly monitored.
 
 Albert Chu
 chu11@llnl.gov
