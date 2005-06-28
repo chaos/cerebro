@@ -15,7 +15,6 @@ Cleanup
 - string length issue with packet buflen fixed in listener
 - check version earlier during unmarshalling, otherwise who knows what
 data you're unmarshalling.
-- static funcs don't need prefix rule
 
 Audit
 - code review to reduce memory footprint
