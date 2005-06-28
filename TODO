@@ -8,14 +8,11 @@ Testing
 
 Cleanup
 - merge metric_names and metric_data stuff better after new version unmarshall/check code inserted
-- get_metric_names && metriclist manpages
 - limit max number of metrics listener can parse
-- common receiving loop?
 - common receive data func?
 - no need to malloc values in heartbeats and destroy em??
 - packet buflen max len issue with number of metrics supportable
 - string length issue with packet buflen fixed in listener
-- type -> len function
 - check version earlier during unmarshalling, otherwise who knows what
 data you're unmarshalling.
 - static funcs don't need prefix rule
