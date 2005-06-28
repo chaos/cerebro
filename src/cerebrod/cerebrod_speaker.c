@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.64 2005-06-27 17:24:09 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.65 2005-06-28 00:32:12 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -26,6 +26,7 @@
 #include "cerebrod_heartbeat.h"
 #include "cerebrod_speaker.h"
 #include "cerebrod_speaker_data.h"
+#include "cerebrod_util.h"
 
 #include "debug.h"
 #include "metric_module.h"
@@ -44,7 +45,7 @@ extern pthread_mutex_t debug_output_mutex;
 static char cerebrod_nodename[CEREBRO_MAX_NODENAME_LEN+1];
 
 /* 
- * _cerebrod_speaker_create_and_setup_socket
+ * _speaker_setup_socketet
  *
  * Create and setup the speaker socket.  Do not use wrappers in this
  * function.  We want to give the daemon additional chances to
@@ -53,12 +54,12 @@ static char cerebrod_nodename[CEREBRO_MAX_NODENAME_LEN+1];
  * Returns file descriptor on success, -1 on error
  */
 static int
-_cerebrod_speaker_create_and_setup_socket(void)
+_speaker_setup_socketet(void)
 {
-  struct sockaddr_in heartbeat_addr;
-  int temp_fd;
+  struct sockaddr_in addr;
+  int fd;
 
-  if ((temp_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
+  if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {
       CEREBRO_DBG(("socket: %s", strerror(errno)));
       return -1;
@@ -79,7 +80,7 @@ _cerebrod_speaker_create_and_setup_socket(void)
 	     sizeof(struct in_addr));
       imr.imr_ifindex = conf.heartbeat_interface_index;
       
-      if (setsockopt(temp_fd,
+      if (setsockopt(fd,
 		     SOL_IP,
 		     IP_MULTICAST_IF,
 		     &imr,
@@ -90,7 +91,7 @@ _cerebrod_speaker_create_and_setup_socket(void)
 	}
 
       optval = 1;
-      if (setsockopt(temp_fd, 
+      if (setsockopt(fd, 
 		     SOL_IP,
 		     IP_MULTICAST_LOOP,
 		     &optval, 
@@ -101,7 +102,7 @@ _cerebrod_speaker_create_and_setup_socket(void)
 	}
 
       optval = conf.heartbeat_ttl;
-      if (setsockopt(temp_fd,
+      if (setsockopt(fd,
 		     SOL_IP,
 		     IP_MULTICAST_TTL,
 		     &optval,
@@ -112,21 +113,19 @@ _cerebrod_speaker_create_and_setup_socket(void)
 	}
     }
 
-  memset(&heartbeat_addr, '\0', sizeof(struct sockaddr_in));
-  heartbeat_addr.sin_family = AF_INET;
-  heartbeat_addr.sin_port = htons(conf.heartbeat_source_port);
-  memcpy(&heartbeat_addr.sin_addr,
+  memset(&addr, '\0', sizeof(struct sockaddr_in));
+  addr.sin_family = AF_INET;
+  addr.sin_port = htons(conf.heartbeat_source_port);
+  memcpy(&addr.sin_addr,
 	 &conf.heartbeat_network_interface_in_addr,
 	 sizeof(struct in_addr));
-  if (bind(temp_fd, 
-	   (struct sockaddr *)&heartbeat_addr, 
-	   sizeof(struct sockaddr_in)) < 0) 
+  if (bind(fd, (struct sockaddr *)&addr, sizeof(struct sockaddr_in)) < 0) 
     {
       CEREBRO_DBG(("bind: %s", strerror(errno)));
       return -1;
     }
 
-  return temp_fd;
+  return fd;
 }
 
 /* 
@@ -308,7 +307,7 @@ cerebrod_speaker(void *arg)
   int fd;
 
   _cerebrod_speaker_initialize();
-  if ((fd = _cerebrod_speaker_create_and_setup_socket()) < 0)
+  if ((fd = _speaker_setup_socketet()) < 0)
     CEREBRO_EXIT(("fd setup failed"));
 
   while (1)
@@ -350,35 +349,9 @@ cerebrod_speaker(void *arg)
 			     sizeof(struct sockaddr_in))) != heartbeat_len)
         {
           if (send_len < 0)
-            {
-              /* For errnos EINVAL, EBADF, ENODEV, assume the device has
-               * been temporarily brought down then back up.  For example,
-               * this can occur if the administrator runs
-               * '/etc/init.d/network restart'.  We just need to re-setup
-               * the socket.
-               * 
-               * If fd < 0, the network device just isn't back up yet from
-               * the previous time we got an errno EINVAL, EBADF, or
-               * ENODEV.
-               */
-              if (errno == EINVAL 
-                  || errno == EBADF
-                  || errno == ENODEV
-                  || fd < 0)
-                {
-                  if (!(fd < 0))
-                    close(fd);	/* no-wrapper, make best effort */
-                  
-                  if ((fd = _cerebrod_speaker_create_and_setup_socket()) < 0)
-                    CEREBRO_DBG(("error re-initializing socket"));
-                  else
-                    CEREBRO_DBG(("success re-initializing socket"));
-                }
-              else if (errno == EINTR)
-                CEREBRO_DBG(("sendto: %s", strerror(errno)));
-              else
-                CEREBRO_EXIT(("sendto: %s", strerror(errno)));
-            }
+            fd = cerebrod_reinitialize_socket(fd,
+                                              _speaker_setup_socketet,
+                                              "speaker: sendto");
           else
             CEREBRO_DBG(("sendto: invalid bytes sent"));
         }

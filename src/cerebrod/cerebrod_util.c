@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_util.c,v 1.23 2005-06-27 17:24:09 achu Exp $
+ *  $Id: cerebrod_util.c,v 1.24 2005-06-28 00:32:12 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -14,10 +14,6 @@
 #include <assert.h>
 #include <errno.h>
 
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-
 #include "cerebrod_config.h"
 #include "cerebrod_util.h"
 
@@ -25,6 +21,8 @@
 #include "wrappers.h"
 
 extern struct cerebrod_config conf;
+
+#define CEREBROD_REINITIALIZE_TIME 2
 
 int 
 list_find_first_string(void *x, void *key)
@@ -115,143 +113,35 @@ cerebrod_rehash(hash_t *old_hash,
   *old_hash = new_hash;
 }
 
-/*
- * _cerebrod_create_and_setup_socket
- *
- * Create and setup the server socket.  Do not use wrappers in this
- * function.  We want to give the server additional chances to
- * "survive" an error condition.
- *
- * Returns file descriptor on success, -1 on error
- */
-static int
-_cerebrod_create_and_setup_socket(unsigned int port,
-                                  unsigned int backlog)
+int
+cerebrod_reinitialize_socket(int old_fd,
+                             Cerebrod_socket_setup socket_setup,
+                             char *debug_msg)
 {
-  struct sockaddr_in server_addr;
-  int temp_fd, optval = 1;
+  int fd = old_fd;
 
-  if ((temp_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+  if (!socket_setup || !debug_msg)
+    CEREBRO_EXIT(("invalid parameters"));
+
+  if (errno == EINVAL || errno == EBADF || errno == ENODEV || old_fd < 0)
     {
-      CEREBRO_DBG(("socket: %s", strerror(errno)));
-      return -1;
+      if (!(old_fd < 0))
+        close(old_fd);       /* no-wrapper, make best effort */
+                                                                                      
+      if ((fd = socket_setup()) < 0)
+        {
+          CEREBRO_DBG(("%s: error re-initializing socket", debug_msg));
+                                                                                      
+          /* Wait a bit, so we don't spin */
+          sleep(CEREBROD_REINITIALIZE_TIME);
+        }
+      else
+        CEREBRO_DBG(("success re-initializing socket"));
     }
+  else if (errno == EINTR)
+    CEREBRO_DBG(("%s: %s", debug_msg, strerror(errno)));
+  else
+    CEREBRO_EXIT(("%s: %s", debug_msg, strerror(errno)));
 
-  /* Configuration checks ensure destination ip is on this machine if
-   * it is a non-multicast address.
-   */
-  memset(&server_addr, '\0', sizeof(struct sockaddr_in));
-  server_addr.sin_family = AF_INET;
-  server_addr.sin_port = htons(port);
-  server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-
-  if (bind(temp_fd,
-           (struct sockaddr *)&server_addr,
-           sizeof(struct sockaddr_in)) < 0)
-    {
-      CEREBRO_DBG(("bind: %s", strerror(errno)));
-      return -1;
-    }
-
-  if (listen(temp_fd, backlog) < 0)
-    {
-      CEREBRO_DBG(("listen: %s", strerror(errno)));
-      return -1;
-    }
-
-
-  /* For quick start/restart */
-  if (setsockopt(temp_fd,
-                 SOL_SOCKET,
-                 SO_REUSEADDR,
-                 &optval,
-                 sizeof(int)) < 0)
-    {
-      CEREBRO_DBG(("setsockopt: %s", strerror(errno)));
-      return -1;
-    }
-
-  return temp_fd;
-}
-
-void
-cerebrod_tcp_data_server(Cerebrod_service_connection service_connection,
-                         unsigned int port,
-                         unsigned int backlog,
-                         unsigned int reinitialize_wait_time)
-{
-  int server_fd;
-
-  assert(service_connection);
-  assert(port);
-  assert(backlog);
-  assert(reinitialize_wait_time);
-
-  if ((server_fd = _cerebrod_create_and_setup_socket(port, backlog)) < 0)
-    CEREBRO_EXIT(("server_fd setup failed"));
-  
-  for (;;)
-    {
-      pthread_t thread;
-      pthread_attr_t attr;
-      int client_fd, client_addr_len, *arg;
-      struct sockaddr_in client_addr;
-
-      client_addr_len = sizeof(struct sockaddr_in);
-      if ((client_fd = accept(server_fd, 
-                              (struct sockaddr *)&client_addr, 
-                              &client_addr_len)) < 0)
-	{
-          /* For errnos EINVAL, EBADF, ENODEV, assume the device has
-           * been temporarily brought down then back up.  For example,
-           * this can occur if the administrator runs
-           * '/etc/init.d/network restart'.  We just need to re-setup
-           * the socket.
-           *
-           * If fd < 0, the network device just isn't back up yet from
-           * the previous time we got an errno EINVAL, EBADF, or
-           * ENODEV.
-           */
-          if (errno == EINVAL
-	      || errno == EBADF
-	      || errno == ENODEV
-	      || server_fd < 0)
-            {
-              if (!(server_fd < 0))
-		close(server_fd);	/* no-wrapper, make best effort */
-
-              if ((server_fd = _cerebrod_create_and_setup_socket(port,
-                                                                 backlog)) < 0)
-		{
-		  CEREBRO_DBG(("error re-initializing socket"));
-
-		  /* Wait a bit, so we don't spin */
-		  sleep(reinitialize_wait_time);
-		}
-              else
-                CEREBRO_DBG(("success re-initializing socket"));
-            }
-          else if (errno == EINTR)
-            CEREBRO_DBG(("accept: %s", strerror(errno)));
-          else
-            CEREBRO_EXIT(("accept: %s", strerror(errno)));
-	}
-
-      if (client_fd < 0)
-	continue;
-
-      /* Pass off connection to thread */
-      Pthread_attr_init(&attr);
-      Pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-      arg = Malloc(sizeof(int));
-      *arg = client_fd;
-      Pthread_create(&thread, 
-                     &attr, 
-                     service_connection, 
-                     (void *)arg);
-      Pthread_attr_destroy(&attr);
-
-    }
-
-  return;			/* NOT REACHED */
+  return fd;
 }

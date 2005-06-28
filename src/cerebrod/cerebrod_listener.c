@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.95 2005-06-27 17:24:09 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.96 2005-06-28 00:32:12 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -27,6 +27,7 @@
 #include "cerebrod_listener.h"
 #include "cerebrod_listener_data.h"
 #include "cerebrod_metric.h"
+#include "cerebrod_util.h"
 
 #include "clusterlist_module.h"
 
@@ -70,7 +71,7 @@ pthread_mutex_t listener_fd_lock = PTHREAD_MUTEX_INITIALIZER;
 clusterlist_module_t clusterlist_handle;
 
 /* 
- * _cerebrod_listener_create_and_setup_socket
+ * _listener_setup_socket
  *
  * Create and setup the listener socket.  Do not use wrappers in this
  * function.  We want to give the daemon additional chances to
@@ -79,12 +80,12 @@ clusterlist_module_t clusterlist_handle;
  * Returns file descriptor on success, -1 on error
  */
 static int
-_cerebrod_listener_create_and_setup_socket(void)
+_listener_setup_socket(void)
 {
-  struct sockaddr_in heartbeat_addr;
-  int temp_fd;
+  struct sockaddr_in addr;
+  int fd;
 
-  if ((temp_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
+  if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {
       CEREBRO_DBG(("socket: %s", strerror(errno)));
       return -1;
@@ -104,11 +105,11 @@ _cerebrod_listener_create_and_setup_socket(void)
              sizeof(struct in_addr));
       imr.imr_ifindex = conf.heartbeat_interface_index;
 
-      if (setsockopt(temp_fd,
-		     SOL_IP,
-		     IP_ADD_MEMBERSHIP,
-		     &imr,
-		     sizeof(struct ip_mreqn)) < 0)
+      if (setsockopt(fd, 
+                     SOL_IP, 
+                     IP_ADD_MEMBERSHIP, 
+                     &imr, 
+                     sizeof(struct ip_mreqn)) < 0)
 	{
 	  CEREBRO_DBG(("setsockopt: %s", strerror(errno)));
 	  return -1;
@@ -118,21 +119,19 @@ _cerebrod_listener_create_and_setup_socket(void)
   /* Configuration checks ensure destination ip is on this machine if
    * it is a non-multicast address.
    */
-  memset(&heartbeat_addr, '\0', sizeof(struct sockaddr_in));
-  heartbeat_addr.sin_family = AF_INET;
-  heartbeat_addr.sin_port = htons(conf.heartbeat_destination_port);
-  memcpy(&heartbeat_addr.sin_addr,
-         &conf.heartbeat_destination_ip_in_addr,
+  memset(&addr, '\0', sizeof(struct sockaddr_in));
+  addr.sin_family = AF_INET;
+  addr.sin_port = htons(conf.heartbeat_destination_port);
+  memcpy(&addr.sin_addr, 
+         &conf.heartbeat_destination_ip_in_addr, 
          sizeof(struct in_addr));
-  if (bind(temp_fd, 
-	   (struct sockaddr *)&heartbeat_addr, 
-	   sizeof(struct sockaddr_in)) < 0)
+  if (bind(fd, (struct sockaddr *)&addr, sizeof(struct sockaddr_in)) < 0)
     {
       CEREBRO_DBG(("bind: %s", strerror(errno)));
       return -1;
     }
 
-  return temp_fd;
+  return fd;
 }
 
 /*
@@ -148,7 +147,7 @@ _cerebrod_listener_initialize(void)
     goto out;
 
   Pthread_mutex_lock(&listener_fd_lock);
-  if ((listener_fd = _cerebrod_listener_create_and_setup_socket()) < 0)
+  if ((listener_fd = _listener_setup_socket()) < 0)
     CEREBRO_EXIT(("listener_fd setup failed"));
   Pthread_mutex_unlock(&listener_fd_lock);
 
@@ -363,40 +362,9 @@ cerebrod_listener(void *arg)
 			       0, 
 			       NULL, 
 			       NULL)) < 0)
-	{
-          /* For errnos EINVAL, EBADF, ENODEV, assume the device has
-           * been temporarily brought down then back up.  For example,
-           * this can occur if the administrator runs
-           * '/etc/init.d/network restart'.  We just need to re-setup
-           * the socket.
-           *
-           * If fd < 0, the network device just isn't back up yet from
-           * the previous time we got an errno EINVAL, EBADF, or
-           * ENODEV.
-           */
-          if (errno == EINVAL
-	      || errno == EBADF
-	      || errno == ENODEV
-	      || listener_fd < 0)
-            {
-              if (!(listener_fd < 0))
-		close(listener_fd);	/* no-wrapper, make best effort */
-
-              if ((listener_fd = _cerebrod_listener_create_and_setup_socket()) < 0)
-		{
-		  CEREBRO_DBG(("error re-initializing socket"));
-                  
-		  /* Wait a bit, so we don't spin */
-		  sleep(CEREBROD_LISTENER_REINITIALIZE_WAIT);
-		}
-              else
-                CEREBRO_DBG(("success re-initializing socket"));
-            }
-          else if (errno == EINTR)
-            CEREBRO_DBG(("recvfrom: %s", strerror(errno)));
-          else
-            CEREBRO_EXIT(("recvfrom: %s", strerror(errno)));
-	}
+        listener_fd = cerebrod_reinitialize_socket(listener_fd,
+                                                   _listener_setup_socket,
+                                                   "listener: recvfrom");
       Pthread_mutex_unlock(&listener_fd_lock);
 
       /* No packet read */

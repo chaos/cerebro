@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric.c,v 1.51 2005-06-27 17:24:09 achu Exp $
+ *  $Id: cerebrod_metric.c,v 1.52 2005-06-28 00:32:12 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -27,9 +27,6 @@
 #include "debug.h"
 #include "wrappers.h"
 
-#define CEREBROD_METRIC_BACKLOG           10
-#define CEREBROD_METRIC_REINITIALIZE_WAIT 2
-
 extern struct cerebrod_config conf;
 #if CEREBRO_DEBUG
 extern pthread_mutex_t debug_output_mutex;
@@ -42,6 +39,8 @@ extern int cerebrod_listener_data_index_numnodes;
 extern int cerebrod_listener_data_index_size;
 extern pthread_mutex_t cerebrod_listener_data_lock;
 extern pthread_mutex_t cerebrod_metric_name_lock;
+
+#define CEREBROD_METRIC_BACKLOG           10
 
 /*
  * cerebrod_metric_initialization_complete
@@ -1180,16 +1179,96 @@ _cerebrod_metric_service_connection(void *arg)
   return NULL;
 }
 
+/*
+ * _metric_setup_socket
+ *
+ * Create and setup the server socket.  Do not use wrappers in this
+ * function.  We want to give the server additional chances to
+ * "survive" an error condition.
+ *
+ * Returns file descriptor on success, -1 on error
+ */
+static
+_metric_setup_socket(void)
+{
+  struct sockaddr_in addr;
+  int fd, optval = 1;
+
+  if ((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+    {
+      CEREBRO_DBG(("socket: %s", strerror(errno)));
+      return -1;
+    }
+
+  /* Configuration checks ensure destination ip is on this machine if
+   * it is a non-multicast address.
+   */
+  memset(&addr, '\0', sizeof(struct sockaddr_in));
+  addr.sin_family = AF_INET;
+  addr.sin_port = htons(conf.metric_server_port);
+  addr.sin_addr.s_addr = htonl(INADDR_ANY);
+
+  if (bind(fd, (struct sockaddr *)&addr, sizeof(struct sockaddr_in)) < 0)
+    {
+      CEREBRO_DBG(("bind: %s", strerror(errno)));
+      return -1;
+    }
+
+  if (listen(fd, CEREBROD_METRIC_BACKLOG) < 0)
+    {
+      CEREBRO_DBG(("listen: %s", strerror(errno)));
+      return -1;
+    }
+
+  /* For quick start/restart */
+  if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(int)) < 0)
+    {
+      CEREBRO_DBG(("setsockopt: %s", strerror(errno)));
+      return -1;
+    }
+
+  return fd;
+}
 
 void *
 cerebrod_metric(void *arg)
 {
+  int fd;
+
   _cerebrod_metric_initialize();
 
-  cerebrod_tcp_data_server(_cerebrod_metric_service_connection, 
-                           conf.metric_server_port,
-                           CEREBROD_METRIC_BACKLOG,
-                           CEREBROD_METRIC_REINITIALIZE_WAIT);
+  if ((fd = _metric_setup_socket()) < 0)
+    CEREBRO_EXIT(("fd setup failed"));
+
+  for (;;)
+    {
+      pthread_t thread;
+      pthread_attr_t attr;
+      int client_fd, client_addr_len, *arg;
+      struct sockaddr_in client_addr;
+      
+      client_addr_len = sizeof(struct sockaddr_in);
+      if ((client_fd = accept(fd,
+                              (struct sockaddr *)&client_addr,
+                              &client_addr_len)) < 0)
+        fd = cerebrod_reinitialize_socket(fd,
+                                          _metric_setup_socket,
+                                          "metric_server: accept");
+      
+      if (client_fd < 0)
+        continue;
+      
+      /* Pass off connection to thread */
+      Pthread_attr_init(&attr);
+      Pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+      arg = Malloc(sizeof(int));
+      *arg = client_fd;
+      Pthread_create(&thread,
+                     &attr,
+                     _cerebrod_metric_service_connection,
+                     (void *)arg);
+      Pthread_attr_destroy(&attr);
+    }
 
   return NULL;			/* NOT REACHED */
 }

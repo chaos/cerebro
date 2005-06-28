@@ -1,11 +1,9 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.h,v 1.10 2005-05-17 22:40:02 achu Exp $
+ *  $Id: cerebrod_listener.h,v 1.11 2005-06-28 00:32:12 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_LISTENER_H
 #define _CEREBROD_LISTENER_H
-
-#define CEREBROD_LISTENER_REINITIALIZE_WAIT 2
 
 /* 
  * cerebrod_listener

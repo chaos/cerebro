@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_util.h,v 1.10 2005-05-31 22:06:03 achu Exp $
+ *  $Id: cerebrod_util.h,v 1.11 2005-06-28 00:32:12 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_UTIL_H
@@ -42,30 +42,33 @@ void cerebrod_rehash(hash_t *old_hash,
 		     int hash_num, 
 		     pthread_mutex_t *hash_mutex);
 
-/* 
- * cerebrod_service_connection
+/*
+ * Cerebrod_socket_setup
  *
- * function prototype for a function that will service a TCP
- * connection.  Function is passed a void * pointer to the
- * TCP connection's file descriptor.  Function is responsible
- * for closing the file descriptor.
- *
- * Function is executed in detached state, so any return is
- * ignored.
+ * function prototype for a function that will return a socket.
  */
-typedef void *(*Cerebrod_service_connection)(void *arg);
+typedef int (*Cerebrod_socket_setup)(void);
 
 /* 
- * cerebrod_tcp_data_server
+ * cerebrod_reinitialize_socket
  *
- * Will execute 'service_connection' thread after a TCP connection
- * received, passing it the connection's file descriptor.  The thread
- * is executed in the detached state, so the return value will be
- * ignored.
+ * This function helps various looping network servers or clients
+ * reinitialize their sockets appropriately.
+ *
+ * For networking errnos EINVAL, EBADF, ENODEV, we assume the network
+ * device has been temporarily brought down then back up.  For
+ * example, this can occur if the administrator runs
+ * '/etc/init.d/network restart'.  
+ *
+ * If old_fd < 0, the network device just isn't back up yet from
+ * the previous time we got an errno EINVAL, EBADF, or
+ * ENODEV.
+ *
+ * Returns new (or possibley old) fd on success, -1 on error
  */
-void cerebrod_tcp_data_server(Cerebrod_service_connection service_connection,
-                              unsigned int port,
-                              unsigned int backlog,
-                              unsigned int reinitialize_wait_time);
+int
+cerebrod_reinitialize_socket(int old_fd,
+                             Cerebrod_socket_setup socket_setup,
+                             char *debug_msg);
 
 #endif /* _CEREBROD_UTIL_H */
