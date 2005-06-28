@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric.c,v 1.56 2005-06-28 22:42:01 achu Exp $
+ *  $Id: cerebrod_metric.c,v 1.57 2005-06-28 23:57:28 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -201,6 +201,32 @@ _metric_err_response_marshall(struct cerebro_metric_err_response *err_res,
   return len;
 }
 
+/* 
+ * _metric_request_check_version
+ *
+ * Check that the version is correct prior to unmarshalling
+ *
+ * Returns 0 if version is correct, -1 if not
+ */
+static int
+_metric_request_check_version(const char *buf, 
+                              unsigned int buflen,
+                              int32_t *version)
+{
+  int n;
+  
+  assert(version);
+                                       
+  if (!(n = Unmarshall_int32(version, buf, buflen)))
+    return -1;
+                                                                                     
+  if (*version != CEREBRO_METRIC_PROTOCOL_VERSION)
+    return -1;
+                                                                                     
+  return 0;
+}
+
+
 /*
  * _metric_request_unmarshall
  *
@@ -241,7 +267,7 @@ _metric_request_unmarshall(struct cerebro_metric_request *req,
 }
 
 /*
- * _cerebrod_metric_request_receive
+ * _cerebrod_metric_receive_data
  *
  * Receive metric server request
  * 
@@ -249,19 +275,21 @@ _metric_request_unmarshall(struct cerebro_metric_request *req,
  * -1 on error
  */
 static int
-_cerebrod_metric_request_receive(int client_fd,	
-				 struct cerebro_metric_request *req)
+_cerebrod_metric_receive_data(int fd,	
+                              unsigned int bytes_to_read,
+                              char *buf,
+                              unsigned int buflen)
 {
-  int count, bytes_read = 0;
-  char buf[CEREBRO_MAX_PACKET_LEN];
+  int bytes_read = 0;
   
-  assert(client_fd >= 0);
-  assert(req);
+  assert(fd >= 0);
+  assert(bytes_to_read);
+  assert(buf);
+  assert(buflen >= bytes_to_read);
   
-  memset(buf, '\0', CEREBRO_MAX_PACKET_LEN);
+  memset(buf, '\0', buflen);
   
-  /* Wait for request from client */
-  while (bytes_read < CEREBRO_METRIC_REQUEST_PACKET_LEN)
+  while (bytes_read < bytes_to_read)
     {
       fd_set rfds;
       struct timeval tv;
@@ -271,9 +299,9 @@ _cerebrod_metric_request_receive(int client_fd,
       tv.tv_usec = 0;
       
       FD_ZERO(&rfds);
-      FD_SET(client_fd, &rfds);
+      FD_SET(fd, &rfds);
   
-      if ((num = select(client_fd + 1, &rfds, NULL, NULL, &tv)) < 0)
+      if ((num = select(fd + 1, &rfds, NULL, NULL, &tv)) < 0)
 	{
 	  CEREBRO_DBG(("select: %s", strerror(errno)));
 	  goto cleanup;
@@ -281,31 +309,31 @@ _cerebrod_metric_request_receive(int client_fd,
 
       if (!num)
 	{
-	  /* Timed out.  If atleast some bytes were read, unmarshall
-	   * the received bytes.  Its possible we are expecting more
-	   * bytes than the client is sending, perhaps because we are
-	   * using a different protocol version.  This will allow the
-	   * server to return a invalid version number error back to
-	   * the user.
+          /* Timed out.  If atleast some bytes were read, return data
+           * back to the caller to let them possibly unmarshall the
+           * data.  Its possible we are expecting more bytes than the
+           * client is sending, perhaps because we are using a
+           * different protocol version.  This will allow the server
+           * to return a invalid version number back to the user.
 	   */
 	  if (!bytes_read)
-	    goto cleanup;
+            {
+              CEREBRO_DBG(("timeout"));
+              goto cleanup;
+            }
 	  else
-	    goto unmarshall_received;
+	    goto out;
 	}
       
-      if (FD_ISSET(client_fd, &rfds))
+      if (FD_ISSET(fd, &rfds))
 	{
 	  int n;
 
           /* Don't use fd_read_n b/c it loops until exactly
-           * CEREBRO_METRIC_REQUEST_PACKET_LEN is read.  Due to
-           * version incompatability, we may want to read a smaller
-           * packet.
+           * bytes_to_read is read.  Due to version incompatability or
+           * error packets, we may want to read a smaller packet.
            */
-	  if ((n = read(client_fd, 
-                        buf + bytes_read, 
-                        CEREBRO_METRIC_REQUEST_PACKET_LEN - bytes_read)) < 0)
+	  if ((n = read(fd, buf + bytes_read, bytes_to_read - bytes_read)) < 0)
 	    {
 	      CEREBRO_DBG(("read: %s", strerror(errno)));
 	      goto cleanup;
@@ -313,7 +341,10 @@ _cerebrod_metric_request_receive(int client_fd,
 
           /* Pipe closed */
 	  if (!n)
-            goto cleanup;
+            {
+              CEREBRO_DBG(("pipe closed"));
+              goto cleanup;
+            }
 
 	  bytes_read += n;
 	}
@@ -324,11 +355,8 @@ _cerebrod_metric_request_receive(int client_fd,
 	}
     }
 
- unmarshall_received:
-  if ((count = _metric_request_unmarshall(req, buf, bytes_read)) < 0)
-    goto cleanup;
-
-  return count;
+ out:
+  return bytes_read;
 
  cleanup:
   return -1;
@@ -1038,46 +1066,46 @@ _respond_with_nodes(int client_fd,
 static void *
 _metric_service_connection(void *arg)
 {
-  int client_fd, req_len;
+  int client_fd, req_len, recv_len;
   struct cerebro_metric_request req;
+  char buf[CEREBRO_MAX_PACKET_LEN];
   char metric_name_buf[CEREBRO_MAX_METRIC_NAME_LEN+1];
   client_fd = *((int *)arg);
+  int32_t version;
 
   memset(&req, '\0', sizeof(struct cerebro_metric_request));
-  if ((req_len = _cerebrod_metric_request_receive(client_fd, &req)) < 0)
-    /* At this point, there is no successfully read request, therefore
-     * there is no reason to respond w/ a response and an error code.
-     */
-    goto cleanup;
-  
-  _metric_request_dump(&req);
 
+  if ((recv_len = _cerebrod_metric_receive_data(client_fd, 
+                                                CEREBRO_METRIC_REQUEST_PACKET_LEN,
+                                                buf,
+                                                CEREBRO_MAX_PACKET_LEN)) < 0)
+    goto cleanup;
+
+  if (_metric_request_check_version(buf, recv_len, &version) < 0)
+    {
+      _metric_respond_with_error(client_fd, 
+                                 version,
+                                 CEREBRO_METRIC_PROTOCOL_ERR_VERSION_INVALID);
+      goto cleanup;
+    }
+
+  if ((req_len = _metric_request_unmarshall(&req, buf, recv_len)) < 0)
+    {
+      _metric_respond_with_error(client_fd, 
+                                 req.version,
+                                 CEREBRO_METRIC_PROTOCOL_ERR_PACKET_INVALID);
+      goto cleanup;
+    }
+  
   if (req_len != CEREBRO_METRIC_REQUEST_PACKET_LEN)
     {
-      CEREBRO_DBG(("len: %d, %d", CEREBRO_METRIC_REQUEST_PACKET_LEN, req_len));
-
-      if (req_len >= sizeof(req.version)
-          && req.version != CEREBRO_METRIC_PROTOCOL_VERSION)
-        {
-          _metric_respond_with_error(client_fd, 
-                                     req.version,
-                                     CEREBRO_METRIC_PROTOCOL_ERR_VERSION_INVALID);
-          goto cleanup;
-        }
-
       _metric_respond_with_error(client_fd, 
                                  req.version,
                                  CEREBRO_METRIC_PROTOCOL_ERR_PACKET_INVALID);
       goto cleanup;
     }
 
-  if (req.version != CEREBRO_METRIC_PROTOCOL_VERSION)
-    {
-      _metric_respond_with_error(client_fd, 
-                                 req.version,
-                                 CEREBRO_METRIC_PROTOCOL_ERR_VERSION_INVALID);
-      goto cleanup;
-    }
+  _metric_request_dump(&req);
 
   /* Guarantee ending '\0' character */
   memset(metric_name_buf, '\0', CEREBRO_MAX_METRIC_NAME_LEN+1);

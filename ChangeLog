@@ -6,6 +6,8 @@
 
 	* Performance improvement through use of index instead of list for
 	metric names.
+
+	* Fix protocol version checking bugs.
 	
 2005-06-27  Albert Chu  <chu11@llnl.gov>
 

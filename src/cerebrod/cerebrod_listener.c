@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.98 2005-06-28 21:26:52 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.99 2005-06-28 23:57:28 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -163,6 +163,29 @@ _cerebrod_listener_initialize(void)
   Pthread_mutex_unlock(&cerebrod_listener_initialization_complete_lock);
 }
 
+/* 
+ * _cerebrod_heartbeat_check_version
+ *
+ * Check that the version is correct prior to unmarshalling
+ *
+ * Returns 0 if version is correct, -1 if not
+ */
+static int
+_cerebrod_heartbeat_check_version(const char *buf, unsigned int buflen)
+{
+  int32_t version;
+  int n;
+
+  if (!(n = Unmarshall_int32(&version, buf, buflen)))
+    return -1;
+
+  if (version != CEREBROD_HEARTBEAT_PROTOCOL_VERSION)
+    return -1;
+  
+  return 0;
+}
+
+
 /*
  * _cerebrod_heartbeat_unmarshall_and_create
  *
@@ -201,6 +224,13 @@ _cerebrod_heartbeat_unmarshall_and_create(const char *buf, unsigned int buflen)
   
   if (hb->metrics_len)
     {
+
+      if (hb->metrics_len > conf.metric_max)
+        {
+          CEREBRO_DBG(("reducing metrics_len: len=%d", hb->metrics_len));
+          hb->metrics_len = conf.metric_max;
+        }
+
       hb->metrics = Malloc(sizeof(struct cerebrod_heartbeat_metric *)*(hb->metrics_len + 1));
       memset(hb->metrics, 
              '\0', 
@@ -371,24 +401,13 @@ cerebrod_listener(void *arg)
       if (recv_len <= 0)
 	continue;
 
-      if (recv_len < CEREBROD_HEARTBEAT_HEADER_LEN)
-        {
-          CEREBRO_DBG(("expect hb_len = %d, recv_len = %d",
-                       CEREBROD_HEARTBEAT_HEADER_LEN, recv_len));
-          continue;
-        }
+      if (_cerebrod_heartbeat_check_version(buf, recv_len) < 0)
+        continue;
 
       if (!(hb = _cerebrod_heartbeat_unmarshall_and_create(buf, recv_len)))
 	continue;
 
       _cerebrod_heartbeat_dump(hb);
-
-      if (hb->version != CEREBROD_HEARTBEAT_PROTOCOL_VERSION)
-	{
-	  CEREBRO_DBG(("invalid hb version: expect = %d, version = %d",
-                       CEREBROD_HEARTBEAT_PROTOCOL_VERSION, hb->version));
-	  continue;
-	}
       
       /* Guarantee ending '\0' character */
       memset(nodename_buf, '\0', CEREBRO_MAX_NODENAME_LEN+1);
@@ -400,7 +419,7 @@ cerebrod_listener(void *arg)
       
       if (!flag)
 	{
-	  CEREBRO_DBG(("received non-cluster packet from: %s", nodename_buf));
+	  CEREBRO_DBG(("received non-cluster packet: %s", nodename_buf));
 	  continue;
 	}
       

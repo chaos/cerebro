@@ -7,14 +7,15 @@ Testing
 - api again
 
 Cleanup
+- common version check code
 - merge metric_names and metric_data stuff better after new version unmarshall/check code inserted
-- limit max number of metrics listener can parse
 - common receive data func?
 - no need to malloc values in heartbeats and destroy em??
 - packet buflen max len issue with number of metrics supportable
 - string length issue with packet buflen fixed in listener
 - check version earlier during unmarshalling, otherwise who knows what
 data you're unmarshalling.
+   - only need to do in cerebro lib now
 
 Audit
 - code review to reduce memory footprint

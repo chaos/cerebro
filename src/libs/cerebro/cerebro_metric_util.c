@@ -411,13 +411,10 @@ _cerebro_metric_receive_data(cerebro_t handle,
           int n;
 
           /* Don't use fd_read_n b/c it loops until exactly
-           * CEREBRO_METRIC_NAME_RESPONSE_PACKET_LEN is read.  Due to version
-           * incompatability or error packets, we may want to read a
-           * smaller packet.
+           * bytes_to_read is read.  Due to version incompatability or
+           * error packets, we may want to read a smaller packet.
            */
-          if ((n = read(fd,
-                        buf + bytes_read,
-                        bytes_to_read - bytes_read)) < 0)
+          if ((n = read(fd, buf + bytes_read, bytes_to_read - bytes_read)) < 0)
             {
               CEREBRO_DBG(("read: %s", strerror(errno)));
               handle->errnum = CEREBRO_ERR_INTERNAL;
@@ -435,7 +432,7 @@ _cerebro_metric_receive_data(cerebro_t handle,
         }
       else
         {
-          CEREBRO_DBG(("select returned bad data"));
+          CEREBRO_DBG(("num != 0 but fd not set"));
           handle->errnum = CEREBRO_ERR_INTERNAL;
           goto cleanup;
         }
