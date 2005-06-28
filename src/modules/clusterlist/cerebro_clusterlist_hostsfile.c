@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_hostsfile.c,v 1.27 2005-06-28 17:08:38 achu Exp $
+ *  $Id: cerebro_clusterlist_hostsfile.c,v 1.28 2005-06-28 21:26:52 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -25,10 +25,9 @@
 
 #include "cerebro_clusterlist_util.h"
 
+#include "debug.h"
 #include "fd.h"
 #include "list.h"
-
-#include "debug.h"
 
 #define HOSTSFILE_CLUSTERLIST_MODULE_NAME "hostsfile"
 #define HOSTSFILE_PARSE_BUFLEN            4096

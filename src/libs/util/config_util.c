@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: config_util.c,v 1.7 2005-06-27 21:22:23 achu Exp $
+ *  $Id: config_util.c,v 1.8 2005-06-28 21:26:52 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -17,9 +17,7 @@
 #include "config_util.h"
 
 #include "conffile.h"
-
 #include "config_module.h"
-
 #include "debug.h"
 
 #if CEREBRO_DEBUG

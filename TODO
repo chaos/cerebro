@@ -12,13 +12,10 @@ Cleanup
 - limit max number of metrics listener can parse
 - common receiving loop?
 - common receive data func?
-- common module loading func
 - no need to malloc values in heartbeats and destroy em??
 - packet buflen max len issue with number of metrics supportable
 - string length issue with packet buflen fixed in listener
 - type -> len function
-- header consistency
-- Makefile libs/include dirs consistency
 - check version earlier during unmarshalling, otherwise who knows what
 data you're unmarshalling.
 - static funcs don't need prefix rule

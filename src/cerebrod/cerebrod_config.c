@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.111 2005-06-28 21:15:01 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.112 2005-06-28 21:26:52 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -33,9 +33,7 @@
 #include "cerebrod_util.h"
 
 #include "config_util.h"
-
 #include "debug.h"
-
 #include "wrappers.h"
 
 #define MULTICAST_CLASS_MIN 224

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_util.c,v 1.5 2005-06-27 17:59:45 achu Exp $
+ *  $Id: cerebro_config_util.c,v 1.6 2005-06-28 21:26:52 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -18,11 +18,8 @@
 #include "cerebro/cerebro_config.h"
 
 #include "conffile.h"
-
 #include "config_module.h"
-
 #include "config_util.h"
-
 #include "debug.h"
 
 int 

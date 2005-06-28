@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.97 2005-06-28 19:47:22 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.98 2005-06-28 21:26:52 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -30,9 +30,7 @@
 #include "cerebrod_util.h"
 
 #include "clusterlist_module.h"
-
 #include "debug.h"
-
 #include "wrappers.h"
 
 extern struct cerebrod_config conf;
