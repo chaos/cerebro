@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_hostsfile.c,v 1.26 2005-06-27 04:44:49 achu Exp $
+ *  $Id: cerebro_clusterlist_hostsfile.c,v 1.27 2005-06-28 17:08:38 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -353,7 +353,7 @@ hostsfile_clusterlist_get_all_nodes(char ***nodes)
 
   if (!nodes)
     {     
-      CEREBRO_DBG(("nodes null"));
+      CEREBRO_DBG(("invalid parameters"));
       return -1;
     }
 
@@ -427,7 +427,7 @@ hostsfile_clusterlist_node_in_cluster(const char *node)
 
   if (!node)
     {     
-      CEREBRO_DBG(("node null"));
+      CEREBRO_DBG(("invalid parameters"));
       return -1;
     }
 
@@ -469,21 +469,9 @@ hostsfile_clusterlist_get_nodename(const char *node,
       return -1;
     }
 
-  if (!node)
-    {     
-      CEREBRO_DBG(("node null"));
-      return -1;
-    }
-
-  if (!buf)
-    {     
-      CEREBRO_DBG(("buf null"));
-      return -1;
-    }
-
-  if (!buflen)
+  if (!node || !buf || !buflen)
     {
-      CEREBRO_DBG(("buflen invalid"));
+      CEREBRO_DBG(("invalid parameters"));
       return -1;
     }
 
@@ -501,9 +489,7 @@ hostsfile_clusterlist_get_nodename(const char *node,
   else
     nodePtr = (char *)node;
 
-  return cerebro_clusterlist_copy_nodename(nodePtr, 
-                                           buf, 
-                                           buflen);
+  return cerebro_clusterlist_copy_nodename(nodePtr, buf, buflen);
 }
 
 struct cerebro_clusterlist_module_info clusterlist_module_info =

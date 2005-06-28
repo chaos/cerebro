@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_genders_util.c,v 1.18 2005-06-27 04:44:49 achu Exp $
+ *  $Id: cerebro_clusterlist_genders_util.c,v 1.19 2005-06-28 17:08:38 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -20,25 +20,25 @@
 #include "debug.h"
 
 int 
-cerebro_clusterlist_genders_setup(genders_t *handle)
+cerebro_clusterlist_genders_setup(genders_t *gh)
 {
-  if (!handle)
+  if (!gh)
     { 
-      CEREBRO_DBG(("handle null"));
+      CEREBRO_DBG(("gh null"));
       return -1;
     }
 
-  *handle = NULL;
+  *gh = NULL;
 
-  if (!(*handle = genders_handle_create()))
+  if (!(*gh = genders_handle_create()))
     {
       CEREBRO_DBG(("genders_handle_create"));
       goto cleanup;
     }
 
-  if (genders_load_data(*handle, NULL) < 0)
+  if (genders_load_data(*gh, NULL) < 0)
     {
-      if (genders_errnum(*handle) == GENDERS_ERR_OPEN)
+      if (genders_errnum(*gh) == GENDERS_ERR_OPEN)
 	{
 	  cerebro_err_output("genders database '%s' cannot be opened",  
                              GENDERS_DEFAULT_FILE);
@@ -46,7 +46,7 @@ cerebro_clusterlist_genders_setup(genders_t *handle)
 	}
       else
         {
-          CEREBRO_DBG(("genders_load_data: %s", genders_errormsg(*handle)));
+          CEREBRO_DBG(("genders_load_data: %s", genders_errormsg(*gh)));
           goto cleanup;
         }
     }
@@ -54,46 +54,46 @@ cerebro_clusterlist_genders_setup(genders_t *handle)
   return 0;
 
  cleanup:
-  if (*handle)
-    genders_handle_destroy(*handle);
-  *handle = NULL;
+  if (*gh)
+    genders_handle_destroy(*gh);
+  *gh = NULL;
   return -1;
 }
 
 int
-cerebro_clusterlist_genders_cleanup(genders_t *handle)
+cerebro_clusterlist_genders_cleanup(genders_t *gh)
 {
-  if (!handle)
+  if (!gh)
     {
-      CEREBRO_DBG(("handle null"));
+      CEREBRO_DBG(("gh null"));
       return -1;
     }
 
-  if (genders_handle_destroy(*handle) < 0)
+  if (genders_handle_destroy(*gh) < 0)
     {
-      CEREBRO_DBG(("genders_handle_destroy: %s", genders_errormsg(*handle)));
+      CEREBRO_DBG(("genders_handle_destroy: %s", genders_errormsg(*gh)));
       return -1;
     }
 
-  *handle = NULL;
+  *gh = NULL;
 
   return 0;
 }
 
 int 
-cerebro_clusterlist_genders_numnodes(genders_t handle)
+cerebro_clusterlist_genders_numnodes(genders_t gh)
 {
   int num;
 
-  if (!handle)
+  if (!gh)
     {
-      CEREBRO_DBG(("handle null"));
+      CEREBRO_DBG(("gh null"));
       return -1;
     }
 
-  if ((num = genders_getnumnodes(handle)) < 0)
+  if ((num = genders_getnumnodes(gh)) < 0)
     {
-      CEREBRO_DBG(("genders_getnumnodes: %s", genders_errormsg(handle)));
+      CEREBRO_DBG(("genders_getnumnodes: %s", genders_errormsg(gh)));
       return -1;
     }
 
@@ -101,15 +101,14 @@ cerebro_clusterlist_genders_numnodes(genders_t handle)
 }
 
 int
-cerebro_clusterlist_genders_get_all_nodes(genders_t handle, 
-                                          char ***nodes)
+cerebro_clusterlist_genders_get_all_nodes(genders_t gh, char ***nodes)
 {
   char **nodelist = NULL;
   int nodelistlen, numnodes;
   
-  if (!handle)
+  if (!gh)
     {
-      CEREBRO_DBG(("handle null"));
+      CEREBRO_DBG(("gh null"));
       return -1;
     }
 
@@ -119,19 +118,19 @@ cerebro_clusterlist_genders_get_all_nodes(genders_t handle,
       return -1;
     }
 
-  if ((nodelistlen = genders_nodelist_create(handle, &nodelist)) < 0)
+  if ((nodelistlen = genders_nodelist_create(gh, &nodelist)) < 0)
     {
-      CEREBRO_DBG(("genders_nodelist_create: %s", genders_errormsg(handle)));
+      CEREBRO_DBG(("genders_nodelist_create: %s", genders_errormsg(gh)));
       goto cleanup;
     }
   
-  if ((numnodes = genders_getnodes(handle, 
+  if ((numnodes = genders_getnodes(gh, 
 				   nodelist, 
 				   nodelistlen, 
 				   NULL, 
 				   NULL)) < 0)
     {
-      CEREBRO_DBG(("genders_getnodes: %s", genders_errormsg(handle)));
+      CEREBRO_DBG(("genders_getnodes: %s", genders_errormsg(gh)));
       goto cleanup;
     }
 
@@ -141,7 +140,7 @@ cerebro_clusterlist_genders_get_all_nodes(genders_t handle,
 
  cleanup:
   if (nodelist)
-    genders_nodelist_destroy(handle, nodelist);
+    genders_nodelist_destroy(gh, nodelist);
   return -1;
 }
 

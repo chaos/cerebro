@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_boottime.c,v 1.11 2005-06-27 05:05:20 achu Exp $
+ *  $Id: cerebro_metric_boottime.c,v 1.12 2005-06-28 17:08:38 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -160,21 +160,9 @@ boottime_metric_get_metric_value(unsigned int *metric_value_type,
                                  unsigned int *metric_value_len,
                                  void **metric_value)
 {
-  if (!metric_value_type)
+  if (!metric_value_type || !metric_value_len || !metric_value)
     {
-      CEREBRO_DBG(("metric_value_type null"));
-      return -1;
-    }
-
-  if (!metric_value_len)
-    {
-      CEREBRO_DBG(("metric_value_len null"));
-      return -1;
-    }
-
-  if (!metric_value)
-    {
-      CEREBRO_DBG(("metric_value null"));
+      CEREBRO_DBG(("invalid parameters"));
       return -1;
     }
 

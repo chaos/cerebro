@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_gendersllnl.c,v 1.24 2005-06-27 04:44:49 achu Exp $
+ *  $Id: cerebro_config_gendersllnl.c,v 1.25 2005-06-28 17:08:38 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -32,11 +32,11 @@ extern int h_errno;
 #define GENDERSLLNL_LARGE_CLUSTER_SIZE 512
 
 /*
- * gendersllnl_handle
+ * gh
  *
  * genders handle
  */
-static genders_t gendersllnl_handle = NULL;
+static genders_t gh = NULL;
 
 /*
  * gendersllnl_config_setup
@@ -46,21 +46,21 @@ static genders_t gendersllnl_handle = NULL;
 static int
 gendersllnl_config_setup(void)
 {
-  if (gendersllnl_handle)
+  if (gh)
     {
-      CEREBRO_DBG(("gendersllnl_handle non-null"));
+      CEREBRO_DBG(("gh non-null"));
       return 0;
     }
 
-  if (!(gendersllnl_handle = genders_handle_create()))
+  if (!(gh = genders_handle_create()))
     {
       CEREBRO_DBG(("genders_handle_create"));
       goto cleanup;
     }
  
-  if (genders_load_data(gendersllnl_handle, NULL) < 0)
+  if (genders_load_data(gh, NULL) < 0)
     {
-      if (genders_errnum(gendersllnl_handle) == GENDERS_ERR_OPEN)
+      if (genders_errnum(gh) == GENDERS_ERR_OPEN)
         {
           cerebro_err_output("genders database '%s' cannot be opened",
                              GENDERS_DEFAULT_FILE);
@@ -68,8 +68,7 @@ gendersllnl_config_setup(void)
         }
       else
         {
-          CEREBRO_DBG(("genders_load_data: %s",
-                       genders_errormsg(gendersllnl_handle)));
+          CEREBRO_DBG(("genders_load_data: %s", genders_errormsg(gh)));
           goto cleanup;
         }
     }
@@ -77,9 +76,9 @@ gendersllnl_config_setup(void)
   return 0;
 
  cleanup:
-  if (gendersllnl_handle)
-    genders_handle_destroy(gendersllnl_handle);
-  gendersllnl_handle = NULL;
+  if (gh)
+    genders_handle_destroy(gh);
+  gh = NULL;
   return -1;
 
 }
@@ -92,16 +91,15 @@ gendersllnl_config_setup(void)
 static int
 gendersllnl_config_cleanup(void)
 {
-  if (!gendersllnl_handle)
+  if (!gh)
     return 0;
 
-  if (genders_handle_destroy(gendersllnl_handle) < 0)
+  if (genders_handle_destroy(gh) < 0)
     {
-      CEREBRO_DBG(("genders_handle_destroy: %s",
-                   genders_errormsg(gendersllnl_handle)));
+      CEREBRO_DBG(("genders_handle_destroy: %s", genders_errormsg(gh)));
     }
 
-  gendersllnl_handle = NULL;
+  gh = NULL;
   return 0;
 }
 
@@ -122,33 +120,28 @@ gendersllnl_config_load_default(struct cerebro_config *conf)
   char altnamebuf[CEREBRO_MAX_NODENAME_LEN+1];
   int flag, numnodes;
 
-  if (!gendersllnl_handle)
+  if (!gh)
     {
-      CEREBRO_DBG(("gendersllnl_handle null"));
+      CEREBRO_DBG(("gh null"));
       return -1;
     }
 
   if (!conf)
     {
-      CEREBRO_DBG(("conf null"));
+      CEREBRO_DBG(("invalid parameters"));
       return -1;
     }
 
-  if ((numnodes = genders_getnumnodes(gendersllnl_handle)) < 0)
+  if ((numnodes = genders_getnumnodes(gh)) < 0)
     {
       CEREBRO_DBG(("genders_numnodes: %s", 
-                   genders_errormsg(gendersllnl_handle)));
+                   genders_errormsg(gh)));
       return -1;
     }
                                    
-  if ((flag = genders_testattr(gendersllnl_handle, 
-			       NULL, 
-			       "mgmt", 
-			       NULL, 
-			       0)) < 0)
+  if ((flag = genders_testattr(gh, NULL, "mgmt", NULL, 0)) < 0)
     {
-      CEREBRO_DBG(("genders_testattr: %s", 
-                   genders_errormsg(gendersllnl_handle)));
+      CEREBRO_DBG(("genders_testattr: %s", genders_errormsg(gh)));
       return -1;
     }
   
@@ -178,23 +171,20 @@ gendersllnl_config_load_default(struct cerebro_config *conf)
       conf->cerebrod_metric_server = 0;
       conf->cerebrod_metric_server_flag++;
 
-      if ((altnodelist_len = genders_altnodelist_create(gendersllnl_handle, 
-                                                        &altnodelist)) < 0)
+      if ((altnodelist_len = genders_altnodelist_create(gh, &altnodelist)) < 0)
 	{
-	  CEREBRO_DBG(("genders_altnodelist_create: %s",
-                       genders_errormsg(gendersllnl_handle)));
+	  CEREBRO_DBG(("genders_altnodelist_create: %s", genders_errormsg(gh)));
 	  return -1;
 	}
       
-      if ((mgmt_len = genders_getaltnodes_preserve(gendersllnl_handle,
+      if ((mgmt_len = genders_getaltnodes_preserve(gh,
                                                    altnodelist,
                                                    altnodelist_len,
                                                    "mgmt",
                                                    NULL)) < 0)
 	{
-	  CEREBRO_DBG(("genders_getnodes: %s",
-                       genders_errormsg(gendersllnl_handle)));
-	  genders_altnodelist_destroy(gendersllnl_handle, altnodelist);      
+	  CEREBRO_DBG(("genders_getnodes: %s", genders_errormsg(gh)));
+	  genders_altnodelist_destroy(gh, altnodelist);      
 	  return -1;
 	}
       
@@ -205,9 +195,8 @@ gendersllnl_config_load_default(struct cerebro_config *conf)
 	{
 	  if (strlen(altnodelist[i]) > CEREBRO_MAX_NODENAME_LEN)
 	    {
-	      CEREBRO_DBG(("genders_getnodes: %s",
-                           genders_errormsg(gendersllnl_handle)));
-	      genders_altnodelist_destroy(gendersllnl_handle, altnodelist);      
+	      CEREBRO_DBG(("genders_getnodes: %s", genders_errormsg(gh)));
+	      genders_altnodelist_destroy(gh, altnodelist);      
 	      return -1;
 	    }
 	  strcpy(conf->cerebro_hostnames[i], altnodelist[i]);
@@ -215,18 +204,17 @@ gendersllnl_config_load_default(struct cerebro_config *conf)
       conf->cerebro_hostnames_len = mgmt_len;
       conf->cerebro_hostnames_flag++;
       
-      genders_altnodelist_destroy(gendersllnl_handle, altnodelist);      
+      genders_altnodelist_destroy(gh, altnodelist);      
     }
   
   memset(altnamebuf, '\0', CEREBRO_MAX_NODENAME_LEN+1);
-  if ((flag = genders_testattr(gendersllnl_handle, 
+  if ((flag = genders_testattr(gh, 
 			       NULL, 
 			       GENDERS_ALTNAME_ATTRIBUTE,
 			       altnamebuf,
 			       CEREBRO_MAX_NODENAME_LEN)) < 0)
     {
-      CEREBRO_DBG(("genders_testattr: %s",
-                   genders_errormsg(gendersllnl_handle)));
+      CEREBRO_DBG(("genders_testattr: %s", genders_errormsg(gh)));
       return -1;
     }
 

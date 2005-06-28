@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_monitor_bootlog.c,v 1.14 2005-06-27 05:05:20 achu Exp $
+ *  $Id: cerebro_monitor_bootlog.c,v 1.15 2005-06-28 17:08:38 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -322,9 +322,9 @@ bootlog_monitor_metric_update(const char *nodename,
       return -1;
     }
 
-  if (!nodename)
+  if (!nodename || !metric_value)
     {
-      CEREBRO_DBG(("nodename null"));
+      CEREBRO_DBG(("invalid parameters"));
       return -1;
     }
 
@@ -337,12 +337,6 @@ bootlog_monitor_metric_update(const char *nodename,
   if (metric_value_len != sizeof(u_int32_t))
     {
       CEREBRO_DBG(("invalid metric_value_len: %d", metric_value_len));
-      return -1;
-    }
-
-  if (!metric_value)
-    {
-      CEREBRO_DBG(("metric_value null"));
       return -1;
     }
 

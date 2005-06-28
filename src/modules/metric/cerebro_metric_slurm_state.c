@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_slurm_state.c,v 1.5 2005-06-27 05:05:20 achu Exp $
+ *  $Id: cerebro_metric_slurm_state.c,v 1.6 2005-06-28 17:08:38 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -186,21 +186,9 @@ slurm_state_metric_get_metric_value(unsigned int *metric_value_type,
 {
   int rv;
 
-  if (!metric_value_type)
+  if (!metric_value_type || !metric_value_len || !metric_value)
     {
-      CEREBRO_DBG(("metric_value_type null"));
-      return -1;
-    }
-
-  if (!metric_value_len)
-    {
-      CEREBRO_DBG(("metric_value_len null"));
-      return -1;
-    }
-
-  if (!metric_value)
-    {
-      CEREBRO_DBG(("metric_value null"));
+      CEREBRO_DBG(("invalid parameters"));
       return -1;
     }
 
@@ -243,7 +231,6 @@ slurm_state_metric_destroy_metric_value(void *metric_value)
 static void *
 slurm_state_metric_thread(void *arg)
 {
-
   while (1)
     {
       struct sockaddr_un addr;

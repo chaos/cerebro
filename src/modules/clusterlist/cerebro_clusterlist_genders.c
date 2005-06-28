@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_genders.c,v 1.28 2005-06-27 04:44:49 achu Exp $
+ *  $Id: cerebro_clusterlist_genders.c,v 1.29 2005-06-28 17:08:38 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -26,11 +26,11 @@
 #define GENDERS_CLUSTERLIST_MODULE_NAME "genders"
 
 /*
- * genders_handle
+ * gh
  *
  * genders handle
  */
-static genders_t genders_handle = NULL;
+static genders_t gh = NULL;
 
 /*
  * genders_clusterlist_setup
@@ -40,13 +40,13 @@ static genders_t genders_handle = NULL;
 static int 
 genders_clusterlist_setup(void)
 {
-  if (genders_handle)
+  if (gh)
     {
-      CEREBRO_DBG(("genders_handle non-null"));
+      CEREBRO_DBG(("gh non-null"));
       return 0;
     }
 
-  return cerebro_clusterlist_genders_setup(&genders_handle);
+  return cerebro_clusterlist_genders_setup(&gh);
 }
 
 /*
@@ -57,10 +57,10 @@ genders_clusterlist_setup(void)
 static int
 genders_clusterlist_cleanup(void)
 {
-  if (!genders_handle)
+  if (!gh)
     return 0;
 
-  return cerebro_clusterlist_genders_cleanup(&genders_handle);
+  return cerebro_clusterlist_genders_cleanup(&gh);
 }
 
 /*
@@ -71,13 +71,13 @@ genders_clusterlist_cleanup(void)
 static int 
 genders_clusterlist_numnodes(void)
 {
-  if (!genders_handle)
+  if (!gh)
     {
-      CEREBRO_DBG(("genders_handle null"));
+      CEREBRO_DBG(("gh null"));
       return -1;
     }
 
-  return cerebro_clusterlist_genders_numnodes(genders_handle);
+  return cerebro_clusterlist_genders_numnodes(gh);
 }
 
 /*
@@ -88,20 +88,19 @@ genders_clusterlist_numnodes(void)
 static int
 genders_clusterlist_get_all_nodes(char ***nodes)
 {
-  if (!genders_handle)
+  if (!gh)
     {
-      CEREBRO_DBG(("genders_handle null"));
+      CEREBRO_DBG(("gh null"));
       return -1;
     }
 
   if (!nodes)
     {
-      CEREBRO_DBG(("nodes null"));
+      CEREBRO_DBG(("invalid parameters"));
       return -1;
     }
   
-  return cerebro_clusterlist_genders_get_all_nodes(genders_handle, 
-                                                   nodes);
+  return cerebro_clusterlist_genders_get_all_nodes(gh, nodes);
 }
 
 /*
@@ -116,15 +115,15 @@ genders_clusterlist_node_in_cluster(const char *node)
   char *nodePtr = NULL;
   int flag;
 
-  if (!genders_handle)
+  if (!gh)
     {
-      CEREBRO_DBG(("genders_handle null"));
+      CEREBRO_DBG(("gh null"));
       return -1;
     }
 
   if (!node)
     {
-      CEREBRO_DBG(("node null"));
+      CEREBRO_DBG(("invalid parameters"));
       return -1;
     }
 
@@ -142,9 +141,9 @@ genders_clusterlist_node_in_cluster(const char *node)
   else
     nodePtr = (char *)node;
 
-  if ((flag = genders_isnode(genders_handle, nodePtr)) < 0)
+  if ((flag = genders_isnode(gh, nodePtr)) < 0)
     {
-      CEREBRO_DBG(("genders_isnode: %s", genders_errormsg(genders_handle)));
+      CEREBRO_DBG(("genders_isnode: %s", genders_errormsg(gh)));
       return -1;
     }
 
@@ -164,27 +163,15 @@ genders_clusterlist_get_nodename(const char *node,
   char nodebuf[CEREBRO_MAX_NODENAME_LEN+1];
   char *nodePtr = NULL;
 
-  if (!genders_handle)
+  if (!gh)
     {
-      CEREBRO_DBG(("genders_handle null"));
+      CEREBRO_DBG(("gh null"));
       return -1;
     }
 
-  if (!node)
+  if (!node || !buf || !buflen)
     {
-      CEREBRO_DBG(("node null"));
-      return -1;
-    }
-
-  if (!buf)
-    {
-      CEREBRO_DBG(("buf invalid"));
-      return -1;
-    }
-
-  if (!buflen)
-    {
-      CEREBRO_DBG(("buflen invalid"));
+      CEREBRO_DBG(("invalid parameters"));
       return -1;
     }
   
@@ -202,9 +189,7 @@ genders_clusterlist_get_nodename(const char *node,
   else
     nodePtr = (char *)node;
 
-  return cerebro_clusterlist_copy_nodename(nodePtr, 
-                                           buf, 
-                                           buflen);
+  return cerebro_clusterlist_copy_nodename(nodePtr, buf, buflen);
 }
 
 struct cerebro_clusterlist_module_info clusterlist_module_info =
