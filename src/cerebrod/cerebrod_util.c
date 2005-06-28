@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_util.c,v 1.24 2005-06-28 00:32:12 achu Exp $
+ *  $Id: cerebrod_util.c,v 1.25 2005-06-28 22:42:01 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -23,15 +23,6 @@
 extern struct cerebrod_config conf;
 
 #define CEREBROD_REINITIALIZE_TIME 2
-
-int 
-list_find_first_string(void *x, void *key)
-{
-  assert(x);
-  assert(key);
-
-  return (!strcmp((char *)x, (char *)key)) ? 1 : 0;
-}
 
 /* 
  * _hash_removeall

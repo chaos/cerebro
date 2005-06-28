@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric.c,v 1.55 2005-06-28 21:26:52 achu Exp $
+ *  $Id: cerebrod_metric.c,v 1.56 2005-06-28 22:42:01 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -34,7 +34,7 @@ extern pthread_mutex_t debug_output_mutex;
 #endif /* CEREBRO_DEBUG */
 
 extern List cerebrod_listener_data_list;
-extern List cerebrod_metric_name_list;
+extern hash_t cerebrod_metric_name_index;
 extern hash_t cerebrod_listener_data_index;
 extern int cerebrod_listener_data_index_numnodes;
 extern int cerebrod_listener_data_index_size;
@@ -564,7 +564,7 @@ _metric_name_response_create(char *metric_name, List metric_name_responses)
 }
 
 /*  
- * _metric_name_list_callback
+ * _metric_name_index_callback
  *
  * Callback function for list_for_each, to determine if a node data
  * should be sent.
@@ -572,7 +572,7 @@ _metric_name_response_create(char *metric_name, List metric_name_responses)
  * Return 0 on success, -1 on error
  */
 static int
-_metric_name_list_callback(void *x, void *arg)
+_metric_name_index_callback(void *data, const void *key, void *arg)
 {
   struct cerebrod_metric_name_evaluation_data *ed;
   char *metric_name;
@@ -580,10 +580,10 @@ _metric_name_list_callback(void *x, void *arg)
   int rv;
 #endif /* CEREBRO_DEBUG */
 
-  assert(x);
+  assert(data);
   assert(arg);
 
-  metric_name = (char *)x;
+  metric_name = (char *)data;
   ed = (struct cerebrod_metric_name_evaluation_data *)arg;
   
 #if CEREBRO_DEBUG
@@ -617,7 +617,7 @@ _respond_with_metric_names(int client_fd, struct cerebro_metric_request *req)
   memset(&ed, '\0', sizeof(struct cerebrod_metric_name_evaluation_data));
   Pthread_mutex_lock(&cerebrod_metric_name_lock);
   
-  if (!List_count(cerebrod_metric_name_list))
+  if (!Hash_count(cerebrod_metric_name_index))
     {
       Pthread_mutex_unlock(&cerebrod_metric_name_lock);
       goto end_response;
@@ -636,8 +636,8 @@ _respond_with_metric_names(int client_fd, struct cerebro_metric_request *req)
   ed.client_fd = client_fd;
   ed.metric_name_responses = metric_name_responses;
 
-  if (list_for_each(cerebrod_metric_name_list,
-		    _metric_name_list_callback, 
+  if (Hash_for_each(cerebrod_metric_name_index,
+		    _metric_name_index_callback, 
 		    &ed) < 0)
     {
       Pthread_mutex_unlock(&cerebrod_metric_name_lock);
@@ -1084,9 +1084,7 @@ _metric_service_connection(void *arg)
   memcpy(metric_name_buf, req.metric_name, CEREBRO_MAX_METRIC_NAME_LEN);
 
   Pthread_mutex_lock(&cerebrod_metric_name_lock);
-  if (!List_find_first(cerebrod_metric_name_list, 
-                       list_find_first_string,
-                       metric_name_buf))
+  if (!Hash_find(cerebrod_metric_name_index, metric_name_buf))
     {
       Pthread_mutex_unlock(&cerebrod_metric_name_lock);
       _metric_respond_with_error(client_fd,
@@ -1095,10 +1093,10 @@ _metric_service_connection(void *arg)
       goto cleanup;
     }
   Pthread_mutex_unlock(&cerebrod_metric_name_lock);
-
+  
   if (!req.timeout_len)
     req.timeout_len = CEREBRO_METRIC_TIMEOUT_LEN_DEFAULT;
-
+  
   if (!strcmp(metric_name_buf, CEREBRO_METRIC_METRIC_NAMES))
     {
       if (_respond_with_metric_names(client_fd, &req) < 0)

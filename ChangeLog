@@ -3,6 +3,9 @@
 	* Continued bug fixes and code cleanup.
 
 	* Updated manpages.
+
+	* Performance improvement through use of index instead of list for
+	metric names.
 	
 2005-06-27  Albert Chu  <chu11@llnl.gov>
 
