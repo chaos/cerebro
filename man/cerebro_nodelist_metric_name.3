@@ -1,18 +1,17 @@
 \."#############################################################################
-\."$Id: cerebro_nodelist_metric_name.3,v 1.8 2005-06-28 20:58:32 achu Exp $
+\."$Id: cerebro_nodelist_metric_name.3,v 1.9 2005-06-28 22:14:12 achu Exp $
 \."#############################################################################
 .TH CEREBRO_NODELIST_METRIC_NAME 3 "May 2005" "LLNL" "LIBCEREBRO"
 .SH "NAME"
 cerebro_nodelist_metric_name, cerebro_nodelist_length,
 cerebro_nodelist_destroy, cerebro_nodelist_iterator_create,
-cerebro_nodelist_iterator_next, cerebro_nodelist_iterator_reset,
-cerebro_nodelist_iterator_at_end, cerebro_nodelist_iterator_nodename,
+cerebro_nodelist_iterator_nodename,
 cerebro_nodelist_iterator_metric_value,
-cerebro_nodelist_iterator_destroy \- cerebro nodelist routines
+cerebro_nodelist_iterator_next, cerebro_nodelist_iterator_reset,
+cerebro_nodelist_iterator_at_end, cerebro_nodelist_iterator_destroy \-
+cerebro nodelist routines
 .SH "SYNOPSIS"
 .B #include <cerebro.h>
-.sp
-.B "typedef int (*Cerebro_for_each)(char *nodename, unsigned int metric_value_type, unsigned int metric_value_len, void *metric_value, void *arg);"
 .sp
 .BI "char *cerebro_nodelist_metric_name(cerebro_nodelist_t nodelist);
 .sp
@@ -91,9 +90,6 @@ nodelist is returned on success.  On error, -1 is returned.
 For \fBcerebro_nodelist_length\fR, the length of the list is returned
 on success.  On error, -1 is returned.
 
-For \fBcerebro_nodelist_find\fR, 1 is returned if the node is found, 0
-if not.  On error, -1 is returned.
-
 For \fBcerebro_nodelist_iterator_create\fR, a cerebro nodelist
 iterator is returned on success.  On error, NULL is returned.
 
@@ -121,7 +117,7 @@ On errors, an error code is returned in \fInodelist\fR or
 .TP
 .B CEREBRO_ERR_NULLNODELIST
 The \fInodelist\fR parameter is NULL.
-.B CEREBRO_ERR_NULLITERATOR
+.B CEREBRO_ERR_NULLNODELIST_ITERATOR
 The \fInodelistItr\fR parameter is NULL.
 .TP
 .B CEREBRO_ERR_MAGIC_NUMBER

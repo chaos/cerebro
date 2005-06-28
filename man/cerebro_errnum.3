@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro_errnum.3,v 1.3 2005-06-01 16:40:23 achu Exp $
+\."$Id: cerebro_errnum.3,v 1.4 2005-06-28 22:14:12 achu Exp $
 \."#############################################################################
 .TH CEREBRO_ERRNUM 3 "May 2005" "LLNL" "LIBCEREBRO"
 .SH "NAME"
@@ -9,6 +9,10 @@ cerebro error routines
 .B #include <cerebro.h>
 .sp
 .BI "int cerebro_errnum(cerebro_t handle);"
+.sp
+.BI "int cerebro_metriclist_errnum(cerebro_metriclist_t metriclist);"
+.sp
+.BI "int cerebro_metriclist_iterator_errnum(cerebro_metriclist_iterator_t handle);"
 .sp
 .BI "int cerebro_nodelist_errnum(cerebro_nodelist_t nodelist);"
 .sp
@@ -20,20 +24,29 @@ cerebro error routines
 \fBcerebro_errnum()\fR returns the error code stored in the cerebro_t
 handle passed in.
 
-\fBcerebro_nodelist_errnum()\fR returns the error code stored in the cerebro_nodelist_t
-nodelist passed in.
+\fBcerebro_metriclist_errnum()\fR returns the error code stored in the
+cerebro_metriclist_t passed in.
 
-\fBcerebro_nodelist_iterator_errnum()\fR returns the error code stored in the cerebro_nodelist_iterator_t
-nodelist passed in.
+\fBcerebro_metriclist_iterator_errnum()\fR returns the error code
+stored in the cerebro_metriclist_iterator_t passed in.
+
+\fBcerebro_nodelist_errnum()\fR returns the error code stored in the
+cerebro_nodelist_t passed in.
+
+\fBcerebro_nodelist_iterator_errnum()\fR returns the error code stored
+in the cerebro_nodelist_iterator_t passed in.
 
 \fBcerebro_strerror()\fR returns a pointer to a string describing the
 error code \fIerrnum\fR.
 
-Generally, an error code is retrieved by
-\fBcerebro_errnum()\fR, \fBcerebro_nodelist_errnum()\fR, or
+Generally, an error code is retrieved by calling
+\fBcerebro_errnum()\fR, 
+\fBcerebro_metriclist_errnum()\fR,
+\fBcerebro_metriclist_iterator_errnum()
+\fBcerebro_nodelist_errnum()\fR, or
 \fBcerebro_nodelist_iterator_errnum()
 and then passed to 
-\fBcerebro_strerror()\fR.
+\fBcerebro_strerror()\fR to retrieve a string describing the error.
 
 .br
 .SH "FILES"

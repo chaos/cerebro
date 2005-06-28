@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.7 2005-06-28 20:58:32 achu Exp $
+ *  $Id: cerebro.h,v 1.8 2005-06-28 22:14:12 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_H
@@ -291,8 +291,8 @@ cerebro_metriclist_iterator_t cerebro_metriclist_iterator_create(cerebro_metricl
  *
  * Returns 0 on success, -1 on error
  */
-int cerebro_metriclist_iterator_nodename(cerebro_metriclist_iterator_t metriclistItr, 
-                                         char **metric_name);
+int cerebro_metriclist_iterator_metric_name(cerebro_metriclist_iterator_t metriclistItr, 
+                                            char **metric_name);
 
 /*
  * cerebro_metriclist_iterator_next

@@ -1,48 +1,31 @@
 \."#############################################################################
-\."$Id: cerebro_get_metric_data.3,v 1.9 2005-06-28 22:14:12 achu Exp $
+\."$Id: cerebro_get_metric_names.3,v 1.1 2005-06-28 22:14:12 achu Exp $
 \."#############################################################################
-.TH CEREBRO_GET_METRIC_DATA 3 "May 2005" "LLNL" "LIBCEREBRO"
+.TH CEREBRO_GET_METRIC_NAMES 3 "May 2005" "LLNL" "LIBCEREBRO"
 .SH "NAME"
-cerebro_get_metric_data \- retrieve cerebro metric data
+cerebro_get_metric_names \- retrieve available cerebro metric names
 .SH "SYNOPSIS"
 .B #include <cerebro.h>
 .sp
-.BI "cerebro_nodelist_t cerebro_get_metric_data(cerebro_t handle, const char *metric_name);"
+.BI "cerebro_metriclist_t cerebro_get_metric_names(cerebro_t handle);"
 .br
 .SH "DESCRIPTION"
-\fBcerebro_get_metric_data()\fR retrieves metric data for the metric 
-\fImetric_name\fR from
-the 
-.B cerebrod
-metric server and returns it in a cerebro nodelist.  The cerebro
-nodelist can then be operated on by the cerebro nodelist routines.
+\fBcerebro_get_metric_names()\fR retrieves a list of metric names available for 
+retrieval with
+.B cerebro_get_metric_data(3).
+The metric names are returned in a cerebro metriclist.  The cerebro
+metriclist can then be operated on by the cerebro metriclist routines.
 
-The default behavior of \fBcerebro_get_metric_data()\fR can be altered by
+The default behavior of \fBcerebro_get_metric_names()\fR can be altered by
 setting alternate defaults using
 .B cerebro_set_hostname(3),
-.B cerebro_set_port(3),
-.B cerebro_set_timeout_len(3),
 or
-.B cerebro_set_flags(3).  It can also be altered using the the cerebro
-configuration file.
-
-The default metrics available through the
-.B cerebrod
-metric server are:
-
-CEREBRO_METRIC_CLUSTER_NODES - Retrieve all nodes known to 
-.B cerebrod.  
-No metric value is returned for this metric.
-
-CEREBRO_METRIC_UPDOWN_STATE - Retrieve the up vs. down state of all
-nodes in the cluster.  The metric type returned for this metric is a
-CEREBRO_METRIC_VALUE_TYPE_U_INT32.  The value is set to
-CEREBRO_METRIC_UPDOWN_STATE_NODE_UP if the node is up and set to
-CEREBRO_METRIC_UPDOWN_STATE_NODE_DOWN if the node is down.
+.B cerebro_set_port(3).  
+It can also be altered using the the cerebro configuration file.
 
 .br
 .SH "RETURN VALUES"
-On success, a cerebro nodelist is returned.  On error, NULL is
+On success, a cerebro metriclist is returned.  On error, NULL is
 returned, and an error code is returned in \fIhandle\fR.  The error
 code can be retrieved via
 .BR cerebro_errnum(3)
@@ -95,9 +78,6 @@ A config module error occurred.
 .B CEREBRO_ERR_CONFIG_INPUT
 A config input is invalid.
 .TP
-.B CEREBRO_ERR_CLUSTERLIST_MODULE
-A clusterlist module error occurred.
-.TP
 .B CEREBRO_ERR_OUTMEM
 Out of memory.
 .TP
@@ -109,11 +89,9 @@ An internal system error occurred.
 .SH "SEE ALSO"
 cerebro_handle_create(3), cerebro_errnum(3), cerebro_strerror(3),
 cerebro_set_hostname(3), cerebro_set_port(3),
-cerebro_set_timeout_len(3), cerebro_set_flags(3),
-cerebro_nodelist_metric_name(3), cerebro_nodelist_length(3),
-cerebro_nodelist_destroy(3), cerebro_nodelist_iterator_create(3),
-cerebro_nodelist_iterator_nodename(3),
-cerebro_nodelist_iterator_metric_value(3),
-cerebro_nodelist_iterator_next(3), cerebro_nodelist_iterator_reset(3),
-cerebro_nodelist_iterator_at_end(3),
-cerebro_nodelist_iterator_destroy(3), cerebro.conf(5)
+cerebro_metriclist_length(3),
+cerebro_metriclist_destroy(3), cerebro_metriclist_iterator_create(3),
+cerebro_metriclist_iterator_metric_name(3),
+cerebro_metriclist_iterator_next(3), cerebro_metriclist_iterator_reset(3),
+cerebro_metriclist_iterator_at_end(3),
+cerebro_metriclist_iterator_destroy(3), cerebro.conf(5)

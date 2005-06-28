@@ -1,0 +1,111 @@
+\."#############################################################################
+\."$Id: cerebro_metriclist_length.3,v 1.1 2005-06-28 22:14:12 achu Exp $
+\."#############################################################################
+.TH CEREBRO_METRICLIST_METRIC_NAME 3 "May 2005" "LLNL" "LIBCEREBRO"
+.SH "NAME"
+cerebro_metriclist_metric_name, cerebro_metriclist_length,
+cerebro_metriclist_destroy, cerebro_metriclist_iterator_create,
+cerebro_metriclist_iterator_metric_name,
+cerebro_metriclist_iterator_next, cerebro_metriclist_iterator_reset,
+cerebro_metriclist_iterator_at_end,
+cerebro_metriclist_iterator_destroy \- cerebro metriclist routines
+.SH "SYNOPSIS"
+.B #include <cerebro.h>
+.sp
+.BI "char *cerebro_metriclist_metric_name(cerebro_metriclist_t metriclist);
+.sp
+.BI "int cerebro_metriclist_length(cerebro_metriclist_t metriclist);
+.sp
+.BI "int cerebro_metriclist_destroy(cerebro_metriclist_t metriclist);"
+.sp
+.BI "cerebro_metriclist_iterator_t cerebro_metriclist_iterator_create(cerebro_metriclist_t metriclist);"
+.sp
+.BI "int cerebro_metriclist_iterator_metric_name(cerebro_metriclist_iterator_t metriclistItr, char **metric_name);"
+.sp
+.BI "int cerebro_metriclist_iterator_next(cerebro_metriclist_iterator_t metriclistItr);"
+.sp
+.BI "int cerebro_metriclist_iterator_reset(cerebro_metriclist_iterator_t metriclistItr);"
+.sp
+.BI "int cerebro_metriclist_iterator_at_end(cerebro_metriclist_iterator_t metriclistItr);"
+.sp
+.BI "int cerebro_metriclist_iterator_destroy(cerebro_metriclist_iterator_t metriclistItr);"
+.br
+.SH "DESCRIPTION"
+\fBcerebro_metriclist_length\fR retrieves the number of metric names
+stored in the metriclist.
+
+\fBcerebro_metriclist_destroy\fR destroys the cerebro metriclist pointed
+by \fImetriclist\fR.  All metriclist iterators created using the indicated
+metriclist will also be destroyed.
+
+\fBcerebro_metriclist_iterator_create\fR creates a cerebro metriclist iterator.
+
+\fBcerebro_metriclist_iterator_metric_name\fR returns the metric_name
+currently pointed at in the iterator.
+
+\fBcerebro_metriclist_iterator_next\fR moves the iterator pointer forward.
+
+\fBcerebro_metriclist_iterator_reset\fR resets the iterator pointer back
+to the beginning.
+
+\fBcerebro_metriclist_iterator_at_end\fR returns a flag indicating if
+the end of the metriclist has been reached.
+
+\fBcerebro_metriclist_iterator_destroy\fR destroys the cerebro metriclist
+iterator pointed by \fImetriclistItr\fR.
+
+.br
+.SH "RETURN VALUES"
+For \fBcerebro_metriclist_length\fR, the length of the list is returned
+on success.  On error, -1 is returned.
+
+For \fBcerebro_metriclist_iterator_create\fR, a cerebro metriclist
+iterator is returned on success.  On error, NULL is returned.
+
+For \fBcerebro_metriclist_iterator_next\fR, 1 is returned if more data
+exists, 0 if not, On error, -1 is returned.
+
+For \fBcerebro_metriclist_iterator_at_end\fR, 1 is returned if the end
+of the list has been reached, 0 if not.  On error, -1 is returned.
+
+For fBcerebro_metriclist_destroy\fR,
+\fBcerebro_metriclist_iterator_metric_name\fR,
+\fBcerebro_metriclist_iterator_reset\fR, and
+\fBcerebro_metriclist_iterator_destroy\fR, 0 is returned on success.  On
+error -1 is returned.
+
+On errors, an error code is returned in \fImetriclist\fR or
+\fImetriclistItr\fR.  The error code can be retrieved via
+.BR cerebro_metriclist_errnum(3) or
+.BR cerebro_metriclist_iterator_errnum(3) respectively
+, and a description of the error code can be retrieved via
+.BR cerebro_strerror(3).  
+.br
+.SH "ERRORS"
+.TP
+.B CEREBRO_ERR_NULLMETRICLIST
+The \fImetriclist\fR parameter is NULL.
+.B CEREBRO_ERR_NULLMETRICLIST_ITERATOR
+The \fImetriclistItr\fR parameter is NULL.
+.TP
+.B CEREBRO_ERR_MAGIC_NUMBER
+\fImetriclist\fR or \fImetriclistItr\fR has an incorrect magic number.
+\fImetriclist\fR or \fImetriclistItr\fR does not point to a an appropriate
+structure or has already been destroyed.
+.TP
+.B CEREBRO_ERR_PARAMETERS
+Invalid parameter passed in.
+.TP
+.B CEREBRO_ERR_END_OF_LIST
+The end of the list has been reached.
+.TP
+.B CEREBRO_ERR_OUTMEM
+Out of memory.
+.TP
+.B CEREBRO_ERR_INTERNAL
+An internal system error occurred.
+.br
+.SH "FILES"
+/usr/include/cerebro.h
+.SH "SEE ALSO"
+cerebro_errnum(3), cerebro_strerror(3)
