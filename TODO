@@ -7,6 +7,8 @@ Testing
 - api again
 
 Cleanup
+- merge metric_names and metric_data stuff better after new version unmarshall/check code inserted
+- get_metric_names && metriclist manpages
 - limit max number of metrics listener can parse
 - common receiving loop?
 - common receive data func?

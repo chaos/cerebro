@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metriclist.c,v 1.2 2005-06-27 17:59:45 achu Exp $
+ *  $Id: cerebro_metriclist.c,v 1.3 2005-06-28 20:58:32 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -143,16 +143,9 @@ _cerebro_metriclist_iterator_check(cerebro_metriclist_iterator_t metriclistItr)
       || metriclistItr->magic != CEREBRO_METRICLIST_ITERATOR_MAGIC_NUMBER)
     return -1;
 
-  if (!metriclistItr->itr)
+  if (!metriclistItr->itr || !metriclistItr->metriclist)
     {
-      CEREBRO_DBG(("itr null"));
-      metriclistItr->errnum = CEREBRO_ERR_INTERNAL;
-      return -1;
-    }
-
-  if (!metriclistItr->metriclist)
-    {
-      CEREBRO_DBG(("metriclist null"));
+      CEREBRO_DBG(("invalid metriclist iterator data"));
       metriclistItr->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
@@ -170,7 +163,7 @@ _cerebro_metriclist_iterator_check(cerebro_metriclist_iterator_t metriclistItr)
 
 int 
 cerebro_metriclist_iterator_metric_name(cerebro_metriclist_iterator_t metriclistItr,
-                                     char **metric_name)
+                                        char **metric_name)
 {
   if (_cerebro_metriclist_iterator_check(metriclistItr) < 0)
     return -1;

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_nodelist.c,v 1.5 2005-06-27 17:59:45 achu Exp $
+ *  $Id: cerebro_nodelist.c,v 1.6 2005-06-28 20:58:32 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -42,138 +42,6 @@ cerebro_nodelist_length(cerebro_nodelist_t nodelist)
   
   nodelist->errnum = CEREBRO_ERR_SUCCESS;
   return list_count(nodelist->nodes);
-}
-
-/* 
- * _cerebro_nodelist_find_func
- *
- * Callback function to find node in nodelist.
- *
- * Returns 1 on match, 0 on no match 
- */
-int
-_cerebro_nodelist_find_func(void *x, void *key)
-{
-  if (!x || !key)
-    return 0;
-
-  return (!strcmp((char *)x, (char *)key) ? 1 : 0);
-}
-
-int 
-cerebro_nodelist_find(cerebro_nodelist_t nodelist, 
-		      const char *node,
-                      unsigned int *metric_value_type,
-                      unsigned int *metric_value_len,
-                      void **metric_value)
-{
-  struct cerebro_nodelist_data *nd;
-  char nodebuf[CEREBRO_MAX_NODENAME_LEN+1];
-  char *nodename;
-
-  if (_cerebro_nodelist_check(nodelist) < 0)
-    return -1;
-
-  if (!node)
-    {
-      nodelist->errnum = CEREBRO_ERR_PARAMETERS;
-      return -1;
-    }
-
-  if (nodelist->handle->loaded_state & CEREBRO_CLUSTERLIST_MODULE_LOADED)
-    {
-      int flag;
-      
-      if ((flag = clusterlist_module_node_in_cluster(nodelist->handle->clusterlist_handle,
-						     node)) < 0)
-        {
-          CEREBRO_DBG(("clusterlist_module_node_in_cluster"));
-          nodelist->errnum = CEREBRO_ERR_INTERNAL;
-          return -1;
-        }
-
-      if (!flag)
-        {
-          nodelist->errnum = CEREBRO_ERR_NODE_NOTFOUND;
-          return -1;
-        }
-      
-      memset(nodebuf, '\0', CEREBRO_MAX_NODENAME_LEN+1);
-
-      if (clusterlist_module_get_nodename(nodelist->handle->clusterlist_handle,
-					  node,
-					  nodebuf,
-					  CEREBRO_MAX_NODENAME_LEN+1) < 0)
-        {
-          CEREBRO_DBG(("clusterlist_module_get_nodename"));
-          nodelist->errnum = CEREBRO_ERR_INTERNAL;
-          return -1;
-        }
-
-      nodename = nodebuf;
-    }
-  else
-    nodename = (char *)node;
-
-  nodelist->errnum = CEREBRO_ERR_SUCCESS;
-  nd = list_find_first(nodelist->nodes,
-                       _cerebro_nodelist_find_func,
-                       (void *)nodename);
-
-  if (nd)
-    {
-      if (metric_value_type)
-        *metric_value_type = nd->metric_value_type;
-
-      if (metric_value_len)
-        *metric_value_len = nd->metric_value_len;
-
-      if (metric_value)
-        *metric_value = nd->metric_value;
-    }
-
-  return (nd) ? 1 : 0;
-}
-
-int 
-cerebro_nodelist_for_each(cerebro_nodelist_t nodelist,
-                          Cerebro_for_each for_each,
-                          void *arg)
-{
-  struct cerebro_nodelist_data *nd;
-  ListIterator itr = NULL;
-
-  if (_cerebro_nodelist_check(nodelist) < 0)
-    return -1;
-
-  if (!for_each)
-    {
-      nodelist->errnum = CEREBRO_ERR_PARAMETERS;
-      return -1;
-    }
-  
-  if (!(itr = list_iterator_create(nodelist->nodes)))
-    {
-      nodelist->errnum = CEREBRO_ERR_OUTMEM;
-      goto cleanup;
-    }
-
-  while ((nd = list_next(itr)))
-    {
-      if (for_each(nd->nodename, 
-                   nd->metric_value_type,
-                   nd->metric_value_len,
-                   nd->metric_value, 
-                   arg) < 0)
-	goto cleanup;
-    }
-
-  list_iterator_destroy(itr);
-  return 0;
- cleanup:
-  if (itr)
-    list_iterator_destroy(itr);
-  return -1;
 }
 
 int 
@@ -288,20 +156,13 @@ _cerebro_nodelist_iterator_check(cerebro_nodelist_iterator_t nodelistItr)
       || nodelistItr->magic != CEREBRO_NODELIST_ITERATOR_MAGIC_NUMBER)
     return -1;
 
-  if (!nodelistItr->itr)
+  if (!nodelistItr->itr || !nodelistItr->nodelist)
     {
-      CEREBRO_DBG(("itr null"));
+      CEREBRO_DBG(("invalid metriclist iterator data"));
       nodelistItr->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
 
-  if (!nodelistItr->nodelist)
-    {
-      CEREBRO_DBG(("nodelist null"));
-      nodelistItr->errnum = CEREBRO_ERR_INTERNAL;
-      return -1;
-    }
-  
   if (nodelistItr->nodelist->magic != CEREBRO_NODELIST_MAGIC_NUMBER)
     {
       CEREBRO_DBG(("nodelist destroyed"));

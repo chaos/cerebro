@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metriclist_util.c,v 1.4 2005-06-27 17:59:45 achu Exp $
+ *  $Id: cerebro_metriclist_util.c,v 1.5 2005-06-28 20:58:32 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -25,35 +25,23 @@ _cerebro_metriclist_check(cerebro_metriclist_t metriclist)
 {
   if (!metriclist || metriclist->magic != CEREBRO_METRICLIST_MAGIC_NUMBER)
     return -1;
-
-  if (!metriclist->metric_names)
+                                                                                      
+  if (!metriclist->metric_names
+      || !metriclist->iterators
+      || !metriclist->handle)
     {
-      CEREBRO_DBG(("metriclist null"));
+      CEREBRO_DBG(("invalid metriclist data"));
       metriclist->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
-
-  if (!metriclist->iterators)
-    {
-      CEREBRO_DBG(("iterators null"));
-      metriclist->errnum = CEREBRO_ERR_INTERNAL;
-      return -1;
-    }
-
-  if (!metriclist->handle)
-    {
-      CEREBRO_DBG(("handle null"));
-      metriclist->errnum = CEREBRO_ERR_INTERNAL;
-      return -1;
-    }
-
+                                                                                      
   if (metriclist->handle->magic != CEREBRO_MAGIC_NUMBER)
     {
       CEREBRO_DBG(("handle destroyed"));
       metriclist->errnum = CEREBRO_ERR_MAGIC_NUMBER;
       return -1;
     }
-
+                                                                                      
   return 0;
 }
 
@@ -110,7 +98,7 @@ _cerebro_metriclist_create(cerebro_t handle)
 }
 
 int 
-_cerebro_metriclist_append(cerebro_metriclist_t metriclist,
+_cerebro_metriclist_append(cerebro_metriclist_t metriclist, 
                            const char *metric_name)
 {
   char *str;

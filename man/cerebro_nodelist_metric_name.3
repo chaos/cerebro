@@ -1,10 +1,9 @@
 \."#############################################################################
-\."$Id: cerebro_nodelist_metric_name.3,v 1.7 2005-06-22 20:30:09 achu Exp $
+\."$Id: cerebro_nodelist_metric_name.3,v 1.8 2005-06-28 20:58:32 achu Exp $
 \."#############################################################################
 .TH CEREBRO_NODELIST_METRIC_NAME 3 "May 2005" "LLNL" "LIBCEREBRO"
 .SH "NAME"
 cerebro_nodelist_metric_name, cerebro_nodelist_length,
-cerebro_nodelist_find, cerebro_nodelist_for_each,
 cerebro_nodelist_destroy, cerebro_nodelist_iterator_create,
 cerebro_nodelist_iterator_next, cerebro_nodelist_iterator_reset,
 cerebro_nodelist_iterator_at_end, cerebro_nodelist_iterator_nodename,
@@ -18,10 +17,6 @@ cerebro_nodelist_iterator_destroy \- cerebro nodelist routines
 .BI "char *cerebro_nodelist_metric_name(cerebro_nodelist_t nodelist);
 .sp
 .BI "int cerebro_nodelist_length(cerebro_nodelist_t nodelist);
-.sp
-.BI "int cerebro_nodelist_find(cerebro_nodelist_t nodelist, const char *node, unsigned int *metric_value_type, unsigned int *metric_value_size, void **metric_value);"
-.sp
-.BI "int cerebro_nodelist_for_each(cerebro_nodelist_t nodelist, Cerebro_for_each for_each, void *arg);"
 .sp
 .BI "int cerebro_nodelist_destroy(cerebro_nodelist_t nodelist);"
 .sp
@@ -45,14 +40,6 @@ retrieve the nodelist data.
 
 \fBcerebro_nodelist_length\fR retrieves the number of nodes stored in
 the nodelist.
-
-\fBcerebro_nodelist_find\fR determines if \fInode\fR exists in the
-nodelist.  If a value exists for the node, the metric type, metric
-value length, and metric value are returned in 'metric_value_type',
-'metric_value_len', and 'metric_value' respectively.
-
-\fBcerebro_nodelist_for_each\fR calls the function \fIfor_each\fR for
-each node and value stored in the nodelist.
 
 \fBcerebro_nodelist_destroy\fR destroys the cerebro nodelist pointed
 by \fInodelist\fR.  All nodelist iterators created using the indicated
@@ -82,11 +69,8 @@ iterator pointed by \fInodelistItr\fR.
 .br
 .SH "METRIC VALUE TYPES"
 The following metric value types can be returned by
-\fBcerebro_nodelist_find\fR,
-\fBcerebro_nodelist_iterator_metric_value\fR, and passed to the
-'for_each' function passed to \fBcerebro_nodelist_for_each\fR.  They
-can be used to determine the data type the 'metric_value' result
-points to.
+\fBcerebro_nodelist_iterator_metric_value\fR.  They can be used to
+determine the data type the 'metric_value' result points to.
 
 CEREBRO_METRIC_VALUE_TYPE_NONE - No metric value
 
@@ -119,7 +103,7 @@ exists, 0 if not, On error, -1 is returned.
 For \fBcerebro_nodelist_iterator_at_end\fR, 1 is returned if the end
 of the list has been reached, 0 if not.  On error, -1 is returned.
 
-For \fBcerebro_nodelist_for_each\fR, \fBcerebro_nodelist_destroy\fR,
+For fBcerebro_nodelist_destroy\fR,
 \fBcerebro_nodelist_iterator_nodename\fR,
 \fBcerebro_nodelist_iterator_metric_value\fR
 \fBcerebro_nodelist_iterator_reset\fR, and

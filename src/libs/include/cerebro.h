@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.6 2005-06-28 19:47:22 achu Exp $
+ *  $Id: cerebro.h,v 1.7 2005-06-28 20:58:32 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_H
@@ -350,47 +350,6 @@ char *cerebro_nodelist_metric_name(cerebro_nodelist_t nodelist);
  * Returns the length of the nodelist on success, -1 on error
  */
 int cerebro_nodelist_length(cerebro_nodelist_t nodelist);
-
-/* 
- * cerebro_nodelist_find
- *
- * Determine if 'node' exists in the list.  If a value exists for the
- * node, the metric type, metric value length, and metric value are
- * returned in 'metric_value_type', 'metric_value_len', and 'metric_value'
- * respectively.
- *
- * Returns 1 if 'node' is found, 0 if not, -1 on error
- */
-int cerebro_nodelist_find(cerebro_nodelist_t nodelist, 
-			  const char *node, 
-                          unsigned int *metric_value_type,
-                          unsigned int *metric_value_len,
-                          void **metric_value);
-
-/* 
- * Cerebro_for_each
- *
- * Function prototype for operating on each node and metric value
- * stored in a nodelist.
- *
- * Returns 0 on success, -1 on error
- */
-typedef int (*Cerebro_for_each)(char *nodename, 
-                                unsigned int metric_value_type,
-                                unsigned int metric_value_len,
-                                void *metric_value,
-                                void *arg);
-
-/* 
- * cerebro_nodelist_for_each
- *
- * For each node in 'nodelist' invoke 'for_each', passing 'arg'.
- *
- * Return 0 on success, -1 on error
- */
-int cerebro_nodelist_for_each(cerebro_nodelist_t nodelist,
-                              Cerebro_for_each for_each,
-                              void *arg);
 
 /* 
  * cerebro_nodelist_destroy

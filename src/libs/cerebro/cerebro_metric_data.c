@@ -40,14 +40,12 @@ _cerebro_node_metric_response_header_unmarshall(cerebro_t handle,
 {
   int n, len = 0;
 
-#if CEREBRO_DEBUG
   if (!res || !buf)
     {
       CEREBRO_DBG(("invalid pointers"));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
-#endif /* CEREBRO_DEBUG */
 
   if ((n = unmarshall_int32(&(res->version), buf + len, buflen - len)) < 0)
     {
@@ -251,7 +249,7 @@ _cerebro_node_metric_response_metric_value_unmarshall(cerebro_t handle,
 }
 
 /* 
- * _cerebro_node_metric_response_receive_one
+ * _receive_node_metric_response
  *
  * Receive a single response
  *
@@ -259,7 +257,7 @@ _cerebro_node_metric_response_metric_value_unmarshall(cerebro_t handle,
  * success, -1 on error
  */
 static int
-_cerebro_node_metric_response_receive_one(cerebro_t handle,
+_receive_node_metric_response(cerebro_t handle,
                                           int fd,
                                           struct cerebro_node_metric_response *res)
 {
@@ -327,29 +325,37 @@ _cerebro_node_metric_response_receive_one(cerebro_t handle,
 }
 
 /* 
- * _cerebro_node_metric_response_receive_all
+ * _receive_node_metric_responses
  *
  * Receive all of the metric server responses.
  * 
  * Returns 0 on success, -1 on error
  */
 static int
-_cerebro_node_metric_response_receive_all(cerebro_t handle,
-                                          struct cerebro_nodelist *nodelist,
-                                          int fd,
-                                          int flags)
+_receive_node_metric_responses(cerebro_t handle, void *list, int fd)
 {
   struct cerebro_node_metric_response res;
   char nodename_buf[CEREBRO_MAX_NODENAME_LEN+1];
+  struct cerebro_nodelist *nodelist;
   int res_len;
+
+  if (_cerebro_handle_check(handle) < 0)
+    {
+      CEREBRO_DBG(("handle invalid"));
+      goto cleanup;
+    }
+
+  if (!list || fd <= 0)
+    {
+      CEREBRO_DBG(("invalid parameters"));
+      goto cleanup;
+    }
 
   /* XXX the cleanup here is disgusting */
   while (1)
     {
       memset(&res, '\0', sizeof(struct cerebro_node_metric_response));
-      if ((res_len = _cerebro_node_metric_response_receive_one(handle,
-                                                               fd, 
-                                                               &res)) < 0)
+      if ((res_len = _receive_node_metric_response(handle, fd, &res)) < 0)
         goto cleanup;
       
       if (res_len < CEREBRO_NODE_METRIC_RESPONSE_HEADER_LEN)
@@ -410,57 +416,10 @@ _cerebro_node_metric_response_receive_all(cerebro_t handle,
   return -1;
 }
 
-/*  
- * _cerebro_metric_get_metric_value
- *
- * Get metric data and store it appropriately into the nodelist
- *
- * Returns 0 on success, -1 on error
- */
-static int
-_cerebro_metric_get_metric_data(cerebro_t handle,
-                                cerebro_nodelist_t nodelist,
-                                const char *metric_name,
-                                const char *hostname,
-                                unsigned int port,
-                                unsigned int timeout_len,
-                                int flags)
-{
-  int fd = -1, rv = -1;
-
-  if ((fd = _cerebro_low_timeout_connect(handle, 
-					 hostname, 
-					 port, 
-					 CEREBRO_METRIC_PROTOCOL_CONNECT_TIMEOUT_LEN)) < 0)
-    goto cleanup;
-
-  if (_cerebro_metric_request_send(handle, 
-				   fd, 
-				   metric_name,
-				   timeout_len, 
-				   flags) < 0)
-    goto cleanup;
-
-  if (_cerebro_node_metric_response_receive_all(handle, 
-                                                nodelist, 
-                                                fd, 
-                                                flags) < 0)
-    goto cleanup;
-
-  rv = 0;
- cleanup:
-  close(fd);
-  return rv;
-}
-
 cerebro_nodelist_t 
-cerebro_get_metric_data(cerebro_t handle, 
-                        const char *metric_name)
+cerebro_get_metric_data(cerebro_t handle, const char *metric_name)
 {
   struct cerebro_nodelist *nodelist = NULL;
-  unsigned int port;
-  unsigned int timeout_len;
-  unsigned int flags;
 
   if (_cerebro_handle_check(handle) < 0)
     goto cleanup;
@@ -474,63 +433,14 @@ cerebro_get_metric_data(cerebro_t handle,
   if (_cerebro_load_clusterlist_module(handle) < 0)
     goto cleanup;
   
-  if (_cerebro_metric_config(handle, &port, &timeout_len, &flags) < 0)
-    goto cleanup;
-
   if (!(nodelist = _cerebro_nodelist_create(handle, metric_name)))
     goto cleanup;
 
-  if (!strlen(handle->hostname))
-    {
-      if (handle->config_data.cerebro_hostnames_flag)
-	{
-	  int i, rv = -1;
-
-	  for (i = 0; i < handle->config_data.cerebro_hostnames_len; i++)
-	    {
-	      if ((rv = _cerebro_metric_get_metric_data(handle,
-                                                        nodelist,
-                                                        metric_name,
-                                                        handle->config_data.cerebro_hostnames[i],
-                                                        port,
-                                                        timeout_len,
-                                                        flags)) < 0)
-		continue;
-	      break;
-	    }
-	  
-          if (i >= handle->config_data.cerebro_hostnames_len)
-            {
-              handle->errnum = CEREBRO_ERR_CONNECT;
-              goto cleanup;
-            }
-
-	  if (rv < 0)
-            goto cleanup;
-	}
-      else
-	{
-	  if (_cerebro_metric_get_metric_data(handle,
-                                              nodelist,
-                                              metric_name,
-                                              "localhost",
-                                              port,
-                                              timeout_len,
-                                              flags) < 0)
-	    goto cleanup;
-	}
-    }
-  else
-    {
-      if (_cerebro_metric_get_metric_data(handle,
+  if (_cerebro_metric_connect_and_receive(handle,
                                           nodelist,
                                           metric_name,
-                                          handle->hostname,
-                                          port,
-                                          timeout_len,
-                                          flags) < 0)
-	goto cleanup;
-    }
+                                          _receive_node_metric_responses) < 0)
+    goto cleanup;
   
   handle->errnum = CEREBRO_ERR_SUCCESS;
   return nodelist;

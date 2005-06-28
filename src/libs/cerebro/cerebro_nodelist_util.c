@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_nodelist_util.c,v 1.5 2005-06-27 17:59:45 achu Exp $
+ *  $Id: cerebro_nodelist_util.c,v 1.6 2005-06-28 20:58:32 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -26,23 +26,11 @@ _cerebro_nodelist_check(cerebro_nodelist_t nodelist)
   if (!nodelist || nodelist->magic != CEREBRO_NODELIST_MAGIC_NUMBER)
     return -1;
 
-  if (!nodelist->nodes)
+  if (!nodelist->nodes
+      || !nodelist->iterators
+      || !nodelist->handle)
     {
-      CEREBRO_DBG(("nodelist null"));
-      nodelist->errnum = CEREBRO_ERR_INTERNAL;
-      return -1;
-    }
-
-  if (!nodelist->iterators)
-    {
-      CEREBRO_DBG(("iterators null"));
-      nodelist->errnum = CEREBRO_ERR_INTERNAL;
-      return -1;
-    }
-
-  if (!nodelist->handle)
-    {
-      CEREBRO_DBG(("handle null"));
+      CEREBRO_DBG(("invalid nodelist data"));
       nodelist->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }

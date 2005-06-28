@@ -39,14 +39,12 @@ _cerebro_metric_name_response_unmarshall(cerebro_t handle,
 {
   int n, len = 0;
 
-#if CEREBRO_DEBUG
   if (!res || !buf)
     {
       CEREBRO_DBG(("invalid pointers"));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
-#endif /* CEREBRO_DEBUG */
 
   if ((n = unmarshall_int32(&(res->version), buf + len, buflen - len)) < 0)
     {
@@ -99,7 +97,7 @@ _cerebro_metric_name_response_unmarshall(cerebro_t handle,
 }
 
 /* 
- * _cerebro_metric_name_response_receive_one
+ * _receive_metric_name_response
  *
  * Receive a single response
  *
@@ -107,9 +105,9 @@ _cerebro_metric_name_response_unmarshall(cerebro_t handle,
  * success, -1 on error
  */
 static int
-_cerebro_metric_name_response_receive_one(cerebro_t handle,
-                                          int fd,
-                                          struct cerebro_metric_name_response *res)
+_receive_metric_name_response(cerebro_t handle,
+                              int fd,
+                              struct cerebro_metric_name_response *res)
 {
   char buf[CEREBRO_MAX_PACKET_LEN];
   int bytes_read, count;
@@ -137,29 +135,36 @@ _cerebro_metric_name_response_receive_one(cerebro_t handle,
 }
 
 /* 
- * _cerebro_metric_name_response_receive_all
+ * _receive_metric_name_responses
  *
  * Receive all of the metric server responses.
  * 
  * Returns 0 on success, -1 on error
  */
 static int
-_cerebro_metric_name_response_receive_all(cerebro_t handle,
-                                          struct cerebro_metriclist *metriclist,
-                                          int fd,
-                                          int flags)
+_receive_metric_name_responses(cerebro_t handle, void *list, int fd)
 {
   struct cerebro_metric_name_response res;
   char metric_name_buf[CEREBRO_MAX_METRIC_NAME_LEN+1];
+  struct cerebro_metriclist *metriclist;
   int res_len;
 
-  /* XXX the cleanup here is disgusting */
+  if (_cerebro_handle_check(handle) < 0)
+    {
+      CEREBRO_DBG(("handle invalid"));
+      goto cleanup;
+    }
+
+  if (!list || fd <= 0)
+    {
+      CEREBRO_DBG(("invalid parameters"));
+      goto cleanup;
+    }
+
   while (1)
     {
       memset(&res, '\0', sizeof(struct cerebro_metric_name_response));
-      if ((res_len = _cerebro_metric_name_response_receive_one(handle,
-                                                               fd, 
-                                                               &res)) < 0)
+      if ((res_len = _receive_metric_name_response(handle, fd, &res)) < 0)
         goto cleanup;
       
       if (res_len < CEREBRO_METRIC_NAME_RESPONSE_LEN)
@@ -208,113 +213,24 @@ _cerebro_metric_name_response_receive_all(cerebro_t handle,
   return -1;
 }
 
-/*  
- * _cerebro_metric_get_metric_names
- *
- * Get metric names and store it appropriately into the metriclist
- *
- * Returns 0 on success, -1 on error
- */
-static int
-_cerebro_metric_get_metric_names(cerebro_t handle,
-                                 cerebro_metriclist_t metriclist,
-                                 const char *hostname,
-                                 unsigned int port,
-                                 unsigned int timeout_len,
-                                 int flags)
-{
-  int fd = -1, rv = -1;
-
-  if ((fd = _cerebro_low_timeout_connect(handle, 
-					 hostname, 
-					 port, 
-					 CEREBRO_METRIC_PROTOCOL_CONNECT_TIMEOUT_LEN)) < 0)
-    goto cleanup;
-
-  if (_cerebro_metric_request_send(handle, 
-				   fd, 
-				   CEREBRO_METRIC_METRIC_NAMES,
-				   timeout_len, 
-				   flags) < 0)
-    goto cleanup;
-
-  if (_cerebro_metric_name_response_receive_all(handle, 
-                                                metriclist, 
-                                                fd, 
-                                                flags) < 0)
-    goto cleanup;
-
-  rv = 0;
- cleanup:
-  close(fd);
-  return rv;
-}
-
 cerebro_metriclist_t 
 cerebro_get_metric_names(cerebro_t handle)
 {
   struct cerebro_metriclist *metriclist = NULL;
-  unsigned int port;
-  unsigned int timeout_len;
-  unsigned int flags;
 
   if (_cerebro_handle_check(handle) < 0)
     goto cleanup;
 
-  if (_cerebro_metric_config(handle, &port, &timeout_len, &flags) < 0)
-    goto cleanup;
-  
   if (!(metriclist = _cerebro_metriclist_create(handle)))
     goto cleanup;
 
-  if (!strlen(handle->hostname))
-    {
-      if (handle->config_data.cerebro_hostnames_flag)
-	{
-	  int i, rv = -1;
-
-	  for (i = 0; i < handle->config_data.cerebro_hostnames_len; i++)
-	    {
-	      if ((rv = _cerebro_metric_get_metric_names(handle,
-                                                         metriclist,
-                                                         handle->config_data.cerebro_hostnames[i],
-                                                         port,
-                                                         timeout_len,
-                                                         flags)) < 0)
-		continue;
-	      break;
-	    }
-	  
-          if (i >= handle->config_data.cerebro_hostnames_len)
-            {
-              handle->errnum = CEREBRO_ERR_CONNECT;
-              goto cleanup;
-            }
-
-	  if (rv < 0)
-            goto cleanup;
-	}
-      else
-	{
-	  if (_cerebro_metric_get_metric_names(handle,
-                                               metriclist,
-                                               "localhost",
-                                               port,
-                                               timeout_len,
-                                               flags) < 0)
-	    goto cleanup;
-	}
-    }
-  else
-    {
-      if (_cerebro_metric_get_metric_names(handle,
-                                           metriclist,
-                                           handle->hostname,
-                                           port,
-                                           timeout_len,
-                                           flags) < 0)
-	goto cleanup;
-    }
+  if (_cerebro_metric_connect_and_receive(handle,
+                                          metriclist,
+                                          CEREBRO_METRIC_METRIC_NAMES,
+                                          _receive_metric_name_responses) < 0)
+    goto cleanup;
+  
+                                            
   
   handle->errnum = CEREBRO_ERR_SUCCESS;
   return metriclist;

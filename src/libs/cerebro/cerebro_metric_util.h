@@ -1,9 +1,11 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_util.h,v 1.4 2005-06-24 16:26:19 achu Exp $
+ *  $Id: cerebro_metric_util.h,v 1.5 2005-06-28 20:58:32 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_METRIC_UTIL_H
 #define _CEREBRO_METRIC_UTIL_H
+
+#include "cerebro.h"
 
 /*
  * _cerebro_metric_protocol_err_conversion
@@ -15,27 +17,25 @@
 int _cerebro_metric_protocol_err_conversion(u_int32_t protocol_error);
 
 /* 
- * _cerebro_metric_config
+ * Cerebro_metric_response_receive
  *
- * Determine the port, timeout_len, and flags to use
+ * Function to call after the metric request has been sent
  */
-int _cerebro_metric_config(cerebro_t handle,
-                           unsigned int *port,
-                           unsigned int *timeout_len,
-                           unsigned int *flags);
+typedef int (*Cerebro_metric_response_receive)(cerebro_t handle,
+                                               void *list,
+                                               int fd);
 
-/*
- * _cerebro_metric_request_send
+/* 
+ * _cerebro_metric_connect_and_receive
  *
- * Send the metric request
+ * Connect to the cerebrod metric and receive responses
  *
  * Returns 0 on success, -1 on error
  */
-int _cerebro_metric_request_send(cerebro_t handle,
-                                 int fd,
-                                 const char *metric_name,
-                                 unsigned int timeout_len,
-                                 int flags);
+int _cerebro_metric_connect_and_receive(cerebro_t handle,
+                                        void *list,
+                                        const char *metric_name,
+                                        Cerebro_metric_response_receive response_receive);
 
 /*
  * _cerebro_metric_receive_data
