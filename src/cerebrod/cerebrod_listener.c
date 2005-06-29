@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.100 2005-06-29 00:55:26 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.101 2005-06-29 17:03:52 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -372,22 +372,33 @@ _cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb)
 void *
 cerebrod_listener(void *arg)
 {
-  struct timeval tv;
+  char *buf;
+  int buflen;
 
   _cerebrod_listener_initialize();
+
+  /* 
+   * Determine max buffer length since packets are variable length
+   */
+  buflen = CEREBROD_HEARTBEAT_HEADER_LEN + conf.metric_max * (CEREBROD_HEARTBEAT_METRIC_HEADER_LEN + CEREBRO_MAX_METRIC_STRING_LEN);
+  
+  if (buflen < CEREBRO_MAX_PACKET_LEN)
+    buflen = CEREBRO_MAX_PACKET_LEN;
+
+  buf = Malloc(buflen);
 
   for (;;)
     {
       struct cerebrod_heartbeat *hb;
       char nodename_buf[CEREBRO_MAX_NODENAME_LEN+1];
       char nodename_key[CEREBRO_MAX_NODENAME_LEN+1];
+      struct timeval tv;
       int recv_len, flag;
-      char buf[CEREBRO_MAX_PACKET_LEN];
       
       Pthread_mutex_lock(&listener_fd_lock);
       if ((recv_len = recvfrom(listener_fd, 
 			       buf, 
-			       CEREBRO_MAX_PACKET_LEN, 
+			       buflen, 
 			       0, 
 			       NULL, 
 			       NULL)) < 0)

@@ -11,13 +11,7 @@ Cleanup
 - merge metric_names and metric_data stuff better after new version unmarshall/check code inserted
 - common receive data func?
 
-- no need to malloc values in heartbeats and destroy em??
-- packet buflen max len issue with number of metrics supportable
-  - base on metric_max
-- string length issue with packet buflen fixed in listener
-   - just do like lib cerebro metric responses, get header, than extra stuff??
-   - no can't b/c its UDP
-- put a cap on string lengths?
+- don't call speaker if no additional metrics to monitor?
 
 
 Audit

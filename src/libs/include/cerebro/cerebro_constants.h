@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_constants.h,v 1.2 2005-06-24 20:42:28 achu Exp $
+ *  $Id: cerebro_constants.h,v 1.3 2005-06-29 17:03:53 achu Exp $
 \*****************************************************************************/
  
 #ifndef _CEREBRO_CONSTANTS_H
@@ -22,5 +22,7 @@
 #define CEREBRO_MAX_NETWORK_INTERFACE_LEN  128
 
 #define CEREBRO_MAX_METRIC_NAME_LEN        32
+
+#define CEREBRO_MAX_METRIC_STRING_LEN      256
 
 #endif /* _CEREBRO_CONSTANTS_H */

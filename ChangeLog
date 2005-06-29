@@ -1,6 +1,8 @@
 2005-06-29  Albert Chu  <chu11@llnl.gov>
 
 	* Fix remaining version checking bugs.
+
+	* Fix maximum packet length buffer bugs.
 	
 2005-06-28  Albert Chu  <chu11@llnl.gov>
 

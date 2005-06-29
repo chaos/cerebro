@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker_data.c,v 1.11 2005-06-28 21:26:52 achu Exp $
+ *  $Id: cerebrod_speaker_data.c,v 1.12 2005-06-29 17:03:52 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -278,6 +278,13 @@ cerebrod_speaker_data_get_metric_data(struct cerebrod_heartbeat *hb,
           CEREBRO_DBG(("bogus metric: type=%d index=%d",
                        hd->metric_value_type, metric_module->index));
           goto cleanup_loop;
+        }
+
+      if (hd->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_STRING
+          && hd->metric_value_len > CEREBRO_MAX_METRIC_STRING_LEN)
+        {
+          CEREBRO_DBG(("truncate metric string: %d", hd->metric_value_len));
+          hd->metric_value_len = CEREBRO_MAX_METRIC_STRING_LEN;
         }
 
       hd->metric_value = Malloc(hd->metric_value_len);
