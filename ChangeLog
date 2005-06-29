@@ -8,6 +8,8 @@
  	average searches.
 
 	* Added network util functions for common network code.
+
+	* Fix assert/wrappers code.
 	
 2005-06-28  Albert Chu  <chu11@llnl.gov>
 
