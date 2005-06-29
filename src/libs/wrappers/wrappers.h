@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.h,v 1.4 2005-06-29 17:26:58 achu Exp $
+ *  $Id: wrappers.h,v 1.5 2005-06-29 21:55:17 achu Exp $
 \*****************************************************************************/
 
 #ifndef _WRAPPERS_H
@@ -54,22 +54,28 @@
 #include "hash.h"
 #include "marshall.h"
 
+#define WRAPPERS_DEBUG_ARGS \
+        __FILE__, __FUNCTION__, __LINE__
+
+#define WRAPPERS_ARGS \
+        const char *file, const char *function, unsigned int line
+
 /* 
  * Memory/String Wrappers 
  */
 #define Malloc(size) \
-        wrap_malloc(__FILE__, __FUNCTION__, __LINE__, size)
+        wrap_malloc(WRAPPERS_DEBUG_ARGS, size)
 #define Free(ptr) \
-        wrap_free(__FILE__, __FUNCTION__, __LINE__, ptr)
+        wrap_free(WRAPPERS_DEBUG_ARGS, ptr)
 #define Strdup(s) \
-        wrap_strdup(__FILE__, __FUNCTION__, __LINE__, s)
+        wrap_strdup(WRAPPERS_DEBUG_ARGS, s)
 #define Strncpy(dest, src, n) \
-        wrap_strncpy(__FILE__, __FUNCTION__, __LINE__, dest, src, n)
+        wrap_strncpy(WRAPPERS_DEBUG_ARGS, dest, src, n)
 
-void * wrap_malloc(const char *file, const char *function, unsigned int line, size_t size);
-void wrap_free(const char *file, const char *function, unsigned int line, void *ptr);
-char * wrap_strdup(const char *file, const char *function, unsigned int line, const char *s);
-char * wrap_strncpy(const char *file, const char *function, unsigned int line, char *dest, const char *src, size_t n);
+void * wrap_malloc(WRAPPERS_ARGS, size_t size);
+void wrap_free(WRAPPERS_ARGS, void *ptr);
+char * wrap_strdup(WRAPPERS_ARGS, const char *s);
+char * wrap_strncpy(WRAPPERS_ARGS, char *dest, const char *src, size_t n);
 
 /* Special wrapper for List/Hash libraries */
 void _Free(void *ptr);
@@ -78,266 +84,266 @@ void _Free(void *ptr);
  * File System Wrappers 
  */
 #define Open(pathname, flags, mode) \
-        wrap_open(__FILE__, __FUNCTION__, __LINE__, pathname, flags, mode)
+        wrap_open(WRAPPERS_DEBUG_ARGS, pathname, flags, mode)
 #define Close(fd) \
-        wrap_close(__FILE__, __FUNCTION__, __LINE__, fd)
+        wrap_close(WRAPPERS_DEBUG_ARGS, fd)
 #define Read(fd, buf, count) \
-        wrap_read(__FILE__, __FUNCTION__, __LINE__, fd, buf, count) 
+        wrap_read(WRAPPERS_DEBUG_ARGS, fd, buf, count) 
 #define Write(fd, buf, count) \
-        wrap_write(__FILE__, __FUNCTION__, __LINE__, fd, buf, count) 
+        wrap_write(WRAPPERS_DEBUG_ARGS, fd, buf, count) 
 #define Chdir(path) \
-        wrap_chdir(__FILE__, __FUNCTION__, __LINE__, path)
+        wrap_chdir(WRAPPERS_DEBUG_ARGS, path)
 #define Stat(path, buf) \
-        wrap_stat(__FILE__, __FUNCTION__, __LINE__, path, buf)
+        wrap_stat(WRAPPERS_DEBUG_ARGS, path, buf)
 #define Umask(mask) \
-        wrap_umask(__FILE__, __FUNCTION__, __LINE__, mask)
+        wrap_umask(WRAPPERS_DEBUG_ARGS, mask)
 #define Opendir(name) \
-        wrap_opendir(__FILE__, __FUNCTION__, __LINE__, name)
+        wrap_opendir(WRAPPERS_DEBUG_ARGS, name)
 #define Closedir(dir) \
-        wrap_closedir(__FILE__, __FUNCTION__, __LINE__, dir)
+        wrap_closedir(WRAPPERS_DEBUG_ARGS, dir)
 
-int wrap_open(const char *file, const char *function, unsigned int line, const char *pathname, int flags, int mode);
-int wrap_close(const char *file, const char *function, unsigned int line, int fd);
-ssize_t wrap_read(const char *file, const char *function, unsigned int line, int fd, void *buf, size_t count);
-ssize_t wrap_write(const char *file, const char *function, unsigned int line, int fd, const void *buf, size_t count);
-int wrap_chdir(const char *file, const char *function, unsigned int line, const char *path);
-int wrap_stat(const char *file, const char *function, unsigned int line, const char *path, struct stat *buf);
-mode_t wrap_umask(const char *file, const char *function, unsigned int line, mode_t mask);
-DIR *wrap_opendir(const char *file, const char *function, unsigned int line, const char *name);
-int wrap_closedir(const char *file, const char *function, unsigned int line, DIR *dir);
+int wrap_open(WRAPPERS_ARGS, const char *pathname, int flags, int mode);
+int wrap_close(WRAPPERS_ARGS, int fd);
+ssize_t wrap_read(WRAPPERS_ARGS, int fd, void *buf, size_t count);
+ssize_t wrap_write(WRAPPERS_ARGS, int fd, const void *buf, size_t count);
+int wrap_chdir(WRAPPERS_ARGS, const char *path);
+int wrap_stat(WRAPPERS_ARGS, const char *path, struct stat *buf);
+mode_t wrap_umask(WRAPPERS_ARGS, mode_t mask);
+DIR *wrap_opendir(WRAPPERS_ARGS, const char *name);
+int wrap_closedir(WRAPPERS_ARGS, DIR *dir);
 
 /* 
  * Networking Wrappers 
  */
 #define Socket(domain, type, protocol) \
-        wrap_socket(__FILE__, __FUNCTION__, __LINE__, domain, type, protocol)
+        wrap_socket(WRAPPERS_DEBUG_ARGS, domain, type, protocol)
 #define Bind(sockfd, my_addr, addrlen) \
-        wrap_bind(__FILE__, __FUNCTION__, __LINE__, sockfd, my_addr, addrlen)
+        wrap_bind(WRAPPERS_DEBUG_ARGS, sockfd, my_addr, addrlen)
 #define Connect(sockfd, serv_addr, addrlen) \
-        wrap_connect(__FILE__, __FUNCTION__, __LINE__, sockfd, serv_addr, addrlen)
+        wrap_connect(WRAPPERS_DEBUG_ARGS, sockfd, serv_addr, addrlen)
 #define Listen(s, backlog) \
-        wrap_listen(__FILE__, __FUNCTION__, __LINE__, s, backlog)
+        wrap_listen(WRAPPERS_DEBUG_ARGS, s, backlog)
 #define Accept(s, addr, addrlen) \
-        wrap_accept(__FILE__, __FUNCTION__, __LINE__, s, addr, addrlen)
+        wrap_accept(WRAPPERS_DEBUG_ARGS, s, addr, addrlen)
 #define Select(n, readfds, writefds, exceptfds, timeout) \
-        wrap_select(__FILE__, __FUNCTION__, __LINE__, n, readfds, writefds, exceptfds, timeout)
+        wrap_select(WRAPPERS_DEBUG_ARGS, n, readfds, writefds, exceptfds, timeout)
 #define Poll(ufds, nfds, timeout) \
-        wrap_poll(__FILE__, __FUNCTION__, __LINE__, ufds, nfds, timeout)
+        wrap_poll(WRAPPERS_DEBUG_ARGS, ufds, nfds, timeout)
 #define Getsockopt(s, level, optname, optval, optlen) \
-        wrap_getsockopt(__FILE__, __FUNCTION__, __LINE__, s, level, optname, optval, optlen)
+        wrap_getsockopt(WRAPPERS_DEBUG_ARGS, s, level, optname, optval, optlen)
 #define Setsockopt(s, level, optname, optval, optlen) \
-        wrap_setsockopt(__FILE__, __FUNCTION__, __LINE__, s, level, optname, optval, optlen)
+        wrap_setsockopt(WRAPPERS_DEBUG_ARGS, s, level, optname, optval, optlen)
 #define Gethostbyname(name) \
-        wrap_gethostbyname(__FILE__, __FUNCTION__, __LINE__, name)
+        wrap_gethostbyname(WRAPPERS_DEBUG_ARGS, name)
 #define Inet_ntop(af, src, dst, cnt) \
-        wrap_inet_ntop(__FILE__, __FUNCTION__, __LINE__, af, src, dst, cnt)
+        wrap_inet_ntop(WRAPPERS_DEBUG_ARGS, af, src, dst, cnt)
 #define Inet_pton(af, src, dst) \
-        wrap_inet_pton(__FILE__, __FUNCTION__, __LINE__, af, src, dst)
+        wrap_inet_pton(WRAPPERS_DEBUG_ARGS, af, src, dst)
 
-int wrap_socket(const char *file, const char *function, unsigned int line, int domain, int type, int protocol);
-int wrap_bind(const char *file, const char *function, unsigned int line, int sockfd, struct sockaddr *my_addr, socklen_t addrlen);
-int wrap_connect(const char *file, const char *function, unsigned int line, int sockfd, struct sockaddr *serv_addr, socklen_t addrlen);
-int wrap_listen(const char *file, const char *function, unsigned int line, int s, int backlog);
-int wrap_accept(const char *file, const char *function, unsigned int line, int s, struct sockaddr *addr, socklen_t *addrlen);
-int wrap_select(const char *file, const char *function, unsigned int line, int n, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout);
-int wrap_poll(const char *file, const char *function, unsigned int line, struct pollfd *ufds, unsigned int nfds, int timeout);
-int wrap_getsockopt(const char *file, const char *function, unsigned int line, int s, int level, int optname, void *optval, socklen_t *optlen);
-int wrap_setsockopt(const char *file, const char *function, unsigned int line, int s, int level, int optname, const void *optval, socklen_t optlen);
-struct hostent *wrap_gethostbyname(const char *file, const char *function, unsigned int line, const char *name);
-const char *wrap_inet_ntop(const char *file, const char *function, unsigned int line, int af, const void *src, char *dst, socklen_t cnt);
-int wrap_inet_pton(const char *file, const char *function, unsigned int line, int af, const char *src, void *dst);
+int wrap_socket(WRAPPERS_ARGS, int domain, int type, int protocol);
+int wrap_bind(WRAPPERS_ARGS, int sockfd, struct sockaddr *my_addr, socklen_t addrlen);
+int wrap_connect(WRAPPERS_ARGS, int sockfd, struct sockaddr *serv_addr, socklen_t addrlen);
+int wrap_listen(WRAPPERS_ARGS, int s, int backlog);
+int wrap_accept(WRAPPERS_ARGS, int s, struct sockaddr *addr, socklen_t *addrlen);
+int wrap_select(WRAPPERS_ARGS, int n, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout);
+int wrap_poll(WRAPPERS_ARGS, struct pollfd *ufds, unsigned int nfds, int timeout);
+int wrap_getsockopt(WRAPPERS_ARGS, int s, int level, int optname, void *optval, socklen_t *optlen);
+int wrap_setsockopt(WRAPPERS_ARGS, int s, int level, int optname, const void *optval, socklen_t optlen);
+struct hostent *wrap_gethostbyname(WRAPPERS_ARGS, const char *name);
+const char *wrap_inet_ntop(WRAPPERS_ARGS, int af, const void *src, char *dst, socklen_t cnt);
+int wrap_inet_pton(WRAPPERS_ARGS, int af, const char *src, void *dst);
 
 /* 
  * Time Wrappers 
  */
 #define Gettimeofday(tv, tz) \
-        wrap_gettimeofday(__FILE__, __FUNCTION__, __LINE__, tv, tz)
+        wrap_gettimeofday(WRAPPERS_DEBUG_ARGS, tv, tz)
 
-int wrap_gettimeofday(const char *file, const char *function, unsigned int line, struct timeval *tv, struct timezone *tz);
+int wrap_gettimeofday(WRAPPERS_ARGS, struct timeval *tv, struct timezone *tz);
 
 /* 
  * Pthread Wrappers 
  */
 #define Pthread_create(thread, attr, start_routine, arg) \
-        wrap_pthread_create(__FILE__, __FUNCTION__, __LINE__, thread, attr, start_routine, arg)
+        wrap_pthread_create(WRAPPERS_DEBUG_ARGS, thread, attr, start_routine, arg)
 #define Pthread_attr_init(attr) \
-        wrap_pthread_attr_init(__FILE__, __FUNCTION__, __LINE__, attr)
+        wrap_pthread_attr_init(WRAPPERS_DEBUG_ARGS, attr)
 #define Pthread_attr_destroy(attr) \
-        wrap_pthread_attr_destroy(__FILE__, __FUNCTION__, __LINE__, attr)
+        wrap_pthread_attr_destroy(WRAPPERS_DEBUG_ARGS, attr)
 #define Pthread_attr_setdetachstate(attr, detachstate) \
-        wrap_pthread_attr_setdetachstate(__FILE__, __FUNCTION__, __LINE__, attr, detachstate)
+        wrap_pthread_attr_setdetachstate(WRAPPERS_DEBUG_ARGS, attr, detachstate)
 #define Pthread_mutex_lock(mutex) \
-        wrap_pthread_mutex_lock(__FILE__, __FUNCTION__, __LINE__, mutex)
+        wrap_pthread_mutex_lock(WRAPPERS_DEBUG_ARGS, mutex)
 #define Pthread_mutex_trylock(mutex) \
-        wrap_pthread_mutex_trylock(__FILE__, __FUNCTION__, __LINE__, mutex)
+        wrap_pthread_mutex_trylock(WRAPPERS_DEBUG_ARGS, mutex)
 #define Pthread_mutex_unlock(mutex) \
-        wrap_pthread_mutex_unlock(__FILE__, __FUNCTION__, __LINE__, mutex)
+        wrap_pthread_mutex_unlock(WRAPPERS_DEBUG_ARGS, mutex)
 #define Pthread_mutex_init(mutex, mutexattr) \
-        wrap_pthread_mutex_init(__FILE__, __FUNCTION__, __LINE__, mutex, mutexattr)
+        wrap_pthread_mutex_init(WRAPPERS_DEBUG_ARGS, mutex, mutexattr)
 #define Pthread_cond_signal(cond) \
-        wrap_pthread_cond_signal(__FILE__, __FUNCTION__, __LINE__, cond)
+        wrap_pthread_cond_signal(WRAPPERS_DEBUG_ARGS, cond)
 #define Pthread_cond_wait(cond, mutex) \
-        wrap_pthread_cond_wait(__FILE__, __FUNCTION__, __LINE__, cond, mutex)
+        wrap_pthread_cond_wait(WRAPPERS_DEBUG_ARGS, cond, mutex)
 
-int wrap_pthread_create(const char *file, const char *function, unsigned int line, pthread_t *thread, pthread_attr_t *attr, void *(*start_routine)(void *), void *arg);
-int wrap_pthread_attr_init(const char *file, const char *function, unsigned int line, pthread_attr_t *attr);
-int wrap_pthread_attr_destroy(const char *file, const char *function, unsigned int line, pthread_attr_t *attr);
-int wrap_pthread_attr_setdetachstate(const char *file, const char *function, unsigned int line, pthread_attr_t *attr, int detachstate);
-int wrap_pthread_mutex_lock(const char *file, const char *function, unsigned int line, pthread_mutex_t *mutex);
-int wrap_pthread_mutex_trylock(const char *file, const char *function, unsigned int line, pthread_mutex_t *mutex);
-int wrap_pthread_mutex_unlock(const char *file, const char *function, unsigned int line, pthread_mutex_t *mutex);
-int wrap_pthread_mutex_init(const char *file, const char *function, unsigned int line, pthread_mutex_t *mutex, const pthread_mutexattr_t *mutexattr);
-int wrap_pthread_cond_signal(const char *file, const char *function, unsigned int line, pthread_cond_t *cond);
-int wrap_pthread_cond_wait(const char *file, const char *function, unsigned int line, pthread_cond_t *cond, pthread_mutex_t *mutex);
+int wrap_pthread_create(WRAPPERS_ARGS, pthread_t *thread, pthread_attr_t *attr, void *(*start_routine)(void *), void *arg);
+int wrap_pthread_attr_init(WRAPPERS_ARGS, pthread_attr_t *attr);
+int wrap_pthread_attr_destroy(WRAPPERS_ARGS, pthread_attr_t *attr);
+int wrap_pthread_attr_setdetachstate(WRAPPERS_ARGS, pthread_attr_t *attr, int detachstate);
+int wrap_pthread_mutex_lock(WRAPPERS_ARGS, pthread_mutex_t *mutex);
+int wrap_pthread_mutex_trylock(WRAPPERS_ARGS, pthread_mutex_t *mutex);
+int wrap_pthread_mutex_unlock(WRAPPERS_ARGS, pthread_mutex_t *mutex);
+int wrap_pthread_mutex_init(WRAPPERS_ARGS, pthread_mutex_t *mutex, const pthread_mutexattr_t *mutexattr);
+int wrap_pthread_cond_signal(WRAPPERS_ARGS, pthread_cond_t *cond);
+int wrap_pthread_cond_wait(WRAPPERS_ARGS, pthread_cond_t *cond, pthread_mutex_t *mutex);
 
 /* 
  * Misc System Call Wrappers 
  */
 #define Fork() \
-        wrap_fork(__FILE__, __FUNCTION__, __LINE__);
+        wrap_fork(WRAPPERS_DEBUG_ARGS);
 #define Signal(signum, handler) \
-        wrap_signal(__FILE__, __FUNCTION__, __LINE__, signum, handler)
+        wrap_signal(WRAPPERS_DEBUG_ARGS, signum, handler)
 #define Gethostname(name, len) \
-        wrap_gethostname(__FILE__, __FUNCTION__, __LINE__, name, len)
+        wrap_gethostname(WRAPPERS_DEBUG_ARGS, name, len)
 
 typedef void (*Sighandler_t)(int);
 
-pid_t wrap_fork(const char *file, const char *function, unsigned int line);
-Sighandler_t wrap_signal(const char *file, const char *function, unsigned int line, int signum, Sighandler_t handler);
-int wrap_gethostname(const char *file, const char *function, unsigned int line, char *name, size_t len);
+pid_t wrap_fork(WRAPPERS_ARGS);
+Sighandler_t wrap_signal(WRAPPERS_ARGS, int signum, Sighandler_t handler);
+int wrap_gethostname(WRAPPERS_ARGS, char *name, size_t len);
 
 /*
  * ltdl wrappers
  */
 
 #define Lt_dlinit() \
-        wrap_lt_dlinit(__FILE__, __FUNCTION__, __LINE__)
+        wrap_lt_dlinit(WRAPPERS_DEBUG_ARGS)
 #define Lt_dlexit() \
-        wrap_lt_dlexit(__FILE__, __FUNCTION__, __LINE__)
+        wrap_lt_dlexit(WRAPPERS_DEBUG_ARGS)
 #define Lt_dlopen(filename) \
-        wrap_lt_dlopen(__FILE__, __FUNCTION__, __LINE__, filename)
+        wrap_lt_dlopen(WRAPPERS_DEBUG_ARGS, filename)
 #define Lt_dlsym(handle, symbol) \
-        wrap_lt_dlsym(__FILE__, __FUNCTION__, __LINE__, handle, symbol)
+        wrap_lt_dlsym(WRAPPERS_DEBUG_ARGS, handle, symbol)
 #define Lt_dlclose(handle) \
-        wrap_lt_dlclose(__FILE__, __FUNCTION__, __LINE__, handle)
+        wrap_lt_dlclose(WRAPPERS_DEBUG_ARGS, handle)
 
-int wrap_lt_dlinit(const char *file, const char *function, unsigned int line);
-int wrap_lt_dlexit(const char *file, const char *function, unsigned int line);
-lt_dlhandle wrap_lt_dlopen(const char *file, const char *function, unsigned int line, const char *filename);
-lt_ptr wrap_lt_dlsym(const char *file, const char *function, unsigned int line, void *handle, char *symbol);
-int wrap_lt_dlclose(const char *file, const char *function, unsigned int line, void *handle);
+int wrap_lt_dlinit(WRAPPERS_ARGS);
+int wrap_lt_dlexit(WRAPPERS_ARGS);
+lt_dlhandle wrap_lt_dlopen(WRAPPERS_ARGS, const char *filename);
+lt_ptr wrap_lt_dlsym(WRAPPERS_ARGS, void *handle, char *symbol);
+int wrap_lt_dlclose(WRAPPERS_ARGS, void *handle);
 
 /* 
  * List lib wrappers 
  */
 #define List_create(f) \
-        wrap_list_create(__FILE__, __FUNCTION__, __LINE__, f)
+        wrap_list_create(WRAPPERS_DEBUG_ARGS, f)
 #define List_destroy(l) \
-        wrap_list_destroy(__FILE__, __FUNCTION__, __LINE__, l)
+        wrap_list_destroy(WRAPPERS_DEBUG_ARGS, l)
 #define List_count(l) \
-        wrap_list_count(__FILE__, __FUNCTION__, __LINE__, l)
+        wrap_list_count(WRAPPERS_DEBUG_ARGS, l)
 #define List_append(l, x) \
-        wrap_list_append(__FILE__, __FUNCTION__, __LINE__, l, x)
+        wrap_list_append(WRAPPERS_DEBUG_ARGS, l, x)
 #define List_find_first(l, f, key) \
-        wrap_list_find_first(__FILE__, __FUNCTION__, __LINE__, l, f, key)
+        wrap_list_find_first(WRAPPERS_DEBUG_ARGS, l, f, key)
 #define List_delete_all(l, f, key) \
-        wrap_list_delete_all(__FILE__, __FUNCTION__, __LINE__, l, f, key)
+        wrap_list_delete_all(WRAPPERS_DEBUG_ARGS, l, f, key)
 #define List_for_each(l, f, arg) \
-        wrap_list_for_each(__FILE__, __FUNCTION__, __LINE__, l, f, arg)
+        wrap_list_for_each(WRAPPERS_DEBUG_ARGS, l, f, arg)
 #define List_sort(l, f) \
-        wrap_list_sort(__FILE__, __FUNCTION__, __LINE__, l, f)
+        wrap_list_sort(WRAPPERS_DEBUG_ARGS, l, f)
 #define List_iterator_create(l) \
-        wrap_list_iterator_create(__FILE__, __FUNCTION__, __LINE__, l)
+        wrap_list_iterator_create(WRAPPERS_DEBUG_ARGS, l)
 #define List_iterator_destroy(i) \
-        wrap_list_iterator_destroy(__FILE__, __FUNCTION__, __LINE__, i)
+        wrap_list_iterator_destroy(WRAPPERS_DEBUG_ARGS, i)
 
-List wrap_list_create(const char *file, const char *function, unsigned int line, ListDelF f);
-void wrap_list_destroy(const char *file, const char *function, unsigned int line, List l);
-int wrap_list_count(const char *file, const char *function, unsigned int line, List l);
-void *wrap_list_append (const char *file, const char *function, unsigned int line, List l, void *x);
-void * wrap_list_find_first (const char *file, const char *function, unsigned int line, List l, ListFindF f, void *key);
-int wrap_list_delete_all(const char *file, const char *function, unsigned int line, List l, ListFindF f, void *key);
-int wrap_list_for_each(const char *file, const char *function, unsigned int line, List l, ListForF f, void *arg);
-void wrap_list_sort(const char *file, const char *function, unsigned int line, List l, ListCmpF f);
-ListIterator wrap_list_iterator_create(const char *file, const char *function, unsigned int line, List l);
-void wrap_list_iterator_destroy(const char *file, const char *function, unsigned int line, ListIterator i);
+List wrap_list_create(WRAPPERS_ARGS, ListDelF f);
+void wrap_list_destroy(WRAPPERS_ARGS, List l);
+int wrap_list_count(WRAPPERS_ARGS, List l);
+void *wrap_list_append (WRAPPERS_ARGS, List l, void *x);
+void * wrap_list_find_first (WRAPPERS_ARGS, List l, ListFindF f, void *key);
+int wrap_list_delete_all(WRAPPERS_ARGS, List l, ListFindF f, void *key);
+int wrap_list_for_each(WRAPPERS_ARGS, List l, ListForF f, void *arg);
+void wrap_list_sort(WRAPPERS_ARGS, List l, ListCmpF f);
+ListIterator wrap_list_iterator_create(WRAPPERS_ARGS, List l);
+void wrap_list_iterator_destroy(WRAPPERS_ARGS, ListIterator i);
 
 /* 
  * Hash lib wrappers 
  */
 #define Hash_create(size, key_f, cmp_f, del_f) \
-        wrap_hash_create(__FILE__, __FUNCTION__, __LINE__, size, key_f, cmp_f, del_f)
+        wrap_hash_create(WRAPPERS_DEBUG_ARGS, size, key_f, cmp_f, del_f)
 #define Hash_count(h) \
-        wrap_hash_count(__FILE__, __FUNCTION__, __LINE__, h)
+        wrap_hash_count(WRAPPERS_DEBUG_ARGS, h)
 #define Hash_find(h, key) \
-        wrap_hash_find(__FILE__, __FUNCTION__, __LINE__, h, key)
+        wrap_hash_find(WRAPPERS_DEBUG_ARGS, h, key)
 #define Hash_insert(h, key, data) \
-        wrap_hash_insert(__FILE__, __FUNCTION__, __LINE__, h, key, data)
+        wrap_hash_insert(WRAPPERS_DEBUG_ARGS, h, key, data)
 #define Hash_remove(h, key) \
-        wrap_hash_remove(__FILE__, __FUNCTION__, __LINE__, h, key)
+        wrap_hash_remove(WRAPPERS_DEBUG_ARGS, h, key)
 #define Hash_delete_if(h, argf, arg) \
-        wrap_hash_delete_if(__FILE__, __FUNCTION__, __LINE__, h, argf, arg)
+        wrap_hash_delete_if(WRAPPERS_DEBUG_ARGS, h, argf, arg)
 #define Hash_for_each(h, argf, arg) \
-        wrap_hash_for_each(__FILE__, __FUNCTION__, __LINE__, h, argf, arg)
+        wrap_hash_for_each(WRAPPERS_DEBUG_ARGS, h, argf, arg)
 #define Hash_destroy(h) \
-        wrap_hash_destroy(__FILE__, __FUNCTION__, __LINE__, h)
+        wrap_hash_destroy(WRAPPERS_DEBUG_ARGS, h)
 
-hash_t wrap_hash_create (const char *file, const char *function, unsigned int line, int size, hash_key_f key_f, hash_cmp_f cmp_f, hash_del_f del_f);
-int wrap_hash_count(const char *file, const char *function, unsigned int line, hash_t h);
-void *wrap_hash_find(const char *file, const char *function, unsigned int line, hash_t h, const void *key);
-void *wrap_hash_insert(const char *file, const char *function, unsigned int line, hash_t h, const void *key, void *data);
-void *wrap_hash_remove (const char *file, const char *function, unsigned int line, hash_t h, const void *key);
-int wrap_hash_delete_if(const char *file, const char *function, unsigned int line, hash_t h, hash_arg_f argf, void *arg);
-int wrap_hash_for_each(const char *file, const char *function, unsigned int line, hash_t h, hash_arg_f argf, void *arg);
-void wrap_hash_destroy(const char *file, const char *function, unsigned int line, hash_t h);
+hash_t wrap_hash_create (WRAPPERS_ARGS, int size, hash_key_f key_f, hash_cmp_f cmp_f, hash_del_f del_f);
+int wrap_hash_count(WRAPPERS_ARGS, hash_t h);
+void *wrap_hash_find(WRAPPERS_ARGS, hash_t h, const void *key);
+void *wrap_hash_insert(WRAPPERS_ARGS, hash_t h, const void *key, void *data);
+void *wrap_hash_remove (WRAPPERS_ARGS, hash_t h, const void *key);
+int wrap_hash_delete_if(WRAPPERS_ARGS, hash_t h, hash_arg_f argf, void *arg);
+int wrap_hash_for_each(WRAPPERS_ARGS, hash_t h, hash_arg_f argf, void *arg);
+void wrap_hash_destroy(WRAPPERS_ARGS, hash_t h);
 
 /* 
  * Marshall wrappers
  */
 
 #define Marshall_int8(val, buf, buflen) \
-        wrap_marshall_int8(__FILE__, __FUNCTION__, __LINE__, val, buf, buflen)
+        wrap_marshall_int8(WRAPPERS_DEBUG_ARGS, val, buf, buflen)
 #define Marshall_int32(val, buf, buflen) \
-        wrap_marshall_int32(__FILE__, __FUNCTION__, __LINE__, val, buf, buflen)
+        wrap_marshall_int32(WRAPPERS_DEBUG_ARGS, val, buf, buflen)
 #define Marshall_u_int8(val, buf, buflen) \
-        wrap_marshall_u_int8(__FILE__, __FUNCTION__, __LINE__, val, buf, buflen)
+        wrap_marshall_u_int8(WRAPPERS_DEBUG_ARGS, val, buf, buflen)
 #define Marshall_u_int32(val, buf, buflen) \
-        wrap_marshall_u_int32(__FILE__, __FUNCTION__, __LINE__, val, buf, buflen)
+        wrap_marshall_u_int32(WRAPPERS_DEBUG_ARGS, val, buf, buflen)
 #define Marshall_float(val, buf, buflen) \
-        wrap_marshall_float(__FILE__, __FUNCTION__, __LINE__, val, buf, buflen)
+        wrap_marshall_float(WRAPPERS_DEBUG_ARGS, val, buf, buflen)
 #define Marshall_double(val, buf, buflen) \
-        wrap_marshall_double(__FILE__, __FUNCTION__, __LINE__, val, buf, buflen)
+        wrap_marshall_double(WRAPPERS_DEBUG_ARGS, val, buf, buflen)
 #define Marshall_buffer(val, vallen, buf, buflen) \
-        wrap_marshall_buffer(__FILE__, __FUNCTION__, __LINE__, val, vallen, buf, buflen)
+        wrap_marshall_buffer(WRAPPERS_DEBUG_ARGS, val, vallen, buf, buflen)
 #define Unmarshall_int8(val, buf, buflen) \
-        wrap_unmarshall_int8(__FILE__, __FUNCTION__, __LINE__, val, buf, buflen)
+        wrap_unmarshall_int8(WRAPPERS_DEBUG_ARGS, val, buf, buflen)
 #define Unmarshall_int32(val, buf, buflen) \
-        wrap_unmarshall_int32(__FILE__, __FUNCTION__, __LINE__, val, buf, buflen)
+        wrap_unmarshall_int32(WRAPPERS_DEBUG_ARGS, val, buf, buflen)
 #define Unmarshall_u_int8(val, buf, buflen) \
-        wrap_unmarshall_u_int8(__FILE__, __FUNCTION__, __LINE__, val, buf, buflen)
+        wrap_unmarshall_u_int8(WRAPPERS_DEBUG_ARGS, val, buf, buflen)
 #define Unmarshall_u_int32(val, buf, buflen) \
-        wrap_unmarshall_u_int32(__FILE__, __FUNCTION__, __LINE__, val, buf, buflen)
+        wrap_unmarshall_u_int32(WRAPPERS_DEBUG_ARGS, val, buf, buflen)
 #define Unmarshall_float(val, buf, buflen) \
-        wrap_unmarshall_float(__FILE__, __FUNCTION__, __LINE__, val, buf, buflen)
+        wrap_unmarshall_float(WRAPPERS_DEBUG_ARGS, val, buf, buflen)
 #define Unmarshall_double(val, buf, buflen) \
-        wrap_unmarshall_double(__FILE__, __FUNCTION__, __LINE__, val, buf, buflen)
+        wrap_unmarshall_double(WRAPPERS_DEBUG_ARGS, val, buf, buflen)
 #define Unmarshall_buffer(val, vallen, buf, buflen) \
-        wrap_unmarshall_buffer(__FILE__, __FUNCTION__, __LINE__, val, vallen, buf, buflen)
+        wrap_unmarshall_buffer(WRAPPERS_DEBUG_ARGS, val, vallen, buf, buflen)
 
-int wrap_marshall_int8(const char *file, const char *function, unsigned int line, int8_t val, char *buf, unsigned int buflen);
-int wrap_marshall_int32(const char *file, const char *function, unsigned int line, int32_t val, char *buf, unsigned int buflen);
-int wrap_marshall_u_int8(const char *file, const char *function, unsigned int line, u_int8_t val, char *buf, unsigned int buflen);
-int wrap_marshall_u_int32(const char *file, const char *function, unsigned int line, u_int32_t val, char *buf, unsigned int buflen);
-int wrap_marshall_float(const char *file, const char *function, unsigned int line, float val, char *buf, unsigned int buflen);
-int wrap_marshall_double(const char *file, const char *function, unsigned int line, double val, char *buf, unsigned int buflen);
-int wrap_marshall_buffer(const char *file, const char *function, unsigned int line, const char *val, unsigned int vallen, char *buf, unsigned int buflen);
-int wrap_unmarshall_int8(const char *file, const char *function, unsigned int line, int8_t *val, const char *buf, unsigned int buflen);
-int wrap_unmarshall_int32(const char *file, const char *function, unsigned int line, int32_t *val, const char *buf, unsigned int buflen);
-int wrap_unmarshall_u_int8(const char *file, const char *function, unsigned int line, u_int8_t *val, const char *buf, unsigned int buflen);
-int wrap_unmarshall_u_int32(const char *file, const char *function, unsigned int line, u_int32_t *val, const char *buf, unsigned int buflen);
-int wrap_unmarshall_float(const char *file, const char *function, unsigned int line, float *val, const char *buf, unsigned int buflen);
-int wrap_unmarshall_double(const char *file, const char *function, unsigned int line, double *val, const char *buf, unsigned int buflen);
-int wrap_unmarshall_buffer(const char *file, const char *function, unsigned int line, char *val, unsigned int vallen, const char *buf, unsigned int buflen);
+int wrap_marshall_int8(WRAPPERS_ARGS, int8_t val, char *buf, unsigned int buflen);
+int wrap_marshall_int32(WRAPPERS_ARGS, int32_t val, char *buf, unsigned int buflen);
+int wrap_marshall_u_int8(WRAPPERS_ARGS, u_int8_t val, char *buf, unsigned int buflen);
+int wrap_marshall_u_int32(WRAPPERS_ARGS, u_int32_t val, char *buf, unsigned int buflen);
+int wrap_marshall_float(WRAPPERS_ARGS, float val, char *buf, unsigned int buflen);
+int wrap_marshall_double(WRAPPERS_ARGS, double val, char *buf, unsigned int buflen);
+int wrap_marshall_buffer(WRAPPERS_ARGS, const char *val, unsigned int vallen, char *buf, unsigned int buflen);
+int wrap_unmarshall_int8(WRAPPERS_ARGS, int8_t *val, const char *buf, unsigned int buflen);
+int wrap_unmarshall_int32(WRAPPERS_ARGS, int32_t *val, const char *buf, unsigned int buflen);
+int wrap_unmarshall_u_int8(WRAPPERS_ARGS, u_int8_t *val, const char *buf, unsigned int buflen);
+int wrap_unmarshall_u_int32(WRAPPERS_ARGS, u_int32_t *val, const char *buf, unsigned int buflen);
+int wrap_unmarshall_float(WRAPPERS_ARGS, float *val, const char *buf, unsigned int buflen);
+int wrap_unmarshall_double(WRAPPERS_ARGS, double *val, const char *buf, unsigned int buflen);
+int wrap_unmarshall_buffer(WRAPPERS_ARGS, char *val, unsigned int vallen, const char *buf, unsigned int buflen);
 
    
 #endif /* _WRAPPERS_H */

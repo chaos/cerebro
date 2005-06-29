@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.c,v 1.6 2005-06-29 21:46:47 achu Exp $
+ *  $Id: wrappers.c,v 1.7 2005-06-29 21:55:17 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -41,7 +41,7 @@ extern int h_errno;
    } while(0);
 
 void *
-wrap_malloc(const char *file, const char *function, unsigned int line, size_t size)
+wrap_malloc(WRAPPERS_ARGS, size_t size)
 {
   void *ptr;
 
@@ -61,7 +61,7 @@ wrap_malloc(const char *file, const char *function, unsigned int line, size_t si
 }
 
 void
-wrap_free(const char *file, const char *function, unsigned int line, void *ptr)
+wrap_free(WRAPPERS_ARGS, void *ptr)
 {
   void *p = ptr - 2*sizeof(int);
   int i, size;
@@ -89,7 +89,7 @@ _Free(void *ptr)
 }
 
 char *
-wrap_strdup(const char *file, const char *function, unsigned int line, const char *s)
+wrap_strdup(WRAPPERS_ARGS, const char *s)
 {
   char *ptr;
 
@@ -104,7 +104,7 @@ wrap_strdup(const char *file, const char *function, unsigned int line, const cha
 }
 
 char *
-wrap_strncpy(const char *file, const char *function, unsigned int line, char *dest, const char *src, size_t n)
+wrap_strncpy(WRAPPERS_ARGS, char *dest, const char *src, size_t n)
 {
   char *rv;
 
@@ -119,7 +119,7 @@ wrap_strncpy(const char *file, const char *function, unsigned int line, char *de
 }
 
 int 
-wrap_open(const char *file, const char *function, unsigned int line, const char *pathname, int flags, int mode)
+wrap_open(WRAPPERS_ARGS, const char *pathname, int flags, int mode)
 {
   int fd;
 
@@ -135,7 +135,7 @@ wrap_open(const char *file, const char *function, unsigned int line, const char 
 }
 
 int 
-wrap_close(const char *file, const char *function, unsigned int line, int fd)
+wrap_close(WRAPPERS_ARGS, int fd)
 {
   int rv;
                                  
@@ -148,7 +148,7 @@ wrap_close(const char *file, const char *function, unsigned int line, int fd)
 }
 
 ssize_t
-wrap_read(const char *file, const char *function, unsigned int line, int fd, void *buf, size_t count)
+wrap_read(WRAPPERS_ARGS, int fd, void *buf, size_t count)
 {
   ssize_t rv;
 
@@ -164,7 +164,7 @@ wrap_read(const char *file, const char *function, unsigned int line, int fd, voi
 }
 
 ssize_t
-wrap_write(const char *file, const char *function, unsigned int line, int fd, const void *buf, size_t count)
+wrap_write(WRAPPERS_ARGS, int fd, const void *buf, size_t count)
 {
   ssize_t rv;
 
@@ -180,7 +180,7 @@ wrap_write(const char *file, const char *function, unsigned int line, int fd, co
 }
 
 int
-wrap_chdir(const char *file, const char *function, unsigned int line, const char *path)
+wrap_chdir(WRAPPERS_ARGS, const char *path)
 {
   int rv;
 
@@ -196,7 +196,7 @@ wrap_chdir(const char *file, const char *function, unsigned int line, const char
 }
 
 int 
-wrap_stat(const char *file, const char *function, unsigned int line, const char *path, struct stat *buf)
+wrap_stat(WRAPPERS_ARGS, const char *path, struct stat *buf)
 {
   int rv;
 
@@ -212,7 +212,7 @@ wrap_stat(const char *file, const char *function, unsigned int line, const char 
 }
 
 mode_t
-wrap_umask(const char *file, const char *function, unsigned int line, mode_t mask)
+wrap_umask(WRAPPERS_ARGS, mode_t mask)
 {
   assert(file && function);
 
@@ -221,7 +221,7 @@ wrap_umask(const char *file, const char *function, unsigned int line, mode_t mas
 }
 
 DIR *
-wrap_opendir(const char *file, const char *function, unsigned int line, const char *name)
+wrap_opendir(WRAPPERS_ARGS, const char *name)
 {
   DIR *rv;
   
@@ -237,7 +237,7 @@ wrap_opendir(const char *file, const char *function, unsigned int line, const ch
 }
 
 int
-wrap_closedir(const char *file, const char *function, unsigned int line, DIR *dir)
+wrap_closedir(WRAPPERS_ARGS, DIR *dir)
 {
   int rv;
 
@@ -253,7 +253,7 @@ wrap_closedir(const char *file, const char *function, unsigned int line, DIR *di
 }
 
 int
-wrap_socket(const char *file, const char *function, unsigned int line, int domain, int type, int protocol)
+wrap_socket(WRAPPERS_ARGS, int domain, int type, int protocol)
 {
   int fd;
 
@@ -266,7 +266,7 @@ wrap_socket(const char *file, const char *function, unsigned int line, int domai
 }
 
 int 
-wrap_bind(const char *file, const char *function, unsigned int line, int sockfd, struct sockaddr *my_addr, socklen_t addrlen)
+wrap_bind(WRAPPERS_ARGS, int sockfd, struct sockaddr *my_addr, socklen_t addrlen)
 {
   int rv;
   
@@ -282,7 +282,7 @@ wrap_bind(const char *file, const char *function, unsigned int line, int sockfd,
 }
 
 int 
-wrap_connect(const char *file, const char *function, unsigned int line, int sockfd, struct sockaddr *serv_addr, socklen_t addrlen)
+wrap_connect(WRAPPERS_ARGS, int sockfd, struct sockaddr *serv_addr, socklen_t addrlen)
 {
   int rv;
 
@@ -298,7 +298,7 @@ wrap_connect(const char *file, const char *function, unsigned int line, int sock
 }
 
 int 
-wrap_listen(const char *file, const char *function, unsigned int line, int s, int backlog)
+wrap_listen(WRAPPERS_ARGS, int s, int backlog)
 {
   int rv;
 
@@ -314,7 +314,7 @@ wrap_listen(const char *file, const char *function, unsigned int line, int s, in
 }
 
 int 
-wrap_accept(const char *file, const char *function, unsigned int line, int s, struct sockaddr *addr, socklen_t *addrlen)
+wrap_accept(WRAPPERS_ARGS, int s, struct sockaddr *addr, socklen_t *addrlen)
 {
   int rv;
 
@@ -330,7 +330,7 @@ wrap_accept(const char *file, const char *function, unsigned int line, int s, st
 }
 
 int 
-wrap_select(const char *file, const char *function, unsigned int line, int n, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout)
+wrap_select(WRAPPERS_ARGS, int n, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout)
 {
   int rv;
   struct timeval timeout_orig, timeout_current;
@@ -371,7 +371,7 @@ wrap_select(const char *file, const char *function, unsigned int line, int n, fd
 }
 
 int 
-wrap_poll(const char *file, const char *function, unsigned int line, struct pollfd *ufds, unsigned int nfds, int timeout)
+wrap_poll(WRAPPERS_ARGS, struct pollfd *ufds, unsigned int nfds, int timeout)
 {
   int rv;
   struct timeval timeout_orig, timeout_current;
@@ -406,7 +406,7 @@ wrap_poll(const char *file, const char *function, unsigned int line, struct poll
 }
 
 int
-wrap_getsockopt(const char *file, const char *function, unsigned int line, int s, int level, int optname, void *optval, socklen_t *optlen)
+wrap_getsockopt(WRAPPERS_ARGS, int s, int level, int optname, void *optval, socklen_t *optlen)
 {
   int rv;
 
@@ -422,7 +422,7 @@ wrap_getsockopt(const char *file, const char *function, unsigned int line, int s
 }
 
 int
-wrap_setsockopt(const char *file, const char *function, unsigned int line, int s, int level, int optname, const void *optval, socklen_t optlen)
+wrap_setsockopt(WRAPPERS_ARGS, int s, int level, int optname, const void *optval, socklen_t optlen)
 {
   int rv;
 
@@ -438,7 +438,7 @@ wrap_setsockopt(const char *file, const char *function, unsigned int line, int s
 }
 
 struct hostent *
-wrap_gethostbyname(const char *file, const char *function, unsigned int line, const char *name)
+wrap_gethostbyname(WRAPPERS_ARGS, const char *name)
 {
   struct hostent *rv;
 
@@ -454,7 +454,7 @@ wrap_gethostbyname(const char *file, const char *function, unsigned int line, co
 }
 
 const char *
-wrap_inet_ntop(const char *file, const char *function, unsigned int line, int af, const void *src, char *dst, socklen_t cnt)
+wrap_inet_ntop(WRAPPERS_ARGS, int af, const void *src, char *dst, socklen_t cnt)
 {
   const char *rv;
 
@@ -470,7 +470,7 @@ wrap_inet_ntop(const char *file, const char *function, unsigned int line, int af
 }
 
 int 
-wrap_inet_pton(const char *file, const char *function, unsigned int line, int af, const char *src, void *dst)
+wrap_inet_pton(WRAPPERS_ARGS, int af, const char *src, void *dst)
 {
   int rv;
   
@@ -486,7 +486,7 @@ wrap_inet_pton(const char *file, const char *function, unsigned int line, int af
 }
 
 int
-wrap_gettimeofday(const char *file, const char *function, unsigned int line, struct timeval *tv, struct timezone *tz)
+wrap_gettimeofday(WRAPPERS_ARGS, struct timeval *tv, struct timezone *tz)
 {
   int rv;
 
@@ -502,7 +502,7 @@ wrap_gettimeofday(const char *file, const char *function, unsigned int line, str
 }
 
 int 
-wrap_pthread_create(const char *file, const char *function, unsigned int line, pthread_t *thread, pthread_attr_t *attr, void *(*start_routine)(void *), void *arg)
+wrap_pthread_create(WRAPPERS_ARGS, pthread_t *thread, pthread_attr_t *attr, void *(*start_routine)(void *), void *arg)
 {
   int rv;
   
@@ -518,7 +518,7 @@ wrap_pthread_create(const char *file, const char *function, unsigned int line, p
 }
 
 int 
-wrap_pthread_attr_init(const char *file, const char *function, unsigned int line, pthread_attr_t *attr)
+wrap_pthread_attr_init(WRAPPERS_ARGS, pthread_attr_t *attr)
 {
   int rv;
   
@@ -534,7 +534,7 @@ wrap_pthread_attr_init(const char *file, const char *function, unsigned int line
 }
 
 int 
-wrap_pthread_attr_destroy(const char *file, const char *function, unsigned int line, pthread_attr_t *attr)
+wrap_pthread_attr_destroy(WRAPPERS_ARGS, pthread_attr_t *attr)
 {
   int rv;
   
@@ -550,7 +550,7 @@ wrap_pthread_attr_destroy(const char *file, const char *function, unsigned int l
 }
 
 int 
-wrap_pthread_attr_setdetachstate(const char *file, const char *function, unsigned int line, pthread_attr_t *attr, int detachstate)
+wrap_pthread_attr_setdetachstate(WRAPPERS_ARGS, pthread_attr_t *attr, int detachstate)
 {
   int rv;
   
@@ -566,7 +566,7 @@ wrap_pthread_attr_setdetachstate(const char *file, const char *function, unsigne
 }
 
 int
-wrap_pthread_mutex_lock(const char *file, const char *function, unsigned int line, pthread_mutex_t *mutex)
+wrap_pthread_mutex_lock(WRAPPERS_ARGS, pthread_mutex_t *mutex)
 {
   int rv;
   
@@ -582,7 +582,7 @@ wrap_pthread_mutex_lock(const char *file, const char *function, unsigned int lin
 }
 
 int 
-wrap_pthread_mutex_trylock(const char *file, const char *function, unsigned int line, pthread_mutex_t *mutex)
+wrap_pthread_mutex_trylock(WRAPPERS_ARGS, pthread_mutex_t *mutex)
 {
   int rv;
   
@@ -599,7 +599,7 @@ wrap_pthread_mutex_trylock(const char *file, const char *function, unsigned int 
 }
 
 int 
-wrap_pthread_mutex_unlock(const char *file, const char *function, unsigned int line, pthread_mutex_t *mutex)
+wrap_pthread_mutex_unlock(WRAPPERS_ARGS, pthread_mutex_t *mutex)
 {
   int rv;
   
@@ -615,7 +615,7 @@ wrap_pthread_mutex_unlock(const char *file, const char *function, unsigned int l
 }
 
 int
-wrap_pthread_mutex_init(const char *file, const char *function, unsigned int line, pthread_mutex_t *mutex, const pthread_mutexattr_t *mutexattr)
+wrap_pthread_mutex_init(WRAPPERS_ARGS, pthread_mutex_t *mutex, const pthread_mutexattr_t *mutexattr)
 {
   int rv;
   
@@ -631,7 +631,7 @@ wrap_pthread_mutex_init(const char *file, const char *function, unsigned int lin
 }
 
 int 
-wrap_pthread_cond_signal(const char *file, const char *function, unsigned int line, pthread_cond_t *cond)
+wrap_pthread_cond_signal(WRAPPERS_ARGS, pthread_cond_t *cond)
 {
   int rv;
 
@@ -647,7 +647,7 @@ wrap_pthread_cond_signal(const char *file, const char *function, unsigned int li
 }
 
 int 
-wrap_pthread_cond_wait(const char *file, const char *function, unsigned int line, pthread_cond_t *cond, pthread_mutex_t *mutex)
+wrap_pthread_cond_wait(WRAPPERS_ARGS, pthread_cond_t *cond, pthread_mutex_t *mutex)
 {
   int rv;
 
@@ -663,7 +663,7 @@ wrap_pthread_cond_wait(const char *file, const char *function, unsigned int line
 }
 
 pid_t 
-wrap_fork(const char *file, const char *function, unsigned int line)
+wrap_fork(WRAPPERS_ARGS)
 {
   pid_t pid;
 
@@ -676,7 +676,7 @@ wrap_fork(const char *file, const char *function, unsigned int line)
 }
 
 Sighandler_t
-wrap_signal(const char *file, const char *function, unsigned int line, int signum, Sighandler_t handler)
+wrap_signal(WRAPPERS_ARGS, int signum, Sighandler_t handler)
 {
   Sighandler_t rv;
 
@@ -692,7 +692,7 @@ wrap_signal(const char *file, const char *function, unsigned int line, int signu
 }
 
 int 
-wrap_gethostname(const char *file, const char *function, unsigned int line, char *name, size_t len)
+wrap_gethostname(WRAPPERS_ARGS, char *name, size_t len)
 {
   int rv;
 
@@ -708,7 +708,7 @@ wrap_gethostname(const char *file, const char *function, unsigned int line, char
 }
 
 int
-wrap_lt_dlinit(const char *file, const char *function, unsigned int line)
+wrap_lt_dlinit(WRAPPERS_ARGS)
 {
   int rv;
 
@@ -721,7 +721,7 @@ wrap_lt_dlinit(const char *file, const char *function, unsigned int line)
 }
 
 int
-wrap_lt_dlexit(const char *file, const char *function, unsigned int line)
+wrap_lt_dlexit(WRAPPERS_ARGS)
 {
   int rv;
 
@@ -734,7 +734,7 @@ wrap_lt_dlexit(const char *file, const char *function, unsigned int line)
 }
 
 lt_dlhandle
-wrap_lt_dlopen(const char *file, const char *function, unsigned int line, const char *filename)
+wrap_lt_dlopen(WRAPPERS_ARGS, const char *filename)
 {
   lt_dlhandle rv;
 
@@ -750,7 +750,7 @@ wrap_lt_dlopen(const char *file, const char *function, unsigned int line, const 
 }
 
 lt_ptr
-wrap_lt_dlsym(const char *file, const char *function, unsigned int line, void *handle, char *symbol)
+wrap_lt_dlsym(WRAPPERS_ARGS, void *handle, char *symbol)
 {
   lt_ptr *rv;
 
@@ -773,7 +773,7 @@ wrap_lt_dlsym(const char *file, const char *function, unsigned int line, void *h
 }
 
 int 
-wrap_lt_dlclose(const char *file, const char *function, unsigned int line, void *handle)
+wrap_lt_dlclose(WRAPPERS_ARGS, void *handle)
 {
   int rv;
 
@@ -789,7 +789,7 @@ wrap_lt_dlclose(const char *file, const char *function, unsigned int line, void 
 }
 
 List 
-wrap_list_create(const char *file, const char *function, unsigned int line, ListDelF f)
+wrap_list_create(WRAPPERS_ARGS, ListDelF f)
 {
   List rv;
 
@@ -802,7 +802,7 @@ wrap_list_create(const char *file, const char *function, unsigned int line, List
 }
 
 void
-wrap_list_destroy(const char *file, const char *function, unsigned int line, List l)
+wrap_list_destroy(WRAPPERS_ARGS, List l)
 {
   assert(file && function);
 
@@ -815,7 +815,7 @@ wrap_list_destroy(const char *file, const char *function, unsigned int line, Lis
 }
 
 int
-wrap_list_count(const char *file, const char *function, unsigned int line, List l)
+wrap_list_count(WRAPPERS_ARGS, List l)
 {
   assert(file && function);
 
@@ -826,7 +826,7 @@ wrap_list_count(const char *file, const char *function, unsigned int line, List 
 }
 
 void *
-wrap_list_append (const char *file, const char *function, unsigned int line, List l, void *x)
+wrap_list_append (WRAPPERS_ARGS, List l, void *x)
 {
   void *rv;
 
@@ -842,7 +842,7 @@ wrap_list_append (const char *file, const char *function, unsigned int line, Lis
 }
 
 void * 
-wrap_list_find_first (const char *file, const char *function, unsigned int line, List l, ListFindF f, void *key)
+wrap_list_find_first (WRAPPERS_ARGS, List l, ListFindF f, void *key)
 {
   assert(file && function);
 
@@ -853,7 +853,7 @@ wrap_list_find_first (const char *file, const char *function, unsigned int line,
 }
 
 int 
-wrap_list_delete_all(const char *file, const char *function, unsigned int line, List l, ListFindF f, void *key)
+wrap_list_delete_all(WRAPPERS_ARGS, List l, ListFindF f, void *key)
 {
   int rv;
 
@@ -869,7 +869,7 @@ wrap_list_delete_all(const char *file, const char *function, unsigned int line, 
 }
 
 int
-wrap_list_for_each(const char *file, const char *function, unsigned int line, List l, ListForF f, void *arg)
+wrap_list_for_each(WRAPPERS_ARGS, List l, ListForF f, void *arg)
 {
   int rv;
 
@@ -885,7 +885,7 @@ wrap_list_for_each(const char *file, const char *function, unsigned int line, Li
 }
 
 void
-wrap_list_sort(const char *file, const char *function, unsigned int line, List l, ListCmpF f)
+wrap_list_sort(WRAPPERS_ARGS, List l, ListCmpF f)
 {
   assert(file && function);
 
@@ -897,7 +897,7 @@ wrap_list_sort(const char *file, const char *function, unsigned int line, List l
 }
 
 ListIterator
-wrap_list_iterator_create(const char *file, const char *function, unsigned int line, List l)
+wrap_list_iterator_create(WRAPPERS_ARGS, List l)
 {
   ListIterator rv;
 
@@ -913,7 +913,7 @@ wrap_list_iterator_create(const char *file, const char *function, unsigned int l
 }
 
 void
-wrap_list_iterator_destroy(const char *file, const char *function, unsigned int line, ListIterator i)
+wrap_list_iterator_destroy(WRAPPERS_ARGS, ListIterator i)
 {
   assert(file && function);
 
@@ -925,7 +925,7 @@ wrap_list_iterator_destroy(const char *file, const char *function, unsigned int 
 }
 
 hash_t 
-wrap_hash_create(const char *file, const char *function, unsigned int line, int size, hash_key_f key_f, hash_cmp_f cmp_f, hash_del_f del_f)
+wrap_hash_create(WRAPPERS_ARGS, int size, hash_key_f key_f, hash_cmp_f cmp_f, hash_del_f del_f)
 {
   hash_t rv;
 
@@ -941,7 +941,7 @@ wrap_hash_create(const char *file, const char *function, unsigned int line, int 
 }
 
 int 
-wrap_hash_count(const char *file, const char *function, unsigned int line, hash_t h)
+wrap_hash_count(WRAPPERS_ARGS, hash_t h)
 {
   int rv;
 
@@ -960,7 +960,7 @@ wrap_hash_count(const char *file, const char *function, unsigned int line, hash_
 }
 
 void *
-wrap_hash_find(const char *file, const char *function, unsigned int line, hash_t h, const void *key)
+wrap_hash_find(WRAPPERS_ARGS, hash_t h, const void *key)
 {
   void *rv;
 
@@ -977,7 +977,7 @@ wrap_hash_find(const char *file, const char *function, unsigned int line, hash_t
 }
 
 void *
-wrap_hash_insert(const char *file, const char *function, unsigned int line, hash_t h, const void *key, void *data)
+wrap_hash_insert(WRAPPERS_ARGS, hash_t h, const void *key, void *data)
 {
   void *rv;
 
@@ -996,7 +996,7 @@ wrap_hash_insert(const char *file, const char *function, unsigned int line, hash
 }
 
 void *
-wrap_hash_remove(const char *file, const char *function, unsigned int line, hash_t h, const void *key)
+wrap_hash_remove(WRAPPERS_ARGS, hash_t h, const void *key)
 {
   void *rv;
 
@@ -1012,7 +1012,7 @@ wrap_hash_remove(const char *file, const char *function, unsigned int line, hash
 }
 
 int 
-wrap_hash_delete_if(const char *file, const char *function, unsigned int line, hash_t h, hash_arg_f argf, void *arg)
+wrap_hash_delete_if(WRAPPERS_ARGS, hash_t h, hash_arg_f argf, void *arg)
 {
   int rv;
 
@@ -1028,7 +1028,7 @@ wrap_hash_delete_if(const char *file, const char *function, unsigned int line, h
 }
 
 int 
-wrap_hash_for_each(const char *file, const char *function, unsigned int line, hash_t h, hash_arg_f argf, void *arg)
+wrap_hash_for_each(WRAPPERS_ARGS, hash_t h, hash_arg_f argf, void *arg)
 {
   int rv;
 
@@ -1044,7 +1044,7 @@ wrap_hash_for_each(const char *file, const char *function, unsigned int line, ha
 }
 
 void
-wrap_hash_destroy(const char *file, const char *function, unsigned int line, hash_t h)
+wrap_hash_destroy(WRAPPERS_ARGS, hash_t h)
 {
   assert(file && function);
 
@@ -1056,7 +1056,7 @@ wrap_hash_destroy(const char *file, const char *function, unsigned int line, has
 }
 
 int 
-wrap_marshall_int8(const char *file, const char *function, unsigned int line, int8_t val, char *buf, unsigned int buflen)
+wrap_marshall_int8(WRAPPERS_ARGS, int8_t val, char *buf, unsigned int buflen)
 {
   int rv;
 
@@ -1072,7 +1072,7 @@ wrap_marshall_int8(const char *file, const char *function, unsigned int line, in
 }
 
 int 
-wrap_marshall_int32(const char *file, const char *function, unsigned int line, int32_t val, char *buf, unsigned int buflen)
+wrap_marshall_int32(WRAPPERS_ARGS, int32_t val, char *buf, unsigned int buflen)
 {
   int rv;
 
@@ -1088,7 +1088,7 @@ wrap_marshall_int32(const char *file, const char *function, unsigned int line, i
 }
 
 int 
-wrap_marshall_u_int8(const char *file, const char *function, unsigned int line, u_int8_t val, char *buf, unsigned int buflen)
+wrap_marshall_u_int8(WRAPPERS_ARGS, u_int8_t val, char *buf, unsigned int buflen)
 {
   int rv;
 
@@ -1104,7 +1104,7 @@ wrap_marshall_u_int8(const char *file, const char *function, unsigned int line, 
 }
 
 int 
-wrap_marshall_u_int32(const char *file, const char *function, unsigned int line, u_int32_t val, char *buf, unsigned int buflen)
+wrap_marshall_u_int32(WRAPPERS_ARGS, u_int32_t val, char *buf, unsigned int buflen)
 {
   int rv;
 
@@ -1120,7 +1120,7 @@ wrap_marshall_u_int32(const char *file, const char *function, unsigned int line,
 }
 
 int 
-wrap_marshall_float(const char *file, const char *function, unsigned int line, float val, char *buf, unsigned int buflen)
+wrap_marshall_float(WRAPPERS_ARGS, float val, char *buf, unsigned int buflen)
 {
   int rv;
 
@@ -1136,7 +1136,7 @@ wrap_marshall_float(const char *file, const char *function, unsigned int line, f
 }
 
 int 
-wrap_marshall_double(const char *file, const char *function, unsigned int line, double val, char *buf, unsigned int buflen)
+wrap_marshall_double(WRAPPERS_ARGS, double val, char *buf, unsigned int buflen)
 {
   int rv;
 
@@ -1152,7 +1152,7 @@ wrap_marshall_double(const char *file, const char *function, unsigned int line, 
 }
 
 int 
-wrap_marshall_buffer(const char *file, const char *function, unsigned int line, const char *val, unsigned int vallen, char *buf, unsigned int buflen)
+wrap_marshall_buffer(WRAPPERS_ARGS, const char *val, unsigned int vallen, char *buf, unsigned int buflen)
 {
   int rv;
 
@@ -1168,7 +1168,7 @@ wrap_marshall_buffer(const char *file, const char *function, unsigned int line, 
 }
 
 int 
-wrap_unmarshall_int8(const char *file, const char *function, unsigned int line, int8_t *val, const char *buf, unsigned int buflen)
+wrap_unmarshall_int8(WRAPPERS_ARGS, int8_t *val, const char *buf, unsigned int buflen)
 {
   int rv;
 
@@ -1184,7 +1184,7 @@ wrap_unmarshall_int8(const char *file, const char *function, unsigned int line, 
 }
 
 int 
-wrap_unmarshall_int32(const char *file, const char *function, unsigned int line, int32_t *val, const char *buf, unsigned int buflen)
+wrap_unmarshall_int32(WRAPPERS_ARGS, int32_t *val, const char *buf, unsigned int buflen)
 {
   int rv;
 
@@ -1200,7 +1200,7 @@ wrap_unmarshall_int32(const char *file, const char *function, unsigned int line,
 }
 
 int 
-wrap_unmarshall_u_int8(const char *file, const char *function, unsigned int line, u_int8_t *val, const char *buf, unsigned int buflen)
+wrap_unmarshall_u_int8(WRAPPERS_ARGS, u_int8_t *val, const char *buf, unsigned int buflen)
 {
   int rv;
 
@@ -1216,7 +1216,7 @@ wrap_unmarshall_u_int8(const char *file, const char *function, unsigned int line
 }
 
 int 
-wrap_unmarshall_u_int32(const char *file, const char *function, unsigned int line, u_int32_t *val, const char *buf, unsigned int buflen)
+wrap_unmarshall_u_int32(WRAPPERS_ARGS, u_int32_t *val, const char *buf, unsigned int buflen)
 {
   int rv;
 
@@ -1232,7 +1232,7 @@ wrap_unmarshall_u_int32(const char *file, const char *function, unsigned int lin
 }
 
 int
-wrap_unmarshall_float(const char *file, const char *function, unsigned int line, float *val, const char *buf, unsigned int buflen)
+wrap_unmarshall_float(WRAPPERS_ARGS, float *val, const char *buf, unsigned int buflen)
 {
   int rv;
 
@@ -1248,7 +1248,7 @@ wrap_unmarshall_float(const char *file, const char *function, unsigned int line,
 }
 
 int 
-wrap_unmarshall_double(const char *file, const char *function, unsigned int line, double *val, const char *buf, unsigned int buflen)
+wrap_unmarshall_double(WRAPPERS_ARGS, double *val, const char *buf, unsigned int buflen)
 {
   int rv;
 
@@ -1264,7 +1264,7 @@ wrap_unmarshall_double(const char *file, const char *function, unsigned int line
 }
 
 int 
-wrap_unmarshall_buffer(const char *file, const char *function, unsigned int line, char *val, unsigned int vallen, const char *buf, unsigned int buflen)
+wrap_unmarshall_buffer(WRAPPERS_ARGS, char *val, unsigned int vallen, const char *buf, unsigned int buflen)
 {
   int rv;
 

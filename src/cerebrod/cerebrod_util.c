@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_util.c,v 1.25 2005-06-28 22:42:01 achu Exp $
+ *  $Id: cerebrod_util.c,v 1.26 2005-06-29 21:55:17 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -36,9 +36,7 @@ _hash_reinsert(void *data, const void *key, void *arg)
 {
   hash_t newhash;
 
-  assert(data);
-  assert(key);
-  assert(arg);
+  assert(data && key && arg);
 
   newhash = *((hash_t *)arg);
   Hash_insert(newhash, key, data);
@@ -67,11 +65,7 @@ cerebrod_rehash(hash_t *old_hash,
   hash_t new_hash;
   int num;
 
-  assert(old_hash);
-  assert(hash_size);
-  assert(hash_size_increment > 0);
-  assert(hash_num > 0);
-  assert(hash_mutex);
+  assert(old_hash && hash_size && hash_size_increment && hash_num && hash_mutex);
 
 #if CEREBRO_DEBUG
   /* Should be called with lock already set */
