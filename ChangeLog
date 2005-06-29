@@ -10,6 +10,8 @@
 	* Added network util functions for common network code.
 
 	* Fix assert/wrappers code.
+
+	* Errnum support in util lib.
 	
 2005-06-28  Albert Chu  <chu11@llnl.gov>
 

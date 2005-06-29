@@ -7,7 +7,6 @@ Testing
 - api again
 
 Cleanup
-errnum stuff in config util?
 
 Audit
 - code review to reduce memory footprint

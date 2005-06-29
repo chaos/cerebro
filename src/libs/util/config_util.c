@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: config_util.c,v 1.8 2005-06-28 21:26:52 achu Exp $
+ *  $Id: config_util.c,v 1.9 2005-06-29 22:43:47 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -12,6 +12,7 @@
 #include <string.h>
 #endif /* STDC_HEADERS */
 
+#include "cerebro.h"
 #include "cerebro/cerebro_constants.h"
 
 #include "config_util.h"
@@ -25,17 +26,32 @@ char *config_debug_config_file = NULL;
 int config_debug_output = 0;
 #endif /* CEREBRO_DEBUG */
 
-int
-load_config_module(struct cerebro_config *conf)
+/* 
+ * _load_config_module
+ *
+ * Find and load config module
+ *
+ * Returns data in structure and 0 on success, -1 on error
+ */
+static int
+_load_config_module(struct cerebro_config *conf, unsigned int *errnum)
 {
   int rv = -1;
   config_module_t config_handle = NULL;
 
   if (!(config_handle = config_module_load()))
-    goto cleanup;
+    {
+      if (errnum)
+        *errnum = CEREBRO_ERR_CONFIG_MODULE;
+      goto cleanup;
+    }
 
   if (config_module_setup(config_handle) < 0)
-    goto cleanup;
+    {
+      if (errnum)
+        *errnum = CEREBRO_ERR_CONFIG_MODULE;
+      goto cleanup;
+    }
 
 #if CEREBRO_DEBUG  
   if (config_debug_output)
@@ -50,7 +66,11 @@ load_config_module(struct cerebro_config *conf)
 #endif /* CEREBRO_DEBUG */
 
   if (config_module_load_default(config_handle, conf) < 0)
-    goto cleanup;
+    {
+      if (errnum)
+        *errnum = CEREBRO_ERR_CONFIG_MODULE;
+      goto cleanup;
+    }
 
   rv = 0;
  cleanup:
@@ -154,8 +174,15 @@ _cb_cerebro_hostnames(conffile_t cf, struct conffile_data *data,
   return 0;
 }
 
-int
-load_config_file(struct cerebro_config *conf)
+/* 
+ * _load_config_file
+ *
+ * Read and load configuration file
+ *
+ * Returns data in structure and 0 on success, -1 on error
+ */
+static int
+_load_config_file(struct cerebro_config *conf, unsigned int *errnum)
 {
   char *config_file = NULL;
 
@@ -396,6 +423,8 @@ load_config_file(struct cerebro_config *conf)
   if (!(cf = conffile_handle_create()))
     {
       CEREBRO_DBG(("conffile_handle_create"));
+      if (errnum)
+        *errnum = CEREBRO_ERR_OUTMEM;
       goto cleanup;
     }
   
@@ -424,6 +453,8 @@ load_config_file(struct cerebro_config *conf)
       else
 	CEREBRO_DBG(("conffile_parse: %s", buf));
 	
+      if (errnum)
+        *errnum = CEREBRO_ERR_CONFIG_FILE;
       goto cleanup;
     }
   
@@ -446,11 +477,15 @@ load_config_file(struct cerebro_config *conf)
  * Returns 0 on success, -1 on error
  */
 static int
-_set_cerebro_config(struct cerebro_config *dest, struct cerebro_config *src)
+_set_cerebro_config(struct cerebro_config *dest, 
+                    struct cerebro_config *src,
+                    unsigned int *errnum)
 {
   if (!dest || !src)
     {
       CEREBRO_DBG(("invalid parameters"));
+      if (errnum)
+        *errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
 
@@ -591,14 +626,24 @@ _set_cerebro_config(struct cerebro_config *dest, struct cerebro_config *src)
   return 0;
 }
 
-int 
-merge_cerebro_configs(struct cerebro_config *conf,
-		      struct cerebro_config *module_conf,
-		      struct cerebro_config *config_file_conf)
+
+/* 
+ * _merge_cerebro_configs
+ *
+ * Merge contents of module_conf and config_file_conf into conf.  The
+ * config file conf takes precedence.
+ */
+static int 
+_merge_cerebro_configs(struct cerebro_config *conf,
+                       struct cerebro_config *module_conf,
+                       struct cerebro_config *config_file_conf,
+                       unsigned int *errnum)
 {
   if (!conf || !module_conf || !config_file_conf)
     {
       CEREBRO_DBG(("invalid parameters"));
+      if (errnum)
+        *errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
 
@@ -609,17 +654,17 @@ merge_cerebro_configs(struct cerebro_config *conf,
 
   memset(conf, '\0', sizeof(struct cerebro_config));
 
-  if (_set_cerebro_config(conf, config_file_conf) < 0)
+  if (_set_cerebro_config(conf, config_file_conf, errnum) < 0)
     return -1;
 
-  if (_set_cerebro_config(conf, module_conf) < 0)
+  if (_set_cerebro_config(conf, module_conf, errnum) < 0)
     return -1;
 
   return 0;
 }
 
 int 
-load_config(struct cerebro_config *conf)
+load_config(struct cerebro_config *conf, unsigned int *errnum)
 {
   struct cerebro_config module_conf; 
   struct cerebro_config config_file_conf;
@@ -627,6 +672,8 @@ load_config(struct cerebro_config *conf)
   if (!conf)
     {
       CEREBRO_DBG(("conf null"));
+      if (errnum)
+        *errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
 
@@ -634,15 +681,13 @@ load_config(struct cerebro_config *conf)
   memset(&module_conf, '\0', sizeof(struct cerebro_config));
   memset(&config_file_conf, '\0', sizeof(struct cerebro_config));
 
-  if (load_config_module(&module_conf) < 0)
+  if (_load_config_module(&module_conf, errnum) < 0)
     return -1;
 
-  if (load_config_file(&config_file_conf) < 0)
+  if (_load_config_file(&config_file_conf, errnum) < 0)
     return -1;
 
-  if (merge_cerebro_configs(conf, 
-			    &module_conf,
-			    &config_file_conf) < 0)
+  if (_merge_cerebro_configs(conf, &module_conf, &config_file_conf, errnum) < 0)
     return -1;
  
   return 0;

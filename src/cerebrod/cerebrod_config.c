@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.113 2005-06-29 22:06:39 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.114 2005-06-29 22:43:47 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -218,14 +218,15 @@ static void
 _cerebrod_load_config(void)
 {
   struct cerebro_config conf_l;
+  unsigned int errnum;
 
 #if CEREBRO_DEBUG
   config_debug_config_file = conf.config_file;
   config_debug_output = conf.debug;
 #endif /* CEREBRO_DEBUG */
 
-  if (load_config(&conf_l) < 0)
-    CEREBRO_EXIT(("load_config"));
+  if (load_config(&conf_l, &errnum) < 0)
+    CEREBRO_EXIT(("load_config: %d", errnum));
   
   if (conf_l.cerebrod_heartbeat_frequency_flag)
     {
