@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.99 2005-06-28 23:57:28 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.100 2005-06-29 00:55:26 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -174,9 +174,8 @@ static int
 _cerebrod_heartbeat_check_version(const char *buf, unsigned int buflen)
 {
   int32_t version;
-  int n;
 
-  if (!(n = Unmarshall_int32(&version, buf, buflen)))
+  if (!Unmarshall_int32(&version, buf, buflen))
     return -1;
 
   if (version != CEREBROD_HEARTBEAT_PROTOCOL_VERSION)

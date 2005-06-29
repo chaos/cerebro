@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric.c,v 1.57 2005-06-28 23:57:28 achu Exp $
+ *  $Id: cerebrod_metric.c,v 1.58 2005-06-29 00:55:26 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -213,11 +213,9 @@ _metric_request_check_version(const char *buf,
                               unsigned int buflen,
                               int32_t *version)
 {
-  int n;
-  
   assert(version);
                                        
-  if (!(n = Unmarshall_int32(version, buf, buflen)))
+  if (!Unmarshall_int32(version, buf, buflen))
     return -1;
                                                                                      
   if (*version != CEREBRO_METRIC_PROTOCOL_VERSION)

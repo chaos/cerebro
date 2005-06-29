@@ -335,9 +335,7 @@ static int
 _receive_node_metric_responses(cerebro_t handle, void *list, int fd)
 {
   struct cerebro_node_metric_response res;
-  char nodename_buf[CEREBRO_MAX_NODENAME_LEN+1];
   struct cerebro_nodelist *nodelist;
-  int res_len;
 
   if (_cerebro_handle_check(handle) < 0)
     {
@@ -351,9 +349,18 @@ _receive_node_metric_responses(cerebro_t handle, void *list, int fd)
       goto cleanup;
     }
 
-  /* XXX the cleanup here is disgusting */
+  nodelist = (struct cerebro_nodelist *)list;
+  if (nodelist->magic != CEREBRO_NODELIST_MAGIC_NUMBER)
+    {
+      CEREBRO_DBG(("invalid parameters"));
+      goto cleanup;
+    }
+
   while (1)
     {
+      char nodename_buf[CEREBRO_MAX_NODENAME_LEN+1];
+      int res_len;
+
       memset(&res, '\0', sizeof(struct cerebro_node_metric_response));
       if ((res_len = _receive_node_metric_response(handle, fd, &res)) < 0)
         goto cleanup;

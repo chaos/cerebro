@@ -12,10 +12,11 @@ Cleanup
 - common receive data func?
 - no need to malloc values in heartbeats and destroy em??
 - packet buflen max len issue with number of metrics supportable
+  - base on metric_max
 - string length issue with packet buflen fixed in listener
 - check version earlier during unmarshalling, otherwise who knows what
 data you're unmarshalling.
-   - only need to do in cerebro lib now
+   - only need to do in cerebro metric_data now
 
 Audit
 - code review to reduce memory footprint
