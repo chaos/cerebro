@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.c,v 1.5 2005-06-29 17:26:58 achu Exp $
+ *  $Id: wrappers.c,v 1.6 2005-06-29 21:46:47 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -22,19 +22,36 @@ extern int h_errno;
 #define MALLOC_PAD_DATA   0xab
 #define MALLOC_PAD_LEN    16
 
+#define WRAPPERS_ERR_INVALID_PARAMETERS(func) \
+   do { \
+     cerebro_err_exit(func "(%s, %s, %d): invalid parameters", \
+                      file, function, line); \
+   } while(0);
+
+#define WRAPPERS_ERR_ERRNO(func) \
+   do { \
+     cerebro_err_exit(func "(%s, %s, %d): %s", \
+                      file, function, line, strerror(errno)); \
+   } while(0);
+
+#define WRAPPERS_ERR_MSG(func, msg) \
+   do { \
+     cerebro_err_exit(func "(%s, %s, %d): %s", \
+                      file, function, line, msg); \
+   } while(0);
+
 void *
 wrap_malloc(const char *file, const char *function, unsigned int line, size_t size)
 {
   void *ptr;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
   if (!(size > 0 || size <= INT_MAX))
-    cerebro_err_exit("malloc(%s(%s:%d)): invalid size: %d", file, function, line, size);
+    WRAPPERS_ERR_INVALID_PARAMETERS("malloc");
 
   if (!(ptr = malloc(2*sizeof(int) + size + MALLOC_PAD_LEN))) 
-    cerebro_err_exit("malloc(%s(%s:%d)): %s", file, function, line, strerror(errno));
+    WRAPPERS_ERR_ERRNO("malloc");
 
   *((int *)(ptr)) = MALLOC_MAGIC;
   *((int *)(ptr+sizeof(int))) = size;
@@ -46,25 +63,23 @@ wrap_malloc(const char *file, const char *function, unsigned int line, size_t si
 void
 wrap_free(const char *file, const char *function, unsigned int line, void *ptr)
 {
-  assert(file);
-  assert(function);
+  void *p = ptr - 2*sizeof(int);
+  int i, size;
+  char *c;
 
-  if (ptr)
-    {
-      void *p = ptr - 2*sizeof(int);
-      int i, size;
-      char *c;
+  assert(file && function);
 
-      /* assert(*((int *)p) == MALLOC_MAGIC); */
-      if (!(*((int *)p) == MALLOC_MAGIC))
-        cerebro_err_exit("free(%s(%s:%d)): memory corruption", file, function, line);
+  if (!ptr)
+    return;
 
-      size = *((int *)(p + sizeof(int)));
-      c = (char *)(p + 2*sizeof(int) + size);
-      for (i = 0; i < MALLOC_PAD_LEN; i++)
-        assert(c[i] == (char)MALLOC_PAD_DATA);
-      free(p);
-    }
+  if (!(*((int *)p) == MALLOC_MAGIC))
+    WRAPPERS_ERR_MSG("free", "memory corruption");
+
+  size = *((int *)(p + sizeof(int)));
+  c = (char *)(p + 2*sizeof(int) + size);
+  for (i = 0; i < MALLOC_PAD_LEN; i++)
+    assert(c[i] == (char)MALLOC_PAD_DATA);
+  free(p);
 }
 
 void 
@@ -78,11 +93,10 @@ wrap_strdup(const char *file, const char *function, unsigned int line, const cha
 {
   char *ptr;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
   if (!s)
-    cerebro_err_exit("strdup(%s(%s:%d)): null s pointer", file, function, line);
+    WRAPPERS_ERR_INVALID_PARAMETERS("strdup");
 
   ptr = wrap_malloc(file, function, line, strlen(s) + 1);
   strcpy(ptr, s);
@@ -94,18 +108,13 @@ wrap_strncpy(const char *file, const char *function, unsigned int line, char *de
 {
   char *rv;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
-  if (!dest)
-    cerebro_err_exit("strncpy(%s(%s:%d)): null dest pointer", file, function, line);
-
-  if (!src)
-    cerebro_err_exit("strncpy(%s(%s:%d)): null src pointer", file, function, line);
+  if (!dest || !src)
+    WRAPPERS_ERR_INVALID_PARAMETERS("strncpy");
 
   rv = strncpy(dest, src, n);
   dest[n-1] = '\0';
-  
   return rv;
 }
 
@@ -114,15 +123,13 @@ wrap_open(const char *file, const char *function, unsigned int line, const char 
 {
   int fd;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
   
   if (!pathname)
-    cerebro_err_exit("open(%s(%s:%d)): null pathname pointer");
+    WRAPPERS_ERR_INVALID_PARAMETERS("open");
 
   if ((fd = open(pathname, flags, mode)) < 0)
-    cerebro_err_exit("open(%s(%s:%d)): pathname=%s flags=%x mode=%o: %s", 
-             file, function, line, pathname, flags, mode, strerror(errno));
+    WRAPPERS_ERR_ERRNO("open");
 
   return fd;
 }
@@ -132,11 +139,11 @@ wrap_close(const char *file, const char *function, unsigned int line, int fd)
 {
   int rv;
                                  
-  assert(file);
-  assert(function);
+  assert(file && function);
                                                    
   if ((rv = close(fd)) < 0)
-    cerebro_err_exit("close(%s(%s:%d)): %s", file, function, line, strerror(errno));
+    WRAPPERS_ERR_ERRNO("close");
+
   return rv;
 }
 
@@ -145,18 +152,13 @@ wrap_read(const char *file, const char *function, unsigned int line, int fd, voi
 {
   ssize_t rv;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
-  if (!buf)
-    cerebro_err_exit("read(%s(%s:%d)): null buf pointer", file, function, line);
-
-  if (!(count > 0 || count <= INT_MAX))
-    cerebro_err_exit("read(%s(%s:%d)): invalid count: %d", file, function, line, count);
+  if (!buf || !(count > 0 || count <= INT_MAX))
+    WRAPPERS_ERR_INVALID_PARAMETERS("read");
 
   if ((rv = fd_read_n(fd, buf, count)) < 0)
-    cerebro_err_exit("read(%s(%s:%d)): count=%d: %s", 
-             file, function, line, count, strerror(errno));
+    WRAPPERS_ERR_ERRNO("read");
   
   return rv;
 }
@@ -166,18 +168,13 @@ wrap_write(const char *file, const char *function, unsigned int line, int fd, co
 {
   ssize_t rv;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
-  if (!buf)
-    cerebro_err_exit("write(%s(%s:%d)): null buf pointer", file, function, line);
-
-  if (!(count > 0 || count <= INT_MAX))
-    cerebro_err_exit("write(%s(%s:%d)): invalid count: %d", file, function, line, count);
+  if (!buf || !(count > 0 || count <= INT_MAX))
+    WRAPPERS_ERR_INVALID_PARAMETERS("write");
 
   if ((rv = fd_write_n(fd, buf, count)) < 0)
-    cerebro_err_exit("write(%s(%s:%d)): count=%d: %s", 
-             file, function, line, count, strerror(errno));
+    WRAPPERS_ERR_ERRNO("write");
 
   return rv;
 }
@@ -187,14 +184,13 @@ wrap_chdir(const char *file, const char *function, unsigned int line, const char
 {
   int rv;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
   if (!path)
-    cerebro_err_exit("chdir(%s(%s:%d)): null path pointer", file, function, line);
+    WRAPPERS_ERR_INVALID_PARAMETERS("chdir");
 
   if ((rv = chdir(path)) < 0)
-    cerebro_err_exit("chdir(%s(%s:%d)): path=%s: %s", file, function, line, path, strerror(errno));
+    WRAPPERS_ERR_ERRNO("chdir");
 
   return rv;
 }
@@ -204,17 +200,13 @@ wrap_stat(const char *file, const char *function, unsigned int line, const char 
 {
   int rv;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
-  if (!path)
-    cerebro_err_exit("stat(%s(%s:%d)): null path pointer", file, function, line);
-
-  if (!buf)
-    cerebro_err_exit("stat(%s(%s:%d)): null buf pointer", file, function, line);
+  if (!path || !buf)
+    WRAPPERS_ERR_INVALID_PARAMETERS("stat");
 
   if ((rv = stat(path, buf)) < 0)
-    cerebro_err_exit("stat(%s(%s:%d)): path=%s: %s", file, function, line, path, strerror(errno));
+    WRAPPERS_ERR_ERRNO("stat");
 
   return rv;
 }
@@ -222,8 +214,7 @@ wrap_stat(const char *file, const char *function, unsigned int line, const char 
 mode_t
 wrap_umask(const char *file, const char *function, unsigned int line, mode_t mask)
 {
-  assert(file);
-  assert(function);
+  assert(file && function);
 
   /* achu: never supposed to fail.  Go fig. */
   return umask(mask);
@@ -234,14 +225,13 @@ wrap_opendir(const char *file, const char *function, unsigned int line, const ch
 {
   DIR *rv;
   
-  assert(file);
-  assert(function);
+  assert(file && function);
 
   if (!name)
-    cerebro_err_exit("opendir(%s(%s:%d)): null name pointer", file, function, line);
+    WRAPPERS_ERR_INVALID_PARAMETERS("opendir");
 
   if (!(rv = opendir(name)))
-    cerebro_err_exit("opendir(%s(%s:%d)): name=%s: %s", file, function, line, name, strerror(errno));
+    WRAPPERS_ERR_ERRNO("opendir");
 
   return rv;
 }
@@ -251,14 +241,13 @@ wrap_closedir(const char *file, const char *function, unsigned int line, DIR *di
 {
   int rv;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
   if (!dir)
-    cerebro_err_exit("closedir(%s(%s:%d)): null dir pointer", file, function, line);
+    WRAPPERS_ERR_INVALID_PARAMETERS("closedir");
 
   if ((rv = closedir(dir)) < 0)
-    cerebro_err_exit("closedir(%s(%s:%d)): %s", file, function, line, strerror(errno));
+    WRAPPERS_ERR_ERRNO("closedir");
 
   return rv;
 }
@@ -268,12 +257,10 @@ wrap_socket(const char *file, const char *function, unsigned int line, int domai
 {
   int fd;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
   if ((fd = socket(domain, type, protocol)) < 0)
-    cerebro_err_exit("socket(%s(%s:%d)): domain=%x type=%x protocol=%x: %s", 
-             file, function, line, domain, type, protocol, strerror(errno));
+    WRAPPERS_ERR_ERRNO("socket");
 
   return fd;
 }
@@ -283,18 +270,13 @@ wrap_bind(const char *file, const char *function, unsigned int line, int sockfd,
 {
   int rv;
   
-  assert(file);
-  assert(function);
+  assert(file && function);
 
-  if (!my_addr)
-    cerebro_err_exit("bind(%s(%s:%d)): null my_addr pointer", file, function, line);
-
-  if (!(addrlen > 0 || addrlen <= INT_MAX))
-    cerebro_err_exit("bind(%s(%s:%d)): invalid addrlen: %d", file, function, line, addrlen);
+  if (!my_addr || !(addrlen > 0 || addrlen <= INT_MAX))
+    WRAPPERS_ERR_INVALID_PARAMETERS("bind");
 
   if ((rv = bind(sockfd, my_addr, addrlen)) < 0)
-    cerebro_err_exit("bind(%s(%s:%d)): addrlen=%d: %s", 
-             file, function, line, addrlen, strerror(errno));
+    WRAPPERS_ERR_ERRNO("bind");
 
   return rv;
 }
@@ -304,18 +286,13 @@ wrap_connect(const char *file, const char *function, unsigned int line, int sock
 {
   int rv;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
-  if (!serv_addr)
-    cerebro_err_exit("connect(%s(%s:%d)): null serv_addr pointer", file, function, line);
-
-  if (!(addrlen > 0 || addrlen <= INT_MAX))
-    cerebro_err_exit("connect(%s(%s:%d)): invalid addrlen: %d", file, function, line, addrlen);
+  if (!serv_addr || !(addrlen > 0 || addrlen <= INT_MAX))
+    WRAPPERS_ERR_INVALID_PARAMETERS("connect");
 
   if ((rv = connect(sockfd, serv_addr, addrlen)) < 0)
-    cerebro_err_exit("connect(%s(%s:%d)): addrlen=%d: %s", 
-             file, function, line, addrlen, strerror(errno));
+    WRAPPERS_ERR_ERRNO("connect");
 
   return rv;
 }
@@ -325,15 +302,13 @@ wrap_listen(const char *file, const char *function, unsigned int line, int s, in
 {
   int rv;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
   if (!(backlog > 0 || backlog <= INT_MAX))
-    cerebro_err_exit("listen(%s(%s:%d)): invalid backlog: %d", file, function, line, backlog);
+    WRAPPERS_ERR_INVALID_PARAMETERS("listen");
 
   if ((rv = listen(s, backlog)) < 0)
-    cerebro_err_exit("listen(%s(%s:%d)): backlog=%d: %s", 
-             file, function, line, backlog, strerror(errno));
+    WRAPPERS_ERR_ERRNO("listen");
 
   return rv;
 }
@@ -343,20 +318,13 @@ wrap_accept(const char *file, const char *function, unsigned int line, int s, st
 {
   int rv;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
-  if (!addr)
-    cerebro_err_exit("accept(%s(%s:%d)): null addr pointer", file, function, line);
-
-  if (!addrlen)
-    cerebro_err_exit("accept(%s(%s:%d)): null addrlen pointer", file, function, line);
-
-  if (!(*addrlen > 0 || *addrlen <= INT_MAX))
-    cerebro_err_exit("accept(%s(%s:%d)): invalid addrlen: %d", file, function, line, *addrlen);
+  if (!addr || !addrlen || !(*addrlen > 0 || *addrlen <= INT_MAX))
+    WRAPPERS_ERR_INVALID_PARAMETERS("accept");
 
   if ((rv = accept(s, addr, addrlen)) < 0)
-    cerebro_err_exit("accept(%s(%s:%d)): %s", file, function, line, strerror(errno));
+    WRAPPERS_ERR_ERRNO("accept");
 
   return rv;
 }
@@ -368,14 +336,13 @@ wrap_select(const char *file, const char *function, unsigned int line, int n, fd
   struct timeval timeout_orig, timeout_current;
   struct timeval start, end, delta;
   
-  assert(file);
-  assert(function);
+  assert(file && function);
 
   /* readfds, writefds, exceptfds, and timeout could each be null, but
    * not all can be null at the same time
    */
   if (!readfds && !writefds && !exceptfds && !timeout)
-    cerebro_err_exit("select(%s(%s:%d)): all null pointers", file, function, line);
+    WRAPPERS_ERR_INVALID_PARAMETERS("select");
 
   if (timeout) 
     {
@@ -388,7 +355,7 @@ wrap_select(const char *file, const char *function, unsigned int line, int n, fd
     {
       rv = select(n, readfds, writefds, exceptfds, &timeout_current);
       if (rv < 0 && errno != EINTR)
-	cerebro_err_exit("select(%s(%s:%d)): %s", strerror(errno));
+        WRAPPERS_ERR_ERRNO("select");
       if (rv < 0 && timeout) 
 	{
 	  Gettimeofday(&end, NULL);
@@ -411,9 +378,7 @@ wrap_poll(const char *file, const char *function, unsigned int line, struct poll
   struct timeval start, end, delta;
                                                                          
   if (!ufds)  
-    cerebro_err_exit("poll(%s(%s:%d)): null ufds pointer", file, function, line);
-
-  /* timeout can be <= 0 */
+    WRAPPERS_ERR_INVALID_PARAMETERS("poll");
 
   /* Poll uses timeout in milliseconds */
   if (timeout >= 0) 
@@ -426,7 +391,7 @@ wrap_poll(const char *file, const char *function, unsigned int line, struct poll
   do {
     rv = poll(ufds, nfds, timeout);
     if (rv < 0 && errno != EINTR)
-      cerebro_err_exit("poll(%s(%s:%d)): %s", strerror(errno));
+      WRAPPERS_ERR_ERRNO("poll");
     if (rv < 0 && timeout >= 0) {
       Gettimeofday(&end, NULL);
       /* delta = end-start */
@@ -445,21 +410,13 @@ wrap_getsockopt(const char *file, const char *function, unsigned int line, int s
 {
   int rv;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
-  if (!optval)
-    cerebro_err_exit("getsockopt(%s(%s:%d)): null optval pointer", file, function, line);
-
-  if (!optlen)  
-    cerebro_err_exit("getsockopt(%s(%s:%d)): null optlen pointer", file, function, line);
-
-  if (!(*optlen > 0 || *optlen <= INT_MAX))
-    cerebro_err_exit("getsockopt(%s(%s:%d)): invalid *optlen: %d", file, function, line, *optlen);
+  if (!optval || !optlen || !(*optlen > 0 || *optlen <= INT_MAX))
+    WRAPPERS_ERR_INVALID_PARAMETERS("getsockopt");
 
   if ((rv = getsockopt(s, level, optname, optval, optlen)) < 0)
-    cerebro_err_exit("getsockopt(%s(%s:%d)): optname=%x: %s", 
-             file, function, line, optname, strerror(errno));
+    WRAPPERS_ERR_ERRNO("getsockopt");
 
   return rv;
 }
@@ -469,17 +426,13 @@ wrap_setsockopt(const char *file, const char *function, unsigned int line, int s
 {
   int rv;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
-  if (!optval)
-    cerebro_err_exit("setsockopt(%s(%s:%d)): null optval pointer", file, function, line);
-
-  if (!(optlen > 0 || optlen <= INT_MAX))
-    cerebro_err_exit("setsockopt(%s(%s:%d)): invalid optlen: %d", file, function, line, optlen);
+  if (!optval || !(optlen > 0 || optlen <= INT_MAX))
+    WRAPPERS_ERR_INVALID_PARAMETERS("setsockopt");
 
   if ((rv = setsockopt(s, level, optname, optval, optlen)) < 0)
-    cerebro_err_exit("setsockopt(%s(%s:%d)): %s", file, function, line, strerror(errno));
+    WRAPPERS_ERR_ERRNO("setsockopt");
 
   return rv;
 }
@@ -489,14 +442,13 @@ wrap_gethostbyname(const char *file, const char *function, unsigned int line, co
 {
   struct hostent *rv;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
   if (!name)
-    cerebro_err_exit("gethostbyname(%s(%s:%d)): null name pointer", file, function, line);
+    WRAPPERS_ERR_INVALID_PARAMETERS("gethostbyname");
 
   if (!(rv = gethostbyname(name)))
-    cerebro_err_exit("gethostbyname(%s(%s:%d)): name=%s: %s", file, function, line, name, hstrerror(h_errno));
+    WRAPPERS_ERR_MSG("gethostbyname", hstrerror(h_errno));
 
   return rv;
 }
@@ -506,17 +458,13 @@ wrap_inet_ntop(const char *file, const char *function, unsigned int line, int af
 {
   const char *rv;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
-  if (!src)
-    cerebro_err_exit("inet_ntop(%s(%s:%d)): null src pointer", file, function, line);
-
-  if (!dst)
-    cerebro_err_exit("inet_ntop(%s(%s:%d)): null dst pointer", file, function, line);
+  if (!src || !dst)
+    WRAPPERS_ERR_INVALID_PARAMETERS("inet_ntop");
 
   if ((rv = inet_ntop(af, src, dst, cnt)) < 0)
-    cerebro_err_exit("inet_ntop(%s(%s:%d)): af=%x: %s", file, function, line, af, strerror(errno));
+    WRAPPERS_ERR_ERRNO("inet_ntop");
   
   return rv;
 }
@@ -526,17 +474,13 @@ wrap_inet_pton(const char *file, const char *function, unsigned int line, int af
 {
   int rv;
   
-  assert(file);
-  assert(function);
+  assert(file && function);
 
-  if (!src)
-    cerebro_err_exit("inet_pton(%s(%s:%d)): null src pointer", file, function, line);
-
-  if (!dst)
-    cerebro_err_exit("inet_pton(%s(%s:%d)): null dst pointer", file, function, line);
+  if (!src || !dst)
+    WRAPPERS_ERR_INVALID_PARAMETERS("inet_pton");
 
   if ((rv = inet_pton(af, src, dst)) < 0)
-    cerebro_err_exit("inet_pton(%s(%s:%d)): af=%x: %s", file, function, line, af, strerror(errno));
+    WRAPPERS_ERR_ERRNO("inet_pton");
 
   return rv;
 }
@@ -546,16 +490,13 @@ wrap_gettimeofday(const char *file, const char *function, unsigned int line, str
 {
   int rv;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
   if (!tv)
-    cerebro_err_exit("gettimeofday(%s(%s:%d)): null tv pointer", file, function, line);
-
-  /* tz can be null */
+    WRAPPERS_ERR_INVALID_PARAMETERS("gettimeofday");
 
   if ((rv = gettimeofday(tv, tz)) < 0)
-    cerebro_err_exit("gettimeofday(%s(%s:%d)): %s", file, function, line, strerror(errno));
+    WRAPPERS_ERR_ERRNO("gettimeofday");
 
   return rv;
 }
@@ -565,19 +506,13 @@ wrap_pthread_create(const char *file, const char *function, unsigned int line, p
 {
   int rv;
   
-  assert(file);
-  assert(function);
+  assert(file && function);
 
-  if (!thread)
-    cerebro_err_exit("pthread_create(%s(%s:%d)): null thread pointer", file, function, line);
-
-  /* attr can be null */
-
-  if (!start_routine)
-    cerebro_err_exit("pthread_create(%s(%s:%d)): null start_routine pointer", file, function, line);
+  if (!thread || !start_routine)
+    WRAPPERS_ERR_INVALID_PARAMETERS("pthread_create");
 
   if ((rv = pthread_create(thread, attr, start_routine, arg)) != 0)
-    cerebro_err_exit("pthread_create(%s(%s:%d)): %s", file, function, line, strerror(rv));
+    WRAPPERS_ERR_MSG("pthread_create", strerror(rv));
 
   return rv;
 }
@@ -587,14 +522,13 @@ wrap_pthread_attr_init(const char *file, const char *function, unsigned int line
 {
   int rv;
   
-  assert(file);
-  assert(function);
+  assert(file && function);
 
   if (!attr)
-    cerebro_err_exit("pthread_attr_init(%s(%s:%d)): null attr pointer", file, function, line);
+    WRAPPERS_ERR_INVALID_PARAMETERS("pthread_attr_init");
 
   if ((rv = pthread_attr_init(attr)) != 0)
-    cerebro_err_exit("pthread_attr_init(%s(%s:%d)): %s", file, function, line, strerror(rv));
+    WRAPPERS_ERR_MSG("pthread_attr_init", strerror(rv));
 
   return rv;
 }
@@ -604,14 +538,13 @@ wrap_pthread_attr_destroy(const char *file, const char *function, unsigned int l
 {
   int rv;
   
-  assert(file);
-  assert(function);
+  assert(file && function);
 
   if (!attr)
-    cerebro_err_exit("pthread_attr_destroy(%s(%s:%d)): null attr pointer", file, function, line);
+    WRAPPERS_ERR_INVALID_PARAMETERS("pthread_attr_destroy");
 
   if ((rv = pthread_attr_destroy(attr)) != 0)
-    cerebro_err_exit("pthread_attr_destroy(%s(%s:%d)): %s", file, function, line, strerror(rv));
+    WRAPPERS_ERR_MSG("pthread_attr_destroy", strerror(rv));
 
   return rv;
 }
@@ -621,15 +554,13 @@ wrap_pthread_attr_setdetachstate(const char *file, const char *function, unsigne
 {
   int rv;
   
-  assert(file);
-  assert(function);
+  assert(file && function);
 
   if (!attr)
-    cerebro_err_exit("pthread_attr_setdetachstate(%s(%s:%d)): null attr pointer", file, function, line);
+    WRAPPERS_ERR_INVALID_PARAMETERS("pthread_attr_setdetachstate");
 
   if ((rv = pthread_attr_setdetachstate(attr, detachstate)) != 0)
-    cerebro_err_exit("pthread_attr_setdetachstate(%s(%s:%d)): detachstate=%d: %s", 
-             file, function, line, detachstate, strerror(rv));
+    WRAPPERS_ERR_MSG("pthread_attr_setdetachstate", strerror(rv));
 
   return rv;
 }
@@ -639,14 +570,13 @@ wrap_pthread_mutex_lock(const char *file, const char *function, unsigned int lin
 {
   int rv;
   
-  assert(file);
-  assert(function);
+  assert(file && function);
 
   if (!mutex)
-    cerebro_err_exit("pthread_mutex_lock(%s(%s:%d)): null mutex pointer", file, function, line);
+    WRAPPERS_ERR_INVALID_PARAMETERS("pthread_mutex_lock");
 
   if ((rv = pthread_mutex_lock(mutex)) != 0)
-    cerebro_err_exit("pthread_mutex_lock(%s(%s:%d)): %s", file, function, line, strerror(rv));
+    WRAPPERS_ERR_MSG("pthread_mutex_lock", strerror(rv));
 
   return rv;
 }
@@ -656,15 +586,14 @@ wrap_pthread_mutex_trylock(const char *file, const char *function, unsigned int 
 {
   int rv;
   
-  assert(file);
-  assert(function);
+  assert(file && function);
 
   if (!mutex)
-    cerebro_err_exit("pthread_mutex_trylock(%s(%s:%d)): null mutex pointer", file, function, line);
+    WRAPPERS_ERR_INVALID_PARAMETERS("pthread_mutex_trylock");
 
   rv = pthread_mutex_trylock(mutex);
   if (rv != 0 && rv != EBUSY)
-    cerebro_err_exit("pthread_mutex_trylock(%s(%s:%d)): %s", file, function, line, strerror(rv));
+    WRAPPERS_ERR_MSG("pthread_mutex_trylock", strerror(rv));
 
   return rv;
 }
@@ -674,14 +603,13 @@ wrap_pthread_mutex_unlock(const char *file, const char *function, unsigned int l
 {
   int rv;
   
-  assert(file);
-  assert(function);
+  assert(file && function);
 
   if (!mutex)
-    cerebro_err_exit("pthread_mutex_unlock(%s(%s:%d)): null mutex pointer", file, function, line);
+    WRAPPERS_ERR_INVALID_PARAMETERS("pthread_mutex_unlock");
 
   if ((rv = pthread_mutex_unlock(mutex)) != 0)
-    cerebro_err_exit("pthread_mutex_unlock(%s(%s:%d)): %s", file, function, line, strerror(rv));
+    WRAPPERS_ERR_MSG("pthread_mutex_unlock", strerror(rv));
 
   return rv;
 }
@@ -691,16 +619,13 @@ wrap_pthread_mutex_init(const char *file, const char *function, unsigned int lin
 {
   int rv;
   
-  assert(file);
-  assert(function);
+  assert(file && function);
 
   if (!mutex)
-    cerebro_err_exit("pthread_mutex_init(%s(%s:%d)): null mutex pointer", file, function, line);
-
-  /* mutexattr can be null */
+    WRAPPERS_ERR_INVALID_PARAMETERS("pthread_mutex_init");
 
   if ((rv = pthread_mutex_init(mutex, mutexattr)) != 0)
-    cerebro_err_exit("pthread_mutex_init(%s(%s:%d)): %s", file, function, line, strerror(rv));
+    WRAPPERS_ERR_MSG("pthread_mutex_init", strerror(rv));
 
   return rv;
 }
@@ -710,14 +635,13 @@ wrap_pthread_cond_signal(const char *file, const char *function, unsigned int li
 {
   int rv;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
   if (!cond)
-    cerebro_err_exit("pthread_cond_signal(%s(%s:%d)): null cond pointer", file, function, line);
+    WRAPPERS_ERR_INVALID_PARAMETERS("pthread_cond_signal");
 
   if ((rv = pthread_cond_signal(cond)) != 0)
-    cerebro_err_exit("pthread_cond_signal(%s(%s:%d)): %s", file, function, line, strerror(rv));
+    WRAPPERS_ERR_MSG("pthread_cond_signal", strerror(rv));
 
   return rv;
 }
@@ -727,17 +651,13 @@ wrap_pthread_cond_wait(const char *file, const char *function, unsigned int line
 {
   int rv;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
-  if (!cond)
-    cerebro_err_exit("pthread_cond_wait(%s(%s:%d)): null cond pointer", file, function, line);
-
-  if (!mutex)
-    cerebro_err_exit("pthread_cond_wait(%s(%s:%d)): null mutex pointer", file, function, line);
+  if (!cond || !mutex)
+    WRAPPERS_ERR_INVALID_PARAMETERS("pthread_cond_wait");
 
   if ((rv = pthread_cond_wait(cond, mutex)) != 0)
-    cerebro_err_exit("pthread_cond_signal(%s(%s:%d)): %s", file, function, line, strerror(rv));
+    WRAPPERS_ERR_MSG("pthread_cond_signal", strerror(rv));
 
   return rv;
 }
@@ -747,11 +667,10 @@ wrap_fork(const char *file, const char *function, unsigned int line)
 {
   pid_t pid;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
   if ((pid = fork()) < 0)
-    cerebro_err_exit("fork(%s(%s:%d)): %s", file, function, line, strerror(errno));
+    WRAPPERS_ERR_ERRNO("fork");
 
   return pid;
 }
@@ -761,14 +680,13 @@ wrap_signal(const char *file, const char *function, unsigned int line, int signu
 {
   Sighandler_t rv;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
   if (!handler)
-    cerebro_err_exit("signal(%s(%s:%d)): null handler pointer", file, function, line);
+    WRAPPERS_ERR_INVALID_PARAMETERS("signal");
 
   if ((rv = signal(signum, handler)) == SIG_ERR)
-    cerebro_err_exit("signal(%s(%s:%d)): %s", file, function, line, strerror(errno));
+    WRAPPERS_ERR_ERRNO("signal");
 
   return rv;
 }
@@ -778,18 +696,13 @@ wrap_gethostname(const char *file, const char *function, unsigned int line, char
 {
   int rv;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
-  if (!name)
-    cerebro_err_exit("gethostname(%s(%s:%d)): null name pointer", file, function, line);
-
-  if (!(len > 0 || len <= INT_MAX))
-    cerebro_err_exit("gethostname(%s(%s:%d)): invalid len: %d", file, function, line, len);
+  if (!name || !(len > 0 || len <= INT_MAX))
+    WRAPPERS_ERR_INVALID_PARAMETERS("gethostbyname");
 
   if ((rv = gethostname(name, len)) < 0)
-    cerebro_err_exit("gethostname(%s(%s:%d)): len=%d: %s", 
-             file, function, line, len, strerror(errno));
+    WRAPPERS_ERR_ERRNO("gethostname");
 
   return rv;
 }
@@ -799,11 +712,10 @@ wrap_lt_dlinit(const char *file, const char *function, unsigned int line)
 {
   int rv;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
   if ((rv = lt_dlinit()) != 0)
-    cerebro_err_exit("lt_dlinit(%s(%s:%d)): %s", file, function, line, lt_dlerror());
+    WRAPPERS_ERR_MSG("lt_dlinit", lt_dlerror());
 
   return rv;
 }
@@ -813,11 +725,10 @@ wrap_lt_dlexit(const char *file, const char *function, unsigned int line)
 {
   int rv;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
   if ((rv = lt_dlexit()) != 0)
-    cerebro_err_exit("lt_dlexit(%s(%s:%d)): %s", file, function, line, lt_dlerror());
+    WRAPPERS_ERR_MSG("lt_dlexit", lt_dlerror());
 
   return rv;
 }
@@ -827,14 +738,13 @@ wrap_lt_dlopen(const char *file, const char *function, unsigned int line, const 
 {
   lt_dlhandle rv;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
   if (!filename)
-    cerebro_err_exit("lt_dlopen(%s(%s:%d)): null filename pointer");
+    WRAPPERS_ERR_INVALID_PARAMETERS("lt_dlopen");
 
   if (!(rv = lt_dlopen(filename)))
-    cerebro_err_exit("lt_dlopen(%s(%s:%d)): filename=%s: %s", file, function, line, filename, lt_dlerror());
+    WRAPPERS_ERR_MSG("lt_dlopen", lt_dlerror());
 
   return rv;
 }
@@ -843,25 +753,20 @@ lt_ptr
 wrap_lt_dlsym(const char *file, const char *function, unsigned int line, void *handle, char *symbol)
 {
   lt_ptr *rv;
-  const char *err;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
-  if (!handle)
-    cerebro_err_exit("lt_dlsym(%s(%s:%d)): null handle pointer");
-
-  if (!symbol)
-    cerebro_err_exit("lt_dlsym(%s(%s:%d)): null symbol pointer");
+  if (!handle || !symbol)
+    WRAPPERS_ERR_INVALID_PARAMETERS("lt_dlsym");
 
   /* "clear" lt_dlerror() */
   lt_dlerror();
 
   if (!(rv = lt_dlsym(handle, symbol)))
     {
-      err = lt_dlerror();
+      const char *err = lt_dlerror();
       if (err)
-        cerebro_err_exit("lt_dlsym(%s(%s:%d)): symbol=%s: %s", file, function, line, symbol, err);
+        WRAPPERS_ERR_MSG("lt_dlopen", err);
     }
 
   return rv;
@@ -872,14 +777,13 @@ wrap_lt_dlclose(const char *file, const char *function, unsigned int line, void 
 {
   int rv;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
   if (!handle)
-    cerebro_err_exit("lt_dlclose(%s(%s:%d)): null handle pointer");
+    WRAPPERS_ERR_INVALID_PARAMETERS("lt_dlclose");
 
   if ((rv = lt_dlclose(handle)) != 0)
-    cerebro_err_exit("lt_dlclose(%s(%s:%d)): %s", lt_dlerror());
+    WRAPPERS_ERR_MSG("lt_dlclose", lt_dlerror());
 
   return rv;
 }
@@ -889,13 +793,10 @@ wrap_list_create(const char *file, const char *function, unsigned int line, List
 {
   List rv;
 
-  assert(file);
-  assert(function);
-
-  /* f can be null */
+  assert(file && function);
 
   if (!(rv = list_create(f)))
-    cerebro_err_exit("list_create(%s(%s:%d)): %s", file, function, line, strerror(errno));
+    WRAPPERS_ERR_ERRNO("list_create");
 
   return rv;
 }
@@ -903,11 +804,10 @@ wrap_list_create(const char *file, const char *function, unsigned int line, List
 void
 wrap_list_destroy(const char *file, const char *function, unsigned int line, List l)
 {
-  assert(file);
-  assert(function);
+  assert(file && function);
 
   if (!l)
-    cerebro_err_exit("list_destroy(%s(%s:%d)): null l pointer", file, function, line);
+    WRAPPERS_ERR_INVALID_PARAMETERS("list_destroy");
 
   list_destroy(l);
 
@@ -917,11 +817,10 @@ wrap_list_destroy(const char *file, const char *function, unsigned int line, Lis
 int
 wrap_list_count(const char *file, const char *function, unsigned int line, List l)
 {
-  assert(file);
-  assert(function);
+  assert(file && function);
 
   if (!l)
-    cerebro_err_exit("list_count(%s(%s:%d)): null l pointer", file, function, line);
+    WRAPPERS_ERR_INVALID_PARAMETERS("list_count");
 
   return list_count(l);
 }
@@ -931,17 +830,13 @@ wrap_list_append (const char *file, const char *function, unsigned int line, Lis
 {
   void *rv;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
-  if (!l)
-    cerebro_err_exit("list_append(%s(%s:%d)): null l pointer", file, function, line);
-
-  if (!x)
-    cerebro_err_exit("list_append(%s(%s:%d)): null x pointer", file, function, line);
+  if (!l || !x)
+    WRAPPERS_ERR_INVALID_PARAMETERS("list_append");
 
   if (!(rv = list_append(l, x)))
-    cerebro_err_exit("list_append(%s(%s:%d)): %s", file, function, line, strerror(errno));
+    WRAPPERS_ERR_ERRNO("list_append");
   
   return rv;
 }
@@ -949,23 +844,12 @@ wrap_list_append (const char *file, const char *function, unsigned int line, Lis
 void * 
 wrap_list_find_first (const char *file, const char *function, unsigned int line, List l, ListFindF f, void *key)
 {
-  void *rv;
+  assert(file && function);
 
-  assert(file);
-  assert(function);
+  if (!l || !f || !key)
+    WRAPPERS_ERR_INVALID_PARAMETERS("list_find_first");
 
-  if (!l)
-    cerebro_err_exit("list_append(%s(%s:%d)): null l pointer", file, function, line);
-
-  if (!f)
-    cerebro_err_exit("list_append(%s(%s:%d)): null f pointer", file, function, line);
-
-  if (!key)
-    cerebro_err_exit("list_append(%s(%s:%d)): null key pointer", file, function, line);
-
-  rv = list_find_first(l, f, key);
-  
-  return rv;
+  return list_find_first(l, f, key);
 }
 
 int 
@@ -973,20 +857,13 @@ wrap_list_delete_all(const char *file, const char *function, unsigned int line, 
 {
   int rv;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
-  if (!l)
-    cerebro_err_exit("list_delete_all(%s(%s:%d)): null l pointer", file, function, line);
-
-  if (!f)
-    cerebro_err_exit("list_delete_all(%s(%s:%d)): null f pointer", file, function, line);
-
-  if (!key)
-    cerebro_err_exit("list_delete_all(%s(%s:%d)): null key pointer", file, function, line);
+  if (!l || !f || !key)
+    WRAPPERS_ERR_INVALID_PARAMETERS("list_delete_all");
 
   if ((rv = list_delete_all(l, f, key)) < 0)
-    cerebro_err_exit("list_delete_all(%s(%s:%d)): %s", file, function, line, strerror(errno));
+    WRAPPERS_ERR_ERRNO("list_delete_all");
   
   return rv;
 }
@@ -996,19 +873,13 @@ wrap_list_for_each(const char *file, const char *function, unsigned int line, Li
 {
   int rv;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
-  if (!l)
-    cerebro_err_exit("list_for_each(%s(%s:%d)): null l pointer", file, function, line);
-
-  if (!f)
-    cerebro_err_exit("list_for_each(%s(%s:%d)): null f pointer", file, function, line);
-
-  /* arg can be null */
+  if (!l || !f)
+    WRAPPERS_ERR_INVALID_PARAMETERS("list_for_each");
 
   if ((rv = list_for_each(l, f, arg)) < 0)
-    cerebro_err_exit("list_for_each(%s(%s:%d)): %s", file, function, line, strerror(errno));
+    WRAPPERS_ERR_ERRNO("list_for_each");
   
   return rv;
 }
@@ -1016,17 +887,12 @@ wrap_list_for_each(const char *file, const char *function, unsigned int line, Li
 void
 wrap_list_sort(const char *file, const char *function, unsigned int line, List l, ListCmpF f)
 {
-  assert(file);
-  assert(function);
+  assert(file && function);
 
-  if (!l)
-    cerebro_err_exit("list_sort(%s(%s:%d)): null l pointer", file, function, line);
-
-  if (!f)
-    cerebro_err_exit("list_sort(%s(%s:%d)): null f pointer", file, function, line);
+  if (!l || !f)
+    WRAPPERS_ERR_INVALID_PARAMETERS("list_sort");
 
   list_sort(l, f);
-  
   return;
 }
 
@@ -1035,14 +901,13 @@ wrap_list_iterator_create(const char *file, const char *function, unsigned int l
 {
   ListIterator rv;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
   if (!l)
-    cerebro_err_exit("list_iterator_create(%s(%s:%d)): null l pointer", file, function, line);
+    WRAPPERS_ERR_INVALID_PARAMETERS("list_iterator_create");
 
   if (!(rv = list_iterator_create(l)))
-    cerebro_err_exit("list_iterator_create(%s(%s:%d)): %s", file, function, line, strerror(errno));
+    WRAPPERS_ERR_ERRNO("list_iterator_create");
 
   return rv;
 }
@@ -1050,14 +915,12 @@ wrap_list_iterator_create(const char *file, const char *function, unsigned int l
 void
 wrap_list_iterator_destroy(const char *file, const char *function, unsigned int line, ListIterator i)
 {
-  assert(file);
-  assert(function);
+  assert(file && function);
 
   if (!i)
-    cerebro_err_exit("list_iterator_destroy(%s(%s:%d)): null i pointer", file, function, line);
+    WRAPPERS_ERR_INVALID_PARAMETERS("list_iterator_destroy");
 
   list_iterator_destroy(i);
-
   return;
 }
 
@@ -1066,22 +929,13 @@ wrap_hash_create(const char *file, const char *function, unsigned int line, int 
 {
   hash_t rv;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
-  if (!(size > 0 || size <= INT_MAX))
-    cerebro_err_exit("hash_create(%s(%s:%d)): invalid size: %d", file, function, line, size);
-
-  if (!key_f)
-    cerebro_err_exit("hash_create(%s(%s:%d)): null key_f pointer", file, function, line);
-
-  if (!cmp_f)
-    cerebro_err_exit("hash_create(%s(%s:%d)): null cmp_f pointer", file, function, line);
-
-  /* del_f can be null */
+  if (!(size > 0 || size <= INT_MAX) || !key_f || !cmp_f)
+    WRAPPERS_ERR_INVALID_PARAMETERS("hash_create");
 
   if (!(rv = hash_create(size, key_f, cmp_f, del_f)))
-    cerebro_err_exit("hash_create(%s(%s:%d)): size=%d: %s", file, function, line, size, strerror(errno));
+    WRAPPERS_ERR_ERRNO("hash_create");
 
   return rv;
 }
@@ -1091,16 +945,15 @@ wrap_hash_count(const char *file, const char *function, unsigned int line, hash_
 {
   int rv;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
   if (!h)
-    cerebro_err_exit("hash_count(%s(%s:%d)): null h pointer", file, function, line);
+    WRAPPERS_ERR_INVALID_PARAMETERS("hash_count");
 
   if (!(rv = hash_count(h)))
     {
       if (errno != 0)
-        cerebro_err_exit("hash_count(%s(%s:%d)): %s", file, function, line, strerror(errno));
+        WRAPPERS_ERR_ERRNO("hash_count");
     }
 
   return rv;
@@ -1111,18 +964,14 @@ wrap_hash_find(const char *file, const char *function, unsigned int line, hash_t
 {
   void *rv;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
-  if (!h)
-    cerebro_err_exit("hash_find(%s(%s:%d)): null h pointer", file, function, line);
-
-  if (!key)
-    cerebro_err_exit("hash_find(%s(%s:%d)): null key pointer", file, function, line);
+  if (!h || !key)
+    WRAPPERS_ERR_INVALID_PARAMETERS("hash_find");
 
   rv = hash_find(h, key);
   if (!rv && errno != 0)
-    cerebro_err_exit("hash_find(%s(%s:%d)): key=%s: %s", file, function, line, key, strerror(errno));
+    WRAPPERS_ERR_ERRNO("hash_find");
 
   return rv;
 }
@@ -1132,42 +981,32 @@ wrap_hash_insert(const char *file, const char *function, unsigned int line, hash
 {
   void *rv;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
-  if (!h)
-    cerebro_err_exit("hash_insert(%s(%s:%d)): null h pointer", file, function, line);
-
-  if (!key)
-    cerebro_err_exit("hash_insert(%s(%s:%d)): null key pointer", file, function, line);
-
-  if (!data)
-    cerebro_err_exit("hash_insert(%s(%s:%d)): null data pointer", file, function, line);
+  if (!h || !key || !data)
+    WRAPPERS_ERR_INVALID_PARAMETERS("hash_insert");
 
   if (!(rv = hash_insert(h, key, data)))
-    cerebro_err_exit("hash_insert(%s(%s:%d)): key=%s: %s", file, function, line, key, strerror(errno));
+    WRAPPERS_ERR_ERRNO("hash_insert");
+
   if (rv != data)
-    cerebro_err_exit("hash_insert(%s(%s:%d)): key=%s: invalid insert", file, function, line, key);
+    WRAPPERS_ERR_MSG("hash_insert", "invalid insert");
 
   return rv;
 }
 
 void *
-wrap_hash_remove (const char *file, const char *function, unsigned int line, hash_t h, const void *key)
+wrap_hash_remove(const char *file, const char *function, unsigned int line, hash_t h, const void *key)
 {
   void *rv;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
-  if (!h)
-    cerebro_err_exit("hash_remove(%s(%s:%d)): null h pointer", file, function, line);
-
-  if (!key)
-    cerebro_err_exit("hash_remove(%s(%s:%d)): null key pointer", file, function, line);
+  if (!h || !key)
+    WRAPPERS_ERR_INVALID_PARAMETERS("hash_remove");
 
   if (!(rv = hash_remove(h, key)))
-    cerebro_err_exit("hash_remove(%s(%s:%d)): key=%s: %s", file, function, line, key, strerror(errno));
+    WRAPPERS_ERR_ERRNO("hash_remove");
 
   return rv;
 }
@@ -1177,19 +1016,13 @@ wrap_hash_delete_if(const char *file, const char *function, unsigned int line, h
 {
   int rv;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
     
-  if (!h)
-    cerebro_err_exit("hash_delete_if(%s(%s:%d)): null h pointer", file, function, line);
-
-  if (!argf)
-    cerebro_err_exit("hash_delete_if(%s(%s:%d)): null argf pointer", file, function, line);
-
-  /* arg can be null */
+  if (!h || !argf)
+    WRAPPERS_ERR_INVALID_PARAMETERS("hash_delete_if");
 
   if ((rv = hash_delete_if(h, argf, arg)) < 0)
-    cerebro_err_exit("hash_delete_if(%s(%s:%d)): %s", file, function, line, strerror(errno));
+    WRAPPERS_ERR_ERRNO("hash_delete_if");
 
   return rv;
 }
@@ -1199,19 +1032,13 @@ wrap_hash_for_each(const char *file, const char *function, unsigned int line, ha
 {
   int rv;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
-  if (!h)
-    cerebro_err_exit("hash_for_each(%s(%s:%d)): null h pointer", file, function, line);
-
-  if (!argf)
-    cerebro_err_exit("hash_for_each(%s(%s:%d)): null argf pointer", file, function, line);
-
-  /* arg can be null */
+  if (!h || !argf)
+    WRAPPERS_ERR_INVALID_PARAMETERS("hash_for_each");
 
   if ((rv = hash_for_each(h, argf, arg)) < 0)
-    cerebro_err_exit("hash_for_each(%s(%s:%d)): %s", file, function, line, strerror(errno));
+    WRAPPERS_ERR_ERRNO("hash_for_each");
 
   return rv;
 }
@@ -1219,14 +1046,12 @@ wrap_hash_for_each(const char *file, const char *function, unsigned int line, ha
 void
 wrap_hash_destroy(const char *file, const char *function, unsigned int line, hash_t h)
 {
-  assert(file);
-  assert(function);
+  assert(file && function);
 
   if (!h)
-    cerebro_err_exit("hash_destroy(%s(%s:%d)): null h pointer", file, function, line);
+    WRAPPERS_ERR_INVALID_PARAMETERS("hash_destroy");
 
   hash_destroy(h);
-
   return;
 }
 
@@ -1235,14 +1060,13 @@ wrap_marshall_int8(const char *file, const char *function, unsigned int line, in
 {
   int rv;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
   if (!buf)
-    cerebro_err_exit("marshall_int8(%s(%s:%d)): null buf pointer", file, function, line);
+    WRAPPERS_ERR_INVALID_PARAMETERS("marshall_int8");
 
   if ((rv = marshall_int8(val, buf, buflen)) <= 0)
-    cerebro_err_exit("marshall_int8(%s(%s:%d)): %s\n", strerror(errno));
+    WRAPPERS_ERR_ERRNO("marshall_int8");
 
   return rv;
 }
@@ -1252,14 +1076,13 @@ wrap_marshall_int32(const char *file, const char *function, unsigned int line, i
 {
   int rv;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
   if (!buf)
-    cerebro_err_exit("marshall_int32(%s(%s:%d)): null buf pointer", file, function, line);
+    WRAPPERS_ERR_INVALID_PARAMETERS("marshall_int32");
 
   if ((rv = marshall_int32(val, buf, buflen)) <= 0)
-    cerebro_err_exit("marshall_int32(%s(%s:%d)): %s\n", strerror(errno));
+    WRAPPERS_ERR_ERRNO("marshall_int32");
 
   return rv;
 }
@@ -1269,14 +1092,13 @@ wrap_marshall_u_int8(const char *file, const char *function, unsigned int line, 
 {
   int rv;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
   if (!buf)
-    cerebro_err_exit("marshall_u_int8(%s(%s:%d)): null buf pointer", file, function, line);
+    WRAPPERS_ERR_INVALID_PARAMETERS("marshall_u_int8");
 
   if ((rv = marshall_u_int8(val, buf, buflen)) <= 0)
-    cerebro_err_exit("marshall_u_int8(%s(%s:%d)): %s\n", strerror(errno));
+    WRAPPERS_ERR_ERRNO("mashall_u_int8");
 
   return rv;
 }
@@ -1286,14 +1108,13 @@ wrap_marshall_u_int32(const char *file, const char *function, unsigned int line,
 {
   int rv;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
   if (!buf)
-    cerebro_err_exit("marshall_u_int32(%s(%s:%d)): null buf pointer", file, function, line);
+    WRAPPERS_ERR_INVALID_PARAMETERS("marshall_u_int32");
 
   if ((rv = marshall_u_int32(val, buf, buflen)) <= 0)
-    cerebro_err_exit("marshall_u_int32(%s(%s:%d)): %s\n", strerror(errno));
+    WRAPPERS_ERR_ERRNO("marshall_u_int32");
 
   return rv;
 }
@@ -1303,14 +1124,13 @@ wrap_marshall_float(const char *file, const char *function, unsigned int line, f
 {
   int rv;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
   if (!buf)
-    cerebro_err_exit("marshall_float(%s(%s:%d)): null buf pointer", file, function, line);
+    WRAPPERS_ERR_INVALID_PARAMETERS("marshall_float");
 
   if ((rv = marshall_float(val, buf, buflen)) <= 0)
-    cerebro_err_exit("marshall_float(%s(%s:%d)): %s\n", strerror(errno));
+    WRAPPERS_ERR_ERRNO("marshall_float");
 
   return rv;
 }
@@ -1320,14 +1140,13 @@ wrap_marshall_double(const char *file, const char *function, unsigned int line, 
 {
   int rv;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
   if (!buf)
-    cerebro_err_exit("marshall_double(%s(%s:%d)): null buf pointer", file, function, line);
+    WRAPPERS_ERR_INVALID_PARAMETERS("marshall_double");
 
   if ((rv = marshall_double(val, buf, buflen)) <= 0)
-    cerebro_err_exit("marshall_double(%s(%s:%d)): %s\n", strerror(errno));
+    WRAPPERS_ERR_ERRNO("marshall_double");
 
   return rv;
 }
@@ -1337,14 +1156,13 @@ wrap_marshall_buffer(const char *file, const char *function, unsigned int line, 
 {
   int rv;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
-  if (!buf)
-    cerebro_err_exit("marshall_buffer(%s(%s:%d)): null buf pointer", file, function, line);
+  if (!val || !buf)
+    WRAPPERS_ERR_INVALID_PARAMETERS("marshall_buffer");
 
   if ((rv = marshall_buffer(val, vallen, buf, buflen)) <= 0)
-    cerebro_err_exit("marshall_buffer(%s(%s:%d)): %s\n", strerror(errno));
+    WRAPPERS_ERR_ERRNO("marshall_buffer");
 
   return rv;
 }
@@ -1354,17 +1172,13 @@ wrap_unmarshall_int8(const char *file, const char *function, unsigned int line, 
 {
   int rv;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
-  if (!val)
-    cerebro_err_exit("unmarshall_int8(%s(%s:%d)): null val pointer", file, function, line);
-
-  if (!buf)
-    cerebro_err_exit("unmarshall_int8(%s(%s:%d)): null buf pointer", file, function, line);
+  if (!val || !buf)
+    WRAPPERS_ERR_INVALID_PARAMETERS("unmarshall_int8");
 
   if ((rv = unmarshall_int8(val, buf, buflen)) < 0)
-    cerebro_err_exit("unmarshall_int8(%s(%s:%d)): %s\n", strerror(errno));
+    WRAPPERS_ERR_ERRNO("unmarshall_int8");
 
   return rv;
 }
@@ -1374,17 +1188,13 @@ wrap_unmarshall_int32(const char *file, const char *function, unsigned int line,
 {
   int rv;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
-  if (!val)
-    cerebro_err_exit("unmarshall_int32(%s(%s:%d)): null val pointer", file, function, line);
-
-  if (!buf)
-    cerebro_err_exit("unmarshall_int32(%s(%s:%d)): null buf pointer", file, function, line);
+  if (!val || !buf)
+    WRAPPERS_ERR_INVALID_PARAMETERS("unmarshall_int32");
 
   if ((rv = unmarshall_int32(val, buf, buflen)) < 0)
-    cerebro_err_exit("unmarshall_int32(%s(%s:%d)): %s\n", strerror(errno));
+    WRAPPERS_ERR_ERRNO("unmarshall_int32");
 
   return rv;
 }
@@ -1394,17 +1204,13 @@ wrap_unmarshall_u_int8(const char *file, const char *function, unsigned int line
 {
   int rv;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
-  if (!val)
-    cerebro_err_exit("unmarshall_u_int8(%s(%s:%d)): null val pointer", file, function, line);
-
-  if (!buf)
-    cerebro_err_exit("unmarshall_u_int8(%s(%s:%d)): null buf pointer", file, function, line);
+  if (!val || !buf)
+    WRAPPERS_ERR_INVALID_PARAMETERS("unmarshall_u_int8");
 
   if ((rv = unmarshall_u_int8(val, buf, buflen)) < 0)
-    cerebro_err_exit("unmarshall_u_int8(%s(%s:%d)): %s\n", strerror(errno));
+    WRAPPERS_ERR_ERRNO("unmarshall_u_int8");
 
   return rv;
 }
@@ -1414,17 +1220,13 @@ wrap_unmarshall_u_int32(const char *file, const char *function, unsigned int lin
 {
   int rv;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
-  if (!val)
-    cerebro_err_exit("unmarshall_u_int32(%s(%s:%d)): null val pointer", file, function, line);
-
-  if (!buf)
-    cerebro_err_exit("unmarshall_u_int32(%s(%s:%d)): null buf pointer", file, function, line);
+  if (!val || !buf)
+    WRAPPERS_ERR_INVALID_PARAMETERS("unmarshall_u_int32");
 
   if ((rv = unmarshall_u_int32(val, buf, buflen)) < 0)
-    cerebro_err_exit("unmarshall_u_int32(%s(%s:%d)): %s\n", strerror(errno));
+    WRAPPERS_ERR_ERRNO("unmarshall_u_int32");
 
   return rv;
 }
@@ -1434,17 +1236,13 @@ wrap_unmarshall_float(const char *file, const char *function, unsigned int line,
 {
   int rv;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
-  if (!val)
-    cerebro_err_exit("unmarshall_float(%s(%s:%d)): null val pointer", file, function, line);
-
-  if (!buf)
-    cerebro_err_exit("unmarshall_float(%s(%s:%d)): null buf pointer", file, function, line);
+  if (!val || !buf)
+    WRAPPERS_ERR_INVALID_PARAMETERS("unmarshall_float");
 
   if ((rv = unmarshall_float(val, buf, buflen)) < 0)
-    cerebro_err_exit("unmarshall_float(%s(%s:%d)): %s\n", strerror(errno));
+    WRAPPERS_ERR_ERRNO("unmarshall_float");
 
   return rv;
 }
@@ -1454,17 +1252,13 @@ wrap_unmarshall_double(const char *file, const char *function, unsigned int line
 {
   int rv;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
-  if (!val)
-    cerebro_err_exit("unmarshall_double(%s(%s:%d)): null val pointer", file, function, line);
-
-  if (!buf)
-    cerebro_err_exit("unmarshall_double(%s(%s:%d)): null buf pointer", file, function, line);
+  if (!val || !buf)
+    WRAPPERS_ERR_INVALID_PARAMETERS("unmarshall_double");
 
   if ((rv = unmarshall_double(val, buf, buflen)) < 0)
-    cerebro_err_exit("unmarshall_double(%s(%s:%d)): %s\n", strerror(errno));
+    WRAPPERS_ERR_ERRNO("unmarshall_double");
 
   return rv;
 }
@@ -1474,17 +1268,13 @@ wrap_unmarshall_buffer(const char *file, const char *function, unsigned int line
 {
   int rv;
 
-  assert(file);
-  assert(function);
+  assert(file && function);
 
-  if (!val)
-    cerebro_err_exit("unmarshall_buffer(%s(%s:%d)): null val pointer", file, function, line);
-
-  if (!buf)
-    cerebro_err_exit("unmarshall_buffer(%s(%s:%d)): null buf pointer", file, function, line);
+  if (!val || !buf)
+    WRAPPERS_ERR_INVALID_PARAMETERS("unmarshall_buffer");
 
   if ((rv = unmarshall_buffer(val, vallen, buf, buflen)) < 0)
-    cerebro_err_exit("unmarshall_buffer(%s(%s:%d)): %s\n", strerror(errno));
+    WRAPPERS_ERR_ERRNO("unmarshall_float");
 
   return rv;
 }
