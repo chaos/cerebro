@@ -283,7 +283,6 @@ _receive_node_metric_responses(cerebro_t handle, void *list, int fd)
       goto cleanup;
     }
 
-  /* XXX fix cleanup, not quite right */
   while (1)
     {
       struct cerebro_node_metric_response res;
