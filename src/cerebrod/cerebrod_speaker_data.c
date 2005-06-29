@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker_data.c,v 1.12 2005-06-29 17:03:52 achu Exp $
+ *  $Id: cerebrod_speaker_data.c,v 1.13 2005-06-29 17:26:58 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -202,6 +202,31 @@ cerebrod_speaker_data_initialize(void)
   Pthread_mutex_unlock(&cerebrod_speaker_data_initialization_complete_lock);
 }
 
+/*
+ * _next_call_time_cmp
+ *
+ * callback function for list_sort to sort node names
+ */
+static int
+_next_call_time_cmp(void *x, void *y)
+{
+  struct cerebrod_speaker_metric_module *a;
+  struct cerebrod_speaker_metric_module *b;
+
+  assert(x);
+  assert(y);
+
+  a = (struct cerebrod_speaker_metric_module *)x;
+  b = (struct cerebrod_speaker_metric_module *)y;
+
+  if (a->next_call_time == b->next_call_time)
+    return 0;
+  else if (a->next_call_time < b->next_call_time)
+    return -1;
+  else 
+    return 1;
+}
+
 void 
 cerebrod_speaker_data_get_metric_data(struct cerebrod_heartbeat *hb,
                                       unsigned int *heartbeat_len)
@@ -316,9 +341,16 @@ cerebrod_speaker_data_get_metric_data(struct cerebrod_heartbeat *hb,
                                            temp_value);
 
     end_loop:
-      metric_module->next_call_time = tv.tv_sec + metric_module->metric_period;
+      /* 
+       * Metric period stays at 0 for metrics that need to be
+       * propogated every time
+       */
+      if (metric_module->metric_period)
+        metric_module->next_call_time = tv.tv_sec + metric_module->metric_period;
     }
   
+  List_sort(metric_list, _next_call_time_cmp);
+
   List_iterator_destroy(itr);
   return;
 }

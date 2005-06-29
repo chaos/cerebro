@@ -11,9 +11,6 @@ Cleanup
 - merge metric_names and metric_data stuff better after new version unmarshall/check code inserted
 - common receive data func?
 
-- don't call speaker if no additional metrics to monitor?
-
-
 Audit
 - code review to reduce memory footprint
 

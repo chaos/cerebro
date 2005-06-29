@@ -3,6 +3,9 @@
 	* Fix remaining version checking bugs.
 
 	* Fix maximum packet length buffer bugs.
+
+	* Sort metric modules based on next call time for faster on
+	average searches.
 	
 2005-06-28  Albert Chu  <chu11@llnl.gov>
 

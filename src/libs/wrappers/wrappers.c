@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.c,v 1.4 2005-06-24 23:53:30 achu Exp $
+ *  $Id: wrappers.c,v 1.5 2005-06-29 17:26:58 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -1011,6 +1011,23 @@ wrap_list_for_each(const char *file, const char *function, unsigned int line, Li
     cerebro_err_exit("list_for_each(%s(%s:%d)): %s", file, function, line, strerror(errno));
   
   return rv;
+}
+
+void
+wrap_list_sort(const char *file, const char *function, unsigned int line, List l, ListCmpF f)
+{
+  assert(file);
+  assert(function);
+
+  if (!l)
+    cerebro_err_exit("list_sort(%s(%s:%d)): null l pointer", file, function, line);
+
+  if (!f)
+    cerebro_err_exit("list_sort(%s(%s:%d)): null f pointer", file, function, line);
+
+  list_sort(l, f);
+  
+  return;
 }
 
 ListIterator

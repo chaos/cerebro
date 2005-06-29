@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.13 2005-06-28 22:42:01 achu Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.14 2005-06-29 17:26:58 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -335,7 +335,7 @@ cerebrod_listener_data_initialize(void)
           free(nodes[i]);
         }
 
-      list_sort(cerebrod_listener_data_list, (ListCmpF)_cerebrod_node_data_strcmp);
+      List_sort(cerebrod_listener_data_list, (ListCmpF)_cerebrod_node_data_strcmp);
 
       free(nodes);
     }
