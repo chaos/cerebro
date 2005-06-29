@@ -444,3 +444,62 @@ _cerebro_metric_receive_data(cerebro_t handle,
  cleanup:
   return -1;
 }
+
+/* 
+ * _cerebro_metric_response_check
+ *
+ * Check that the version and error code are good prior to unmarshalling
+ *
+ * Returns 0 on success, -1 on error
+ */
+int
+_cerebro_metric_response_check(cerebro_t handle,
+                               const char *buf, 
+                               unsigned int buflen)
+{
+  int n, len = 0;
+  int32_t version;
+  u_int32_t err_code;
+
+  if ((n = unmarshall_int32(&version, buf + len, buflen - len)) < 0)
+    {
+      CEREBRO_DBG(("unmarshall_int32"));
+      handle->errnum = CEREBRO_ERR_INTERNAL;
+      return -1;
+    }
+
+  if (!n)
+    {
+      handle->errnum = CEREBRO_ERR_PROTOCOL;
+      return -1;
+    }
+  len += n;
+
+  if ((n = unmarshall_u_int32(&err_code, buf + len, buflen - len)) < 0)
+    {
+      CEREBRO_DBG(("unmarshall_u_int32"));
+      handle->errnum = CEREBRO_ERR_INTERNAL;
+      return -1;
+    }
+
+  if (!n)
+    {
+      handle->errnum = CEREBRO_ERR_PROTOCOL;
+      return -1;
+    }
+  len += n;
+  
+  if (version != CEREBRO_METRIC_PROTOCOL_VERSION)
+    {
+      handle->errnum = CEREBRO_ERR_VERSION_INCOMPATIBLE;
+      return -1;
+    }
+
+  if (err_code != CEREBRO_METRIC_PROTOCOL_ERR_SUCCESS)
+    {
+      handle->errnum = _cerebro_metric_protocol_err_conversion(err_code);
+      return -1;
+    }
+  
+  return 0;
+}

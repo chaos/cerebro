@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_util.h,v 1.5 2005-06-28 20:58:32 achu Exp $
+ *  $Id: cerebro_metric_util.h,v 1.6 2005-06-29 15:50:59 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_METRIC_UTIL_H
@@ -50,5 +50,17 @@ int _cerebro_metric_receive_data(cerebro_t handle,
                                  unsigned int bytes_to_read,
                                  char *buf,
                                  unsigned int buflen);
+
+/*
+ * _cerebro_metric_response_check
+ *
+ * Check that the version and error code are good prior to unmarshalling
+ *
+ * Returns 0 on success, -1 on error
+ */
+int _cerebro_metric_response_check(cerebro_t handle,
+                                   const char *buf,
+                                   unsigned int buflen);
+
 
 #endif /* _CEREBRO_METRIC_UTIL_H */

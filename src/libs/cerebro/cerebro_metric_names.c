@@ -97,65 +97,6 @@ _cerebro_metric_name_response_unmarshall(cerebro_t handle,
 }
 
 /* 
- * _metric_response_check
- *
- * Check that the version and error code are good prior to unmarshalling
- *
- * Returns 0 on success, -1 on error
- */
-static int
-_metric_response_check(cerebro_t handle,
-                       const char *buf, 
-                       unsigned int buflen)
-{
-  int n, len = 0;
-  int32_t version;
-  u_int32_t err_code;
-
-  if ((n = unmarshall_int32(&version, buf + len, buflen - len)) < 0)
-    {
-      CEREBRO_DBG(("unmarshall_int32"));
-      handle->errnum = CEREBRO_ERR_INTERNAL;
-      return -1;
-    }
-
-  if (!n)
-    {
-      handle->errnum = CEREBRO_ERR_PROTOCOL;
-      return -1;
-    }
-  len += n;
-
-  if ((n = unmarshall_u_int32(&err_code, buf + len, buflen - len)) < 0)
-    {
-      CEREBRO_DBG(("unmarshall_u_int32"));
-      handle->errnum = CEREBRO_ERR_INTERNAL;
-      return -1;
-    }
-
-  if (!n)
-    {
-      handle->errnum = CEREBRO_ERR_PROTOCOL;
-      return -1;
-    }
-  len += n;
-  
-  if (version != CEREBRO_METRIC_PROTOCOL_VERSION)
-    {
-      handle->errnum = CEREBRO_ERR_VERSION_INCOMPATIBLE;
-      return -1;
-    }
-
-  if (err_code != CEREBRO_METRIC_PROTOCOL_ERR_SUCCESS)
-    {
-      handle->errnum = _cerebro_metric_protocol_err_conversion(err_code);
-      return -1;
-    }
-  
-  return 0;
-}
-
-/* 
  * _receive_metric_name_responses
  *
  * Receive all of the metric server responses.
@@ -170,12 +111,14 @@ _receive_metric_name_responses(cerebro_t handle, void *list, int fd)
   if (_cerebro_handle_check(handle) < 0)
     {
       CEREBRO_DBG(("handle invalid"));
+      handle->errnum = CEREBRO_ERR_INTERNAL;
       goto cleanup;
     }
 
   if (!list || fd <= 0)
     {
       CEREBRO_DBG(("invalid parameters"));
+      handle->errnum = CEREBRO_ERR_INTERNAL;
       goto cleanup;
     }
 
@@ -183,6 +126,7 @@ _receive_metric_name_responses(cerebro_t handle, void *list, int fd)
   if (metriclist->magic != CEREBRO_METRICLIST_MAGIC_NUMBER)
     {
       CEREBRO_DBG(("invalid parameters"));
+      handle->errnum = CEREBRO_ERR_INTERNAL;
       goto cleanup;
     }
 
@@ -206,7 +150,7 @@ _receive_metric_name_responses(cerebro_t handle, void *list, int fd)
           goto cleanup;
         }
   
-      if (_metric_response_check(handle, buf, bytes_read) < 0)
+      if (_cerebro_metric_response_check(handle, buf, bytes_read) < 0)
         goto cleanup;
       
       memset(&res, '\0', sizeof(struct cerebro_metric_name_response));
