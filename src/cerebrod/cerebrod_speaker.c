@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.66 2005-06-28 19:47:22 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.67 2005-06-29 22:06:39 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -207,9 +207,7 @@ _cerebrod_heartbeat_marshall(struct cerebrod_heartbeat *hb,
 {
   int i, len = 0;
  
-  assert(hb);
-  assert(buf);
-  assert(buflen >= CEREBROD_HEARTBEAT_HEADER_LEN);
+  assert(hb && buf && buflen >= CEREBROD_HEARTBEAT_HEADER_LEN);
   
   memset(buf, '\0', buflen);
   len += Marshall_int32(hb->version, buf + len, buflen - len);

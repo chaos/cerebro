@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.14 2005-06-29 17:26:58 achu Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.15 2005-06-29 22:06:39 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -133,8 +133,7 @@ int monitor_index_size = 0;
 static int 
 _cerebrod_node_data_strcmp(void *x, void *y)
 {
-  assert(x);
-  assert(y);
+  assert(x && y);
 
   return strcmp(((struct cerebrod_node_data *)x)->nodename,
                 ((struct cerebrod_node_data *)y)->nodename);
@@ -423,9 +422,7 @@ _cerebrod_node_data_metric_data_dump(void *data, const void *key, void *arg)
   struct cerebrod_listener_metric_data *md;
   char *nodename, *buf;
  
-  assert(data);
-  assert(key);
-  assert(arg);
+  assert(data && key && arg);
  
   md = (struct cerebrod_listener_metric_data *)data;
   nodename = (char *)arg;
@@ -606,9 +603,7 @@ _cerebrod_listener_metric_data_update(struct cerebrod_node_data *nd,
   int rv;
 #endif /* CEREBRO_DEBUG */
   
-  assert(nd);
-  assert(hd);
-  assert(nd->metric_data);
+  assert(nd && hd && nd->metric_data);
 
 #if CEREBRO_DEBUG
   /* Should be called with lock already set */
@@ -666,8 +661,7 @@ cerebrod_listener_data_update(char *nodename,
   struct cerebrod_node_data *nd;
   int i, update_output_flag = 0;
 
-  assert(nodename);
-  assert(hb);
+  assert(nodename && hb);
 
   if (!cerebrod_listener_data_initialization_complete)
     CEREBRO_EXIT(("initialization not complete"));

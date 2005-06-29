@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_util.c,v 1.26 2005-06-29 21:55:17 achu Exp $
+ *  $Id: cerebrod_util.c,v 1.27 2005-06-29 22:06:39 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -105,8 +105,7 @@ cerebrod_reinitialize_socket(int old_fd,
 {
   int fd = old_fd;
 
-  if (!socket_setup || !debug_msg)
-    CEREBRO_EXIT(("invalid parameters"));
+  assert(socket_setup && debug_msg);
 
   if (errno == EINVAL || errno == EBADF || errno == ENODEV || old_fd < 0)
     {

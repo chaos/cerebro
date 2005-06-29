@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker_data.c,v 1.13 2005-06-29 17:26:58 achu Exp $
+ *  $Id: cerebrod_speaker_data.c,v 1.14 2005-06-29 22:06:39 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -213,8 +213,7 @@ _next_call_time_cmp(void *x, void *y)
   struct cerebrod_speaker_metric_module *a;
   struct cerebrod_speaker_metric_module *b;
 
-  assert(x);
-  assert(y);
+  assert(x && y);
 
   a = (struct cerebrod_speaker_metric_module *)x;
   b = (struct cerebrod_speaker_metric_module *)y;
@@ -235,8 +234,7 @@ cerebrod_speaker_data_get_metric_data(struct cerebrod_heartbeat *hb,
   ListIterator itr = NULL;
   struct timeval tv;
 
-  assert(hb);
-  assert(heartbeat_len);
+  assert(hb && heartbeat_len);
 
   if (!cerebrod_speaker_data_initialization_complete)
     CEREBRO_EXIT(("initialization not complete"));

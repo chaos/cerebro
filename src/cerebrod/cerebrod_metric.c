@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric.c,v 1.59 2005-06-29 17:52:26 achu Exp $
+ *  $Id: cerebrod_metric.c,v 1.60 2005-06-29 22:06:39 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -90,9 +90,7 @@ _metric_name_response_marshall(struct cerebro_metric_name_response *res,
 {
   int len = 0;
 
-  assert(res);
-  assert(buf);
-  assert(buflen >= CEREBRO_METRIC_NAME_RESPONSE_LEN);
+  assert(res && buf && buflen >= CEREBRO_METRIC_NAME_RESPONSE_LEN);
 
   memset(buf, '\0', buflen);
   len += Marshall_int32(res->version, buf + len, buflen - len);
@@ -119,9 +117,7 @@ _node_metric_response_marshall(struct cerebro_node_metric_response *res,
 {
   int len = 0;
 
-  assert(res);
-  assert(buf);
-  assert(buflen >= CEREBRO_NODE_METRIC_RESPONSE_HEADER_LEN);
+  assert(res && buf && buflen >= CEREBRO_NODE_METRIC_RESPONSE_HEADER_LEN);
 
   memset(buf, '\0', buflen);
 
@@ -192,9 +188,7 @@ _metric_err_response_marshall(struct cerebro_metric_err_response *err_res,
 {
   int len = 0;
  
-  assert(err_res);
-  assert(buf);
-  assert(buflen >= CEREBRO_METRIC_ERR_RESPONSE_LEN);
+  assert(err_res && buf && buflen >= CEREBRO_METRIC_ERR_RESPONSE_LEN);
 
   memset(buf, '\0', buflen);
   len += Marshall_int32(err_res->version, buf + len, buflen - len);
@@ -240,8 +234,7 @@ _metric_request_unmarshall(struct cerebro_metric_request *req,
 {
   int n, len = 0;
 
-  assert(req);
-  assert(buf);
+  assert(req && buf);
  
   if (!(n = Unmarshall_int32(&(req->version), buf + len, buflen - len)))
     return len;
@@ -306,8 +299,7 @@ _metric_err_response_send(int client_fd,
   char buf[CEREBRO_MAX_PACKET_LEN];
   int err_res_len;
 
-  assert(client_fd >= 0);
-  assert(err_res);
+  assert(client_fd >= 0 && err_res);
 
   if ((err_res_len = _metric_err_response_marshall(err_res, 
                                                    buf, 
@@ -338,8 +330,7 @@ _metric_name_response_send_one(int client_fd,
   char buf[CEREBRO_MAX_PACKET_LEN];
   int res_len, rv = -1;
 
-  assert(client_fd >= 0);
-  assert(res);
+  assert(client_fd >= 0 && res);
 
   if ((res_len = _metric_name_response_marshall(res, 
                                                 buf, 
@@ -371,8 +362,7 @@ _node_metric_response_send_one(int client_fd,
   char *buf = NULL;
   int buflen, res_len, rv = -1;
 
-  assert(client_fd >= 0);
-  assert(res);
+  assert(client_fd >= 0 && res);
 
   buflen = CEREBRO_NODE_METRIC_RESPONSE_HEADER_LEN + res->metric_value_len + 1;
   buf = Malloc(buflen);
@@ -406,8 +396,8 @@ _metric_respond_with_error(int client_fd,
 {
   struct cerebro_metric_err_response err_res;
 
-  assert(client_fd >= 0);
-  assert(err_code >= CEREBRO_METRIC_PROTOCOL_ERR_VERSION_INVALID
+  assert(client_fd >= 0
+         && err_code >= CEREBRO_METRIC_PROTOCOL_ERR_VERSION_INVALID
 	 && err_code <= CEREBRO_METRIC_PROTOCOL_ERR_INTERNAL_SYSTEM_ERROR);
   
   memset(&err_res, '\0', CEREBRO_METRIC_ERR_RESPONSE_LEN);
@@ -434,8 +424,7 @@ _metric_name_responses_send_all(void *x, void *arg)
   struct cerebro_metric_name_response *res;
   int client_fd;
 
-  assert(x);
-  assert(arg);
+  assert(x && arg);
 
   res = (struct cerebro_metric_name_response *)x;
   client_fd = *((int *)arg);
@@ -459,8 +448,7 @@ _metric_name_response_create(char *metric_name, List metric_name_responses)
 {
   struct cerebro_metric_name_response *res = NULL;
 
-  assert(metric_name);
-  assert(metric_name_responses);
+  assert(metric_name && metric_name_responses);
   
   if (!(res = malloc(sizeof(struct cerebro_metric_name_response))))
     {
@@ -511,8 +499,7 @@ _metric_name_index_callback(void *data, const void *key, void *arg)
   int rv;
 #endif /* CEREBRO_DEBUG */
 
-  assert(data);
-  assert(arg);
+  assert(data && arg);
 
   metric_name = (char *)data;
   ed = (struct cerebrod_metric_name_evaluation_data *)arg;
@@ -542,8 +529,7 @@ _respond_with_metric_names(int client_fd, struct cerebro_metric_request *req)
   struct cerebro_metric_name_response end_res;
   List metric_name_responses = NULL;
 
-  assert(client_fd >= 0);
-  assert(req);
+  assert(client_fd >= 0 && req);
 
   memset(&ed, '\0', sizeof(struct cerebrod_metric_name_evaluation_data));
   Pthread_mutex_lock(&cerebrod_metric_name_lock);
@@ -627,8 +613,7 @@ _node_metric_responses_send_all(void *x, void *arg)
   struct cerebro_node_metric_response *res;
   int client_fd;
 
-  assert(x);
-  assert(arg);
+  assert(x && arg);
 
   res = (struct cerebro_node_metric_response *)x;
   client_fd = *((int *)arg);
@@ -656,8 +641,7 @@ _node_metric_response_create(char *nodename,
 {
   struct cerebro_node_metric_response *res = NULL;
 
-  assert(nodename);
-  assert(node_responses);
+  assert(nodename && node_responses);
   
   if ((metric_value_type == CEREBRO_METRIC_VALUE_TYPE_NONE && metric_value_len)
       || (metric_value_type != CEREBRO_METRIC_VALUE_TYPE_NONE && !metric_value_len))
@@ -741,8 +725,7 @@ _node_metric_evaluate(void *x, void *arg)
   int rv;
 #endif /* CEREBRO_DEBUG */
 
-  assert(x);
-  assert(arg);
+  assert(x && arg);
 
   nd = (struct cerebrod_node_data *)x;
   ed = (struct cerebrod_node_metric_evaluation_data *)arg;
@@ -880,9 +863,7 @@ _respond_with_nodes(int client_fd,
   struct timeval tv;
   List node_responses = NULL;
 
-  assert(client_fd >= 0);
-  assert(req);
-  assert(metric_name);
+  assert(client_fd >= 0 && req && metric_name);
 
   memset(&ed, '\0', sizeof(struct cerebrod_node_metric_evaluation_data));
 

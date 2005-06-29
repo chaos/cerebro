@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.112 2005-06-28 21:26:52 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.113 2005-06-29 22:06:39 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -410,8 +410,7 @@ _get_if_conf(void **buf, struct ifconf *ifc, int fd)
 {
   int lastlen = -1, len = sizeof(struct ifreq) * 100;
 
-  assert(buf);
-  assert(ifc);
+  assert(buf && ifc);
 
   for(;;)
     {
@@ -485,8 +484,7 @@ _cerebrod_calculate_in_addr_and_index(char *network_interface,
 				      struct in_addr *interface_in_addr,
 				      int *interface_index)
 {
-  assert(interface_in_addr);
-  assert(interface_index);
+  assert(interface_in_addr && interface_index);
   
   if (!network_interface)
     {
