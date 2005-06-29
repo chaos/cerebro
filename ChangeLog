@@ -5,7 +5,9 @@
 	* Fix maximum packet length buffer bugs.
 
 	* Sort metric modules based on next call time for faster on
-	average searches.
+ 	average searches.
+
+	* Added network util functions for common network code.
 	
 2005-06-28  Albert Chu  <chu11@llnl.gov>
 

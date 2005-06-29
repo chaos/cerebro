@@ -7,9 +7,7 @@ Testing
 - api again
 
 Cleanup
-- common version check code
-- merge metric_names and metric_data stuff better after new version unmarshall/check code inserted
-- common receive data func?
+errnum stuff in config util?
 
 Audit
 - code review to reduce memory footprint
@@ -29,6 +27,7 @@ Design
   - Will require speaker to listen for "control" packets.
 - strerror_r and errormsg_r funcs
 - generic err message buffer in cerebro_t handle, i.e for conffile errors
+- use tables instead of lists in speaker_data to sort faster
 
 Before distribution
 - devel package?

@@ -24,6 +24,7 @@
 #include "debug.h"
 #include "fd.h"
 #include "marshall.h"
+#include "network_util.h"
 
 /* 
  * _cerebro_node_metric_response_header_unmarshall
@@ -289,13 +290,18 @@ _receive_node_metric_responses(cerebro_t handle, void *list, int fd)
       char buf[CEREBRO_MAX_PACKET_LEN];
       char nodename_buf[CEREBRO_MAX_NODENAME_LEN+1];
       int bytes_read, header_len;
+      unsigned int errnum;
 
-      if ((bytes_read = _cerebro_metric_receive_data(handle,
-                                                     fd,
-                                                     CEREBRO_NODE_METRIC_RESPONSE_HEADER_LEN,
-                                                     buf,
-                                                     CEREBRO_MAX_PACKET_LEN)) < 0)
-        goto cleanup;
+      if ((bytes_read = receive_data(fd,
+                                     CEREBRO_NODE_METRIC_RESPONSE_HEADER_LEN,
+                                     buf,
+                                     CEREBRO_MAX_PACKET_LEN,
+                                     CEREBRO_METRIC_PROTOCOL_CLIENT_TIMEOUT_LEN,
+                                     &errnum)) < 0)
+        {
+          handle->errnum = errnum;
+          goto cleanup;
+        }
 
       if (bytes_read < CEREBRO_METRIC_ERR_RESPONSE_LEN)
         {
@@ -322,6 +328,7 @@ _receive_node_metric_responses(cerebro_t handle, void *list, int fd)
         {
           char *value = NULL;
           int value_read, value_count;
+          unsigned int errnum;
 
           if (res.metric_value_type == CEREBRO_METRIC_VALUE_TYPE_NONE)
             {
@@ -335,12 +342,14 @@ _receive_node_metric_responses(cerebro_t handle, void *list, int fd)
               goto cleanup;
             }
 
-          if ((value_read = _cerebro_metric_receive_data(handle,
-                                                         fd,
-                                                         res.metric_value_len,
-                                                         value,
-                                                         res.metric_value_len)) < 0)
+          if ((value_read = receive_data(fd,
+                                         res.metric_value_len,
+                                         value,
+                                         res.metric_value_len,
+                                         CEREBRO_METRIC_PROTOCOL_CLIENT_TIMEOUT_LEN,
+                                         &errnum)) < 0)
             {
+              handle->errnum = errnum;
               free(value);
               goto cleanup;
             }

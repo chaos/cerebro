@@ -23,6 +23,7 @@
 #include "fd.h"
 #include "debug.h"
 #include "marshall.h"
+#include "network_util.h"
 
 /* 
  * _cerebro_metric_name_response_unmarshall
@@ -135,14 +136,18 @@ _receive_metric_name_responses(cerebro_t handle, void *list, int fd)
       struct cerebro_metric_name_response res;
       char metric_name_buf[CEREBRO_MAX_METRIC_NAME_LEN+1]; 
       char buf[CEREBRO_MAX_PACKET_LEN];
-      int bytes_read, res_len;
+      int bytes_read, res_len, errnum;
   
-      if ((bytes_read = _cerebro_metric_receive_data(handle,
-                                                     fd,
-                                                     CEREBRO_METRIC_NAME_RESPONSE_LEN,
-                                                     buf,
-                                                     CEREBRO_MAX_PACKET_LEN)) < 0)
-        goto cleanup;
+      if ((bytes_read = receive_data(fd,
+                                     CEREBRO_METRIC_NAME_RESPONSE_LEN,
+                                     buf,
+                                     CEREBRO_MAX_PACKET_LEN,
+                                     CEREBRO_METRIC_PROTOCOL_CLIENT_TIMEOUT_LEN,
+                                     &errnum)) < 0)
+        {
+          handle->errnum = errnum;
+          goto cleanup;
+        }
   
       if (bytes_read < CEREBRO_METRIC_ERR_RESPONSE_LEN)
         {

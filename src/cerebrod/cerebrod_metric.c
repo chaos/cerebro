@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric.c,v 1.58 2005-06-29 00:55:26 achu Exp $
+ *  $Id: cerebrod_metric.c,v 1.59 2005-06-29 17:52:26 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -26,6 +26,7 @@
 #include "debug.h"
 #include "fd.h"
 #include "list.h"
+#include "network_util.h"
 #include "wrappers.h"
 
 extern struct cerebrod_config conf;
@@ -263,103 +264,7 @@ _metric_request_unmarshall(struct cerebro_metric_request *req,
   
   return len;
 }
-
-/*
- * _cerebrod_metric_receive_data
- *
- * Receive metric server request
- * 
- * Return request packet and length of packet unmarshalled on success,
- * -1 on error
- */
-static int
-_cerebrod_metric_receive_data(int fd,	
-                              unsigned int bytes_to_read,
-                              char *buf,
-                              unsigned int buflen)
-{
-  int bytes_read = 0;
-  
-  assert(fd >= 0);
-  assert(bytes_to_read);
-  assert(buf);
-  assert(buflen >= bytes_to_read);
-  
-  memset(buf, '\0', buflen);
-  
-  while (bytes_read < bytes_to_read)
-    {
-      fd_set rfds;
-      struct timeval tv;
-      int num;
-
-      tv.tv_sec = CEREBRO_METRIC_PROTOCOL_SERVER_TIMEOUT_LEN;
-      tv.tv_usec = 0;
-      
-      FD_ZERO(&rfds);
-      FD_SET(fd, &rfds);
-  
-      if ((num = select(fd + 1, &rfds, NULL, NULL, &tv)) < 0)
-	{
-	  CEREBRO_DBG(("select: %s", strerror(errno)));
-	  goto cleanup;
-	}
-
-      if (!num)
-	{
-          /* Timed out.  If atleast some bytes were read, return data
-           * back to the caller to let them possibly unmarshall the
-           * data.  Its possible we are expecting more bytes than the
-           * client is sending, perhaps because we are using a
-           * different protocol version.  This will allow the server
-           * to return a invalid version number back to the user.
-	   */
-	  if (!bytes_read)
-            {
-              CEREBRO_DBG(("timeout"));
-              goto cleanup;
-            }
-	  else
-	    goto out;
-	}
-      
-      if (FD_ISSET(fd, &rfds))
-	{
-	  int n;
-
-          /* Don't use fd_read_n b/c it loops until exactly
-           * bytes_to_read is read.  Due to version incompatability or
-           * error packets, we may want to read a smaller packet.
-           */
-	  if ((n = read(fd, buf + bytes_read, bytes_to_read - bytes_read)) < 0)
-	    {
-	      CEREBRO_DBG(("read: %s", strerror(errno)));
-	      goto cleanup;
-	    }
-
-          /* Pipe closed */
-	  if (!n)
-            {
-              CEREBRO_DBG(("pipe closed"));
-              goto cleanup;
-            }
-
-	  bytes_read += n;
-	}
-      else
-	{
-	  CEREBRO_DBG(("num != 0 but fd not set"));
-	  goto cleanup;
-	}
-    }
-
- out:
-  return bytes_read;
-
- cleanup:
-  return -1;
-}
-
+     
 /*  
  * _metric_request_dump
  *
@@ -1073,10 +978,12 @@ _metric_service_connection(void *arg)
 
   memset(&req, '\0', sizeof(struct cerebro_metric_request));
 
-  if ((recv_len = _cerebrod_metric_receive_data(client_fd, 
-                                                CEREBRO_METRIC_REQUEST_PACKET_LEN,
-                                                buf,
-                                                CEREBRO_MAX_PACKET_LEN)) < 0)
+  if ((recv_len = receive_data(client_fd, 
+                               CEREBRO_METRIC_REQUEST_PACKET_LEN,
+                               buf,
+                               CEREBRO_MAX_PACKET_LEN,
+                               CEREBRO_METRIC_PROTOCOL_CLIENT_TIMEOUT_LEN,
+                               NULL)) < 0)
     goto cleanup;
 
   if (_metric_request_check_version(buf, recv_len, &version) < 0)

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_util.h,v 1.6 2005-06-29 15:50:59 achu Exp $
+ *  $Id: cerebro_metric_util.h,v 1.7 2005-06-29 17:52:26 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_METRIC_UTIL_H
@@ -36,20 +36,6 @@ int _cerebro_metric_connect_and_receive(cerebro_t handle,
                                         void *list,
                                         const char *metric_name,
                                         Cerebro_metric_response_receive response_receive);
-
-/*
- * _cerebro_metric_receive_data
- *
- * Receive a certain amount of data
- *
- * Returns bytes read on success, -1 on error
- *
- */
-int _cerebro_metric_receive_data(cerebro_t handle,
-                                 int fd,
-                                 unsigned int bytes_to_read,
-                                 char *buf,
-                                 unsigned int buflen);
 
 /*
  * _cerebro_metric_response_check
