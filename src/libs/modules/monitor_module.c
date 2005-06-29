@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: monitor_module.c,v 1.9 2005-06-27 23:27:06 achu Exp $
+ *  $Id: monitor_module.c,v 1.10 2005-06-29 18:19:20 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -145,7 +145,9 @@ monitor_modules_load(unsigned int modules_max)
   if (rv)
     goto out;
 
-  /* Responsibility of caller to call count to see no modules were loaded */
+  /* Responsibility of caller to call count to see if no modules were
+   * loaded 
+   */
 
  out:
   return monitor_handle;
