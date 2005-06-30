@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.102 2005-06-30 00:37:40 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.103 2005-06-30 17:39:56 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -26,7 +26,6 @@
 #include "cerebrod_heartbeat.h"
 #include "cerebrod_listener.h"
 #include "cerebrod_listener_data.h"
-#include "cerebrod_metric.h"
 #include "cerebrod_util.h"
 
 #include "clusterlist_module.h"
@@ -41,16 +40,16 @@ extern pthread_mutex_t debug_output_mutex;
 extern clusterlist_module_t clusterlist_handle;
 
 /* 
- * cerebrod_listener_initialization_complete
- * cerebrod_listener_initialization_complete_cond
- * cerebrod_listener_initialization_complete_lock
+ * listener_init
+ * listener_init_cond
+ * listener_init_lock
  *
  * variables for synchronizing initialization between different pthreads
  * and signaling when it is complete
  */
-int cerebrod_listener_initialization_complete = 0;
-pthread_cond_t cerebrod_listener_initialization_complete_cond = PTHREAD_COND_INITIALIZER;
-pthread_mutex_t cerebrod_listener_initialization_complete_lock = PTHREAD_MUTEX_INITIALIZER;
+int listener_init = 0;
+pthread_cond_t listener_init_cond = PTHREAD_COND_INITIALIZER;
+pthread_mutex_t listener_init_lock = PTHREAD_MUTEX_INITIALIZER;
 
 /* 
  * listener_fd
@@ -140,8 +139,8 @@ _listener_setup_socket(void)
 static void
 _cerebrod_listener_initialize(void)
 {
-  Pthread_mutex_lock(&cerebrod_listener_initialization_complete_lock);
-  if (cerebrod_listener_initialization_complete)
+  Pthread_mutex_lock(&listener_init_lock);
+  if (listener_init)
     goto out;
 
   Pthread_mutex_lock(&listener_fd_lock);
@@ -157,10 +156,10 @@ _cerebrod_listener_initialize(void)
 
   cerebrod_listener_data_initialize();
 
-  cerebrod_listener_initialization_complete++;
-  Pthread_cond_signal(&cerebrod_listener_initialization_complete_cond);
+  listener_init++;
+  Pthread_cond_signal(&listener_init_cond);
  out:
-  Pthread_mutex_unlock(&cerebrod_listener_initialization_complete_lock);
+  Pthread_mutex_unlock(&listener_init_lock);
 }
 
 /* 

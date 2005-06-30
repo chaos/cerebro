@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric.c,v 1.61 2005-06-30 00:37:40 achu Exp $
+ *  $Id: cerebrod_metric_server.c,v 1.1 2005-06-30 17:39:56 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -20,7 +20,7 @@
 
 #include "cerebrod_config.h"
 #include "cerebrod_listener_data.h"
-#include "cerebrod_metric.h"
+#include "cerebrod_metric_server.h"
 #include "cerebrod_util.h"
 
 #include "debug.h"
@@ -45,35 +45,35 @@ extern pthread_mutex_t cerebrod_metric_name_lock;
 #define CEREBROD_METRIC_BACKLOG           10
 
 /*
- * cerebrod_metric_initialization_complete
- * cerebrod_metric_initialization_complete_cond
- * cerebrod_metric_initialization_complete_lock
+ * metric_server_init
+ * metric_server_init_cond
+ * metric_server_init_lock
  *
  * variables for synchronizing initialization between different pthreads
  * and signaling when it is complete
  */
-int cerebrod_metric_initialization_complete = 0;
-pthread_cond_t cerebrod_metric_initialization_complete_cond = PTHREAD_COND_INITIALIZER;
-pthread_mutex_t cerebrod_metric_initialization_complete_lock = PTHREAD_MUTEX_INITIALIZER;
+int metric_server_init = 0;
+pthread_cond_t metric_server_init_cond = PTHREAD_COND_INITIALIZER;
+pthread_mutex_t metric_server_init_lock = PTHREAD_MUTEX_INITIALIZER;
 
 /*
- * _cerebrod_metric_initialize
+ * _cerebrod_metric_server_initialize
  *
  * perform metric server initialization
  */
 static void
-_cerebrod_metric_initialize(void)
+_cerebrod_metric_server_initialize(void)
 {
-  Pthread_mutex_lock(&cerebrod_metric_initialization_complete_lock);
-  if (cerebrod_metric_initialization_complete)
+  Pthread_mutex_lock(&metric_server_init_lock);
+  if (metric_server_init)
     goto out;
 
   Signal(SIGPIPE, SIG_IGN);
 
-  cerebrod_metric_initialization_complete++;
-  Pthread_cond_signal(&cerebrod_metric_initialization_complete_cond);
+  metric_server_init++;
+  Pthread_cond_signal(&metric_server_init_cond);
  out:
-  Pthread_mutex_unlock(&cerebrod_metric_initialization_complete_lock);
+  Pthread_mutex_unlock(&metric_server_init_lock);
 }
 
 /*
@@ -939,7 +939,7 @@ _respond_with_nodes(int client_fd,
 }
 
 /* 
- * _metric_service_connection
+ * _metric_server_service_connection
  *
  * Thread to service a connection from a client to retrieve metric
  * data.  Use wrapper functions minimally, b/c we want to return
@@ -950,7 +950,7 @@ _respond_with_nodes(int client_fd,
  * Executed in detached state, no return value.
  */
 static void *
-_metric_service_connection(void *arg)
+_metric_server_service_connection(void *arg)
 {
   int client_fd, req_len, recv_len;
   struct cerebro_metric_request req;
@@ -1031,7 +1031,7 @@ _metric_service_connection(void *arg)
 }
 
 /*
- * _metric_setup_socket
+ * _metric_server_setup_socket
  *
  * Create and setup the server socket.  Do not use wrappers in this
  * function.  We want to give the server additional chances to
@@ -1040,7 +1040,7 @@ _metric_service_connection(void *arg)
  * Returns file descriptor on success, -1 on error
  */
 static int
-_metric_setup_socket(void)
+_metric_server_setup_socket(void)
 {
   struct sockaddr_in addr;
   int fd, optval = 1;
@@ -1082,13 +1082,13 @@ _metric_setup_socket(void)
 }
 
 void *
-cerebrod_metric(void *arg)
+cerebrod_metric_server(void *arg)
 {
   int fd;
 
-  _cerebrod_metric_initialize();
+  _cerebrod_metric_server_initialize();
 
-  if ((fd = _metric_setup_socket()) < 0)
+  if ((fd = _metric_server_setup_socket()) < 0)
     CEREBRO_EXIT(("fd setup failed"));
 
   for (;;)
@@ -1103,7 +1103,7 @@ cerebrod_metric(void *arg)
                               (struct sockaddr *)&client_addr,
                               &client_addr_len)) < 0)
         fd = cerebrod_reinitialize_socket(fd,
-                                          _metric_setup_socket,
+                                          _metric_server_setup_socket,
                                           "metric_server: accept");
       
       if (client_fd < 0)
@@ -1114,7 +1114,10 @@ cerebrod_metric(void *arg)
       Pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
       arg = Malloc(sizeof(int));
       *arg = client_fd;
-      Pthread_create(&thread, &attr, _metric_service_connection, (void *)arg);
+      Pthread_create(&thread, 
+                     &attr, 
+                     _metric_server_service_connection, 
+                     (void *)arg);
       Pthread_attr_destroy(&attr);
     }
 

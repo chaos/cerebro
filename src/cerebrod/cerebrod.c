@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.69 2005-06-24 23:53:30 achu Exp $
+ *  $Id: cerebrod.c,v 1.70 2005-06-30 17:39:56 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -15,7 +15,7 @@
 #include "cerebrod_daemon.h"
 #include "cerebrod_config.h"
 #include "cerebrod_listener.h"
-#include "cerebrod_metric.h"
+#include "cerebrod_metric_server.h"
 #include "cerebrod_speaker.h"
 
 #include "wrappers.h"
@@ -37,13 +37,13 @@ pthread_mutex_t debug_output_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 extern struct cerebrod_config conf;
 
-extern int cerebrod_listener_initialization_complete;
-extern pthread_cond_t cerebrod_listener_initialization_complete_cond;
-extern pthread_mutex_t cerebrod_listener_initialization_complete_lock;
+extern int listener_init;
+extern pthread_cond_t listener_init_cond;
+extern pthread_mutex_t listener_init_lock;
 
-extern int cerebrod_metric_initialization_complete;
-extern pthread_cond_t cerebrod_metric_initialization_complete_cond;
-extern pthread_mutex_t cerebrod_metric_initialization_complete_lock;
+extern int metric_server_init;
+extern pthread_cond_t metric_server_init_cond;
+extern pthread_mutex_t metric_server_init_lock;
 
 int 
 main(int argc, char **argv)
@@ -79,15 +79,14 @@ main(int argc, char **argv)
 
       Pthread_attr_init(&attr);
       Pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-      Pthread_create(&thread, &attr, cerebrod_metric, NULL);
+      Pthread_create(&thread, &attr, cerebrod_metric_server, NULL);
       Pthread_attr_destroy(&attr);
 
       /* Wait for initialization to complete */
-      Pthread_mutex_lock(&cerebrod_metric_initialization_complete_lock);
-      while (cerebrod_metric_initialization_complete == 0)
-        Pthread_cond_wait(&cerebrod_metric_initialization_complete_cond,
-                          &cerebrod_metric_initialization_complete_lock);
-      Pthread_mutex_unlock(&cerebrod_metric_initialization_complete_lock);
+      Pthread_mutex_lock(&metric_server_init_lock);
+      while (metric_server_init == 0)
+        Pthread_cond_wait(&metric_server_init_cond, &metric_server_init_lock);
+      Pthread_mutex_unlock(&metric_server_init_lock);
     }
 
   /* Start listening server before speaker so that listener
@@ -109,11 +108,10 @@ main(int argc, char **argv)
         }
 
       /* Wait for initialization to complete */
-      Pthread_mutex_lock(&cerebrod_listener_initialization_complete_lock);
-      while (cerebrod_listener_initialization_complete == 0)
-        Pthread_cond_wait(&cerebrod_listener_initialization_complete_cond,
-                          &cerebrod_listener_initialization_complete_lock);
-      Pthread_mutex_unlock(&cerebrod_listener_initialization_complete_lock);
+      Pthread_mutex_lock(&listener_init_lock);
+      while (listener_init == 0)
+        Pthread_cond_wait(&listener_init_cond, &listener_init_lock);
+      Pthread_mutex_unlock(&listener_init_lock);
     }
 
   /* Start speaker */

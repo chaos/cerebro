@@ -1,3 +1,7 @@
+2005-06-30  Albert Chu  <chu11@llnl.gov>
+
+	* Code cleanup.
+	
 2005-06-29  Albert Chu  <chu11@llnl.gov>
 
 	* Fix remaining version checking bugs.

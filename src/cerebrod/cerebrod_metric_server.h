@@ -1,9 +1,9 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric.h,v 1.6 2005-06-23 21:37:22 achu Exp $
+ *  $Id: cerebrod_metric_server.h,v 1.1 2005-06-30 17:39:56 achu Exp $
 \*****************************************************************************/
 
-#ifndef _CEREBROD_METRIC_H
-#define _CEREBROD_METRIC_H
+#ifndef _CEREBROD_METRIC_SERVER_H
+#define _CEREBROD_METRIC_SERVER_H
 
 #include "list.h"
  
@@ -41,6 +41,6 @@ struct cerebrod_node_metric_evaluation_data
  *
  * Executed in detached state, no return value.
  */
-void *cerebrod_metric(void *);
+void *cerebrod_metric_server(void *);
 
-#endif /* _CEREBROD_METRIC_H */
+#endif /* _CEREBROD_METRIC_SERVER_H */
