@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.115 2005-06-30 00:37:40 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.116 2005-06-30 22:43:59 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -40,6 +40,10 @@
 #define MULTICAST_CLASS_MAX 239
 #define IPADDR_BITS          32   
 #define IPADDR6_BITS        128
+
+#define INTF_NONE             0
+#define INTF_IP               1 
+#define INTF_NAME             2
 
 #if CEREBRO_DEBUG
 extern char *config_debug_config_file;
@@ -201,7 +205,7 @@ _cerebrod_cmdline_arguments_error_check(void)
       if (strcmp(conf.config_file, CEREBRO_CONFIG_FILE_DEFAULT) != 0)
         {
           struct stat buf;
-  
+          
           if (stat(conf.config_file, &buf) < 0)
             cerebro_err_exit("config file '%s' not found", conf.config_file);
         }
@@ -217,7 +221,7 @@ _cerebrod_cmdline_arguments_error_check(void)
 static void
 _cerebrod_load_config(void)
 {
-  struct cerebro_config temp_conf;
+  struct cerebro_config tconf;
   unsigned int errnum;
 
 #if CEREBRO_DEBUG
@@ -225,46 +229,45 @@ _cerebrod_load_config(void)
   config_debug_output = conf.debug;
 #endif /* CEREBRO_DEBUG */
 
-  if (load_config(&temp_conf, &errnum) < 0)
+  if (load_config(&tconf, &errnum) < 0)
     CEREBRO_EXIT(("load_config: %d", errnum));
   
-  if (temp_conf.cerebrod_heartbeat_frequency_flag)
+  if (tconf.cerebrod_heartbeat_frequency_flag)
     {
-      conf.heartbeat_frequency_min = temp_conf.cerebrod_heartbeat_frequency_min;
-      conf.heartbeat_frequency_max = temp_conf.cerebrod_heartbeat_frequency_max;
+      conf.heartbeat_frequency_min = tconf.cerebrod_heartbeat_frequency_min;
+      conf.heartbeat_frequency_max = tconf.cerebrod_heartbeat_frequency_max;
     }
-  if (temp_conf.cerebrod_heartbeat_source_port_flag)
-    conf.heartbeat_source_port = temp_conf.cerebrod_heartbeat_source_port;
-  if (temp_conf.cerebrod_heartbeat_destination_port_flag)
-    conf.heartbeat_destination_port = temp_conf.cerebrod_heartbeat_destination_port;
-  if (temp_conf.cerebrod_heartbeat_destination_ip_flag)
-    conf.heartbeat_destination_ip = Strdup(temp_conf.cerebrod_heartbeat_destination_ip);
-  if (temp_conf.cerebrod_heartbeat_network_interface_flag)
-    conf.heartbeat_network_interface = Strdup(temp_conf.cerebrod_heartbeat_network_interface);
-
-  if (temp_conf.cerebrod_heartbeat_ttl_flag)
-    conf.heartbeat_ttl = temp_conf.cerebrod_heartbeat_ttl;
-  if (temp_conf.cerebrod_speak_flag)
-    conf.speak = temp_conf.cerebrod_speak;
-  if (temp_conf.cerebrod_listen_flag)
-    conf.listen = temp_conf.cerebrod_listen;
-  if (temp_conf.cerebrod_listen_threads_flag)
-    conf.listen_threads = temp_conf.cerebrod_listen_threads;
-  if (temp_conf.cerebrod_metric_server_flag)
-    conf.metric_server = temp_conf.cerebrod_metric_server;
-  if (temp_conf.cerebrod_metric_server_port_flag)
-    conf.metric_server_port = temp_conf.cerebrod_metric_server_port;
-  if (temp_conf.cerebrod_metric_max_flag)
-    conf.metric_max = temp_conf.cerebrod_metric_max;
-  if (temp_conf.cerebrod_monitor_max_flag)
-    conf.monitor_max = temp_conf.cerebrod_monitor_max;
+  if (tconf.cerebrod_heartbeat_source_port_flag)
+    conf.heartbeat_source_port = tconf.cerebrod_heartbeat_source_port;
+  if (tconf.cerebrod_heartbeat_destination_port_flag)
+    conf.heartbeat_destination_port = tconf.cerebrod_heartbeat_destination_port;
+  if (tconf.cerebrod_heartbeat_destination_ip_flag)
+    conf.heartbeat_destination_ip = Strdup(tconf.cerebrod_heartbeat_destination_ip);
+  if (tconf.cerebrod_heartbeat_network_interface_flag)
+    conf.heartbeat_network_interface = Strdup(tconf.cerebrod_heartbeat_network_interface);
+  if (tconf.cerebrod_heartbeat_ttl_flag)
+    conf.heartbeat_ttl = tconf.cerebrod_heartbeat_ttl;
+  if (tconf.cerebrod_speak_flag)
+    conf.speak = tconf.cerebrod_speak;
+  if (tconf.cerebrod_listen_flag)
+    conf.listen = tconf.cerebrod_listen;
+  if (tconf.cerebrod_listen_threads_flag)
+    conf.listen_threads = tconf.cerebrod_listen_threads;
+  if (tconf.cerebrod_metric_server_flag)
+    conf.metric_server = tconf.cerebrod_metric_server;
+  if (tconf.cerebrod_metric_server_port_flag)
+    conf.metric_server_port = tconf.cerebrod_metric_server_port;
+  if (tconf.cerebrod_metric_max_flag)
+    conf.metric_max = tconf.cerebrod_metric_max;
+  if (tconf.cerebrod_monitor_max_flag)
+    conf.monitor_max = tconf.cerebrod_monitor_max;
 #if CEREBRO_DEBUG
-  if (temp_conf.cerebrod_speak_debug_flag)
-    conf.speak_debug = temp_conf.cerebrod_speak_debug;
-  if (temp_conf.cerebrod_listen_debug_flag)
-    conf.listen_debug = temp_conf.cerebrod_listen_debug;
-  if (temp_conf.cerebrod_metric_server_debug_flag)
-    conf.metric_server_debug = temp_conf.cerebrod_metric_server_debug;
+  if (tconf.cerebrod_speak_debug_flag)
+    conf.speak_debug = tconf.cerebrod_speak_debug;
+  if (tconf.cerebrod_listen_debug_flag)
+    conf.listen_debug = tconf.cerebrod_listen_debug;
+  if (tconf.cerebrod_metric_server_debug_flag)
+    conf.metric_server_debug = tconf.cerebrod_metric_server_debug;
 #endif /* CEREBRO_DEBUG */
 }
 
@@ -398,11 +401,15 @@ _cerebrod_calculate_heartbeat_destination_ip_in_addr(void)
                      conf.heartbeat_destination_ip);
 }
 
+/* 
+ * achu: A significant portion of the network code below is from from
+ * Unix Network Programming, by R. Stevens, Chapter 16 
+ */
+
 /*
  * _get_if_conf
  *
- * Retrieve network interface configuration.  Code is mostly from Unix
- * Network Programming by R. Stevens, Chapter 16
+ * Retrieve network interface configuration.
  * 
  * Return buffer of local network interface configurations.
  */
@@ -434,8 +441,7 @@ _get_if_conf(void **buf, struct ifconf *ifc, int fd)
 /*
  * _get_ifr_len
  *
- * Determine the length of an ifreq structure.  Code is mostly from
- * Unix Network Programming by R. Stevens, Chapter 16
+ * Determine the length of an ifreq structure.
  *
  * Return calculated length of the ifreq structure
  */
@@ -473,7 +479,7 @@ _get_ifr_len(struct ifreq *ifr)
 }
 
 /*
- * _cerebrod_calculate_in_addr_and_index
+ * _calculate_in_addr_and_index
  *
  * Calculate a network interface ip address and interface index
  * based on the network interface passed in.
@@ -481,255 +487,156 @@ _get_ifr_len(struct ifreq *ifr)
  * Return calculated ip address and interface index.
  */
 static void
-_cerebrod_calculate_in_addr_and_index(char *network_interface,
-				      struct in_addr *interface_in_addr,
-				      int *interface_index)
+_calculate_in_addr_and_index(char *intf, struct in_addr *in_addr, int *index)
 {
-  assert(interface_in_addr && interface_index);
-  
-  if (!network_interface)
+  void *buf = NULL, *ptr = NULL;
+  int fd, mask = 0, found_interface = 0;
+  u_int32_t conf_masked_ip;
+  struct ifconf ifc;
+  int intf_type;
+
+  /* 
+   * There are three possibile formats for the interface input:
+   *
+   * - No interface specified (i.e. null)
+   * - IP address or subnet specified 
+   * - Interface name specified 
+   */
+
+  if (!intf)
+    intf_type = INTF_NONE;
+  else if (strchr(intf, '.'))
     {
-      /* Case A: No interface specified
-       * - If multicast heartbeat IP address specified, find a
-       *   multicast interface
-       * - If singlecast heartbeat IP address specified, use INADDR_ANY
-       */
-      if (conf.multicast)
-	{
-	  void *buf = NULL, *ptr = NULL;
-	  int fd, found_interface = 0;;
-	  struct ifconf ifc;
-                                                                    
-	  /* From Unix Network Programming, by R. Stevens, Chapter 16 */
-
-	  fd = Socket(AF_INET, SOCK_DGRAM, 0);
-
-	  _get_if_conf(&buf, &ifc, fd);
-
-	  /* Check all interfaces */
-	  for (ptr = buf; ptr < buf + ifc.ifc_len; ) 
-	    {
-	      struct sockaddr_in *sinptr;
-	      struct ifreq ifr_tmp;
-              struct ifreq *ifr;
-	      int len;
-
-	      ifr = (struct ifreq *)ptr;
-
-	      len = _get_ifr_len(ifr);
-
-	      ptr += sizeof(ifr->ifr_name) + len;
-          
-	      /* NUL termination not required, don't use strncpy() wrapper */
-	      memset(&ifr_tmp, '\0', sizeof(struct ifreq));
-	      strncpy(ifr_tmp.ifr_name, ifr->ifr_name, IFNAMSIZ);
-
-	      if(ioctl(fd, SIOCGIFFLAGS, &ifr_tmp) < 0)
-		CEREBRO_EXIT(("ioctl: %s", strerror(errno)));
-
-	      if (!(ifr_tmp.ifr_flags & IFF_UP) 
-                  || !(ifr_tmp.ifr_flags & IFF_MULTICAST))
-		continue;
-
-	      /* NUL termination not required, don't use strncpy() wrapper */
-	      memset(&ifr_tmp, '\0', sizeof(struct ifreq));
-	      strncpy(ifr_tmp.ifr_name, ifr->ifr_name, IFNAMSIZ);
-
-	      if(ioctl(fd, SIOCGIFINDEX, &ifr_tmp) < 0)
-		CEREBRO_EXIT(("ioctl: %s", strerror(errno)));
-	      
-	      sinptr = (struct sockaddr_in *)&ifr->ifr_addr;
-	      interface_in_addr->s_addr = sinptr->sin_addr.s_addr;
-	      *interface_index = ifr_tmp.ifr_ifindex;
-	      found_interface++;
-	      break;
-	    }
-
-	  if (!found_interface)
-	    cerebro_err_exit("network interface with multicast not found", 
-                             network_interface);
-          
-	  Free(buf);
-	  Close(fd);
-	}
-      else
-	interface_in_addr->s_addr = INADDR_ANY;
-    }
-  else if (strchr(network_interface, '.'))
-    {
-      /* Case B: IP address or subnet specified */
-      void *buf = NULL, *ptr = NULL;
-      int fd, mask = 0, found_interface = 0;
-      struct ifconf ifc;
       struct in_addr addr_temp;
-      u_int32_t conf_masked_ip;
 
-      fd = Socket(AF_INET, SOCK_DGRAM, 0);
-
-      _get_if_conf(&buf, &ifc, fd);
-     
-      if (strchr(network_interface, '/'))
-	{
-	  char *network_interface_cpy = Strdup(network_interface);
-	  char *subnet_mask, *ptr, *tok;
-
-	  tok = strtok(network_interface_cpy, "/");
-	  if (!Inet_pton(AF_INET, tok, &addr_temp))
-            cerebro_err_exit("network interface IP address '%s' invalid",
-                             network_interface);
+      if (strchr(intf, '/'))
+        {
+          char *intf_cpy = Strdup(intf);
+          char *s_mask, *ptr, *tok;
           
-	  if (!(subnet_mask = strtok(NULL, "")))
-	    cerebro_err_exit("network interface '%s' subnet mask not specified",
-                             network_interface);
-	  else
-	    {
-	      mask = strtol(subnet_mask, &ptr, 10);
-	      if ((ptr != (subnet_mask + strlen(subnet_mask))) 
+          tok = strtok(intf_cpy, "/");
+          if (!Inet_pton(AF_INET, tok, &addr_temp))
+            cerebro_err_exit("network interface IP '%s' invalid", intf);
+          
+          if (!(s_mask = strtok(NULL, "")))
+            cerebro_err_exit("subnet mask not specified in '%s'", intf);
+          else
+            {
+              mask = strtol(s_mask, &ptr, 10);
+              if ((ptr != (s_mask + strlen(s_mask))) 
                   || (mask < 1 || mask > IPADDR_BITS))
-		cerebro_err_exit("network interface '%s' subnet mask invalid",
-                                 network_interface);
-	    }
-
-	  Free(network_interface_cpy);
-	}
+                cerebro_err_exit("subnet mask in '%s' invalid", intf);
+            }
+          
+          Free(intf_cpy);
+        }
       else
-	{
-	  /* If no '/', then just an IP address, mask is all bits */
-	  if (!Inet_pton(AF_INET, network_interface, &addr_temp))
-            cerebro_err_exit("network interface IP address '%s' invalid",
-                             network_interface);
-	  mask = IPADDR_BITS;
-	}
-
+        {
+          /* If no '/', then just an IP address, mask is all bits */
+          if (!Inet_pton(AF_INET, intf, &addr_temp))
+            cerebro_err_exit("network interface IP '%s' invalid", intf);
+          mask = IPADDR_BITS;
+        }
+      
       conf_masked_ip = htonl(addr_temp.s_addr) >> (IPADDR_BITS - mask);
-
-      /* Check all interfaces */
-      for(ptr = buf; ptr < buf + ifc.ifc_len;)
-	{ 
-	  struct sockaddr_in *sinptr;
-	  struct ifreq ifr_tmp;
-          struct ifreq *ifr;
-	  u_int32_t intf_masked_ip;
-	  int len;
-
-	  ifr = (struct ifreq *)ptr;
-
-	  len = _get_ifr_len(ifr);
-
-	  ptr += sizeof(ifr->ifr_name) + len;
-          
-	  sinptr = (struct sockaddr_in *)&ifr->ifr_addr;
-          
-	  intf_masked_ip = htonl((sinptr->sin_addr).s_addr) >> (32 - mask);
-          
-	  /* NUL termination not required, don't use wrapper */
-	  memset(&ifr_tmp, '\0', sizeof(struct ifreq));
-	  strncpy(ifr_tmp.ifr_name, ifr->ifr_name, IFNAMSIZ);
-
-	  if (ioctl(fd, SIOCGIFFLAGS, &ifr_tmp) < 0)
-	    CEREBRO_EXIT(("ioctl: %s", strerror(errno)));
-          
-	  if (!(ifr_tmp.ifr_flags & IFF_UP))
-	    continue;
-
-	  if (conf.multicast && !(ifr_tmp.ifr_flags & IFF_MULTICAST))
-	    continue;
-          
-	  if (conf_masked_ip == intf_masked_ip)
-	    {
-	      /* NUL termination not required, don't use strncpy() wrapper */
-	      memset(&ifr_tmp, '\0', sizeof(struct ifreq));
-	      strncpy(ifr_tmp.ifr_name, ifr->ifr_name, IFNAMSIZ);
-
-	      if(ioctl(fd, SIOCGIFINDEX, &ifr_tmp) < 0)
-		CEREBRO_EXIT(("ioctl: %s", strerror(errno)));
-
-	      interface_in_addr->s_addr = sinptr->sin_addr.s_addr;
-	      *interface_index = ifr_tmp.ifr_ifindex;
-	      found_interface++;
-	      break;
-	    }
-	}
       
-      if (!found_interface)
-	{
-	  if (conf.multicast)
-	    cerebro_err_exit("network interface '%s' with multicast not found",
-                             network_interface);
-	  else
-	    cerebro_err_exit("network interface '%s' not found", 
-                             network_interface);
-	}
-      
-      Free(buf);
-      Close(fd);
+      intf_type = INTF_IP;
     }
   else
+    intf_type = INTF_NAME;
+
+  assert(in_addr && index);
+  
+  /* Special Case */
+  if (intf_type == INTF_NONE && !conf.multicast)
     {
-      /* Case C: Interface name specified */
-      void *buf = NULL, *ptr = NULL;
-      int fd, found_interface = 0;
-      struct ifconf ifc;
-                                                                    
-      /* From Unix Network Programming, by R. Stevens, Chapter 16 */
-
-      fd = Socket(AF_INET, SOCK_DGRAM, 0);
-
-      _get_if_conf(&buf, &ifc, fd);
-
-      /* Check all interfaces */
-      for (ptr = buf; ptr < buf + ifc.ifc_len; ) 
-	{
-          struct ifreq *ifr;
-	  int len;
-
-	  ifr = (struct ifreq *)ptr;
-
-	  len = _get_ifr_len(ifr);
-
-	  ptr += sizeof(ifr->ifr_name) + len;
-          
-	  if (!strcmp(network_interface, ifr->ifr_name))
-	    {
-	      struct sockaddr_in *sinptr;
-	      struct ifreq ifr_tmp;
-
-	      /* NUL termination not required, don't use wrapper */
-	      memset(&ifr_tmp, '\0', sizeof(struct ifreq));
-	      strncpy(ifr_tmp.ifr_name, ifr->ifr_name, IFNAMSIZ);
-
-	      if(ioctl(fd, SIOCGIFFLAGS, &ifr_tmp) < 0)
-		CEREBRO_EXIT(("ioctl: %s", strerror(errno)));
-
-	      if (!(ifr_tmp.ifr_flags & IFF_UP))
-		cerebro_err_exit("network interface '%s' not up",
-                                 network_interface);
-	      
-	      if (conf.multicast && !(ifr_tmp.ifr_flags & IFF_MULTICAST))
-		cerebro_err_exit("network interface '%s' cannot multicast",
-                                 network_interface);
-
-	      /* NUL termination not required, don't use strncpy() wrapper */
-	      memset(&ifr_tmp, '\0', sizeof(struct ifreq));
-	      strncpy(ifr_tmp.ifr_name, ifr->ifr_name, IFNAMSIZ);
-
-	      if(ioctl(fd, SIOCGIFINDEX, &ifr_tmp) < 0)
-		CEREBRO_EXIT(("ioctl: %s", strerror(errno)));
-
-	      sinptr = (struct sockaddr_in *)&ifr->ifr_addr;
-	      interface_in_addr->s_addr = sinptr->sin_addr.s_addr;
-	      *interface_index = ifr_tmp.ifr_ifindex;
-	      found_interface++;
-	      break;
-	    }
-	}
-
-      if (!found_interface)
-	cerebro_err_exit("network interface '%s' not found", network_interface);
-
-      Free(buf);
-      Close(fd);
+      in_addr->s_addr = INADDR_ANY;
+      return;
     }
+
+  fd = Socket(AF_INET, SOCK_DGRAM, 0);
+
+  _get_if_conf(&buf, &ifc, fd);
+
+  for (ptr = buf; ptr < buf + ifc.ifc_len; ) 
+    {
+      struct sockaddr_in *sinptr;
+      struct ifreq ifr_tmp;
+      struct ifreq *ifr;
+      int len;
+          
+      ifr = (struct ifreq *)ptr;
+      
+      len = _get_ifr_len(ifr);
+      
+      ptr += sizeof(ifr->ifr_name) + len;
+      
+      /* Don't bother continuing if this isn't the right interface */
+      if (intf_type == INTF_NAME)
+        {
+          char ifr_name_buf[IFNAMSIZ+1];
+          
+          /* Guarantee NUL termination */
+          memset(ifr_name_buf, '\0', IFNAMSIZ+1);
+          memcpy(ifr_name_buf, ifr->ifr_name, IFNAMSIZ);
+
+          if (strcmp(intf, ifr_name_buf))
+            continue;
+        }
+
+      /* Don't bother continuing if the IP doesn't match */
+      if (intf_type == INTF_IP)
+        {
+          u_int32_t intf_masked_ip;
+
+          sinptr = (struct sockaddr_in *)&ifr->ifr_addr;
+          intf_masked_ip = htonl((sinptr->sin_addr).s_addr) >> (32 - mask);
+
+          if (intf_type == INTF_IP && conf_masked_ip != intf_masked_ip)
+            continue;
+        }
+
+      /* NUL termination not required, don't use strncpy() wrapper */
+      memset(&ifr_tmp, '\0', sizeof(struct ifreq));
+      strncpy(ifr_tmp.ifr_name, ifr->ifr_name, IFNAMSIZ);
+
+      if (ioctl(fd, SIOCGIFFLAGS, &ifr_tmp) < 0)
+        CEREBRO_EXIT(("ioctl: %s", strerror(errno)));
+
+      if (!(ifr_tmp.ifr_flags & IFF_UP))
+        continue;
+
+      if (conf.multicast && !(ifr_tmp.ifr_flags & IFF_MULTICAST))
+        continue;
+
+      /* NUL termination not required, don't use strncpy() wrapper */
+      memset(&ifr_tmp, '\0', sizeof(struct ifreq));
+      strncpy(ifr_tmp.ifr_name, ifr->ifr_name, IFNAMSIZ);
+      
+      if(ioctl(fd, SIOCGIFINDEX, &ifr_tmp) < 0)
+        CEREBRO_EXIT(("ioctl: %s", strerror(errno)));
+          
+      sinptr = (struct sockaddr_in *)&ifr->ifr_addr;
+      in_addr->s_addr = sinptr->sin_addr.s_addr;
+      *index = ifr_tmp.ifr_ifindex;
+      found_interface++;
+      break;
+    }
+  
+  if (!found_interface)
+    {
+      if (conf.multicast)
+        {
+          if (intf_type == INTF_NONE)
+            cerebro_err_exit("multicast network interface not found");
+          cerebro_err_exit("multicast network interface '%s' not found", intf);
+        }
+      else
+        cerebro_err_exit("network interface '%s' not found", intf);
+    }
+
+  Free(buf);
+  Close(fd);
 }
 
 /*
@@ -740,9 +647,9 @@ _cerebrod_calculate_in_addr_and_index(char *network_interface,
 static void
 _cerebrod_calculate_heartbeat_network_interface_in_addr_and_index(void)
 {
-  _cerebrod_calculate_in_addr_and_index(conf.heartbeat_network_interface,
-					&conf.heartbeat_network_interface_in_addr,
-					&conf.heartbeat_interface_index);
+  _calculate_in_addr_and_index(conf.heartbeat_network_interface,
+                               &conf.heartbeat_network_interface_in_addr,
+                               &conf.heartbeat_interface_index);
 }
 
 /*
@@ -850,42 +757,42 @@ _cerebrod_config_dump(void)
 {
 #if CEREBRO_DEBUG
   if (conf.debug)
-    {
-      fprintf(stderr, "**************************************\n");
-      fprintf(stderr, "* Cerebrod Configuration:\n");     
-      fprintf(stderr, "* -------------------------------\n");
-      fprintf(stderr, "* Command Line Options\n");
-      fprintf(stderr, "* -------------------------------\n");
-      fprintf(stderr, "* debug: %d\n", conf.debug);
-      fprintf(stderr, "* config_file: \"%s\"\n", conf.config_file);
-      fprintf(stderr, "* -------------------------------\n");
-      fprintf(stderr, "* Configuration File Options\n");
-      fprintf(stderr, "* -------------------------------\n");
-      fprintf(stderr, "* heartbeat_frequency_min: %d\n", conf.heartbeat_frequency_min);
-      fprintf(stderr, "* heartbeat_frequency_max: %d\n", conf.heartbeat_frequency_max);
-      fprintf(stderr, "* heartbeat_source_port: %d\n", conf.heartbeat_source_port);
-      fprintf(stderr, "* heartbeat_destination_port: %d\n", conf.heartbeat_destination_port);
-      fprintf(stderr, "* heartbeat_destination_ip: \"%s\"\n", conf.heartbeat_destination_ip);
-      fprintf(stderr, "* heartbeat_network_interface: \"%s\"\n", conf.heartbeat_network_interface);
-      fprintf(stderr, "* heartbeat_ttl: %d\n", conf.heartbeat_ttl);
-      fprintf(stderr, "* speak: %d\n", conf.speak);
-      fprintf(stderr, "* listen: %d\n", conf.listen);
-      fprintf(stderr, "* listen_threads: %d\n", conf.listen_threads);
-      fprintf(stderr, "* metric_server: %d\n", conf.metric_server);
-      fprintf(stderr, "* metric_server_port: %d\n", conf.metric_server_port);
-      fprintf(stderr, "* metric_max: %d\n", conf.metric_max);
-      fprintf(stderr, "* speak_debug: %d\n", conf.speak_debug);
-      fprintf(stderr, "* listen_debug: %d\n", conf.listen_debug);
-      fprintf(stderr, "* metric_server_debug: %d\n", conf.metric_server_debug);
-      fprintf(stderr, "* -------------------------------\n");
-      fprintf(stderr, "* Calculated Configuration\n");
-      fprintf(stderr, "* -------------------------------\n");
-      fprintf(stderr, "* multicast: %d\n", conf.multicast);
-      fprintf(stderr, "* heartbeat_destination_ip_in_addr: %s\n", inet_ntoa(conf.heartbeat_destination_ip_in_addr));
-      fprintf(stderr, "* heartbeat_network_interface_in_addr: %s\n", inet_ntoa(conf.heartbeat_network_interface_in_addr));
-      fprintf(stderr, "* heartbeat_interface_index: %d\n", conf.heartbeat_interface_index);
-      fprintf(stderr, "**************************************\n");
-    }
+    return;
+
+  fprintf(stderr, "**************************************\n");
+  fprintf(stderr, "* Cerebrod Configuration:\n");     
+  fprintf(stderr, "* -------------------------------\n");
+  fprintf(stderr, "* Command Line Options\n");
+  fprintf(stderr, "* -------------------------------\n");
+  fprintf(stderr, "* debug: %d\n", conf.debug);
+  fprintf(stderr, "* config_file: \"%s\"\n", conf.config_file);
+  fprintf(stderr, "* -------------------------------\n");
+  fprintf(stderr, "* Configuration File Options\n");
+  fprintf(stderr, "* -------------------------------\n");
+  fprintf(stderr, "* heartbeat_frequency_min: %d\n", conf.heartbeat_frequency_min);
+  fprintf(stderr, "* heartbeat_frequency_max: %d\n", conf.heartbeat_frequency_max);
+  fprintf(stderr, "* heartbeat_source_port: %d\n", conf.heartbeat_source_port);
+  fprintf(stderr, "* heartbeat_destination_port: %d\n", conf.heartbeat_destination_port);
+  fprintf(stderr, "* heartbeat_destination_ip: \"%s\"\n", conf.heartbeat_destination_ip);
+  fprintf(stderr, "* heartbeat_network_interface: \"%s\"\n", conf.heartbeat_network_interface);
+  fprintf(stderr, "* heartbeat_ttl: %d\n", conf.heartbeat_ttl);
+  fprintf(stderr, "* speak: %d\n", conf.speak);
+  fprintf(stderr, "* listen: %d\n", conf.listen);
+  fprintf(stderr, "* listen_threads: %d\n", conf.listen_threads);
+  fprintf(stderr, "* metric_server: %d\n", conf.metric_server);
+  fprintf(stderr, "* metric_server_port: %d\n", conf.metric_server_port);
+  fprintf(stderr, "* metric_max: %d\n", conf.metric_max);
+  fprintf(stderr, "* speak_debug: %d\n", conf.speak_debug);
+  fprintf(stderr, "* listen_debug: %d\n", conf.listen_debug);
+  fprintf(stderr, "* metric_server_debug: %d\n", conf.metric_server_debug);
+  fprintf(stderr, "* -------------------------------\n");
+  fprintf(stderr, "* Calculated Configuration\n");
+  fprintf(stderr, "* -------------------------------\n");
+  fprintf(stderr, "* multicast: %d\n", conf.multicast);
+  fprintf(stderr, "* heartbeat_destination_ip_in_addr: %s\n", inet_ntoa(conf.heartbeat_destination_ip_in_addr));
+  fprintf(stderr, "* heartbeat_network_interface_in_addr: %s\n", inet_ntoa(conf.heartbeat_network_interface_in_addr));
+  fprintf(stderr, "* heartbeat_interface_index: %d\n", conf.heartbeat_interface_index);
+  fprintf(stderr, "**************************************\n");
 #endif /* CEREBRO_DEBUG */
 }
 

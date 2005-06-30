@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker_data.c,v 1.14 2005-06-29 22:06:39 achu Exp $
+ *  $Id: cerebrod_speaker_data.c,v 1.15 2005-06-30 22:43:59 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -35,13 +35,13 @@ extern pthread_mutex_t debug_output_mutex;
 #endif /* CEREBRO_DEBUG */
 
 /*
- * cerebrod_speaker_data_initialization_complete
- * cerebrod_speaker_data_initialization_complete_lock
+ * speaker_data_init
+ * speaker_data_init_lock
  *
  * variables for synchronizing initialization between different pthreads
  */
-int cerebrod_speaker_data_initialization_complete = 0;
-pthread_mutex_t cerebrod_speaker_data_initialization_complete_lock = PTHREAD_MUTEX_INITIALIZER;
+int speaker_data_init = 0;
+pthread_mutex_t speaker_data_init_lock = PTHREAD_MUTEX_INITIALIZER;
 
 /*
  * metric_handle
@@ -190,16 +190,16 @@ _setup_metric_modules(void)
 void
 cerebrod_speaker_data_initialize(void)
 {
-  pthread_mutex_lock(&cerebrod_speaker_data_initialization_complete_lock);
-  if (cerebrod_speaker_data_initialization_complete)
+  pthread_mutex_lock(&speaker_data_init_lock);
+  if (speaker_data_init)
     goto out;
 
   if (_setup_metric_modules() < 0)
     CEREBRO_EXIT(("_setup_metric_modules"));
 
-  cerebrod_speaker_data_initialization_complete++;
+  speaker_data_init++;
  out:
-  Pthread_mutex_unlock(&cerebrod_speaker_data_initialization_complete_lock);
+  Pthread_mutex_unlock(&speaker_data_init_lock);
 }
 
 /*
@@ -236,7 +236,7 @@ cerebrod_speaker_data_get_metric_data(struct cerebrod_heartbeat *hb,
 
   assert(hb && heartbeat_len);
 
-  if (!cerebrod_speaker_data_initialization_complete)
+  if (!speaker_data_init)
     CEREBRO_EXIT(("initialization not complete"));
 
   /* Could be no metric modules */

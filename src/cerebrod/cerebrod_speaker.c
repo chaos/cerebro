@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.68 2005-06-30 18:41:42 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.69 2005-06-30 22:43:59 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -286,16 +286,16 @@ _cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb)
 #if CEREBRO_DEBUG
   assert(hb);
 
-  if (conf.debug && conf.speak_debug)
-    {
-      Pthread_mutex_lock(&debug_output_mutex);
-      fprintf(stderr, "**************************************\n");
-      fprintf(stderr, "* Sending Heartbeat\n");     
-      fprintf(stderr, "* -----------------------\n");
-      cerebrod_heartbeat_dump(hb);
-      fprintf(stderr, "**************************************\n");
-      Pthread_mutex_unlock(&debug_output_mutex);
-    }
+  if (!(conf.debug && conf.speak_debug))
+    return;
+
+  Pthread_mutex_lock(&debug_output_mutex);
+  fprintf(stderr, "**************************************\n");
+  fprintf(stderr, "* Sending Heartbeat\n");     
+  fprintf(stderr, "* -----------------------\n");
+  cerebrod_heartbeat_dump(hb);
+  fprintf(stderr, "**************************************\n");
+  Pthread_mutex_unlock(&debug_output_mutex);
 #endif /* CEREBRO_DEBUG */
 }
 

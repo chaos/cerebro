@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_util.c,v 1.27 2005-06-29 22:06:39 achu Exp $
+ *  $Id: cerebrod_util.c,v 1.28 2005-06-30 22:43:59 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -73,8 +73,7 @@ cerebrod_rehash(hash_t *old_hash,
     {
       int rv = Pthread_mutex_trylock(hash_mutex);
       if (rv != EBUSY)
-        CEREBRO_EXIT(("%s(%s:%d): mutex not locked: rv=%d",
-                      __FILE__, __FUNCTION__, __LINE__, rv));
+        CEREBRO_EXIT(("mutex not locked: rv=%d", rv));
     }
 #endif /* CEREBRO_DEBUG */
 

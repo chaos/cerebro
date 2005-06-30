@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.70 2005-06-30 17:39:56 achu Exp $
+ *  $Id: cerebrod.c,v 1.71 2005-06-30 22:43:59 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -71,7 +71,7 @@ main(int argc, char **argv)
    */
   openlog(argv[0], LOG_ODELAY | LOG_PID, LOG_DAEMON);
 
-  /* Start metric before the listener begins receiving data. */
+  /* Start metric server before the listener begins receiving data. */
   if (conf.metric_server)
     {
       pthread_t thread;
