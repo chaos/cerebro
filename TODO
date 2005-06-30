@@ -8,9 +8,6 @@ Testing
 
 Cleanup
 
-Audit
-- code review to reduce memory footprint
-
 Portability
 - IPv6
 - Non-pthreads support
