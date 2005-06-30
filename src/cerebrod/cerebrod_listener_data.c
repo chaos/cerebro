@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.15 2005-06-29 22:06:39 achu Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.16 2005-06-30 00:37:40 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -594,7 +594,7 @@ _cerebrod_metric_name_index_dump(void)
  */
 static void
 _cerebrod_listener_metric_data_update(struct cerebrod_node_data *nd,
-                                      char *metric_name,
+                                      const char *metric_name,
                                       struct cerebrod_heartbeat_metric *hd,
                                       u_int32_t received_time)
 {
@@ -603,7 +603,10 @@ _cerebrod_listener_metric_data_update(struct cerebrod_node_data *nd,
   int rv;
 #endif /* CEREBRO_DEBUG */
   
-  assert(nd && hd && nd->metric_data);
+  assert(nd && metric_name && hd && nd->metric_data);
+
+  if (!cerebrod_metric_name_index)
+    return;
 
 #if CEREBRO_DEBUG
   /* Should be called with lock already set */
@@ -612,6 +615,23 @@ _cerebrod_listener_metric_data_update(struct cerebrod_node_data *nd,
     CEREBRO_EXIT(("mutex not locked: rv=%d", rv));
 #endif /* CEREBRO_DEBUG */
   
+  Pthread_mutex_lock(&cerebrod_metric_name_lock);
+  if (!Hash_find(cerebrod_metric_name_index, metric_name))
+    {
+      char *str;
+      
+      if ((Hash_count(cerebrod_metric_name_index) - cerebrod_metric_name_default_count) >= conf.metric_max)
+        {
+          CEREBRO_DBG(("too many metrics"));
+          Pthread_mutex_unlock(&cerebrod_metric_name_lock);
+          return;
+        }
+      
+      str = Strdup(metric_name);
+      Hash_insert(cerebrod_metric_name_index, str, str);
+    }
+  Pthread_mutex_unlock(&cerebrod_metric_name_lock);             
+
   if (!(md = Hash_find(nd->metric_data, metric_name)))
     {
       /* Should be impossible to hit due to checks in
@@ -651,6 +671,48 @@ _cerebrod_listener_metric_data_update(struct cerebrod_node_data *nd,
     }
   md->metric_value_len = hd->metric_value_len;
   memcpy(md->metric_value, hd->metric_value, hd->metric_value_len);
+}
+
+/* 
+ * _cerebrod_listener_monitor_update
+ *
+ * Send metric data to the appropriate monitor, if necessary.  The
+ * struct cerebrod_node_data lock should already be locked.
+ */
+static void
+_cerebrod_listener_monitor_update(const char *nodename,
+                                  struct cerebrod_node_data *nd,
+                                  const char *metric_name,
+                                  struct cerebrod_heartbeat_metric *hd)
+{
+  struct cerebrod_monitor_module *monitor_module;
+#if CEREBRO_DEBUG
+  int rv;
+#endif /* CEREBRO_DEBUG */
+  
+  assert(nodename && nd && metric_name && hd);
+
+  if (!monitor_index)
+    return;
+
+#if CEREBRO_DEBUG
+  /* Should be called with lock already set */
+  rv = Pthread_mutex_trylock(&nd->node_data_lock);
+  if (rv != EBUSY)
+    CEREBRO_EXIT(("mutex not locked: rv=%d", rv));
+#endif /* CEREBRO_DEBUG */
+  
+  if ((monitor_module = Hash_find(monitor_index, metric_name)))
+    {
+      Pthread_mutex_lock(&monitor_module->monitor_lock);
+      monitor_module_metric_update(monitor_handle,
+                                   monitor_module->index,
+                                   nodename,
+                                   hd->metric_value_type,
+                                   hd->metric_value_len,
+                                   hd->metric_value);
+      Pthread_mutex_unlock(&monitor_module->monitor_lock);
+    }
 }
 
 void 
@@ -698,58 +760,25 @@ cerebrod_listener_data_update(char *nodename,
       nd->discovered = 1;
       nd->last_received_time = received_time;
 
-      if (cerebrod_metric_name_index || monitor_index)
+      for (i = 0; i < hb->metrics_len; i++)
         {
-          for (i = 0; i < hb->metrics_len; i++)
-            {
-              char metric_name_buf[CEREBRO_MAX_METRIC_NAME_LEN+1];
-              struct cerebrod_monitor_module *monitor_module;
+          char metric_name_buf[CEREBRO_MAX_METRIC_NAME_LEN+1];
               
-              /* Guarantee ending '\0' character */
-              memset(metric_name_buf, '\0', CEREBRO_MAX_METRIC_NAME_LEN+1);
-              memcpy(metric_name_buf, 
-                     hb->metrics[i]->metric_name, 
-                     CEREBRO_MAX_METRIC_NAME_LEN);
+          /* Guarantee ending '\0' character */
+          memset(metric_name_buf, '\0', CEREBRO_MAX_METRIC_NAME_LEN+1);
+          memcpy(metric_name_buf, 
+                 hb->metrics[i]->metric_name, 
+                 CEREBRO_MAX_METRIC_NAME_LEN);
               
-              if (cerebrod_metric_name_index)
-                {
-                  Pthread_mutex_lock(&cerebrod_metric_name_lock);
-                  if (!Hash_find(cerebrod_metric_name_index, metric_name_buf))
-                    {
-                      char *str;
+          _cerebrod_listener_metric_data_update(nd,
+                                                metric_name_buf,
+                                                hb->metrics[i],
+                                                received_time);
 
-                      if ((Hash_count(cerebrod_metric_name_index) - cerebrod_metric_name_default_count) >= conf.metric_max)
-                        {
-                          Pthread_mutex_unlock(&cerebrod_metric_name_lock);
-                          continue;
-                        }
-                      
-                      str = Strdup(metric_name_buf);
-                      Hash_insert(cerebrod_metric_name_index, str, str);
-                    }
-                  Pthread_mutex_unlock(&cerebrod_metric_name_lock);
-                  
-                  _cerebrod_listener_metric_data_update(nd,
-                                                        metric_name_buf,
-                                                        hb->metrics[i],
-                                                        received_time);
-                }
-
-              if (monitor_index)
-                {
-                  if ((monitor_module = Hash_find(monitor_index, metric_name_buf)))
-                    {
-                      Pthread_mutex_lock(&monitor_module->monitor_lock);
-                      monitor_module_metric_update(monitor_handle,
-						   monitor_module->index,
-						   nodename,
-						   hb->metrics[i]->metric_value_type,
-						   hb->metrics[i]->metric_value_len,
-						   hb->metrics[i]->metric_value);
-                      Pthread_mutex_unlock(&monitor_module->monitor_lock);
-                    }
-                }
-            }
+          _cerebrod_listener_monitor_update(nodename,
+                                            nd,
+                                            metric_name_buf,
+                                            hb->metrics[i]);
         }
 
       /* Can't call a debug output function in here, it can cause a
@@ -759,7 +788,6 @@ cerebrod_listener_data_update(char *nodename,
       update_output_flag++;
     }
   Pthread_mutex_unlock(&(nd->node_data_lock));
-
 
   if (update_output_flag)
     _output_node_data_update(nd);

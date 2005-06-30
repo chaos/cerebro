@@ -14,6 +14,7 @@ Audit
 Portability
 - IPv6
 - Non-pthreads support
+- Multicast
 
 Design
 - Update time for each cerebro metric data?
@@ -30,15 +31,13 @@ Design
 
 Before distribution
 - devel package?
+- untabify
 
 GPL
 - do it
 - place header on all headers
 - place on all c files
 - note on manpage ORIGINS
-
-Before public release
-- untabify
 
 Misc
 - remove hash/list buffering in list.c hash.c?

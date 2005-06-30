@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_heartbeat.c,v 1.40 2005-06-22 20:30:09 achu Exp $
+ *  $Id: cerebrod_heartbeat.c,v 1.41 2005-06-30 00:37:40 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -18,8 +18,8 @@
 
 #include "wrappers.h"
 
-extern struct cerebrod_config conf;
 #if CEREBRO_DEBUG
+extern struct cerebrod_config conf;
 extern pthread_mutex_t debug_output_mutex;
 #endif /* CEREBRO_DEBUG */
 
@@ -44,8 +44,6 @@ void
 cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb)
 {
 #if CEREBRO_DEBUG
-  char *buf;
-
   assert(hb);
 
   if (conf.debug)
@@ -68,6 +66,8 @@ cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb)
       fprintf(stderr, "* metrics_len: %d\n", hb->metrics_len);
       for (i = 0; i < hb->metrics_len; i++)
         {
+          char *buf;
+
           fprintf(stderr, 
                   "* %s: metric_value_type = %d, metric_value_len = %d ",
                   hb->metrics[i]->metric_name, 

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric.c,v 1.60 2005-06-29 22:06:39 achu Exp $
+ *  $Id: cerebrod_metric.c,v 1.61 2005-06-30 00:37:40 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -643,8 +643,10 @@ _node_metric_response_create(char *nodename,
 
   assert(nodename && node_responses);
   
-  if ((metric_value_type == CEREBRO_METRIC_VALUE_TYPE_NONE && metric_value_len)
-      || (metric_value_type != CEREBRO_METRIC_VALUE_TYPE_NONE && !metric_value_len))
+  if ((metric_value_type == CEREBRO_METRIC_VALUE_TYPE_NONE 
+       && metric_value_len)
+      || (metric_value_type != CEREBRO_METRIC_VALUE_TYPE_NONE 
+          && !metric_value_len))
     {
       CEREBRO_DBG(("bogus metric: type=%d len=%d", 
                    metric_value_type, metric_value_len));
