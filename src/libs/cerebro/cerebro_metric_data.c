@@ -27,17 +27,17 @@
 #include "network_util.h"
 
 /* 
- * _cerebro_node_metric_response_header_unmarshall
+ * _node_metric_response_header_unmarshall
  *
  * Unmarshall contents of a metric server response header
  *
  * Returns 0 on success, -1 on error
  */
 static int
-_cerebro_node_metric_response_header_unmarshall(cerebro_t handle,
-                                                struct cerebro_node_metric_response *res,
-                                                const char *buf,
-                                                unsigned int buflen)
+_node_metric_response_header_unmarshall(cerebro_t handle,
+                                        struct cerebro_node_metric_response *res,
+                                        const char *buf,
+                                        unsigned int buflen)
 {
   int n, c = 0;
 
@@ -54,7 +54,6 @@ _cerebro_node_metric_response_header_unmarshall(cerebro_t handle,
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
-
   if (!n)
     return c;
   c += n;
@@ -125,17 +124,17 @@ _cerebro_node_metric_response_header_unmarshall(cerebro_t handle,
 }
 
 /* 
- * _cerebro_node_metric_response_metric_value_unmarshall
+ * _metric_value_unmarshall
  *
  * Unmarshall contents of a metric server response
  *
  * Returns 0 on success, -1 on error
  */
 static int
-_cerebro_node_metric_response_metric_value_unmarshall(cerebro_t handle,
-                                                      struct cerebro_node_metric_response *res,
-                                                      const char *buf,
-                                                      unsigned int buflen)
+_metric_value_unmarshall(cerebro_t handle,
+                         struct cerebro_node_metric_response *res,
+                         const char *buf,
+                         unsigned int buflen)
 {
   int n, malloc_len = 0;
   void *metric_value = NULL;
@@ -167,6 +166,7 @@ _cerebro_node_metric_response_metric_value_unmarshall(cerebro_t handle,
       if ((n = unmarshall_int32((int32_t *)metric_value, buf, buflen)) < 0)
         {
           CEREBRO_DBG(("unmarshall_int32"));
+          goto cleanup;
         }
       break;
     case CEREBRO_METRIC_VALUE_TYPE_U_INT32:
@@ -283,13 +283,13 @@ _receive_node_metric_responses(cerebro_t handle, void *list, int fd)
       if (_cerebro_metric_response_check(handle, buf, bytes_read) < 0)
         goto cleanup;
 
-      if ((header_len = _cerebro_node_metric_response_header_unmarshall(handle, 
-                                                                        &res, 
-                                                                        buf, 
-                                                                        bytes_read)) < 0)
+      if ((header_len = _node_metric_response_header_unmarshall(handle, 
+                                                                &res, 
+                                                                buf, 
+                                                                bytes_read)) < 0)
         goto cleanup;
       
-      if (header_len < CEREBRO_NODE_METRIC_RESPONSE_HEADER_LEN)
+      if (header_len != CEREBRO_NODE_METRIC_RESPONSE_HEADER_LEN)
         {
           handle->errnum = CEREBRO_ERR_PROTOCOL;
           goto cleanup;
@@ -332,16 +332,16 @@ _receive_node_metric_responses(cerebro_t handle, void *list, int fd)
               goto cleanup;
             }
 
-          if ((value_count = _cerebro_node_metric_response_metric_value_unmarshall(handle,
-                                                                                   &res,
-                                                                                   value,
-                                                                                   value_read)) < 0)
+          if ((value_count = _metric_value_unmarshall(handle,
+                                                      &res,
+                                                      value,
+                                                      value_read)) < 0)
             {
               free(value);
               goto cleanup;
             }
 
-          if (value_count < res.metric_value_len)
+          if (value_count != res.metric_value_len)
             {
               handle->errnum = CEREBRO_ERR_PROTOCOL;
               free(value);

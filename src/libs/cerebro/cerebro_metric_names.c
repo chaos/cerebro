@@ -26,17 +26,17 @@
 #include "network_util.h"
 
 /* 
- * _cerebro_metric_name_response_unmarshall
+ * _metric_name_response_unmarshall
  *
  * Unmarshall contents of a metric server response header
  *
  * Returns 0 on success, -1 on error
  */
 static int
-_cerebro_metric_name_response_unmarshall(cerebro_t handle,
-					 struct cerebro_metric_name_response *res,
-					 const char *buf,
-					 unsigned int buflen)
+_metric_name_response_unmarshall(cerebro_t handle,
+                                 struct cerebro_metric_name_response *res,
+                                 const char *buf,
+                                 unsigned int buflen)
 {
   int n, c = 0;
 
@@ -159,13 +159,13 @@ _receive_metric_name_responses(cerebro_t handle, void *list, int fd)
         goto cleanup;
       
       memset(&res, '\0', sizeof(struct cerebro_metric_name_response));
-      if ((res_len = _cerebro_metric_name_response_unmarshall(handle, 
-                                                              &res, 
-                                                              buf, 
-                                                              bytes_read)) < 0)
+      if ((res_len = _metric_name_response_unmarshall(handle, 
+                                                      &res, 
+                                                      buf, 
+                                                      bytes_read)) < 0)
         goto cleanup;
       
-      if (res_len < CEREBRO_METRIC_NAME_RESPONSE_LEN)
+      if (res_len != CEREBRO_METRIC_NAME_RESPONSE_LEN)
         {
           handle->errnum = CEREBRO_ERR_PROTOCOL;
           goto cleanup;
