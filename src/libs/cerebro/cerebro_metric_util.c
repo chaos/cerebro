@@ -40,7 +40,7 @@ _cerebro_metric_protocol_err_conversion(u_int32_t protocol_error)
       return CEREBRO_ERR_METRIC_UNKNOWN;
     case CEREBRO_METRIC_PROTOCOL_ERR_PARAMETER_INVALID:
       return CEREBRO_ERR_PROTOCOL;
-    case CEREBRO_METRIC_PROTOCOL_ERR_INTERNAL_SYSTEM_ERROR:
+    case CEREBRO_METRIC_PROTOCOL_ERR_INTERNAL_ERROR:
       CEREBRO_DBG(("server internal system error"));
       return CEREBRO_ERR_INTERNAL;
     default:
@@ -62,7 +62,7 @@ _cerebro_metric_request_marshall(cerebro_t handle,
                                  char *buf,
                                  unsigned int buflen)
 {
-  int n, len = 0;
+  int n, c = 0;
 
   if (!buf || buflen < CEREBRO_METRIC_REQUEST_PACKET_LEN)
     {
@@ -73,42 +73,42 @@ _cerebro_metric_request_marshall(cerebro_t handle,
 
   memset(buf, '\0', buflen);
 
-  if ((n = marshall_int32(req->version, buf + len, buflen - len)) <= 0)
+  if ((n = marshall_int32(req->version, buf + c, buflen - c)) <= 0)
     {
       CEREBRO_DBG(("marshall_int32"));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
-  len += n;
+  c += n;
 
   if ((n = marshall_buffer(req->metric_name,
                            sizeof(req->metric_name),
-                           buf + len,
-                           buflen - len)) <= 0)
+                           buf + c,
+                           buflen - c)) <= 0)
     {
       CEREBRO_DBG(("marshall_buffer"));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
-  len += n;
+  c += n;
 
-  if ((n = marshall_u_int32(req->timeout_len, buf + len, buflen - len)) <= 0)
+  if ((n = marshall_u_int32(req->timeout_len, buf + c, buflen - c)) <= 0)
     {
       CEREBRO_DBG(("marshall_u_int32"));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
-  len += n;
+  c += n;
 
-  if ((n = marshall_u_int32(req->flags, buf + len, buflen - len)) <= 0)
+  if ((n = marshall_u_int32(req->flags, buf + c, buflen - c)) <= 0)
     {
       CEREBRO_DBG(("marshall_u_int32"));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
-  len += n;
+  c += n;
 
-  return len;
+  return c;
 }
 
 /*

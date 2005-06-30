@@ -38,7 +38,7 @@ _cerebro_metric_name_response_unmarshall(cerebro_t handle,
 					 const char *buf,
 					 unsigned int buflen)
 {
-  int n, len = 0;
+  int n, c = 0;
 
   if (!res || !buf)
     {
@@ -47,7 +47,7 @@ _cerebro_metric_name_response_unmarshall(cerebro_t handle,
       return -1;
     }
 
-  if ((n = unmarshall_int32(&(res->version), buf + len, buflen - len)) < 0)
+  if ((n = unmarshall_int32(&(res->version), buf + c, buflen - c)) < 0)
     {
       CEREBRO_DBG(("unmarshall_int32"));
       handle->errnum = CEREBRO_ERR_INTERNAL;
@@ -55,10 +55,10 @@ _cerebro_metric_name_response_unmarshall(cerebro_t handle,
     }
   
   if (!n)
-    return len;
-  len += n;
+    return c;
+  c += n;
 
-  if ((n = unmarshall_u_int32(&(res->err_code), buf + len, buflen - len)) < 0)
+  if ((n = unmarshall_u_int32(&(res->err_code), buf + c, buflen - c)) < 0)
     {
       CEREBRO_DBG(("unmarshall_u_int32"));
       handle->errnum = CEREBRO_ERR_INTERNAL;
@@ -66,10 +66,10 @@ _cerebro_metric_name_response_unmarshall(cerebro_t handle,
     }
 
   if (!n)
-    return len;
-  len += n;
+    return c;
+  c += n;
 
-  if ((n = unmarshall_u_int8(&(res->end), buf + len, buflen - len)) < 0)
+  if ((n = unmarshall_u_int8(&(res->end), buf + c, buflen - c)) < 0)
     {
       CEREBRO_DBG(("unmarshall_u_int8"));
       handle->errnum = CEREBRO_ERR_INTERNAL;
@@ -77,13 +77,13 @@ _cerebro_metric_name_response_unmarshall(cerebro_t handle,
     }
 
   if (!n)
-    return len;
-  len += n;
+    return c;
+  c += n;
 
   if ((n = unmarshall_buffer(res->metric_name,
                              sizeof(res->metric_name),
-                             buf + len,
-                             buflen - len)) < 0)
+                             buf + c,
+                             buflen - c)) < 0)
     {
       CEREBRO_DBG(("unmarshall_buffer"));
       handle->errnum = CEREBRO_ERR_INTERNAL;
@@ -91,10 +91,10 @@ _cerebro_metric_name_response_unmarshall(cerebro_t handle,
     }
 
   if (!n)
-    return len;
-  len += n;
+    return c;
+  c += n;
 
-  return len;
+  return c;
 }
 
 /* 

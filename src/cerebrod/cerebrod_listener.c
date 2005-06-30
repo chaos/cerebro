@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.103 2005-06-30 17:39:56 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.104 2005-06-30 18:41:42 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -197,7 +197,7 @@ _cerebrod_heartbeat_unmarshall_and_create(const char *buf, unsigned int buflen)
 {
   struct cerebrod_heartbeat *hb = NULL;
   struct cerebrod_heartbeat_metric *hd = NULL;
-  int i, n, len = 0;
+  int i, n, c = 0;
 
   assert(buf);
   
@@ -205,20 +205,20 @@ _cerebrod_heartbeat_unmarshall_and_create(const char *buf, unsigned int buflen)
 
   memset(hb, '\0', sizeof(struct cerebrod_heartbeat));
   
-  if (!(n = Unmarshall_int32(&(hb->version), buf + len, buflen - len)))
-    goto bad_len_cleanup;
-  len += n;
+  if (!(n = Unmarshall_int32(&(hb->version), buf + c, buflen - c)))
+    goto cleanup;
+  c += n;
 
   if (!(n = Unmarshall_buffer(hb->nodename,
                               sizeof(hb->nodename),
-                              buf + len,
-                              buflen - len)))
-    goto bad_len_cleanup;
-  len += n;
+                              buf + c,
+                              buflen - c)))
+    goto cleanup;
+  c += n;
   
-  if (!(n = Unmarshall_u_int32(&(hb->metrics_len), buf + len, buflen - len)))
-    goto bad_len_cleanup;
-  len += n;
+  if (!(n = Unmarshall_u_int32(&(hb->metrics_len), buf + c, buflen - c)))
+    goto cleanup;
+  c += n;
 
   /* If no metrics in this packet, just return with the header */
   if (!hb->metrics_len)
@@ -245,84 +245,82 @@ _cerebrod_heartbeat_unmarshall_and_create(const char *buf, unsigned int buflen)
       
       if (!(n = Unmarshall_buffer(hd->metric_name,
                                   sizeof(hd->metric_name),
-                                  buf + len,
-                                  buflen - len)))
-        goto bad_len_cleanup;
-      len += n;
+                                  buf + c,
+                                  buflen - c)))
+        goto cleanup;
+      c += n;
       
       if (!(n = Unmarshall_u_int32(&(hd->metric_value_type),
-                                   buf + len,
-                                   buflen - len)))
-        goto bad_len_cleanup;
-      len += n;
+                                   buf + c,
+                                   buflen - c)))
+        goto cleanup;
+      c += n;
       
       if (!(n = Unmarshall_u_int32(&(hd->metric_value_len),
-                                   buf + len,
-                                   buflen - len)))
-        goto bad_len_cleanup;
-      len += n;
+                                   buf + c,
+                                   buflen - c)))
+        goto cleanup;
+      c += n;
       
-      if (hd->metric_value_len)
+      if (!hd->metric_value_len)
         {
-          hd->metric_value = Malloc(hd->metric_value_len);
-          
-          switch(hd->metric_value_type)
-            {
-            case CEREBRO_METRIC_VALUE_TYPE_NONE:
-              CEREBRO_DBG(("metric value len > 0 for type NONE"));
-              break;
-            case CEREBRO_METRIC_VALUE_TYPE_INT32:
-              if (!(n = Unmarshall_int32((int32_t *)hd->metric_value,
-                                         buf + len,
-                                         buflen - len)))
-                goto bad_len_cleanup;
-              len += n;
-              break;
-            case CEREBRO_METRIC_VALUE_TYPE_U_INT32:
-              if (!(n = Unmarshall_u_int32((u_int32_t *)hd->metric_value,
-                                           buf + len,
-                                           buflen - len)))
-                goto bad_len_cleanup;
-              len += n;
-              break;
-            case CEREBRO_METRIC_VALUE_TYPE_FLOAT:
-              if (!(n = Unmarshall_float((float *)hd->metric_value,
-                                         buf + len,
-                                         buflen - len)))
-                goto bad_len_cleanup;
-              len += n;
-              break;
-            case CEREBRO_METRIC_VALUE_TYPE_DOUBLE:
-              if (!(n = Unmarshall_double((double *)hd->metric_value,
-                                          buf + len,
-                                          buflen - len)))
-                goto bad_len_cleanup;
-              len += n;
-              break;
-            case CEREBRO_METRIC_VALUE_TYPE_STRING:
-              if (!(n = Unmarshall_buffer((char *)hd->metric_value,
-                                          hd->metric_value_len,
-                                              buf + len,
-                                          buflen - len)))
-                goto bad_len_cleanup;
-              len += n;
-              break;
-            default:
-              CEREBRO_DBG(("invalid type %d", hd->metric_value_type));
-              goto cleanup;
-            }
+          hd->metric_value = NULL;
+          goto end_loop;
         }
-      else
-        hd->metric_value = NULL;
 
+      hd->metric_value = Malloc(hd->metric_value_len);
+      switch(hd->metric_value_type)
+        {
+        case CEREBRO_METRIC_VALUE_TYPE_NONE:
+          CEREBRO_DBG(("metric value len > 0 for type NONE"));
+          break;
+        case CEREBRO_METRIC_VALUE_TYPE_INT32:
+          if (!(n = Unmarshall_int32((int32_t *)hd->metric_value,
+                                     buf + c,
+                                     buflen - c)))
+            goto cleanup;
+          c += n;
+          break;
+        case CEREBRO_METRIC_VALUE_TYPE_U_INT32:
+          if (!(n = Unmarshall_u_int32((u_int32_t *)hd->metric_value,
+                                       buf + c,
+                                       buflen - c)))
+            goto cleanup;
+          c += n;
+          break;
+        case CEREBRO_METRIC_VALUE_TYPE_FLOAT:
+          if (!(n = Unmarshall_float((float *)hd->metric_value,
+                                     buf + c,
+                                     buflen - c)))
+            goto cleanup;
+          c += n;
+          break;
+        case CEREBRO_METRIC_VALUE_TYPE_DOUBLE:
+          if (!(n = Unmarshall_double((double *)hd->metric_value,
+                                      buf + c,
+                                      buflen - c)))
+            goto cleanup;
+              c += n;
+              break;
+        case CEREBRO_METRIC_VALUE_TYPE_STRING:
+          if (!(n = Unmarshall_buffer((char *)hd->metric_value,
+                                      hd->metric_value_len,
+                                      buf + c,
+                                      buflen - c)))
+            goto cleanup;
+          c += n;
+          break;
+        default:
+          CEREBRO_DBG(("invalid type %d", hd->metric_value_type));
+          goto cleanup;
+        }
+
+    end_loop:
       hb->metrics[i] = hd;
     }
   
   return hb;
 
- bad_len_cleanup:
-  CEREBRO_DBG(("packet buffer length invalid"));
-  
  cleanup:
   if (hd)
     {

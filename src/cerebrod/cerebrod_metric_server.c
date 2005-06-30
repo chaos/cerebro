@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_server.c,v 1.1 2005-06-30 17:39:56 achu Exp $
+ *  $Id: cerebrod_metric_server.c,v 1.2 2005-06-30 18:41:42 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -115,62 +115,62 @@ _node_metric_response_marshall(struct cerebro_node_metric_response *res,
                                char *buf, 
                                unsigned int buflen)
 {
-  int len = 0;
+  int c = 0;
 
   assert(res && buf && buflen >= CEREBRO_NODE_METRIC_RESPONSE_HEADER_LEN);
 
   memset(buf, '\0', buflen);
 
-  len += Marshall_int32(res->version, buf + len, buflen - len);
-  len += Marshall_u_int32(res->err_code, buf + len, buflen - len);
-  len += Marshall_u_int8(res->end, buf + len, buflen - len);
-  len += Marshall_buffer(res->nodename,
-                         sizeof(res->nodename),
-                         buf + len,
-                         buflen - len);
-  len += Marshall_u_int32(res->metric_value_type, buf + len, buflen - len);
-  len += Marshall_u_int32(res->metric_value_len, buf + len, buflen - len);
+  c += Marshall_int32(res->version, buf + c, buflen - c);
+  c += Marshall_u_int32(res->err_code, buf + c, buflen - c);
+  c += Marshall_u_int8(res->end, buf + c, buflen - c);
+  c += Marshall_buffer(res->nodename,
+                       sizeof(res->nodename),
+                       buf + c,
+                       buflen - c);
+  c += Marshall_u_int32(res->metric_value_type, buf + c, buflen - c);
+  c += Marshall_u_int32(res->metric_value_len, buf + c, buflen - c);
   
-  if (res->metric_value_len)
+  if (!res->metric_value_len)
+    return c;
+
+  switch(res->metric_value_type)
     {
-      switch(res->metric_value_type)
-        {
-        case CEREBRO_METRIC_VALUE_TYPE_NONE:
-          CEREBRO_DBG(("metric value len > 0 for type NONE"));
-          break;
-        case CEREBRO_METRIC_VALUE_TYPE_INT32:
-          len += Marshall_int32(*((int32_t *)res->metric_value),
-                                buf + len,
-                                buflen - len);
-          break;
-        case CEREBRO_METRIC_VALUE_TYPE_U_INT32:
-          len += Marshall_u_int32(*((u_int32_t *)res->metric_value),
-                                  buf + len,
-                                  buflen - len);
-          break;
-        case CEREBRO_METRIC_VALUE_TYPE_FLOAT:
-          len += Marshall_float(*((float *)res->metric_value), 
-                                buf + len,
-                                buflen - len);
-          break;
-        case CEREBRO_METRIC_VALUE_TYPE_DOUBLE:
-          len += Marshall_double(*((double *)res->metric_value),
-                                 buf + len,
-                                 buflen - len);
-          break;
-        case CEREBRO_METRIC_VALUE_TYPE_STRING:
-          len += Marshall_buffer(res->metric_value,
-                                 res->metric_value_len,
-                                 buf + len,
-                                 buflen - len);
-          break;
-        default:
-          CEREBRO_DBG(("invalid type %d", res->metric_value_type));
-          return -1;
-        }
+    case CEREBRO_METRIC_VALUE_TYPE_NONE:
+      CEREBRO_DBG(("metric value len > 0 for type NONE"));
+      break;
+    case CEREBRO_METRIC_VALUE_TYPE_INT32:
+      c += Marshall_int32(*((int32_t *)res->metric_value),
+                          buf + c,
+                          buflen - c);
+      break;
+    case CEREBRO_METRIC_VALUE_TYPE_U_INT32:
+      c += Marshall_u_int32(*((u_int32_t *)res->metric_value),
+                            buf + c,
+                            buflen - c);
+      break;
+    case CEREBRO_METRIC_VALUE_TYPE_FLOAT:
+      c += Marshall_float(*((float *)res->metric_value), 
+                          buf + c,
+                          buflen - c);
+      break;
+    case CEREBRO_METRIC_VALUE_TYPE_DOUBLE:
+      c += Marshall_double(*((double *)res->metric_value),
+                           buf + c,
+                           buflen - c);
+      break;
+    case CEREBRO_METRIC_VALUE_TYPE_STRING:
+      c += Marshall_buffer(res->metric_value,
+                           res->metric_value_len,
+                           buf + c,
+                           buflen - c);
+      break;
+    default:
+      CEREBRO_DBG(("invalid type %d", res->metric_value_type));
+      return -1;
     }
 
-  return len;
+  return c;
 }
 
 
@@ -232,30 +232,30 @@ _metric_request_unmarshall(struct cerebro_metric_request *req,
                            const char *buf, 
                            unsigned int buflen)
 {
-  int n, len = 0;
+  int n, c = 0;
 
   assert(req && buf);
  
-  if (!(n = Unmarshall_int32(&(req->version), buf + len, buflen - len)))
-    return len;
-  len += n;
+  if (!(n = Unmarshall_int32(&(req->version), buf + c, buflen - c)))
+    return c;
+  c += n;
   
   if (!(n = Unmarshall_buffer(req->metric_name,
                               sizeof(req->metric_name),
-                              buf + len,
-                              buflen - len)))
-    return len;
-  len += n;
+                              buf + c,
+                              buflen - c)))
+    return c;
+  c += n;
   
-  if (!(n = Unmarshall_u_int32(&(req->timeout_len), buf + len, buflen - len)))
-    return len;
-  len += n;
+  if (!(n = Unmarshall_u_int32(&(req->timeout_len), buf + c, buflen - c)))
+    return c;
+  c += n;
   
-  if (!(n = Unmarshall_u_int32(&(req->flags), buf + len, buflen - len)))
-    return len;
-  len += n;
+  if (!(n = Unmarshall_u_int32(&(req->flags), buf + c, buflen - c)))
+    return c;
+  c += n;
   
-  return len;
+  return c;
 }
      
 /*  
@@ -398,7 +398,7 @@ _metric_respond_with_error(int client_fd,
 
   assert(client_fd >= 0
          && err_code >= CEREBRO_METRIC_PROTOCOL_ERR_VERSION_INVALID
-	 && err_code <= CEREBRO_METRIC_PROTOCOL_ERR_INTERNAL_SYSTEM_ERROR);
+	 && err_code <= CEREBRO_METRIC_PROTOCOL_ERR_INTERNAL_ERROR);
   
   memset(&err_res, '\0', CEREBRO_METRIC_ERR_RESPONSE_LEN);
   
@@ -546,7 +546,7 @@ _respond_with_metric_names(int client_fd, struct cerebro_metric_request *req)
       Pthread_mutex_unlock(&cerebrod_metric_name_lock);
       _metric_respond_with_error(client_fd,
                                  req->version,
-                                 CEREBRO_METRIC_PROTOCOL_ERR_INTERNAL_SYSTEM_ERROR);
+                                 CEREBRO_METRIC_PROTOCOL_ERR_INTERNAL_ERROR);
       goto cleanup;
     }
 
@@ -560,7 +560,7 @@ _respond_with_metric_names(int client_fd, struct cerebro_metric_request *req)
       Pthread_mutex_unlock(&cerebrod_metric_name_lock);
       _metric_respond_with_error(client_fd,
                                  req->version,
-                                 CEREBRO_METRIC_PROTOCOL_ERR_INTERNAL_SYSTEM_ERROR);
+                                 CEREBRO_METRIC_PROTOCOL_ERR_INTERNAL_ERROR);
       goto cleanup;
     }
 
@@ -575,7 +575,7 @@ _respond_with_metric_names(int client_fd, struct cerebro_metric_request *req)
         {
           _metric_respond_with_error(client_fd,
                                      req->version,
-                                     CEREBRO_METRIC_PROTOCOL_ERR_INTERNAL_SYSTEM_ERROR);
+                                     CEREBRO_METRIC_PROTOCOL_ERR_INTERNAL_ERROR);
           goto cleanup;
         }
     }
@@ -883,7 +883,7 @@ _respond_with_nodes(int client_fd,
       Pthread_mutex_unlock(&cerebrod_listener_data_lock);
       _metric_respond_with_error(client_fd,
                                  req->version,
-                                 CEREBRO_METRIC_PROTOCOL_ERR_INTERNAL_SYSTEM_ERROR);
+                                 CEREBRO_METRIC_PROTOCOL_ERR_INTERNAL_ERROR);
       goto cleanup;
     }
 
@@ -899,7 +899,7 @@ _respond_with_nodes(int client_fd,
       Pthread_mutex_unlock(&cerebrod_listener_data_lock);
       _metric_respond_with_error(client_fd,
                                  req->version,
-                                 CEREBRO_METRIC_PROTOCOL_ERR_INTERNAL_SYSTEM_ERROR);
+                                 CEREBRO_METRIC_PROTOCOL_ERR_INTERNAL_ERROR);
       goto cleanup;
     }
 
@@ -914,7 +914,7 @@ _respond_with_nodes(int client_fd,
         {
           _metric_respond_with_error(client_fd,
                                      req->version,
-                                     CEREBRO_METRIC_PROTOCOL_ERR_INTERNAL_SYSTEM_ERROR);
+                                     CEREBRO_METRIC_PROTOCOL_ERR_INTERNAL_ERROR);
           goto cleanup;
         }
     }
