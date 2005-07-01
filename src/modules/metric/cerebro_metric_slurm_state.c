@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_slurm_state.c,v 1.6 2005-06-28 17:08:38 achu Exp $
+ *  $Id: cerebro_metric_slurm_state.c,v 1.7 2005-07-01 16:52:06 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -71,19 +71,19 @@ static pthread_mutex_t metric_slurm_state_lock = PTHREAD_MUTEX_INITIALIZER;
 static int slurm_state_fd = -1;
 
 /* 
- * _slurm_state_create_and_setup_socket
+ * _slurm_state_setup_socket
  *
  * Create and setup the server socket
  *
  * Returns file descriptor on success, -1 on error
  */
 static int
-_slurm_state_create_and_setup_socket(void)
+_slurm_state_setup_socket(void)
 {
   struct sockaddr_un addr;
-  int temp_fd;
+  int fd;
 
-  if ((temp_fd = socket(AF_LOCAL, SOCK_STREAM, 0)) < 0)
+  if ((fd = socket(AF_LOCAL, SOCK_STREAM, 0)) < 0)
     {      
       CEREBRO_DBG(("socket: %s", strerror(errno)));
       goto cleanup;
@@ -101,24 +101,22 @@ _slurm_state_create_and_setup_socket(void)
   addr.sun_family = AF_LOCAL;
   strncpy(addr.sun_path, SLURM_STATE_UNIX_PATH, sizeof(addr.sun_path));
 
-  if (bind(temp_fd, 
-           (struct sockaddr *)&addr, 
-           sizeof(struct sockaddr_un)) < 0)
+  if (bind(fd, (struct sockaddr *)&addr, sizeof(struct sockaddr_un)) < 0)
     {
       CEREBRO_DBG(("bind: %s", strerror(errno)));
       goto cleanup;
     }
   
-  if (listen(temp_fd, SLURM_STATE_BACKLOG) < 0)
+  if (listen(fd, SLURM_STATE_BACKLOG) < 0)
     {
       CEREBRO_DBG(("listen: %s", strerror(errno)));
       goto cleanup;
     }
   
-  return temp_fd;
+  return fd;
 
  cleanup:
-  close(temp_fd);
+  close(fd);
   return -1;
 }
 
@@ -130,7 +128,7 @@ _slurm_state_create_and_setup_socket(void)
 static int
 slurm_state_metric_setup(void)
 {
-  if ((slurm_state_fd = _slurm_state_create_and_setup_socket()) < 0)
+  if ((slurm_state_fd = _slurm_state_setup_socket()) < 0)
     return -1;
 
   return 0;
@@ -195,9 +193,7 @@ slurm_state_metric_get_metric_value(unsigned int *metric_value_type,
   *metric_value_type = CEREBRO_METRIC_VALUE_TYPE_U_INT32;
   *metric_value_len = sizeof(u_int32_t);
 
-  /* Its not the end of the world if the lock fails, just keep on
-   * going
-   */
+  /* Its not the end of the world if the lock fails */
   if ((rv = pthread_mutex_lock(&metric_slurm_state_lock)) != 0)
     CEREBRO_DBG(("pthread_mutex_lock: %s", strerror(rv)));
 
@@ -235,30 +231,23 @@ slurm_state_metric_thread(void *arg)
     {
       struct sockaddr_un addr;
       socklen_t addrlen;
-      int slurm_fd, num, rv;
+      int fd, num, rv;
       
       addrlen = sizeof(sizeof(struct sockaddr_un));
-      if ((slurm_fd = accept(slurm_state_fd,
-                             (struct sockaddr *)&addr,
-                             &addrlen)) < 0)
+      if ((fd = accept(slurm_state_fd, (struct sockaddr *)&addr, &addrlen)) < 0)
         {
           CEREBRO_DBG(("accept: %s", strerror(errno)));
           if (errno == EINTR)
             continue;
           else
             {
-              /* 
-               * Make an attempt to set things up again and get
-               * this working again.
-               */
+              /* Make an attempt to set things up again */
               slurm_state_fd = _slurm_state_create_and_setup_socket();
               sleep(SLURM_STATE_REINITIALIZE_WAIT_TIME);
             }
         }
 
-      /* Its not the end of the world if the lock fails, just keep on
-       * going
-       */
+      /* Its not the end of the world if the lock fails */
       if ((rv = pthread_mutex_lock(&metric_slurm_state_lock)) != 0)
         CEREBRO_DBG(("pthread_mutex_lock: %s", strerror(rv)));
 
@@ -272,13 +261,13 @@ slurm_state_metric_thread(void *arg)
       
       while (1)
         {
-          char buffer[CEREBRO_MAX_PACKET_LEN];
+          char buf[CEREBRO_MAX_PACKET_LEN];
           fd_set rfds;
 
           FD_ZERO(&rfds);
-          FD_SET(slurm_fd, &rfds);
+          FD_SET(fd, &rfds);
           
-          if ((num = select(slurm_fd + 1, &rfds, NULL, NULL, NULL)) < 0)
+          if ((num = select(fd + 1, &rfds, NULL, NULL, NULL)) < 0)
             {
               CEREBRO_DBG(("select: %s", strerror(errno)));
               if (errno == EINTR)
@@ -287,37 +276,36 @@ slurm_state_metric_thread(void *arg)
                 {
                   /* Break and we'll try again */
                   sleep(SLURM_STATE_REINITIALIZE_WAIT_TIME);
-                  close(slurm_fd);
+                  close(fd);
                   break;
                 }
             }
 
           if (!num)
             {
-              /* Umm, I'm not sure how this would even happen, lets break */
+              /* Can this even happen? Re-setup and restart the loop */
               CEREBRO_DBG(("select invalid return"));
+              slurm_state_fd = _slurm_state_create_and_setup_socket();
               sleep(SLURM_STATE_REINITIALIZE_WAIT_TIME);
-              close(slurm_fd);
+              close(fd);
               break;
             }
 
-          if (FD_ISSET(slurm_fd, &rfds))
+          if (FD_ISSET(fd, &rfds))
             {
               int n;
               
-              if ((n = read(slurm_fd,
-                            buffer,
-                            CEREBRO_MAX_PACKET_LEN)) < 0)
+              if ((n = read(fd, buf, CEREBRO_MAX_PACKET_LEN)) < 0)
                 {
                   CEREBRO_DBG(("read: %s", strerror(errno)));
                   sleep(SLURM_STATE_REINITIALIZE_WAIT_TIME);
-                  close(slurm_fd);
+                  close(fd);
                   break;
                 }
 
-              /* Normally should be 0, but perhaps somehow something
-               * could get read.  We'll assume the connection died if
-               * partial data was read.
+              /* Should be 0, but perhaps something was accidently
+               * sent.  We'll assume the connection died if partial
+               * data was read.
                */
               if (n > 0 && n < CEREBRO_MAX_PACKET_LEN)
                 {
@@ -327,9 +315,7 @@ slurm_state_metric_thread(void *arg)
 
               if (!n)
                 {
-                  /* Its not the end of the world if the lock fails, just keep on
-                   * going
-                   */
+                  /* Its not the end of the world if the lock fails */
                   if ((rv = pthread_mutex_lock(&metric_slurm_state_lock)) != 0)
                     CEREBRO_DBG(("pthread_mutex_lock: %s", strerror(rv)));
 
@@ -341,16 +327,17 @@ slurm_state_metric_thread(void *arg)
                         CEREBRO_DBG(("pthread_mutex_unlock: %s", strerror(rv)));
                     }
                   
-                  close(slurm_fd);
+                  close(fd);
                   break;
                 }
             }
           else
             {
-              /* Umm, I'm not sure how this would even happen, lets break */
+              /* Can this even happen? Re-setup and restart the loop */
               CEREBRO_DBG(("select invalid return"));
+              slurm_state_fd = _slurm_state_create_and_setup_socket();
               sleep(SLURM_STATE_REINITIALIZE_WAIT_TIME);
-              close(slurm_fd);
+              close(fd);
               break;
             }
           

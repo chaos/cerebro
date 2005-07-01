@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_hostsfile.c,v 1.28 2005-06-28 21:26:52 achu Exp $
+ *  $Id: cerebro_clusterlist_hostsfile.c,v 1.29 2005-07-01 16:52:06 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -56,21 +56,9 @@ _readline(int fd, char *buf, unsigned int buflen)
 {
   int len;
 
-  if (fd <= 0)
+  if (fd <= 0 || !buf || !buflen)
     {
-      CEREBRO_DBG(("fd invalid"));
-      return -1;
-    }
-
-  if (!buf)
-    {
-      CEREBRO_DBG(("buf null"));
-      return -1;
-    }
-
-  if (!buflen)
-    {
-      CEREBRO_DBG(("buflen invalid"));
+      CEREBRO_DBG(("invalid parameters"));
       return -1;
     }
 
@@ -108,7 +96,7 @@ _remove_comments(char *buf, int buflen)
 
   if (!buf)
     {
-      CEREBRO_DBG(("buf null"));
+      CEREBRO_DBG(("invalid parameters"));
       return -1;
     }
 
@@ -156,7 +144,7 @@ _remove_trailing_whitespace(char *buf, int buflen)
   
   if (!buf)
     {
-      CEREBRO_DBG(("buf null"));
+      CEREBRO_DBG(("invalid parameters"));
       return -1;
     }
 
@@ -188,7 +176,7 @@ _move_past_whitespace(char *buf)
 {
   if (!buf)
     {
-      CEREBRO_DBG(("buf null"));
+      CEREBRO_DBG(("invalid parameters"));
       return NULL;
     }
 
@@ -226,8 +214,7 @@ hostsfile_clusterlist_setup(void)
   if ((fd = open(CEREBRO_CLUSTERLIST_HOSTSFILE_DEFAULT, O_RDONLY)) < 0)
     {
       cerebro_err_output("hostsfile '%s' cannot be opened: %s", 
-                         CEREBRO_CLUSTERLIST_HOSTSFILE_DEFAULT, 
-                         strerror(errno));
+                         CEREBRO_CLUSTERLIST_HOSTSFILE_DEFAULT, strerror(errno));
       goto cleanup;
     }
  
@@ -456,8 +443,8 @@ hostsfile_clusterlist_node_in_cluster(const char *node)
  */
 static int
 hostsfile_clusterlist_get_nodename(const char *node, 
-				   char *buf, 
-				   unsigned int buflen)
+                                   char *buf, 
+                                   unsigned int buflen)
 {
   char nodebuf[CEREBRO_MAX_NODENAME_LEN+1];
   char *nodePtr = NULL;
@@ -488,7 +475,7 @@ hostsfile_clusterlist_get_nodename(const char *node,
   else
     nodePtr = (char *)node;
 
-  return cerebro_clusterlist_copy_nodename(nodePtr, buf, buflen);
+  return cerebro_copy_nodename(nodePtr, buf, buflen);
 }
 
 struct cerebro_clusterlist_module_info clusterlist_module_info =

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_util.c,v 1.13 2005-06-27 04:44:49 achu Exp $
+ *  $Id: cerebro_clusterlist_util.c,v 1.14 2005-07-01 16:52:06 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -17,27 +17,13 @@
 #include "debug.h"
 
 int 
-cerebro_clusterlist_copy_nodename(const char *node, 
-                                  char *buf, 
-                                  unsigned int buflen)
+cerebro_copy_nodename(const char *node, char *buf, unsigned int buflen)
 {
   int len;
 
-  if (!node)
+  if (!node || !buf || !buflen)
     {
-      CEREBRO_DBG(("node null"));
-      return -1;
-    }
-
-  if (!buf)
-    {
-      CEREBRO_DBG(("buf null"));
-      return -1;
-    }
-
-  if (!buflen)
-    {
-      CEREBRO_DBG(("buflen invalid"));
+      CEREBRO_DBG(("invalid parameters"));
       return -1;
     }
 

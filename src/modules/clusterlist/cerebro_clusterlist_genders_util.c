@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_genders_util.c,v 1.19 2005-06-28 17:08:38 achu Exp $
+ *  $Id: cerebro_clusterlist_genders_util.c,v 1.20 2005-07-01 16:52:06 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -24,7 +24,7 @@ cerebro_clusterlist_genders_setup(genders_t *gh)
 {
   if (!gh)
     { 
-      CEREBRO_DBG(("gh null"));
+      CEREBRO_DBG(("invalid parameters"));
       return -1;
     }
 
@@ -65,7 +65,7 @@ cerebro_clusterlist_genders_cleanup(genders_t *gh)
 {
   if (!gh)
     {
-      CEREBRO_DBG(("gh null"));
+      CEREBRO_DBG(("invalid parameters"));
       return -1;
     }
 
@@ -87,7 +87,7 @@ cerebro_clusterlist_genders_numnodes(genders_t gh)
 
   if (!gh)
     {
-      CEREBRO_DBG(("gh null"));
+      CEREBRO_DBG(("invalid parameters"));
       return -1;
     }
 
@@ -104,17 +104,11 @@ int
 cerebro_clusterlist_genders_get_all_nodes(genders_t gh, char ***nodes)
 {
   char **nodelist = NULL;
-  int nodelistlen, numnodes;
+  int nodelistlen, num;
   
-  if (!gh)
+  if (!gh || !nodes)
     {
-      CEREBRO_DBG(("gh null"));
-      return -1;
-    }
-
-  if (!nodes)
-    {
-      CEREBRO_DBG(("nodes null"));
+      CEREBRO_DBG(("invalid parameters"));
       return -1;
     }
 
@@ -124,19 +118,14 @@ cerebro_clusterlist_genders_get_all_nodes(genders_t gh, char ***nodes)
       goto cleanup;
     }
   
-  if ((numnodes = genders_getnodes(gh, 
-				   nodelist, 
-				   nodelistlen, 
-				   NULL, 
-				   NULL)) < 0)
+  if ((num = genders_getnodes(gh, nodelist, nodelistlen, NULL, NULL)) < 0)
     {
       CEREBRO_DBG(("genders_getnodes: %s", genders_errormsg(gh)));
       goto cleanup;
     }
 
-
   *nodes = nodelist;
-  return numnodes;
+  return num;
 
  cleanup:
   if (nodelist)

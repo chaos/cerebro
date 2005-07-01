@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_monitor_bootlog.c,v 1.15 2005-06-28 17:08:38 achu Exp $
+ *  $Id: cerebro_monitor_bootlog.c,v 1.16 2005-07-01 16:52:06 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -108,7 +108,7 @@ bootlog_monitor_setup(void)
 
   if (!(res = qsql_list_tables(qsql_handle)))
     {
-      CEREBRO_DBG(("qsql_list_tables: %s",	qsql_error(qsql_handle)));
+      CEREBRO_DBG(("qsql_list_tables: %s", qsql_error(qsql_handle)));
       goto cleanup;
     }
 
@@ -216,7 +216,7 @@ _check_if_new_btime(const char *nodename, u_int32_t btime)
 
   if (!nodename)
     {
-      CEREBRO_DBG(("nodename null"));
+      CEREBRO_DBG(("invalid parameters"));
       return -1;
     }
 
@@ -237,7 +237,8 @@ _check_if_new_btime(const char *nodename, u_int32_t btime)
 
   if (!rows)
     {
-      if (_qsql_query("insert into last_btime (name,btime) values ('%s', %d)", nodename, btime) < 0)
+      if (_qsql_query("insert into last_btime (name,btime) values ('%s', %d)", 
+                      nodename, btime) < 0)
         goto cleanup;
       rv++;
     }
@@ -275,7 +276,7 @@ _check_if_new_btime(const char *nodename, u_int32_t btime)
 
       /* Rounding issue on some kernels that can change boottime +/-
        * one or two.  This is the fix.  We have to assume that a
-       * machine can't fully reboot within 2 seconds.
+       * machine won't fully reboot within 2 seconds.
        */
       if (btime > (stored_btime + 2))
         {
@@ -346,14 +347,16 @@ bootlog_monitor_metric_update(const char *nodename,
 
   if (new_btime)
     {
-      if (_qsql_query("insert into bootlog (name,btime,ctime) values ('%s',%d,%d)", nodename, btime, btime) < 0)
+      if (_qsql_query("insert into bootlog (name,btime,ctime) values ('%s',%d,%d)", 
+                      nodename, btime, btime) < 0)
         goto cleanup;
     }
   else
     {
       time_t now = time(NULL);
       
-      if (_qsql_query("update bootlog set ctime=%d where name='%s' and btime=%d", now, nodename, btime) < 0)
+      if (_qsql_query("update bootlog set ctime=%d where name='%s' and btime=%d", 
+                      now, nodename, btime) < 0)
         goto cleanup;
     }
 

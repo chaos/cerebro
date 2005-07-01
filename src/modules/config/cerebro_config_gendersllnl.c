@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_gendersllnl.c,v 1.25 2005-06-28 17:08:38 achu Exp $
+ *  $Id: cerebro_config_gendersllnl.c,v 1.26 2005-07-01 16:52:06 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -95,9 +95,7 @@ gendersllnl_config_cleanup(void)
     return 0;
 
   if (genders_handle_destroy(gh) < 0)
-    {
-      CEREBRO_DBG(("genders_handle_destroy: %s", genders_errormsg(gh)));
-    }
+    CEREBRO_DBG(("genders_handle_destroy: %s", genders_errormsg(gh)));
 
   gh = NULL;
   return 0;
@@ -134,8 +132,7 @@ gendersllnl_config_load_default(struct cerebro_config *conf)
 
   if ((numnodes = genders_getnumnodes(gh)) < 0)
     {
-      CEREBRO_DBG(("genders_numnodes: %s", 
-                   genders_errormsg(gh)));
+      CEREBRO_DBG(("genders_numnodes: %s", genders_errormsg(gh)));
       return -1;
     }
                                    
@@ -220,7 +217,7 @@ gendersllnl_config_load_default(struct cerebro_config *conf)
 
   if (flag)
     {
-      char heartbeat_network_interface[INET_ADDRSTRLEN+1];
+      char intf[INET_ADDRSTRLEN+1];
       struct hostent *h = NULL;
       struct in_addr in;
       
@@ -232,21 +229,18 @@ gendersllnl_config_load_default(struct cerebro_config *conf)
       
       in = *((struct in_addr *)h->h_addr);
       
-      memset(heartbeat_network_interface, '\0', INET_ADDRSTRLEN+1);
-      if (!inet_ntop(AF_INET, 
-                     &in, 
-                     heartbeat_network_interface,
-                     INET_ADDRSTRLEN+1))
+      memset(intf, '\0', INET_ADDRSTRLEN+1);
+      if (!inet_ntop(AF_INET, &in, intf, INET_ADDRSTRLEN+1))
         {
           CEREBRO_DBG(("inet_ntop: %s", strerror(errno)));
           return -1;
         }
       
       memset(conf->cerebrod_heartbeat_network_interface, 
-	     '\0', 
-	     CEREBRO_MAX_NETWORK_INTERFACE_LEN+1);
+             '\0', 
+             CEREBRO_MAX_NETWORK_INTERFACE_LEN+1);
       strncpy(conf->cerebrod_heartbeat_network_interface, 
-	      heartbeat_network_interface, 
+	      intf, 
 	      CEREBRO_MAX_NETWORK_INTERFACE_LEN);
       conf->cerebrod_heartbeat_network_interface_flag++;
     }

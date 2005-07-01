@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_genders.c,v 1.29 2005-06-28 17:08:38 achu Exp $
+ *  $Id: cerebro_clusterlist_genders.c,v 1.30 2005-07-01 16:52:06 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -189,7 +189,7 @@ genders_clusterlist_get_nodename(const char *node,
   else
     nodePtr = (char *)node;
 
-  return cerebro_clusterlist_copy_nodename(nodePtr, buf, buflen);
+  return cerebro_copy_nodename(nodePtr, buf, buflen);
 }
 
 struct cerebro_clusterlist_module_info clusterlist_module_info =
