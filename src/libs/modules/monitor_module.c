@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: monitor_module.c,v 1.10 2005-06-29 18:19:20 achu Exp $
+ *  $Id: monitor_module.c,v 1.11 2005-07-01 17:13:50 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -96,7 +96,7 @@ _monitor_module_cb(void *handle, void *dl_handle, void *module_info)
 monitor_modules_t 
 monitor_modules_load(unsigned int modules_max)
 {
-  struct monitor_module *monitor_handle = NULL;
+  struct monitor_module *handle = NULL;
   int rv;
 
   if (!modules_max)
@@ -108,29 +108,29 @@ monitor_modules_load(unsigned int modules_max)
   if (module_setup() < 0)
     return NULL;
                                                                                     
-  if (!(monitor_handle = (struct monitor_module *)malloc(sizeof(struct monitor_module))))
+  if (!(handle = (struct monitor_module *)malloc(sizeof(struct monitor_module))))
     {
       CEREBRO_DBG(("malloc: %s", strerror(errno)));
       return NULL;
     }
-  memset(monitor_handle, '\0', sizeof(struct monitor_module));
-  monitor_handle->magic = MONITOR_MODULE_MAGIC_NUMBER;
-  monitor_handle->modules_max = modules_max;
-  monitor_handle->modules_count = 0;
+  memset(handle, '\0', sizeof(struct monitor_module));
+  handle->magic = MONITOR_MODULE_MAGIC_NUMBER;
+  handle->modules_max = modules_max;
+  handle->modules_count = 0;
 
-  if (!(monitor_handle->dl_handle = (lt_dlhandle *)malloc(sizeof(lt_dlhandle)*monitor_handle->modules_max)))
+  if (!(handle->dl_handle = (lt_dlhandle *)malloc(sizeof(lt_dlhandle)*handle->modules_max)))
     {
       CEREBRO_DBG(("malloc: %s", strerror(errno)));
       goto cleanup;
     }
-  memset(monitor_handle->dl_handle, '\0', sizeof(lt_dlhandle)*monitor_handle->modules_max);
+  memset(handle->dl_handle, '\0', sizeof(lt_dlhandle)*handle->modules_max);
   
-  if (!(monitor_handle->module_info = (struct cerebro_monitor_module_info * *)malloc(sizeof(struct cerebro_monitor_module_info *)*monitor_handle->modules_max)))
+  if (!(handle->module_info = (struct cerebro_monitor_module_info * *)malloc(sizeof(struct cerebro_monitor_module_info *)*handle->modules_max)))
     {
       CEREBRO_DBG(("malloc: %s", strerror(errno)));
       goto cleanup;
     }
-  memset(monitor_handle->module_info, '\0', sizeof(struct cerebro_monitor_module_info *)*monitor_handle->modules_max);
+  memset(handle->module_info, '\0', sizeof(struct cerebro_monitor_module_info *)*handle->modules_max);
 
   if ((rv = find_and_load_modules(MONITOR_MODULE_DIR,
                                   NULL,
@@ -138,8 +138,8 @@ monitor_modules_load(unsigned int modules_max)
                                   MONITOR_FILENAME_SIGNATURE,
                                   _monitor_module_cb,
                                   MONITOR_MODULE_INFO_SYM,
-                                  monitor_handle,
-                                  monitor_handle->modules_max)) < 0)
+                                  handle,
+                                  handle->modules_max)) < 0)
     goto cleanup;
 
   if (rv)
@@ -150,39 +150,39 @@ monitor_modules_load(unsigned int modules_max)
    */
 
  out:
-  return monitor_handle;
+  return handle;
 
  cleanup:
-  if (monitor_handle)
+  if (handle)
     {
-      if (monitor_handle->dl_handle)
+      if (handle->dl_handle)
         {
           int i;
-          for (i = 0; i < monitor_handle->modules_count; i++)
-            lt_dlclose(monitor_handle->dl_handle[i]);
-          free(monitor_handle->dl_handle);
+          for (i = 0; i < handle->modules_count; i++)
+            lt_dlclose(handle->dl_handle[i]);
+          free(handle->dl_handle);
         }
-      if (monitor_handle->module_info)
-        free(monitor_handle->module_info);
-      free(monitor_handle);
+      if (handle->module_info)
+        free(handle->module_info);
+      free(handle);
     }
   module_cleanup();
   return NULL;
 }
 
 /*
- * monitor_module_handle_check
+ * _handle_check
  *
  * Check for proper monitor module handle
  *
  * Returns 0 on success, -1 on error
  */
 static int
-monitor_module_handle_check(monitor_modules_t monitor_handle)
+_handle_check(monitor_modules_t handle)
 {
-  if (!monitor_handle || monitor_handle->magic != MONITOR_MODULE_MAGIC_NUMBER)
+  if (!handle || handle->magic != MONITOR_MODULE_MAGIC_NUMBER)
     {
-      CEREBRO_DBG(("invalid monitor_handle"));
+      CEREBRO_DBG(("invalid handle"));
       return -1;
     }
 
@@ -190,20 +190,19 @@ monitor_module_handle_check(monitor_modules_t monitor_handle)
 }
 
 /*
- * monitor_module_handle_and_index_check
+ * _handle_index_check
  *
  * Check for proper monitor module handle and index
  *
  * Returns 0 on success, -1 on error
  */
 static int
-monitor_module_handle_and_index_check(monitor_modules_t monitor_handle, 
-                                      unsigned int index)
+_handle_index_check(monitor_modules_t handle, unsigned int index)
 {
-  if (monitor_module_handle_check(monitor_handle) < 0)
+  if (_handle_check(handle) < 0)
     return -1;
 
-  if (!(index < monitor_handle->modules_count))
+  if (!(index < handle->modules_count))
     {
       CEREBRO_DBG(("invalid index"));
       return -1;
@@ -213,34 +212,34 @@ monitor_module_handle_and_index_check(monitor_modules_t monitor_handle,
 }
 
 int 
-monitor_modules_unload(monitor_modules_t monitor_handle)
+monitor_modules_unload(monitor_modules_t handle)
 {
   int i;
 
-  if (monitor_module_handle_check(monitor_handle) < 0)
+  if (_handle_check(handle) < 0)
     return -1;
 
-  for (i = 0; i < monitor_handle->modules_count; i++)
-    monitor_module_cleanup(monitor_handle, i);
+  for (i = 0; i < handle->modules_count; i++)
+    monitor_module_cleanup(handle, i);
 
-  if (monitor_handle->dl_handle)
+  if (handle->dl_handle)
     {
-      for (i = 0; i < monitor_handle->modules_count; i++)
-        lt_dlclose(monitor_handle->dl_handle[i]);
-      free(monitor_handle->dl_handle);
-      monitor_handle->dl_handle = NULL;
+      for (i = 0; i < handle->modules_count; i++)
+        lt_dlclose(handle->dl_handle[i]);
+      free(handle->dl_handle);
+      handle->dl_handle = NULL;
     }
-  if (monitor_handle->module_info)
+  if (handle->module_info)
     {
-      free(monitor_handle->module_info);
-      monitor_handle->module_info = NULL;
+      free(handle->module_info);
+      handle->module_info = NULL;
     }
 
-  monitor_handle->magic = ~MONITOR_MODULE_MAGIC_NUMBER;
-  monitor_handle->modules_max = 0;
-  monitor_handle->modules_count = 0;
+  handle->magic = ~MONITOR_MODULE_MAGIC_NUMBER;
+  handle->modules_max = 0;
+  handle->modules_count = 0;
 
-  free(monitor_handle);
+  free(handle);
 
   module_cleanup();
   return 0;
@@ -248,67 +247,63 @@ monitor_modules_unload(monitor_modules_t monitor_handle)
 }
 
 int 
-monitor_modules_count(monitor_modules_t monitor_handle)
+monitor_modules_count(monitor_modules_t handle)
 {
-  if (monitor_module_handle_check(monitor_handle) < 0)
+  if (_handle_check(handle) < 0)
     return -1;
 
-  return monitor_handle->modules_count;
+  return handle->modules_count;
 }
 
 char *
-monitor_module_name(monitor_modules_t monitor_handle,
-		    unsigned int index)
+monitor_module_name(monitor_modules_t handle, unsigned int index)
 {
-  if (monitor_module_handle_and_index_check(monitor_handle, index) < 0)
+  if (_handle_index_check(handle, index) < 0)
     return NULL;
 
-  return (monitor_handle->module_info[index])->monitor_module_name;
+  return (handle->module_info[index])->monitor_module_name;
 }
 
 int 
-monitor_module_setup(monitor_modules_t monitor_handle,
-		     unsigned int index)
+monitor_module_setup(monitor_modules_t handle, unsigned int index)
 {
-  if (monitor_module_handle_and_index_check(monitor_handle, index) < 0)
+  if (_handle_index_check(handle, index) < 0)
     return -1;
 
-  return ((*(monitor_handle->module_info[index])->setup)());
+  return ((*(handle->module_info[index])->setup)());
 }
 
 int 
-monitor_module_cleanup(monitor_modules_t monitor_handle,
-		       unsigned int index)
+monitor_module_cleanup(monitor_modules_t handle, unsigned int index)
 {
-  if (monitor_module_handle_and_index_check(monitor_handle, index) < 0)
+  if (_handle_index_check(handle, index) < 0)
     return -1;
 
-  return ((*(monitor_handle->module_info[index])->cleanup)());
+  return ((*(handle->module_info[index])->cleanup)());
 }
 
 char *
-monitor_module_metric_name(monitor_modules_t monitor_handle,
-			   unsigned int index)
+monitor_module_metric_name(monitor_modules_t handle, unsigned int index)
 {
-  if (monitor_module_handle_and_index_check(monitor_handle, index) < 0)
+  if (_handle_index_check(handle, index) < 0)
     return NULL;
 
-  return ((*(monitor_handle->module_info[index])->metric_name)());
+  return ((*(handle->module_info[index])->metric_name)());
 }
 
 int 
-monitor_module_metric_update(monitor_modules_t monitor_handle,
+monitor_module_metric_update(monitor_modules_t handle,
 			     unsigned int index,
 			     const char *nodename,
 			     unsigned int metric_value_type,
 			     unsigned int metric_value_len,
 			     void *metric_value)
 {
-  if (monitor_module_handle_and_index_check(monitor_handle, index) < 0)
+  if (_handle_index_check(handle, index) < 0)
     return -1;
 
-  return ((*(monitor_handle->module_info[index])->metric_update)(nodename,
-                                                                 metric_value_type,
-                                                                 metric_value_len,
-                                                                 metric_value));
+  return ((*(handle->module_info[index])->metric_update)(nodename,
+                                                         metric_value_type,
+                                                         metric_value_len,
+                                                         metric_value));
 }

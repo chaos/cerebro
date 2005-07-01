@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: clusterlist_module.c,v 1.8 2005-06-27 23:27:06 achu Exp $
+ *  $Id: clusterlist_module.c,v 1.9 2005-07-01 17:13:50 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -106,19 +106,19 @@ _clusterlist_module_cb(void *handle, void *dl_handle, void *module_info)
 clusterlist_module_t 
 clusterlist_module_load(void)
 {
-  struct clusterlist_module *clusterlist_handle = NULL;
+  struct clusterlist_module *handle = NULL;
   int rv;
   
   if (module_setup() < 0)
     return NULL;
 
-  if (!(clusterlist_handle = (struct clusterlist_module *)malloc(sizeof(struct clusterlist_module))))
+  if (!(handle = (struct clusterlist_module *)malloc(sizeof(struct clusterlist_module))))
     {
       CEREBRO_DBG(("malloc: %s", strerror(errno)));
       return NULL;
     }
-  memset(clusterlist_handle, '\0', sizeof(struct clusterlist_module));
-  clusterlist_handle->magic = CLUSTERLIST_MODULE_MAGIC_NUMBER;
+  memset(handle, '\0', sizeof(struct clusterlist_module));
+  handle->magic = CLUSTERLIST_MODULE_MAGIC_NUMBER;
       
   if ((rv = find_and_load_modules(CLUSTERLIST_MODULE_DIR,
                                   clusterlist_modules,
@@ -126,44 +126,44 @@ clusterlist_module_load(void)
                                   CLUSTERLIST_FILENAME_SIGNATURE,
                                   _clusterlist_module_cb,
                                   CLUSTERLIST_MODULE_INFO_SYM,
-                                  clusterlist_handle,
+                                  handle,
                                   1)) < 0)
     goto cleanup;
   
   if (rv)
     goto out;
 
-  clusterlist_handle->dl_handle = NULL;
-  clusterlist_handle->module_info = &default_clusterlist_module_info;
+  handle->dl_handle = NULL;
+  handle->module_info = &default_clusterlist_module_info;
  out:
-  return clusterlist_handle;
+  return handle;
 
  cleanup:
-  if (clusterlist_handle)
+  if (handle)
     {
-      if (clusterlist_handle->dl_handle)
-        lt_dlclose(clusterlist_handle->dl_handle);
-      free(clusterlist_handle);
+      if (handle->dl_handle)
+        lt_dlclose(handle->dl_handle);
+      free(handle);
     }
   module_cleanup();
   return NULL;
 }
 
 /* 
- * clusterlist_module_handle_check
+ * _handle_check
  *
  * Check for proper clusterlist module handle
  *
  * Returns 0 on success, -1 on error
  */
 static int
-clusterlist_module_handle_check(clusterlist_module_t clusterlist_handle)
+_handle_check(clusterlist_module_t handle)
 {
-  if (!clusterlist_handle 
-      || clusterlist_handle->magic != CLUSTERLIST_MODULE_MAGIC_NUMBER
-      || !clusterlist_handle->module_info)
+  if (!handle 
+      || handle->magic != CLUSTERLIST_MODULE_MAGIC_NUMBER
+      || !handle->module_info)
     {
-      CEREBRO_DBG(("invalid clusterlist_handle"));
+      CEREBRO_DBG(("invalid handle"));
       return -1;
     }
 
@@ -171,87 +171,85 @@ clusterlist_module_handle_check(clusterlist_module_t clusterlist_handle)
 }
 
 int
-clusterlist_module_unload(clusterlist_module_t clusterlist_handle)
+clusterlist_module_unload(clusterlist_module_t handle)
 {
-  if (clusterlist_module_handle_check(clusterlist_handle) < 0)
+  if (_handle_check(handle) < 0)
     return -1;
 
-  clusterlist_module_cleanup(clusterlist_handle);
+  clusterlist_module_cleanup(handle);
 
-  clusterlist_handle->magic = ~CLUSTERLIST_MODULE_MAGIC_NUMBER;
-  if (clusterlist_handle->dl_handle)
-    lt_dlclose(clusterlist_handle->dl_handle);
-  clusterlist_handle->module_info = NULL;
-  free(clusterlist_handle);
+  handle->magic = ~CLUSTERLIST_MODULE_MAGIC_NUMBER;
+  if (handle->dl_handle)
+    lt_dlclose(handle->dl_handle);
+  handle->module_info = NULL;
+  free(handle);
 
   module_cleanup();
   return 0;
 }
 
 char *
-clusterlist_module_name(clusterlist_module_t clusterlist_handle)
+clusterlist_module_name(clusterlist_module_t handle)
 {
-  if (clusterlist_module_handle_check(clusterlist_handle) < 0)
+  if (_handle_check(handle) < 0)
     return NULL;
 
-  return (clusterlist_handle->module_info)->clusterlist_module_name;
+  return (handle->module_info)->clusterlist_module_name;
 }
 
 int
-clusterlist_module_setup(clusterlist_module_t clusterlist_handle)
+clusterlist_module_setup(clusterlist_module_t handle)
 {
-  if (clusterlist_module_handle_check(clusterlist_handle) < 0)
+  if (_handle_check(handle) < 0)
     return -1;
   
-  return ((*(clusterlist_handle->module_info)->setup)());
+  return ((*(handle->module_info)->setup)());
 }
 
 int
-clusterlist_module_cleanup(clusterlist_module_t clusterlist_handle)
+clusterlist_module_cleanup(clusterlist_module_t handle)
 {
-  if (clusterlist_module_handle_check(clusterlist_handle) < 0)
+  if (_handle_check(handle) < 0)
     return -1;
   
-  return ((*(clusterlist_handle->module_info)->cleanup)());
+  return ((*(handle->module_info)->cleanup)());
 }
 
 int
-clusterlist_module_numnodes(clusterlist_module_t clusterlist_handle)
+clusterlist_module_numnodes(clusterlist_module_t handle)
 {
-  if (clusterlist_module_handle_check(clusterlist_handle) < 0)
+  if (_handle_check(handle) < 0)
     return -1;
   
-  return ((*(clusterlist_handle->module_info)->numnodes)());
+  return ((*(handle->module_info)->numnodes)());
 }
 
 int
-clusterlist_module_get_all_nodes(clusterlist_module_t clusterlist_handle, 
-				 char ***nodes)
+clusterlist_module_get_all_nodes(clusterlist_module_t handle, char ***nodes)
 {
-  if (clusterlist_module_handle_check(clusterlist_handle) < 0)
+  if (_handle_check(handle) < 0)
     return -1;
   
-  return ((*(clusterlist_handle->module_info)->get_all_nodes)(nodes));
+  return ((*(handle->module_info)->get_all_nodes)(nodes));
 }
 
 int
-clusterlist_module_node_in_cluster(clusterlist_module_t clusterlist_handle, 
-				   const char *node)
+clusterlist_module_node_in_cluster(clusterlist_module_t handle, const char *node)
 {
-  if (clusterlist_module_handle_check(clusterlist_handle) < 0)
+  if (_handle_check(handle) < 0)
     return -1;
   
-  return ((*(clusterlist_handle->module_info)->node_in_cluster)(node));
+  return ((*(handle->module_info)->node_in_cluster)(node));
 }
 
 int
-clusterlist_module_get_nodename(clusterlist_module_t clusterlist_handle,
+clusterlist_module_get_nodename(clusterlist_module_t handle,
 				const char *node, 
 				char *buf, 
 				unsigned int buflen)
 {
-  if (clusterlist_module_handle_check(clusterlist_handle) < 0)
+  if (_handle_check(handle) < 0)
     return -1;
   
-  return ((*(clusterlist_handle->module_info)->get_nodename)(node, buf, buflen));
+  return ((*(handle->module_info)->get_nodename)(node, buf, buflen));
 }

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: config_module.h,v 1.1 2005-06-18 18:48:30 achu Exp $
+ *  $Id: config_module.h,v 1.2 2005-07-01 17:13:50 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CONFIG_MODULE_H
@@ -26,36 +26,36 @@ config_module_t config_module_load(void);
  *
  * Returns 0 on success, -1 on error
  */
-int config_module_unload(config_module_t config_handle);
+int config_module_unload(config_module_t handle);
 
 /*
  * config_module_name
  *
  * Return config module name
  */
-char *config_module_name(config_module_t config_handle);
+char *config_module_name(config_module_t handle);
 
 /*
  * config_module_setup
  *
  * call config module setup function
  */
-int config_module_setup(config_module_t config_handle);
+int config_module_setup(config_module_t handle);
 
 /*
  * config_module_cleanup
  *
  * call config module cleanup function
  */
-int config_module_cleanup(config_module_t config_handle);
+int config_module_cleanup(config_module_t handle);
 
 /*
  * config_module_load_default
  *
  * call config module get all nodes function
  */
-int config_module_load_default(config_module_t config_handle,
-			       struct cerebro_config *conf);
+int config_module_load_default(config_module_t handle, 
+                               struct cerebro_config *conf);
 
 
 #endif /* _CONFIG_MODULE_H */

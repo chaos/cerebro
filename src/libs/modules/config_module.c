@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: config_module.c,v 1.9 2005-06-28 21:15:01 achu Exp $
+ *  $Id: config_module.c,v 1.10 2005-07-01 17:13:50 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -102,19 +102,19 @@ _config_module_cb(void *handle, void *dl_handle, void *module_info)
 config_module_t
 config_module_load(void)
 {
-  struct config_module *config_handle = NULL;
+  struct config_module *handle = NULL;
   int rv;
 
   if (module_setup() < 0)
     return NULL;
 
-  if (!(config_handle = (struct config_module *)malloc(sizeof(struct config_module))))
+  if (!(handle = (struct config_module *)malloc(sizeof(struct config_module))))
     {
       CEREBRO_DBG(("malloc: %s", strerror(errno)));
       return NULL;
     }
-  memset(config_handle, '\0', sizeof(struct config_module));
-  config_handle->magic = CONFIG_MODULE_MAGIC_NUMBER;
+  memset(handle, '\0', sizeof(struct config_module));
+  handle->magic = CONFIG_MODULE_MAGIC_NUMBER;
 
   if ((rv = find_and_load_modules(CONFIG_MODULE_DIR,
                                   config_modules,
@@ -122,44 +122,44 @@ config_module_load(void)
                                   CONFIG_FILENAME_SIGNATURE,
                                   _config_module_cb,
                                   CONFIG_MODULE_INFO_SYM,
-                                  config_handle,
+                                  handle,
                                   1)) < 0)
     goto cleanup;
 
   if (rv)
     goto out;
 
-  config_handle->dl_handle = NULL;
-  config_handle->module_info = &default_config_module_info;
+  handle->dl_handle = NULL;
+  handle->module_info = &default_config_module_info;
  out:
-  return config_handle;
+  return handle;
 
  cleanup:
-  if (config_handle)
+  if (handle)
     {
-      if (config_handle->dl_handle)
-        lt_dlclose(config_handle->dl_handle);
-      free(config_handle);
+      if (handle->dl_handle)
+        lt_dlclose(handle->dl_handle);
+      free(handle);
     }
   module_cleanup();
   return NULL;
 }
 
 /*
- * config_module_handle_check
+ * _handle_check
  *
  * Check for proper config module handle
  *
  * Returns 0 on success, -1 on error
  */
 static int
-config_module_handle_check(config_module_t config_handle)
+_handle_check(config_module_t handle)
 {
-  if (!config_handle 
-      || config_handle->magic != CONFIG_MODULE_MAGIC_NUMBER
-      || !config_handle->module_info)
+  if (!handle 
+      || handle->magic != CONFIG_MODULE_MAGIC_NUMBER 
+      || !handle->module_info)
     {
-      CEREBRO_DBG(("invalid config_handle"));
+      CEREBRO_DBG(("invalid handle"));
       return -1;
     }
 
@@ -167,56 +167,55 @@ config_module_handle_check(config_module_t config_handle)
 }
 
 int
-config_module_unload(config_module_t config_handle)
+config_module_unload(config_module_t handle)
 {
-  if (config_module_handle_check(config_handle) < 0)
+  if (_handle_check(handle) < 0)
     return -1;
   
-  config_module_cleanup(config_handle);
+  config_module_cleanup(handle);
 
-  config_handle->magic = ~CONFIG_MODULE_MAGIC_NUMBER;
-  if (config_handle->dl_handle)
-    lt_dlclose(config_handle->dl_handle);
-  config_handle->module_info = NULL;
-  free(config_handle);
+  handle->magic = ~CONFIG_MODULE_MAGIC_NUMBER;
+  if (handle->dl_handle)
+    lt_dlclose(handle->dl_handle);
+  handle->module_info = NULL;
+  free(handle);
 
   module_cleanup();
   return 0;
 }
 
 char *
-config_module_name(config_module_t config_handle)
+config_module_name(config_module_t handle)
 {
-  if (config_module_handle_check(config_handle) < 0)
+  if (_handle_check(handle) < 0)
     return NULL;
 
-  return (config_handle->module_info)->config_module_name;
+  return (handle->module_info)->config_module_name;
 }
 
 int
-config_module_setup(config_module_t config_handle)
+config_module_setup(config_module_t handle)
 {
-  if (config_module_handle_check(config_handle) < 0)
+  if (_handle_check(handle) < 0)
     return -1;
   
-  return ((*(config_handle->module_info)->setup)());
+  return ((*(handle->module_info)->setup)());
 }
 
 int
-config_module_cleanup(config_module_t config_handle)
+config_module_cleanup(config_module_t handle)
 {
-  if (config_module_handle_check(config_handle) < 0)
+  if (_handle_check(handle) < 0)
     return -1;
   
-  return ((*(config_handle->module_info)->cleanup)());
+  return ((*(handle->module_info)->cleanup)());
 }
 
 int
-config_module_load_default(config_module_t config_handle,
-			   struct cerebro_config *conf)
+config_module_load_default(config_module_t handle, struct cerebro_config *conf)
 {
-  if (config_module_handle_check(config_handle) < 0)
+  if (_handle_check(handle) < 0)
     return -1;
   
-  return ((*(config_handle->module_info)->load_default)(conf));
+  return ((*(handle->module_info)->load_default)(conf));
 }
