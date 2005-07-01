@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_slurm_state.c,v 1.7 2005-07-01 16:52:06 achu Exp $
+ *  $Id: cerebro_metric_slurm_state.c,v 1.8 2005-07-01 20:28:56 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -242,7 +242,7 @@ slurm_state_metric_thread(void *arg)
           else
             {
               /* Make an attempt to set things up again */
-              slurm_state_fd = _slurm_state_create_and_setup_socket();
+              slurm_state_fd = _slurm_state_setup_socket();
               sleep(SLURM_STATE_REINITIALIZE_WAIT_TIME);
             }
         }
@@ -285,7 +285,7 @@ slurm_state_metric_thread(void *arg)
             {
               /* Can this even happen? Re-setup and restart the loop */
               CEREBRO_DBG(("select invalid return"));
-              slurm_state_fd = _slurm_state_create_and_setup_socket();
+              slurm_state_fd = _slurm_state_setup_socket();
               sleep(SLURM_STATE_REINITIALIZE_WAIT_TIME);
               close(fd);
               break;
@@ -335,7 +335,7 @@ slurm_state_metric_thread(void *arg)
             {
               /* Can this even happen? Re-setup and restart the loop */
               CEREBRO_DBG(("select invalid return"));
-              slurm_state_fd = _slurm_state_create_and_setup_socket();
+              slurm_state_fd = _slurm_state_setup_socket();
               sleep(SLURM_STATE_REINITIALIZE_WAIT_TIME);
               close(fd);
               break;
