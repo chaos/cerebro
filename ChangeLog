@@ -1,6 +1,8 @@
-2005-06-30  Albert Chu  <chu11@llnl.gov>
+2005-07-01  Albert Chu  <chu11@llnl.gov>
 
-	* Code cleanup.
+	* Fix various mem-leaks and bugs.
+
+	* Massive code cleanup.
 	
 2005-06-29  Albert Chu  <chu11@llnl.gov>
 
