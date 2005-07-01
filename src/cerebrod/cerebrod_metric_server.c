@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_server.c,v 1.3 2005-06-30 22:43:59 achu Exp $
+ *  $Id: cerebrod_metric_server.c,v 1.4 2005-07-01 00:31:41 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -85,18 +85,17 @@ _metric_name_response_marshall(struct cerebro_metric_name_response *res,
                                char *buf, 
                                unsigned int buflen)
 {
+  char *bufPtr;
   int len = 0;
 
   assert(res && buf && buflen >= CEREBRO_METRIC_NAME_RESPONSE_LEN);
 
+  bufPtr = res->metric_name;
   memset(buf, '\0', buflen);
   len += Marshall_int32(res->version, buf + len, buflen - len);
   len += Marshall_u_int32(res->err_code, buf + len, buflen - len);
   len += Marshall_u_int8(res->end, buf + len, buflen - len);
-  len += Marshall_buffer(res->metric_name,
-                         sizeof(res->metric_name),
-                         buf + len,
-                         buflen - len);
+  len += Marshall_buffer(bufPtr, sizeof(bufPtr), buf + len, buflen - len);
   return len;
 }
 
@@ -113,57 +112,47 @@ _node_metric_response_marshall(struct cerebro_node_metric_response *res,
                                unsigned int buflen)
 {
   int c = 0;
+  char *bufPtr;
+  void *mvalue;
+  u_int32_t mtype, mlen;
 
   assert(res && buf && buflen >= CEREBRO_NODE_METRIC_RESPONSE_HEADER_LEN);
 
   memset(buf, '\0', buflen);
 
+  bufPtr = res->nodename;
   c += Marshall_int32(res->version, buf + c, buflen - c);
   c += Marshall_u_int32(res->err_code, buf + c, buflen - c);
   c += Marshall_u_int8(res->end, buf + c, buflen - c);
-  c += Marshall_buffer(res->nodename,
-                       sizeof(res->nodename),
-                       buf + c,
-                       buflen - c);
+  c += Marshall_buffer(bufPtr, sizeof(bufPtr), buf + c, buflen - c);
   c += Marshall_u_int32(res->metric_value_type, buf + c, buflen - c);
   c += Marshall_u_int32(res->metric_value_len, buf + c, buflen - c);
   
   if (!res->metric_value_len)
     return c;
 
-  switch(res->metric_value_type)
+  mtype = res->metric_value_type;
+  mlen = res->metric_value_len;
+  mvalue = res->metric_value;
+  
+  if (mtype == CEREBRO_METRIC_VALUE_TYPE_NONE)
     {
-    case CEREBRO_METRIC_VALUE_TYPE_NONE:
       CEREBRO_DBG(("metric value len > 0 for type NONE"));
-      break;
-    case CEREBRO_METRIC_VALUE_TYPE_INT32:
-      c += Marshall_int32(*((int32_t *)res->metric_value),
-                          buf + c,
-                          buflen - c);
-      break;
-    case CEREBRO_METRIC_VALUE_TYPE_U_INT32:
-      c += Marshall_u_int32(*((u_int32_t *)res->metric_value),
-                            buf + c,
-                            buflen - c);
-      break;
-    case CEREBRO_METRIC_VALUE_TYPE_FLOAT:
-      c += Marshall_float(*((float *)res->metric_value), 
-                          buf + c,
-                          buflen - c);
-      break;
-    case CEREBRO_METRIC_VALUE_TYPE_DOUBLE:
-      c += Marshall_double(*((double *)res->metric_value),
-                           buf + c,
-                           buflen - c);
-      break;
-    case CEREBRO_METRIC_VALUE_TYPE_STRING:
-      c += Marshall_buffer(res->metric_value,
-                           res->metric_value_len,
-                           buf + c,
-                           buflen - c);
-      break;
-    default:
-      CEREBRO_DBG(("invalid type %d", res->metric_value_type));
+      return -1;
+    }
+  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_INT32)
+    c += Marshall_int32(*((int32_t *)mvalue), buf + c, buflen - c);
+  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_U_INT32)
+    c += Marshall_u_int32(*((u_int32_t *)mvalue), buf + c, buflen - c);
+  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_FLOAT)
+    c += Marshall_float(*((float *)mvalue), buf + c, buflen - c);
+  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_DOUBLE)
+    c += Marshall_double(*((double *)mvalue), buf + c, buflen - c);
+  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_STRING)
+    c += Marshall_buffer(mvalue, mlen, buf + c, buflen - c);
+  else
+    {
+      CEREBRO_DBG(("invalid type %d", mtype));
       return -1;
     }
 
@@ -209,10 +198,10 @@ _metric_request_check_version(const char *buf,
                                        
   if (!Unmarshall_int32(version, buf, buflen))
     return -1;
-                                                                                     
+
   if (*version != CEREBRO_METRIC_PROTOCOL_VERSION)
     return -1;
-                                                                                     
+
   return 0;
 }
 
@@ -230,6 +219,7 @@ _metric_request_unmarshall(struct cerebro_metric_request *req,
                            unsigned int buflen)
 {
   int n, c = 0;
+  char *bufPtr;
 
   assert(req && buf);
  
@@ -237,10 +227,8 @@ _metric_request_unmarshall(struct cerebro_metric_request *req,
     return c;
   c += n;
   
-  if (!(n = Unmarshall_buffer(req->metric_name,
-                              sizeof(req->metric_name),
-                              buf + c,
-                              buflen - c)))
+  bufPtr = req->metric_name;
+  if (!(n = Unmarshall_buffer(bufPtr, sizeof(bufPtr), buf + c, buflen - c)))
     return c;
   c += n;
   

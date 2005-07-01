@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.17 2005-06-30 22:43:59 achu Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.18 2005-07-01 00:31:41 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -133,10 +133,12 @@ int monitor_index_size = 0;
 static int 
 _cerebrod_node_data_strcmp(void *x, void *y)
 {
+  struct cerebrod_node_data *a = x;
+  struct cerebrod_node_data *b = y;
+  
   assert(x && y);
 
-  return strcmp(((struct cerebrod_node_data *)x)->nodename,
-                ((struct cerebrod_node_data *)y)->nodename);
+  return strcmp(a->nodename, b->nodename);
 }
 
 /* 
@@ -149,7 +151,7 @@ static struct cerebrod_node_data *
 _cerebrod_node_data_create_and_init(const char *nodename)
 {
   struct cerebrod_node_data *nd;
-  
+
   assert(nodename);
 
   nd = Malloc(sizeof(struct cerebrod_node_data));
@@ -159,9 +161,9 @@ _cerebrod_node_data_create_and_init(const char *nodename)
   nd->last_received_time = 0;
   Pthread_mutex_init(&(nd->node_data_lock), NULL);
   if (conf.metric_server)
-    nd->metric_data = Hash_create(conf.metric_max,
+    nd->metric_data = Hash_create(conf.metric_max, 
                                   (hash_key_f)hash_key_string,
-                                  (hash_cmp_f)strcmp,
+                                  (hash_cmp_f)strcmp, 
                                   (hash_del_f)NULL);
   else
     nd->metric_data = NULL;
@@ -209,23 +211,24 @@ _setup_monitor_modules(void)
       goto monitor_cleanup;
     }
   
-  monitor_index = Hash_create(monitor_index_len,
-                              (hash_key_f)hash_key_string,
-                              (hash_cmp_f)strcmp,
+  monitor_index = Hash_create(monitor_index_len, 
+                              (hash_key_f)hash_key_string, 
+                              (hash_cmp_f)strcmp, 
                               (hash_del_f)_Free);
 
   for (i = 0; i < monitor_index_len; i++)
     {
       struct cerebrod_monitor_module *monitor_module;
-      char *metric_name;
+      char *module_name, *metric_name;
+
+      module_name = monitor_module_name(monitor_handle, i);
 
 #if CEREBRO_DEBUG
       if (conf.debug && conf.listen_debug)
         {
           Pthread_mutex_lock(&debug_output_mutex);
           fprintf(stderr, "**************************************\n");
-          fprintf(stderr, "* Settup up Monitor Module: %s\n",
-                  monitor_module_name(monitor_handle, i));
+          fprintf(stderr, "* Settup up Monitor Module: %s\n", module_name);
           fprintf(stderr, "**************************************\n");
           Pthread_mutex_unlock(&debug_output_mutex);
         }
@@ -233,13 +236,13 @@ _setup_monitor_modules(void)
 
       if (monitor_module_setup(monitor_handle, i) < 0)
         {
-          CEREBRO_DBG(("monitor_module_setup failed"));
+          CEREBRO_DBG(("monitor_module_setup failed: %s", module_name));
           continue;
         }
 
       if (!(metric_name = monitor_module_metric_name(monitor_handle, i)) < 0)
         {
-          CEREBRO_DBG(("monitor_module_metric_name failed"));
+          CEREBRO_DBG(("monitor_module_metric_name failed: %s", module_name));
           monitor_module_cleanup(monitor_handle, i);
           continue;
         }
@@ -317,8 +320,7 @@ cerebrod_listener_data_initialize(void)
       int i;
       char **nodes;
 
-      if (clusterlist_module_get_all_nodes(clusterlist_handle,
-					   &nodes) < 0)
+      if (clusterlist_module_get_all_nodes(clusterlist_handle, &nodes) < 0)
         CEREBRO_EXIT(("clusterlist_module_get_all_nodes"));
 
       for (i = 0; i < numnodes; i++)
@@ -340,11 +342,12 @@ cerebrod_listener_data_initialize(void)
 
   if (conf.metric_server)
     {
-      int i;
-
-      metric_name_index = Hash_create(metric_name_defaults_count + conf.metric_max,
-                                      (hash_key_f)hash_key_string,
-                                      (hash_cmp_f)strcmp,
+      int i, size;
+      
+      size = metric_name_defaults_count + conf.metric_max;
+      metric_name_index = Hash_create(size, 
+                                      (hash_key_f)hash_key_string, 
+                                      (hash_cmp_f)strcmp, 
                                       (hash_del_f)NULL);
 
       /* The hash is more for the speed over a list, it doesn't
@@ -352,9 +355,10 @@ cerebrod_listener_data_initialize(void)
        * same thing
        */
       for (i = 0; i < metric_name_defaults_count; i++)
-        Hash_insert(metric_name_index, 
-                    metric_name_defaults[i],
-                    metric_name_defaults[i]);
+        {
+          char *metric_name = metric_name_defaults[i];
+          Hash_insert(metric_name_index, metric_name, metric_name);
+        }
     }
 
   if (_setup_monitor_modules() < 0)
@@ -411,12 +415,12 @@ _output_node_data_update(struct cerebrod_node_data *nd)
 
 #if CEREBRO_DEBUG
 /*
- * _node_data_metric_data_dump
+ * _metric_data_dump
  *
  * callback function from hash_for_each to dump metric node data
  */
 static int
-_node_data_metric_data_dump(void *data, const void *key, void *arg)
+_metric_data_dump(void *data, const void *key, void *arg)
 {
   struct cerebrod_listener_metric_data *md;
   char *nodename, *buf;
@@ -430,30 +434,22 @@ _node_data_metric_data_dump(void *data, const void *key, void *arg)
           nodename, md->metric_name, md->metric_value_type, 
           md->metric_value_len);
 
-  switch (md->metric_value_type)
+  if (md->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_INT32)
+    fprintf(stderr, "metric_value=%d", *((int32_t *)md->metric_value));
+  else if (md->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_U_INT32)
+    fprintf(stderr, "metric_value=%u", *((u_int32_t *)md->metric_value));
+  else if (md->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_FLOAT)
+    fprintf(stderr, "metric_value=%f", *((float *)md->metric_value));
+  else if (md->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_DOUBLE)
+    fprintf(stderr, "metric_value=%f", *((double *)md->metric_value));
+  else if (md->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_STRING)
     {
-    case CEREBRO_METRIC_VALUE_TYPE_INT32:
-      fprintf(stderr, "metric_value=%d", *((int32_t *)md->metric_value));
-      break;
-    case CEREBRO_METRIC_VALUE_TYPE_U_INT32:
-      fprintf(stderr, "metric_value=%u", *((u_int32_t *)md->metric_value));
-      break;
-    case CEREBRO_METRIC_VALUE_TYPE_FLOAT:
-      fprintf(stderr, "metric_value=%f", *((float *)md->metric_value));
-      break;
-    case CEREBRO_METRIC_VALUE_TYPE_DOUBLE:
-      fprintf(stderr, "metric_value=%f", *((double *)md->metric_value));
-      break;
-    case CEREBRO_METRIC_VALUE_TYPE_STRING:
       /* Watch for NUL termination */
       buf = Malloc(md->metric_value_len + 1);
       memset(buf, '\0', md->metric_value_len + 1);
       memcpy(buf, md->metric_value, md->metric_value_len);
       fprintf(stderr, "metric_value=%s", buf);
       Free(buf);
-      break;
-    default:
-      break;
     }
   fprintf(stderr, "\n");
 
@@ -481,13 +477,11 @@ _node_data_dump(void *x, void *arg)
       
       fprintf(stderr, "* %s: discovered=%d\n", nd->nodename, nd->discovered);
       fprintf(stderr, "* %s: last_received_time=%u\n", 
-	      nd->nodename, nd->last_received_time);
+              nd->nodename, nd->last_received_time);
 
       if (nd->metric_data)
         {
-          num = Hash_for_each(nd->metric_data,
-                              _node_data_metric_data_dump,
-                              nd->nodename);
+          num = Hash_for_each(nd->metric_data, _metric_data_dump, nd->nodename);
           if (num != nd->metric_data_count)
             {
               fprintf(stderr, "* invalid dump count: num=%d numnodes=%d",
@@ -758,22 +752,14 @@ cerebrod_listener_data_update(char *nodename,
       for (i = 0; i < hb->metrics_len; i++)
         {
           char metric_name_buf[CEREBRO_MAX_METRIC_NAME_LEN+1];
-              
+          struct cerebrod_heartbeat_metric *hd = hb->metrics[i];
+
           /* Guarantee ending '\0' character */
           memset(metric_name_buf, '\0', CEREBRO_MAX_METRIC_NAME_LEN+1);
-          memcpy(metric_name_buf, 
-                 hb->metrics[i]->metric_name, 
-                 CEREBRO_MAX_METRIC_NAME_LEN);
-              
-          _metric_data_update(nd, 
-                              metric_name_buf, 
-                              hb->metrics[i], 
-                              received_time);
+          memcpy(metric_name_buf, hd->metric_name, CEREBRO_MAX_METRIC_NAME_LEN);
 
-          _monitor_update(nodename,
-                          nd,
-                          metric_name_buf,
-                          hb->metrics[i]);
+          _metric_data_update(nd, metric_name_buf, hd, received_time);
+          _monitor_update(nodename, nd, metric_name_buf, hd);
         }
 
       /* Can't call a debug output function in here, it can cause a

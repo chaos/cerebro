@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_util.c,v 1.28 2005-06-30 22:43:59 achu Exp $
+ *  $Id: cerebrod_util.c,v 1.29 2005-07-01 00:31:41 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -63,7 +63,6 @@ cerebrod_rehash(hash_t *old_hash,
 		pthread_mutex_t *hash_mutex)
 {
   hash_t new_hash;
-  int num;
 
   assert(old_hash && hash_size && hash_size_increment && hash_num && hash_mutex);
 
@@ -84,13 +83,11 @@ cerebrod_rehash(hash_t *old_hash,
 			 (hash_cmp_f)strcmp,
 			 (hash_del_f)_Free);
   
-  num = Hash_for_each(*old_hash, _hash_reinsert, &new_hash);
-  if (num != hash_num)
-    CEREBRO_EXIT(("invalid reinsert: num=%d hash_num=%d", num, hash_num));
+  if (Hash_for_each(*old_hash, _hash_reinsert, &new_hash) != hash_num)
+    CEREBRO_EXIT(("invalid reinsert: hash_num=%d", hash_num));
 
-  num = Hash_delete_if(*old_hash, _hash_removeall, NULL);
-  if (num != hash_num)
-    CEREBRO_EXIT(("invalid removeall: num=%d hash_num=%d", num, hash_num));
+  if (Hash_delete_if(*old_hash, _hash_removeall, NULL) != hash_num)
+    CEREBRO_EXIT(("invalid removeall: hash_num=%d", hash_num));
 
   Hash_destroy(*old_hash);
 
@@ -110,11 +107,11 @@ cerebrod_reinitialize_socket(int old_fd,
     {
       if (!(old_fd < 0))
         close(old_fd);       /* no-wrapper, make best effort */
-                                                                                      
+
       if ((fd = socket_setup()) < 0)
         {
           CEREBRO_DBG(("%s: error re-initializing socket", debug_msg));
-                                                                                      
+
           /* Wait a bit, so we don't spin */
           sleep(CEREBROD_REINITIALIZE_TIME);
         }

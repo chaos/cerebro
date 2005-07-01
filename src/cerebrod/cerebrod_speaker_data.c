@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker_data.c,v 1.15 2005-06-30 22:43:59 achu Exp $
+ *  $Id: cerebrod_speaker_data.c,v 1.16 2005-07-01 00:31:41 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -104,16 +104,16 @@ _setup_metric_modules(void)
     {
       struct cerebrod_speaker_metric_module *metric_module;
       Cerebro_metric_thread_pointer thread_pointer;
-      char *metric_name;
+      char *module_name, *metric_name;
       int metric_period;
       
+      module_name = metric_module_name(metric_handle, i);
 #if CEREBRO_DEBUG
       if (conf.debug && conf.speak_debug)
         {
           Pthread_mutex_lock(&debug_output_mutex);
           fprintf(stderr, "**************************************\n");
-          fprintf(stderr, "* Setup Metric Module: %s\n",
-                  metric_module_name(metric_handle, i));
+          fprintf(stderr, "* Setup Metric Module: %s\n", module_name);
           fprintf(stderr, "**************************************\n");
           Pthread_mutex_unlock(&debug_output_mutex);
         }
@@ -121,23 +121,20 @@ _setup_metric_modules(void)
 
       if (metric_module_setup(metric_handle, i) < 0)
         {
-          CEREBRO_DBG(("metric_module_setup: %s", 
-                       metric_module_name(metric_handle, i)));
+          CEREBRO_DBG(("metric_module_setup: %s", module_name));
           continue;
         }
 
       if (!(metric_name = metric_module_get_metric_name(metric_handle, i)))
         {
-          CEREBRO_DBG(("metric_module_get_metric_name: %s", 
-                       metric_module_name(metric_handle, i)));
+          CEREBRO_DBG(("metric_module_get_metric_name: %s", module_name));
           metric_module_cleanup(metric_handle, i);
           continue;
         }
 
       if ((metric_period = metric_module_get_metric_period(metric_handle, i)) < 0)
         {
-          CEREBRO_DBG(("metric_module_get_metric_period: %s", 
-                       metric_module_name(metric_handle, i)));
+          CEREBRO_DBG(("metric_module_get_metric_period: %s", module_name));
           metric_module_cleanup(metric_handle, i);
           continue;
         }
@@ -172,9 +169,9 @@ _setup_metric_modules(void)
   return 1;
 
  metric_cleanup:
-  /* unload will call module cleanup functions */
   if (metric_handle)
     {
+      /* unload will call module cleanup functions */
       metric_modules_unload(metric_handle);
       metric_handle = NULL;
     }
@@ -239,7 +236,7 @@ cerebrod_speaker_data_get_metric_data(struct cerebrod_heartbeat *hb,
   if (!speaker_data_init)
     CEREBRO_EXIT(("initialization not complete"));
 
-  /* Could be no metric modules */
+  /* There may not be any metric modules */
   if (!metric_handle || !metric_list || !metric_list_size)
     {
       hb->metrics_len = 0;
@@ -259,18 +256,19 @@ cerebrod_speaker_data_get_metric_data(struct cerebrod_heartbeat *hb,
       struct cerebrod_heartbeat_metric *hd = NULL;
       void *temp_value = NULL;
       char *metric_name;
+      unsigned int index;
 
       if (tv.tv_sec <= metric_module->next_call_time)
-        continue;
+        break;
 
       hd = Malloc(sizeof(struct cerebrod_heartbeat_metric));
       memset(hd, '\0', sizeof(struct cerebrod_heartbeat_metric));
 
-      if (!(metric_name = metric_module_get_metric_name(metric_handle,
-                                                        metric_module->index)))
+      index = metric_module->index;
+
+      if (!(metric_name = metric_module_get_metric_name(metric_handle, index)))
         {
-          CEREBRO_DBG(("metric_module_get_metric_name: %d", 
-                       metric_module->index));
+          CEREBRO_DBG(("metric_module_get_metric_name: %d", index));
           goto cleanup_loop;
         }
 
@@ -278,28 +276,39 @@ cerebrod_speaker_data_get_metric_data(struct cerebrod_heartbeat *hb,
       strncpy(hd->metric_name, metric_name, CEREBRO_MAX_METRIC_NAME_LEN);
       
       if (metric_module_get_metric_value(metric_handle,
-                                         metric_module->index,
+                                         index,
                                          &(hd->metric_value_type),
                                          &(hd->metric_value_len),
                                          &temp_value) < 0)
         {
-          CEREBRO_DBG(("metric_module_get_metric_value: %d", 
-                       metric_module->index));
+          CEREBRO_DBG(("metric_module_get_metric_value: %d", index));
           goto cleanup_loop;
         }
 
-      if (hd->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_NONE
+      if (hd->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_NONE  
           && !hd->metric_value_len)
         {
-          CEREBRO_DBG(("bogus metric information: %d", metric_module->index));
+          CEREBRO_DBG(("bogus metric information: %d", index));
           goto cleanup_loop;
         }
 
       if (!(hd->metric_value_type >= CEREBRO_METRIC_VALUE_TYPE_NONE
             && hd->metric_value_type <= CEREBRO_METRIC_VALUE_TYPE_STRING))
         {
-          CEREBRO_DBG(("bogus metric: type=%d index=%d",
-                       hd->metric_value_type, metric_module->index));
+          CEREBRO_DBG(("bogus metric: index=%d", index));
+          goto cleanup_loop;
+        }
+
+      if ((hd->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_INT32
+           && hd->metric_value_len != sizeof(int32_t))
+          || (hd->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_U_INT32
+              && hd->metric_value_len != sizeof(u_int32_t))
+          || (hd->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_FLOAT
+              && hd->metric_value_len != sizeof(float))
+          || (hd->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_DOUBLE
+              && hd->metric_value_len != sizeof(double)))
+        {
+          CEREBRO_DBG(("bogus metric: index=%d", index));
           goto cleanup_loop;
         }
 
@@ -313,9 +322,7 @@ cerebrod_speaker_data_get_metric_data(struct cerebrod_heartbeat *hb,
       hd->metric_value = Malloc(hd->metric_value_len);
       memcpy(hd->metric_value, temp_value, hd->metric_value_len);
 
-      metric_module_destroy_metric_value(metric_handle, 
-                                         metric_module->index, 
-                                         temp_value);
+      metric_module_destroy_metric_value(metric_handle, index, temp_value);
 
       *heartbeat_len += CEREBROD_HEARTBEAT_METRIC_HEADER_LEN;
       *heartbeat_len += hd->metric_value_len;
@@ -334,9 +341,7 @@ cerebrod_speaker_data_get_metric_data(struct cerebrod_heartbeat *hb,
         }
 
       if (temp_value)
-        metric_module_destroy_metric_value(metric_handle, 
-                                           metric_module->index, 
-                                           temp_value);
+        metric_module_destroy_metric_value(metric_handle, index, temp_value);
 
     end_loop:
       /* 
