@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_server.h,v 1.1 2005-06-30 17:39:56 achu Exp $
+ *  $Id: cerebrod_metric_server.h,v 1.2 2005-07-01 16:22:31 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_METRIC_SERVER_H
@@ -14,7 +14,7 @@
  */
 struct cerebrod_metric_name_evaluation_data
 {
-  int client_fd;
+  int fd;
   List metric_name_responses;
 };
 
@@ -25,7 +25,7 @@ struct cerebrod_metric_name_evaluation_data
  */
 struct cerebrod_node_metric_evaluation_data
 {
-  int client_fd;
+  int fd;
   struct cerebro_metric_request *req;
   u_int32_t time_now;
   char *metric_name;

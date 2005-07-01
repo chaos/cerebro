@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_util.c,v 1.29 2005-07-01 00:31:41 achu Exp $
+ *  $Id: cerebrod_util.c,v 1.30 2005-07-01 16:22:31 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -95,13 +95,11 @@ cerebrod_rehash(hash_t *old_hash,
 }
 
 int
-cerebrod_reinitialize_socket(int old_fd,
-                             Cerebrod_socket_setup socket_setup,
-                             char *debug_msg)
+cerebrod_reinit_socket(int old_fd, Cerebrod_socket_setup socket_setup, char *msg)
 {
   int fd = old_fd;
 
-  assert(socket_setup && debug_msg);
+  assert(socket_setup && msg);
 
   if (errno == EINVAL || errno == EBADF || errno == ENODEV || old_fd < 0)
     {
@@ -110,7 +108,7 @@ cerebrod_reinitialize_socket(int old_fd,
 
       if ((fd = socket_setup()) < 0)
         {
-          CEREBRO_DBG(("%s: error re-initializing socket", debug_msg));
+          CEREBRO_DBG(("%s: error re-initializing socket", msg));
 
           /* Wait a bit, so we don't spin */
           sleep(CEREBROD_REINITIALIZE_TIME);
@@ -119,9 +117,9 @@ cerebrod_reinitialize_socket(int old_fd,
         CEREBRO_DBG(("success re-initializing socket"));
     }
   else if (errno == EINTR)
-    CEREBRO_DBG(("%s: %s", debug_msg, strerror(errno)));
+    CEREBRO_DBG(("%s: %s", msg, strerror(errno)));
   else
-    CEREBRO_EXIT(("%s: %s", debug_msg, strerror(errno)));
+    CEREBRO_EXIT(("%s: %s", msg, strerror(errno)));
 
   return fd;
 }

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.70 2005-07-01 00:31:41 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.71 2005-07-01 16:22:31 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -267,11 +267,11 @@ _cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb)
 void *
 cerebrod_speaker(void *arg)
 {
-  int fd;
+  int speaker_fd;
 
   _speaker_initialize();
-  if ((fd = _speaker_socket_setup()) < 0)
-    CEREBRO_EXIT(("fd setup failed"));
+  if ((speaker_fd = _speaker_socket_setup()) < 0)
+    CEREBRO_EXIT(("speaker_fd setup failed"));
 
   while (1)
     {
@@ -305,12 +305,12 @@ cerebrod_speaker(void *arg)
 
       addr = (struct sockaddr *)&hbaddr;
       addrlen = sizeof(struct sockaddr_in);
-      if ((rv = sendto(fd, buf, hblen, 0, addr, addrlen)) != hblen)
+      if ((rv = sendto(speaker_fd, buf, hblen, 0, addr, addrlen)) != hblen)
         {
-          char *dbg = "speaker: sendto";
-
           if (rv < 0)
-            fd = cerebrod_reinitialize_socket(fd, _speaker_socket_setup, dbg);
+            speaker_fd = cerebrod_reinit_socket(speaker_fd, 
+                                                _speaker_socket_setup, 
+                                                "speaker: sendto");
           else
             CEREBRO_DBG(("sendto: invalid bytes sent"));
         }

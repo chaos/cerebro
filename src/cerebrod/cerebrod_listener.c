@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.107 2005-07-01 03:31:24 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.108 2005-07-01 16:22:31 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -384,9 +384,9 @@ cerebrod_listener(void *arg)
       
       Pthread_mutex_lock(&listener_fd_lock);
       if ((recv_len = recvfrom(listener_fd, buf, buflen, 0, NULL, NULL)) < 0)
-        listener_fd = cerebrod_reinitialize_socket(listener_fd,
-                                                   _listener_setup_socket,
-                                                   "listener: recvfrom");
+        listener_fd = cerebrod_reinit_socket(listener_fd, 
+                                             _listener_setup_socket, 
+                                             "listener: recvfrom");
       Pthread_mutex_unlock(&listener_fd_lock);
 
       /* No packet read */

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_util.h,v 1.12 2005-06-28 22:42:01 achu Exp $
+ *  $Id: cerebrod_util.h,v 1.13 2005-07-01 16:22:31 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_UTIL_H
@@ -19,7 +19,7 @@
  * cerebrod_rehash
  *
  * rehash the contents of old_hash into a new hash.  Caller is
- * responsible for locking any locks before calling cerebrod_rehash.
+ * responsible for locking any locks before calling rehash.
  *
  * - old_hash - pointer to old hash
  * - hash_size - pointer to integer with current hash size
@@ -30,10 +30,10 @@
  * Returns new_hash in 'old_hash', and new hash size in 'hash_size'.
  */
 void cerebrod_rehash(hash_t *old_hash, 
-		     int *hash_size, 
-		     int hash_size_increment,
-		     int hash_num, 
-		     pthread_mutex_t *hash_mutex);
+                     int *hash_size, 
+                     int hash_size_increment,
+                     int hash_num, 
+                     pthread_mutex_t *hash_mutex);
 
 /*
  * Cerebrod_socket_setup
@@ -43,7 +43,7 @@ void cerebrod_rehash(hash_t *old_hash,
 typedef int (*Cerebrod_socket_setup)(void);
 
 /* 
- * cerebrod_reinitialize_socket
+ * cerebrod_reinit_socket
  *
  * This function helps various looping network servers or clients
  * reinitialize their sockets appropriately.
@@ -60,8 +60,8 @@ typedef int (*Cerebrod_socket_setup)(void);
  * Returns new (or possibley old) fd on success, -1 on error
  */
 int
-cerebrod_reinitialize_socket(int old_fd,
-                             Cerebrod_socket_setup socket_setup,
-                             char *debug_msg);
+cerebrod_reinit_socket(int old_fd, 
+                       Cerebrod_socket_setup socket_setup,
+                       char *msg);
 
 #endif /* _CEREBROD_UTIL_H */
