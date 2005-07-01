@@ -1,20 +1,11 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_util.h,v 1.7 2005-06-29 17:52:26 achu Exp $
+ *  $Id: cerebro_metric_util.h,v 1.8 2005-07-01 20:14:23 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_METRIC_UTIL_H
 #define _CEREBRO_METRIC_UTIL_H
 
 #include "cerebro.h"
-
-/*
- * _cerebro_metric_protocol_err_conversion
- *
- * Convert metric protocol err codes to API err codes
- *
- * Returns proper err code
- */
-int _cerebro_metric_protocol_err_conversion(u_int32_t protocol_error);
 
 /* 
  * Cerebro_metric_response_receive
@@ -26,16 +17,16 @@ typedef int (*Cerebro_metric_response_receive)(cerebro_t handle,
                                                int fd);
 
 /* 
- * _cerebro_metric_connect_and_receive
+ * _cerebro_metric_get_data
  *
  * Connect to the cerebrod metric and receive responses
  *
  * Returns 0 on success, -1 on error
  */
-int _cerebro_metric_connect_and_receive(cerebro_t handle,
-                                        void *list,
-                                        const char *metric_name,
-                                        Cerebro_metric_response_receive response_receive);
+int _cerebro_metric_get_data(cerebro_t handle,
+                             void *list,
+                             const char *metric_name,
+                             Cerebro_metric_response_receive response_receive);
 
 /*
  * _cerebro_metric_response_check
@@ -44,8 +35,8 @@ int _cerebro_metric_connect_and_receive(cerebro_t handle,
  *
  * Returns 0 on success, -1 on error
  */
-int _cerebro_metric_response_check(cerebro_t handle,
-                                   const char *buf,
+int _cerebro_metric_response_check(cerebro_t handle, 
+                                   const char *buf, 
                                    unsigned int buflen);
 
 

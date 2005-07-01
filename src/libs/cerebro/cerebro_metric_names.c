@@ -41,7 +41,7 @@ _metric_name_response_unmarshall(cerebro_t handle,
   int n, c = 0;
   char *bufPtr;
 
-  if (!res || !buf)
+  if (!res || !buf || buflen < CEREBRO_METRIC_NAME_RESPONSE_LEN)
     {
       CEREBRO_DBG(("invalid pointers"));
       handle->errnum = CEREBRO_ERR_INTERNAL;
@@ -54,9 +54,6 @@ _metric_name_response_unmarshall(cerebro_t handle,
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
-  
-  if (!n)
-    return c;
   c += n;
 
   if ((n = unmarshall_u_int32(&(res->err_code), buf + c, buflen - c)) < 0)
@@ -65,9 +62,6 @@ _metric_name_response_unmarshall(cerebro_t handle,
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
-
-  if (!n)
-    return c;
   c += n;
 
   if ((n = unmarshall_u_int8(&(res->end), buf + c, buflen - c)) < 0)
@@ -76,9 +70,6 @@ _metric_name_response_unmarshall(cerebro_t handle,
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
-
-  if (!n)
-    return c;
   c += n;
 
   bufPtr = res->metric_name;
@@ -88,12 +79,15 @@ _metric_name_response_unmarshall(cerebro_t handle,
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
-
-  if (!n)
-    return c;
   c += n;
 
-  return c;
+  if (c != CEREBRO_METRIC_NAME_RESPONSE_LEN)
+    {
+      handle->errnum = CEREBRO_ERR_PROTOCOL;
+      return -1;
+    }
+
+  return 0;
 }
 
 /* 
@@ -135,7 +129,7 @@ _receive_metric_name_responses(cerebro_t handle, void *list, int fd)
       struct cerebro_metric_name_response res;
       char metric_name_buf[CEREBRO_MAX_METRIC_NAME_LEN+1]; 
       char buf[CEREBRO_MAX_PACKET_LEN];
-      int bytes_read, res_len, errnum;
+      int bytes_read, errnum;
   
       if ((bytes_read = receive_data(fd,
                                      CEREBRO_METRIC_NAME_RESPONSE_LEN,
@@ -157,18 +151,18 @@ _receive_metric_name_responses(cerebro_t handle, void *list, int fd)
       if (_cerebro_metric_response_check(handle, buf, bytes_read) < 0)
         goto cleanup;
       
-      memset(&res, '\0', sizeof(struct cerebro_metric_name_response));
-      if ((res_len = _metric_name_response_unmarshall(handle, 
-                                                      &res, 
-                                                      buf, 
-                                                      bytes_read)) < 0)
-        goto cleanup;
-      
-      if (res_len != CEREBRO_METRIC_NAME_RESPONSE_LEN)
+      if (bytes_read != CEREBRO_METRIC_NAME_RESPONSE_LEN)
         {
           handle->errnum = CEREBRO_ERR_PROTOCOL;
           goto cleanup;
         }
+      
+      memset(&res, '\0', sizeof(struct cerebro_metric_name_response));
+      if (_metric_name_response_unmarshall(handle, 
+                                           &res, 
+                                           buf, 
+                                           bytes_read) < 0)
+        goto cleanup;
 
       if (res.end == CEREBRO_METRIC_PROTOCOL_IS_LAST_RESPONSE)
         break;
@@ -198,10 +192,10 @@ cerebro_get_metric_names(cerebro_t handle)
   if (!(metriclist = _cerebro_metriclist_create(handle)))
     goto cleanup;
 
-  if (_cerebro_metric_connect_and_receive(handle,
-                                          metriclist,
-                                          CEREBRO_METRIC_METRIC_NAMES,
-                                          _receive_metric_name_responses) < 0)
+  if (_cerebro_metric_get_data(handle,
+                               metriclist,
+                               CEREBRO_METRIC_METRIC_NAMES,
+                               _receive_metric_name_responses) < 0)
     goto cleanup;
   
                                             

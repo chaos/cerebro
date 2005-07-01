@@ -43,7 +43,7 @@ _node_metric_response_header_unmarshall(cerebro_t handle,
   int n, c = 0;
   char *bufPtr;
 
-  if (!res || !buf)
+  if (!res || !buf || buflen < CEREBRO_NODE_METRIC_RESPONSE_HEADER_LEN)
     {
       CEREBRO_DBG(("invalid pointers"));
       handle->errnum = CEREBRO_ERR_INTERNAL;
@@ -56,8 +56,6 @@ _node_metric_response_header_unmarshall(cerebro_t handle,
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
-  if (!n)
-    return c;
   c += n;
 
   if ((n = unmarshall_u_int32(&(res->err_code), buf + c, buflen - c)) < 0)
@@ -66,9 +64,6 @@ _node_metric_response_header_unmarshall(cerebro_t handle,
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
-
-  if (!n)
-    return c;
   c += n;
 
   if ((n = unmarshall_u_int8(&(res->end), buf + c, buflen - c)) < 0)
@@ -77,9 +72,6 @@ _node_metric_response_header_unmarshall(cerebro_t handle,
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
-
-  if (!n)
-    return c;
   c += n;
 
   bufPtr = res->nodename;
@@ -89,9 +81,6 @@ _node_metric_response_header_unmarshall(cerebro_t handle,
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
-
-  if (!n)
-    return c;
   c += n;
 
   mtypePtr = &(res->metric_value_type);
@@ -101,9 +90,6 @@ _node_metric_response_header_unmarshall(cerebro_t handle,
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
-
-  if (!n)
-    return c;
   c += n;
   
   mlenPtr = &(res->metric_value_len);
@@ -113,12 +99,15 @@ _node_metric_response_header_unmarshall(cerebro_t handle,
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
-
-  if (!n)
-    return c;
   c += n;
 
-  return c;
+  if (c != CEREBRO_NODE_METRIC_RESPONSE_HEADER_LEN)
+    {
+      handle->errnum = CEREBRO_ERR_PROTOCOL;
+      return -1;
+    }
+
+  return 0;
 }
 
 /* 
@@ -150,6 +139,7 @@ _metric_value_unmarshall(cerebro_t handle,
   mtype = res->metric_value_type;
   mlen = res->metric_value_len;
 
+  /* Special case for ending null character */
   if (mtype == CEREBRO_METRIC_VALUE_TYPE_STRING)
     malloc_len = buflen;
   else
@@ -292,22 +282,24 @@ _receive_node_metric_responses(cerebro_t handle, void *list, int fd)
       if (_cerebro_metric_response_check(handle, buf, bytes_read) < 0)
         goto cleanup;
 
-      if ((header_len = _node_metric_response_header_unmarshall(handle, 
-                                                                &res, 
-                                                                buf, 
-                                                                bytes_read)) < 0)
-        goto cleanup;
-      
-      if (header_len != CEREBRO_NODE_METRIC_RESPONSE_HEADER_LEN)
+
+      if (header_len < CEREBRO_NODE_METRIC_RESPONSE_HEADER_LEN)
         {
           handle->errnum = CEREBRO_ERR_PROTOCOL;
           goto cleanup;
         }
+
+      if (_node_metric_response_header_unmarshall(handle, 
+                                                  &res, 
+                                                  buf, 
+                                                  bytes_read) < 0)
+        goto cleanup;
       
+     
       if (res.metric_value_len)
         {
-          char *value = NULL;
-          int value_read, value_count;
+          char *vbuf = NULL;
+          int vbytes_read;
           unsigned int errnum;
 
           if (res.metric_value_type == CEREBRO_METRIC_VALUE_TYPE_NONE)
@@ -316,48 +308,38 @@ _receive_node_metric_responses(cerebro_t handle, void *list, int fd)
               goto cleanup;
             }
 
-          if (!(value = malloc(res.metric_value_len)))
+          if (!(vbuf = malloc(res.metric_value_len)))
             {
               handle->errnum = CEREBRO_ERR_OUTMEM;
               goto cleanup;
             }
 
-          if ((value_read = receive_data(fd,
-                                         res.metric_value_len,
-                                         value,
-                                         res.metric_value_len,
-                                         CEREBRO_METRIC_PROTOCOL_CLIENT_TIMEOUT_LEN,
-                                         &errnum)) < 0)
+          if ((vbytes_read = receive_data(fd,
+                                          res.metric_value_len,
+                                          vbuf,
+                                          res.metric_value_len,
+                                          CEREBRO_METRIC_PROTOCOL_CLIENT_TIMEOUT_LEN,
+                                          &errnum)) < 0)
             {
               handle->errnum = errnum;
-              free(value);
+              free(vbuf);
               goto cleanup;
             }
       
-          if (value_read < res.metric_value_len)
+          if (vbytes_read != res.metric_value_len)
             {
               handle->errnum = CEREBRO_ERR_PROTOCOL;
-              free(value);
+              free(vbuf);
               goto cleanup;
             }
 
-          if ((value_count = _metric_value_unmarshall(handle,
-                                                      &res,
-                                                      value,
-                                                      value_read)) < 0)
+          if (_metric_value_unmarshall(handle, &res, vbuf, vbytes_read) < 0)
             {
-              free(value);
+              free(vbuf);
               goto cleanup;
             }
 
-          if (value_count != res.metric_value_len)
-            {
-              handle->errnum = CEREBRO_ERR_PROTOCOL;
-              free(value);
-              goto cleanup;
-            }
-
-          res.metric_value = value;
+          res.metric_value = vbuf;
         }
       else
         res.metric_value = NULL;
@@ -422,10 +404,10 @@ cerebro_get_metric_data(cerebro_t handle, const char *metric_name)
   if (!(nodelist = _cerebro_nodelist_create(handle, metric_name)))
     goto cleanup;
 
-  if (_cerebro_metric_connect_and_receive(handle,
-                                          nodelist,
-                                          metric_name,
-                                          _receive_node_metric_responses) < 0)
+  if (_cerebro_metric_get_data(handle,
+                               nodelist,
+                               metric_name,
+                               _receive_node_metric_responses) < 0)
     goto cleanup;
   
   handle->errnum = CEREBRO_ERR_SUCCESS;
