@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.13 2005-06-27 17:59:45 achu Exp $
+## $Id: Makefile.am,v 1.14 2005-07-01 20:46:47 achu Exp $
 ##*****************************************************************************
 
 if WITH_GNU_LD
@@ -10,6 +10,7 @@ endif
 noinst_HEADERS	       = cerebro_api.h \
 			 cerebro_clusterlist_util.h \
 			 cerebro_config_util.h \
+			 cerebro_metric_util.h \
 			 cerebro_metriclist_util.h \
 			 cerebro_nodelist_util.h \
 			 cerebro_util.h
