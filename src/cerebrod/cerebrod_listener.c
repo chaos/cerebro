@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.106 2005-07-01 00:31:41 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.107 2005-07-01 03:31:24 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -183,7 +183,7 @@ _cerebrod_heartbeat_check_version(const char *buf, unsigned int buflen)
 
 
 /*
- * _cerebrod_heartbeat_unmarshall_and_create
+ * _cerebrod_heartbeat_unmarshall
  *
  * unmarshall contents of a heartbeat packet buffer and
  * return in an allocated heartbeat
@@ -191,7 +191,7 @@ _cerebrod_heartbeat_check_version(const char *buf, unsigned int buflen)
  * Returns heartbeat data on success, NULL on error
  */
 static struct cerebrod_heartbeat *
-_cerebrod_heartbeat_unmarshall_and_create(const char *buf, unsigned int buflen)
+_cerebrod_heartbeat_unmarshall(const char *buf, unsigned int buflen)
 {
   struct cerebrod_heartbeat *hb = NULL;
   struct cerebrod_heartbeat_metric *hd = NULL;
@@ -396,7 +396,7 @@ cerebrod_listener(void *arg)
       if (_cerebrod_heartbeat_check_version(buf, recv_len) < 0)
         continue;
 
-      if (!(hb = _cerebrod_heartbeat_unmarshall_and_create(buf, recv_len)))
+      if (!(hb = _cerebrod_heartbeat_unmarshall(buf, recv_len)))
 	continue;
 
       _cerebrod_heartbeat_dump(hb);

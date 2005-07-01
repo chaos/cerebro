@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_server.c,v 1.4 2005-07-01 00:31:41 achu Exp $
+ *  $Id: cerebrod_metric_server.c,v 1.5 2005-07-01 03:31:24 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -223,11 +223,12 @@ _metric_request_unmarshall(struct cerebro_metric_request *req,
 
   assert(req && buf);
  
+  bufPtr = req->metric_name;
+
   if (!(n = Unmarshall_int32(&(req->version), buf + c, buflen - c)))
     return c;
   c += n;
   
-  bufPtr = req->metric_name;
   if (!(n = Unmarshall_buffer(bufPtr, sizeof(bufPtr), buf + c, buflen - c)))
     return c;
   c += n;
