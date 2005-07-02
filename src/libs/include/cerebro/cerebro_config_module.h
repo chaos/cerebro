@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_module.h,v 1.1 2005-06-17 22:58:30 achu Exp $
+ *  $Id: cerebro_config_module.h,v 1.2 2005-07-02 13:20:45 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_CONFIG_MODULE_H
@@ -28,7 +28,7 @@ typedef int (*Cerebro_config_setup)(void);
 typedef int (*Cerebro_config_cleanup)(void);
 
 /*
- * Cerebro_config_load_default
+ * Cerebro_config_load_config
  *
  * function prototype for config module function to alter default
  * cerebro configuration values.  Required to be defined by each
@@ -36,7 +36,7 @@ typedef int (*Cerebro_config_cleanup)(void);
  *
  * Returns 0 on success, -1 on error
  */
-typedef int (*Cerebro_config_load_default)(struct cerebro_config *conf);
+typedef int (*Cerebro_config_load_config)(struct cerebro_config *conf);
 
 /*
  * struct cerebro_config_module_info 
@@ -49,7 +49,7 @@ struct cerebro_config_module_info
   char *config_module_name;
   Cerebro_config_setup setup;
   Cerebro_config_cleanup cleanup;
-  Cerebro_config_load_default load_default;
+  Cerebro_config_load_config load_config;
 };
 
 #endif /* _CEREBRO_CONFIG_MODULE_H */

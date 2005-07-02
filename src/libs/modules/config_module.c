@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: config_module.c,v 1.10 2005-07-01 17:13:50 achu Exp $
+ *  $Id: config_module.c,v 1.11 2005-07-02 13:20:45 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -88,7 +88,7 @@ _config_module_cb(void *handle, void *dl_handle, void *module_info)
   if (!config_module_info->config_module_name
       || !config_module_info->setup
       || !config_module_info->cleanup
-      || !config_module_info->load_default)
+      || !config_module_info->load_config)
     {
       CEREBRO_DBG(("invalid module info"));
       return 0;
@@ -212,10 +212,10 @@ config_module_cleanup(config_module_t handle)
 }
 
 int
-config_module_load_default(config_module_t handle, struct cerebro_config *conf)
+config_module_load_config(config_module_t handle, struct cerebro_config *conf)
 {
   if (_handle_check(handle) < 0)
     return -1;
   
-  return ((*(handle->module_info)->load_default)(conf));
+  return ((*(handle->module_info)->load_config)(conf));
 }

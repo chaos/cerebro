@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: config_util.c,v 1.9 2005-06-29 22:43:47 achu Exp $
+ *  $Id: config_util.c,v 1.10 2005-07-02 13:20:45 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -65,7 +65,7 @@ _load_config_module(struct cerebro_config *conf, unsigned int *errnum)
     }
 #endif /* CEREBRO_DEBUG */
 
-  if (config_module_load_default(config_handle, conf) < 0)
+  if (config_module_load_config(config_handle, conf) < 0)
     {
       if (errnum)
         *errnum = CEREBRO_ERR_CONFIG_MODULE;

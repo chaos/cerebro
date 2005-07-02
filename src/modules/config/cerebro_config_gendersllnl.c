@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_gendersllnl.c,v 1.26 2005-07-01 16:52:06 achu Exp $
+ *  $Id: cerebro_config_gendersllnl.c,v 1.27 2005-07-02 13:20:45 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -102,7 +102,7 @@ gendersllnl_config_cleanup(void)
 }
 
 /* 
- * gendersllnl_config_load_default
+ * gendersllnl_config_load_config
  *
  * config specifically for use on LLNL clusters. 'mgmt' nodes listen
  * and speak, while compute nodes only speak.  We always speak on the
@@ -113,7 +113,7 @@ gendersllnl_config_cleanup(void)
  * Returns 0 on success, -1 on error
  */
 int
-gendersllnl_config_load_default(struct cerebro_config *conf)
+gendersllnl_config_load_config(struct cerebro_config *conf)
 {
   char altnamebuf[CEREBRO_MAX_NODENAME_LEN+1];
   int flag, numnodes;
@@ -253,5 +253,5 @@ struct cerebro_config_module_info config_module_info =
     GENDERSLLNL_CONFIG_MODULE_NAME,
     &gendersllnl_config_setup,
     &gendersllnl_config_cleanup,
-    &gendersllnl_config_load_default,
+    &gendersllnl_config_load_config,
   };
