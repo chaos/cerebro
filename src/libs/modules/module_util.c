@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: module_util.c,v 1.12 2005-07-02 14:13:33 achu Exp $
+ *  $Id: module_util.c,v 1.13 2005-07-02 14:24:04 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -76,10 +76,8 @@ _load_module(char *search_dir,
   
   if (!(module_info = lt_dlsym(dl_handle, module_info_sym)))
     {
-      const char *err = lt_dlerror();
-      if (err)
-        CEREBRO_DBG(("lt_dlsym: %s, %s", filebuf, err));
-      goto cleanup;
+      lt_dlclose(dl_handle);
+      return 0;
     }
   
   if ((flag = module_cb(handle, dl_handle, module_info)) < 0)
