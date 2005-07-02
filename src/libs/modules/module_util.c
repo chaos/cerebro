@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: module_util.c,v 1.11 2005-07-02 13:55:53 achu Exp $
+ *  $Id: module_util.c,v 1.12 2005-07-02 14:13:33 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -48,6 +48,7 @@ _load_module(char *search_dir,
              void *handle)
 {
   char filebuf[CEREBRO_MAX_PATH_LEN+1];
+  struct stat buf;
   lt_dlhandle dl_handle;
   void *module_info;
   int flag;
@@ -60,6 +61,9 @@ _load_module(char *search_dir,
 
   memset(filebuf, '\0', CEREBRO_MAX_PATH_LEN+1);
   snprintf(filebuf, CEREBRO_MAX_PATH_LEN, "%s/%s", search_dir, filename);
+
+  if (stat(filebuf, &buf) < 0)
+    return 0;
 
   if (!(dl_handle = lt_dlopen(filebuf)))
     {
