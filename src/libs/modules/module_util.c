@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: module_util.c,v 1.9 2005-06-28 21:26:52 achu Exp $
+ *  $Id: module_util.c,v 1.10 2005-07-02 13:49:36 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -150,7 +150,7 @@ _find_known_module(char *search_dir,
                                        module_cb,
                                        module_info_sym,
                                        handle)) < 0)
-                return -1;
+                goto cleanup;
 
               if (flag)
                 {
@@ -165,6 +165,10 @@ _find_known_module(char *search_dir,
  out:
   closedir(dir);
   return (found) ? 1 : 0;
+
+ cleanup:
+  closedir(dir);
+  return -1;
 }
 
 /*
@@ -230,7 +234,7 @@ _find_unknown_modules(char *search_dir,
                                    module_cb,
                                    module_info_sym,
                                    handle)) < 0)
-            return -1;
+            goto cleanup;
           
           if (flag)
             found++;
@@ -243,6 +247,9 @@ _find_unknown_modules(char *search_dir,
  out:
   closedir(dir);
   return (found) ? 1 : 0;
+
+ cleanup:
+  return -1;
 }
 
 int 
