@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: module_util.c,v 1.10 2005-07-02 13:49:36 achu Exp $
+ *  $Id: module_util.c,v 1.11 2005-07-02 13:55:53 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -50,7 +50,7 @@ _load_module(char *search_dir,
   char filebuf[CEREBRO_MAX_PATH_LEN+1];
   lt_dlhandle dl_handle;
   void *module_info;
-  int flag, rv = -1;
+  int flag;
 
   if (!search_dir || !filename || !module_cb || !module_info_sym || !handle)
     {
@@ -89,7 +89,7 @@ _load_module(char *search_dir,
  cleanup:
   if (dl_handle)
     lt_dlclose(dl_handle);
-  return rv;
+  return -1;
 }
 
 /*
