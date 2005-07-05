@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_util.c,v 1.3 2005-06-27 17:59:45 achu Exp $
+ *  $Id: cerebro_util.c,v 1.4 2005-07-05 22:27:13 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -63,21 +63,9 @@ _cerebro_low_timeout_connect(cerebro_t handle,
   struct sockaddr_in servaddr;
   struct hostent *hptr;
  
-  if (!hostname)
+  if (!hostname || !port || !connect_timeout)
     {
-      CEREBRO_DBG(("hostname null"));
-      return -1;
-    }
-
-  if (!port)
-    {
-      CEREBRO_DBG(("port invalid"));
-      return -1;
-    }
-
-  if (!connect_timeout)
-    {
-      CEREBRO_DBG(("connect_timeout invalid"));
+      CEREBRO_DBG(("invalid parameters"));
       return -1;
     }
 
