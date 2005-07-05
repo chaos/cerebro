@@ -260,7 +260,7 @@ _receive_node_metric_responses(cerebro_t handle, void *list, int fd)
       struct cerebro_node_metric_response res;
       char buf[CEREBRO_MAX_PACKET_LEN];
       char nodename_buf[CEREBRO_MAX_NODENAME_LEN+1];
-      int bytes_read, header_len;
+      int bytes_read;
       unsigned int errnum;
 
       if ((bytes_read = receive_data(fd,
@@ -284,7 +284,7 @@ _receive_node_metric_responses(cerebro_t handle, void *list, int fd)
         goto cleanup;
 
 
-      if (header_len < CEREBRO_NODE_METRIC_RESPONSE_HEADER_LEN)
+      if (bytes_read < CEREBRO_NODE_METRIC_RESPONSE_HEADER_LEN)
         {
           handle->errnum = CEREBRO_ERR_PROTOCOL;
           goto cleanup;

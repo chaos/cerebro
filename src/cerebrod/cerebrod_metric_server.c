@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_server.c,v 1.7 2005-07-05 19:55:25 achu Exp $
+ *  $Id: cerebrod_metric_server.c,v 1.8 2005-07-05 21:01:24 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -86,16 +86,17 @@ _metric_name_response_marshall(struct cerebro_metric_name_response *res,
                                unsigned int buflen)
 {
   char *bufPtr;
-  int len = 0;
+  int bufPtrlen, len = 0;
 
   assert(res && buf && buflen >= CEREBRO_METRIC_NAME_RESPONSE_LEN);
 
   bufPtr = res->metric_name;
+  bufPtrlen = sizeof(res->metric_name);
   memset(buf, '\0', buflen);
   len += Marshall_int32(res->version, buf + len, buflen - len);
   len += Marshall_u_int32(res->err_code, buf + len, buflen - len);
   len += Marshall_u_int8(res->end, buf + len, buflen - len);
-  len += Marshall_buffer(bufPtr, sizeof(bufPtr), buf + len, buflen - len);
+  len += Marshall_buffer(bufPtr, bufPtrlen, buf + len, buflen - len);
   return len;
 }
 
@@ -111,7 +112,7 @@ _node_metric_response_marshall(struct cerebro_node_metric_response *res,
                                char *buf, 
                                unsigned int buflen)
 {
-  int c = 0;
+  int bufPtrlen, c = 0;
   char *bufPtr;
   void *mvalue;
   u_int32_t mtype, mlen;
@@ -121,10 +122,11 @@ _node_metric_response_marshall(struct cerebro_node_metric_response *res,
   memset(buf, '\0', buflen);
 
   bufPtr = res->nodename;
+  bufPtrlen = sizeof(res->nodename);
   c += Marshall_int32(res->version, buf + c, buflen - c);
   c += Marshall_u_int32(res->err_code, buf + c, buflen - c);
   c += Marshall_u_int8(res->end, buf + c, buflen - c);
-  c += Marshall_buffer(bufPtr, sizeof(bufPtr), buf + c, buflen - c);
+  c += Marshall_buffer(bufPtr, bufPtrlen, buf + c, buflen - c);
   c += Marshall_u_int32(res->metric_value_type, buf + c, buflen - c);
   c += Marshall_u_int32(res->metric_value_len, buf + c, buflen - c);
   
