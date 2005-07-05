@@ -7,8 +7,6 @@ Testing
 - api again
 
 Cleanup
-- in debugging, and set mod, lib, bin, etc. in userspace tools
-- not debugging, can't turn all that stuff on
 
 Portability
 - IPv6
