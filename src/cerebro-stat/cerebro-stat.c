@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro-stat.c,v 1.2 2005-07-05 22:25:06 achu Exp $
+ *  $Id: cerebro-stat.c,v 1.3 2005-07-05 23:33:33 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -122,6 +122,30 @@ _version(void)
   exit(1);
 }
 
+/* 
+ * _try_nice_err_exit
+ *
+ * Check for and output "nice" error messages for certain errnums
+ */
+static void
+_try_nice_err_exit(int errnum)
+{
+  if (errnum == CEREBRO_ERR_CONNECT)
+    err_exit("Cannot connect to server");
+  if (errnum == CEREBRO_ERR_CONNECT_TIMEOUT)
+    err_exit("Timeout connecting to server");
+  if (errnum == CEREBRO_ERR_HOSTNAME)
+    err_exit("Invalid hostname");
+  if (errnum == CEREBRO_ERR_VERSION_INCOMPATIBLE)
+    err_exit("Server version not compatible");
+  if (errnum == CEREBRO_ERR_METRIC_UNKNOWN)
+    err_exit("Unknown metric name specified");
+  if (errnum == CEREBRO_ERR_CONFIG_FILE)
+    err_exit("Error parsing configuration file");
+  if (errnum == CEREBRO_ERR_CONFIG_INPUT)
+    err_exit("Invalid configuration input found");
+}
+
 /*
  * _metric_list
  *
@@ -140,6 +164,8 @@ _metric_list(void)
   if (!(m = cerebro_get_metric_names(handle)))
     {
       char *msg = cerebro_strerror(cerebro_errnum(handle));
+
+      _try_nice_err_exit(cerebro_errnum(handle));
       err_exit("%s: cerebro_get_metric_names: %s", func, msg);
     }
   
@@ -195,11 +221,14 @@ _metric_data(void)
   List l = NULL;
   ListIterator litr = NULL;
   struct node_metric_data *data = NULL;
+  int cluster_nodes_flag = 0;
 
   if (!(n = cerebro_get_metric_data(handle, metric_name)))
     {
       char *msg = cerebro_strerror(cerebro_errnum(handle));
-      err_exit("%s: cerebro_get_metric_names: %s", func, msg);
+
+      _try_nice_err_exit(cerebro_errnum(handle));
+      err_exit("%s: cerebro_get_metric_data: %s", func, msg);
     }
   
   if (!(nitr = cerebro_nodelist_iterator_create(n)))
@@ -247,10 +276,20 @@ _metric_data(void)
   if (!(litr = list_iterator_create(l)))
     err_exit("%s: list_iterator_create: %s", func, strerror(errno));
 
+  /* Special case for metric "cluster_nodes" */
+  if (!strcmp(metric_name, CEREBRO_METRIC_CLUSTER_NODES))
+    cluster_nodes_flag++;
+
   while ((data = list_next(litr)))
     {
       unsigned int mtype, mlen;
       
+      if (cluster_nodes_flag)
+        {
+          fprintf(stdout, "%s\n", data->nodename);
+          continue;
+        }
+
       fprintf(stdout, "%s: ", data->nodename);
 
       mtype = data->metric_value_type;
@@ -259,10 +298,12 @@ _metric_data(void)
       if (mtype == CEREBRO_METRIC_VALUE_TYPE_NONE)
         {
 #if CEREBRO_DEBUG
-          if (!mlen)
+          if (mlen)
             err_exit("%s: invalid metric length: %d %d", func, mtype, mlen);
 #endif /* CEREBRO_DEBUG */
-          fprintf(stdout, "%s", NONE_STRING);
+
+          if (!cluster_nodes_flag)
+            fprintf(stdout, "%s", NONE_STRING);
         }
       else if (mtype == CEREBRO_METRIC_VALUE_TYPE_INT32)
         {
@@ -424,7 +465,7 @@ main(int argc, char *argv[])
 
   _cmdline_parse(argc, argv);
   
-  if (metric_list_flag)
+  if (metric_list_flag || !strcmp(metric_name, CEREBRO_METRIC_METRIC_NAMES))
     _metric_list();
 
   if (metric_name)

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: network_util.c,v 1.1 2005-07-01 17:24:46 achu Exp $
+ *  $Id: network_util.c,v 1.2 2005-07-05 23:33:33 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -100,7 +100,7 @@ receive_data(int fd,
       if (FD_ISSET(fd, &rfds))
         {
           int n;
-                                                                                              
+
           /* Don't use fd_read_n b/c it loops until exactly
            * bytes_to_read is read.  Due to version incompatability or
            * error packets, we may want to read a smaller packet.
@@ -116,6 +116,9 @@ receive_data(int fd,
           /* Pipe closed */
           if (!n)
             {
+              if (bytes_read)
+                goto out;
+              
               if (errnum)
                 *errnum = CEREBRO_ERR_PROTOCOL;
               goto cleanup;
