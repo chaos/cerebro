@@ -214,6 +214,7 @@ _metric_value_unmarshall(cerebro_t handle,
     }
 
   res->metric_value = mvalue;
+
   return buflen;
 
  cleanup:
@@ -340,7 +341,7 @@ _receive_node_metric_responses(cerebro_t handle, void *list, int fd)
               goto cleanup;
             }
 
-          res.metric_value = vbuf;
+          free(vbuf);
         }
       else
         res.metric_value = NULL;
