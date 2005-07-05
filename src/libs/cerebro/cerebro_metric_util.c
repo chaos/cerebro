@@ -69,7 +69,7 @@ _metric_request_marshall(cerebro_t handle,
                          char *buf,
                          unsigned int buflen)
 {
-  int n, c = 0;
+  int n, bufPtrlen, c = 0;
   char *bufPtr;
 
   if (!buf || buflen < CEREBRO_METRIC_REQUEST_PACKET_LEN)
@@ -90,7 +90,8 @@ _metric_request_marshall(cerebro_t handle,
   c += n;
 
   bufPtr = req->metric_name;
-  if ((n = marshall_buffer(bufPtr, sizeof(bufPtr), buf + c, buflen - c)) <= 0)
+  bufPtrlen = sizeof(req->metric_name);
+  if ((n = marshall_buffer(bufPtr, bufPtrlen, buf + c, buflen - c)) <= 0)
     {
       CEREBRO_DBG(("marshall_buffer"));
       handle->errnum = CEREBRO_ERR_INTERNAL;

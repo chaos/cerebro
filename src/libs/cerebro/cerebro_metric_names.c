@@ -38,7 +38,7 @@ _metric_name_response_unmarshall(cerebro_t handle,
                                  const char *buf,
                                  unsigned int buflen)
 {
-  int n, c = 0;
+  int n, bufPtrlen, c = 0;
   char *bufPtr;
 
   if (!res || !buf || buflen < CEREBRO_METRIC_NAME_RESPONSE_LEN)
@@ -73,7 +73,8 @@ _metric_name_response_unmarshall(cerebro_t handle,
   c += n;
 
   bufPtr = res->metric_name;
-  if ((n = unmarshall_buffer(bufPtr, sizeof(bufPtr), buf + c, buflen - c)) < 0)
+  bufPtrlen = sizeof(res->metric_name);
+  if ((n = unmarshall_buffer(bufPtr, bufPtrlen, buf + c, buflen - c)) < 0)
     {
       CEREBRO_DBG(("unmarshall_buffer"));
       handle->errnum = CEREBRO_ERR_INTERNAL;

@@ -40,7 +40,7 @@ _node_metric_response_header_unmarshall(cerebro_t handle,
                                         unsigned int buflen)
 {
   u_int32_t *mtypePtr, *mlenPtr;
-  int n, c = 0;
+  int n, bufPtrlen, c = 0;
   char *bufPtr;
 
   if (!res || !buf || buflen < CEREBRO_NODE_METRIC_RESPONSE_HEADER_LEN)
@@ -75,7 +75,8 @@ _node_metric_response_header_unmarshall(cerebro_t handle,
   c += n;
 
   bufPtr = res->nodename;
-  if ((n = unmarshall_buffer(bufPtr, sizeof(bufPtr), buf + c, buflen - c)) < 0)
+  bufPtrlen = sizeof(res->nodename);
+  if ((n = unmarshall_buffer(bufPtr, bufPtrlen, buf + c, buflen - c)) < 0)
     {
       CEREBRO_DBG(("unmarshall_buffer"));
       handle->errnum = CEREBRO_ERR_INTERNAL;

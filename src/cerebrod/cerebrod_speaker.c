@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.71 2005-07-01 16:22:31 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.72 2005-07-05 19:55:25 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -192,14 +192,15 @@ _heartbeat_marshall(struct cerebrod_heartbeat *hb,
                     unsigned int buflen)
 {
   char *bufPtr;
-  int i, c = 0;
+  int i, bufPtrlen, c = 0;
  
   assert(hb && buf && buflen >= CEREBROD_HEARTBEAT_HEADER_LEN);
   
   bufPtr = hb->nodename;
+  bufPtrlen = sizeof(hb->nodename);
   memset(buf, '\0', buflen);
   c += Marshall_int32(hb->version, buf + c, buflen - c);
-  c += Marshall_buffer(bufPtr, sizeof(bufPtr), buf + c, buflen - c);
+  c += Marshall_buffer(bufPtr, bufPtrlen, buf + c, buflen - c);
   c += Marshall_u_int32(hb->metrics_len, buf + c, buflen - c);
   
   if (!hb->metrics_len)
@@ -210,13 +211,15 @@ _heartbeat_marshall(struct cerebrod_heartbeat *hb,
       char *mname;
       u_int32_t mtype, mlen;
       void *mvalue;
+      int mnamelen;
 
       mname = hb->metrics[i]->metric_name;
+      mnamelen = sizeof(hb->metrics[i]->metric_name);
       mtype = hb->metrics[i]->metric_value_type;
       mlen = hb->metrics[i]->metric_value_len;
       mvalue = hb->metrics[i]->metric_value;
 
-      c += Marshall_buffer(mname, sizeof(mname), buf + c, buflen - c);
+      c += Marshall_buffer(mname, mnamelen, buf + c, buflen - c);
       c += Marshall_u_int32(mtype, buf + c, buflen - c);
       c += Marshall_u_int32(mlen, buf + c, buflen - c);
       

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_server.c,v 1.6 2005-07-01 16:22:31 achu Exp $
+ *  $Id: cerebrod_metric_server.c,v 1.7 2005-07-05 19:55:25 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -221,14 +221,15 @@ _metric_request_unmarshall(struct cerebro_metric_request *req,
                            const char *buf, 
                            unsigned int buflen)
 {
-  int c = 0;
+  int bufPtrlen, c = 0;
   char *bufPtr;
-
+  
   assert(req && buf);
 
   bufPtr = req->metric_name;
+  bufPtrlen = sizeof(req->metric_name);
   c += Unmarshall_int32(&(req->version), buf + c, buflen - c);
-  c += Unmarshall_buffer(bufPtr, sizeof(bufPtr), buf + c, buflen - c);
+  c += Unmarshall_buffer(bufPtr, bufPtrlen, buf + c, buflen - c);
   c += Unmarshall_u_int32(&(req->timeout_len), buf + c, buflen - c);
   c += Unmarshall_u_int32(&(req->flags), buf + c, buflen - c);
 
@@ -249,19 +250,19 @@ _metric_request_dump(struct cerebro_metric_request *req)
 #if CEREBRO_DEBUG
   assert(req);
 
-  if (conf.debug && conf.metric_server_debug)
-    {
-      Pthread_mutex_lock(&debug_output_mutex);
-      fprintf(stderr, "**************************************\n");
-      fprintf(stderr, "* Metric Request Received:\n");
-      fprintf(stderr, "* ------------------------\n");
-      fprintf(stderr, "* Version: %d\n", req->version);
-      fprintf(stderr, "* Metric_Name: %s\n", req->metric_name);
-      fprintf(stderr, "* Flags: %x\n", req->flags);
-      fprintf(stderr, "* Timeout_len: %d\n", req->timeout_len);
-      fprintf(stderr, "**************************************\n");
-      Pthread_mutex_unlock(&debug_output_mutex);
-    }
+  if (!(conf.debug && conf.metric_server_debug))
+    return;
+
+  Pthread_mutex_lock(&debug_output_mutex);
+  fprintf(stderr, "**************************************\n");
+  fprintf(stderr, "* Metric Request Received:\n");
+  fprintf(stderr, "* ------------------------\n");
+  fprintf(stderr, "* Version: %d\n", req->version);
+  fprintf(stderr, "* Metric_Name: %s\n", req->metric_name);
+  fprintf(stderr, "* Flags: %x\n", req->flags);
+  fprintf(stderr, "* Timeout_len: %d\n", req->timeout_len);
+  fprintf(stderr, "**************************************\n");
+  Pthread_mutex_unlock(&debug_output_mutex);
 #endif /* CEREBRO_DEBUG */
 }
 

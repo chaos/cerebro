@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.116 2005-06-30 22:43:59 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.117 2005-07-05 19:55:25 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -756,7 +756,7 @@ static void
 _cerebrod_config_dump(void)
 {
 #if CEREBRO_DEBUG
-  if (conf.debug)
+  if (!conf.debug)
     return;
 
   fprintf(stderr, "**************************************\n");

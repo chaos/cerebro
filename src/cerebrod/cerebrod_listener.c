@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.108 2005-07-01 16:22:31 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.109 2005-07-05 19:55:25 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -197,7 +197,7 @@ _cerebrod_heartbeat_unmarshall(const char *buf, unsigned int buflen)
   struct cerebrod_heartbeat_metric *hd = NULL;
   unsigned int size;
   char *bufPtr;
-  int i, n, c = 0;
+  int i, n, bufPtrlen, c = 0;
 
   assert(buf);
   
@@ -210,7 +210,8 @@ _cerebrod_heartbeat_unmarshall(const char *buf, unsigned int buflen)
   c += n;
 
   bufPtr = hb->nodename;
-  if (!(n = Unmarshall_buffer(bufPtr, sizeof(bufPtr), buf + c, buflen - c)))
+  bufPtrlen = sizeof(hb->nodename);
+  if (!(n = Unmarshall_buffer(bufPtr, bufPtrlen, buf + c, buflen - c)))
     goto cleanup;
   c += n;
   
@@ -241,15 +242,17 @@ _cerebrod_heartbeat_unmarshall(const char *buf, unsigned int buflen)
       u_int32_t mtype, mlen;
       void *mvalue;
       char *mname;
+      int mnamelen;
 
       hd = Malloc(sizeof(struct cerebrod_heartbeat_metric));
       memset(hd, '\0', sizeof(struct cerebrod_heartbeat_metric));
       
       mname = hd->metric_name;
-      mtypePtr = &(hd->metric_value_len);
+      mnamelen = sizeof(hd->metric_name);
+      mtypePtr = &(hd->metric_value_type);
       mlenPtr = &(hd->metric_value_len);
       
-      if (!(n = Unmarshall_buffer(mname, sizeof(mname), buf + c, buflen - c)))
+      if (!(n = Unmarshall_buffer(mname, mnamelen, buf + c, buflen - c)))
         goto cleanup;
       c += n;
       
@@ -394,10 +397,16 @@ cerebrod_listener(void *arg)
 	continue;
 
       if (_cerebrod_heartbeat_check_version(buf, recv_len) < 0)
-        continue;
+        {
+	  CEREBRO_DBG(("received invalid version packet"));
+          continue;
+        }
 
       if (!(hb = _cerebrod_heartbeat_unmarshall(buf, recv_len)))
-	continue;
+        {
+	  CEREBRO_DBG(("received unmarshallable packet"));
+          continue;
+        }
 
       _cerebrod_heartbeat_dump(hb);
       
