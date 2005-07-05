@@ -7,6 +7,10 @@ Testing
 - api again
 
 Cleanup
+- cerebro-stat
+   - flags
+   - output types?
+   - manpage
 
 Portability
 - IPv6
