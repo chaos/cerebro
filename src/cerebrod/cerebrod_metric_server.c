@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_server.c,v 1.9 2005-07-06 00:10:09 achu Exp $
+ *  $Id: cerebrod_metric_server.c,v 1.10 2005-07-06 23:55:33 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -757,6 +757,7 @@ _node_metric_evaluate(void *x, void *arg)
               Pthread_mutex_unlock(&(nd->node_data_lock));
               return -1;
             }
+          goto out;
         }
       
       if ((md = Hash_find(nd->metric_data, ed->metric_name)))

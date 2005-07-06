@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro-stat.c,v 1.5 2005-07-06 23:02:25 achu Exp $
+ *  $Id: cerebro-stat.c,v 1.6 2005-07-06 23:55:33 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -109,7 +109,7 @@ _usage(void)
           NONE_STRING, NONE_STRING);
 #if CEREBRO_DEBUG
   fprintf(stderr,
-          "  -d         --debug             Turn on debugging\n");
+          "  -d         Turn on debugging\n");
 #endif /* CEREBRO_DEBUG */
 
   fprintf(stderr, "\n");
@@ -129,6 +129,32 @@ _version(void)
 }
 
 /* 
+ * _cerebro_set_flags
+ *
+ * Set a cerebro flag
+ */
+static void
+_cerebro_set_flags(unsigned int new_flag)
+{
+  const char *func = __FUNCTION__;
+  int flags;
+
+  if ((flags = cerebro_get_flags(handle)) < 0)
+    {
+      char *msg = cerebro_strerror(cerebro_errnum(handle));
+      err_exit("%s: cerebro_get_flags: %s", func, msg);
+    }
+
+  flags |= new_flag;
+
+  if (cerebro_set_flags(handle, flags) < 0)
+    {
+      char *msg = cerebro_strerror(cerebro_errnum(handle));
+      err_exit("%s: cerebro_set_flags: %s", func, msg);
+    }
+}
+
+/* 
  * _cmdline_parse
  *
  * parse all cmdline input
@@ -139,7 +165,7 @@ _cmdline_parse(int argc, char **argv)
   const char *func = __FUNCTION__;
   char options[1024];
   char *ptr;
-  int flags, c;
+  int c;
 
 #if HAVE_GETOPT_LONG
   struct option loptions[] = 
@@ -207,43 +233,13 @@ _cmdline_parse(int argc, char **argv)
         metric_name = optarg;
         break;
       case 'U':
-        if ((flags = cerebro_get_flags(handle)) < 0)
-          {
-            char *msg = cerebro_strerror(cerebro_errnum(handle));
-            err_exit("%s: cerebro_get_flags: %s", func, msg);
-          }
-        flags |= CEREBRO_METRIC_FLAGS_UP_ONLY;
-        if (cerebro_set_flags(handle, flags) < 0)
-          {
-            char *msg = cerebro_strerror(cerebro_errnum(handle));
-            err_exit("%s: cerebro_set_flags: %s", func, msg);
-          }
+        _cerebro_set_flags(CEREBRO_METRIC_FLAGS_UP_ONLY);
         break;
       case 'D':
-        if ((flags = cerebro_get_flags(handle)) < 0)
-          {
-            char *msg = cerebro_strerror(cerebro_errnum(handle));
-            err_exit("%s: cerebro_get_flags: %s", func, msg);
-          }
-        flags |= CEREBRO_METRIC_FLAGS_NONE_IF_DOWN;
-        if (cerebro_set_flags(handle, flags) < 0)
-          {
-            char *msg = cerebro_strerror(cerebro_errnum(handle));
-            err_exit("%s: cerebro_set_flags: %s", func, msg);
-          }
+        _cerebro_set_flags(CEREBRO_METRIC_FLAGS_NONE_IF_DOWN);
         break;
       case 'N':
-        if ((flags = cerebro_get_flags(handle)) < 0)
-          {
-            char *msg = cerebro_strerror(cerebro_errnum(handle));
-            err_exit("%s: cerebro_get_flags: %s", func, msg);
-          }
-        flags |= CEREBRO_METRIC_FLAGS_NONE_IF_NOT_MONITORED;
-        if (cerebro_set_flags(handle, flags) < 0)
-          {
-            char *msg = cerebro_strerror(cerebro_errnum(handle));
-            err_exit("%s: cerebro_set_flags: %s", func, msg);
-          }
+        _cerebro_set_flags(CEREBRO_METRIC_FLAGS_NONE_IF_NOT_MONITORED);
         break;
 #if CEREBRO_DEBUG
       case 'd':
