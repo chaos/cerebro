@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_server.c,v 1.8 2005-07-05 21:01:24 achu Exp $
+ *  $Id: cerebrod_metric_server.c,v 1.9 2005-07-06 00:10:09 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -771,7 +771,7 @@ _node_metric_evaluate(void *x, void *arg)
               return -1;
             }
         }
-      else if (ed->req->flags & CEREBRO_METRIC_FLAGS_NONE_IF_NOEXIST)
+      else if (ed->req->flags & CEREBRO_METRIC_FLAGS_NONE_IF_NOT_MONITORED)
         {
           if (_node_metric_response_create(nd->nodename,
                                            CEREBRO_METRIC_VALUE_TYPE_NONE,

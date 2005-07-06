@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.9 2005-07-05 22:44:07 achu Exp $
+ *  $Id: cerebro.h,v 1.10 2005-07-06 00:10:09 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_H
@@ -38,10 +38,10 @@
  * Cerebro Flags
  */
 
-#define CEREBRO_METRIC_FLAGS_UP_ONLY              0x00000001
-#define CEREBRO_METRIC_FLAGS_NONE_IF_DOWN         0x00000002
-#define CEREBRO_METRIC_FLAGS_NONE_IF_NOEXIST      0x00000004
-#define CEREBRO_METRIC_FLAGS_MASK                 0x00000007
+#define CEREBRO_METRIC_FLAGS_UP_ONLY               0x00000001
+#define CEREBRO_METRIC_FLAGS_NONE_IF_DOWN          0x00000002
+#define CEREBRO_METRIC_FLAGS_NONE_IF_NOT_MONITORED 0x00000004
+#define CEREBRO_METRIC_FLAGS_MASK                  0x00000007
 
 /* 
  * Default available metrics

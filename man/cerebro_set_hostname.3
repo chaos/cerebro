@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro_set_hostname.3,v 1.7 2005-07-05 22:44:07 achu Exp $
+\."$Id: cerebro_set_hostname.3,v 1.8 2005-07-06 00:10:09 achu Exp $
 \."#############################################################################
 .TH CEREBRO_SET_HOSTNAME 3 "May 2005" "LLNL" "LIBCEREBRO"
 .SH "NAME"
@@ -49,7 +49,7 @@ metric server return the node to the user without a metric_value.
 This flag does not apply to any of the default metrics supplied by
 .BR cerebrod(8).
 
-CEREBRO_METRIC_FLAGS_NONE_IF_NOEXIST - By default, 
+CEREBRO_METRIC_FLAGS_NONE_IF_NOT_MONITORED - By default, 
 .BR cerebro_get_metric_data(3)
 will not return a cluster node if the cluster node is not currently
 monitoring the specified metric.  This flag alters this behavior to
