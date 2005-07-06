@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.71 2005-06-30 22:43:59 achu Exp $
+ *  $Id: cerebrod.c,v 1.72 2005-07-06 17:12:24 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -84,7 +84,7 @@ main(int argc, char **argv)
 
       /* Wait for initialization to complete */
       Pthread_mutex_lock(&metric_server_init_lock);
-      while (metric_server_init == 0)
+      while (!metric_server_init)
         Pthread_cond_wait(&metric_server_init_cond, &metric_server_init_lock);
       Pthread_mutex_unlock(&metric_server_init_lock);
     }
@@ -109,7 +109,7 @@ main(int argc, char **argv)
 
       /* Wait for initialization to complete */
       Pthread_mutex_lock(&listener_init_lock);
-      while (listener_init == 0)
+      while (!listener_init)
         Pthread_cond_wait(&listener_init_cond, &listener_init_lock);
       Pthread_mutex_unlock(&listener_init_lock);
     }

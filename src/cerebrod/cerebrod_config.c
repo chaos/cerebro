@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.117 2005-07-05 19:55:25 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.118 2005-07-06 17:12:24 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -491,7 +491,7 @@ _calculate_in_addr_and_index(char *intf, struct in_addr *in_addr, int *index)
 {
   void *buf = NULL, *ptr = NULL;
   int fd, mask = 0, found_interface = 0;
-  u_int32_t conf_masked_ip;
+  u_int32_t conf_masked_ip = 0;
   struct ifconf ifc;
   int intf_type;
 
