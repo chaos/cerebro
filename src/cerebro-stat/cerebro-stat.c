@@ -1,5 +1,5 @@
-/*****************************************************************************\
- *  $Id: cerebro-stat.c,v 1.3 2005-07-05 23:33:33 achu Exp $
+>/*****************************************************************************\
+ *  $Id: cerebro-stat.c,v 1.4 2005-07-06 23:00:52 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -22,7 +22,9 @@
 
 #include "cerebro.h"
 #include "cerebro/cerebro_constants.h"
+#if CEREBRO_DEBUG
 #include "cerebro/cerebro_error.h"
+#endif /* CEREBRO_DEBUG */
 
 #include "hostlist.h"
 #include "error.h"
@@ -95,12 +97,16 @@ _usage(void)
 {
   fprintf(stderr,
 	  "Usage: cerebro_stat [OPTIONS]...\n"
-	  "  -h         --help              Print help and exit\n"
-	  "  -v         --version           Print version and exit\n"
-	  "  -o STRING  --hostname=STRING   Cerebro server hostname\n"
-	  "  -p INT     --port=INT          Cerebro server port\n"
-          "  -l         --metric-list       List all available metrics\n"
-          "  -m STRING  --metric=STRING     Output metric data\n");        
+	  "  -h         Print help and exit\n"
+	  "  -v         Print version and exit\n"
+	  "  -o STRING  Cerebro server hostname\n"
+	  "  -p INT     Cerebro server port\n"
+          "  -l         List all available metrics\n"
+          "  -m STRING  Output metric data\n"
+          "  -U         Only output metrics from up nodes\n"
+          "  -D         Output '%s' for down nodes\n"
+          "  -N         Output '%s' for nodes not monitoring a metric\n",
+          NONE_STRING, NONE_STRING);
 #if CEREBRO_DEBUG
   fprintf(stderr,
           "  -d         --debug             Turn on debugging\n");
@@ -120,6 +126,142 @@ _version(void)
 {
   fprintf(stderr, "%s %s-%s\n", PROJECT, VERSION, RELEASE);
   exit(1);
+}
+
+/* 
+ * _cmdline_parse
+ *
+ * parse all cmdline input
+ */
+static void
+_cmdline_parse(int argc, char **argv) 
+{
+  const char *func = __FUNCTION__;
+  char options[1024];
+  char *ptr;
+  int flags, c;
+
+#if HAVE_GETOPT_LONG
+  struct option loptions[] = 
+    {
+      {"help",                  0, NULL, 'h'},
+      {"version",               0, NULL, 'v'},
+      {"hostname",              1, NULL, 'o'},
+      {"port",                  1, NULL, 'p'},
+      {"metric-list",           0, NULL, 'l'},
+      {"metric",                1, NULL, 'm'},
+      {"up-only",               0, NULL, 'U'},
+      {"none-if-down",          0, NULL, 'D'},
+      {"none-if-not-monitored", 0, NULL, 'N'},
+#if CEREBRO_DEBUG
+      {"debug",                 0, NULL, 'd'},
+#endif /* CEREBRO_DEBUG */
+      {0, 0, 0, 0},
+  };
+#endif /* HAVE_GETOPT_LONG */
+
+  assert(argv);
+
+  strcpy(options, "hvo:p:lm:UDN");
+#if CEREBRO_DEBUG
+  strcat(options, "d");
+#endif /* CEREBRO_DEBUG */
+
+  /* turn off output messages printed by getopt_long */
+  opterr = 0;
+
+#if HAVE_GETOPT_LONG
+  while ((c = getopt_long(argc, argv, options, loptions, NULL)) != -1)
+#else
+  while ((c = getopt(argc, argv, options)) != -1)
+#endif
+    {
+    switch(c) 
+      {
+      case 'h':
+        _usage();
+      case 'v':
+        _version();
+      case 'o':
+        hostname = optarg;
+        if (cerebro_set_hostname(handle, hostname) < 0)
+          {
+            char *msg = cerebro_strerror(cerebro_errnum(handle));
+            err_exit("%s: cerebro_set_hostname: %s", func, msg);
+          }
+        break;
+      case 'p':
+        port = strtol(optarg, &ptr, 10);
+        if (ptr != (optarg + strlen(optarg)))
+          err_exit("invalid port specified");
+        if (cerebro_set_port(handle, port) < 0)
+          {
+            char *msg = cerebro_strerror(cerebro_errnum(handle));
+            err_exit("%s: cerebro_set_port: %s", func, msg);
+          }
+        break;
+      case 'l':
+        metric_list_flag++;
+        break;
+      case 'm':
+        metric_name = optarg;
+        break;
+      case 'U':
+        if ((flags = cerebro_get_flags(handle)) < 0)
+          {
+            char *msg = cerebro_strerror(cerebro_errnum(handle));
+            err_exit("%s: cerebro_get_flags: %s", func, msg);
+          }
+        flags |= CEREBRO_METRIC_FLAGS_UP_ONLY;
+        if (cerebro_set_flags(handle, flags) < 0)
+          {
+            char *msg = cerebro_strerror(cerebro_errnum(handle));
+            err_exit("%s: cerebro_set_flags: %s", func, msg);
+          }
+        break;
+      case 'D':
+        if ((flags = cerebro_get_flags(handle)) < 0)
+          {
+            char *msg = cerebro_strerror(cerebro_errnum(handle));
+            err_exit("%s: cerebro_get_flags: %s", func, msg);
+          }
+        flags |= CEREBRO_METRIC_FLAGS_NONE_IF_DOWN;
+        if (cerebro_set_flags(handle, flags) < 0)
+          {
+            char *msg = cerebro_strerror(cerebro_errnum(handle));
+            err_exit("%s: cerebro_set_flags: %s", func, msg);
+          }
+        break;
+      case 'N':
+        if ((flags = cerebro_get_flags(handle)) < 0)
+          {
+            char *msg = cerebro_strerror(cerebro_errnum(handle));
+            err_exit("%s: cerebro_get_flags: %s", func, msg);
+          }
+        flags |= CEREBRO_METRIC_FLAGS_NONE_IF_NOT_MONITORED;
+        if (cerebro_set_flags(handle, flags) < 0)
+          {
+            char *msg = cerebro_strerror(cerebro_errnum(handle));
+            err_exit("%s: cerebro_set_flags: %s", func, msg);
+          }
+        break;
+#if CEREBRO_DEBUG
+      case 'd':
+        cerebro_err_set_flags(CEREBRO_ERROR_STDERR);
+        break;
+#endif /* CEREBRO_DEBUG */
+      default:
+      case '?':
+        fprintf(stderr, "command line option error\n");
+        _usage();
+      }
+    }
+
+  if (metric_list_flag && metric_name)
+    err_exit("Cannot specify both --metric-list and --metric options");
+
+  if (!metric_list_flag && !metric_name)
+    _usage();
 }
 
 /* 
@@ -301,9 +443,7 @@ _metric_data(void)
           if (mlen)
             err_exit("%s: invalid metric length: %d %d", func, mtype, mlen);
 #endif /* CEREBRO_DEBUG */
-
-          if (!cluster_nodes_flag)
-            fprintf(stdout, "%s", NONE_STRING);
+          fprintf(stdout, "%s", NONE_STRING);
         }
       else if (mtype == CEREBRO_METRIC_VALUE_TYPE_INT32)
         {
@@ -353,103 +493,9 @@ _metric_data(void)
       fprintf(stdout, "\n");
     }
 
-  /* cerebro_nodelist_destory() and list_destroy() Destroy iterators too */
+  /* list_destroy() and cerebro_nodelist_destory() destroy iterators too */
   (void)list_destroy(l);
   (void)cerebro_nodelist_destroy(n);
-}
-
-/* 
- * _cmdline_parse
- *
- * parse all cmdline input
- */
-static void
-_cmdline_parse(int argc, char **argv) 
-{
-  const char *func = __FUNCTION__;
-  char options[1024];
-  char *ptr;
-  int c;
-
-#if HAVE_GETOPT_LONG
-  struct option loptions[] = 
-    {
-      {"help",        0, NULL, 'h'},
-      {"version",     0, NULL, 'v'},
-      {"hostname",    1, NULL, 'o'},
-      {"port",        1, NULL, 'p'},
-      {"metric-list", 0, NULL, 'l'},
-      {"metric",      1, NULL, 'm'},
-#if CEREBRO_DEBUG
-      {"debug",       0, NULL, 'd'},
-#endif /* CEREBRO_DEBUG */
-      {0, 0, 0, 0},
-  };
-#endif /* HAVE_GETOPT_LONG */
-
-  assert(argv);
-
-  strcpy(options, "hvo:p:lm:");
-#if CEREBRO_DEBUG
-  strcat(options, "d");
-#endif /* CEREBRO_DEBUG */
-
-  /* turn off output messages printed by getopt_long */
-  opterr = 0;
-
-#if HAVE_GETOPT_LONG
-  while ((c = getopt_long(argc, argv, options, loptions, NULL)) != -1)
-#else
-  while ((c = getopt(argc, argv, options)) != -1)
-#endif
-    {
-    switch(c) 
-      {
-      case 'h':
-        _usage();
-      case 'v':
-        _version();
-      case 'o':
-        hostname = optarg;
-        if (cerebro_set_hostname(handle, hostname) < 0)
-          {
-            char *msg = cerebro_strerror(cerebro_errnum(handle));
-            err_exit("%s: cerebro_set_hostname: %s", func, msg);
-          }
-        break;
-      case 'p':
-        port = strtol(optarg, &ptr, 10);
-        if (ptr != (optarg + strlen(optarg)))
-          err_exit("invalid port specified");
-        if (cerebro_set_port(handle, port) < 0)
-          {
-            char *msg = cerebro_strerror(cerebro_errnum(handle));
-            err_exit("%s: cerebro_set_port: %s", func, msg);
-          }
-        break;
-      case 'l':
-        metric_list_flag++;
-        break;
-      case 'm':
-        metric_name = optarg;
-        break;
-#if CEREBRO_DEBUG
-      case 'd':
-        cerebro_err_set_flags(CEREBRO_ERROR_STDERR);
-        break;
-#endif /* CEREBRO_DEBUG */
-      default:
-      case '?':
-        fprintf(stderr, "command line option error\n");
-        _usage();
-      }
-    }
-
-  if (metric_list_flag && metric_name)
-    err_exit("Cannot specify both --metric-list and --metric options");
-
-  if (!metric_list_flag && !metric_name)
-    _usage();
 }
 
 int 

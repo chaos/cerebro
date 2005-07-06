@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.72 2005-07-06 17:12:24 achu Exp $
+ *  $Id: cerebrod.c,v 1.73 2005-07-06 23:00:52 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -19,6 +19,8 @@
 #include "cerebrod_speaker.h"
 
 #include "wrappers.h"
+
+#define CEREBROD_THREAD_STACKSIZE  (1024*1024)
 
 #if CEREBRO_DEBUG
 /*  
@@ -79,6 +81,7 @@ main(int argc, char **argv)
 
       Pthread_attr_init(&attr);
       Pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+      Pthread_attr_setstacksize(&attr, CEREBROD_THREAD_STACKSIZE);
       Pthread_create(&thread, &attr, cerebrod_metric_server, NULL);
       Pthread_attr_destroy(&attr);
 
@@ -103,6 +106,7 @@ main(int argc, char **argv)
 
           Pthread_attr_init(&attr);
           Pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+          Pthread_attr_setstacksize(&attr, CEREBROD_THREAD_STACKSIZE);
           Pthread_create(&thread, &attr, cerebrod_listener, NULL);
           Pthread_attr_destroy(&attr);
         }
@@ -122,6 +126,7 @@ main(int argc, char **argv)
 
       Pthread_attr_init(&attr);
       Pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+      Pthread_attr_setstacksize(&attr, CEREBROD_THREAD_STACKSIZE);
       Pthread_create(&thread, &attr, cerebrod_speaker, NULL);
       Pthread_attr_destroy(&attr);
     }

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metriclist_util.c,v 1.5 2005-06-28 20:58:32 achu Exp $
+ *  $Id: cerebro_metriclist_util.c,v 1.6 2005-07-06 23:00:52 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -101,7 +101,7 @@ int
 _cerebro_metriclist_append(cerebro_metriclist_t metriclist, 
                            const char *metric_name)
 {
-  char *str;
+  char *str = NULL;
 
   if (_cerebro_metriclist_check(metriclist) < 0)
     return -1;

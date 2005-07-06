@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.h,v 1.5 2005-06-29 21:55:17 achu Exp $
+ *  $Id: wrappers.h,v 1.6 2005-07-06 23:00:52 achu Exp $
 \*****************************************************************************/
 
 #ifndef _WRAPPERS_H
@@ -172,6 +172,8 @@ int wrap_gettimeofday(WRAPPERS_ARGS, struct timeval *tv, struct timezone *tz);
         wrap_pthread_attr_destroy(WRAPPERS_DEBUG_ARGS, attr)
 #define Pthread_attr_setdetachstate(attr, detachstate) \
         wrap_pthread_attr_setdetachstate(WRAPPERS_DEBUG_ARGS, attr, detachstate)
+#define Pthread_attr_setstacksize(attr, stacksize) \
+        wrap_pthread_attr_setstacksize(WRAPPERS_DEBUG_ARGS, attr, stacksize)
 #define Pthread_mutex_lock(mutex) \
         wrap_pthread_mutex_lock(WRAPPERS_DEBUG_ARGS, mutex)
 #define Pthread_mutex_trylock(mutex) \
@@ -189,6 +191,7 @@ int wrap_pthread_create(WRAPPERS_ARGS, pthread_t *thread, pthread_attr_t *attr, 
 int wrap_pthread_attr_init(WRAPPERS_ARGS, pthread_attr_t *attr);
 int wrap_pthread_attr_destroy(WRAPPERS_ARGS, pthread_attr_t *attr);
 int wrap_pthread_attr_setdetachstate(WRAPPERS_ARGS, pthread_attr_t *attr, int detachstate);
+int wrap_pthread_attr_setstacksize(WRAPPERS_ARGS, pthread_attr_t *attr, size_t stacksize);
 int wrap_pthread_mutex_lock(WRAPPERS_ARGS, pthread_mutex_t *mutex);
 int wrap_pthread_mutex_trylock(WRAPPERS_ARGS, pthread_mutex_t *mutex);
 int wrap_pthread_mutex_unlock(WRAPPERS_ARGS, pthread_mutex_t *mutex);

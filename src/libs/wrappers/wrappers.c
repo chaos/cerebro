@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.c,v 1.7 2005-06-29 21:55:17 achu Exp $
+ *  $Id: wrappers.c,v 1.8 2005-07-06 23:00:52 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -561,6 +561,22 @@ wrap_pthread_attr_setdetachstate(WRAPPERS_ARGS, pthread_attr_t *attr, int detach
 
   if ((rv = pthread_attr_setdetachstate(attr, detachstate)) != 0)
     WRAPPERS_ERR_MSG("pthread_attr_setdetachstate", strerror(rv));
+
+  return rv;
+}
+
+int 
+wrap_pthread_attr_setstacksize(WRAPPERS_ARGS, pthread_attr_t *attr, size_t stacksize)
+{
+  int rv;
+  
+  assert(file && function);
+
+  if (!attr || stacksize < PTHREAD_STACK_MIN)
+    WRAPPERS_ERR_INVALID_PARAMETERS("pthread_attr_setstacksize");
+
+  if ((rv = pthread_attr_setstacksize(attr, stacksize)) != 0)
+    WRAPPERS_ERR_MSG("pthread_attr_setstacksize", strerror(rv));
 
   return rv;
 }
