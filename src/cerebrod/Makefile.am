@@ -1,10 +1,11 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.61 2005-06-30 17:39:56 achu Exp $
+## $Id: Makefile.am,v 1.62 2005-07-07 21:48:34 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
 
-noinst_HEADERS = cerebrod_config.h \
+noinst_HEADERS = cerebrod.h \
+		 cerebrod_config.h \
                  cerebrod_daemon.h \
 		 cerebrod_heartbeat.h \
 		 cerebrod_listener.h \

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker_data.c,v 1.16 2005-07-01 00:31:41 achu Exp $
+ *  $Id: cerebrod_speaker_data.c,v 1.17 2005-07-07 21:48:34 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -22,6 +22,7 @@
 #include "cerebro/cerebro_constants.h"
 #include "cerebro/cerebrod_heartbeat_protocol.h"
 
+#include "cerebrod.h"
 #include "cerebrod_config.h"
 #include "cerebrod_speaker_data.h"
 
@@ -158,6 +159,7 @@ _setup_metric_modules(void)
           
           Pthread_attr_init(&attr);
           Pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+          Pthread_attr_setstacksize(&attr, CEREBROD_THREAD_STACKSIZE);
           Pthread_create(&thread, &attr, metric_module->thread_pointer, NULL);
           Pthread_attr_destroy(&attr);
         }

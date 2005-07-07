@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_server.c,v 1.10 2005-07-06 23:55:33 achu Exp $
+ *  $Id: cerebrod_metric_server.c,v 1.11 2005-07-07 21:48:34 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -18,6 +18,7 @@
 #include "cerebro/cerebro_constants.h"
 #include "cerebro/cerebro_metric_protocol.h"
 
+#include "cerebrod.h"
 #include "cerebrod_config.h"
 #include "cerebrod_listener_data.h"
 #include "cerebrod_metric_server.h"
@@ -39,7 +40,7 @@ extern hash_t metric_name_index;
 extern pthread_mutex_t listener_data_lock;
 extern pthread_mutex_t metric_name_lock;
 
-#define CEREBROD_METRIC_BACKLOG           10
+#define CEREBROD_METRIC_SERVER_BACKLOG 10
 
 /*
  * metric_server_init
@@ -1026,7 +1027,7 @@ _metric_server_setup_socket(void)
       return -1;
     }
 
-  if (listen(fd, CEREBROD_METRIC_BACKLOG) < 0)
+  if (listen(fd, CEREBROD_METRIC_SERVER_BACKLOG) < 0)
     {
       CEREBRO_DBG(("listen: %s", strerror(errno)));
       return -1;
@@ -1073,6 +1074,7 @@ cerebrod_metric_server(void *arg)
       /* Pass off connection to thread */
       Pthread_attr_init(&attr);
       Pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+      Pthread_attr_setstacksize(&attr, CEREBROD_THREAD_STACKSIZE);
       arg = Malloc(sizeof(int));
       *arg = fd;
       Pthread_create(&thread, &attr, _service_connection, (void *)arg);

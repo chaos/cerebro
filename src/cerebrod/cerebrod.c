@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.73 2005-07-06 23:00:52 achu Exp $
+ *  $Id: cerebrod.c,v 1.74 2005-07-07 21:48:34 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -12,6 +12,7 @@
 
 #include "cerebro/cerebro_error.h"
 
+#include "cerebrod.h"
 #include "cerebrod_daemon.h"
 #include "cerebrod_config.h"
 #include "cerebrod_listener.h"
@@ -19,8 +20,6 @@
 #include "cerebrod_speaker.h"
 
 #include "wrappers.h"
-
-#define CEREBROD_THREAD_STACKSIZE  (1024*1024)
 
 #if CEREBRO_DEBUG
 /*  
