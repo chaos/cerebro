@@ -6,6 +6,8 @@
 
 	* Added cerebro-stat manpage.
 
+	* cerebro.spec.in: Updated.
+
 	* tagged cerebro-1-0-0-pre4
 	
 2005-07-06  Albert Chu  <chu11@llnl.gov>

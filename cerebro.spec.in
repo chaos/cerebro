@@ -29,19 +29,19 @@ Conflicts: ganglia-monitor-core
 Cerebro is a collection of cluster monitoring tools and libraries.
 
 %if %{?_with_chaos:1}%{!?_with_chaos:0}
-%define _with_gendersllnl  --with-gendersllnl
-%define _without_genders   --without-genders
-%define _without_hostsfile --without-hostsfile
-%define _with_slurm_state  --with-slurm-state
+%define _with_gendersllnl    --with-gendersllnl
+%define _without_genders     --without-genders
+%define _without_hostsfile   --without-hostsfile
+%define _without_slurm_state --without-slurm-state
 %ifarch ia64
-%define _with_boottime     --with-boottime
-%define _with_bootlog      --with-bootlog
+%define _with_boottime       --with-boottime
+%define _with_bootlog        --with-bootlog
 %else
-%define _without_boottime  --without-boottime
-%define _without_bootlog   --without-bootlog
+%define _without_boottime    --without-boottime
+%define _without_bootlog     --without-bootlog
 %endif
 %else
-%{!?_with_gendersllnl: %{!?_without_gendersllnl: %define _with_gendersllnl --with-gen\dersllnl}}
+%{!?_with_gendersllnl: %{!?_without_gendersllnl: %define _with_gendersllnl --with-gendersllnl}}
 %{!?_with_genders: %{!?_without_genders: %define _with_genders --with-genders}}
 %{!?_with_hostsfile: %{!?_without_hostsfile: %define _with_hostsfile --with-hostsfile}}
 %{!?_with_boottime: %{!?_without_boottime: %define _with_boottime --with-boottime}}
@@ -112,6 +112,8 @@ Bootlog monitoring module(s).
            %{?_without_hostsfile} \
            %{?_with_boottime} \
            %{?_without_boottime} \
+           %{?_with_slurm_state} \
+           %{?_without_slurm_state} \
            %{?_with_bootlog} \
            %{?_without_bootlog} \
            %{?_enable_debug}
@@ -160,7 +162,6 @@ fi
 %if %{?_with_chaos:1}%{!?_with_chaos:0}
 %{_libdir}/cerebro/cerebro_clusterlist*
 %{_libdir}/cerebro/cerebro_config*
-%{_libdir}/cerebro/cerebro_metric_slurm_state*
 %endif
 
 %if %{?_with_chaos:0}%{!?_with_chaos:1}
