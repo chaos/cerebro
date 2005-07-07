@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.48 2005-07-05 19:55:25 achu Exp $
+## $Id: configure.ac,v 1.49 2005-07-07 16:37:28 achu Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -158,6 +158,7 @@ AC_CONFIG_FILES( \
   etc/Makefile \
   man/Makefile \
   man/cerebro.1 \
+  man/cerebro-stat.8 \
   man/cerebrod.8 \
   man/cerebro_module.3 \
   man/cerebro_module_devel.3 \
