@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro-stat.c,v 1.7 2005-07-07 16:10:15 achu Exp $
+ *  $Id: cerebro-stat.c,v 1.8 2005-07-07 16:28:34 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -116,8 +116,8 @@ _usage(void)
 	  "Usage: cerebro_stat [OPTIONS]...\n"
 	  "  -h         Print help and exit\n"
 	  "  -v         Print version and exit\n"
-	  "  -o STRING  Cerebro server hostname\n"
-	  "  -p INT     Cerebro server port\n"
+	  "  -o STRING  Cerebro metric server hostname\n"
+	  "  -p INT     Cerebro metric server port\n"
           "  -l         List all available metrics\n"
           "  -m STRING  Output metric data\n"
           "  -U         Only output metrics from up nodes\n"
