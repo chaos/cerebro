@@ -1,10 +1,10 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.2 2005-07-07 16:10:15 achu Exp $
+## $Id: Makefile.am,v 1.3 2005-07-07 19:35:26 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
 
-bin_PROGRAMS = cerebro-stat
+sbin_PROGRAMS = cerebro-stat
 cerebro_stat_SOURCES = cerebro-stat.c
 cerebro_stat_CFLAGS  = -I $(srcdir)/../libs/include \
 		       -I $(srcdir)/../libs/common \

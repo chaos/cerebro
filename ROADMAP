@@ -1,6 +1,5 @@
-cerebro-1-0-0-pre4
+cerebro-1-0-0-pre5
 - library/server to monitor new metrics
   - uncache metrics?
-
-cerebro-1-0-0-pre5
-- command line tools
+- server control
+- admin tool
