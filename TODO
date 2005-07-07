@@ -22,6 +22,7 @@ Design
 - how remove metric data?
   - Behlendo Request: Way to force most up to date data
   - Will require speaker to listen for "control" packets.
+    - should be multicast?
 - strerror_r and errormsg_r funcs
 - generic err message buffer in cerebro_t handle, i.e for conffile errors
 - use tables instead of lists in speaker_data to sort faster
