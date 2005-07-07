@@ -2,15 +2,15 @@ Name:    @PROJECT@
 Version: @VERSION@
 %if %{?_with_chaos:1}%{!?_with_chaos:0}
 %if %{?_with_debug:1}%{!?_with_debug:0}
-%define release @RELEASE@chaos.debug
+Release: @RELEASE@chaos.debug
 %else
-%define release @RELEASE@chaos
+Release: @RELEASE@chaos
 %endif
 %else
-%if %{?_with_debug:1}%{!?_with_debug:0}
-%define release @RELEASE@.debug
-%else
-%define release @RELEASE@
+%if %{?_with_debug:1}%{!?_with_debug:0} 
+Release: @RELEASE@.debug
+%else 
+Release: @RELEASE@
 %endif
 %endif
 
