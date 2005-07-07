@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.h,v 1.6 2005-07-06 23:00:52 achu Exp $
+ *  $Id: wrappers.h,v 1.7 2005-07-07 16:10:15 achu Exp $
 \*****************************************************************************/
 
 #ifndef _WRAPPERS_H
@@ -49,9 +49,10 @@
 #include <dirent.h>
 
 #include "error.h"
-#include "ltdl.h"
-#include "list.h"
 #include "hash.h"
+#include "hostlist.h"
+#include "list.h"
+#include "ltdl.h"
 #include "marshall.h"
 
 #define WRAPPERS_DEBUG_ARGS \
@@ -291,7 +292,7 @@ void wrap_list_iterator_destroy(WRAPPERS_ARGS, ListIterator i);
 #define Hash_destroy(h) \
         wrap_hash_destroy(WRAPPERS_DEBUG_ARGS, h)
 
-hash_t wrap_hash_create (WRAPPERS_ARGS, int size, hash_key_f key_f, hash_cmp_f cmp_f, hash_del_f del_f);
+hash_t wrap_hash_create(WRAPPERS_ARGS, int size, hash_key_f key_f, hash_cmp_f cmp_f, hash_del_f del_f);
 int wrap_hash_count(WRAPPERS_ARGS, hash_t h);
 void *wrap_hash_find(WRAPPERS_ARGS, hash_t h, const void *key);
 void *wrap_hash_insert(WRAPPERS_ARGS, hash_t h, const void *key, void *data);
@@ -299,6 +300,32 @@ void *wrap_hash_remove (WRAPPERS_ARGS, hash_t h, const void *key);
 int wrap_hash_delete_if(WRAPPERS_ARGS, hash_t h, hash_arg_f argf, void *arg);
 int wrap_hash_for_each(WRAPPERS_ARGS, hash_t h, hash_arg_f argf, void *arg);
 void wrap_hash_destroy(WRAPPERS_ARGS, hash_t h);
+
+/* 
+ * Hostlist lib wrappers 
+ */
+#define Hostlist_create(hostlist) \
+        wrap_hostlist_create(WRAPPERS_DEBUG_ARGS, hostlist)
+#define Hostlist_destroy(hl) \
+        wrap_hostlist_destroy(WRAPPERS_DEBUG_ARGS, hl)
+#define Hostlist_sort(hl) \
+        wrap_hostlist_sort(WRAPPERS_DEBUG_ARGS, hl)
+#define Hostlist_uniq(hl) \
+        wrap_hostlist_uniq(WRAPPERS_DEBUG_ARGS, hl)
+#define Hostlist_push(hl, hosts) \
+        wrap_hostlist_push(WRAPPERS_DEBUG_ARGS, hl, hosts)
+#define Hostlist_ranged_string(hl, n, buf) \
+        wrap_hostlist_ranged_string(WRAPPERS_DEBUG_ARGS, hl, n, buf)
+#define Hostlist_deranged_string(hl, n, buf) \
+        wrap_hostlist_deranged_string(WRAPPERS_DEBUG_ARGS, hl, n, buf)
+
+hostlist_t wrap_hostlist_create(WRAPPERS_ARGS, const char *hostlist);
+void wrap_hostlist_destroy(WRAPPERS_ARGS, hostlist_t hl);
+void wrap_hostlist_sort(WRAPPERS_ARGS, hostlist_t hl);
+void wrap_hostlist_uniq(WRAPPERS_ARGS, hostlist_t hl);
+int wrap_hostlist_push(WRAPPERS_ARGS, hostlist_t hl, const char *host);
+size_t wrap_hostlist_ranged_string(WRAPPERS_ARGS, hostlist_t hl, size_t n, char *buf);
+size_t wrap_hostlist_deranged_string(WRAPPERS_ARGS, hostlist_t hl, size_t n, char *buf);
 
 /* 
  * Marshall wrappers
