@@ -14,7 +14,7 @@
 #include <errno.h>
 
 #include "cerebro.h"
-#include "cerebro/cerebro_metric_protocol.h"
+#include "cerebro/cerebro_metric_server_protocol.h"
 
 #include "cerebro_api.h"
 #include "cerebro_config_util.h"
@@ -26,28 +26,28 @@
 #include "marshall.h"
 
 /*
- * _metric_protocol_err_code_conversion
+ * _metric_server_protocol_err_code_conversion
  *
  * Convert metric protocol err codes to API err codes
  *
  * Returns proper err code
  */
 static int
-_metric_protocol_err_code_conversion(u_int32_t err_code)
+_metric_server_protocol_err_code_conversion(u_int32_t err_code)
 {
   switch(err_code)
     {
-    case CEREBRO_METRIC_PROTOCOL_ERR_SUCCESS:
+    case CEREBRO_METRIC_SERVER_PROTOCOL_ERR_SUCCESS:
       return CEREBRO_ERR_SUCCESS;
-    case CEREBRO_METRIC_PROTOCOL_ERR_VERSION_INVALID:
+    case CEREBRO_METRIC_SERVER_PROTOCOL_ERR_VERSION_INVALID:
       return CEREBRO_ERR_VERSION_INCOMPATIBLE;
-    case CEREBRO_METRIC_PROTOCOL_ERR_PACKET_INVALID:
+    case CEREBRO_METRIC_SERVER_PROTOCOL_ERR_PACKET_INVALID:
       return CEREBRO_ERR_PROTOCOL;
-    case CEREBRO_METRIC_PROTOCOL_ERR_METRIC_UNKNOWN:
+    case CEREBRO_METRIC_SERVER_PROTOCOL_ERR_METRIC_UNKNOWN:
       return CEREBRO_ERR_METRIC_UNKNOWN;
-    case CEREBRO_METRIC_PROTOCOL_ERR_PARAMETER_INVALID:
+    case CEREBRO_METRIC_SERVER_PROTOCOL_ERR_PARAMETER_INVALID:
       return CEREBRO_ERR_PROTOCOL;
-    case CEREBRO_METRIC_PROTOCOL_ERR_INTERNAL_ERROR:
+    case CEREBRO_METRIC_SERVER_PROTOCOL_ERR_INTERNAL_ERROR:
       CEREBRO_DBG(("server internal system error"));
       return CEREBRO_ERR_INTERNAL;
     default:
@@ -143,7 +143,7 @@ _metric_request_send(cerebro_t handle,
       return -1;
     }
 
-  req.version = CEREBRO_METRIC_PROTOCOL_VERSION;
+  req.version = CEREBRO_METRIC_SERVER_PROTOCOL_VERSION;
   strncpy(req.metric_name, metric_name, CEREBRO_MAX_METRIC_NAME_LEN);
   req.flags = flags;
   req.timeout_len = timeout_len;
@@ -193,7 +193,7 @@ _get_metric_data(cerebro_t handle,
   if ((fd = _cerebro_low_timeout_connect(handle,
                                          hostname,
                                          port,
-                                         CEREBRO_METRIC_PROTOCOL_CONNECT_TIMEOUT_LEN)) < 0)
+                                         CEREBRO_METRIC_SERVER_PROTOCOL_CONNECT_TIMEOUT_LEN)) < 0)
     goto cleanup;
   
   if (_metric_request_send(handle,
@@ -264,7 +264,7 @@ _cerebro_metric_get_data(cerebro_t handle,
           timeout_len = handle->config_data.cerebro_timeout_len;
         }
       else
-        timeout_len = CEREBRO_METRIC_TIMEOUT_LEN_DEFAULT;
+        timeout_len = CEREBRO_METRIC_SERVER_TIMEOUT_LEN_DEFAULT;
     }
   else
     timeout_len = handle->timeout_len;
@@ -280,7 +280,7 @@ _cerebro_metric_get_data(cerebro_t handle,
             }
           flags = handle->config_data.cerebro_flags;
         }
-      flags = CEREBRO_METRIC_FLAGS_DEFAULT;
+      flags = CEREBRO_METRIC_SERVER_FLAGS_DEFAULT;
     }
   else
     flags = handle->flags;
@@ -380,15 +380,15 @@ _cerebro_metric_response_check(cerebro_t handle,
     }
   len += n;
   
-  if (version != CEREBRO_METRIC_PROTOCOL_VERSION)
+  if (version != CEREBRO_METRIC_SERVER_PROTOCOL_VERSION)
     {
       handle->errnum = CEREBRO_ERR_VERSION_INCOMPATIBLE;
       return -1;
     }
 
-  if (err_code != CEREBRO_METRIC_PROTOCOL_ERR_SUCCESS)
+  if (err_code != CEREBRO_METRIC_SERVER_PROTOCOL_ERR_SUCCESS)
     {
-      handle->errnum = _metric_protocol_err_code_conversion(err_code);
+      handle->errnum = _metric_server_protocol_err_code_conversion(err_code);
       return -1;
     }
   

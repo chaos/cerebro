@@ -1,3 +1,8 @@
+2005-07-08  Albert Chu  <chu11@llnl.gov>
+
+	* Re-named 'metric_protocol' to 'metric_server_protocol' globally
+	in preparation of new features being added in.
+	
 2005-07-07  Albert Chu  <chu11@llnl.gov>
 
 	* Completed cerebro-stat tool.

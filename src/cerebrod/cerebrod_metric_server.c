@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_server.c,v 1.11 2005-07-07 21:48:34 achu Exp $
+ *  $Id: cerebrod_metric_server.c,v 1.12 2005-07-08 18:38:48 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -16,7 +16,7 @@
 
 #include "cerebro.h"
 #include "cerebro/cerebro_constants.h"
-#include "cerebro/cerebro_metric_protocol.h"
+#include "cerebro/cerebro_metric_server_protocol.h"
 
 #include "cerebrod.h"
 #include "cerebrod_config.h"
@@ -205,7 +205,7 @@ _metric_request_check_version(const char *buf,
       return -1;
     }
 
-  if (*version != CEREBRO_METRIC_PROTOCOL_VERSION)
+  if (*version != CEREBRO_METRIC_SERVER_PROTOCOL_VERSION)
     return -1;
 
   return 0;
@@ -372,8 +372,8 @@ _respond_with_error(int fd, int32_t version, u_int32_t err_code)
   struct cerebro_metric_err_response res;
 
   assert(fd >= 0
-         && err_code >= CEREBRO_METRIC_PROTOCOL_ERR_VERSION_INVALID
-	 && err_code <= CEREBRO_METRIC_PROTOCOL_ERR_INTERNAL_ERROR);
+         && err_code >= CEREBRO_METRIC_SERVER_PROTOCOL_ERR_VERSION_INVALID
+	 && err_code <= CEREBRO_METRIC_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
   
   memset(&res, '\0', CEREBRO_METRIC_ERR_RESPONSE_LEN);
   res.version = version;
@@ -431,9 +431,9 @@ _metric_name_response_create(char *metric_name, List metric_name_responses)
     }
   memset(res, '\0', sizeof(struct cerebro_metric_name_response));
   
-  res->version = CEREBRO_METRIC_PROTOCOL_VERSION;
-  res->err_code = CEREBRO_METRIC_PROTOCOL_ERR_SUCCESS;
-  res->end = CEREBRO_METRIC_PROTOCOL_IS_NOT_LAST_RESPONSE;
+  res->version = CEREBRO_METRIC_SERVER_PROTOCOL_VERSION;
+  res->err_code = CEREBRO_METRIC_SERVER_PROTOCOL_ERR_SUCCESS;
+  res->end = CEREBRO_METRIC_SERVER_PROTOCOL_IS_NOT_LAST_RESPONSE;
   /* strncpy, b/c terminating character not required */
   strncpy(res->metric_name, metric_name, CEREBRO_MAX_METRIC_NAME_LEN);
  
@@ -515,7 +515,7 @@ _respond_with_metric_names(int fd, struct cerebro_metric_request *req)
       Pthread_mutex_unlock(&metric_name_lock);
       _respond_with_error(fd, 
                           req->version, 
-                          CEREBRO_METRIC_PROTOCOL_ERR_INTERNAL_ERROR);
+                          CEREBRO_METRIC_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
       goto cleanup;
     }
 
@@ -527,7 +527,7 @@ _respond_with_metric_names(int fd, struct cerebro_metric_request *req)
       Pthread_mutex_unlock(&metric_name_lock);
       _respond_with_error(fd,
                           req->version,
-                          CEREBRO_METRIC_PROTOCOL_ERR_INTERNAL_ERROR);
+                          CEREBRO_METRIC_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
       goto cleanup;
     }
 
@@ -540,7 +540,7 @@ _respond_with_metric_names(int fd, struct cerebro_metric_request *req)
         {
           _respond_with_error(fd,
                               req->version,
-                              CEREBRO_METRIC_PROTOCOL_ERR_INTERNAL_ERROR);
+                              CEREBRO_METRIC_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
           goto cleanup;
         }
     }
@@ -549,9 +549,9 @@ _respond_with_metric_names(int fd, struct cerebro_metric_request *req)
 
   /* Send end response */
   memset(&end_res, '\0', sizeof(struct cerebro_metric_name_response));
-  end_res.version = CEREBRO_METRIC_PROTOCOL_VERSION;
-  end_res.err_code = CEREBRO_METRIC_PROTOCOL_ERR_SUCCESS;
-  end_res.end = CEREBRO_METRIC_PROTOCOL_IS_LAST_RESPONSE;
+  end_res.version = CEREBRO_METRIC_SERVER_PROTOCOL_VERSION;
+  end_res.err_code = CEREBRO_METRIC_SERVER_PROTOCOL_ERR_SUCCESS;
+  end_res.end = CEREBRO_METRIC_SERVER_PROTOCOL_IS_LAST_RESPONSE;
 
   if (_metric_name_response_send(fd, &end_res) < 0)
     return -1;
@@ -632,9 +632,9 @@ _node_metric_response_create(char *nodename,
     }
   memset(res, '\0', sizeof(struct cerebro_node_metric_response));
 
-  res->version = CEREBRO_METRIC_PROTOCOL_VERSION;
-  res->err_code = CEREBRO_METRIC_PROTOCOL_ERR_SUCCESS;
-  res->end = CEREBRO_METRIC_PROTOCOL_IS_NOT_LAST_RESPONSE;
+  res->version = CEREBRO_METRIC_SERVER_PROTOCOL_VERSION;
+  res->err_code = CEREBRO_METRIC_SERVER_PROTOCOL_ERR_SUCCESS;
+  res->end = CEREBRO_METRIC_SERVER_PROTOCOL_IS_NOT_LAST_RESPONSE;
   /* strncpy, b/c terminating character not required */
   strncpy(res->nodename, nodename, CEREBRO_MAX_NODENAME_LEN);
       
@@ -844,7 +844,7 @@ _respond_with_nodes(int fd,
       Pthread_mutex_unlock(&listener_data_lock);
       _respond_with_error(fd,
                           req->version,
-                          CEREBRO_METRIC_PROTOCOL_ERR_INTERNAL_ERROR);
+                          CEREBRO_METRIC_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
       goto cleanup;
     }
 
@@ -860,7 +860,7 @@ _respond_with_nodes(int fd,
       Pthread_mutex_unlock(&listener_data_lock);
       _respond_with_error(fd,
                           req->version,
-                          CEREBRO_METRIC_PROTOCOL_ERR_INTERNAL_ERROR);
+                          CEREBRO_METRIC_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
       goto cleanup;
     }
 
@@ -873,7 +873,7 @@ _respond_with_nodes(int fd,
         {
           _respond_with_error(fd,
                               req->version,
-                              CEREBRO_METRIC_PROTOCOL_ERR_INTERNAL_ERROR);
+                              CEREBRO_METRIC_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
           goto cleanup;
         }
     }
@@ -881,9 +881,9 @@ _respond_with_nodes(int fd,
  end_response:
   /* Send end response */
   memset(&end_res, '\0', sizeof(struct cerebro_node_metric_response));
-  end_res.version = CEREBRO_METRIC_PROTOCOL_VERSION;
-  end_res.err_code = CEREBRO_METRIC_PROTOCOL_ERR_SUCCESS;
-  end_res.end = CEREBRO_METRIC_PROTOCOL_IS_LAST_RESPONSE;
+  end_res.version = CEREBRO_METRIC_SERVER_PROTOCOL_VERSION;
+  end_res.err_code = CEREBRO_METRIC_SERVER_PROTOCOL_ERR_SUCCESS;
+  end_res.end = CEREBRO_METRIC_SERVER_PROTOCOL_IS_LAST_RESPONSE;
 
   if (_node_metric_response_send(fd, &end_res) < 0)
     return -1;
@@ -924,7 +924,7 @@ _service_connection(void *arg)
                                CEREBRO_METRIC_REQUEST_PACKET_LEN,
                                buf,
                                CEREBRO_MAX_PACKET_LEN,
-                               CEREBRO_METRIC_PROTOCOL_CLIENT_TIMEOUT_LEN,
+                               CEREBRO_METRIC_SERVER_PROTOCOL_CLIENT_TIMEOUT_LEN,
                                NULL)) < 0)
     goto cleanup;
 
@@ -935,7 +935,7 @@ _service_connection(void *arg)
     {
       _respond_with_error(fd, 
                           version,
-                          CEREBRO_METRIC_PROTOCOL_ERR_VERSION_INVALID);
+                          CEREBRO_METRIC_SERVER_PROTOCOL_ERR_VERSION_INVALID);
       goto cleanup;
     }
 
@@ -943,7 +943,7 @@ _service_connection(void *arg)
     {
       _respond_with_error(fd, 
                           version,
-                          CEREBRO_METRIC_PROTOCOL_ERR_PACKET_INVALID);
+                          CEREBRO_METRIC_SERVER_PROTOCOL_ERR_PACKET_INVALID);
       goto cleanup;
     }
 
@@ -951,7 +951,7 @@ _service_connection(void *arg)
     {
       _respond_with_error(fd, 
                           version,
-                          CEREBRO_METRIC_PROTOCOL_ERR_PACKET_INVALID);
+                          CEREBRO_METRIC_SERVER_PROTOCOL_ERR_PACKET_INVALID);
       goto cleanup;
     } 
 
@@ -967,13 +967,13 @@ _service_connection(void *arg)
       Pthread_mutex_unlock(&metric_name_lock);
       _respond_with_error(fd,
                           req.version,
-                          CEREBRO_METRIC_PROTOCOL_ERR_METRIC_UNKNOWN);
+                          CEREBRO_METRIC_SERVER_PROTOCOL_ERR_METRIC_UNKNOWN);
       goto cleanup;
     }
   Pthread_mutex_unlock(&metric_name_lock);
   
   if (!req.timeout_len)
-    req.timeout_len = CEREBRO_METRIC_TIMEOUT_LEN_DEFAULT;
+    req.timeout_len = CEREBRO_METRIC_SERVER_TIMEOUT_LEN_DEFAULT;
   
   if (!strcmp(metric_name_buf, CEREBRO_METRIC_METRIC_NAMES))
     {

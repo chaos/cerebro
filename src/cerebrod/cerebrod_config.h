@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.h,v 1.49 2005-06-22 20:30:09 achu Exp $
+ *  $Id: cerebrod_config.h,v 1.50 2005-07-08 18:38:48 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_CONFIG_H
@@ -11,7 +11,7 @@
 
 #include <netinet/in.h>
 
-#include "cerebro/cerebro_metric_protocol.h"
+#include "cerebro/cerebro_metric_server_protocol.h"
 
 #define CEREBROD_DEBUG_DEFAULT                        0
 #define CEREBROD_HEARTBEAT_FREQUENCY_MIN_DEFAULT      10

@@ -17,7 +17,7 @@
 #include "cerebro_clusterlist_util.h"
 #include "cerebro_nodelist_util.h"
 #include "cerebro_util.h"
-#include "cerebro/cerebro_metric_protocol.h"
+#include "cerebro/cerebro_metric_server_protocol.h"
 
 #include "cerebro_metric_util.h"
 
@@ -268,7 +268,7 @@ _receive_node_metric_responses(cerebro_t handle, void *list, int fd)
                                      CEREBRO_NODE_METRIC_RESPONSE_HEADER_LEN,
                                      buf,
                                      CEREBRO_MAX_PACKET_LEN,
-                                     CEREBRO_METRIC_PROTOCOL_CLIENT_TIMEOUT_LEN,
+                                     CEREBRO_METRIC_SERVER_PROTOCOL_CLIENT_TIMEOUT_LEN,
                                      &errnum)) < 0)
         {
           handle->errnum = errnum;
@@ -320,7 +320,7 @@ _receive_node_metric_responses(cerebro_t handle, void *list, int fd)
                                           res.metric_value_len,
                                           vbuf,
                                           res.metric_value_len,
-                                          CEREBRO_METRIC_PROTOCOL_CLIENT_TIMEOUT_LEN,
+                                          CEREBRO_METRIC_SERVER_PROTOCOL_CLIENT_TIMEOUT_LEN,
                                           &errnum)) < 0)
             {
               handle->errnum = errnum;
@@ -346,7 +346,7 @@ _receive_node_metric_responses(cerebro_t handle, void *list, int fd)
       else
         res.metric_value = NULL;
 
-      if (res.end == CEREBRO_METRIC_PROTOCOL_IS_LAST_RESPONSE)
+      if (res.end == CEREBRO_METRIC_SERVER_PROTOCOL_IS_LAST_RESPONSE)
         {
           if (res.metric_value)
             {

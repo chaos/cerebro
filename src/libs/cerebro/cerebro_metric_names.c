@@ -16,7 +16,7 @@
 #include "cerebro_api.h"
 #include "cerebro_metriclist_util.h"
 #include "cerebro_util.h"
-#include "cerebro/cerebro_metric_protocol.h"
+#include "cerebro/cerebro_metric_server_protocol.h"
 
 #include "cerebro_metric_util.h"
 
@@ -136,7 +136,7 @@ _receive_metric_name_responses(cerebro_t handle, void *list, int fd)
                                      CEREBRO_METRIC_NAME_RESPONSE_LEN,
                                      buf,
                                      CEREBRO_MAX_PACKET_LEN,
-                                     CEREBRO_METRIC_PROTOCOL_CLIENT_TIMEOUT_LEN,
+                                     CEREBRO_METRIC_SERVER_PROTOCOL_CLIENT_TIMEOUT_LEN,
                                      &errnum)) < 0)
         {
           handle->errnum = errnum;
@@ -165,7 +165,7 @@ _receive_metric_name_responses(cerebro_t handle, void *list, int fd)
                                            bytes_read) < 0)
         goto cleanup;
 
-      if (res.end == CEREBRO_METRIC_PROTOCOL_IS_LAST_RESPONSE)
+      if (res.end == CEREBRO_METRIC_SERVER_PROTOCOL_IS_LAST_RESPONSE)
         break;
 
       /* Guarantee ending '\0' character */
