@@ -8,6 +8,8 @@
 	* re-worked cerebrod for metric server protocol change
 
 	* tagged pre-metric-server-protocol-rework-1-a
+
+	* re-worked cerebro lib for metric server protocol change
 	
 2005-07-07  Albert Chu  <chu11@llnl.gov>
 

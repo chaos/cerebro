@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_server.c,v 1.13 2005-07-08 21:59:26 achu Exp $
+ *  $Id: cerebrod_metric_server.c,v 1.14 2005-07-08 23:10:03 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -658,6 +658,7 @@ _respond_with_metric_names(int fd, struct cerebro_metric_server_request *req)
 {
   struct cerebrod_metric_name_evaluation_data ed;
   List responses = NULL;
+  int rv = -1;
 
   assert(fd >= 0 && req);
 
@@ -708,13 +709,11 @@ _respond_with_metric_names(int fd, struct cerebro_metric_server_request *req)
   if (_send_end_response(fd) < 0)
     goto cleanup;
 
-  list_destroy(responses);
-  return 0;
-
+  rv = 0;
  cleanup:
   if (responses)
     list_destroy(responses);
-  return -1;
+  return rv;
 }
 
 /* 
@@ -747,6 +746,7 @@ _respond_with_nodes(int fd,
   struct cerebrod_metric_data_evaluation_data ed;
   struct timeval tv;
   List responses = NULL;
+  int rv = -1;
 
   assert(fd >= 0 && req && metric_name);
 
@@ -801,13 +801,11 @@ _respond_with_nodes(int fd,
   if (_send_end_response(fd) < 0)
     goto cleanup;
 
-  list_destroy(responses);
-  return 0;
-
+  rv = 0;
  cleanup:
   if (responses)
     list_destroy(responses);
-  return -1;
+  return rv;
 }
 
 /* 

@@ -1,19 +1,22 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_util.h,v 1.8 2005-07-01 20:14:23 achu Exp $
+ *  $Id: cerebro_metric_util.h,v 1.9 2005-07-08 23:10:03 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_METRIC_UTIL_H
 #define _CEREBRO_METRIC_UTIL_H
 
 #include "cerebro.h"
+#include "cerebro/cerebro_metric_server_protocol.h"
 
 /* 
- * Cerebro_metric_response_receive
+ * Cerebro_metric_receive_response
  *
  * Function to call after the metric request has been sent
  */
-typedef int (*Cerebro_metric_response_receive)(cerebro_t handle,
+typedef int (*Cerebro_metric_receive_response)(cerebro_t handle,
                                                void *list,
+                                               struct cerebro_metric_server_response *res,
+                                               unsigned int bytes_read,
                                                int fd);
 
 /* 
@@ -26,18 +29,6 @@ typedef int (*Cerebro_metric_response_receive)(cerebro_t handle,
 int _cerebro_metric_get_data(cerebro_t handle,
                              void *list,
                              const char *metric_name,
-                             Cerebro_metric_response_receive response_receive);
-
-/*
- * _cerebro_metric_response_check
- *
- * Check that the version and error code are good prior to unmarshalling
- *
- * Returns 0 on success, -1 on error
- */
-int _cerebro_metric_response_check(cerebro_t handle, 
-                                   const char *buf, 
-                                   unsigned int buflen);
-
+                             Cerebro_metric_receive_response receive_response);
 
 #endif /* _CEREBRO_METRIC_UTIL_H */

@@ -24,6 +24,7 @@
 #include "debug.h"
 #include "fd.h"
 #include "marshall.h"
+#include "network_util.h"
 
 /*
  * _metric_server_protocol_err_code_conversion
@@ -57,22 +58,22 @@ _metric_server_protocol_err_code_conversion(u_int32_t err_code)
 }
 
 /*
- * _metric_request_marshall
+ * _metric_server_request_marshall
  *
  * Marshall contents of a metric server request
  *
  * Returns length written to buffer on success, -1 on error
  */
 static int
-_metric_request_marshall(cerebro_t handle,
-                         struct cerebro_metric_request *req,
-                         char *buf,
-                         unsigned int buflen)
+_metric_server_request_marshall(cerebro_t handle,
+                                struct cerebro_metric_server_request *req,
+                                char *buf,
+                                unsigned int buflen)
 {
   int n, bufPtrlen, c = 0;
   char *bufPtr;
 
-  if (!buf || buflen < CEREBRO_METRIC_REQUEST_PACKET_LEN)
+  if (!buf || buflen < CEREBRO_METRIC_SERVER_REQUEST_PACKET_LEN)
     {
       CEREBRO_DBG(("invalid parameters"));
       handle->errnum = CEREBRO_ERR_INTERNAL;
@@ -119,20 +120,20 @@ _metric_request_marshall(cerebro_t handle,
 }
 
 /*
- * _metric_request_send
+ * _metric_server_request_send
  *
  * Send the metric request
  *
  * Returns 0 on success, -1 on error
  */
 static int
-_metric_request_send(cerebro_t handle,
-                     int fd,
-                     const char *metric_name,
-                     unsigned int timeout_len,
-                     int flags)
+_metric_server_request_send(cerebro_t handle,
+                            int fd,
+                            const char *metric_name,
+                            unsigned int timeout_len,
+                            int flags)
 {
-  struct cerebro_metric_request req;
+  struct cerebro_metric_server_request req;
   char buf[CEREBRO_MAX_PACKET_LEN];
   int req_len;
 
@@ -148,16 +149,161 @@ _metric_request_send(cerebro_t handle,
   req.flags = flags;
   req.timeout_len = timeout_len;
 
-  if ((req_len = _metric_request_marshall(handle,
-                                          &req,
-                                          buf,
-                                          CEREBRO_MAX_PACKET_LEN)) < 0)
+  if ((req_len = _metric_server_request_marshall(handle,
+                                                 &req,
+                                                 buf,
+                                                 CEREBRO_MAX_PACKET_LEN)) < 0)
     return -1;
 
   if (fd_write_n(fd, buf, req_len) < 0)
     {
       CEREBRO_DBG(("fd_write_n: %s", strerror(errno)));
       handle->errnum = CEREBRO_ERR_INTERNAL;
+      return -1;
+    }
+
+  return 0;
+}
+
+/*
+ * _metric_response_check
+ *
+ * Check that the version and error code are good prior to
+ * unmarshalling
+ *
+ * Returns 0 on success, -1 on error
+ */
+static int
+_metric_server_response_check(cerebro_t handle, 
+                               const char *buf, 
+                               unsigned int buflen)
+{
+  int n, len = 0;
+  int32_t version;
+  u_int32_t err_code;
+
+  if ((n = unmarshall_int32(&version, buf + len, buflen - len)) < 0)
+    {
+      CEREBRO_DBG(("unmarshall_int32"));
+      handle->errnum = CEREBRO_ERR_INTERNAL;
+      return -1;
+    }
+
+  if (!n)
+    {
+      handle->errnum = CEREBRO_ERR_PROTOCOL;
+      return -1;
+    }
+  len += n;
+
+  if ((n = unmarshall_u_int32(&err_code, buf + len, buflen - len)) < 0)
+    {
+      CEREBRO_DBG(("unmarshall_u_int32"));
+      handle->errnum = CEREBRO_ERR_INTERNAL;
+      return -1;
+    }
+
+  if (!n)
+    {
+      handle->errnum = CEREBRO_ERR_PROTOCOL;
+      return -1;
+    }
+  len += n;
+  
+  if (version != CEREBRO_METRIC_SERVER_PROTOCOL_VERSION)
+    {
+      handle->errnum = CEREBRO_ERR_VERSION_INCOMPATIBLE;
+      return -1;
+    }
+
+  if (err_code != CEREBRO_METRIC_SERVER_PROTOCOL_ERR_SUCCESS)
+    {
+      handle->errnum = _metric_server_protocol_err_code_conversion(err_code);
+      return -1;
+    }
+  
+  return 0;
+}
+
+/*
+ * _metric_server_response_header_unmarshall
+ *
+ * Unmarshall contents of a metric server response header
+ *
+ * Returns 0 on success, -1 on error
+ */
+static int
+_metric_server_response_header_unmarshall(cerebro_t handle,
+                                          struct cerebro_metric_server_response *res,
+                                          const char *buf,
+                                          unsigned int buflen)
+{
+  u_int32_t *mtypePtr, *mlenPtr;
+  int n, bufPtrlen, c = 0;
+  char *bufPtr;
+
+  if (!res || !buf || buflen < CEREBRO_METRIC_SERVER_RESPONSE_HEADER_LEN)
+    {
+      CEREBRO_DBG(("invalid pointers"));
+      handle->errnum = CEREBRO_ERR_INTERNAL;
+      return -1;
+    }
+
+  if ((n = unmarshall_int32(&(res->version), buf + c, buflen - c)) < 0)
+    {
+      CEREBRO_DBG(("unmarshall_int32"));
+      handle->errnum = CEREBRO_ERR_INTERNAL;
+      return -1;
+    }
+  c += n;
+
+  if ((n = unmarshall_u_int32(&(res->err_code), buf + c, buflen - c)) < 0)
+    {
+      CEREBRO_DBG(("unmarshall_u_int32"));
+      handle->errnum = CEREBRO_ERR_INTERNAL;
+      return -1;
+    }
+  c += n;
+
+  if ((n = unmarshall_u_int8(&(res->end), buf + c, buflen - c)) < 0)
+    {
+      CEREBRO_DBG(("unmarshall_u_int8"));
+      handle->errnum = CEREBRO_ERR_INTERNAL;
+      return -1;
+    }
+  c += n;
+
+  bufPtr = res->name;
+  bufPtrlen = sizeof(res->name);
+  if ((n = unmarshall_buffer(bufPtr, bufPtrlen, buf + c, buflen - c)) < 0)
+    {
+      CEREBRO_DBG(("unmarshall_buffer"));
+      handle->errnum = CEREBRO_ERR_INTERNAL;
+      return -1;
+    }
+  c += n;
+
+  mtypePtr = &(res->metric_value_type);
+  if ((n = unmarshall_u_int32(mtypePtr, buf + c,  buflen - c)) < 0)
+    {
+      CEREBRO_DBG(("unmarshall_u_int32"));
+      handle->errnum = CEREBRO_ERR_INTERNAL;
+      return -1;
+    }
+  c += n;
+  
+  mlenPtr = &(res->metric_value_len);
+  if ((n = unmarshall_u_int32(mlenPtr, buf + c, buflen - c)) < 0)
+    {
+      CEREBRO_DBG(("unmarshall_u_int32"));
+      handle->errnum = CEREBRO_ERR_INTERNAL;
+      return -1;
+    }
+  c += n;
+
+  if (c != CEREBRO_METRIC_SERVER_RESPONSE_HEADER_LEN)
+    {
+      handle->errnum = CEREBRO_ERR_PROTOCOL;
       return -1;
     }
 
@@ -179,11 +325,11 @@ _get_metric_data(cerebro_t handle,
                  unsigned int port,
                  unsigned int timeout_len,
                  int flags,
-                 Cerebro_metric_response_receive response_receive)
+                 Cerebro_metric_receive_response receive_response)
 {
   int fd = -1, rv = -1;
                                                                   
-  if (!metric_name || !hostname || !response_receive)
+  if (!metric_name || !hostname || !receive_response)
     {
       CEREBRO_DBG(("invalid parameters"));
       handle->errnum = CEREBRO_ERR_INTERNAL;
@@ -196,16 +342,61 @@ _get_metric_data(cerebro_t handle,
                                          CEREBRO_METRIC_SERVER_PROTOCOL_CONNECT_TIMEOUT_LEN)) < 0)
     goto cleanup;
   
-  if (_metric_request_send(handle,
-                           fd,
-                           metric_name,
-                           timeout_len,
-                           flags) < 0)
+  if (_metric_server_request_send(handle,
+                                  fd,
+                                  metric_name,
+                                  timeout_len,
+                                  flags) < 0)
     goto cleanup;
 
-  if (response_receive(handle, list, fd) < 0)
-    goto cleanup;
-  
+  while (1)
+    {
+      struct cerebro_metric_server_response res;
+      char buf[CEREBRO_MAX_PACKET_LEN];
+      char nodename_buf[CEREBRO_MAX_NODENAME_LEN+1];
+      int bytes_read;
+      unsigned int errnum;
+
+      if ((bytes_read = receive_data(fd,
+                                     CEREBRO_METRIC_SERVER_RESPONSE_HEADER_LEN,
+                                     buf,
+                                     CEREBRO_MAX_PACKET_LEN,
+                                     CEREBRO_METRIC_SERVER_PROTOCOL_CLIENT_TIMEOUT_LEN,
+                                     &errnum)) < 0)
+        {
+          handle->errnum = errnum;
+          goto cleanup;
+        }
+
+      if (bytes_read < CEREBRO_METRIC_SERVER_ERR_RESPONSE_LEN)
+        {
+          handle->errnum = CEREBRO_ERR_PROTOCOL;
+          goto cleanup;
+        }
+
+      if (_metric_server_response_check(handle, buf, bytes_read) < 0)
+        goto cleanup;
+
+
+      if (bytes_read < CEREBRO_METRIC_SERVER_RESPONSE_HEADER_LEN)
+        {
+          handle->errnum = CEREBRO_ERR_PROTOCOL;
+          goto cleanup;
+        }
+
+      if (_metric_server_response_header_unmarshall(handle, 
+                                                    &res, 
+                                                    buf, 
+                                                    bytes_read) < 0)
+        goto cleanup;
+     
+      if (res.end == CEREBRO_METRIC_SERVER_PROTOCOL_IS_LAST_RESPONSE)
+        break;
+
+      if (receive_response(handle, list, &res, bytes_read, fd) < 0)
+        goto cleanup;
+    }
+ 
   rv = 0;
  cleanup:
   close(fd);
@@ -216,7 +407,7 @@ int
 _cerebro_metric_get_data(cerebro_t handle,
                          void *list,
                          const char *metric_name,
-                         Cerebro_metric_response_receive response_receive)
+                         Cerebro_metric_receive_response receive_response)
 {
   unsigned int port;
   unsigned int timeout_len;
@@ -225,7 +416,7 @@ _cerebro_metric_get_data(cerebro_t handle,
   if (_cerebro_handle_check(handle) < 0)
     return -1;
 
-  if (!list || !metric_name || !response_receive)
+  if (!list || !metric_name || !receive_response)
     {
       CEREBRO_DBG(("invalid parameters"));
       handle->errnum = CEREBRO_ERR_INTERNAL;
@@ -300,7 +491,7 @@ _cerebro_metric_get_data(cerebro_t handle,
                                          port,
                                          timeout_len,
                                          flags,
-                                         response_receive)) < 0)
+                                         receive_response)) < 0)
                 continue;
               break;
             }
@@ -323,7 +514,7 @@ _cerebro_metric_get_data(cerebro_t handle,
                                port,
                                timeout_len,
                                flags,
-                               response_receive) < 0)
+                               receive_response) < 0)
             return -1;
         }
     }
@@ -336,61 +527,10 @@ _cerebro_metric_get_data(cerebro_t handle,
                            port,
                            timeout_len,
                            flags,
-                           response_receive) < 0)
+                           receive_response) < 0)
         return -1;
     }
   
   return 0;
 }
 
-int
-_cerebro_metric_response_check(cerebro_t handle, 
-                               const char *buf, 
-                               unsigned int buflen)
-{
-  int n, len = 0;
-  int32_t version;
-  u_int32_t err_code;
-
-  if ((n = unmarshall_int32(&version, buf + len, buflen - len)) < 0)
-    {
-      CEREBRO_DBG(("unmarshall_int32"));
-      handle->errnum = CEREBRO_ERR_INTERNAL;
-      return -1;
-    }
-
-  if (!n)
-    {
-      handle->errnum = CEREBRO_ERR_PROTOCOL;
-      return -1;
-    }
-  len += n;
-
-  if ((n = unmarshall_u_int32(&err_code, buf + len, buflen - len)) < 0)
-    {
-      CEREBRO_DBG(("unmarshall_u_int32"));
-      handle->errnum = CEREBRO_ERR_INTERNAL;
-      return -1;
-    }
-
-  if (!n)
-    {
-      handle->errnum = CEREBRO_ERR_PROTOCOL;
-      return -1;
-    }
-  len += n;
-  
-  if (version != CEREBRO_METRIC_SERVER_PROTOCOL_VERSION)
-    {
-      handle->errnum = CEREBRO_ERR_VERSION_INCOMPATIBLE;
-      return -1;
-    }
-
-  if (err_code != CEREBRO_METRIC_SERVER_PROTOCOL_ERR_SUCCESS)
-    {
-      handle->errnum = _metric_server_protocol_err_code_conversion(err_code);
-      return -1;
-    }
-  
-  return 0;
-}
