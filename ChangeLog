@@ -14,6 +14,9 @@
 	* tagged post-metric-server-protocol-rework-1
 
 	* tagged pre-metric-control-protocol-1
+
+	* src/libs/include/cerebro/cerebro_metric_control_protocol.h: New
+	file.
 	
 2005-07-07  Albert Chu  <chu11@llnl.gov>
 
