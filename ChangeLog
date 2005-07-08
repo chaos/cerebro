@@ -4,6 +4,10 @@
 	in preparation of new features being added in.
 
 	* tagged pre-metric-server-protocol-rework-1
+
+	* re-worked cerebrod for metric server protocol change
+
+	* tagged pre-metric-server-protoco-rework-1-a
 	
 2005-07-07  Albert Chu  <chu11@llnl.gov>
 

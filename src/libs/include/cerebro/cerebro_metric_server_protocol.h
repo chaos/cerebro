@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_server_protocol.h,v 1.1 2005-07-08 18:38:48 achu Exp $
+ *  $Id: cerebro_metric_server_protocol.h,v 1.2 2005-07-08 21:59:26 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_METRIC_SERVER_PROTOCOL_H
@@ -31,7 +31,7 @@
  *   message.
  */
 
-#define CEREBRO_METRIC_SERVER_PROTOCOL_VERSION               3
+#define CEREBRO_METRIC_SERVER_PROTOCOL_VERSION               4
 #define CEREBRO_METRIC_SERVER_PROTOCOL_SERVER_TIMEOUT_LEN    3
 #define CEREBRO_METRIC_SERVER_PROTOCOL_CLIENT_TIMEOUT_LEN    5
 #define CEREBRO_METRIC_SERVER_PROTOCOL_CONNECT_TIMEOUT_LEN   5
@@ -51,11 +51,11 @@
 #define CEREBRO_METRIC_SERVER_FLAGS_DEFAULT                  0
 
 /*
- * struct cerebro_metric_request
+ * struct cerebro_metric_server_request
  *
  * defines a metric server data request
  */
-struct cerebro_metric_request
+struct cerebro_metric_server_request
 {
   int32_t version;
   char metric_name[CEREBRO_MAX_METRIC_NAME_LEN];
@@ -63,64 +63,47 @@ struct cerebro_metric_request
   u_int32_t flags;
 };
   
-#define CEREBRO_METRIC_REQUEST_PACKET_LEN  (sizeof(int32_t) \
-                                            + CEREBRO_MAX_METRIC_NAME_LEN \
-                                            + sizeof(u_int32_t) \
-                                            + sizeof(u_int32_t))
+#define CEREBRO_METRIC_SERVER_REQUEST_PACKET_LEN  (sizeof(int32_t) \
+                                                   + CEREBRO_MAX_METRIC_NAME_LEN \
+                                                   + sizeof(u_int32_t) \
+                                                   + sizeof(u_int32_t))
 
 /*
- * struct cerebro_metric_name_response
+ * struct cerebro_metric_server_response
  *
- * defines a metric server data response
+ * defines a metric server data response.  The 'name' field may
+ * contain a metric name or a nodename.
  */
-struct cerebro_metric_name_response
+struct cerebro_metric_server_response
 {
   int32_t version;
   u_int32_t err_code;
   u_int8_t end;
-  char metric_name[CEREBRO_MAX_METRIC_NAME_LEN];
-};
-  
-#define CEREBRO_METRIC_NAME_RESPONSE_LEN  (sizeof(int32_t) \
-                                           + sizeof(u_int32_t) \
-                                           + sizeof(u_int8_t) \
-                                           + CEREBRO_MAX_METRIC_NAME_LEN)
-
-/*
- * struct cerebro_node_metric_response
- *
- * defines a metric server data response
- */
-struct cerebro_node_metric_response
-{
-  int32_t version;
-  u_int32_t err_code;
-  u_int8_t end;
-  char nodename[CEREBRO_MAX_NODENAME_LEN];
+  char name[CEREBRO_MAX_NAME_LEN];
   u_int32_t metric_value_type;
   u_int32_t metric_value_len;
   void *metric_value;
 };
   
-#define CEREBRO_NODE_METRIC_RESPONSE_HEADER_LEN  (sizeof(int32_t) \
-                                                  + sizeof(u_int32_t) \
-                                                  + sizeof(u_int8_t) \
-                                                  + CEREBRO_MAX_NODENAME_LEN \
-                                                  + sizeof(u_int32_t) \
-                                                  + sizeof(u_int32_t))
+#define CEREBRO_METRIC_SERVER_RESPONSE_HEADER_LEN  (sizeof(int32_t) \
+                                                    + sizeof(u_int32_t) \
+                                                    + sizeof(u_int8_t) \
+                                                    + CEREBRO_MAX_NAME_LEN \
+                                                    + sizeof(u_int32_t) \
+                                                    + sizeof(u_int32_t))
 
 /*
- * struct cerebro_metric_err_response
+ * struct cerebro_metric_server_err_response
  *
  * defines a metric server invalid version or packet response
  */
-struct cerebro_metric_err_response
+struct cerebro_metric_server_err_response
 {
   int32_t version;
   u_int32_t err_code;
 };
   
-#define CEREBRO_METRIC_ERR_RESPONSE_LEN  (sizeof(int32_t) \
-                                          + sizeof(u_int32_t))
+#define CEREBRO_METRIC_SERVER_ERR_RESPONSE_LEN  (sizeof(int32_t) \
+                                                 + sizeof(u_int32_t))
 
 #endif /* _CEREBRO_METRIC_SERVER_PROTOCOL_H */
