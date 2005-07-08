@@ -12,6 +12,8 @@
 	* re-worked cerebro lib for metric server protocol change
 
 	* tagged post-metric-server-protocol-rework-1
+
+	* tagged pre-metric-control-protocol-1
 	
 2005-07-07  Albert Chu  <chu11@llnl.gov>
 
