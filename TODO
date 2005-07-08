@@ -7,6 +7,7 @@ Testing
 - api again
 
 Cleanup
+- merge node_metric and metric_name protocols into one.
 
 Portability
 - IPv6
