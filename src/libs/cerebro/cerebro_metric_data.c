@@ -36,6 +36,7 @@
 static int
 _metric_value_unmarshall(cerebro_t handle,
                          struct cerebro_metric_server_response *res,
+                         void **metric_value,
                          const char *buf,
                          unsigned int buflen)
 {
@@ -44,9 +45,9 @@ _metric_value_unmarshall(cerebro_t handle,
   u_int32_t mtype, mlen;
 
 #if CEREBRO_DEBUG
-  if (!res || !buf)
+  if (!res || !metric_value || !buf)
     {
-      CEREBRO_DBG(("invalid pointers"));
+      CEREBRO_DBG(("invalid arguments"));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
@@ -128,8 +129,7 @@ _metric_value_unmarshall(cerebro_t handle,
       goto cleanup;
     }
 
-  res->metric_value = mvalue;
-
+  *metric_value = mvalue;
   return buflen;
 
  cleanup:
@@ -153,6 +153,7 @@ _receive_metric_data_response(cerebro_t handle,
 {
   struct cerebro_nodelist *nodelist;
   char nodename_buf[CEREBRO_MAX_NODENAME_LEN+1];
+  void *metric_value = NULL;
   char *vbuf = NULL;
   int vbytes_read, rv = -1;
 
@@ -178,6 +179,7 @@ _receive_metric_data_response(cerebro_t handle,
       goto cleanup;
     }
 
+  res->metric_value = NULL;
   if (res->metric_value_len)
     {
       unsigned int errnum;
@@ -211,10 +213,17 @@ _receive_metric_data_response(cerebro_t handle,
           goto cleanup;
         }
 
-      if (_metric_value_unmarshall(handle, res, vbuf, vbytes_read) < 0)
-        goto cleanup;
+      if (_metric_value_unmarshall(handle, 
+                                   res, 
+                                   &metric_value, 
+                                   vbuf, 
+                                   vbytes_read) < 0)
+        {
+          goto cleanup;
+        }
       
       free(vbuf);
+      vbuf = NULL;
     }
 
   /* Guarantee ending '\0' character */
@@ -225,11 +234,12 @@ _receive_metric_data_response(cerebro_t handle,
                                nodename_buf,
                                res->metric_value_type,
                                res->metric_value_len,
-                               vbuf) < 0)
+                               metric_value) < 0)
     goto cleanup;
   
   rv = 0;
  cleanup:
+  free(metric_value);
   free(vbuf);
   return rv;
 }
