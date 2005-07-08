@@ -2,6 +2,8 @@
 
 	* Re-named 'metric_protocol' to 'metric_server_protocol' globally
 	in preparation of new features being added in.
+
+	* tagged pre-metric-server-protocol-rework-1
 	
 2005-07-07  Albert Chu  <chu11@llnl.gov>
 
