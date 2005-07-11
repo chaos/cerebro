@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.118 2005-07-06 17:12:24 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.119 2005-07-11 20:35:34 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -81,6 +81,7 @@ _cerebrod_set_config_default(void)
   conf.speak = CEREBROD_SPEAK_DEFAULT;
   conf.listen = CEREBROD_LISTEN_DEFAULT;
   conf.listen_threads = CEREBROD_LISTEN_THREADS_DEFAULT;
+  conf.metric_controller = CEREBROD_METRIC_CONTROLLER_DEFAULT;
   conf.metric_server = CEREBROD_METRIC_SERVER_DEFAULT;
   conf.metric_server_port = CEREBROD_METRIC_SERVER_PORT_DEFAULT;
   conf.metric_max = CEREBROD_METRIC_MAX_DEFAULT;
@@ -88,6 +89,7 @@ _cerebrod_set_config_default(void)
 #if CEREBRO_DEBUG
   conf.speak_debug = CEREBROD_SPEAK_DEBUG_DEFAULT;
   conf.listen_debug = CEREBROD_LISTEN_DEBUG_DEFAULT;
+  conf.metric_controller_debug = CEREBROD_METRIC_CONTROLLER_DEBUG_DEFAULT;
   conf.metric_server_debug = CEREBROD_METRIC_SERVER_DEBUG_DEFAULT;
 #endif /* CEREBRO_DEBUG */
 }
@@ -253,6 +255,8 @@ _cerebrod_load_config(void)
     conf.listen = tconf.cerebrod_listen;
   if (tconf.cerebrod_listen_threads_flag)
     conf.listen_threads = tconf.cerebrod_listen_threads;
+  if (tconf.cerebrod_metric_controller_flag)
+    conf.metric_controller = tconf.cerebrod_metric_controller;
   if (tconf.cerebrod_metric_server_flag)
     conf.metric_server = tconf.cerebrod_metric_server;
   if (tconf.cerebrod_metric_server_port_flag)
@@ -266,6 +270,8 @@ _cerebrod_load_config(void)
     conf.speak_debug = tconf.cerebrod_speak_debug;
   if (tconf.cerebrod_listen_debug_flag)
     conf.listen_debug = tconf.cerebrod_listen_debug;
+  if (tconf.cerebrod_metric_controller_debug_flag)
+    conf.metric_controller_debug = tconf.cerebrod_metric_controller_debug;
   if (tconf.cerebrod_metric_server_debug_flag)
     conf.metric_server_debug = tconf.cerebrod_metric_server_debug;
 #endif /* CEREBRO_DEBUG */
@@ -674,11 +680,17 @@ _cerebrod_calculate_configuration_data(void)
    */
   _cerebrod_calculate_heartbeat_network_interface_in_addr_and_index();
 
-  /* If the listening server is turned off, none of the other
-   * servers can be on.  So we turn them off.
+  /* If the listening server is turned off, the metric server must be
+   * turned off
    */
   if (!conf.listen)
     conf.metric_server = 0;
+
+  /* If the speaker is turned off, the metric controller must be
+   * turned off
+   */
+  if (!conf.speak)
+    conf.metric_controller = 0;
 }
 
 /*
@@ -779,11 +791,13 @@ _cerebrod_config_dump(void)
   fprintf(stderr, "* speak: %d\n", conf.speak);
   fprintf(stderr, "* listen: %d\n", conf.listen);
   fprintf(stderr, "* listen_threads: %d\n", conf.listen_threads);
+  fprintf(stderr, "* metric_controller: %d\n", conf.metric_controller);
   fprintf(stderr, "* metric_server: %d\n", conf.metric_server);
   fprintf(stderr, "* metric_server_port: %d\n", conf.metric_server_port);
   fprintf(stderr, "* metric_max: %d\n", conf.metric_max);
   fprintf(stderr, "* speak_debug: %d\n", conf.speak_debug);
   fprintf(stderr, "* listen_debug: %d\n", conf.listen_debug);
+  fprintf(stderr, "* metric_controller_debug: %d\n", conf.metric_controller_debug);
   fprintf(stderr, "* metric_server_debug: %d\n", conf.metric_server_debug);
   fprintf(stderr, "* -------------------------------\n");
   fprintf(stderr, "* Calculated Configuration\n");

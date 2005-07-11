@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_slurm_state.c,v 1.8 2005-07-01 20:28:56 achu Exp $
+ *  $Id: cerebro_metric_slurm_state.c,v 1.9 2005-07-11 20:35:34 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -94,7 +94,8 @@ _slurm_state_setup_socket(void)
       CEREBRO_DBG(("path '%s' too long", SLURM_STATE_UNIX_PATH));
       goto cleanup;
     }
-  
+
+  /* unlink is allowed to fail */ 
   unlink(SLURM_STATE_UNIX_PATH);
 
   memset(&addr, '\0', sizeof(struct sockaddr_un));

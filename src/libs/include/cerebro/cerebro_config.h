@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config.h,v 1.2 2005-06-24 20:42:28 achu Exp $
+ *  $Id: cerebro_config.h,v 1.3 2005-07-11 20:35:34 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_CONFIG_H
@@ -51,6 +51,8 @@ struct cerebro_config
   int cerebrod_listen_flag;
   int cerebrod_listen_threads;
   int cerebrod_listen_threads_flag;
+  int cerebrod_metric_controller;
+  int cerebrod_metric_controller_flag;
   int cerebrod_metric_server;
   int cerebrod_metric_server_flag;
   int cerebrod_metric_server_port;
@@ -64,6 +66,8 @@ struct cerebro_config
   int cerebrod_speak_debug_flag;
   int cerebrod_listen_debug;
   int cerebrod_listen_debug_flag;
+  int cerebrod_metric_controller_debug;
+  int cerebrod_metric_controller_debug_flag;
   int cerebrod_metric_server_debug;
   int cerebrod_metric_server_debug_flag;
 #endif /* CEREBRO_DEBUG */

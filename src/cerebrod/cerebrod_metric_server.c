@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_server.c,v 1.14 2005-07-08 23:10:03 achu Exp $
+ *  $Id: cerebrod_metric_server.c,v 1.15 2005-07-11 20:35:34 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -809,7 +809,7 @@ _respond_with_nodes(int fd,
 }
 
 /* 
- * _service_connection
+ * _metric_server_service_connection
  *
  * Thread to service a connection from a client to retrieve metric
  * data.  Use wrapper functions minimally, b/c we want to return
@@ -820,7 +820,7 @@ _respond_with_nodes(int fd,
  * Executed in detached state, no return value.
  */
 static void *
-_service_connection(void *arg)
+_metric_server_service_connection(void *arg)
 {
   int fd, recv_len;
   struct cerebro_metric_server_request req;
@@ -921,7 +921,7 @@ _metric_server_setup_socket(void)
   if ((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
       CEREBRO_DBG(("socket: %s", strerror(errno)));
-      return -1;
+      goto cleanup;
     }
 
   /* Configuration checks ensure destination ip is on this machine if
@@ -935,23 +935,27 @@ _metric_server_setup_socket(void)
   if (bind(fd, (struct sockaddr *)&addr, sizeof(struct sockaddr_in)) < 0)
     {
       CEREBRO_DBG(("bind: %s", strerror(errno)));
-      return -1;
+      goto cleanup;
     }
 
   if (listen(fd, CEREBROD_METRIC_SERVER_BACKLOG) < 0)
     {
       CEREBRO_DBG(("listen: %s", strerror(errno)));
-      return -1;
+      goto cleanup;
     }
 
   /* For quick start/restart */
   if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(int)) < 0)
     {
       CEREBRO_DBG(("setsockopt: %s", strerror(errno)));
-      return -1;
+      goto cleanup;
     }
 
   return fd;
+
+ cleanup:
+  close(fd);
+  return -1;
 }
 
 void *
@@ -988,7 +992,10 @@ cerebrod_metric_server(void *arg)
       Pthread_attr_setstacksize(&attr, CEREBROD_THREAD_STACKSIZE);
       arg = Malloc(sizeof(int));
       *arg = fd;
-      Pthread_create(&thread, &attr, _service_connection, (void *)arg);
+      Pthread_create(&thread, 
+                     &attr, 
+                     _metric_server_service_connection, 
+                     (void *)arg);
       Pthread_attr_destroy(&attr);
     }
 

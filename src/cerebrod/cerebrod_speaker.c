@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.72 2005-07-05 19:55:25 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.73 2005-07-11 20:35:34 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -44,6 +44,18 @@ extern pthread_mutex_t debug_output_mutex;
  */
 static char cerebrod_nodename[CEREBRO_MAX_NODENAME_LEN+1];
 
+/*
+ * speaker_init
+ * speaker_init_cond
+ * speaker_init_lock
+ *
+ * variables for synchronizing initialization between different pthreads
+ * and signaling when it is complete
+ */
+int speaker_init = 0;
+pthread_cond_t speaker_init_cond = PTHREAD_COND_INITIALIZER;
+pthread_mutex_t speaker_init_lock = PTHREAD_MUTEX_INITIALIZER;
+
 /* 
  * _speaker_socket_setup
  *
@@ -62,7 +74,7 @@ _speaker_socket_setup(void)
   if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {
       CEREBRO_DBG(("socket: %s", strerror(errno)));
-      return -1;
+      goto cleanup;
     }
 
   if (conf.multicast)
@@ -85,7 +97,7 @@ _speaker_socket_setup(void)
       if (setsockopt(fd, SOL_IP, IP_MULTICAST_IF, &imr, optlen) < 0)
 	{
 	  CEREBRO_DBG(("setsockopt: %s", strerror(errno)));
-	  return -1;
+          goto cleanup;
 	}
 
       optval = 1;
@@ -93,7 +105,7 @@ _speaker_socket_setup(void)
       if (setsockopt(fd, SOL_IP, IP_MULTICAST_LOOP, &optval, optlen) < 0)
 	{
 	  CEREBRO_DBG(("setsockopt: %s", strerror(errno)));
-	  return -1;
+          goto cleanup;
 	}
 
       optval = conf.heartbeat_ttl;
@@ -101,7 +113,7 @@ _speaker_socket_setup(void)
       if (setsockopt(fd, SOL_IP, IP_MULTICAST_TTL, &optval, optlen) < 0)
 	{
 	  CEREBRO_DBG(("setsockopt: %s", strerror(errno)));
-	  return -1;
+          goto cleanup;
 	}
     }
 
@@ -114,10 +126,14 @@ _speaker_socket_setup(void)
   if (bind(fd, (struct sockaddr *)&addr, sizeof(struct sockaddr_in)) < 0) 
     {
       CEREBRO_DBG(("bind: %s", strerror(errno)));
-      return -1;
+      goto cleanup;
     }
 
   return fd;
+
+ cleanup:
+  close(fd);
+  return -1;
 }
 
 /* 
@@ -131,6 +147,10 @@ _speaker_initialize(void)
   unsigned int seed;
   struct timeval tv;
   int i, len;
+
+  Pthread_mutex_lock(&speaker_init_lock);
+  if (speaker_init)
+    goto out;
 
   /* Cache Nodename */
   memset(cerebrod_nodename, '\0', CEREBRO_MAX_NODENAME_LEN+1);
@@ -152,6 +172,11 @@ _speaker_initialize(void)
   srand(seed);
 
   cerebrod_speaker_data_initialize();
+
+  speaker_init++;
+  Pthread_cond_signal(&speaker_init_cond);
+ out:
+  Pthread_mutex_unlock(&speaker_init_lock);
 }
 
 /*

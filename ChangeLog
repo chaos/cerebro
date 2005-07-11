@@ -2,6 +2,10 @@
 
 	* Cleanup cerebrod_speaker_data.[ch] in preparation for metric
 	control code.
+
+	* Begin development of metric controller.
+
+	* Fixed potential fd leak in socket reinitialization routines.
 	
 2005-07-08  Albert Chu  <chu11@llnl.gov>
 

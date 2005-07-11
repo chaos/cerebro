@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_server.h,v 1.3 2005-07-08 21:59:26 achu Exp $
+ *  $Id: cerebrod_metric_server.h,v 1.4 2005-07-11 20:35:34 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_METRIC_SERVER_H
@@ -35,7 +35,7 @@ struct cerebrod_metric_data_evaluation_data
 };
 
 /*
- * cerebrod_metric
+ * cerebrod_metric_server
  *
  * Runs the cerebrod metric server thread
  *

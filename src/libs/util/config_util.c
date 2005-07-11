@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: config_util.c,v 1.10 2005-07-02 13:20:45 achu Exp $
+ *  $Id: config_util.c,v 1.11 2005-07-11 20:35:34 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -338,6 +338,17 @@ _load_config_file(struct cerebro_config *conf, unsigned int *errnum)
 	0
       },
       {
+	"cerebrod_metric_controller", 
+	CONFFILE_OPTION_BOOL, 
+	-1,
+	conffile_bool, 
+	1, 
+	0, 
+	&(conf->cerebrod_metric_controller_flag),
+	&conf->cerebrod_metric_controller, 
+	0
+      },
+      {
 	"cerebrod_metric_server", 
 	CONFFILE_OPTION_BOOL, 
 	-1,
@@ -402,6 +413,17 @@ _load_config_file(struct cerebro_config *conf, unsigned int *errnum)
 	0, 
 	&(conf->cerebrod_listen_debug_flag),
 	&conf->cerebrod_listen_debug, 
+	0
+      },
+      {
+	"cerebrod_metric_controller_debug", 
+	CONFFILE_OPTION_BOOL, 
+	-1,
+	conffile_bool, 
+	1, 
+	0, 
+	&(conf->cerebrod_metric_controller_debug_flag),
+	&conf->cerebrod_metric_controller_debug, 
 	0
       },
       {
@@ -575,6 +597,12 @@ _set_cerebro_config(struct cerebro_config *dest,
     {
       dest->cerebrod_listen_threads = src->cerebrod_listen_threads;
       dest->cerebrod_listen_threads_flag++;
+    }
+
+  if (!dest->cerebrod_metric_controller_flag && src->cerebrod_metric_controller_flag)
+    {
+      dest->cerebrod_metric_controller = src->cerebrod_metric_controller;
+      dest->cerebrod_metric_controller_flag++;
     }
 
   if (!dest->cerebrod_metric_server_flag && src->cerebrod_metric_server_flag)

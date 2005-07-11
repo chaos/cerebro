@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.109 2005-07-05 19:55:25 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.110 2005-07-11 20:35:34 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -85,7 +85,7 @@ _listener_setup_socket(void)
   if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {
       CEREBRO_DBG(("socket: %s", strerror(errno)));
-      return -1;
+      goto cleanup;
     }
 
   if (conf.multicast)
@@ -107,7 +107,7 @@ _listener_setup_socket(void)
       if (setsockopt(fd, SOL_IP, IP_ADD_MEMBERSHIP, &imr, optlen) < 0)
 	{
 	  CEREBRO_DBG(("setsockopt: %s", strerror(errno)));
-	  return -1;
+          goto cleanup;
 	}
     }
 
@@ -123,10 +123,14 @@ _listener_setup_socket(void)
   if (bind(fd, (struct sockaddr *)&addr, sizeof(struct sockaddr_in)) < 0)
     {
       CEREBRO_DBG(("bind: %s", strerror(errno)));
-      return -1;
+      goto cleanup;
     }
 
   return fd;
+
+ cleanup:
+  close(fd);
+  return -1;
 }
 
 /*

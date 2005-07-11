@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.74 2005-07-07 21:48:34 achu Exp $
+ *  $Id: cerebrod.c,v 1.75 2005-07-11 20:35:34 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -16,6 +16,7 @@
 #include "cerebrod_daemon.h"
 #include "cerebrod_config.h"
 #include "cerebrod_listener.h"
+#include "cerebrod_metric_controller.h"
 #include "cerebrod_metric_server.h"
 #include "cerebrod_speaker.h"
 
@@ -42,9 +43,17 @@ extern int listener_init;
 extern pthread_cond_t listener_init_cond;
 extern pthread_mutex_t listener_init_lock;
 
+extern int metric_controller_init;
+extern pthread_cond_t metric_controller_init_cond;
+extern pthread_mutex_t metric_controller_init_lock;
+
 extern int metric_server_init;
 extern pthread_cond_t metric_server_init_cond;
 extern pthread_mutex_t metric_server_init_lock;
+
+extern int speaker_init;
+extern pthread_cond_t speaker_init_cond;
+extern pthread_mutex_t speaker_init_lock;
 
 int 
 main(int argc, char **argv)
@@ -128,6 +137,34 @@ main(int argc, char **argv)
       Pthread_attr_setstacksize(&attr, CEREBROD_THREAD_STACKSIZE);
       Pthread_create(&thread, &attr, cerebrod_speaker, NULL);
       Pthread_attr_destroy(&attr);
+
+      /* Wait for initialization to complete */
+      Pthread_mutex_lock(&speaker_init_lock);
+      while (!speaker_init)
+        Pthread_cond_wait(&speaker_init_cond, &speaker_init_lock);
+      Pthread_mutex_unlock(&speaker_init_lock);
+    }
+
+  /* Start metric controller after speaker since metric data cannot be
+   * propogated until after the speaker has finished being setup.
+   */
+  if (conf.metric_controller)
+    {
+      pthread_t thread;
+      pthread_attr_t attr;
+
+      Pthread_attr_init(&attr);
+      Pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+      Pthread_attr_setstacksize(&attr, CEREBROD_THREAD_STACKSIZE);
+      Pthread_create(&thread, &attr, cerebrod_metric_controller, NULL);
+      Pthread_attr_destroy(&attr);
+
+      /* Wait for initialization to complete */
+      Pthread_mutex_lock(&metric_controller_init_lock);
+      while (!metric_controller_init)
+        Pthread_cond_wait(&metric_controller_init_cond, 
+                          &metric_controller_init_lock);
+      Pthread_mutex_unlock(&metric_controller_init_lock);
     }
 
   for (;;) 
