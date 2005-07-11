@@ -1,3 +1,8 @@
+2005-07-11  Albert Chu  <chu11@llnl.gov>
+
+	* Cleanup cerebrod_speaker_data.[ch] in preparation for metric
+	control code.
+	
 2005-07-08  Albert Chu  <chu11@llnl.gov>
 
 	* Re-named 'metric_protocol' to 'metric_server_protocol' globally
