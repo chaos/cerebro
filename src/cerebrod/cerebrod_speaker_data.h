@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker_data.h,v 1.4 2005-07-11 17:27:03 achu Exp $
+ *  $Id: cerebrod_speaker_data.h,v 1.5 2005-07-11 17:44:52 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_SPEAKER_DATA_H
@@ -29,8 +29,10 @@ struct cerebrod_speaker_metric_info
   char *metric_name;
   u_int32_t metric_origin;
   u_int32_t metric_period;
-  int index;
   u_int32_t next_call_time;
+
+  /* For Metric Modules */
+  int index;
 };
 
 /*

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker_data.c,v 1.19 2005-07-11 17:34:00 achu Exp $
+ *  $Id: cerebrod_speaker_data.c,v 1.20 2005-07-11 17:44:51 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -353,9 +353,10 @@ cerebrod_speaker_data_get_metric_data(struct cerebrod_heartbeat *hb,
   hb->metrics = Malloc(sizeof(struct cerebrod_heartbeat_metric *)*(metric_list_size + 1));
   memset(hb->metrics, '\0', sizeof(struct cerebrod_heartbeat_metric *)*(metric_list_size + 1));
 
-  itr = List_iterator_create(metric_list);
-
   Gettimeofday(&tv, NULL);
+  
+  Pthread_mutex_lock(&metric_list_lock);
+  itr = List_iterator_create(metric_list);
   while ((metric_info = list_next(itr)))
     {      
       struct cerebrod_heartbeat_metric *hd = NULL;
@@ -380,10 +381,10 @@ cerebrod_speaker_data_get_metric_data(struct cerebrod_heartbeat *hb,
        */
       if (metric_info->metric_period)
         metric_info->next_call_time = tv.tv_sec + metric_info->metric_period;
-    }
-  
-  List_sort(metric_list, _next_call_time_cmp);
-
+    } 
   List_iterator_destroy(itr);
+  List_sort(metric_list, _next_call_time_cmp);
+  Pthread_mutex_unlock(&metric_list_lock);
+
   return;
 }
