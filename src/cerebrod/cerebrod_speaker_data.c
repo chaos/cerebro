@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker_data.c,v 1.18 2005-07-11 17:27:03 achu Exp $
+ *  $Id: cerebrod_speaker_data.c,v 1.19 2005-07-11 17:34:00 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -54,10 +54,17 @@ metric_modules_t metric_handle = NULL;
 /*
  * metric_list
  *
- * Metric modules to grab data from
+ * Metrics to grab data from
  */
 List metric_list = NULL;
 int metric_list_size = 0;
+
+/*
+ * metric_list_lock
+ *
+ * lock to protect pthread access to the metric_list
+ */
+pthread_mutex_t metric_list_lock = PTHREAD_MUTEX_INITIALIZER;
 
 /* 
  * _setup_metric_modules
@@ -75,13 +82,13 @@ _setup_metric_modules(void)
   if (!(metric_handle = metric_modules_load(conf.metric_max)))
     {
       CEREBRO_DBG(("metric_modules_load"));
-      goto metric_cleanup;
+      goto cleanup;
     }
   
   if ((metric_index_len = metric_modules_count(metric_handle)) < 0)
     {
       CEREBRO_DBG(("metric_module_count failed"));
-      goto metric_cleanup;
+      goto cleanup;
     }
   
   if (!metric_index_len)
@@ -96,7 +103,7 @@ _setup_metric_modules(void)
           Pthread_mutex_unlock(&debug_output_mutex);
         }
 #endif /* CEREBRO_DEBUG */
-      goto metric_cleanup;
+      goto cleanup;
     }
 
   metric_list = List_create((ListDelF)_Free);
@@ -164,11 +171,11 @@ _setup_metric_modules(void)
     }
   
   if (!metric_list_size)
-    goto metric_cleanup;
+    goto cleanup;
 
   return 1;
 
- metric_cleanup:
+ cleanup:
   if (metric_handle)
     {
       /* unload will call module cleanup functions */

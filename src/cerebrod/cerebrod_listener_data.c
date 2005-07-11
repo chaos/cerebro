@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.18 2005-07-01 00:31:41 achu Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.19 2005-07-11 17:31:19 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -72,7 +72,6 @@ int listener_data_index_size;
  *
  * lock to protect pthread access to both the cluster_data list and
  * cluster_data_index
- *
  */
 pthread_mutex_t listener_data_lock = PTHREAD_MUTEX_INITIALIZER;
 
