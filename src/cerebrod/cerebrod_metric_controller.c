@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_controller.c,v 1.3 2005-07-12 15:34:42 achu Exp $
+ *  $Id: cerebrod_metric_controller.c,v 1.4 2005-07-12 16:00:26 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -289,6 +289,61 @@ _send_metric_control_response(int fd, int32_t version, u_int32_t err_code)
   return 0;
 }
 
+/* 
+ * _find_metric_info
+ *
+ * Find metric_info for 'metric_name' in the metric_list
+ *
+ * Returns metric_info on success, NULL if not found
+ */
+static struct cerebrod_speaker_metric_info *
+_find_metric_info(const char *metric_name)
+{
+  struct cerebrod_speaker_metric_info *metric_info = NULL;
+  ListIterator itr = NULL;
+#if CEREBRO_DEBUG
+  int rv;
+#endif /* CEREBRO_DEBUG */
+
+  assert(metric_name);
+
+#if CEREBRO_DEBUG
+  /* Should be called with lock already set */
+  rv = Pthread_mutex_trylock(&metric_list_lock);
+  if (rv != EBUSY)
+    CEREBRO_EXIT(("mutex not locked: rv=%d", rv));
+#endif /* CEREBRO_DEBUG */
+
+  itr = List_iterator_create(metric_list);
+  while ((metric_info = list_next(itr)))
+    {
+      if (!strcmp(metric_info->metric_name, metric_name))
+        break;
+    }
+  List_iterator_destroy(itr);
+  
+  return metric_info;
+}
+
+/* 
+ * _find_metric_name
+ *
+ * Find the metric name in the metric list
+ *
+ * Returns 1 if it matches, 0 otherwise
+ */
+static int
+_find_metric_name(void *x, void *key)
+{
+  struct cerebrod_speaker_metric_info *metric_info = NULL;
+
+  assert(x);
+
+  metric_info = (struct cerebrod_speaker_metric_info *)x;
+  
+  return (!strcmp(metric_info->metric_name, (char *)key)) ? 1 : 0;
+}
+
 /*
  * _metric_controller_service_connection
  *
@@ -305,6 +360,7 @@ _metric_controller_service_connection(void *arg)
 {
   int fd, recv_len;
   struct cerebro_metric_control_request req;
+  char metric_name_buf[CEREBRO_MAX_METRIC_NAME_LEN+1];
   char buf[CEREBRO_MAX_PACKET_LEN];
   int32_t version;
 
@@ -349,32 +405,23 @@ _metric_controller_service_connection(void *arg)
 
   _metric_control_request_dump(&req);
 
+  /* Guarantee ending '\0' character */
+  memset(metric_name_buf, '\0', CEREBRO_MAX_METRIC_NAME_LEN+1);
+  memcpy(metric_name_buf, req.metric_name, CEREBRO_MAX_METRIC_NAME_LEN);
+  
   if (req.command == CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_REGISTER)
     {
       struct cerebrod_speaker_metric_info *metric_info;
-      char metric_name_buf[CEREBRO_MAX_METRIC_NAME_LEN+1];
-      ListIterator itr = NULL;
-
-      /* Guarantee ending '\0' character */
-      memset(metric_name_buf, '\0', CEREBRO_MAX_METRIC_NAME_LEN+1);
-      memcpy(metric_name_buf, req.metric_name, CEREBRO_MAX_METRIC_NAME_LEN);
-
+  
       Pthread_mutex_lock(&metric_list_lock);
-      itr = List_iterator_create(metric_list);
-      while ((metric_info = list_next(itr)))
+      if ((metric_info = _find_metric_info(metric_name_buf)))
         {
-          if (!strcmp(metric_info->metric_name, metric_name_buf))
-            {
-              _send_metric_control_response(fd,
-                                            version,
-                                            CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_METRIC_INVALID);
-              List_iterator_destroy(itr);
-              Pthread_mutex_unlock(&metric_list_lock);
-              goto cleanup;
-            }
+          _send_metric_control_response(fd,
+                                        version,
+                                        CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_METRIC_INVALID);
+          Pthread_mutex_unlock(&metric_list_lock);
+          goto cleanup;
         }
-      metric_info = NULL;
-      List_iterator_destroy(itr);
 
       metric_info = Malloc(sizeof(struct cerebrod_speaker_metric_info));
       metric_info->metric_name = Strdup(metric_name_buf);
@@ -391,47 +438,36 @@ _metric_controller_service_connection(void *arg)
   else if (req.command == CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_UNREGISTER)
     {
       struct cerebrod_speaker_metric_info *metric_info;
-      char metric_name_buf[CEREBRO_MAX_METRIC_NAME_LEN+1];
-      ListIterator itr = NULL;
-      int found = 0;
-
-      /* Guarantee ending '\0' character */
-      memset(metric_name_buf, '\0', CEREBRO_MAX_METRIC_NAME_LEN+1);
-      memcpy(metric_name_buf, req.metric_name, CEREBRO_MAX_METRIC_NAME_LEN);
 
       Pthread_mutex_lock(&metric_list_lock);
-      itr = List_iterator_create(metric_list);
-      while ((metric_info = list_next(itr)))
-        {
-          if (!strcmp(metric_info->metric_name, metric_name_buf))
-            {
-              found++;
-              break;
-            }
-        }
-
-      if (!found || 
-          !(metric_info->metric_origin & CEREBROD_METRIC_ORIGIN_USERSPACE))
+      if (!(metric_info = _find_metric_info(metric_name_buf)))
         {
           _send_metric_control_response(fd,
                                         version,
                                         CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_METRIC_INVALID);
-          List_iterator_destroy(itr);
           Pthread_mutex_unlock(&metric_list_lock);
           goto cleanup;
         }
 
-      List_delete(itr);
-      List_iterator_destroy(itr);
+      if (!(metric_info->metric_origin & CEREBROD_METRIC_ORIGIN_USERSPACE))
+        {
+          _send_metric_control_response(fd,
+                                        version,
+                                        CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_METRIC_INVALID);
+          Pthread_mutex_unlock(&metric_list_lock);
+          goto cleanup;
+        }
+
+      if (List_delete_all(metric_list, _find_metric_name, metric_name_buf) != 1)
+        CEREBRO_DBG(("invalid list_delete_all"));
+
       Pthread_mutex_unlock(&metric_list_lock);
     }
   else if (req.command == CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_UPDATE)
     {
       struct cerebrod_speaker_metric_info *metric_info;
-      char metric_name_buf[CEREBRO_MAX_METRIC_NAME_LEN+1];
-      ListIterator itr = NULL;
-      int vbytes_read, found = 0;
       char *vbuf, *metric_value = NULL;
+      int vbytes_read;
 
       if (!(req.metric_value_type >= CEREBRO_METRIC_VALUE_TYPE_NONE
             && req.metric_value_type <= CEREBRO_METRIC_VALUE_TYPE_STRING))
@@ -496,33 +532,27 @@ _metric_controller_service_connection(void *arg)
           free(vbuf);
         }
 
-      /* Guarantee ending '\0' character */
-      memset(metric_name_buf, '\0', CEREBRO_MAX_METRIC_NAME_LEN+1);
-      memcpy(metric_name_buf, req.metric_name, CEREBRO_MAX_METRIC_NAME_LEN);
-
       Pthread_mutex_lock(&metric_list_lock);
-      itr = List_iterator_create(metric_list);
-      while ((metric_info = list_next(itr)))
-        {
-          if (!strcmp(metric_info->metric_name, metric_name_buf))
-            {
-              found++;
-              break;
-            }
-        }
 
-      if (!found || 
-          !(metric_info->metric_origin & CEREBROD_METRIC_ORIGIN_USERSPACE))
+      if (!(metric_info = _find_metric_info(metric_name_buf)))
         {
           _send_metric_control_response(fd,
                                         version,
                                         CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_METRIC_INVALID);
-          List_iterator_destroy(itr);
           Pthread_mutex_unlock(&metric_list_lock);
           Free(req.metric_value);
           goto cleanup;
         }
-      List_iterator_destroy(itr);
+      
+      if (!(metric_info->metric_origin & CEREBROD_METRIC_ORIGIN_USERSPACE))
+        {
+          _send_metric_control_response(fd,
+                                        version,
+                                        CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_METRIC_INVALID);
+          Pthread_mutex_unlock(&metric_list_lock);
+          Free(req.metric_value);
+          goto cleanup;
+        }
 
       if (metric_info->metric_value)
         Free(metric_info->metric_value);
