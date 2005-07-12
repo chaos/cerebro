@@ -122,7 +122,7 @@ _metric_server_request_marshall(cerebro_t handle,
 /*
  * _metric_server_request_send
  *
- * Send the metric request
+ * Send the metric server request
  *
  * Returns 0 on success, -1 on error
  */
