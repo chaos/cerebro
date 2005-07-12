@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_server.c,v 1.16 2005-07-12 00:31:53 achu Exp $
+ *  $Id: cerebrod_metric_server.c,v 1.17 2005-07-12 23:04:09 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -198,6 +198,12 @@ _metric_server_response_marshall(struct cerebro_metric_server_response *res,
   mtype = res->metric_value_type;
   mlen = res->metric_value_len;
   mvalue = res->metric_value;
+
+  if (!mvalue)
+    {
+      CEREBRO_DBG(("metric value invalid"));
+      return -1;
+    }
   
   if (mtype == CEREBRO_METRIC_VALUE_TYPE_NONE)
     {

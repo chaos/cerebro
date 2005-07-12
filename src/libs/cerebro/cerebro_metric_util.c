@@ -29,7 +29,7 @@
 /*
  * _metric_server_protocol_err_code_conversion
  *
- * Convert metric protocol err codes to API err codes
+ * Convert metric server protocol err codes to API err codes
  *
  * Returns proper err code
  */
@@ -166,7 +166,7 @@ _metric_server_request_send(cerebro_t handle,
 }
 
 /*
- * _metric_response_check
+ * _metric_server_response_check
  *
  * Check that the version and error code are good prior to
  * unmarshalling
@@ -353,7 +353,6 @@ _get_metric_data(cerebro_t handle,
     {
       struct cerebro_metric_server_response res;
       char buf[CEREBRO_MAX_PACKET_LEN];
-      char nodename_buf[CEREBRO_MAX_NODENAME_LEN+1];
       int bytes_read;
       unsigned int errnum;
 

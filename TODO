@@ -17,6 +17,7 @@ Cleanup
 - libcerebro control stuff
 - manpages for libcerebro control stuff
 - cerebro-admin
+- autoconf CEREBRO_METRIC_CONTROL_PATH??
 
 Portability
 - IPv6

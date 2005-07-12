@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_controller.c,v 1.5 2005-07-12 18:34:04 achu Exp $
+ *  $Id: cerebrod_metric_controller.c,v 1.6 2005-07-12 23:04:09 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -47,11 +47,6 @@ extern List metric_list;
 extern int metric_list_size;
 extern pthread_mutex_t metric_list_lock;
 
-#if CEREBRO_DEBUG
-#define CEREBROD_METRIC_CONTROLLER_UNIX_PATH  "/tmp/cerebro_metric_cerebrod_metric_controller"
-#else  /* !CEREBRO_DEBUG */
-#define CEREBROD_METRIC_CONTROLLER_UNIX_PATH  CEREBRO_MODULE_DIR "/cerebro_metric_cerebrod_metric_controller"
-#endif  /* !CEREBRO_DEBUG */
 #define CEREBROD_METRIC_CONTROLLER_BACKLOG    5
 
 /*
@@ -107,19 +102,19 @@ _metric_controller_setup_socket(void)
       return -1;
     }
 
-  if (strlen(CEREBROD_METRIC_CONTROLLER_UNIX_PATH) >= sizeof(addr.sun_path))
+  if (strlen(CEREBRO_METRIC_CONTROL_PATH) >= sizeof(addr.sun_path))
     {
-      CEREBRO_DBG(("path '%s' too long", CEREBROD_METRIC_CONTROLLER_UNIX_PATH));
+      CEREBRO_DBG(("path '%s' too long", CEREBRO_METRIC_CONTROL_PATH));
       goto cleanup;
     }
 
   /* unlink is allowed to fail */
-  unlink(CEREBROD_METRIC_CONTROLLER_UNIX_PATH);
+  unlink(CEREBRO_METRIC_CONTROL_PATH);
   
   memset(&addr, '\0', sizeof(struct sockaddr_un));
   addr.sun_family = AF_LOCAL;
   strncpy(addr.sun_path, 
-          CEREBROD_METRIC_CONTROLLER_UNIX_PATH, 
+          CEREBRO_METRIC_CONTROL_PATH, 
           sizeof(addr.sun_path));
   
   if (bind(fd, (struct sockaddr *)&addr, sizeof(struct sockaddr_un)) < 0)
@@ -440,6 +435,7 @@ _receive_metric_value(int fd,
 {
   char *vbuf, *metric_value = NULL;
   int vbytes_read, rv = -1;
+  u_int32_t mtype, mlen;
 
   assert(fd >= 0 && req);
 
@@ -480,17 +476,20 @@ _receive_metric_value(int fd,
     }
   
   metric_value = Malloc(req->metric_value_len);
-  
-  if (req->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_INT32)
+
+  mtype = req->metric_value_type;
+  mlen = req->metric_value_len;
+
+  if (mtype == CEREBRO_METRIC_VALUE_TYPE_INT32)
     Unmarshall_int32((int32_t *)metric_value, vbuf, vbytes_read);
-  else if (req->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_U_INT32)
+  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_U_INT32)
     Unmarshall_u_int32((u_int32_t *)metric_value, vbuf, vbytes_read);
-  else if (req->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_FLOAT)
+  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_FLOAT)
     Unmarshall_float((float *)metric_value, vbuf, vbytes_read);
-  else if (req->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_DOUBLE)
+  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_DOUBLE)
     Unmarshall_double((double *)metric_value, vbuf, vbytes_read);
-  else if (req->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_STRING)
-    Unmarshall_buffer((char *)metric_value, req->metric_value_len, vbuf, vbytes_read);
+  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_STRING)
+    Unmarshall_buffer((char *)metric_value, mlen, vbuf, vbytes_read);
   
   req->metric_value = metric_value;
   
