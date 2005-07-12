@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.14 2005-07-01 20:46:47 achu Exp $
+## $Id: Makefile.am,v 1.15 2005-07-12 19:57:07 achu Exp $
 ##*****************************************************************************
 
 if WITH_GNU_LD
@@ -25,6 +25,7 @@ libcerebro_la_CFLAGS  = -D_REENTRANT \
 libcerebro_la_SOURCES = cerebro.c \
 			cerebro_clusterlist_util.c \
 			cerebro_config_util.c \
+			cerebro_metric_control.c \
 			cerebro_metric_data.c \
 			cerebro_metric_names.c \
 			cerebro_metric_util.c \
