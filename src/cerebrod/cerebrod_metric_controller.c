@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_controller.c,v 1.2 2005-07-12 00:31:53 achu Exp $
+ *  $Id: cerebrod_metric_controller.c,v 1.3 2005-07-12 15:34:42 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -23,6 +23,7 @@
 
 #include <assert.h>
 
+#include "cerebro.h"
 #include "cerebro/cerebro_constants.h"
 #include "cerebro/cerebro_metric_control_protocol.h"
 
@@ -393,6 +394,7 @@ _metric_controller_service_connection(void *arg)
       char metric_name_buf[CEREBRO_MAX_METRIC_NAME_LEN+1];
       ListIterator itr = NULL;
       int found = 0;
+
       /* Guarantee ending '\0' character */
       memset(metric_name_buf, '\0', CEREBRO_MAX_METRIC_NAME_LEN+1);
       memcpy(metric_name_buf, req.metric_name, CEREBRO_MAX_METRIC_NAME_LEN);
@@ -425,12 +427,113 @@ _metric_controller_service_connection(void *arg)
     }
   else if (req.command == CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_UPDATE)
     {
-      /* XXX 
-       *
-       * need to sort 
-       *
-       * check for name and userspace flag
-       */
+      struct cerebrod_speaker_metric_info *metric_info;
+      char metric_name_buf[CEREBRO_MAX_METRIC_NAME_LEN+1];
+      ListIterator itr = NULL;
+      int vbytes_read, found = 0;
+      char *vbuf, *metric_value = NULL;
+
+      if (!(req.metric_value_type >= CEREBRO_METRIC_VALUE_TYPE_NONE
+            && req.metric_value_type <= CEREBRO_METRIC_VALUE_TYPE_STRING))
+        {
+          _send_metric_control_response(fd,
+                                        version,
+                                        CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_PARAMETER_INVALID);
+          goto cleanup;
+        }
+
+      req.metric_value = NULL;
+      if (req.metric_value_len)
+        {
+
+          if (req.metric_value_type == CEREBRO_METRIC_VALUE_TYPE_NONE)
+            {
+              _send_metric_control_response(fd,
+                                            version,
+                                            CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_PARAMETER_INVALID);
+              goto cleanup;
+            }
+
+          vbuf = Malloc(req.metric_value_len);
+
+          if ((vbytes_read = receive_data(fd,
+                                          req.metric_value_len,
+                                          vbuf,
+                                          req.metric_value_len,
+                                          CEREBRO_METRIC_CONTROL_PROTOCOL_CLIENT_TIMEOUT_LEN,
+                                          NULL)) < 0)
+            {
+              _send_metric_control_response(fd,
+                                            version,
+                                            CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_PACKET_INVALID);
+              free(vbuf);
+              goto cleanup;
+            }
+
+          if (vbytes_read != req.metric_value_len)
+            {
+              _send_metric_control_response(fd,
+                                            version,
+                                            CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_PACKET_INVALID);
+              free(vbuf);
+              goto cleanup;
+            }
+
+          metric_value = Malloc(req.metric_value_len);
+          
+          if (req.metric_value_type == CEREBRO_METRIC_VALUE_TYPE_INT32)
+            Unmarshall_int32((int32_t *)metric_value, vbuf, vbytes_read);
+          else if (req.metric_value_type == CEREBRO_METRIC_VALUE_TYPE_U_INT32)
+            Unmarshall_u_int32((u_int32_t *)metric_value, vbuf, vbytes_read);
+          else if (req.metric_value_type == CEREBRO_METRIC_VALUE_TYPE_FLOAT)
+            Unmarshall_float((float *)metric_value, vbuf, vbytes_read);
+          else if (req.metric_value_type == CEREBRO_METRIC_VALUE_TYPE_DOUBLE)
+            Unmarshall_double((double *)metric_value, vbuf, vbytes_read);
+          else if (req.metric_value_type == CEREBRO_METRIC_VALUE_TYPE_STRING)
+            Unmarshall_buffer((char *)metric_value, req.metric_value_len, vbuf, vbytes_read);
+
+          req.metric_value = metric_value;
+          free(vbuf);
+        }
+
+      /* Guarantee ending '\0' character */
+      memset(metric_name_buf, '\0', CEREBRO_MAX_METRIC_NAME_LEN+1);
+      memcpy(metric_name_buf, req.metric_name, CEREBRO_MAX_METRIC_NAME_LEN);
+
+      Pthread_mutex_lock(&metric_list_lock);
+      itr = List_iterator_create(metric_list);
+      while ((metric_info = list_next(itr)))
+        {
+          if (!strcmp(metric_info->metric_name, metric_name_buf))
+            {
+              found++;
+              break;
+            }
+        }
+
+      if (!found || 
+          !(metric_info->metric_origin & CEREBROD_METRIC_ORIGIN_USERSPACE))
+        {
+          _send_metric_control_response(fd,
+                                        version,
+                                        CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_METRIC_INVALID);
+          List_iterator_destroy(itr);
+          Pthread_mutex_unlock(&metric_list_lock);
+          Free(req.metric_value);
+          goto cleanup;
+        }
+      List_iterator_destroy(itr);
+
+      if (metric_info->metric_value)
+        Free(metric_info->metric_value);
+      
+      metric_info->next_call_time = 0;
+      metric_info->metric_value_type = req.metric_value_type;
+      metric_info->metric_value_len = req.metric_value_len;
+      metric_info->metric_value = req.metric_value;
+      /* Don't Free metric value, it'll be done later */
+      cerebrod_speaker_data_metric_list_sort();
+      Pthread_mutex_unlock(&metric_list_lock);
     }
   else
     {

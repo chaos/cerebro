@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker_data.c,v 1.21 2005-07-12 00:31:53 achu Exp $
+ *  $Id: cerebrod_speaker_data.c,v 1.22 2005-07-12 15:34:42 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -81,7 +81,12 @@ _destroy_speaker_metric_info(void *x)
   metric_info = (struct cerebrod_speaker_metric_info *)x;
 
   if (metric_info->metric_origin & CEREBROD_METRIC_ORIGIN_USERSPACE)
-    Free(metric_info->metric_name);
+    {
+      Free(metric_info->metric_name);
+      if (metric_info->metric_value)
+        Free(metric_info->metric_value);
+    }
+  
   Free(metric_info);
 }
 
@@ -253,8 +258,7 @@ _next_call_time_cmp(void *x, void *y)
 /* 
  * _get_module_metric_value
  *
- * Get the metric value data from a module and store it in the
- * heartbeat
+ * Get the metric value data from a module
  *
  * Returns heartbeat metric data on success, NULL otherwise
  */
@@ -348,6 +352,38 @@ _get_module_metric_value(struct cerebrod_speaker_metric_info *metric_info)
   return NULL;
 }
 
+/* 
+ * _get_userspace_metric_value
+ *
+ * Get the metric value data supplied by a userspace program
+ *
+ * Returns heartbeat metric data on success, NULL otherwise
+ */
+static struct cerebrod_heartbeat_metric *
+_get_userspace_metric_value(struct cerebrod_speaker_metric_info *metric_info)
+{
+  struct cerebrod_heartbeat_metric *hd = NULL;
+  void *temp_value = NULL;
+  char *metric_name;
+  unsigned int index;
+
+  assert(metric_info);
+
+#if CEREBRO_DEBUG
+  if (metric_info->next_call_time)
+    CEREBRO_DBG(("Unexpected next_call_time"));
+#endif /* CEREBRO_DEBUG */
+
+  hd = Malloc(sizeof(struct cerebrod_heartbeat_metric));
+  memset(hd, '\0', sizeof(struct cerebrod_heartbeat_metric));
+
+  hd->metric_value_type = metric_info->metric_value_type;
+  hd->metric_value_len = metric_info->metric_value_len;
+  hd->metric_value = metric_info->metric_value;
+
+  return hd;
+}
+
 void 
 cerebrod_speaker_data_metric_list_sort(void)
 {
@@ -394,6 +430,12 @@ cerebrod_speaker_data_get_metric_data(struct cerebrod_heartbeat *hb,
 
       if (metric_info->metric_origin & CEREBROD_METRIC_ORIGIN_MODULE)
         hd = _get_module_metric_value(metric_info);
+
+      if (metric_info->metric_origin & CEREBROD_METRIC_ORIGIN_USERSPACE)
+        {
+          hd = _get_userspace_metric_value(metric_info);
+          metric_info->next_call_time = UINT_MAX;
+        }
 
       if (hd)
         {

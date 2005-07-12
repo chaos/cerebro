@@ -1,3 +1,7 @@
+2005-07-12  Albert Chu  <chu11@llnl.gov>
+
+	* Continued work on metric controller.
+	
 2005-07-11  Albert Chu  <chu11@llnl.gov>
 
 	* Cleanup cerebrod_speaker_data.[ch] in preparation for metric
