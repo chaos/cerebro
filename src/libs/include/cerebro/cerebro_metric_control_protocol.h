@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_control_protocol.h,v 1.1 2005-07-08 23:54:37 achu Exp $
+ *  $Id: cerebro_metric_control_protocol.h,v 1.2 2005-07-12 00:31:53 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_METRIC_CONTROL_PROTOCOL_H
@@ -18,14 +18,23 @@
  *
  */
 
-#define CEREBRO_METRIC_CONTROL_PROTOCOL_VERSION               4
+#define CEREBRO_METRIC_CONTROL_PROTOCOL_VERSION               1
+/* 
+ * Even though the controller protocol is through a local unix domain
+ * socket, we'll still need timeouts to ensure the user isn't being an
+ * idiot and not sending data.
+ */
+#define CEREBRO_METRIC_CONTROL_PROTOCOL_SERVER_TIMEOUT_LEN    3
+#define CEREBRO_METRIC_CONTROL_PROTOCOL_CLIENT_TIMEOUT_LEN    5
+#define CEREBRO_METRIC_CONTROL_PROTOCOL_CONNECT_TIMEOUT_LEN   5
 
 #define CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_SUCCESS           0
 #define CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_VERSION_INVALID   1
 #define CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_COMMAND_INVALID   2
-#define CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_PARAMETER_INVALID 3
-#define CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_PACKET_INVALID    4
-#define CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_INTERNAL_ERROR    5
+#define CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_METRIC_INVALID    3
+#define CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_PARAMETER_INVALID 4
+#define CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_PACKET_INVALID    5
+#define CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_INTERNAL_ERROR    6
 
 #define CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_REGISTER          0
 #define CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_UNREGISTER        1
@@ -48,11 +57,11 @@ struct cerebro_metric_control_request
   void *metric_value;
 };
 
-#define CEREBRO_METRIC_SERVER_REQUEST_HEADER_LEN  (sizeof(int32_t) \
-                                                   sizeof(int32_t) \
-                                                   + CEREBRO_MAX_METRIC_NAME_LEN \
-                                                   + sizeof(u_int32_t) \
-                                                   + sizeof(u_int32_t))
+#define CEREBRO_METRIC_CONTROL_REQUEST_HEADER_LEN  (sizeof(int32_t) \
+                                                    + sizeof(int32_t) \
+                                                    + CEREBRO_MAX_METRIC_NAME_LEN \
+                                                    + sizeof(u_int32_t) \
+                                                    + sizeof(u_int32_t))
 
 /*
  * struct cerebro_metric_control_response

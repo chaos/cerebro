@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.c,v 1.9 2005-07-07 16:10:15 achu Exp $
+ *  $Id: wrappers.c,v 1.10 2005-07-12 00:31:53 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -938,6 +938,22 @@ wrap_list_iterator_destroy(WRAPPERS_ARGS, ListIterator i)
 
   list_iterator_destroy(i);
   return;
+}
+
+int 
+wrap_list_delete(WRAPPERS_ARGS, ListIterator i)
+{
+  int rv;
+
+  assert(file && function);
+
+  if (!i)
+    WRAPPERS_ERR_INVALID_PARAMETERS("list_delete");
+
+  if ((rv = list_delete(i)) != 1)
+    WRAPPERS_ERR_ERRNO("list_delete");
+
+  return rv;
 }
 
 hash_t 

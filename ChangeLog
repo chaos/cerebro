@@ -6,6 +6,8 @@
 	* Begin development of metric controller.
 
 	* Fixed potential fd leak in socket reinitialization routines.
+
+	* Fix some buffer overflow bugs.
 	
 2005-07-08  Albert Chu  <chu11@llnl.gov>
 

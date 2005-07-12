@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.h,v 1.7 2005-07-07 16:10:15 achu Exp $
+ *  $Id: wrappers.h,v 1.8 2005-07-12 00:31:53 achu Exp $
 \*****************************************************************************/
 
 #ifndef _WRAPPERS_H
@@ -260,6 +260,8 @@ int wrap_lt_dlclose(WRAPPERS_ARGS, void *handle);
         wrap_list_iterator_create(WRAPPERS_DEBUG_ARGS, l)
 #define List_iterator_destroy(i) \
         wrap_list_iterator_destroy(WRAPPERS_DEBUG_ARGS, i)
+#define List_delete(i) \
+        wrap_list_delete(WRAPPERS_DEBUG_ARGS, i)
 
 List wrap_list_create(WRAPPERS_ARGS, ListDelF f);
 void wrap_list_destroy(WRAPPERS_ARGS, List l);
@@ -271,6 +273,7 @@ int wrap_list_for_each(WRAPPERS_ARGS, List l, ListForF f, void *arg);
 void wrap_list_sort(WRAPPERS_ARGS, List l, ListCmpF f);
 ListIterator wrap_list_iterator_create(WRAPPERS_ARGS, List l);
 void wrap_list_iterator_destroy(WRAPPERS_ARGS, ListIterator i);
+int wrap_list_delete(WRAPPERS_ARGS, ListIterator i);
 
 /* 
  * Hash lib wrappers 

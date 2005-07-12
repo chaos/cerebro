@@ -7,7 +7,10 @@ Testing
 - api again
 
 Cleanup
-- merge node_metric and metric_name protocols into one.
+- metric_list into a new file or something? 
+  - hard to follow, especially destroy stuff
+  - atleast a common create func?
+- abstract listener_data a bit more?  
 
 Portability
 - IPv6
@@ -15,6 +18,15 @@ Portability
 - Multicast
 
 Design
+- Way for metric modules to tell Cerebrod it has new data and it should
+  be sent out??
+  - pass a function to the thread to be called with a metric_name.
+  - will tell cerebrod this thing has been updated.
+  - redo metric_period logic
+    - -1 never
+    - 0 all the time
+    - > 0 ...
+    - ??
 - Update time for each cerebro metric data?
 - ability for data to be stored/not-stored in the internal hash
   i.e. passed directly to module and forgotten

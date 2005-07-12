@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_server.c,v 1.15 2005-07-11 20:35:34 achu Exp $
+ *  $Id: cerebrod_metric_server.c,v 1.16 2005-07-12 00:31:53 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -75,16 +75,16 @@ _metric_server_initialize(void)
 }
 
 /*
- * _request_unmarshall
+ * _metric_server_request_unmarshall
  *
- * unmarshall contents of a metric request packet buffer
+ * unmarshall contents of a metric server request packet buffer
  *
  * Returns 0 on success, -1 on error
  */
 static int
-_request_unmarshall(struct cerebro_metric_server_request *req,
-                    const char *buf, 
-                    unsigned int buflen)
+_metric_server_request_unmarshall(struct cerebro_metric_server_request *req,
+                                  const char *buf, 
+                                  unsigned int buflen)
 {
   int bufPtrlen, c = 0;
   char *bufPtr;
@@ -105,14 +105,16 @@ _request_unmarshall(struct cerebro_metric_server_request *req,
 }
      
 /*  
- * _request_dump
+ * _metric_server_request_dump
  *
- * dump contents of an metric request
+ * dump contents of a metric server request
  */
 static void
-_request_dump(struct cerebro_metric_server_request *req)
+_metric_server_request_dump(struct cerebro_metric_server_request *req)
 {
 #if CEREBRO_DEBUG
+  char metric_name_buf[CEREBRO_MAX_METRIC_NAME_LEN+1];
+
   assert(req);
 
   if (!(conf.debug && conf.metric_server_debug))
@@ -120,10 +122,13 @@ _request_dump(struct cerebro_metric_server_request *req)
   
   Pthread_mutex_lock(&debug_output_mutex);
   fprintf(stderr, "**************************************\n");
-  fprintf(stderr, "* Metric Request Received:\n");
+  fprintf(stderr, "* Metric Server Request Received:\n");
   fprintf(stderr, "* ------------------------\n");
   fprintf(stderr, "* Version: %d\n", req->version);
-  fprintf(stderr, "* Metric_Name: %s\n", req->metric_name);
+  /* Guarantee ending '\0' character */
+  memset(metric_name_buf, '\0', CEREBRO_MAX_METRIC_NAME_LEN+1);
+  memcpy(metric_name_buf, req->metric_name, CEREBRO_MAX_METRIC_NAME_LEN);
+  fprintf(stderr, "* Metric_Name: %s\n", metric_name_buf);
   fprintf(stderr, "* Flags: %x\n", req->flags);
   fprintf(stderr, "* Timeout_len: %d\n", req->timeout_len);
   fprintf(stderr, "**************************************\n");
@@ -132,14 +137,16 @@ _request_dump(struct cerebro_metric_server_request *req)
 }
 
 /* 
- * _request_check_version
+ * _metric_server_request_check_version
  *
  * Check that the version is correct prior to unmarshalling
  *
  * Returns 0 if version is correct, -1 if not
  */
 static int
-_request_check_version(const char *buf, unsigned int buflen, int32_t *version)
+_metric_server_request_check_version(const char *buf, 
+                                     unsigned int buflen, 
+                                     int32_t *version)
 {
   assert(buflen >= sizeof(int32_t) && version);
                                        
@@ -156,16 +163,16 @@ _request_check_version(const char *buf, unsigned int buflen, int32_t *version)
 }
 
 /*
- * _response_marshall
+ * _metric_server_response_marshall
  *
  * marshall contents of a metric server response packet
  *
  * Returns length written to buffer on success, -1 on error
  */
 static int
-_response_marshall(struct cerebro_metric_server_response *res,
-                   char *buf, 
-                   unsigned int buflen)
+_metric_server_response_marshall(struct cerebro_metric_server_response *res,
+                                 char *buf, 
+                                 unsigned int buflen)
 {
   int bufPtrlen, c = 0;
   char *bufPtr;
@@ -217,16 +224,16 @@ _response_marshall(struct cerebro_metric_server_response *res,
 }
 
 /*
- * _err_response_marshall
+ * _metric_server_err_response_marshall
  *
  * marshall contents of a metric err response packet buffer
  *
  * Returns length written to buffer on success, -1 on error
  */
 static int
-_err_response_marshall(struct cerebro_metric_server_err_response *err_res,
-                       char *buf, 
-                       unsigned int buflen)
+_metric_server_err_response_marshall(struct cerebro_metric_server_err_response *err_res,
+                                     char *buf, 
+                                     unsigned int buflen)
 {
   int len = 0;
  
@@ -239,14 +246,14 @@ _err_response_marshall(struct cerebro_metric_server_err_response *err_res,
 }
 
 /*
- * _response_send
+ * _metric_server_response_send
  *
  * send a metric server response packet to the client
  *
  * Return 0 on success, -1 on error
  */
 static int
-_response_send(int fd, struct cerebro_metric_server_response *res)
+_metric_server_response_send(int fd, struct cerebro_metric_server_response *res)
 {
   char *buf = NULL;
   int buflen, res_len, rv = -1;
@@ -256,7 +263,7 @@ _response_send(int fd, struct cerebro_metric_server_response *res)
   buflen = CEREBRO_METRIC_SERVER_RESPONSE_HEADER_LEN + res->metric_value_len + 1;
   buf = Malloc(buflen);
 
-  if ((res_len = _response_marshall(res, buf, buflen)) < 0)
+  if ((res_len = _metric_server_response_marshall(res, buf, buflen)) < 0)
     goto cleanup;
 
   if (fd_write_n(fd, buf, res_len) < 0)
@@ -272,14 +279,15 @@ _response_send(int fd, struct cerebro_metric_server_response *res)
 }
 
 /*
- * _err_response_send
+ * _metric_server_err_response_send
  *
  * send an error response packet to the client
  *
  * Return 0 on success, -1 on error
  */
 static int
-_err_response_send(int fd, struct cerebro_metric_server_err_response *res)
+_metric_server_err_response_send(int fd, 
+                                 struct cerebro_metric_server_err_response *res)
 {
   char buf[CEREBRO_MAX_PACKET_LEN];
   int res_len, buflen;
@@ -287,7 +295,7 @@ _err_response_send(int fd, struct cerebro_metric_server_err_response *res)
   assert(fd >= 0 && res);
 
   buflen = CEREBRO_MAX_PACKET_LEN;
-  if ((res_len = _err_response_marshall(res, buf, buflen)) < 0)
+  if ((res_len = _metric_server_err_response_marshall(res, buf, buflen)) < 0)
     return -1;
   
   if (fd_write_n(fd, buf, res_len) < 0)
@@ -300,14 +308,14 @@ _err_response_send(int fd, struct cerebro_metric_server_err_response *res)
 }
 
 /* 
- * _respond_with_error
+ * _metric_server_respond_with_error
  *
  * respond to the metric_server_request with an error
  *
  * Return 0 on success, -1 on error
  */
 static int
-_respond_with_error(int fd, int32_t version, u_int32_t err_code)
+_metric_server_respond_with_error(int fd, int32_t version, u_int32_t err_code)
 {
   struct cerebro_metric_server_err_response res;
 
@@ -319,14 +327,14 @@ _respond_with_error(int fd, int32_t version, u_int32_t err_code)
   res.version = version;
   res.err_code = err_code;
 
-  if (_err_response_send(fd, &res) < 0)
+  if (_metric_server_err_response_send(fd, &res) < 0)
     return -1;
 
   return 0;
 }
 
 /* 
- * _response_create
+ * _metric_server_response_create
  *
  * Create a metric server response and add it to the list of responses
  * to reply with.
@@ -334,12 +342,12 @@ _respond_with_error(int fd, int32_t version, u_int32_t err_code)
  * Returns 0 on success, -1 on error
  */
 static int
-_response_create(char *name,
-                 unsigned int max_name_len,
-                 u_int32_t metric_value_type,
-                 u_int32_t metric_value_len,
-                 void *metric_value,
-                 List responses)
+_metric_server_response_create(char *name,
+                               unsigned int max_name_len,
+                               u_int32_t metric_value_type,
+                               u_int32_t metric_value_len,
+                               void *metric_value,
+                               List responses)
 {
   struct cerebro_metric_server_response *res = NULL;
 
@@ -440,12 +448,12 @@ _metric_name_index_callback(void *data, const void *key, void *arg)
     CEREBRO_EXIT(("mutex not locked: rv=%d", rv));
 #endif /* CEREBRO_DEBUG */
 
-  if (_response_create(metric_name, 
-                       CEREBRO_MAX_METRIC_NAME_LEN,
-                       CEREBRO_METRIC_VALUE_TYPE_NONE,
-                       0,
-                       NULL,
-                       ed->responses) < 0)
+  if (_metric_server_response_create(metric_name, 
+                                     CEREBRO_MAX_METRIC_NAME_LEN,
+                                     CEREBRO_METRIC_VALUE_TYPE_NONE,
+                                     0,
+                                     NULL,
+                                     ed->responses) < 0)
     return -1;
 
   return 0;
@@ -493,12 +501,12 @@ _metric_data_evaluate(void *x, void *arg)
 
   if (!strcmp(ed->metric_name, CEREBRO_METRIC_CLUSTER_NODES))
     {
-      if (_response_create(nd->nodename,
-                           CEREBRO_MAX_NODENAME_LEN,
-                           CEREBRO_METRIC_VALUE_TYPE_NONE,
-                           0,
-                           NULL,
-                           ed->responses) < 0)
+      if (_metric_server_response_create(nd->nodename,
+                                         CEREBRO_MAX_NODENAME_LEN,
+                                         CEREBRO_METRIC_VALUE_TYPE_NONE,
+                                         0,
+                                         NULL,
+                                         ed->responses) < 0)
         {
           Pthread_mutex_unlock(&(nd->node_data_lock));
           return -1;
@@ -513,12 +521,12 @@ _metric_data_evaluate(void *x, void *arg)
       else
         updown_state = CEREBRO_METRIC_UPDOWN_STATE_NODE_DOWN;
 
-      if (_response_create(nd->nodename,
-                           CEREBRO_MAX_NODENAME_LEN,
-                           CEREBRO_METRIC_VALUE_TYPE_U_INT32,
-                           sizeof(u_int32_t),
-                           &updown_state,
-                           ed->responses) < 0)
+      if (_metric_server_response_create(nd->nodename,
+                                         CEREBRO_MAX_NODENAME_LEN,
+                                         CEREBRO_METRIC_VALUE_TYPE_U_INT32,
+                                         sizeof(u_int32_t),
+                                         &updown_state,
+                                         ed->responses) < 0)
         {
           Pthread_mutex_unlock(&(nd->node_data_lock));
           return -1;
@@ -533,12 +541,12 @@ _metric_data_evaluate(void *x, void *arg)
       if (ed->req->flags & CEREBRO_METRIC_FLAGS_NONE_IF_DOWN
           && !((ed->time_now - nd->last_received_time) < ed->req->timeout_len))
         {
-          if (_response_create(nd->nodename,
-                               CEREBRO_MAX_NODENAME_LEN,
-                               CEREBRO_METRIC_VALUE_TYPE_NONE,
-                               0,
-                               NULL,
-                               ed->responses) < 0)
+          if (_metric_server_response_create(nd->nodename,
+                                             CEREBRO_MAX_NODENAME_LEN,
+                                             CEREBRO_METRIC_VALUE_TYPE_NONE,
+                                             0,
+                                             NULL,
+                                             ed->responses) < 0)
             {
               Pthread_mutex_unlock(&(nd->node_data_lock));
               return -1;
@@ -548,12 +556,12 @@ _metric_data_evaluate(void *x, void *arg)
       
       if ((md = Hash_find(nd->metric_data, ed->metric_name)))
         {
-          if (_response_create(nd->nodename,
-                               CEREBRO_MAX_NODENAME_LEN,
-                               md->metric_value_type,
-                               md->metric_value_len,
-                               md->metric_value,
-                               ed->responses) < 0)
+          if (_metric_server_response_create(nd->nodename,
+                                             CEREBRO_MAX_NODENAME_LEN,
+                                             md->metric_value_type,
+                                             md->metric_value_len,
+                                             md->metric_value,
+                                             ed->responses) < 0)
             {
               Pthread_mutex_unlock(&(nd->node_data_lock));
               return -1;
@@ -561,12 +569,12 @@ _metric_data_evaluate(void *x, void *arg)
         }
       else if (ed->req->flags & CEREBRO_METRIC_FLAGS_NONE_IF_NOT_MONITORED)
         {
-          if (_response_create(nd->nodename,
-                               CEREBRO_MAX_NODENAME_LEN,
-                               CEREBRO_METRIC_VALUE_TYPE_NONE,
-                               0,
-                               NULL,
-                               ed->responses) < 0)
+          if (_metric_server_response_create(nd->nodename,
+                                             CEREBRO_MAX_NODENAME_LEN,
+                                             CEREBRO_METRIC_VALUE_TYPE_NONE,
+                                             0,
+                                             NULL,
+                                             ed->responses) < 0)
             {
               Pthread_mutex_unlock(&(nd->node_data_lock));
               return -1;
@@ -599,19 +607,19 @@ _send_end_response(int fd)
   end_res.err_code = CEREBRO_METRIC_SERVER_PROTOCOL_ERR_SUCCESS;
   end_res.end = CEREBRO_METRIC_SERVER_PROTOCOL_IS_LAST_RESPONSE;
 
-  if (_response_send(fd, &end_res) < 0)
+  if (_metric_server_response_send(fd, &end_res) < 0)
     return -1;
 
   return 0;
 }
 
 /* 
- * _response_send_callback
+ * _metric_server_response_send_callback
  *
  * Callback function to send all responses
  */
 static int
-_response_send_callback(void *x, void *arg)
+_metric_server_response_send_callback(void *x, void *arg)
 {
   struct cerebro_metric_server_response *res;
   int fd;
@@ -621,7 +629,7 @@ _response_send_callback(void *x, void *arg)
   res = (struct cerebro_metric_server_response *)x;
   fd = *((int *)arg);
 
-  if (_response_send(fd, res) < 0)
+  if (_metric_server_response_send(fd, res) < 0)
     return -1;
 
   return 0;
@@ -641,7 +649,9 @@ _responses_send_all(int fd, List responses)
 
   if (List_count(responses))
     {
-      if (list_for_each(responses, _response_send_callback, &fd) < 0)
+      if (list_for_each(responses, 
+                        _metric_server_response_send_callback, 
+                        &fd) < 0)
         return -1;
     }
 
@@ -676,9 +686,9 @@ _respond_with_metric_names(int fd, struct cerebro_metric_server_request *req)
     {
       CEREBRO_DBG(("list_create: %s", strerror(errno)));
       Pthread_mutex_unlock(&metric_name_lock);
-      _respond_with_error(fd, 
-                          req->version, 
-                          CEREBRO_METRIC_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
+      _metric_server_respond_with_error(fd, 
+                                        req->version, 
+                                        CEREBRO_METRIC_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
       goto cleanup;
     }
 
@@ -688,9 +698,9 @@ _respond_with_metric_names(int fd, struct cerebro_metric_server_request *req)
   if (Hash_for_each(metric_name_index, _metric_name_index_callback, &ed) < 0)
     {
       Pthread_mutex_unlock(&metric_name_lock);
-      _respond_with_error(fd,
-                          req->version,
-                          CEREBRO_METRIC_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
+      _metric_server_respond_with_error(fd,
+                                        req->version,
+                                        CEREBRO_METRIC_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
       goto cleanup;
     }
 
@@ -699,9 +709,9 @@ _respond_with_metric_names(int fd, struct cerebro_metric_server_request *req)
 
   if (_responses_send_all(fd, responses) < 0)
     {
-      _respond_with_error(fd,
-                          req->version,
-                          CEREBRO_METRIC_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
+      _metric_server_respond_with_error(fd,
+                                        req->version,
+                                        CEREBRO_METRIC_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
       goto cleanup;
     }
 
@@ -764,9 +774,9 @@ _respond_with_nodes(int fd,
     {
       CEREBRO_DBG(("list_create: %s", strerror(errno)));
       Pthread_mutex_unlock(&listener_data_lock);
-      _respond_with_error(fd,
-                          req->version,
-                          CEREBRO_METRIC_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
+      _metric_server_respond_with_error(fd,
+                                        req->version,
+                                        CEREBRO_METRIC_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
       goto cleanup;
     }
 
@@ -780,9 +790,9 @@ _respond_with_nodes(int fd,
   if (list_for_each(listener_data_list, _metric_data_evaluate, &ed) < 0)
     {
       Pthread_mutex_unlock(&listener_data_lock);
-      _respond_with_error(fd,
-                          req->version,
-                          CEREBRO_METRIC_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
+      _metric_server_respond_with_error(fd,
+                                        req->version,
+                                        CEREBRO_METRIC_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
       goto cleanup;
     }
 
@@ -791,9 +801,9 @@ _respond_with_nodes(int fd,
 
   if (_responses_send_all(fd, responses) < 0)
     {
-      _respond_with_error(fd,
-                          req->version,
-                          CEREBRO_METRIC_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
+      _metric_server_respond_with_error(fd,
+                                        req->version,
+                                        CEREBRO_METRIC_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
       goto cleanup;
     }
 
@@ -826,8 +836,9 @@ _metric_server_service_connection(void *arg)
   struct cerebro_metric_server_request req;
   char buf[CEREBRO_MAX_PACKET_LEN];
   char metric_name_buf[CEREBRO_MAX_METRIC_NAME_LEN+1];
-  fd = *((int *)arg);
   int32_t version;
+
+  fd = *((int *)arg);
 
   memset(&req, '\0', sizeof(struct cerebro_metric_server_request));
 
@@ -842,31 +853,31 @@ _metric_server_service_connection(void *arg)
   if (recv_len < sizeof(version))
     goto cleanup;
 
-  if (_request_check_version(buf, recv_len, &version) < 0)
+  if (_metric_server_request_check_version(buf, recv_len, &version) < 0)
     {
-      _respond_with_error(fd, 
-                          version,
-                          CEREBRO_METRIC_SERVER_PROTOCOL_ERR_VERSION_INVALID);
+      _metric_server_respond_with_error(fd, 
+                                        version,
+                                        CEREBRO_METRIC_SERVER_PROTOCOL_ERR_VERSION_INVALID);
       goto cleanup;
     }
 
   if (recv_len != CEREBRO_METRIC_SERVER_REQUEST_PACKET_LEN)
     {
-      _respond_with_error(fd, 
-                          version,
-                          CEREBRO_METRIC_SERVER_PROTOCOL_ERR_PACKET_INVALID);
+      _metric_server_respond_with_error(fd, 
+                                        version,
+                                        CEREBRO_METRIC_SERVER_PROTOCOL_ERR_PACKET_INVALID);
       goto cleanup;
     }
 
-  if (_request_unmarshall(&req, buf, recv_len) < 0)
+  if (_metric_server_request_unmarshall(&req, buf, recv_len) < 0)
     {
-      _respond_with_error(fd, 
-                          version,
-                          CEREBRO_METRIC_SERVER_PROTOCOL_ERR_PACKET_INVALID);
+      _metric_server_respond_with_error(fd, 
+                                        version,
+                                        CEREBRO_METRIC_SERVER_PROTOCOL_ERR_PACKET_INVALID);
       goto cleanup;
     } 
 
-  _request_dump(&req);
+  _metric_server_request_dump(&req);
 
   /* Guarantee ending '\0' character */
   memset(metric_name_buf, '\0', CEREBRO_MAX_METRIC_NAME_LEN+1);
@@ -876,9 +887,9 @@ _metric_server_service_connection(void *arg)
   if (!Hash_find(metric_name_index, metric_name_buf))
     {
       Pthread_mutex_unlock(&metric_name_lock);
-      _respond_with_error(fd,
-                          req.version,
-                          CEREBRO_METRIC_SERVER_PROTOCOL_ERR_METRIC_UNKNOWN);
+      _metric_server_respond_with_error(fd,
+                                        req.version,
+                                        CEREBRO_METRIC_SERVER_PROTOCOL_ERR_METRIC_UNKNOWN);
       goto cleanup;
     }
   Pthread_mutex_unlock(&metric_name_lock);

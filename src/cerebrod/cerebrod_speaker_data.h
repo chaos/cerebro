@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker_data.h,v 1.5 2005-07-11 17:44:52 achu Exp $
+ *  $Id: cerebrod_speaker_data.h,v 1.6 2005-07-12 00:31:53 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBROD_SPEAKER_DATA_H
@@ -28,11 +28,13 @@ struct cerebrod_speaker_metric_info
 {
   char *metric_name;
   u_int32_t metric_origin;
-  u_int32_t metric_period;
   u_int32_t next_call_time;
 
   /* For Metric Modules */
+  u_int32_t metric_period;
   int index;
+
+  /* For Metrics from userspace */
 };
 
 /*
@@ -41,6 +43,13 @@ struct cerebrod_speaker_metric_info
  * Initialize speaker_data structures
  */
 void cerebrod_speaker_data_initialize(void);
+
+/* 
+ * cerebrod_speaker_data_metric_list_sort
+ *
+ * Sort the metric list
+ */
+void cerebrod_speaker_data_metric_list_sort(void);
 
 /*
  * cerebrod_speaker_data_get_metric_data
