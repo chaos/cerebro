@@ -7,11 +7,16 @@ Testing
 - api again
 
 Cleanup
-- metric_list into a new file or something? 
+- metric value receive in libcerebro metric_data
+- cerebrod metric_list into a new file or something? 
   - hard to follow, especially destroy stuff
   - atleast a common create func?
 - abstract listener_data a bit more?  
--metric value marshall/unmarshall
+- metric value marshall/unmarshall common funcs??
+- receive metric_value common funcs?
+- libcerebro control stuff
+- manpages for libcerebro control stuff
+- cerebro-admin
 
 Portability
 - IPv6

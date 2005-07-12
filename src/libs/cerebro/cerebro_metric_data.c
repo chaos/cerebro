@@ -138,6 +138,70 @@ _metric_value_unmarshall(cerebro_t handle,
 }
 
 /* 
+ * _receive_metric_value
+ *
+ * Receive the metric value
+ *
+ * Returns 0 on success, -1 on error
+ */
+static int
+_receive_metric_value(cerebro_t handle, 
+                      struct cerebro_metric_server_response *res,
+                      int fd)
+{
+  char *vbuf = NULL;
+  int vbytes_read, rv = -1;
+  void *metric_value = NULL;
+  unsigned int errnum;
+
+  if (!res->metric_value_len)
+    return 0;
+
+  if (res->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_NONE)
+    {
+      handle->errnum = CEREBRO_ERR_PROTOCOL;
+      goto cleanup;
+    }
+      
+  if (!(vbuf = malloc(res->metric_value_len)))
+    {
+      handle->errnum = CEREBRO_ERR_OUTMEM;
+      goto cleanup;
+    }
+      
+  if ((vbytes_read = receive_data(fd,
+                                  res->metric_value_len,
+                                  vbuf,
+                                  res->metric_value_len,
+                                  CEREBRO_METRIC_SERVER_PROTOCOL_CLIENT_TIMEOUT_LEN,
+                                  &errnum)) < 0)
+    {
+      handle->errnum = errnum;
+      goto cleanup;
+    }
+  
+  if (vbytes_read != res->metric_value_len)
+    {
+      handle->errnum = CEREBRO_ERR_PROTOCOL;
+      goto cleanup;
+    }
+  
+  if (_metric_value_unmarshall(handle, 
+                               res, 
+                               &metric_value, 
+                               vbuf, 
+                               vbytes_read) < 0)
+      goto cleanup;
+
+  res->metric_value = metric_value;
+  
+  rv = 0;
+ cleanup:
+  free(vbuf);
+  return rv;
+}
+
+/* 
  * _receive_metric_data_response
  *
  * Receive a metric server data response.
@@ -153,9 +217,7 @@ _receive_metric_data_response(cerebro_t handle,
 {
   struct cerebro_nodelist *nodelist;
   char nodename_buf[CEREBRO_MAX_NODENAME_LEN+1];
-  void *metric_value = NULL;
-  char *vbuf = NULL;
-  int vbytes_read, rv = -1;
+  int rv = -1;
 
   if (_cerebro_handle_check(handle) < 0)
     {
@@ -180,51 +242,8 @@ _receive_metric_data_response(cerebro_t handle,
     }
 
   res->metric_value = NULL;
-  if (res->metric_value_len)
-    {
-      unsigned int errnum;
-      
-      if (res->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_NONE)
-        {
-          handle->errnum = CEREBRO_ERR_PROTOCOL;
-          goto cleanup;
-        }
-      
-      if (!(vbuf = malloc(res->metric_value_len)))
-        {
-          handle->errnum = CEREBRO_ERR_OUTMEM;
-          goto cleanup;
-        }
-      
-      if ((vbytes_read = receive_data(fd,
-                                      res->metric_value_len,
-                                      vbuf,
-                                      res->metric_value_len,
-                                      CEREBRO_METRIC_SERVER_PROTOCOL_CLIENT_TIMEOUT_LEN,
-                                      &errnum)) < 0)
-        {
-          handle->errnum = errnum;
-          goto cleanup;
-        }
-      
-      if (vbytes_read != res->metric_value_len)
-        {
-          handle->errnum = CEREBRO_ERR_PROTOCOL;
-          goto cleanup;
-        }
-
-      if (_metric_value_unmarshall(handle, 
-                                   res, 
-                                   &metric_value, 
-                                   vbuf, 
-                                   vbytes_read) < 0)
-        {
-          goto cleanup;
-        }
-      
-      free(vbuf);
-      vbuf = NULL;
-    }
+  if (_receive_metric_value(handle, res, fd) < 0)
+    goto cleanup;
 
   /* Guarantee ending '\0' character */
   memset(nodename_buf, '\0', CEREBRO_MAX_NODENAME_LEN+1);
@@ -234,13 +253,13 @@ _receive_metric_data_response(cerebro_t handle,
                                nodename_buf,
                                res->metric_value_type,
                                res->metric_value_len,
-                               metric_value) < 0)
-    goto cleanup;
+                               res->metric_value) < 0)
+    goto cleanup_metric_value;
   
   rv = 0;
+ cleanup_metric_value:
+  free(res->metric_value);
  cleanup:
-  free(metric_value);
-  free(vbuf);
   return rv;
 }
 

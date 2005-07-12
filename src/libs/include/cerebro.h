@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.10 2005-07-06 00:10:09 achu Exp $
+ *  $Id: cerebro.h,v 1.11 2005-07-12 18:34:04 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_H
@@ -230,7 +230,7 @@ int cerebro_get_flags(cerebro_t handle);
 int cerebro_set_flags(cerebro_t handle, unsigned int flags);
 
 /* 
- * Core API
+ * Metric Retrieval API
  */
 
 /* 
@@ -251,6 +251,40 @@ cerebro_metriclist_t cerebro_get_metric_names(cerebro_t handle);
  */
 cerebro_nodelist_t cerebro_get_metric_data(cerebro_t handle,
 					   const char *metric_name);
+
+/* 
+ * Metric Monitoring API
+ */
+
+/* 
+ * cerebro_register_metric
+ *
+ * Register a new metric with the local cerebro daemon
+ *
+ * Returns 0 on success, -1 on error
+ */
+int cerebro_register_metric(cerebro_t handle, const char *metric_name);
+
+/* 
+ * cerebro_unregister_metric
+ *
+ * Unregister a metric with the local cerebro daemon
+ *
+ * Returns 0 on success, -1 on error
+ */
+int cerebro_unregister_metric(cerebro_t handle, const char *metric_name);
+
+/* 
+ * cerebro_update_metric_value
+ *
+ * Update the value of a metric on the local cerebro daemon
+ *
+ * Returns 0 on success, -1 on error
+ */
+int cerebro_update_metric_value(cerebro_t handle,
+                                unsigned int metric_value_type,
+                                unsigned int metric_value_len,
+                                void *metric_value);
 
 /* 
  * Metriclist API
