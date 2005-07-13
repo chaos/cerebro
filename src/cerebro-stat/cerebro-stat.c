@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro-stat.c,v 1.9 2005-07-07 16:37:29 achu Exp $
+ *  $Id: cerebro-stat.c,v 1.10 2005-07-13 00:14:16 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -379,7 +379,7 @@ _metric_value_str(struct node_metric_data *data, char *buf, unsigned int buflen)
 {
   const char *func = __FUNCTION__;
   unsigned int mtype, mlen;
-  int rv;
+  int rv = 0;
 
   assert(data && buf && buflen > 0);
 
@@ -563,7 +563,9 @@ _hostrange_output_data(void *data, const void *key, void *arg)
 static void
 _hostrange_output(List l)
 {
+#if CEREBRO_DEBUG
   const char *func = __FUNCTION__;
+#endif /* CEREBRO_DEBUG */
   struct node_metric_data *data = NULL;
   ListIterator litr = NULL;
   unsigned int count;

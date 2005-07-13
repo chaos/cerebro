@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_controller.c,v 1.6 2005-07-12 23:04:09 achu Exp $
+ *  $Id: cerebrod_metric_controller.c,v 1.7 2005-07-13 00:14:16 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -433,7 +433,7 @@ _receive_metric_value(int fd,
                       int32_t version, 
                       struct cerebro_metric_control_request *req)
 {
-  char *vbuf, *metric_value = NULL;
+  char *vbuf = NULL, *metric_value = NULL;
   int vbytes_read, rv = -1;
   u_int32_t mtype, mlen;
 
