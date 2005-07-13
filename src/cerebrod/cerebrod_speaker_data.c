@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker_data.c,v 1.22 2005-07-12 15:34:42 achu Exp $
+ *  $Id: cerebrod_speaker_data.c,v 1.23 2005-07-13 00:09:30 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -363,9 +363,6 @@ static struct cerebrod_heartbeat_metric *
 _get_userspace_metric_value(struct cerebrod_speaker_metric_info *metric_info)
 {
   struct cerebrod_heartbeat_metric *hd = NULL;
-  void *temp_value = NULL;
-  char *metric_name;
-  unsigned int index;
 
   assert(metric_info);
 
