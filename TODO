@@ -19,6 +19,8 @@ Cleanup
 - cerebro-admin
 - autoconf CEREBRO_METRIC_CONTROL_PATH??
 
+- metric_value_len == 0 with STRING?? hmmm
+
 Portability
 - IPv6
 - Non-pthreads support

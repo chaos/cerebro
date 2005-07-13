@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.11 2005-07-12 18:34:04 achu Exp $
+ *  $Id: cerebro.h,v 1.12 2005-07-13 00:08:04 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_H
@@ -282,6 +282,7 @@ int cerebro_unregister_metric(cerebro_t handle, const char *metric_name);
  * Returns 0 on success, -1 on error
  */
 int cerebro_update_metric_value(cerebro_t handle,
+				const char *metric_name,
                                 unsigned int metric_value_type,
                                 unsigned int metric_value_len,
                                 void *metric_value);

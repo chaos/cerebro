@@ -1,8 +1,8 @@
 2005-07-12  Albert Chu  <chu11@llnl.gov>
 
-	* Continued work on metric controller.
+	* Finished initial work on cerebrod metric controller.
 
-	* Begin work on libcerebro control functions.
+	* Added libcerebro metric control API.
 	
 2005-07-11  Albert Chu  <chu11@llnl.gov>
 

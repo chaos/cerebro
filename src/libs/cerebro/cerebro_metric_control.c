@@ -398,17 +398,19 @@ _metric_control_response_receive(cerebro_t handle, int fd)
 }
 
 /* 
- * _cerebro_control_metric
+ * _cerebro_metric_control
  *
- * Common function for cerebro_register_metric and
- * cerebro_unregister_metric
+ * Common code for cerebro metric control API
  *
  * Returns 0 on success, -1 on error
  */
 static int
-_cerebro_control_metric(cerebro_t handle, 
+_cerebro_metric_control(cerebro_t handle, 
+                        unsigned int command,
                         const char *metric_name, 
-                        unsigned int command)
+                        unsigned int metric_value_type,
+                        unsigned int metric_value_len,
+                        void *metric_value)
 {
   int fd = -1, rv = -1;
 
@@ -421,11 +423,25 @@ _cerebro_control_metric(cerebro_t handle,
       return -1;
     }
 
-  if (command != CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_REGISTER
-      && command != CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_UNREGISTER)
+  if (command == CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_UPDATE
+      && (!(metric_value_type >= CEREBRO_METRIC_VALUE_TYPE_NONE
+            && metric_value_type <= CEREBRO_METRIC_VALUE_TYPE_STRING)
+          || (metric_value_type == CEREBRO_METRIC_VALUE_TYPE_NONE
+              && metric_value_len)
+          || (metric_value_type == CEREBRO_METRIC_VALUE_TYPE_NONE
+              && metric_value)
+          || (metric_value_type != CEREBRO_METRIC_VALUE_TYPE_NONE
+              && !metric_value)
+          || (metric_value_type == CEREBRO_METRIC_VALUE_TYPE_INT32
+              && metric_value_len != sizeof(int32_t))
+          || (metric_value_type == CEREBRO_METRIC_VALUE_TYPE_U_INT32
+              && metric_value_len != sizeof(u_int32_t))
+          || (metric_value_type == CEREBRO_METRIC_VALUE_TYPE_FLOAT
+              && metric_value_len != sizeof(float))
+          || (metric_value_type == CEREBRO_METRIC_VALUE_TYPE_DOUBLE
+              && metric_value_len != sizeof(double))))
     {
-      CEREBRO_DBG(("invalid parameters"));
-      handle->errnum = CEREBRO_ERR_INTERNAL;
+      handle->errnum = CEREBRO_ERR_PARAMETERS;
       return -1;
     }
 
@@ -439,9 +455,9 @@ _cerebro_control_metric(cerebro_t handle,
                                    fd,
                                    CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_REGISTER,
                                    metric_name,
-                                   CEREBRO_METRIC_VALUE_TYPE_NONE,
-                                   0,
-                                   NULL) < 0)
+                                   metric_value_type,
+                                   metric_value_len,
+                                   metric_value) < 0)
     goto cleanup;
 
   if (_metric_control_response_receive(handle, fd) < 0)
@@ -457,17 +473,37 @@ _cerebro_control_metric(cerebro_t handle,
 int 
 cerebro_register_metric(cerebro_t handle, const char *metric_name)
 {
-  return _cerebro_control_metric(handle, 
+  return _cerebro_metric_control(handle, 
+                                 CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_REGISTER,
                                  metric_name, 
-                                 CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_REGISTER);
+                                 CEREBRO_METRIC_VALUE_TYPE_NONE,
+                                 0,
+                                 NULL);
 }
 
 int 
 cerebro_unregister_metric(cerebro_t handle, const char *metric_name)
 {
-  return _cerebro_control_metric(handle, 
+  return _cerebro_metric_control(handle, 
+                                 CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_UNREGISTER,
                                  metric_name, 
-                                 CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_UNREGISTER);
+                                 CEREBRO_METRIC_VALUE_TYPE_NONE,
+                                 0,
+                                 NULL);
 }
 
+int
+cerebro_update_metric_value(cerebro_t handle,
+                            const char *metric_name,
+                            unsigned int metric_value_type,
+                            unsigned int metric_value_len,
+                            void *metric_value)
+{
+  return _cerebro_metric_control(handle, 
+                                 CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_UPDATE,
+                                 metric_name, 
+                                 metric_value_type,
+                                 metric_value_len,
+                                 metric_value);
+}
 
