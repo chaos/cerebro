@@ -23,6 +23,8 @@ Cleanup
 
 - metric_value_len == 0 with STRING?? hmmm
 
+- audit controller security for non-root
+
 Portability
 - IPv6
 - Non-pthreads support
