@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.19 2005-07-11 17:31:19 achu Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.20 2005-07-15 21:57:00 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -756,6 +756,12 @@ cerebrod_listener_data_update(char *nodename,
           /* Guarantee ending '\0' character */
           memset(metric_name_buf, '\0', CEREBRO_MAX_METRIC_NAME_LEN+1);
           memcpy(metric_name_buf, hd->metric_name, CEREBRO_MAX_METRIC_NAME_LEN);
+
+          if (!strlen(metric_name_buf))
+            {
+              CEREBRO_DBG(("null heartbeat_data metric_name received"));
+              continue;
+            }
 
           _metric_data_update(nd, metric_name_buf, hd, received_time);
           _monitor_update(nodename, nd, metric_name_buf, hd);

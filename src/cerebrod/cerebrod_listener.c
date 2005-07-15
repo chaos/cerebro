@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.110 2005-07-11 20:35:34 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.111 2005-07-15 21:57:00 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -417,6 +417,12 @@ cerebrod_listener(void *arg)
       /* Guarantee ending '\0' character */
       memset(nodename_buf, '\0', CEREBRO_MAX_NODENAME_LEN+1);
       memcpy(nodename_buf, hb->nodename, CEREBRO_MAX_NODENAME_LEN);
+
+      if (!strlen(nodename_buf))
+        {
+          CEREBRO_DBG(("received null nodename"));
+          continue;
+        }
 
       if ((flag = clusterlist_module_node_in_cluster(clusterlist_handle,
 						     nodename_buf)) < 0)

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_server.c,v 1.18 2005-07-15 21:30:18 achu Exp $
+ *  $Id: cerebrod_metric_server.c,v 1.19 2005-07-15 21:57:00 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -888,6 +888,14 @@ _metric_server_service_connection(void *arg)
   /* Guarantee ending '\0' character */
   memset(metric_name_buf, '\0', CEREBRO_MAX_METRIC_NAME_LEN+1);
   memcpy(metric_name_buf, req.metric_name, CEREBRO_MAX_METRIC_NAME_LEN);
+
+  if (!strlen(metric_name_buf))
+    {
+      _metric_server_respond_with_error(fd,
+                                        req.version,
+                                        CEREBRO_METRIC_SERVER_PROTOCOL_ERR_METRIC_UNKNOWN);
+      goto cleanup;
+    }
 
   Pthread_mutex_lock(&metric_name_lock);
   if (!Hash_find(metric_name_index, metric_name_buf))

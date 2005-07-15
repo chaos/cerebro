@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_controller.c,v 1.8 2005-07-15 21:30:18 achu Exp $
+ *  $Id: cerebrod_metric_controller.c,v 1.9 2005-07-15 21:57:00 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -663,6 +663,14 @@ _metric_controller_service_connection(void *arg)
   memset(metric_name_buf, '\0', CEREBRO_MAX_METRIC_NAME_LEN+1);
   memcpy(metric_name_buf, req.metric_name, CEREBRO_MAX_METRIC_NAME_LEN);
   
+  if (!strlen(metric_name_buf))
+    {
+      _send_metric_control_response(fd,
+                                    version,
+                                    CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_METRIC_INVALID);
+      goto cleanup;
+    }
+
   if (req.command == CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_REGISTER)
     {
       if (_register_metric(fd, version, metric_name_buf) < 0)

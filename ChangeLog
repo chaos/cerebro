@@ -1,3 +1,9 @@
+2005-07-15  Albert Chu  <chu11@llnl.gov>
+
+	* Fixed metric controller bugs.
+
+	* Fixed null packet string bugs.
+	
 2005-07-12  Albert Chu  <chu11@llnl.gov>
 
 	* Finished initial work on cerebrod metric controller.
