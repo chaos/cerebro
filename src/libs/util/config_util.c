@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: config_util.c,v 1.11 2005-07-11 20:35:34 achu Exp $
+ *  $Id: config_util.c,v 1.12 2005-07-15 21:30:18 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -641,6 +641,13 @@ _set_cerebro_config(struct cerebro_config *dest,
     {
       dest->cerebrod_listen_debug = src->cerebrod_listen_debug;
       dest->cerebrod_listen_debug_flag++;
+    }
+
+  if (!dest->cerebrod_metric_controller_debug_flag
+      && src->cerebrod_metric_controller_debug_flag)
+    {
+      dest->cerebrod_metric_controller_debug = src->cerebrod_metric_controller_debug;
+      dest->cerebrod_metric_controller_debug_flag++;
     }
 
   if (!dest->cerebrod_metric_server_debug_flag

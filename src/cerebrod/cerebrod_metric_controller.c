@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_controller.c,v 1.7 2005-07-13 00:14:16 achu Exp $
+ *  $Id: cerebrod_metric_controller.c,v 1.8 2005-07-15 21:30:18 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -241,8 +241,8 @@ _metric_control_request_dump(struct cerebro_metric_control_request *req)
   /* Guarantee ending '\0' character */
   memset(metric_name_buf, '\0', CEREBRO_MAX_METRIC_NAME_LEN+1);
   memcpy(metric_name_buf, req->metric_name, CEREBRO_MAX_METRIC_NAME_LEN);
-  fprintf(stderr, "* Metric_Name: %s\n", metric_name_buf);
-  fprintf(stderr, "* Metric_Value_Type: %x\n", req->metric_value_type);
+  fprintf(stderr, "* Metric_name: %s\n", metric_name_buf);
+  fprintf(stderr, "* Metric_value_type: %x\n", req->metric_value_type);
   fprintf(stderr, "* metric_value_len: %d\n", req->metric_value_len);
   fprintf(stderr, "**************************************\n");
   Pthread_mutex_unlock(&debug_output_mutex);
@@ -264,7 +264,7 @@ _send_metric_control_response(int fd, int32_t version, u_int32_t err_code)
   int res_len, buflen;
                                                                                       
   assert(fd >= 0
-         && err_code >= CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_VERSION_INVALID
+         && err_code >= CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_SUCCESS
          && err_code <= CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_INTERNAL_ERROR);
                                                                                       
   memset(&res, '\0', CEREBRO_METRIC_SERVER_ERR_RESPONSE_LEN);
@@ -569,6 +569,35 @@ _update_metric(int fd,
   return -1;
 }
 
+/* 
+ * _speaker_metric_names_dump
+ *
+ * Dump the currently known/registered metric names
+ */
+static void
+_speaker_metric_names_dump(void)
+{
+  struct cerebrod_speaker_metric_info *metric_info = NULL;
+  ListIterator itr = NULL;
+
+  if (!(conf.debug && conf.metric_controller_debug))
+    return;
+
+  Pthread_mutex_lock(&metric_list_lock);
+  Pthread_mutex_lock(&debug_output_mutex);
+
+  fprintf(stderr, "**************************************\n");
+  fprintf(stderr, "* Speaker Data Metric Names\n");
+  fprintf(stderr, "* -----------------------\n");
+  itr = List_iterator_create(metric_list);
+  while ((metric_info = list_next(itr)))
+    fprintf(stderr, "* %s\n", metric_info->metric_name);
+  fprintf(stderr, "**************************************\n");
+  List_iterator_destroy(itr);
+  Pthread_mutex_unlock(&debug_output_mutex);
+  Pthread_mutex_unlock(&metric_list_lock);
+}
+
 /*
  * _metric_controller_service_connection
  *
@@ -656,6 +685,8 @@ _metric_controller_service_connection(void *arg)
                                     CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_PARAMETER_INVALID);
       goto cleanup;
     }
+
+  _speaker_metric_names_dump();
 
   _send_metric_control_response(fd,
                                 version,

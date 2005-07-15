@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_server.c,v 1.17 2005-07-12 23:04:09 achu Exp $
+ *  $Id: cerebrod_metric_server.c,v 1.18 2005-07-15 21:30:18 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -128,7 +128,7 @@ _metric_server_request_dump(struct cerebro_metric_server_request *req)
   /* Guarantee ending '\0' character */
   memset(metric_name_buf, '\0', CEREBRO_MAX_METRIC_NAME_LEN+1);
   memcpy(metric_name_buf, req->metric_name, CEREBRO_MAX_METRIC_NAME_LEN);
-  fprintf(stderr, "* Metric_Name: %s\n", metric_name_buf);
+  fprintf(stderr, "* Metric_name: %s\n", metric_name_buf);
   fprintf(stderr, "* Flags: %x\n", req->flags);
   fprintf(stderr, "* Timeout_len: %d\n", req->timeout_len);
   fprintf(stderr, "**************************************\n");

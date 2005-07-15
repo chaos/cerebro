@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_control_protocol.h,v 1.3 2005-07-12 23:04:09 achu Exp $
+ *  $Id: cerebro_metric_control_protocol.h,v 1.4 2005-07-15 21:30:18 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_METRIC_CONTROL_PROTOCOL_H
@@ -41,9 +41,9 @@
 #define CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_UPDATE            2
 
 #if CEREBRO_DEBUG
-#define CEREBRO_METRIC_CONTROL_PATH  "/tmp/cerebro_metric_cerebrod_metric_controller"
+#define CEREBRO_METRIC_CONTROL_PATH  "/tmp/cerebrod_metric_controller"
 #else  /* !CEREBRO_DEBUG */
-#define CEREBRO_METRIC_CONTROL_PATH  CEREBRO_MODULE_DIR "/cerebro_metric_cerebrod_metric_controller"
+#define CEREBRO_METRIC_CONTROL_PATH  CEREBRO_MODULE_DIR "/cerebrod_metric_controller"
 #endif  /* !CEREBRO_DEBUG */
 
 /*

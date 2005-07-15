@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker_data.c,v 1.23 2005-07-13 00:09:30 achu Exp $
+ *  $Id: cerebrod_speaker_data.c,v 1.24 2005-07-15 21:30:18 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -374,9 +374,19 @@ _get_userspace_metric_value(struct cerebrod_speaker_metric_info *metric_info)
   hd = Malloc(sizeof(struct cerebrod_heartbeat_metric));
   memset(hd, '\0', sizeof(struct cerebrod_heartbeat_metric));
 
+  /* need not overflow */
+  strncpy(hd->metric_name, 
+          metric_info->metric_name, 
+          CEREBRO_MAX_METRIC_NAME_LEN);
+
   hd->metric_value_type = metric_info->metric_value_type;
   hd->metric_value_len = metric_info->metric_value_len;
-  hd->metric_value = metric_info->metric_value;
+
+  hd->metric_value = Malloc(metric_info->metric_value_len);
+
+  memcpy(hd->metric_value, 
+         metric_info->metric_value, 
+         metric_info->metric_value_len);
 
   return hd;
 }

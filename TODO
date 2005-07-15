@@ -19,6 +19,8 @@ Cleanup
 - cerebro-admin
 - autoconf CEREBRO_METRIC_CONTROL_PATH??
 
+- NULL metric_name corner case checks, NULL nodename too
+
 - metric_value_len == 0 with STRING?? hmmm
 
 Portability

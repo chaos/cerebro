@@ -56,7 +56,7 @@ _setup_metric_control_fd(cerebro_t handle)
   if (connect(fd, (struct sockaddr *)&addr, sizeof(struct sockaddr_un)) < 0)
     {
       CEREBRO_DBG(("connect: %s", strerror(errno)));
-      handle->errnum = CEREBRO_ERR_INTERNAL;
+      handle->errnum = CEREBRO_ERR_CONNECT;
       goto cleanup;
     }
 
@@ -162,7 +162,7 @@ _metric_control_request_marshall(cerebro_t handle,
     }
   c += n;
 
-  mlen = req->metric_value_type;
+  mlen = req->metric_value_len;
   if ((n = marshall_u_int32(mlen, buf + c, buflen - c)) <= 0)
     {
       CEREBRO_DBG(("marshall_u_int32"));
@@ -279,7 +279,7 @@ _metric_control_request_send(cerebro_t handle,
 
   memset(&req, '\0', sizeof(struct cerebro_metric_control_request));
   req.version = CEREBRO_METRIC_CONTROL_PROTOCOL_VERSION;
-  req.command = CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_REGISTER;
+  req.command = command;
   strncpy(req.metric_name, metric_name, CEREBRO_MAX_METRIC_NAME_LEN);
   req.metric_value_type = metric_value_type;
   req.metric_value_len = metric_value_len;
@@ -453,7 +453,7 @@ _cerebro_metric_control(cerebro_t handle,
 
   if (_metric_control_request_send(handle,
                                    fd,
-                                   CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_REGISTER,
+                                   command,
                                    metric_name,
                                    metric_value_type,
                                    metric_value_len,
