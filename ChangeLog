@@ -3,6 +3,8 @@
 	* Fixed metric controller bugs.
 
 	* Fixed null packet string bugs.
+
+	* Added metric restart capability.
 	
 2005-07-12  Albert Chu  <chu11@llnl.gov>
 

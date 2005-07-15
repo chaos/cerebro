@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_controller.c,v 1.9 2005-07-15 21:57:00 achu Exp $
+ *  $Id: cerebrod_metric_controller.c,v 1.10 2005-07-15 23:39:51 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -371,6 +371,9 @@ _register_metric(int fd, int32_t version, const char *metric_name)
    * be sent.
    */
   metric_info->next_call_time = UINT_MAX;
+  metric_info->metric_value_type = CEREBRO_METRIC_VALUE_TYPE_NONE;
+  metric_info->metric_value_len = 0;
+  metric_info->metric_value = NULL;
   List_append(metric_list, metric_info);
   cerebrod_speaker_data_metric_list_sort();
 
@@ -570,6 +573,52 @@ _update_metric(int fd,
 }
 
 /* 
+ * _restart_metric
+ *
+ * Update the metric type, len, and data for a metric
+ *
+ * Returns 0 on success, -1 on error
+ */
+static int
+_restart_metric(int fd, 
+                int32_t version, 
+                const char *metric_name)
+{
+  struct cerebrod_speaker_metric_info *metric_info;
+  int rv = -1;
+
+  assert(fd >= 0 && metric_name);
+
+  Pthread_mutex_lock(&metric_list_lock);
+  
+  if (!(metric_info = _find_metric_info(metric_name)))
+    {
+      _send_metric_control_response(fd,
+                                    version,
+                                    CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_METRIC_INVALID);
+      Pthread_mutex_unlock(&metric_list_lock);
+      goto cleanup;
+    }
+  
+  if (!(metric_info->metric_origin & CEREBROD_METRIC_ORIGIN_USERSPACE))
+    {
+      _send_metric_control_response(fd,
+                                    version,
+                                    CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_METRIC_INVALID);
+      Pthread_mutex_unlock(&metric_list_lock);
+      goto cleanup;
+    }
+  
+  metric_info->next_call_time = 0;
+  cerebrod_speaker_data_metric_list_sort();
+
+  rv = 0;
+ cleanup:
+  Pthread_mutex_unlock(&metric_list_lock);
+  return rv;
+}
+
+/* 
  * _speaker_metric_names_dump
  *
  * Dump the currently known/registered metric names
@@ -671,19 +720,28 @@ _metric_controller_service_connection(void *arg)
       goto cleanup;
     }
 
-  if (req.command == CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_REGISTER)
+  if (req.command == CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_REGISTER 
+      && conf.speak)
     {
       if (_register_metric(fd, version, metric_name_buf) < 0)
         goto cleanup;
     }
-  else if (req.command == CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_UNREGISTER)
+  else if (req.command == CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_UNREGISTER 
+           && conf.speak)
     {
       if (_unregister_metric(fd, version, metric_name_buf) < 0)
         goto cleanup;
     }
-  else if (req.command == CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_UPDATE)
+  else if (req.command == CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_UPDATE 
+           && conf.speak)
     {
       if (_update_metric(fd, version, metric_name_buf, &req) < 0)
+        goto cleanup;
+    }
+  else if (req.command == CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_RESTART 
+           && conf.speak)
+    {
+      if (_restart_metric(fd, version, metric_name_buf) < 0)
         goto cleanup;
     }
   else

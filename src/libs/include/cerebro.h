@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.12 2005-07-13 00:08:04 achu Exp $
+ *  $Id: cerebro.h,v 1.13 2005-07-15 23:39:51 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_H
@@ -24,7 +24,7 @@
 #define CEREBRO_ERR_VERSION_INCOMPATIBLE     13
 #define CEREBRO_ERR_OVERFLOW                 14
 #define CEREBRO_ERR_NODE_NOTFOUND            15
-#define CEREBRO_ERR_METRIC_UNKNOWN           16
+#define CEREBRO_ERR_METRIC_INVALID           16
 #define CEREBRO_ERR_END_OF_LIST              17
 #define CEREBRO_ERR_CONFIG_FILE              18
 #define CEREBRO_ERR_CONFIG_MODULE            19
@@ -286,6 +286,15 @@ int cerebro_update_metric_value(cerebro_t handle,
                                 unsigned int metric_value_type,
                                 unsigned int metric_value_len,
                                 void *metric_value);
+
+/* 
+ * cerebro_restart_metric
+ *
+ * Restart a metric on the local cerebro daemon
+ *
+ * Returns 0 on success, -1 on error
+ */
+int cerebro_restart_metric(cerebro_t handle, const char *metric_name);
 
 /* 
  * Metriclist API

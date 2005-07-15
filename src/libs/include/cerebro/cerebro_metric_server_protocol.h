@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_server_protocol.h,v 1.2 2005-07-08 21:59:26 achu Exp $
+ *  $Id: cerebro_metric_server_protocol.h,v 1.3 2005-07-15 23:39:51 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_METRIC_SERVER_PROTOCOL_H
@@ -38,7 +38,7 @@
 
 #define CEREBRO_METRIC_SERVER_PROTOCOL_ERR_SUCCESS           0
 #define CEREBRO_METRIC_SERVER_PROTOCOL_ERR_VERSION_INVALID   1
-#define CEREBRO_METRIC_SERVER_PROTOCOL_ERR_METRIC_UNKNOWN    2
+#define CEREBRO_METRIC_SERVER_PROTOCOL_ERR_METRIC_INVALID    2
 #define CEREBRO_METRIC_SERVER_PROTOCOL_ERR_PARAMETER_INVALID 3
 #define CEREBRO_METRIC_SERVER_PROTOCOL_ERR_PACKET_INVALID    4
 #define CEREBRO_METRIC_SERVER_PROTOCOL_ERR_INTERNAL_ERROR    5

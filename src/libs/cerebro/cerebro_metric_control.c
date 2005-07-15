@@ -86,7 +86,7 @@ _metric_control_protocol_err_code_conversion(u_int32_t err_code)
     case CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_COMMAND_INVALID:
       return CEREBRO_ERR_PROTOCOL;
     case CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_METRIC_INVALID:
-      return CEREBRO_ERR_METRIC_UNKNOWN;
+      return CEREBRO_ERR_METRIC_INVALID;
     case CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_PARAMETER_INVALID:
       return CEREBRO_ERR_PROTOCOL;
     case CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_PACKET_INVALID:
@@ -267,7 +267,7 @@ _metric_control_request_send(cerebro_t handle,
   int req_len;
 
   if (!(command >= CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_REGISTER
-        && command <= CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_UPDATE)
+        && command <= CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_RESTART)
       || !metric_name
       || !(metric_value_type >= CEREBRO_METRIC_VALUE_TYPE_NONE
            && metric_value_type <= CEREBRO_METRIC_VALUE_TYPE_STRING))
@@ -505,5 +505,16 @@ cerebro_update_metric_value(cerebro_t handle,
                                  metric_value_type,
                                  metric_value_len,
                                  metric_value);
+}
+
+int 
+cerebro_restart_metric(cerebro_t handle, const char *metric_name)
+{
+  return _cerebro_metric_control(handle, 
+                                 CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_RESTART,
+                                 metric_name, 
+                                 CEREBRO_METRIC_VALUE_TYPE_NONE,
+                                 0,
+                                 NULL);
 }
 

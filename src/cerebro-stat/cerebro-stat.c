@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro-stat.c,v 1.10 2005-07-13 00:14:16 achu Exp $
+ *  $Id: cerebro-stat.c,v 1.11 2005-07-15 23:39:51 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -303,7 +303,7 @@ _try_nice_err_exit(int errnum)
     err_exit("Invalid hostname");
   if (errnum == CEREBRO_ERR_VERSION_INCOMPATIBLE)
     err_exit("Server version not compatible");
-  if (errnum == CEREBRO_ERR_METRIC_UNKNOWN)
+  if (errnum == CEREBRO_ERR_METRIC_INVALID)
     err_exit("Unknown metric name specified");
   if (errnum == CEREBRO_ERR_CONFIG_FILE)
     err_exit("Error parsing configuration file");

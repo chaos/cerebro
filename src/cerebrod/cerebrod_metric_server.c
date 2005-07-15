@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_server.c,v 1.19 2005-07-15 21:57:00 achu Exp $
+ *  $Id: cerebrod_metric_server.c,v 1.20 2005-07-15 23:39:51 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -893,7 +893,7 @@ _metric_server_service_connection(void *arg)
     {
       _metric_server_respond_with_error(fd,
                                         req.version,
-                                        CEREBRO_METRIC_SERVER_PROTOCOL_ERR_METRIC_UNKNOWN);
+                                        CEREBRO_METRIC_SERVER_PROTOCOL_ERR_METRIC_INVALID);
       goto cleanup;
     }
 
@@ -903,7 +903,7 @@ _metric_server_service_connection(void *arg)
       Pthread_mutex_unlock(&metric_name_lock);
       _metric_server_respond_with_error(fd,
                                         req.version,
-                                        CEREBRO_METRIC_SERVER_PROTOCOL_ERR_METRIC_UNKNOWN);
+                                        CEREBRO_METRIC_SERVER_PROTOCOL_ERR_METRIC_INVALID);
       goto cleanup;
     }
   Pthread_mutex_unlock(&metric_name_lock);
