@@ -4,6 +4,10 @@
 
 	* Fixed string length == 0 corner case problem.
 
+	* Cleaned up some autoconf macros.
+
+	* Added and use configurable SLURM_STATE_CONTROL_PATH.
+
 2005-07-15  Albert Chu  <chu11@llnl.gov>
 
 	* Fixed metric controller bugs.

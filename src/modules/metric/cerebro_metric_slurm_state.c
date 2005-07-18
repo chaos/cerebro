@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_slurm_state.c,v 1.9 2005-07-11 20:35:34 achu Exp $
+ *  $Id: cerebro_metric_slurm_state.c,v 1.10 2005-07-18 21:45:28 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -41,11 +41,6 @@
 
 #define SLURM_STATE_METRIC_MODULE_NAME      "slurm_state"
 #define SLURM_STATE_METRIC_NAME             "slurm_state"
-#if CEREBRO_DEBUG
-#define SLURM_STATE_UNIX_PATH               "/tmp/cerebro_metric_slurm_state"
-#else  /* !CEREBRO_DEBUG */
-#define SLURM_STATE_UNIX_PATH               CEREBRO_MODULE_DIR "/cerebro_metric_slurm_state"
-#endif  /* !CEREBRO_DEBUG */
 #define SLURM_STATE_BACKLOG                 5
 #define SLURM_STATE_REINITIALIZE_WAIT_TIME  5
 
@@ -89,18 +84,18 @@ _slurm_state_setup_socket(void)
       goto cleanup;
     }
   
-  if (strlen(SLURM_STATE_UNIX_PATH) >= sizeof(addr.sun_path))
+  if (strlen(SLURM_STATE_CONTROL_PATH) >= sizeof(addr.sun_path))
     {
-      CEREBRO_DBG(("path '%s' too long", SLURM_STATE_UNIX_PATH));
+      CEREBRO_DBG(("path '%s' too long", SLURM_STATE_CONTROL_PATH));
       goto cleanup;
     }
 
   /* unlink is allowed to fail */ 
-  unlink(SLURM_STATE_UNIX_PATH);
+  unlink(SLURM_STATE_CONTROL_PATH);
 
   memset(&addr, '\0', sizeof(struct sockaddr_un));
   addr.sun_family = AF_LOCAL;
-  strncpy(addr.sun_path, SLURM_STATE_UNIX_PATH, sizeof(addr.sun_path));
+  strncpy(addr.sun_path, SLURM_STATE_CONTROL_PATH, sizeof(addr.sun_path));
 
   if (bind(fd, (struct sockaddr *)&addr, sizeof(struct sockaddr_un)) < 0)
     {

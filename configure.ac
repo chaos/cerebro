@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.49 2005-07-07 16:37:28 achu Exp $
+## $Id: configure.ac,v 1.50 2005-07-18 21:45:28 achu Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -56,6 +56,12 @@ AC_LIBTOOL_DLOPEN
 AC_PROG_LIBTOOL
 AC_LIB_LTDL
 AM_CONDITIONAL(WITH_GNU_LD, test "$with_gnu_ld" = "yes")
+
+#
+# Check for debugging
+#
+# Must be called before module checks
+#
 AC_DEBUG
 
 ##
@@ -72,7 +78,9 @@ AC_CHECK_HEADERS( \
 )
 
 #
-# Check for default paths
+# Check for default module and config file paths
+#
+# Must be called before module checks
 #
 AC_CEREBRO_MODULE_DIR
 AC_CEREBRO_CONFIG_FILE
@@ -106,6 +114,7 @@ AM_CONDITIONAL(WITH_BOOTTIME, [test "$ac_with_boottime" = "yes"])
 # Check to build slurm_state module(s)
 #
 AC_SLURM_STATE
+AC_SLURM_STATE_PATH
 AM_CONDITIONAL(WITH_SLURM_STATE, [test "$ac_with_slurm_state" = "yes"])
 
 #
