@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: ac_slurm_state.m4,v 1.2 2005-07-18 21:45:28 achu Exp $
+## $Id: ac_slurm_state.m4,v 1.3 2005-07-18 22:06:47 achu Exp $
 ##*****************************************************************************
 
 AC_DEFUN([AC_SLURM_STATE],
@@ -27,7 +27,7 @@ AC_DEFUN([AC_SLURM_STATE],
   AC_SUBST(MANPAGE_SLURM_STATE)
 ])
 
-AC_DEFUN([AC_SLURM_STATE_PATH],
+AC_DEFUN([AC_SLURM_STATE_CONTROL_PATH],
 [
   if test "$ac_debug" = "yes"; then
      SLURM_STATE_CONTROL_PATH="/tmp/cerebro_metric_slurm_state"     

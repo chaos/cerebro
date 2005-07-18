@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.50 2005-07-18 21:45:28 achu Exp $
+## $Id: configure.ac,v 1.51 2005-07-18 22:06:47 achu Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -78,12 +78,14 @@ AC_CHECK_HEADERS( \
 )
 
 #
-# Check for default module and config file paths
+# Check for default paths
 #
-# Must be called before module checks
+# Must be called before module checks.  Module dir must be calculated
+# before metric control path.
 #
 AC_CEREBRO_MODULE_DIR
 AC_CEREBRO_CONFIG_FILE
+AC_CEREBRO_METRIC_CONTROL_PATH
 
 #
 # Check to build gendersllnl module(s)
@@ -114,7 +116,7 @@ AM_CONDITIONAL(WITH_BOOTTIME, [test "$ac_with_boottime" = "yes"])
 # Check to build slurm_state module(s)
 #
 AC_SLURM_STATE
-AC_SLURM_STATE_PATH
+AC_SLURM_STATE_CONTROL_PATH
 AM_CONDITIONAL(WITH_SLURM_STATE, [test "$ac_with_slurm_state" = "yes"])
 
 #
@@ -181,6 +183,7 @@ AC_CONFIG_FILES( \
   src/libs/common/Makefile \
   src/libs/debug/Makefile \
   src/libs/include/Makefile \
+  src/libs/include/cerebro/cerebro_metric_control_protocol.h \
   src/libs/modules/Makefile \
   src/libs/util/Makefile \
   src/libs/wrappers/Makefile \

@@ -8,6 +8,8 @@
 
 	* Added and use configurable SLURM_STATE_CONTROL_PATH.
 
+	* Autoconfed CEREBRO_METRIC_CONTROL_PATH
+
 2005-07-15  Albert Chu  <chu11@llnl.gov>
 
 	* Fixed metric controller bugs.
