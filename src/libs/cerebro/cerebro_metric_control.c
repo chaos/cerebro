@@ -445,6 +445,11 @@ _cerebro_metric_control(cerebro_t handle,
       return -1;
     }
 
+  if (command == CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_UPDATE
+      && metric_value_type == CEREBRO_METRIC_VALUE_TYPE_STRING
+      && !metric_value_len)
+    metric_value_type = CEREBRO_METRIC_VALUE_TYPE_NONE;
+
   if (_cerebro_load_config(handle) < 0)
     goto cleanup;
 

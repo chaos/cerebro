@@ -14,16 +14,8 @@ Cleanup
 - abstract listener_data a bit more?  
 - metric value marshall/unmarshall common funcs??
 - receive metric_value common funcs?
-- libcerebro control stuff
 - manpages for libcerebro control stuff
-- cerebro-admin
 - autoconf CEREBRO_METRIC_CONTROL_PATH??
-
-- flush stuff for listener metric control
-
-- metric_value_len == 0 with STRING?? hmmm
-
-- audit controller security for non-root
 
 Portability
 - IPv6
@@ -31,6 +23,10 @@ Portability
 - Multicast
 
 Design
+- cerebro-admin
+- Ability to flush metric from listener
+  - requires protocol change, listener must also know metric origin
+- password or something for userspace metrics?
 - Way for metric modules to tell Cerebrod it has new data and it should
   be sent out??
   - pass a function to the thread to be called with a metric_name.

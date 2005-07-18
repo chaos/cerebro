@@ -154,15 +154,28 @@ _receive_metric_value(cerebro_t handle,
   void *metric_value = NULL;
   unsigned int errnum;
 
-  if (!res->metric_value_len)
-    return 0;
-
-  if (res->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_NONE)
+  if (!(res->metric_value_type >= CEREBRO_METRIC_VALUE_TYPE_NONE
+        && res->metric_value_type <= CEREBRO_METRIC_VALUE_TYPE_STRING)
+      || (res->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_NONE
+          && res->metric_value_len)
+      || (res->metric_value_type != CEREBRO_METRIC_VALUE_TYPE_NONE
+          && !res->metric_value_len)
+      || (res->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_INT32
+          && res->metric_value_len != sizeof(int32_t))
+      || (res->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_U_INT32
+          && res->metric_value_len != sizeof(u_int32_t))
+      || (res->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_FLOAT
+          && res->metric_value_len != sizeof(float))
+      || (res->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_DOUBLE
+          && res->metric_value_len != sizeof(double)))
     {
       handle->errnum = CEREBRO_ERR_PROTOCOL;
       goto cleanup;
     }
-      
+
+  if (!res->metric_value_len)
+    return 0;
+
   if (!(vbuf = malloc(res->metric_value_len)))
     {
       handle->errnum = CEREBRO_ERR_OUTMEM;

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_controller.c,v 1.10 2005-07-15 23:39:51 achu Exp $
+ *  $Id: cerebrod_metric_controller.c,v 1.11 2005-07-18 17:51:08 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -43,6 +43,9 @@ extern struct cerebrod_config conf;
 extern pthread_mutex_t debug_output_mutex;
 #endif /* CEREBRO_DEBUG */
 
+/* 
+ * Speaker Data
+ */
 extern List metric_list;
 extern int metric_list_size;
 extern pthread_mutex_t metric_list_lock;
@@ -285,14 +288,14 @@ _send_metric_control_response(int fd, int32_t version, u_int32_t err_code)
 }
 
 /* 
- * _find_metric_info
+ * _find_speaker_metric_info
  *
  * Find metric_info for 'metric_name' in the metric_list
  *
  * Returns metric_info on success, NULL if not found
  */
 static struct cerebrod_speaker_metric_info *
-_find_metric_info(const char *metric_name)
+_find_speaker_metric_info(const char *metric_name)
 {
   struct cerebrod_speaker_metric_info *metric_info = NULL;
   ListIterator itr = NULL;
@@ -352,10 +355,10 @@ _register_metric(int fd, int32_t version, const char *metric_name)
   struct cerebrod_speaker_metric_info *metric_info;
   int rv = -1;
 
-  assert(fd >= 0 && metric_name);
+  assert(fd >= 0 && metric_name && conf.speak);
 
   Pthread_mutex_lock(&metric_list_lock);
-  if ((metric_info = _find_metric_info(metric_name)))
+  if ((metric_info = _find_speaker_metric_info(metric_name)))
     {
       _send_metric_control_response(fd,
                                     version,
@@ -396,10 +399,10 @@ _unregister_metric(int fd, int32_t version, const char *metric_name)
   struct cerebrod_speaker_metric_info *metric_info;
   int rv = -1;
 
-  assert(fd >= 0 && metric_name);
+  assert(fd >= 0 && metric_name && conf.speak);
 
   Pthread_mutex_lock(&metric_list_lock);
-  if (!(metric_info = _find_metric_info(metric_name)))
+  if (!(metric_info = _find_speaker_metric_info(metric_name)))
     {
       _send_metric_control_response(fd,
                                     version,
@@ -517,25 +520,49 @@ _update_metric(int fd,
 {
   struct cerebrod_speaker_metric_info *metric_info;
 
-  assert(fd >= 0 && metric_name && req);
+  assert(fd >= 0 && metric_name && req && conf.speak);
 
   req->metric_value = NULL;
 
   if (_receive_metric_value(fd, version, req) < 0)
     goto cleanup;
   
-  if (!(req->metric_value_type >= CEREBRO_METRIC_VALUE_TYPE_NONE
-        && req->metric_value_type <= CEREBRO_METRIC_VALUE_TYPE_STRING))
+  if ((req->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_NONE
+       && !req->metric_value_len)
+      || !(req->metric_value_type >= CEREBRO_METRIC_VALUE_TYPE_NONE
+           && req->metric_value_type <= CEREBRO_METRIC_VALUE_TYPE_STRING)
+      || (req->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_INT32
+          && req->metric_value_len != sizeof(int32_t))
+      || (req->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_U_INT32
+          && req->metric_value_len != sizeof(u_int32_t))
+      || (req->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_FLOAT
+          && req->metric_value_len != sizeof(float))
+      || (req->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_DOUBLE
+          && req->metric_value_len != sizeof(double)))
     {
       _send_metric_control_response(fd,
                                     version,
                                     CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_PARAMETER_INVALID);
       goto cleanup;
     }
+                                                                                    
+  if (req->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_STRING
+      && req->metric_value_len > CEREBRO_MAX_METRIC_STRING_LEN)
+    {
+      CEREBRO_DBG(("truncate metric string: %d", req->metric_value_len));
+      req->metric_value_len = CEREBRO_MAX_METRIC_STRING_LEN;
+    }
+                                                                                    
+  if (req->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_STRING &&
+      !req->metric_value_len)
+    {
+      CEREBRO_DBG(("adjusting metric type to none"));
+      req->metric_value_type = CEREBRO_METRIC_VALUE_TYPE_NONE;
+    }
 
   Pthread_mutex_lock(&metric_list_lock);
   
-  if (!(metric_info = _find_metric_info(metric_name)))
+  if (!(metric_info = _find_speaker_metric_info(metric_name)))
     {
       _send_metric_control_response(fd,
                                     version,
@@ -551,11 +578,11 @@ _update_metric(int fd,
                                     CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_METRIC_INVALID);
       Pthread_mutex_unlock(&metric_list_lock);
       goto cleanup;
-    }
-  
+    } 
+
   if (metric_info->metric_value)
     Free(metric_info->metric_value);
-  
+
   metric_info->next_call_time = 0;
   metric_info->metric_value_type = req->metric_value_type;
   metric_info->metric_value_len = req->metric_value_len;
@@ -575,7 +602,7 @@ _update_metric(int fd,
 /* 
  * _restart_metric
  *
- * Update the metric type, len, and data for a metric
+ * Restart a metric by setting the next call time to 0
  *
  * Returns 0 on success, -1 on error
  */
@@ -587,11 +614,11 @@ _restart_metric(int fd,
   struct cerebrod_speaker_metric_info *metric_info;
   int rv = -1;
 
-  assert(fd >= 0 && metric_name);
+  assert(fd >= 0 && metric_name && conf.speak);
 
   Pthread_mutex_lock(&metric_list_lock);
   
-  if (!(metric_info = _find_metric_info(metric_name)))
+  if (!(metric_info = _find_speaker_metric_info(metric_name)))
     {
       _send_metric_control_response(fd,
                                     version,
@@ -748,7 +775,7 @@ _metric_controller_service_connection(void *arg)
     {
       _send_metric_control_response(fd,
                                     version,
-                                    CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_PARAMETER_INVALID);
+                                    CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_COMMAND_INVALID);
       goto cleanup;
     }
 

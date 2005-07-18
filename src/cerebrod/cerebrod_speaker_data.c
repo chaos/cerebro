@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker_data.c,v 1.24 2005-07-15 21:30:18 achu Exp $
+ *  $Id: cerebrod_speaker_data.c,v 1.25 2005-07-18 17:51:08 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -328,6 +328,13 @@ _get_module_metric_value(struct cerebrod_speaker_metric_info *metric_info)
     {
       CEREBRO_DBG(("truncate metric string: %d", hd->metric_value_len));
       hd->metric_value_len = CEREBRO_MAX_METRIC_STRING_LEN;
+    }
+ 
+  if (hd->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_STRING && 
+      !hd->metric_value_len)
+    {
+      CEREBRO_DBG(("adjusting metric type to none"));
+      hd->metric_value_type = CEREBRO_METRIC_VALUE_TYPE_NONE;
     }
   
   hd->metric_value = Malloc(hd->metric_value_len);
