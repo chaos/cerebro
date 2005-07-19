@@ -27,6 +27,7 @@
 #include "debug.h"
 #include "fd.h"
 #include "marshall.h"
+#include "metric_util.h"
 #include "network_util.h"
 
 /* 
@@ -425,32 +426,30 @@ _cerebro_metric_control(cerebro_t handle,
       return -1;
     }
 
-  if (command == CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_UPDATE
-      && (!(metric_value_type >= CEREBRO_METRIC_VALUE_TYPE_NONE
-            && metric_value_type <= CEREBRO_METRIC_VALUE_TYPE_STRING)
-          || (metric_value_type == CEREBRO_METRIC_VALUE_TYPE_NONE
-              && metric_value_len)
-          || (metric_value_type == CEREBRO_METRIC_VALUE_TYPE_NONE
-              && metric_value)
-          || (metric_value_type != CEREBRO_METRIC_VALUE_TYPE_NONE
-              && !metric_value)
-          || (metric_value_type == CEREBRO_METRIC_VALUE_TYPE_INT32
-              && metric_value_len != sizeof(int32_t))
-          || (metric_value_type == CEREBRO_METRIC_VALUE_TYPE_U_INT32
-              && metric_value_len != sizeof(u_int32_t))
-          || (metric_value_type == CEREBRO_METRIC_VALUE_TYPE_FLOAT
-              && metric_value_len != sizeof(float))
-          || (metric_value_type == CEREBRO_METRIC_VALUE_TYPE_DOUBLE
-              && metric_value_len != sizeof(double))))
+  if (command == CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_UPDATE)
     {
-      handle->errnum = CEREBRO_ERR_PARAMETERS;
-      return -1;
-    }
+      if (metric_value_type == CEREBRO_METRIC_VALUE_TYPE_STRING
+          && metric_value_len > CEREBRO_MAX_METRIC_STRING_LEN)
+        {
+          CEREBRO_DBG(("truncate metric string: %d", metric_value_len));
+          metric_value_len = CEREBRO_MAX_METRIC_STRING_LEN;
+        }
 
-  if (command == CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_UPDATE
-      && metric_value_type == CEREBRO_METRIC_VALUE_TYPE_STRING
-      && !metric_value_len)
-    metric_value_type = CEREBRO_METRIC_VALUE_TYPE_NONE;
+      if (metric_value_type == CEREBRO_METRIC_VALUE_TYPE_STRING
+          && !metric_value_len)
+        {
+          CEREBRO_DBG(("adjusting metric type to none"));
+          metric_value_type = CEREBRO_METRIC_VALUE_TYPE_NONE;
+        }
+      
+      if (check_metric_type_len_value(metric_value_type, 
+                                      metric_value_len,
+                                      metric_value) < 0)
+        {
+          handle->errnum = CEREBRO_ERR_PARAMETERS;
+          return -1;
+        }
+    }
 
   if (_cerebro_load_config(handle) < 0)
     goto cleanup;

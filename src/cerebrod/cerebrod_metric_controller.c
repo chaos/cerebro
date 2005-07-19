@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_controller.c,v 1.13 2005-07-19 00:36:12 achu Exp $
+ *  $Id: cerebrod_metric_controller.c,v 1.14 2005-07-19 20:18:35 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -35,6 +35,7 @@
 
 #include "debug.h"
 #include "fd.h"
+#include "metric_util.h"
 #include "network_util.h"
 #include "wrappers.h"
 
@@ -209,9 +210,9 @@ _metric_control_response_marshall(struct cerebro_metric_control_response *res,
                                   unsigned int buflen)
 {
   int len = 0;
-                                                                                      
+
   assert(res && buf && buflen >= CEREBRO_METRIC_CONTROL_RESPONSE_LEN);
-                                                                                      
+
   memset(buf, '\0', buflen);
   len += Marshall_int32(res->version, buf + len, buflen - len);
   len += Marshall_u_int32(res->err_code, buf + len, buflen - len);
@@ -265,15 +266,15 @@ _send_metric_control_response(int fd, int32_t version, u_int32_t err_code)
   struct cerebro_metric_control_response res;
   char buf[CEREBRO_MAX_PACKET_LEN];
   int res_len, buflen;
-                                                                                      
+
   assert(fd >= 0
          && err_code >= CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_SUCCESS
          && err_code <= CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_INTERNAL_ERROR);
-                                                                                      
+
   memset(&res, '\0', CEREBRO_METRIC_SERVER_ERR_RESPONSE_LEN);
   res.version = version;
   res.err_code = err_code;
-                                                                                      
+
   buflen = CEREBRO_MAX_PACKET_LEN;
   if ((res_len = _metric_control_response_marshall(&res, buf, buflen)) < 0)
     return -1;
@@ -283,7 +284,7 @@ _send_metric_control_response(int fd, int32_t version, u_int32_t err_code)
       CEREBRO_DBG(("fd_write_n: %s", strerror(errno)));
       return -1;
     }
-                                                                                      
+
   return 0;
 }
 
@@ -452,19 +453,8 @@ _receive_metric_value(int fd,
   int vbytes_read, rv = -1;
   u_int32_t mtype, mlen;
 
-  assert(fd >= 0 && req);
+  assert(fd >= 0 && req && req->metric_value_len);
 
-  if (!req->metric_value_len)
-    return 0;
-
-  if (req->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_NONE)
-    {
-      _send_metric_control_response(fd,
-                                    version,
-                                    CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_PARAMETER_INVALID);
-      goto cleanup;
-    }
-  
   vbuf = Malloc(req->metric_value_len);
   
   if ((vbytes_read = receive_data(fd,
@@ -494,7 +484,6 @@ _receive_metric_value(int fd,
 
   mtype = req->metric_value_type;
   mlen = req->metric_value_len;
-
   if (mtype == CEREBRO_METRIC_VALUE_TYPE_INT32)
     Unmarshall_int32((int32_t *)metric_value, vbuf, vbytes_read);
   else if (mtype == CEREBRO_METRIC_VALUE_TYPE_U_INT32)
@@ -503,7 +492,7 @@ _receive_metric_value(int fd,
     Unmarshall_float((float *)metric_value, vbuf, vbytes_read);
   else if (mtype == CEREBRO_METRIC_VALUE_TYPE_DOUBLE)
     Unmarshall_double((double *)metric_value, vbuf, vbytes_read);
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_STRING)
+  else
     Unmarshall_buffer((char *)metric_value, mlen, vbuf, vbytes_read);
   
   req->metric_value = metric_value;
@@ -528,40 +517,12 @@ _update_metric(int fd,
                struct cerebro_metric_control_request *req)
 {
   struct cerebrod_speaker_metric_info *metric_info;
+  u_int32_t mtype, mlen;
 
   assert(fd >= 0 && metric_name && req && conf.speak);
 
   req->metric_value = NULL;
 
-  if (_receive_metric_value(fd, version, req) < 0)
-    goto cleanup;
-  
-  if ((req->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_NONE
-       && !req->metric_value_len)
-      || !(req->metric_value_type >= CEREBRO_METRIC_VALUE_TYPE_NONE
-           && req->metric_value_type <= CEREBRO_METRIC_VALUE_TYPE_STRING)
-      || (req->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_INT32
-          && req->metric_value_len != sizeof(int32_t))
-      || (req->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_U_INT32
-          && req->metric_value_len != sizeof(u_int32_t))
-      || (req->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_FLOAT
-          && req->metric_value_len != sizeof(float))
-      || (req->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_DOUBLE
-          && req->metric_value_len != sizeof(double)))
-    {
-      _send_metric_control_response(fd,
-                                    version,
-                                    CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_PARAMETER_INVALID);
-      goto cleanup;
-    }
-                                                                                    
-  if (req->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_STRING
-      && req->metric_value_len > CEREBRO_MAX_METRIC_STRING_LEN)
-    {
-      CEREBRO_DBG(("truncate metric string: %d", req->metric_value_len));
-      req->metric_value_len = CEREBRO_MAX_METRIC_STRING_LEN;
-    }
-                                                                                    
   if (req->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_STRING &&
       !req->metric_value_len)
     {
@@ -569,6 +530,22 @@ _update_metric(int fd,
       req->metric_value_type = CEREBRO_METRIC_VALUE_TYPE_NONE;
     }
 
+  mtype = req->metric_value_type;
+  mlen = req->metric_value_len;
+  if (check_metric_type_len(mtype, mlen) < 0)
+    {
+      _send_metric_control_response(fd,
+                                    version,
+                                    CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_PARAMETER_INVALID);
+      goto cleanup;
+    }
+
+  if (req->metric_value_len)
+    {
+      if (_receive_metric_value(fd, version, req) < 0)
+        goto cleanup;
+    }
+ 
   Pthread_mutex_lock(&metric_list_lock);
   
   if (!(metric_info = _find_speaker_metric_info(metric_name)))

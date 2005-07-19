@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.112 2005-07-18 17:51:08 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.113 2005-07-19 20:18:35 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -30,6 +30,7 @@
 
 #include "clusterlist_module.h"
 #include "debug.h"
+#include "metric_util.h"
 #include "wrappers.h"
 
 extern struct cerebrod_config conf;
@@ -185,7 +186,6 @@ _cerebrod_heartbeat_check_version(const char *buf, unsigned int buflen)
   return 0;
 }
 
-
 /*
  * _cerebrod_heartbeat_unmarshall
  *
@@ -276,70 +276,33 @@ _cerebrod_heartbeat_unmarshall(const char *buf, unsigned int buflen)
       mtype = hd->metric_value_type;
       mlen = hd->metric_value_len;
 
-      if (mtype == CEREBRO_METRIC_VALUE_TYPE_NONE && mlen)
-        {
-          CEREBRO_DBG(("metric value len > 0 for type NONE"));
-          goto cleanup;
-        }
-      
+      if (check_metric_type_len(mtype, mlen) < 0)
+        goto cleanup;
+
       if (!mlen)
         {
           hd->metric_value = NULL;
           goto end_loop;
         }
 
+      if ((buflen - c) < mlen)
+        {
+          CEREBRO_DBG(("invalid packet size"));
+          goto cleanup;
+        }
+
       mvalue = hd->metric_value = Malloc(hd->metric_value_len);
 
       if (mtype == CEREBRO_METRIC_VALUE_TYPE_INT32)
-        {
-          if ((buflen - c) < sizeof(int32_t))
-            {
-              CEREBRO_DBG(("invalid packet size"));
-              goto cleanup;
-            }
-          n = Unmarshall_int32((int32_t *)mvalue, buf + c, buflen - c);
-        }
+        n = Unmarshall_int32((int32_t *)mvalue, buf + c, buflen - c);
       else if (mtype == CEREBRO_METRIC_VALUE_TYPE_U_INT32)
-        {
-          if ((buflen - c) < sizeof(u_int32_t))
-            {
-              CEREBRO_DBG(("invalid packet size"));
-              goto cleanup;
-            }
-          n = Unmarshall_u_int32((u_int32_t *)mvalue, buf + c, buflen - c);
-        }
+        n = Unmarshall_u_int32((u_int32_t *)mvalue, buf + c, buflen - c);
       else if (mtype == CEREBRO_METRIC_VALUE_TYPE_FLOAT)
-        {
-          if ((buflen - c) < sizeof(float))
-            {
-              CEREBRO_DBG(("invalid packet size"));
-              goto cleanup;
-            }
-          n = Unmarshall_float((float *)mvalue, buf + c, buflen - c);
-        }
+        n = Unmarshall_float((float *)mvalue, buf + c, buflen - c);
       else if (mtype == CEREBRO_METRIC_VALUE_TYPE_DOUBLE)
-        {
-          if ((buflen - c) < sizeof(double))
-            {
-              CEREBRO_DBG(("invalid packet size"));
-              goto cleanup;
-            }
-          n = Unmarshall_double((double *)mvalue, buf + c, buflen - c);
-        }
-      else if (mtype == CEREBRO_METRIC_VALUE_TYPE_STRING)
-        {
-          if ((buflen - c) <= 0)
-            {
-              CEREBRO_DBG(("invalid packet size"));
-              goto cleanup;
-            }
-          n = Unmarshall_buffer((char *)mvalue, mlen, buf + c, buflen - c);
-        }
+        n = Unmarshall_double((double *)mvalue, buf + c, buflen - c);
       else
-        {
-          CEREBRO_DBG(("invalid type %d", mtype));
-          goto cleanup;
-        }
+        n = Unmarshall_buffer((char *)mvalue, mlen, buf + c, buflen - c);
       
       if (!n)
         {

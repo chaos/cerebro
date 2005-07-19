@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.74 2005-07-18 17:51:08 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.75 2005-07-19 20:18:35 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -30,6 +30,7 @@
 
 #include "debug.h"
 #include "metric_module.h"
+#include "metric_util.h"
 #include "wrappers.h"
 
 extern struct cerebrod_config conf;
@@ -246,7 +247,7 @@ _heartbeat_marshall(struct cerebrod_heartbeat *hb,
 
       if (mtype == CEREBRO_METRIC_VALUE_TYPE_NONE && mlen)
         {
-          CEREBRO_DBG(("metric value len > 0 for type NONE"));
+          CEREBRO_DBG(("adjusting metric len to 0"));
           mlen = 0;
         }
 
@@ -256,6 +257,9 @@ _heartbeat_marshall(struct cerebrod_heartbeat *hb,
           mtype = CEREBRO_METRIC_VALUE_TYPE_NONE;
         }
 
+      if (check_metric_type_len_value(mtype, mlen, mvalue) < 0)
+        goto cleanup;
+
       c += Marshall_buffer(mname, mnamelen, buf + c, buflen - c);
       c += Marshall_u_int32(mtype, buf + c, buflen - c);
       c += Marshall_u_int32(mlen, buf + c, buflen - c);
@@ -264,48 +268,21 @@ _heartbeat_marshall(struct cerebrod_heartbeat *hb,
         continue;
 
       if (mtype == CEREBRO_METRIC_VALUE_TYPE_INT32)
-        {
-          if (mlen != sizeof(int32_t))
-            {
-              CEREBRO_DBG(("invalid packet size"));
-              return -1;
-            }
-          c += Marshall_int32(*((int32_t *)mvalue), buf + c, buflen - c);
-        }
+        c += Marshall_int32(*((int32_t *)mvalue), buf + c, buflen - c);
       else if (mtype == CEREBRO_METRIC_VALUE_TYPE_U_INT32)
-        {
-          if (mlen != sizeof(u_int32_t))
-            {
-              CEREBRO_DBG(("invalid packet size"));
-              return -1;
-            }
-          c += Marshall_u_int32(*((u_int32_t *)mvalue), buf + c, buflen - c);
-        }
+        c += Marshall_u_int32(*((u_int32_t *)mvalue), buf + c, buflen - c);
       else if (mtype == CEREBRO_METRIC_VALUE_TYPE_FLOAT)
-        {
-          if (mlen != sizeof(float))
-            {
-              CEREBRO_DBG(("invalid packet size"));
-              return -1;
-            }
-          c += Marshall_float(*((float *)mvalue), buf + c, buflen - c);
-        }
+        c += Marshall_float(*((float *)mvalue), buf + c, buflen - c);
       else if (mtype == CEREBRO_METRIC_VALUE_TYPE_DOUBLE)
-        {
-          if (mlen != sizeof(double))
-            {
-              CEREBRO_DBG(("invalid packet size"));
-              return -1;
-            }
-          c += Marshall_double(*((double *)mvalue), buf + c, buflen - c);
-        }
-      else if (mtype == CEREBRO_METRIC_VALUE_TYPE_STRING)
-        c += Marshall_buffer((char *)mvalue, mlen, buf + c, buflen - c);
+        c += Marshall_double(*((double *)mvalue), buf + c, buflen - c);
       else
-        CEREBRO_EXIT(("invalid type %d", mtype));
+        c += Marshall_buffer((char *)mvalue, mlen, buf + c, buflen - c);
     }
   
   return c;
+
+ cleanup:
+  return -1;
 }
 
 /* 
@@ -360,7 +337,8 @@ cerebrod_speaker(void *arg)
   
       buf = Malloc(buflen + 1);
 
-      hblen = _heartbeat_marshall(hb, buf, buflen);
+      if ((hblen = _heartbeat_marshall(hb, buf, buflen)) < 0)
+        goto end_loop;
 
       _cerebrod_heartbeat_dump(hb);
       
@@ -383,6 +361,7 @@ cerebrod_speaker(void *arg)
             CEREBRO_DBG(("sendto: invalid bytes sent"));
         }
 
+    end_loop:
       cerebrod_heartbeat_destroy(hb);
       Free(buf);
       sleep(sleep_time);

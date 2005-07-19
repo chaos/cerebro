@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker_data.c,v 1.26 2005-07-19 00:36:12 achu Exp $
+ *  $Id: cerebrod_speaker_data.c,v 1.27 2005-07-19 20:18:35 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -28,6 +28,7 @@
 
 #include "debug.h"
 #include "metric_module.h"
+#include "metric_util.h"
 #include "wrappers.h"
 
 extern struct cerebrod_config conf;
@@ -261,8 +262,9 @@ static struct cerebrod_heartbeat_metric *
 _get_module_metric_value(struct cerebrod_speaker_metric_info *metric_info)
 {
   struct cerebrod_heartbeat_metric *hd = NULL;
-  void *temp_value = NULL;
   char *metric_name;
+  u_int32_t mtype, mlen;
+  void *mvalue = NULL;
   unsigned int index;
 
   assert(metric_info);
@@ -283,66 +285,43 @@ _get_module_metric_value(struct cerebrod_speaker_metric_info *metric_info)
   
   if (metric_module_get_metric_value(metric_handle,
                                      index,
-                                     &(hd->metric_value_type),
-                                     &(hd->metric_value_len),
-                                     &temp_value) < 0)
+                                     &mtype,
+                                     &mlen,
+                                     &mvalue) < 0)
     {
       CEREBRO_DBG(("metric_module_get_metric_value: %d", index));
       goto cleanup;
     }
 
-  if (hd->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_NONE  
-      && !hd->metric_value_len)
+  if (mtype == CEREBRO_METRIC_VALUE_TYPE_STRING 
+      && mlen > CEREBRO_MAX_METRIC_STRING_LEN)
     {
-      CEREBRO_DBG(("bogus metric information: %d", index));
-      goto cleanup;
-    }
-  
-  if (!(hd->metric_value_type >= CEREBRO_METRIC_VALUE_TYPE_NONE
-        && hd->metric_value_type <= CEREBRO_METRIC_VALUE_TYPE_STRING))
-    {
-      CEREBRO_DBG(("bogus metric: index=%d", index));
-      goto cleanup;
-    }
-
-  if ((hd->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_INT32
-       && hd->metric_value_len != sizeof(int32_t))
-      || (hd->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_U_INT32
-          && hd->metric_value_len != sizeof(u_int32_t))
-      || (hd->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_FLOAT
-          && hd->metric_value_len != sizeof(float))
-      || (hd->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_DOUBLE
-          && hd->metric_value_len != sizeof(double)))
-    {
-      CEREBRO_DBG(("bogus metric: index=%d", index));
-      goto cleanup;
-    }
-  
-  if (hd->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_STRING
-      && hd->metric_value_len > CEREBRO_MAX_METRIC_STRING_LEN)
-    {
-      CEREBRO_DBG(("truncate metric string: %d", hd->metric_value_len));
-      hd->metric_value_len = CEREBRO_MAX_METRIC_STRING_LEN;
+      CEREBRO_DBG(("truncate metric string: %d", mlen));
+      mlen = CEREBRO_MAX_METRIC_STRING_LEN;
     }
  
-  if (hd->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_STRING && 
-      !hd->metric_value_len)
+  if (mtype == CEREBRO_METRIC_VALUE_TYPE_STRING && !mlen)
     {
       CEREBRO_DBG(("adjusting metric type to none"));
-      hd->metric_value_type = CEREBRO_METRIC_VALUE_TYPE_NONE;
+      mtype = CEREBRO_METRIC_VALUE_TYPE_NONE;
     }
-  
-  hd->metric_value = Malloc(hd->metric_value_len);
-  memcpy(hd->metric_value, temp_value, hd->metric_value_len);
 
-  metric_module_destroy_metric_value(metric_handle, index, temp_value);
+  if (check_metric_type_len_value(mtype, mlen, mvalue) < 0)
+    goto cleanup;
+
+  hd->metric_value_type = mtype;
+  hd->metric_value_len = mlen;
+  hd->metric_value = Malloc(hd->metric_value_len);
+  memcpy(hd->metric_value, mvalue, hd->metric_value_len);
+
+  metric_module_destroy_metric_value(metric_handle, index, mvalue);
   
   return hd;
 
  cleanup:
   
-  if (temp_value)
-    metric_module_destroy_metric_value(metric_handle, index, temp_value);
+  if (mvalue)
+    metric_module_destroy_metric_value(metric_handle, index, mvalue);
 
   if (hd)
     {
@@ -365,6 +344,8 @@ static struct cerebrod_heartbeat_metric *
 _get_userspace_metric_value(struct cerebrod_speaker_metric_info *metric_info)
 {
   struct cerebrod_heartbeat_metric *hd = NULL;
+  u_int32_t mtype, mlen;
+  void *mvalue;
 
   assert(metric_info);
 
@@ -372,6 +353,12 @@ _get_userspace_metric_value(struct cerebrod_speaker_metric_info *metric_info)
   if (metric_info->next_call_time)
     CEREBRO_DBG(("Unexpected next_call_time"));
 #endif /* CEREBRO_DEBUG */
+
+  mtype = metric_info->metric_value_type;
+  mlen = metric_info->metric_value_len;
+  mvalue = metric_info->metric_value;
+  if (check_metric_type_len_value(mtype, mlen, mvalue) < 0)
+    goto cleanup;
 
   hd = Malloc(sizeof(struct cerebrod_heartbeat_metric));
   memset(hd, '\0', sizeof(struct cerebrod_heartbeat_metric));
@@ -391,6 +378,15 @@ _get_userspace_metric_value(struct cerebrod_speaker_metric_info *metric_info)
          metric_info->metric_value_len);
 
   return hd;
+
+ cleanup:
+  if (hd)
+    {
+      if (hd->metric_value)
+        Free(hd->metric_value);
+      Free(hd);
+    }
+  return NULL;
 }
 
 void 

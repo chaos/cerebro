@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_heartbeat.c,v 1.42 2005-06-30 22:43:59 achu Exp $
+ *  $Id: cerebrod_heartbeat.c,v 1.43 2005-07-19 20:18:35 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -28,7 +28,8 @@ cerebrod_heartbeat_destroy(struct cerebrod_heartbeat *hb)
 {
   int i;
 
-  assert(hb);
+  if (!hb)
+    return;
 
   for (i = 0; i < hb->metrics_len; i++)
     {

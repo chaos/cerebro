@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_server.c,v 1.20 2005-07-15 23:39:51 achu Exp $
+ *  $Id: cerebrod_metric_server.c,v 1.21 2005-07-19 20:18:35 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -27,6 +27,7 @@
 #include "debug.h"
 #include "fd.h"
 #include "list.h"
+#include "metric_util.h"
 #include "network_util.h"
 #include "wrappers.h"
 
@@ -189,28 +190,21 @@ _metric_server_response_marshall(struct cerebro_metric_server_response *res,
   c += Marshall_u_int32(res->err_code, buf + c, buflen - c);
   c += Marshall_u_int8(res->end, buf + c, buflen - c);
   c += Marshall_buffer(bufPtr, bufPtrlen, buf + c, buflen - c);
-  c += Marshall_u_int32(res->metric_value_type, buf + c, buflen - c);
-  c += Marshall_u_int32(res->metric_value_len, buf + c, buflen - c);
-  
-  if (!res->metric_value_len)
-    return c;
 
   mtype = res->metric_value_type;
   mlen = res->metric_value_len;
   mvalue = res->metric_value;
 
-  if (!mvalue)
-    {
-      CEREBRO_DBG(("metric value invalid"));
-      return -1;
-    }
+  if (check_metric_type_len(mtype, mlen, mvalue) < 0)
+    return -1;
+
+  c += Marshall_u_int32(mtype, buf + c, buflen - c);
+  c += Marshall_u_int32(mlen, buf + c, buflen - c);
   
-  if (mtype == CEREBRO_METRIC_VALUE_TYPE_NONE)
-    {
-      CEREBRO_DBG(("metric value len > 0 for type NONE"));
-      return -1;
-    }
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_INT32)
+  if (!mlen)
+    return c;
+
+  if (mtype == CEREBRO_METRIC_VALUE_TYPE_INT32)
     c += Marshall_int32(*((int32_t *)mvalue), buf + c, buflen - c);
   else if (mtype == CEREBRO_METRIC_VALUE_TYPE_U_INT32)
     c += Marshall_u_int32(*((u_int32_t *)mvalue), buf + c, buflen - c);
@@ -218,13 +212,8 @@ _metric_server_response_marshall(struct cerebro_metric_server_response *res,
     c += Marshall_float(*((float *)mvalue), buf + c, buflen - c);
   else if (mtype == CEREBRO_METRIC_VALUE_TYPE_DOUBLE)
     c += Marshall_double(*((double *)mvalue), buf + c, buflen - c);
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_STRING)
-    c += Marshall_buffer(mvalue, mlen, buf + c, buflen - c);
   else
-    {
-      CEREBRO_DBG(("invalid type %d", mtype));
-      return -1;
-    }
+    c += Marshall_buffer(mvalue, mlen, buf + c, buflen - c);
 
   return c;
 }

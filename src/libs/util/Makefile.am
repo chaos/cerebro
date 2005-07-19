@@ -1,8 +1,9 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.4 2005-06-29 17:52:26 achu Exp $
+## $Id: Makefile.am,v 1.5 2005-07-19 20:18:35 achu Exp $
 ##*****************************************************************************
 
 noinst_HEADERS	   = config_util.h \
+		     metric_util.h \
 		     network_util.h
 
 noinst_LTLIBRARIES = libutil.la
@@ -11,6 +12,7 @@ libutil_la_CFLAGS  = -I$(srcdir)/../common \
 		     -I$(srcdir)/../include \
 		     -I$(srcdir)/../modules
 libutil_la_SOURCES = config_util.c \
+		     metric_util.c \
 		     network_util.c
 libutil_la_LIBADD  = ../modules/libmodules.la
 

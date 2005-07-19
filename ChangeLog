@@ -1,3 +1,7 @@
+2005-07-19  Albert Chu  <chu11@llnl.gov>
+
+	* Added metric_util lib to clean up code and fix corner cases.
+
 2005-07-18  Albert Chu  <chu11@llnl.gov>
 
 	* Added additional protocol corner case checks.

@@ -24,6 +24,7 @@
 #include "debug.h"
 #include "fd.h"
 #include "marshall.h"
+#include "metric_util.h"
 #include "network_util.h"
 
 /* 
@@ -154,28 +155,6 @@ _receive_metric_value(cerebro_t handle,
   void *metric_value = NULL;
   unsigned int errnum;
 
-  if (!(res->metric_value_type >= CEREBRO_METRIC_VALUE_TYPE_NONE
-        && res->metric_value_type <= CEREBRO_METRIC_VALUE_TYPE_STRING)
-      || (res->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_NONE
-          && res->metric_value_len)
-      || (res->metric_value_type != CEREBRO_METRIC_VALUE_TYPE_NONE
-          && !res->metric_value_len)
-      || (res->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_INT32
-          && res->metric_value_len != sizeof(int32_t))
-      || (res->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_U_INT32
-          && res->metric_value_len != sizeof(u_int32_t))
-      || (res->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_FLOAT
-          && res->metric_value_len != sizeof(float))
-      || (res->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_DOUBLE
-          && res->metric_value_len != sizeof(double)))
-    {
-      handle->errnum = CEREBRO_ERR_PROTOCOL;
-      goto cleanup;
-    }
-
-  if (!res->metric_value_len)
-    return 0;
-
   if (!(vbuf = malloc(res->metric_value_len)))
     {
       handle->errnum = CEREBRO_ERR_OUTMEM;
@@ -230,7 +209,10 @@ _receive_metric_data_response(cerebro_t handle,
 {
   struct cerebro_nodelist *nodelist;
   char nodename_buf[CEREBRO_MAX_NODENAME_LEN+1];
+  u_int32_t mtype, mlen;
   int rv = -1;
+
+  res->metric_value = NULL;
 
   if (_cerebro_handle_check(handle) < 0)
     {
@@ -254,9 +236,19 @@ _receive_metric_data_response(cerebro_t handle,
       goto cleanup;
     }
 
-  res->metric_value = NULL;
-  if (_receive_metric_value(handle, res, fd) < 0)
-    goto cleanup;
+  mtype = res->metric_value_type;
+  mlen = res->metric_value_len;
+  if (check_metric_type_len(mtype, mlen) < 0)
+    {
+      handle->errnum = CEREBRO_ERR_PROTOCOL;
+      goto cleanup;
+    }
+
+  if (mlen)
+    {
+      if (_receive_metric_value(handle, res, fd) < 0)
+        goto cleanup;
+    }
 
   /* Guarantee ending '\0' character */
   memset(nodename_buf, '\0', CEREBRO_MAX_NODENAME_LEN+1);

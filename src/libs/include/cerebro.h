@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.14 2005-07-19 00:36:12 achu Exp $
+ *  $Id: cerebro.h,v 1.15 2005-07-19 20:18:35 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_H
@@ -25,7 +25,7 @@
 #define CEREBRO_ERR_OVERFLOW                 14
 #define CEREBRO_ERR_NODE_NOTFOUND            15
 #define CEREBRO_ERR_METRIC_INVALID           16
-#deinfe CEREBRO_ERR_METRIC_MAX               17
+#define CEREBRO_ERR_METRIC_MAX               17
 #define CEREBRO_ERR_END_OF_LIST              18
 #define CEREBRO_ERR_CONFIG_FILE              19
 #define CEREBRO_ERR_CONFIG_MODULE            20

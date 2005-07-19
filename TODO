@@ -13,7 +13,6 @@ Cleanup
   - atleast a common create func?
 - abstract listener_data a bit more?  
 - metric value marshall/unmarshall common funcs??
-- receive metric_value common funcs?
 
 Portability
 - IPv6
