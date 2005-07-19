@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_server.c,v 1.23 2005-07-19 22:43:38 achu Exp $
+ *  $Id: cerebrod_metric_server.c,v 1.24 2005-07-19 23:41:13 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -175,10 +175,8 @@ _metric_server_response_marshall(struct cerebro_metric_server_response *res,
                                  char *buf, 
                                  unsigned int buflen)
 {
-  int bufPtrlen, c = 0;
+  int bufPtrlen, n, c = 0;
   char *bufPtr;
-  void *mvalue;
-  u_int32_t mtype, mlen;
 
   assert(res && buf && buflen >= CEREBRO_METRIC_SERVER_RESPONSE_HEADER_LEN);
 
@@ -191,30 +189,14 @@ _metric_server_response_marshall(struct cerebro_metric_server_response *res,
   c += Marshall_u_int8(res->end, buf + c, buflen - c);
   c += Marshall_buffer(bufPtr, bufPtrlen, buf + c, buflen - c);
 
-  mtype = res->metric_value_type;
-  mlen = res->metric_value_len;
-  mvalue = res->metric_value;
-
-  if (check_metric_type_len_value(mtype, mlen, mvalue) < 0)
-    return -1;
-
-  c += Marshall_u_int32(mtype, buf + c, buflen - c);
-  c += Marshall_u_int32(mlen, buf + c, buflen - c);
-  
-  if (mlen)
-    {
-      int n;
-      
-      if ((n = marshall_metric_value(mtype, 
-                                     mlen,
-                                     mvalue,
-                                     buf + c,
-                                     buflen - c,
-                                     NULL)) < 0)
-        goto cleanup;
-      
-      c += n;
-    }
+  if ((n = marshall_metric(res->metric_value_type, 
+                           res->metric_value_len,
+                           res->metric_value,
+                           buf + c,
+                           buflen - c,
+                           NULL)) < 0)
+    goto cleanup;
+  c += n;
 
   return c;
 

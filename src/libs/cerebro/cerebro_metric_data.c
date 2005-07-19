@@ -51,7 +51,7 @@ _metric_value_unmarshall(cerebro_t handle,
       || !metric_value 
       || !buf)
     {
-      CEREBRO_DBG(("invalid arguments"));
+      CEREBRO_DBG(("invalid parameters"));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }

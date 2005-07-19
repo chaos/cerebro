@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.77 2005-07-19 22:43:38 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.78 2005-07-19 23:41:13 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -237,13 +237,15 @@ _heartbeat_marshall(struct cerebrod_heartbeat *hb,
       char *mname;
       u_int32_t mtype, mlen;
       void *mvalue;
-      int mnamelen;
+      int n, mnamelen;
 
       mname = hb->metrics[i]->metric_name;
       mnamelen = sizeof(hb->metrics[i]->metric_name);
       mtype = hb->metrics[i]->metric_value_type;
       mlen = hb->metrics[i]->metric_value_len;
       mvalue = hb->metrics[i]->metric_value;
+
+      c += Marshall_buffer(mname, mnamelen, buf + c, buflen - c);
 
       if (mtype == CEREBRO_METRIC_VALUE_TYPE_NONE && mlen)
         {
@@ -257,27 +259,14 @@ _heartbeat_marshall(struct cerebrod_heartbeat *hb,
           mtype = CEREBRO_METRIC_VALUE_TYPE_NONE;
         }
 
-      if (check_metric_type_len_value(mtype, mlen, mvalue) < 0)
+      if ((n = marshall_metric(mtype, 
+                               mlen,
+                               mvalue,
+                               buf + c,
+                               buflen - c,
+                               NULL)) < 0)
         goto cleanup;
-
-      c += Marshall_buffer(mname, mnamelen, buf + c, buflen - c);
-      c += Marshall_u_int32(mtype, buf + c, buflen - c);
-      c += Marshall_u_int32(mlen, buf + c, buflen - c);
-
-      if (mlen)
-        {
-          int n;
-
-          if ((n = marshall_metric_value(mtype, 
-                                         mlen,
-                                         mvalue,
-                                         buf + c,
-                                         buflen - c,
-                                         NULL)) < 0)
-            goto cleanup;
-          
-          c += n;
-        }
+      c += n;
     }
   
   return c;

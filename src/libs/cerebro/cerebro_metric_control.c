@@ -116,25 +116,13 @@ _metric_control_request_marshall(cerebro_t handle,
                                 char *buf,
                                 unsigned int buflen)
 {
-  int n, bufPtrlen, c = 0;
+  int n, errnum, bufPtrlen, c = 0;
   char *bufPtr;
-  u_int32_t mtype, mlen;
-  void *mvalue;
 
   if (!buf || buflen < CEREBRO_METRIC_CONTROL_REQUEST_HEADER_LEN)
     {
       CEREBRO_DBG(("invalid parameters"));
       handle->errnum = CEREBRO_ERR_INTERNAL;
-      return -1;
-    }
-
-  mtype = req->metric_value_type;
-  mlen = req->metric_value_len;
-  mvalue = req->metric_value;
-
-  if (check_metric_type_len_value(mtype, mlen, mvalue) < 0)
-    {
-      handle->errnum = CEREBRO_ERR_PARAMETERS;
       return -1;
     }
 
@@ -166,40 +154,18 @@ _metric_control_request_marshall(cerebro_t handle,
     }
   c += n;
 
-  if ((n = marshall_u_int32(mtype, buf + c, buflen - c)) <= 0)
+  if ((n = marshall_metric(req->metric_value_type,
+                           req->metric_value_len,
+                           req->metric_value,
+                           buf + c,
+                           buflen - c,
+                           &errnum)) < 0)
     {
-      CEREBRO_DBG(("marshall_u_int32"));
-      handle->errnum = CEREBRO_ERR_INTERNAL;
+      handle->errnum = errnum;
       return -1;
     }
   c += n;
-
-  if ((n = marshall_u_int32(mlen, buf + c, buflen - c)) <= 0)
-    {
-      CEREBRO_DBG(("marshall_u_int32"));
-      handle->errnum = CEREBRO_ERR_INTERNAL;
-      return -1;
-    }
-  c += n;
-
-  if (mlen)
-    {
-      int errnum = 0;
-      
-      if ((n = marshall_metric_value(mtype,
-                                     mlen,
-                                     mvalue,
-                                     buf + c,
-                                     buflen - c,
-                                     &errnum)) < 0)
-        {
-          handle->errnum = errnum;
-          return -1;
-        }
-      
-      c += n;
-    }
-
+  
   return c;
 }
 
