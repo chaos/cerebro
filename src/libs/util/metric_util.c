@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: metric_util.c,v 1.1 2005-07-19 20:18:35 achu Exp $
+ *  $Id: metric_util.c,v 1.2 2005-07-19 22:43:38 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -15,9 +15,10 @@
 #include "metric_util.h"
 
 #include "debug.h"
+#include "marshall.h"
 
 int 
-_check_metric_type_and_len(u_int32_t mtype, u_int32_t mlen, const char *caller)
+_check_metric_type_len(u_int32_t mtype, u_int32_t mlen, const char *caller)
 {
   if (!caller)
     {
@@ -69,14 +70,96 @@ _check_metric_type_len_value(u_int32_t mtype,
       return -1;
     }
 
-  if (_check_metric_type_and_len(mtype, mlen, caller) < 0)
+  if (_check_metric_type_len(mtype, mlen, caller) < 0)
     return -1;
 
   if ((!mlen && mvalue) || (mlen && !mvalue))
     {
-      CEREBRO_DBG(("invalid metric value"));
+      CEREBRO_DBG(("%s: invalid metric value", caller));
       return -1;
     }
 
   return 0;
+}
+
+int
+_marshall_metric_value(u_int32_t mtype,
+                       u_int32_t mlen,
+                       void *mvalue,
+                       char *buf,
+                       unsigned int buflen,
+                       int *errnum,
+                       const char *caller)
+{
+  int n, c = 0;
+  
+  if (!buf || mtype == CEREBRO_METRIC_VALUE_TYPE_NONE || !mlen || !mvalue)
+    {
+      CEREBRO_DBG(("%s: invalid parameters", caller));
+      if (errnum)
+        *errnum = CEREBRO_ERR_INTERNAL;
+      return -1;
+    }
+
+  if (mtype == CEREBRO_METRIC_VALUE_TYPE_INT32)
+    {
+      if ((n = marshall_int32(*((int32_t *)mvalue), buf + c, buflen - c)) <= 0)
+        {
+          CEREBRO_DBG(("%s: marshall_int32", caller));
+          if (errnum)
+            *errnum = CEREBRO_ERR_INTERNAL;
+          return -1;
+        }
+    }
+  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_U_INT32)
+    {
+      if ((n = marshall_u_int32(*((u_int32_t *)mvalue), buf + c, buflen - c)) <= 0)
+        {
+          CEREBRO_DBG(("%s: marshall_u_int32", caller));
+          if (errnum)
+            *errnum = CEREBRO_ERR_INTERNAL;
+          return -1;
+        }
+    }
+  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_FLOAT)
+    {
+      if ((n = marshall_float(*((float *)mvalue), buf + c, buflen - c)) <= 0)
+        {
+          CEREBRO_DBG(("%s: marshall_float", caller));
+          if (errnum)
+            *errnum = CEREBRO_ERR_INTERNAL;
+          return -1;
+        }
+    }
+  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_DOUBLE)
+    {
+      if ((n = marshall_double(*((double *)mvalue), buf + c, buflen - c)) <= 0)
+        {
+          CEREBRO_DBG(("%s: marshall_double", caller));
+          if (errnum)
+            *errnum = CEREBRO_ERR_INTERNAL;
+          return -1;
+        }
+    }
+  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_STRING)
+    {
+      if ((n = marshall_buffer(mvalue, mlen, buf + c, buflen - c)) <= 0)
+        {
+          CEREBRO_DBG(("%s: marshall_buffer", caller));
+          if (errnum)
+            *errnum = CEREBRO_ERR_INTERNAL;
+          return -1;
+        }
+    }
+  else
+    {
+      CEREBRO_DBG(("%s: invalid type %d", caller, mtype));
+      if (errnum)
+        *errnum = CEREBRO_ERR_INTERNAL;
+      return -1;
+    }
+
+  c += n;
+
+  return c;
 }

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: metric_util.h,v 1.1 2005-07-19 20:18:35 achu Exp $
+ *  $Id: metric_util.h,v 1.2 2005-07-19 22:43:38 achu Exp $
 \*****************************************************************************/
 
 #ifndef _METRIC_UTIL_H
@@ -10,6 +10,9 @@
 
 #define check_metric_type_len_value(t,l,v) \
         _check_metric_type_len_value(t,l,v,__FUNCTION__)
+
+#define marshall_metric_value(t,l,v,b,bl,e) \
+        _marshall_metric_value(t,l,v,b,bl,e,__FUNCTION__)
 
 /* 
  * _check_metric_type_len
@@ -34,4 +37,19 @@ int _check_metric_type_len_value(u_int32_t mtype,
                                  void *mvalue,
                                  const char *caller);
 
+/* 
+ * _marshall_metric_value
+ *
+ * Marshall a metric value
+ *
+ * Returns bytes written to buffer on success, -1 on error
+ */
+int _marshall_metric_value(u_int32_t mtype,
+                           u_int32_t mlen,
+                           void *mvalue,
+                           char *buf,
+                           unsigned int buflen,
+                           int *errnum,
+                           const char *caller);
+     
 #endif /* _METRIC_UTIL_H */

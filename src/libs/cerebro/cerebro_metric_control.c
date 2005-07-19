@@ -128,6 +128,16 @@ _metric_control_request_marshall(cerebro_t handle,
       return -1;
     }
 
+  mtype = req->metric_value_type;
+  mlen = req->metric_value_len;
+  mvalue = req->metric_value;
+
+  if (check_metric_type_len_value(mtype, mlen, mvalue) < 0)
+    {
+      handle->errnum = CEREBRO_ERR_PARAMETERS;
+      return -1;
+    }
+
   memset(buf, '\0', buflen);
 
   if ((n = marshall_int32(req->version, buf + c, buflen - c)) <= 0)
@@ -156,7 +166,6 @@ _metric_control_request_marshall(cerebro_t handle,
     }
   c += n;
 
-  mtype = req->metric_value_type;
   if ((n = marshall_u_int32(mtype, buf + c, buflen - c)) <= 0)
     {
       CEREBRO_DBG(("marshall_u_int32"));
@@ -165,7 +174,6 @@ _metric_control_request_marshall(cerebro_t handle,
     }
   c += n;
 
-  mlen = req->metric_value_len;
   if ((n = marshall_u_int32(mlen, buf + c, buflen - c)) <= 0)
     {
       CEREBRO_DBG(("marshall_u_int32"));
@@ -174,77 +182,23 @@ _metric_control_request_marshall(cerebro_t handle,
     }
   c += n;
 
-  if (!mlen)
-    return c;
-
-  mvalue = req->metric_value;
-
-  if (!mvalue)
+  if (mlen)
     {
-      CEREBRO_DBG(("metric value invalid"));
-      handle->errnum = CEREBRO_ERR_INTERNAL;
-      return -1;
-    }
-  
-  if (mtype == CEREBRO_METRIC_VALUE_TYPE_NONE)
-    {
-      CEREBRO_DBG(("metric value len > 0 for type NONE"));
-      handle->errnum = CEREBRO_ERR_INTERNAL;
-      return -1;
-    }
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_INT32)
-    {
-      if ((n = marshall_int32(*((int32_t *)mvalue), buf + c, buflen - c)) <= 0)
+      int errnum = 0;
+      
+      if ((n = marshall_metric_value(mtype,
+                                     mlen,
+                                     mvalue,
+                                     buf + c,
+                                     buflen - c,
+                                     &errnum)) < 0)
         {
-          CEREBRO_DBG(("marshall_int32"));
-          handle->errnum = CEREBRO_ERR_INTERNAL;
+          handle->errnum = errnum;
           return -1;
         }
+      
+      c += n;
     }
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_U_INT32)
-    {
-      if ((n = marshall_u_int32(*((u_int32_t *)mvalue), buf + c, buflen - c)) <= 0)
-        {
-          CEREBRO_DBG(("marshall_u_int32"));
-          handle->errnum = CEREBRO_ERR_INTERNAL;
-          return -1;
-        }
-    }
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_FLOAT)
-    {
-      if ((n = marshall_float(*((float *)mvalue), buf + c, buflen - c)) <= 0)
-        {
-          CEREBRO_DBG(("marshall_float"));
-          handle->errnum = CEREBRO_ERR_INTERNAL;
-          return -1;
-        }
-    }
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_DOUBLE)
-    {
-      if ((n = marshall_double(*((double *)mvalue), buf + c, buflen - c)) <= 0)
-        {
-          CEREBRO_DBG(("marshall_double"));
-          handle->errnum = CEREBRO_ERR_INTERNAL;
-          return -1;
-        }
-    }
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_STRING)
-    {
-      if ((n = marshall_buffer(mvalue, mlen, buf + c, buflen - c)) <= 0)
-        {
-          CEREBRO_DBG(("marshall_buffer"));
-          handle->errnum = CEREBRO_ERR_INTERNAL;
-          return -1;
-        }
-    }
-  else
-    {
-      CEREBRO_DBG(("invalid type %d", mtype));
-      handle->errnum = CEREBRO_ERR_INTERNAL;
-      return -1;
-    }
-
-  c += n;
 
   return c;
 }
@@ -280,6 +234,23 @@ _metric_control_request_send(cerebro_t handle,
       return -1;
     }
 
+  if (command == CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_UPDATE)
+    {
+      if (metric_value_type == CEREBRO_METRIC_VALUE_TYPE_STRING
+          && metric_value_len > CEREBRO_MAX_METRIC_STRING_LEN)
+        {
+          CEREBRO_DBG(("truncate metric string: %d", metric_value_len));
+          metric_value_len = CEREBRO_MAX_METRIC_STRING_LEN;
+        }
+      
+      if (metric_value_type == CEREBRO_METRIC_VALUE_TYPE_STRING
+          && !metric_value_len)
+        {
+          CEREBRO_DBG(("adjusting metric type to none"));
+          metric_value_type = CEREBRO_METRIC_VALUE_TYPE_NONE;
+        }      
+    }
+  
   memset(&req, '\0', sizeof(struct cerebro_metric_control_request));
   req.version = CEREBRO_METRIC_CONTROL_PROTOCOL_VERSION;
   req.command = command;
@@ -424,31 +395,6 @@ _cerebro_metric_control(cerebro_t handle,
     {
       handle->errnum = CEREBRO_ERR_PARAMETERS;
       return -1;
-    }
-
-  if (command == CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_UPDATE)
-    {
-      if (metric_value_type == CEREBRO_METRIC_VALUE_TYPE_STRING
-          && metric_value_len > CEREBRO_MAX_METRIC_STRING_LEN)
-        {
-          CEREBRO_DBG(("truncate metric string: %d", metric_value_len));
-          metric_value_len = CEREBRO_MAX_METRIC_STRING_LEN;
-        }
-
-      if (metric_value_type == CEREBRO_METRIC_VALUE_TYPE_STRING
-          && !metric_value_len)
-        {
-          CEREBRO_DBG(("adjusting metric type to none"));
-          metric_value_type = CEREBRO_METRIC_VALUE_TYPE_NONE;
-        }
-      
-      if (check_metric_type_len_value(metric_value_type, 
-                                      metric_value_len,
-                                      metric_value) < 0)
-        {
-          handle->errnum = CEREBRO_ERR_PARAMETERS;
-          return -1;
-        }
     }
 
   if (_cerebro_load_config(handle) < 0)

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_server.c,v 1.22 2005-07-19 20:31:40 achu Exp $
+ *  $Id: cerebrod_metric_server.c,v 1.23 2005-07-19 22:43:38 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -195,32 +195,31 @@ _metric_server_response_marshall(struct cerebro_metric_server_response *res,
   mlen = res->metric_value_len;
   mvalue = res->metric_value;
 
-  if (check_metric_type_len(mtype, mlen, mvalue) < 0)
+  if (check_metric_type_len_value(mtype, mlen, mvalue) < 0)
     return -1;
 
   c += Marshall_u_int32(mtype, buf + c, buflen - c);
   c += Marshall_u_int32(mlen, buf + c, buflen - c);
   
-  if (!mlen)
-    return c;
-
-  if (mtype == CEREBRO_METRIC_VALUE_TYPE_INT32)
-    c += Marshall_int32(*((int32_t *)mvalue), buf + c, buflen - c);
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_U_INT32)
-    c += Marshall_u_int32(*((u_int32_t *)mvalue), buf + c, buflen - c);
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_FLOAT)
-    c += Marshall_float(*((float *)mvalue), buf + c, buflen - c);
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_DOUBLE)
-    c += Marshall_double(*((double *)mvalue), buf + c, buflen - c);
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_STRING)
-    c += Marshall_buffer(mvalue, mlen, buf + c, buflen - c);
-  else
+  if (mlen)
     {
-      CEREBRO_DBG(("invalid type %d", mtype));
-      return -1;
+      int n;
+      
+      if ((n = marshall_metric_value(mtype, 
+                                     mlen,
+                                     mvalue,
+                                     buf + c,
+                                     buflen - c,
+                                     NULL)) < 0)
+        goto cleanup;
+      
+      c += n;
     }
 
   return c;
+
+ cleanup:
+  return -1;
 }
 
 /*

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_controller.c,v 1.15 2005-07-19 20:31:40 achu Exp $
+ *  $Id: cerebrod_metric_controller.c,v 1.16 2005-07-19 22:43:38 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -498,7 +498,7 @@ _receive_metric_value(int fd,
       CEREBRO_DBG(("invalid type %d", mtype));
       _send_metric_control_response(fd,
                                     version,
-                                    CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_INTERNAL);
+                                    CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_INTERNAL_ERROR);
       goto cleanup;
     }
   
