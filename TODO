@@ -14,8 +14,6 @@ Cleanup
 - abstract listener_data a bit more?  
 - metric value marshall/unmarshall common funcs??
 - receive metric_value common funcs?
-- manpages for libcerebro control stuff
-- autoconf CEREBRO_METRIC_CONTROL_PATH??
 
 Portability
 - IPv6
@@ -36,21 +34,16 @@ Design
     - 0 all the time
     - > 0 ...
     - ??
+  - max period allowed too?
+- Way for monitoring lib to set period?
 - Update time for each cerebro metric data?
 - ability for data to be stored/not-stored in the internal hash
   i.e. passed directly to module and forgotten
 - nodelist
   - use own list instead of 'List' to store iterators?
-- how remove metric data?
-  - Behlendo Request: Way to force most up to date data
-  - Will require speaker to listen for "control" packets.
-    - should be multicast?
 - strerror_r and errormsg_r funcs
 - generic err message buffer in cerebro_t handle, i.e for conffile errors
 - use tables instead of lists in speaker_data to sort faster
-- speaker controller - flush (can read multicast packets)
-- listener controller - clean remove/unhash (can read multicast packets)
-- metric controller - unregister/register/update (local only)
 
 Before distribution
 - devel package?

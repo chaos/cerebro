@@ -1,0 +1,103 @@
+\."#############################################################################
+\."$Id: cerebro_register_metric.3,v 1.1 2005-07-19 00:16:12 achu Exp $
+\."#############################################################################
+.TH CEREBRO_REGISTER_METRIC 3 "May 2005" "LLNL" "LIBCEREBRO"
+.SH "NAME"
+cerebro_register_metric, cerebro_unregister_metric, cerebro_update_metric_value, cerebro_restart_metric \-
+cerebro metric monitoring routines
+.SH "SYNOPSIS"
+.B #include <cerebro.h>
+.sp
+.BI "int cerebro_register_metric(cerebro_t handle, const char *metric_name);"
+.sp
+.BI "int cerebro_unregister_metric(cerebro_t handle, const char *metric_name);"
+.sp
+.BI "int cerebro_update_metric_value(cerebro_t handle, const char *metric_name, unsigned int metric_value_type, unsigned int metric_value_len, void *metric_value);"
+.sp
+.BI "int cerebro_restart_metric(cerebro_t handle, const char *metric_name);"
+.br
+.SH "DESCRIPTION"
+\fBcerebro_register_metric()\fR registers a new metric that can be propogated by
+by the local
+.BR cerebrod(8)
+daemon.  A metric value will not be propogated until one is set by the
+\fBcerebro_update_metric_value()\fR function.
+
+\fBcerebro_unregister_metric()\fR unregisters a metric in the local 
+.BR cerebrod(8)
+daemon.
+
+\fBcerebro_update_metric_value()\fR updates the current metric value to be
+propogated by the 
+.BR cerebrod(8)
+daemon.
+
+\fBcerebro_restart_metric()\fR restarts the monitoring of the
+specified metric.  Usually, this function is called to force a metric
+to be re-propogated.
+
+Metrics can be registered and propogated only if the
+.BR cerebrod(8)
+can speak.
+
+.br
+.SH "RETURN VALUES"
+On success, 0 is returned.  On error, -1 is returned, and an error
+code is returned in \fIhandle\fR.  The error code can be retrieved via
+.BR cerebro_errnum(3),
+and a description of the error code can be retrieved via
+.BR cerebro_strerror(3).
+.br
+.SH "ERRORS"
+.TP
+.B CEREBRO_ERR_NULLHANDLE
+The \fIhandle\fR parameter is NULL.
+.TP
+.B CEREBRO_ERR_MAGIC_NUMBER
+\fIhandle\fR has an incorrect magic number.  \fIhandle\fR does not
+point to an appropriate structure or has already been destroyed.
+.TP
+.B CEREBRO_ERR_PARAMETERS
+Invalid parameter passed in.
+.TP
+.B CEREBRO_ERR_CONNECT
+Error connecting to
+.B cerebrod
+metric control server.
+.TP
+.B CEREBRO_ERR_CONNECT_TIMEOUT
+Timed out connecting to
+.B cerebrod
+metric control server.
+.TP
+.B CEREBRO_ERR_PROTOCOL
+Error during protocol communication.
+.TP
+.B CEREBRO_ERR_PROTOCOL_TIMEOUT
+Timeout during protocol communication.
+.TP
+.B CEREBRO_ERR_VERSION_INCOMPATIBLE
+Version incompatible with the metric control server.
+.TP
+.B CEREBRO_ERR_METRIC_INVALID
+The specified metric is unknown to the metric control server.
+.TP
+.B CEREBRO_ERR_CONFIG_FILE
+A config file error occurred.
+.TP
+.B CEREBRO_ERR_CONFIG_MODULE
+A config module error occurred.
+.TP
+.B CEREBRO_ERR_CONFIG_INPUT
+A config input is invalid.
+.TP
+.B CEREBRO_ERR_OUTMEM
+Out of memory.
+.TP
+.B CEREBRO_ERR_INTERNAL
+An internal system error occurred.
+.br
+.SH "FILES"
+/usr/include/cerebro.h
+.SH "SEE ALSO"
+cerebro_errnum(3), cerebro_strerror(3)

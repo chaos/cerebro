@@ -10,6 +10,8 @@
 
 	* Autoconfed CEREBRO_METRIC_CONTROL_PATH
 
+	* Add metric controller API manpages.
+
 2005-07-15  Albert Chu  <chu11@llnl.gov>
 
 	* Fixed metric controller bugs.

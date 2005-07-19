@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_control_protocol.h.in,v 1.1 2005-07-18 22:06:47 achu Exp $
+ *  $Id: cerebro_metric_control_protocol.h.in,v 1.2 2005-07-19 00:16:12 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_METRIC_CONTROL_PROTOCOL_H
@@ -34,7 +34,8 @@
 #define CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_METRIC_INVALID    3
 #define CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_PARAMETER_INVALID 4
 #define CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_PACKET_INVALID    5
-#define CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_INTERNAL_ERROR    6
+#define CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_METRIC_MAX        6
+#define CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_INTERNAL_ERROR    7
 
 #define CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_REGISTER          0
 #define CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_UNREGISTER        1

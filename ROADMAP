@@ -1,5 +1,6 @@
 cerebro-1-0-0-pre5
-- library/server to monitor new metrics
-  - uncache metrics?
-- server control
-- admin tool
+- cerebro-admin tool
+
+cerebro-1-0-0-pre6
+flush ability
+update thread w/ callback func
