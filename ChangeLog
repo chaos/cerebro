@@ -12,6 +12,8 @@
 
 	* Add metric controller API manpages.
 
+	* Fixed metric max corner case bug.
+
 2005-07-15  Albert Chu  <chu11@llnl.gov>
 
 	* Fixed metric controller bugs.

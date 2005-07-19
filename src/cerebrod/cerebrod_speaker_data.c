@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker_data.c,v 1.25 2005-07-18 17:51:08 achu Exp $
+ *  $Id: cerebrod_speaker_data.c,v 1.26 2005-07-19 00:36:12 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -130,8 +130,6 @@ _setup_metric_modules(void)
       goto cleanup;
     }
 
-  metric_list = List_create((ListDelF)_destroy_speaker_metric_info);
-
   for (i = 0; i < metric_index_len; i++)
     {
       struct cerebrod_speaker_metric_info *metric_info;
@@ -207,11 +205,6 @@ _setup_metric_modules(void)
       metric_modules_unload(metric_handle);
       metric_handle = NULL;
     }
-  if (metric_list)
-    {
-      list_destroy(metric_list);
-      metric_list = NULL;
-    }
   metric_list_size = 0;
   return 0;
 }
@@ -222,6 +215,8 @@ cerebrod_speaker_data_initialize(void)
   pthread_mutex_lock(&speaker_data_init_lock);
   if (speaker_data_init)
     goto out;
+
+  metric_list = List_create((ListDelF)_destroy_speaker_metric_info);
 
   if (_setup_metric_modules() < 0)
     CEREBRO_EXIT(("_setup_metric_modules"));
@@ -419,12 +414,14 @@ cerebrod_speaker_data_get_metric_data(struct cerebrod_heartbeat *hb,
   if (!speaker_data_init)
     CEREBRO_EXIT(("initialization not complete"));
 
-  /* There may not be any metric modules */
-  if (!metric_handle || !metric_list || !metric_list_size)
+  Pthread_mutex_lock(&metric_list_lock);
+
+  /* There may not be any metrics to distribute */
+  if (!metric_list_size)
     {
       hb->metrics_len = 0;
       hb->metrics = NULL;
-      return;
+      goto out;
     }
 
   hb->metrics_len = 0;
@@ -433,7 +430,6 @@ cerebrod_speaker_data_get_metric_data(struct cerebrod_heartbeat *hb,
 
   Gettimeofday(&tv, NULL);
   
-  Pthread_mutex_lock(&metric_list_lock);
   itr = List_iterator_create(metric_list);
   while ((metric_info = list_next(itr)))
     {      
@@ -471,7 +467,7 @@ cerebrod_speaker_data_get_metric_data(struct cerebrod_heartbeat *hb,
     } 
   List_iterator_destroy(itr);
   cerebrod_speaker_data_metric_list_sort();
+ out:
   Pthread_mutex_unlock(&metric_list_lock);
-
   return;
 }

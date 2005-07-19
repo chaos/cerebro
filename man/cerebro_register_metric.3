@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro_register_metric.3,v 1.1 2005-07-19 00:16:12 achu Exp $
+\."$Id: cerebro_register_metric.3,v 1.2 2005-07-19 00:36:12 achu Exp $
 \."#############################################################################
 .TH CEREBRO_REGISTER_METRIC 3 "May 2005" "LLNL" "LIBCEREBRO"
 .SH "NAME"
@@ -80,7 +80,10 @@ Timeout during protocol communication.
 Version incompatible with the metric control server.
 .TP
 .B CEREBRO_ERR_METRIC_INVALID
-The specified metric is unknown to the metric control server.
+The specified metric is invalid.
+.TP
+.B CEREBRO_ERR_METRIC_MAX
+The maximum number of metrics has been reaached.
 .TP
 .B CEREBRO_ERR_CONFIG_FILE
 A config file error occurred.

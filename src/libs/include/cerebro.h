@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.13 2005-07-15 23:39:51 achu Exp $
+ *  $Id: cerebro.h,v 1.14 2005-07-19 00:36:12 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_H
@@ -25,14 +25,15 @@
 #define CEREBRO_ERR_OVERFLOW                 14
 #define CEREBRO_ERR_NODE_NOTFOUND            15
 #define CEREBRO_ERR_METRIC_INVALID           16
-#define CEREBRO_ERR_END_OF_LIST              17
-#define CEREBRO_ERR_CONFIG_FILE              18
-#define CEREBRO_ERR_CONFIG_MODULE            19
-#define CEREBRO_ERR_CONFIG_INPUT             20
-#define CEREBRO_ERR_CLUSTERLIST_MODULE       21
-#define CEREBRO_ERR_OUTMEM                   22
-#define CEREBRO_ERR_INTERNAL                 23
-#define CEREBRO_ERR_ERRNUMRANGE              24
+#deinfe CEREBRO_ERR_METRIC_MAX               17
+#define CEREBRO_ERR_END_OF_LIST              18
+#define CEREBRO_ERR_CONFIG_FILE              19
+#define CEREBRO_ERR_CONFIG_MODULE            20
+#define CEREBRO_ERR_CONFIG_INPUT             21
+#define CEREBRO_ERR_CLUSTERLIST_MODULE       22
+#define CEREBRO_ERR_OUTMEM                   23
+#define CEREBRO_ERR_INTERNAL                 24
+#define CEREBRO_ERR_ERRNUMRANGE              25
 
 /* 
  * Cerebro Flags

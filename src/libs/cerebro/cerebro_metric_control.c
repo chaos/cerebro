@@ -91,6 +91,8 @@ _metric_control_protocol_err_code_conversion(u_int32_t err_code)
       return CEREBRO_ERR_PROTOCOL;
     case CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_PACKET_INVALID:
       return CEREBRO_ERR_PROTOCOL;
+    case CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_METRIC_MAX:
+      return CEREBRO_ERR_METRIC_MAX;
     case CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_INTERNAL_ERROR:
       CEREBRO_DBG(("control internal system error"));
       return CEREBRO_ERR_INTERNAL;

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_controller.c,v 1.12 2005-07-19 00:16:12 achu Exp $
+ *  $Id: cerebrod_metric_controller.c,v 1.13 2005-07-19 00:36:12 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -359,7 +359,13 @@ _register_metric(int fd, int32_t version, const char *metric_name)
 
   Pthread_mutex_lock(&metric_list_lock);
 
-  /* XXX check for metric max count */
+  if (metric_list_size >= conf.metric_max)
+    {
+      _send_metric_control_response(fd,
+                                    version,
+                                    CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_METRIC_MAX);
+      goto cleanup;
+    }
 
   if ((metric_info = _find_speaker_metric_info(metric_name)))
     {
