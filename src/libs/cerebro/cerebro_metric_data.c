@@ -46,7 +46,10 @@ _metric_value_unmarshall(cerebro_t handle,
   u_int32_t mtype, mlen;
 
 #if CEREBRO_DEBUG
-  if (!res || !metric_value || !buf)
+  if (!res 
+      || res->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_NONE 
+      || !metric_value 
+      || !buf)
     {
       CEREBRO_DBG(("invalid arguments"));
       handle->errnum = CEREBRO_ERR_INTERNAL;
@@ -59,9 +62,9 @@ _metric_value_unmarshall(cerebro_t handle,
 
   /* Special case for ending null character */
   if (mtype == CEREBRO_METRIC_VALUE_TYPE_STRING)
-    malloc_len = buflen;
-  else
     malloc_len = buflen + 1;
+  else
+    malloc_len = buflen;
 
   if (!(mvalue = malloc(buflen)))
     {
@@ -70,13 +73,7 @@ _metric_value_unmarshall(cerebro_t handle,
     }
   memset(mvalue, '\0', malloc_len);
 
-  if (mtype == CEREBRO_METRIC_VALUE_TYPE_NONE)
-    {
-      CEREBRO_DBG(("metric value len > 0 for type NONE"));
-      handle->errnum = CEREBRO_ERR_PROTOCOL;
-      goto cleanup;
-    }
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_INT32)
+  if (mtype == CEREBRO_METRIC_VALUE_TYPE_INT32)
     {
       if ((n = unmarshall_int32((int32_t *)mvalue, buf, buflen)) < 0)
         {
@@ -118,8 +115,9 @@ _metric_value_unmarshall(cerebro_t handle,
     }
   else
     {
+      /* If an invalid param, should have been caught before here */
       CEREBRO_DBG(("invalid type %d", mtype));
-      handle->errnum = CEREBRO_ERR_PROTOCOL;
+      handle->errnum = CEREBRO_ERR_INTERNAL;
       goto cleanup;
     }
 
@@ -154,6 +152,13 @@ _receive_metric_value(cerebro_t handle,
   int vbytes_read, rv = -1;
   void *metric_value = NULL;
   unsigned int errnum;
+
+  if (!res->metric_value_len)
+    {
+      CEREBRO_DBG(("invalid parameters"));
+      handle->errnum = CEREBRO_ERR_INTERNAL;
+      goto cleanup;
+    }
 
   if (!(vbuf = malloc(res->metric_value_len)))
     {

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.113 2005-07-19 20:18:35 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.114 2005-07-19 20:31:40 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -301,8 +301,13 @@ _cerebrod_heartbeat_unmarshall(const char *buf, unsigned int buflen)
         n = Unmarshall_float((float *)mvalue, buf + c, buflen - c);
       else if (mtype == CEREBRO_METRIC_VALUE_TYPE_DOUBLE)
         n = Unmarshall_double((double *)mvalue, buf + c, buflen - c);
-      else
+      else if (mtype == CEREBRO_METRIC_VALUE_TYPE_STRING)
         n = Unmarshall_buffer((char *)mvalue, mlen, buf + c, buflen - c);
+      else
+        {
+          CEREBRO_DBG(("invalid type %d", mtype));
+	  goto cleanup;
+        }
       
       if (!n)
         {

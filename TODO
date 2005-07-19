@@ -7,7 +7,6 @@ Testing
 - api again
 
 Cleanup
-- metric value receive in libcerebro metric_data
 - cerebrod metric_list into a new file or something? 
   - hard to follow, especially destroy stuff
   - atleast a common create func?

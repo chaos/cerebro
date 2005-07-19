@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_server.c,v 1.21 2005-07-19 20:18:35 achu Exp $
+ *  $Id: cerebrod_metric_server.c,v 1.22 2005-07-19 20:31:40 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -212,8 +212,13 @@ _metric_server_response_marshall(struct cerebro_metric_server_response *res,
     c += Marshall_float(*((float *)mvalue), buf + c, buflen - c);
   else if (mtype == CEREBRO_METRIC_VALUE_TYPE_DOUBLE)
     c += Marshall_double(*((double *)mvalue), buf + c, buflen - c);
-  else
+  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_STRING)
     c += Marshall_buffer(mvalue, mlen, buf + c, buflen - c);
+  else
+    {
+      CEREBRO_DBG(("invalid type %d", mtype));
+      return -1;
+    }
 
   return c;
 }

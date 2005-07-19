@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_controller.c,v 1.14 2005-07-19 20:18:35 achu Exp $
+ *  $Id: cerebrod_metric_controller.c,v 1.15 2005-07-19 20:31:40 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -467,7 +467,6 @@ _receive_metric_value(int fd,
       _send_metric_control_response(fd,
                                     version,
                                     CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_PACKET_INVALID);
-      Free(vbuf);
       goto cleanup;
     }
   
@@ -476,7 +475,6 @@ _receive_metric_value(int fd,
       _send_metric_control_response(fd,
                                     version,
                                     CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_PACKET_INVALID);
-      Free(vbuf);
       goto cleanup;
     }
   
@@ -492,8 +490,17 @@ _receive_metric_value(int fd,
     Unmarshall_float((float *)metric_value, vbuf, vbytes_read);
   else if (mtype == CEREBRO_METRIC_VALUE_TYPE_DOUBLE)
     Unmarshall_double((double *)metric_value, vbuf, vbytes_read);
-  else
+  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_STRING)
     Unmarshall_buffer((char *)metric_value, mlen, vbuf, vbytes_read);
+  else 
+    {
+      /* If an invalid param, should have been caught before here */
+      CEREBRO_DBG(("invalid type %d", mtype));
+      _send_metric_control_response(fd,
+                                    version,
+                                    CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_INTERNAL);
+      goto cleanup;
+    }
   
   req->metric_value = metric_value;
   
