@@ -24,6 +24,7 @@
 #include "debug.h"
 #include "fd.h"
 #include "marshall.h"
+#include "metric_util.h"
 #include "network_util.h"
 
 /*
@@ -300,7 +301,7 @@ _metric_server_response_header_unmarshall(cerebro_t handle,
       return -1;
     }
   c += n;
-
+  
   if (c != CEREBRO_METRIC_SERVER_RESPONSE_HEADER_LEN)
     {
       handle->errnum = CEREBRO_ERR_PROTOCOL;

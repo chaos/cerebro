@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: metric_util.h,v 1.3 2005-07-19 23:41:13 achu Exp $
+ *  $Id: metric_util.h,v 1.4 2005-07-20 00:08:25 achu Exp $
 \*****************************************************************************/
 
 #ifndef _METRIC_UTIL_H
@@ -15,7 +15,6 @@
 
 #define marshall_metric(t,l,v,b,bl,e) \
         _marshall_metric(t,l,v,b,bl,e,__FUNCTION__)
-
 /* 
  * _check_metric_type_len
  *
