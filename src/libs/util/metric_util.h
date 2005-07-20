@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: metric_util.h,v 1.4 2005-07-20 00:08:25 achu Exp $
+ *  $Id: metric_util.h,v 1.5 2005-07-20 18:08:18 achu Exp $
 \*****************************************************************************/
 
 #ifndef _METRIC_UTIL_H
@@ -15,6 +15,9 @@
 
 #define marshall_metric(t,l,v,b,bl,e) \
         _marshall_metric(t,l,v,b,bl,e,__FUNCTION__)
+
+#define unmarshall_metric_value(t,l,v,vl,b,bl,e) \
+        _unmarshall_metric_value(t,l,v,vl,b,bl,e,__FUNCTION__)
 /* 
  * _check_metric_type_len
  *
@@ -46,11 +49,28 @@ int _check_metric_type_len_value(u_int32_t mtype,
  * Returns bytes written to buffer on success, -1 on error
  */
 int _marshall_metric(u_int32_t mtype,
-                           u_int32_t mlen,
-                           void *mvalue,
-                           char *buf,
-                           unsigned int buflen,
-                           int *errnum,
-                           const char *caller);
-     
+                     u_int32_t mlen,
+                     void *mvalue,
+                     char *buf,
+                     unsigned int buflen,
+                     int *errnum,
+                     const char *caller);
+
+/* 
+ * _unmarshall_metric_value
+ *
+ * Unmarshall a metric type and len
+ *
+ * Returns length of data unmarshalled from buffer, 0 if buffer 
+ * does not contain enough data, -1 on error
+ */
+int _unmarshall_metric_value(u_int32_t mtype,
+                             u_int32_t mlen,
+                             void *mvalue,
+                             unsigned int mvalue_len,
+                             const char *buf,
+                             unsigned int buflen,
+                             int *errnum,
+                             const char *caller);
+
 #endif /* _METRIC_UTIL_H */

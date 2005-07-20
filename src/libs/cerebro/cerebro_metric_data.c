@@ -41,7 +41,7 @@ _metric_value_unmarshall(cerebro_t handle,
                          const char *buf,
                          unsigned int buflen)
 {
-  int n, malloc_len = 0;
+  int n, errnum = 0, mvalue_len = 0;
   void *mvalue = NULL;
   u_int32_t mtype, mlen;
 
@@ -62,74 +62,31 @@ _metric_value_unmarshall(cerebro_t handle,
 
   /* Special case for ending null character */
   if (mtype == CEREBRO_METRIC_VALUE_TYPE_STRING)
-    malloc_len = buflen + 1;
+    mvalue_len = buflen + 1;
   else
-    malloc_len = buflen;
+    mvalue_len = buflen;
 
   if (!(mvalue = malloc(buflen)))
     {
       handle->errnum = CEREBRO_ERR_OUTMEM;
       return -1;
     }
-  memset(mvalue, '\0', malloc_len);
+  memset(mvalue, '\0', mvalue_len);
 
-  if (mtype == CEREBRO_METRIC_VALUE_TYPE_INT32)
+  if ((n = unmarshall_metric_value(mtype, 
+                                   mlen,
+                                   mvalue,
+                                   mvalue_len,
+                                   buf,
+                                   buflen,
+                                   &errnum)) < 0)
     {
-      if ((n = unmarshall_int32((int32_t *)mvalue, buf, buflen)) < 0)
-        {
-          CEREBRO_DBG(("unmarshall_int32"));
-          goto cleanup;
-        }
-    }
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_U_INT32)
-    {
-      if ((n = unmarshall_u_int32((u_int32_t *)mvalue, buf, buflen)) < 0)
-        {
-          CEREBRO_DBG(("unmarshall_u_int32"));
-          goto cleanup;
-        }
-    }  
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_FLOAT)
-    {
-      if ((n = unmarshall_float((float *)mvalue, buf, buflen)) < 0)
-        {
-          CEREBRO_DBG(("unmarshall_float"));
-          goto cleanup;
-        }
-    }
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_DOUBLE)
-    {
-      if ((n = unmarshall_double((double *)mvalue, buf, buflen)) < 0)
-        {
-          CEREBRO_DBG(("unmarshall_double"));
-          goto cleanup;
-        }
-    }
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_STRING)
-    {
-      if ((n = unmarshall_buffer((char *)mvalue, mlen, buf, buflen)) < 0)
-        {
-          CEREBRO_DBG(("unmarshall_buffer"));
-          goto cleanup;
-        }
-    }
-  else
-    {
-      /* If an invalid param, should have been caught before here */
-      CEREBRO_DBG(("invalid type %d", mtype));
-      handle->errnum = CEREBRO_ERR_INTERNAL;
-      goto cleanup;
-    }
-
-  if (n != buflen)
-    {
-      CEREBRO_DBG(("received invalid metric value buflen"));
-      handle->errnum = CEREBRO_ERR_PROTOCOL;
+      handle->errnum = errnum;
       goto cleanup;
     }
 
   *metric_value = mvalue;
-  return buflen;
+  return n;
 
  cleanup:
   free(mvalue);

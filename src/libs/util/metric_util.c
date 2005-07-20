@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: metric_util.c,v 1.4 2005-07-20 00:08:25 achu Exp $
+ *  $Id: metric_util.c,v 1.5 2005-07-20 18:08:18 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -190,4 +190,90 @@ _marshall_metric(u_int32_t mtype,
   c += n;
 
   return c;
+}
+
+int 
+_unmarshall_metric_value(u_int32_t mtype,
+                         u_int32_t mlen,
+                         void *mvalue,
+                         unsigned int mvalue_len,
+                         const char *buf,
+                         unsigned int buflen,
+                         int *errnum,
+                         const char *caller)
+{
+  int n = -1;
+
+  if (mlen < mvalue_len || !buf || !caller)
+    {
+      CEREBRO_DBG(("%s: invalid parameters", caller));
+      if (errnum)
+        *errnum = CEREBRO_ERR_INTERNAL;
+      return -1;
+    }
+
+  if (_check_metric_type_len(mtype, mlen, caller) < 0)
+    {
+      if (errnum)
+        *errnum = CEREBRO_ERR_PROTOCOL;
+      return -1;
+    }
+  
+  if (!mlen)
+    return 0;
+
+  if (buflen < mlen)
+    {
+      CEREBRO_DBG(("%s: invalid packet size", caller));
+      if (errnum)
+        *errnum = CEREBRO_ERR_PROTOCOL;
+      return -1;
+    }
+
+  if (mtype == CEREBRO_METRIC_VALUE_TYPE_INT32)
+    {
+      if ((n = unmarshall_int32((int32_t *)mvalue, buf, buflen)) < 0)
+        CEREBRO_DBG(("%s: unmarshall_int32", caller));
+    }
+  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_U_INT32)
+    {
+      if ((n = unmarshall_u_int32((u_int32_t *)mvalue, buf, buflen)) < 0)
+        CEREBRO_DBG(("%s: unmarshall_u_int32", caller));
+    }
+  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_FLOAT)
+    {
+      if ((n = unmarshall_float((float *)mvalue, buf, buflen)) < 0)
+        CEREBRO_DBG(("%s: unmarshall_float", caller));
+    }
+  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_DOUBLE)
+    {
+      if ((n = unmarshall_double((double *)mvalue, buf, buflen)) < 0)
+        CEREBRO_DBG(("%s: unmarshall_double", caller));
+    }
+  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_STRING)
+    {
+      if ((n = unmarshall_buffer((char *)mvalue, mlen, buf, buflen)) < 0)
+        CEREBRO_DBG(("%s: unmarshall_buffer", caller));
+    }
+  else
+    /* If an invalid param, should have been caught before here */
+    CEREBRO_DBG(("%s: invalid type %d", caller, mtype));
+  
+  if (n < 0)
+    {
+      if (errnum)
+        *errnum = CEREBRO_ERR_INTERNAL;
+      return -1;
+    }
+
+  if (n != mlen)
+    {
+      /* Internal error b/c this should have been caught earlier */
+      CEREBRO_DBG(("%s: unfinished unmarshalling", caller));
+      if (errnum)
+        *errnum = CEREBRO_ERR_INTERNAL;
+      return -1;
+    }
+  
+  return n;
 }

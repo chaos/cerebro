@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_controller.c,v 1.16 2005-07-19 22:43:38 achu Exp $
+ *  $Id: cerebrod_metric_controller.c,v 1.17 2005-07-20 18:08:18 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -153,16 +153,16 @@ _metric_control_request_check_version(const char *buf,
                                       int32_t *version)
 {
   assert(buflen >= sizeof(int32_t) && version);
-                                                                                      
+
   if (!Unmarshall_int32(version, buf, buflen))
     {
       CEREBRO_DBG(("version could not be unmarshalled"));
       return -1;
     }
-                                                                                      
+
   if (*version != CEREBRO_METRIC_CONTROL_PROTOCOL_VERSION)
     return -1;
-                                                                                      
+
   return 0;
 }
 
@@ -449,8 +449,8 @@ _receive_metric_value(int fd,
                       int32_t version, 
                       struct cerebro_metric_control_request *req)
 {
-  char *vbuf = NULL, *metric_value = NULL;
-  int vbytes_read, rv = -1;
+  char *vbuf = NULL, *mvalue = NULL;
+  int n, vbytes_read, rv = -1;
   u_int32_t mtype, mlen;
 
   assert(fd >= 0 && req && req->metric_value_len);
@@ -478,31 +478,21 @@ _receive_metric_value(int fd,
       goto cleanup;
     }
   
-  metric_value = Malloc(req->metric_value_len);
+  mvalue = Malloc(req->metric_value_len);
 
   mtype = req->metric_value_type;
   mlen = req->metric_value_len;
-  if (mtype == CEREBRO_METRIC_VALUE_TYPE_INT32)
-    Unmarshall_int32((int32_t *)metric_value, vbuf, vbytes_read);
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_U_INT32)
-    Unmarshall_u_int32((u_int32_t *)metric_value, vbuf, vbytes_read);
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_FLOAT)
-    Unmarshall_float((float *)metric_value, vbuf, vbytes_read);
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_DOUBLE)
-    Unmarshall_double((double *)metric_value, vbuf, vbytes_read);
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_STRING)
-    Unmarshall_buffer((char *)metric_value, mlen, vbuf, vbytes_read);
-  else 
-    {
-      /* If an invalid param, should have been caught before here */
-      CEREBRO_DBG(("invalid type %d", mtype));
-      _send_metric_control_response(fd,
-                                    version,
-                                    CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_INTERNAL_ERROR);
-      goto cleanup;
-    }
+
+  if ((n = unmarshall_metric_value(mtype,
+                                   mlen,
+                                   mvalue,
+                                   req->metric_value_len,
+                                   vbuf,
+                                   vbytes_read,
+                                   NULL)) < 0)
+    goto cleanup;
   
-  req->metric_value = metric_value;
+  req->metric_value = mvalue;
   
   rv = 0;
  cleanup:

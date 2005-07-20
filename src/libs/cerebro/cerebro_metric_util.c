@@ -377,7 +377,6 @@ _get_metric_data(cerebro_t handle,
       if (_metric_server_response_check(handle, buf, bytes_read) < 0)
         goto cleanup;
 
-
       if (bytes_read < CEREBRO_METRIC_SERVER_RESPONSE_HEADER_LEN)
         {
           handle->errnum = CEREBRO_ERR_PROTOCOL;
