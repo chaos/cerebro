@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: metric_util.c,v 1.5 2005-07-20 18:08:18 achu Exp $
+ *  $Id: metric_util.c,v 1.6 2005-07-20 21:17:48 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -188,6 +188,62 @@ _marshall_metric(u_int32_t mtype,
     }
 
   c += n;
+
+  return c;
+}
+
+int 
+_unmarshall_metric_type_len(u_int32_t *mtype,
+                            u_int32_t *mlen,
+                            const char *buf,
+                            unsigned int buflen,
+                            int *errnum,
+                            const char *caller)
+{
+  int n, c = 0;
+
+  if (!mtype || !mlen || !buf || !caller)
+    {
+      CEREBRO_DBG(("%s: invalid parameters", caller));
+      if (errnum)
+        *errnum = CEREBRO_ERR_INTERNAL;
+      return -1;
+    }
+
+  if (buflen < 2*sizeof(u_int32_t))
+    {
+      CEREBRO_DBG(("%s: invalid packet size", caller));
+      if (errnum)
+        *errnum = CEREBRO_ERR_PROTOCOL;
+      return -1;
+    }
+
+  if ((n = unmarshall_u_int32(mtype, buf + c,  buflen - c)) < 0)
+    {
+      CEREBRO_DBG(("unmarshall_u_int32"));
+      if (errnum)
+        *errnum = CEREBRO_ERR_INTERNAL;
+      return -1;
+    }
+  c += n;
+                                                                                     
+  if ((n = unmarshall_u_int32(mlen, buf + c, buflen - c)) < 0)
+    {
+      CEREBRO_DBG(("unmarshall_u_int32"));
+      if (errnum)
+        *errnum = CEREBRO_ERR_INTERNAL;
+      return -1;
+    }
+  c += n;
+
+  if (c != 2*sizeof(u_int32_t))
+    {
+      /* Internal error b/c this should have been caught earlier */
+      CEREBRO_DBG(("%s: unfinished unmarshalling", caller));
+      if (errnum)
+        *errnum = CEREBRO_ERR_INTERNAL;
+      return -1;
+    }
 
   return c;
 }

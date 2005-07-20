@@ -11,6 +11,8 @@ Cleanup
   - hard to follow, especially destroy stuff
   - atleast a common create func?
 - abstract listener_data a bit more?  
+- heartbeat destroy in listener - can use common one??
+- passthrough code cleanup
 
 Portability
 - IPv6
