@@ -2,6 +2,8 @@
 
 	* Added metric_util lib to clean up code and fix corner cases.
 
+	* Began cerebro-admin.
+
 2005-07-18  Albert Chu  <chu11@llnl.gov>
 
 	* Added additional protocol corner case checks.

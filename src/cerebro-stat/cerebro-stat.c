@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro-stat.c,v 1.11 2005-07-15 23:39:51 achu Exp $
+ *  $Id: cerebro-stat.c,v 1.12 2005-07-20 21:51:47 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -677,9 +677,6 @@ _metric_data(void)
         }
     }
 
-  /* 
-   * XXX need cluster nodes special case
-   */
   if (!strcmp(metric_name, CEREBRO_METRIC_CLUSTER_NODES))
     _cluster_nodes_output(l);
   else if (output_type == CEREBRO_STAT_NEWLINE)

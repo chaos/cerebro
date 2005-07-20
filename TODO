@@ -1,23 +1,16 @@
 Documention
 - cerebro.1 manpage
 
-Testing
-- fd leaking
-- mem-leaking
-- api again
+Portability
+- IPv6
+- Multicast
 
 Cleanup
 - cerebrod metric_list into a new file or something? 
   - hard to follow, especially destroy stuff
   - atleast a common create func?
 - abstract listener_data a bit more?  
-- heartbeat destroy in listener - can use common one??
 - passthrough code cleanup
-
-Portability
-- IPv6
-- Non-pthreads support
-- Multicast
 
 Design
 - cerebro-admin
@@ -34,10 +27,7 @@ Design
     - > 0 ...
     - ??
   - max period allowed too?
-- Way for monitoring lib to set period?
 - Update time for each cerebro metric data?
-- ability for data to be stored/not-stored in the internal hash
-  i.e. passed directly to module and forgotten
 - nodelist
   - use own list instead of 'List' to store iterators?
 - strerror_r and errormsg_r funcs
@@ -47,13 +37,10 @@ Design
 Before distribution
 - devel package?
 - untabify
-= default installed cerebro.conf w/ instructions/examples
+- default installed cerebro.conf w/ instructions/examples
 
 GPL
 - do it
 - place header on all headers
 - place on all c files
 - note on manpage ORIGINS
-
-Misc
-- remove hash/list buffering in list.c hash.c?

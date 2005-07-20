@@ -1,10 +1,11 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.8 2005-07-05 19:55:25 achu Exp $
+## $Id: Makefile.am,v 1.9 2005-07-20 21:51:46 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
 
-SUBDIRS = cerebro-stat \
+SUBDIRS = cerebro-admin \
+	  cerebro-stat \
 	  cerebrod \
 	  libs \
 	  modules
