@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.115 2005-07-20 18:08:17 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.116 2005-07-20 20:20:32 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -247,8 +247,6 @@ _cerebrod_heartbeat_unmarshall(const char *buf, unsigned int buflen)
       
   for (i = 0; i < hb->metrics_len; i++)
     {
-      u_int32_t *mtypePtr, *mlenPtr;
-      u_int32_t mtype, mlen;
       char *mname;
       int mnamelen;
 
@@ -257,33 +255,28 @@ _cerebrod_heartbeat_unmarshall(const char *buf, unsigned int buflen)
       
       mname = hd->metric_name;
       mnamelen = sizeof(hd->metric_name);
-      mtypePtr = &(hd->metric_value_type);
-      mlenPtr = &(hd->metric_value_len);
       
       if (!(n = Unmarshall_buffer(mname, mnamelen, buf + c, buflen - c)))
         goto cleanup;
       c += n;
       
-      if (!(n = Unmarshall_u_int32(mtypePtr, buf + c, buflen - c)))
+      if ((n = unmarshall_metric_type_len(&(hd->metric_value_type),
+                                          &(hd->metric_value_len),
+                                          buf + c, 
+                                          buflen - c,
+                                          NULL)) < 0)
         goto cleanup;
       c += n;
       
-      if (!(n = Unmarshall_u_int32(mlenPtr, buf + c, buflen - c)))
-        goto cleanup;
-      c += n;
-      
-      mtype = hd->metric_value_type;
-      mlen = hd->metric_value_len;
-
-      if (check_metric_type_len(mtype, mlen) < 0)
+      if (check_metric_type_len(hd->metric_value_type, hd->metric_value_len) < 0)
         goto cleanup;
 
       hd->metric_value = NULL;
-      if (mlen)
+      if (hd->metric_value_len)
         {
           hd->metric_value = Malloc(hd->metric_value_len);
-          if ((n = unmarshall_metric_value(mtype, 
-                                           mlen,
+          if ((n = unmarshall_metric_value(hd->metric_value_type, 
+                                           hd->metric_value_len,
                                            hd->metric_value,
                                            hd->metric_value_len,
                                            buf + c,

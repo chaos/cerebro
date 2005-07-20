@@ -11,7 +11,6 @@ Cleanup
   - hard to follow, especially destroy stuff
   - atleast a common create func?
 - abstract listener_data a bit more?  
-- metric value marshall/unmarshall common funcs??
 
 Portability
 - IPv6
