@@ -10,6 +10,7 @@ Cleanup
   - hard to follow, especially destroy stuff
   - atleast a common create func?
 - abstract listener_data a bit more?  
+- restart metric - not the right word?
 - passthrough code cleanup
 
 Design

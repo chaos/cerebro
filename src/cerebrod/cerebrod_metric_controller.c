@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_controller.c,v 1.17 2005-07-20 18:08:18 achu Exp $
+ *  $Id: cerebrod_metric_controller.c,v 1.18 2005-07-21 16:57:54 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -610,7 +610,8 @@ _restart_metric(int fd,
       goto cleanup;
     }
   
-  if (!(metric_info->metric_origin & CEREBROD_METRIC_ORIGIN_USERSPACE))
+  if (!(metric_info->metric_origin & CEREBROD_METRIC_ORIGIN_MODULE
+        || metric_info->metric_origin & CEREBRO_METRIC_ORIGIN_USERSPACE))
     {
       _send_metric_control_response(fd,
                                     version,

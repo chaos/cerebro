@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro-admin.c,v 1.2 2005-07-21 15:47:42 achu Exp $
+ *  $Id: cerebro-admin.c,v 1.3 2005-07-21 16:57:54 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -231,7 +231,12 @@ _cmdline_parse(int argc, char **argv)
   if (metric_value_type != CEREBRO_METRIC_VALUE_TYPE_NONE && !metric_value)
     err_exit("invalid metric value specified");
 
-  if (metric_value_type == CEREBRO_METRIC_VALUE_TYPE_INT32)
+  if (metric_value_type == CEREBRO_METRIC_VALUE_TYPE_NONE)
+    {
+      metric_value_len = 0;
+      metric_value_ptr = NULL;
+    }
+  else if (metric_value_type == CEREBRO_METRIC_VALUE_TYPE_INT32)
     {
       metric_value_int32 = strtol(metric_value, &ptr, 10);
       if (ptr != (metric_value + strlen(metric_value)))

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker_data.c,v 1.27 2005-07-19 20:18:35 achu Exp $
+ *  $Id: cerebrod_speaker_data.c,v 1.28 2005-07-21 16:57:54 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -311,9 +311,13 @@ _get_module_metric_value(struct cerebrod_speaker_metric_info *metric_info)
 
   hd->metric_value_type = mtype;
   hd->metric_value_len = mlen;
-  hd->metric_value = Malloc(hd->metric_value_len);
-  memcpy(hd->metric_value, mvalue, hd->metric_value_len);
-
+  if (hd->metric_value_len)
+    {
+      hd->metric_value = Malloc(hd->metric_value_len);
+      memcpy(hd->metric_value, mvalue, hd->metric_value_len);
+    }
+  else
+    hd->metric_value = NULL;
   metric_module_destroy_metric_value(metric_handle, index, mvalue);
   
   return hd;
@@ -370,13 +374,16 @@ _get_userspace_metric_value(struct cerebrod_speaker_metric_info *metric_info)
 
   hd->metric_value_type = metric_info->metric_value_type;
   hd->metric_value_len = metric_info->metric_value_len;
-
-  hd->metric_value = Malloc(metric_info->metric_value_len);
-
-  memcpy(hd->metric_value, 
-         metric_info->metric_value, 
-         metric_info->metric_value_len);
-
+  if (hd->metric_value_len)
+    {
+      hd->metric_value = Malloc(metric_info->metric_value_len);
+      memcpy(hd->metric_value, 
+             metric_info->metric_value, 
+             metric_info->metric_value_len);
+    }
+  else
+    hd->metric_value = NULL;
+      
   return hd;
 
  cleanup:
