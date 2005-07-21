@@ -5,6 +5,9 @@
 	* Complete cerebro-admin.
 
 	* Alter metric period logic and metric module period retrieval.
+
+	* Added ability for metric modules to inform the cerebrod daemon
+	of a metric update.
 	
 2005-07-20  Albert Chu  <chu11@llnl.gov>
 

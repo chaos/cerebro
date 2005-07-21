@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_module.h,v 1.5 2005-07-21 20:15:45 achu Exp $
+ *  $Id: cerebro_metric_module.h,v 1.6 2005-07-21 23:11:26 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_METRIC_MODULE_H
@@ -73,10 +73,36 @@ typedef int (*Cerebro_metric_get_metric_value)(unsigned int *metric_value_type,
 typedef int (*Cerebro_metric_destroy_metric_value)(void *metric_value);
 
 /* 
+ * Cerebro_metric_updated
+ *
+ * function prototype to inform the cerebrod daemon a metric
+ * has been updated.
+ *
+ * Returns 0 on success, -1 on error
+ */
+typedef int (*Cerebro_metric_updated)(char *metric_name);
+
+/* 
  * Cerebro_metric_thread_pointer
  *
- * function prototype for a thread which can be passed to
+ * function prototype for a thread which will be passed to
  * pthread_create
+ *
+ * The function will be passed a pointer to a 'Cerebro_metric_updated'
+ * function that can be called when value is updated.  This thread can
+ * perform any metric monitoring duties it pleases and optionally call
+ * the 'Cerebro_metric_updated' function when a metric value is
+ * updated.
+ *
+ * Typically the thread is used to watch or monitor for some event and
+ * locally update data so that cerebrod will propogate the newly
+ * received data from a 'get_metric_value' call.
+ *
+ * If the user wishes to use mutexes within the metric thread to
+ * protect against concurrent access, the user is responsible for not
+ * putting the locks in situations that can lead to a deadlock.  The
+ * 'Cerebro_metric_updated' function call may require locks to
+ * function appropriately within the cerebrod daemon.
  */
 typedef void *(*Cerebro_metric_thread_pointer)(void *arg);
 
@@ -85,12 +111,9 @@ typedef void *(*Cerebro_metric_thread_pointer)(void *arg);
  *
  * function prototype for metric module function that will return a
  * pointer to function that will be executed as a detached thread.
- * This thread can perform any metric monitoring duties it pleases.
- * Typically the thread is used to watch or monitor for some event,
- * and after that occurs, it will update the metric value that the
- * cerebrod daemon should then propogate. If a metric_thread is not
- * needed, this function can return NULL.  Required to be defined by
- * each metric module.
+ *
+ * If a metric_thread is not needed, this function returns NULL.
+ * Required to be defined by each metric module.
  *
  * Returns 0 on success, -1 on error
  */

@@ -155,10 +155,10 @@ fi
 %defattr(-,root,root)
 %doc README NEWS ChangeLog 
 %config(noreplace) %{_sysconfdir}/init.d/cerebrod
-%{_sbindir}/*
 %{_includedir}/*
 %{_libdir}/libcerebro*
 %{_mandir}/*
+%{_sbindir}/*
 %if %{?_with_chaos:1}%{!?_with_chaos:0}
 %{_libdir}/cerebro/cerebro_clusterlist*
 %{_libdir}/cerebro/cerebro_config*

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker_data.c,v 1.29 2005-07-21 20:15:45 achu Exp $
+ *  $Id: cerebrod_speaker_data.c,v 1.30 2005-07-21 23:11:26 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -68,27 +68,48 @@ int metric_list_size = 0;
 pthread_mutex_t metric_list_lock = PTHREAD_MUTEX_INITIALIZER;
 
 /* 
- * _destroy_speaker_metric_info
+ * _metric_is_updated
  *
- * Deallocate speaker_metric_info structure
+ * May be called by a metric module to inform us to 
+ * propogate the metric.
+ *
+ * Returns 0 on success, -1 on error
  */
-static void
-_destroy_speaker_metric_info(void *x)
+static int 
+_metric_is_updated(char *metric_name)
 {
-  struct cerebrod_speaker_metric_info *metric_info;
-  
-  assert(x);
+  struct cerebrod_speaker_metric_info *metric_info = NULL;
+  ListIterator itr = NULL;
+  int found = 0;
 
-  metric_info = (struct cerebrod_speaker_metric_info *)x;
+  assert(metric_list);
 
-  if (metric_info->metric_origin & CEREBROD_METRIC_ORIGIN_USERSPACE)
+  if (!metric_name)
     {
-      Free(metric_info->metric_name);
-      if (metric_info->metric_value)
-        Free(metric_info->metric_value);
+      CEREBRO_DBG(("invalid parameters"));
+      return -1;
     }
-  
-  Free(metric_info);
+
+  Pthread_mutex_lock(&metric_list_lock);
+  itr = List_iterator_create(metric_list);
+  while ((metric_info = list_next(itr)))
+    {
+      if (!strcmp(metric_info->metric_name, metric_name))
+        {
+          metric_info->next_call_time = 0;
+          found++;
+          break;
+        }
+    }
+  cerebrod_speaker_data_metric_list_sort();
+  Pthread_mutex_unlock(&metric_list_lock);
+
+#if CEREBRO_DEBUG  
+  if (!found)
+    CEREBRO_DBG(("metric '%s' not found", metric_name));
+#endif /* CEREBRO_DEBUG */
+
+  return (found) ? 0 : -1;
 }
 
 /* 
@@ -103,6 +124,18 @@ static int
 _setup_metric_modules(void)
 {
   int i, metric_index_len;
+#if CEREBRO_DEBUG
+  int rv;
+#endif /* CEREBRO_DEBUG */
+
+  assert(metric_list);
+
+#if CEREBRO_DEBUG
+  /* Should be called with lock already set */
+  rv = Pthread_mutex_trylock(&metric_list_lock);
+  if (rv != EBUSY)
+    CEREBRO_EXIT(("mutex not locked: rv=%d", rv));
+#endif /* CEREBRO_DEBUG */
 
   if (!(metric_handle = metric_modules_load(conf.metric_max)))
     {
@@ -195,7 +228,7 @@ _setup_metric_modules(void)
           Pthread_attr_init(&attr);
           Pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
           Pthread_attr_setstacksize(&attr, CEREBROD_THREAD_STACKSIZE);
-          Pthread_create(&thread, &attr, threadPtr, NULL);
+          Pthread_create(&thread, &attr, threadPtr, &_metric_is_updated);
           Pthread_attr_destroy(&attr);
         }
     }
@@ -216,6 +249,30 @@ _setup_metric_modules(void)
   return 0;
 }
 
+/* 
+ * _destroy_speaker_metric_info
+ *
+ * Deallocate speaker_metric_info structure
+ */
+static void
+_destroy_speaker_metric_info(void *x)
+{
+  struct cerebrod_speaker_metric_info *metric_info;
+  
+  assert(x);
+
+  metric_info = (struct cerebrod_speaker_metric_info *)x;
+
+  if (metric_info->metric_origin & CEREBROD_METRIC_ORIGIN_USERSPACE)
+    {
+      Free(metric_info->metric_name);
+      if (metric_info->metric_value)
+        Free(metric_info->metric_value);
+    }
+  
+  Free(metric_info);
+}
+
 void
 cerebrod_speaker_data_initialize(void)
 {
@@ -223,10 +280,19 @@ cerebrod_speaker_data_initialize(void)
   if (speaker_data_init)
     goto out;
 
+  /* 
+   * Must lock around this initialization routine, b/c update thread
+   * initialization in metric modules may call the updated state
+   * function that could update the next call time.
+   */
+  Pthread_mutex_lock(&metric_list_lock);
+
   metric_list = List_create((ListDelF)_destroy_speaker_metric_info);
 
   if (_setup_metric_modules() < 0)
     CEREBRO_EXIT(("_setup_metric_modules"));
+
+  Pthread_mutex_unlock(&metric_list_lock);
 
   speaker_data_init++;
  out:
@@ -405,7 +471,18 @@ _get_userspace_metric_value(struct cerebrod_speaker_metric_info *metric_info)
 void 
 cerebrod_speaker_data_metric_list_sort(void)
 {
+#if CEREBRO_DEBUG
+  int rv;
+#endif /* CEREBRO_DEBUG */
+
   assert(metric_list);
+
+#if CEREBRO_DEBUG
+  /* Should be called with lock already set */
+  rv = Pthread_mutex_trylock(&metric_list_lock);
+  if (rv != EBUSY)
+    CEREBRO_EXIT(("mutex not locked: rv=%d", rv));
+#endif /* CEREBRO_DEBUG */
 
   List_sort(metric_list, _next_call_time_cmp);
 }

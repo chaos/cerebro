@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_controller.c,v 1.19 2005-07-21 20:15:45 achu Exp $
+ *  $Id: cerebrod_metric_controller.c,v 1.20 2005-07-21 23:11:26 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -637,6 +637,7 @@ _resend_metric(int fd,
 static void
 _speaker_metric_names_dump(void)
 {
+#if CEREBRO_DEBUG
   struct cerebrod_speaker_metric_info *metric_info = NULL;
   ListIterator itr = NULL;
 
@@ -656,6 +657,7 @@ _speaker_metric_names_dump(void)
   List_iterator_destroy(itr);
   Pthread_mutex_unlock(&debug_output_mutex);
   Pthread_mutex_unlock(&metric_list_lock);
+#endif /* CEREBRO_DEBUG */
 }
 
 /*

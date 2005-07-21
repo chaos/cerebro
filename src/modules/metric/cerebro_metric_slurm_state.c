@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_slurm_state.c,v 1.11 2005-07-21 20:15:45 achu Exp $
+ *  $Id: cerebro_metric_slurm_state.c,v 1.12 2005-07-21 23:11:26 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -50,13 +50,6 @@
  * cached system slurm_state
  */
 static u_int32_t metric_slurm_state = 0;
-
-/* 
- * metric_slurm_state_lock
- *
- * Protect access to metric_slurm_state
- */
-static pthread_mutex_t metric_slurm_state_lock = PTHREAD_MUTEX_INITIALIZER;
 
 /* 
  * slurm_state_fd
@@ -167,11 +160,10 @@ slurm_state_metric_get_metric_period(int *period)
       return -1;
     }
 
-  /* The slurm_state is propogated all of the time so that
-   * programs/modules monitoring it will immediately know when slurm
-   * has died and has woken back up.
+  /* The slurm_state is propogated every once in awhile.  The
+   * slurm_state metric thread is more responsible for propogation..
    */
-  *period = 0;
+  *period = 5*60;
   return 0;
 }
 
@@ -185,8 +177,6 @@ slurm_state_metric_get_metric_value(unsigned int *metric_value_type,
                                     unsigned int *metric_value_len,
                                     void **metric_value)
 {
-  int rv;
-
   if (!metric_value_type || !metric_value_len || !metric_value)
     {
       CEREBRO_DBG(("invalid parameters"));
@@ -195,18 +185,7 @@ slurm_state_metric_get_metric_value(unsigned int *metric_value_type,
 
   *metric_value_type = CEREBRO_METRIC_VALUE_TYPE_U_INT32;
   *metric_value_len = sizeof(u_int32_t);
-
-  /* Its not the end of the world if the lock fails */
-  if ((rv = pthread_mutex_lock(&metric_slurm_state_lock)) != 0)
-    CEREBRO_DBG(("pthread_mutex_lock: %s", strerror(rv)));
-
   *metric_value = (void *)&metric_slurm_state;
-
-  if (!rv)
-    {
-      if ((rv = pthread_mutex_unlock(&metric_slurm_state_lock)) != 0)
-        CEREBRO_DBG(("pthread_mutex_unlock: %s", strerror(rv)));
-    }
 
   return 0;
 }
@@ -230,11 +209,21 @@ slurm_state_metric_destroy_metric_value(void *metric_value)
 static void *
 slurm_state_metric_thread(void *arg)
 {
+  Cerebro_metric_updated updated_func;
+
+  if (!arg)
+    {
+      CEREBRO_DBG(("invalid parameters"));
+      return NULL;
+    }
+
+  updated_func = (Cerebro_metric_updated)arg;
+
   while (1)
     {
       struct sockaddr_un addr;
       socklen_t addrlen;
-      int fd, num, rv;
+      int fd, num;
       
       addrlen = sizeof(sizeof(struct sockaddr_un));
       if ((fd = accept(slurm_state_fd, (struct sockaddr *)&addr, &addrlen)) < 0)
@@ -250,17 +239,11 @@ slurm_state_metric_thread(void *arg)
             }
         }
 
-      /* Its not the end of the world if the lock fails */
-      if ((rv = pthread_mutex_lock(&metric_slurm_state_lock)) != 0)
-        CEREBRO_DBG(("pthread_mutex_lock: %s", strerror(rv)));
-
       metric_slurm_state = 1;
-      
-      if (!rv)
-        {
-          if ((rv = pthread_mutex_unlock(&metric_slurm_state_lock)) != 0)
-            CEREBRO_DBG(("pthread_mutex_unlock: %s", strerror(rv)));
-        }
+
+      /* No biggie if it fails, we can continue */
+      if (updated_func(SLURM_STATE_METRIC_MODULE_NAME) < 0)
+        CEREBRO_DBG(("updated_func failed"));
       
       while (1)
         {
@@ -318,18 +301,12 @@ slurm_state_metric_thread(void *arg)
 
               if (!n)
                 {
-                  /* Its not the end of the world if the lock fails */
-                  if ((rv = pthread_mutex_lock(&metric_slurm_state_lock)) != 0)
-                    CEREBRO_DBG(("pthread_mutex_lock: %s", strerror(rv)));
-
                   metric_slurm_state = 0;
-
-                  if (!rv)
-                    {
-                      if ((rv = pthread_mutex_unlock(&metric_slurm_state_lock)) != 0)
-                        CEREBRO_DBG(("pthread_mutex_unlock: %s", strerror(rv)));
-                    }
                   
+                  /* No biggie if it fails, we can continue */
+                  if (updated_func(SLURM_STATE_METRIC_MODULE_NAME) < 0)
+                    CEREBRO_DBG(("updated_func failed"));
+
                   close(fd);
                   break;
                 }
