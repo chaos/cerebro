@@ -1,0 +1,56 @@
+\."#############################################################################
+\."$Id: cerebro-admin.8.in,v 1.1 2005-07-21 23:58:38 achu Exp $
+\."#############################################################################
+.TH cerebro-admin 8 "July 2005" "cerebro-admin @VERSION@" cerebro-admin
+.SH "NAME"
+cerebro-admin \- cerebro metric administration
+.SH "SYNOPSIS"
+.B cerebro-admin [OPTIONS]
+.br
+.SH "DESCRIPTION"
+The
+.B cerebro-admin
+allows administrators to perform metric administration with 
+a 
+.B cerebrod(8)
+metric server.  
+
+.SH "OPTIONS"
+.TP
+.B  -h, --help
+Output help
+.TP
+.B  -v, --version
+Output version
+.TP
+.B \-m \fISTRING\fR, \fB\-\-metric\fR=\fISTRING\fR
+Specify the metric name to operate on.
+.TP
+.B  -r, --register
+Register the metric name.
+.TP
+.B  -u, --unregister
+Unregister the metric name.
+.TP
+.B  -p, --update
+Update the metric's value.
+.TP
+.B  -s, --resend
+Resend the metric.
+.TP
+.B \-t \fIINT\fR, \fB\-\-metric-value-type\fR=\fIINT\fR
+Specify the metric type to the updated.  Run the -h option
+to see input options.
+.TP
+.B \-l \fISTRING\fR, \fB\-\-metric-value\fR=\fISTRING\fR
+Specify the metric value to be updated.
+.if @MANPAGE_DEBUG@ \{
+.TP
+.B  -d, --debug
+Turn on debugging
+\}
+
+.SH "ORIGIN"
+Developed by Albert Chu <chu11@llnl.gov> on LLNL's Linux clusters.
+.SH "SEE ALSO"
+cerebro_module(3), cerebro.conf(5), cerebrod(8)
