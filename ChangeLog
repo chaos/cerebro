@@ -8,6 +8,8 @@
 
 	* Added ability for metric modules to inform the cerebrod daemon
 	of a metric update.
+
+	* cerebro.spec.in: Tweak default permissions.
 	
 2005-07-20  Albert Chu  <chu11@llnl.gov>
 

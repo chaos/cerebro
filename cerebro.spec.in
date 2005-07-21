@@ -158,42 +158,44 @@ fi
 %{_includedir}/*
 %{_libdir}/libcerebro*
 %{_mandir}/*
-%{_sbindir}/*
+%{_sbindir}/cerebrod
+%attr(700,root,root) %{_sbindir}/cerebro-stat
+%attr(700,root,root) %{_sbindir}/cerebro-admin
 %if %{?_with_chaos:1}%{!?_with_chaos:0}
-%{_libdir}/cerebro/cerebro_clusterlist*
-%{_libdir}/cerebro/cerebro_config*
+%attr(700,root,root) %{_libdir}/cerebro/cerebro_clusterlist*
+%attr(700,root,root) %{_libdir}/cerebro/cerebro_config*
 %endif
 
 %if %{?_with_chaos:0}%{!?_with_chaos:1}
 
 %if %{?_with_gendersllnl:1}%{!?_with_gendersllnl:0}
 %files gendersllnl
-%defattr(-,root,root)
+%defattr(700,root,root)
 %{_libdir}/cerebro/cerebro_clusterlist_gendersllnl.*
 %{_libdir}/cerebro/cerebro_config_gendersllnl.*
 %endif
 
 %if %{?_with_genders:1}%{!?_with_genders:0}
 %files genders
-%defattr(-,root,root)
+%defattr(700,root,root)
 %{_libdir}/cerebro/cerebro_clusterlist_genders.*
 %endif
 
 %if %{?_with_hostsfile:1}%{!?_with_hostsfile:0}
 %files hostsfile
-%defattr(-,root,root)
+%defattr(700,root,root)
 %{_libdir}/cerebro/cerebro_clusterlist_hostsfile.*
 %endif
 
 %if %{?_with_boottime:1}%{!?_with_boottime:0}
 %files metric-boottime
-%defattr(-,root,root)
+%defattr(700,root,root)
 %{_libdir}/cerebro/cerebro_metric_boottime.*
 %endif
 
 %if %{?_with_slurm_state:1}%{!?_with_slurm_state:0}
 %files metric-slurm-state
-%defattr(-,root,root)
+%defattr(700,root,root)
 %{_libdir}/cerebro/cerebro_metric_slurm-state.*
 %endif
 
@@ -202,7 +204,7 @@ fi
 %if %{?_with_chaos:1}%{!?_with_chaos:0}
 %if %{?_with_bootlog:1}%{!?_with_bootlog:0}
 %files bootlog
-%defattr(-,root,root)
+%defattr(700,root,root)
 %{_libdir}/cerebro/cerebro_metric_boottime.*
 %{_libdir}/cerebro/cerebro_monitor_bootlog.*
 %endif
