@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_boottime.c,v 1.12 2005-06-28 17:08:38 achu Exp $
+ *  $Id: cerebro_metric_boottime.c,v 1.13 2005-07-21 20:15:45 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -141,12 +141,19 @@ boottime_metric_get_metric_name(void)
  * boottime metric module get_metric_period function
  */
 static int
-boottime_metric_get_metric_period(void)
+boottime_metric_get_metric_period(int *period)
 {
+  if (!period)
+    {
+      CEREBRO_DBG(("invalid parameters"));
+      return -1;
+    }
+  
   /* The boottime is propogated all of the time so that
    * programs/modules monitoring it will immediately know when a
    * machine has been rebooted and brought straight back up.
    */
+  *period = 0;
   return 0;
 }
 

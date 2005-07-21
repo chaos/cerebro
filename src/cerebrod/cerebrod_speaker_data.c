@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker_data.c,v 1.28 2005-07-21 16:57:54 achu Exp $
+ *  $Id: cerebrod_speaker_data.c,v 1.29 2005-07-21 20:15:45 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -163,7 +163,7 @@ _setup_metric_modules(void)
           continue;
         }
 
-      if ((metric_period = metric_module_get_metric_period(metric_handle, i)) < 0)
+      if (metric_module_get_metric_period(metric_handle, i, &metric_period) < 0)
         {
           CEREBRO_DBG(("metric_module_get_metric_period: %s", module_name));
           metric_module_cleanup(metric_handle, i);
@@ -174,10 +174,16 @@ _setup_metric_modules(void)
       /* No need to Strdup() the name in this case */
       metric_info->metric_name = metric_name;
       metric_info->metric_origin = CEREBROD_METRIC_ORIGIN_MODULE;
-      /* Initialize to 0, so data is sent on the first heartbeat */
-      metric_info->next_call_time = 0;
+
       metric_info->metric_period = metric_period;
       metric_info->index = i;
+
+      if (metric_info->metric_period < 0)
+        metric_info->next_call_time = UINT_MAX;
+      else
+        /* Initialize to 0, so data is sent on the first heartbeat */
+        metric_info->next_call_time = 0;
+
       List_append(metric_list, metric_info);
       metric_list_size++;
 
@@ -460,11 +466,14 @@ cerebrod_speaker_data_get_metric_data(struct cerebrod_heartbeat *hb,
 
       if (metric_info->metric_origin & CEREBROD_METRIC_ORIGIN_MODULE)
         {
+          if (metric_info->metric_period < 0)
+            metric_info->next_call_time = UINT_MAX;
+
           /* 
            * Metric period stays at 0 for metrics that need to be
            * propogated every time
            */
-          if (metric_info->metric_period)
+          if (metric_info->metric_period > 0)
             metric_info->next_call_time = tv.tv_sec + metric_info->metric_period;
         }
     } 

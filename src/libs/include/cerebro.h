@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.15 2005-07-19 20:18:35 achu Exp $
+ *  $Id: cerebro.h,v 1.16 2005-07-21 20:15:45 achu Exp $
 \*****************************************************************************/
 
 #ifndef _CEREBRO_H
@@ -289,13 +289,13 @@ int cerebro_update_metric_value(cerebro_t handle,
                                 void *metric_value);
 
 /* 
- * cerebro_restart_metric
+ * cerebro_resend_metric
  *
- * Restart a metric on the local cerebro daemon
+ * Resend a metric
  *
  * Returns 0 on success, -1 on error
  */
-int cerebro_restart_metric(cerebro_t handle, const char *metric_name);
+int cerebro_resend_metric(cerebro_t handle, const char *metric_name);
 
 /* 
  * Metriclist API

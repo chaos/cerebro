@@ -6,28 +6,18 @@ Portability
 - Multicast
 
 Cleanup
-- cerebrod metric_list into a new file or something? 
-  - hard to follow, especially destroy stuff
-  - atleast a common create func?
-- abstract listener_data a bit more?  
-- restart metric - not the right word?
 - passthrough code cleanup
 
 Design
-- cerebro-admin
 - Ability to flush metric from listener
-  - requires protocol change, listener must also know metric origin
-- password or something for userspace metrics?
+  - requires protocol change, listener must also know metric origin?
+  - Check for root in lib?
+  - will require protocol headers to be hidden?
+  - password or something for userspace metrics?
 - Way for metric modules to tell Cerebrod it has new data and it should
   be sent out??
   - pass a function to the thread to be called with a metric_name.
   - will tell cerebrod this thing has been updated.
-  - redo metric_period logic
-    - -1 never
-    - 0 all the time
-    - > 0 ...
-    - ??
-  - max period allowed too?
 - Update time for each cerebro metric data?
 - nodelist
   - use own list instead of 'List' to store iterators?

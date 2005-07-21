@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_slurm_state.c,v 1.10 2005-07-18 21:45:28 achu Exp $
+ *  $Id: cerebro_metric_slurm_state.c,v 1.11 2005-07-21 20:15:45 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -159,12 +159,19 @@ slurm_state_metric_get_metric_name(void)
  * slurm_state metric module get_metric_period function
  */
 static int
-slurm_state_metric_get_metric_period(void)
+slurm_state_metric_get_metric_period(int *period)
 {
+  if (!period)
+    {
+      CEREBRO_DBG(("invalid parameters"));
+      return -1;
+    }
+
   /* The slurm_state is propogated all of the time so that
    * programs/modules monitoring it will immediately know when slurm
    * has died and has woken back up.
    */
+  *period = 0;
   return 0;
 }
 

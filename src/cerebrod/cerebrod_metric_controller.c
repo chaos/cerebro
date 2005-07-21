@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_controller.c,v 1.18 2005-07-21 16:57:54 achu Exp $
+ *  $Id: cerebrod_metric_controller.c,v 1.19 2005-07-21 20:15:45 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -583,16 +583,16 @@ _update_metric(int fd,
 }
 
 /* 
- * _restart_metric
+ * _resend_metric
  *
- * Restart a metric by setting the next call time to 0
+ * Resend a metric by setting the next call time to 0
  *
  * Returns 0 on success, -1 on error
  */
 static int
-_restart_metric(int fd, 
-                int32_t version, 
-                const char *metric_name)
+_resend_metric(int fd, 
+               int32_t version, 
+               const char *metric_name)
 {
   struct cerebrod_speaker_metric_info *metric_info;
   int rv = -1;
@@ -611,7 +611,7 @@ _restart_metric(int fd,
     }
   
   if (!(metric_info->metric_origin & CEREBROD_METRIC_ORIGIN_MODULE
-        || metric_info->metric_origin & CEREBRO_METRIC_ORIGIN_USERSPACE))
+        || metric_info->metric_origin & CEREBROD_METRIC_ORIGIN_USERSPACE))
     {
       _send_metric_control_response(fd,
                                     version,
@@ -749,10 +749,10 @@ _metric_controller_service_connection(void *arg)
       if (_update_metric(fd, version, metric_name_buf, &req) < 0)
         goto cleanup;
     }
-  else if (req.command == CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_RESTART 
+  else if (req.command == CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_RESEND 
            && conf.speak)
     {
-      if (_restart_metric(fd, version, metric_name_buf) < 0)
+      if (_resend_metric(fd, version, metric_name_buf) < 0)
         goto cleanup;
     }
   else

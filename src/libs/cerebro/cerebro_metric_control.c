@@ -190,7 +190,7 @@ _metric_control_request_send(cerebro_t handle,
   int req_len;
 
   if (!(command >= CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_REGISTER
-        && command <= CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_RESTART)
+        && command <= CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_RESEND)
       || !metric_name
       || !(metric_value_type >= CEREBRO_METRIC_VALUE_TYPE_NONE
            && metric_value_type <= CEREBRO_METRIC_VALUE_TYPE_STRING))
@@ -426,10 +426,10 @@ cerebro_update_metric_value(cerebro_t handle,
 }
 
 int 
-cerebro_restart_metric(cerebro_t handle, const char *metric_name)
+cerebro_resend_metric(cerebro_t handle, const char *metric_name)
 {
   return _cerebro_metric_control(handle, 
-                                 CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_RESTART,
+                                 CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_RESEND,
                                  metric_name, 
                                  CEREBRO_METRIC_VALUE_TYPE_NONE,
                                  0,

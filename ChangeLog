@@ -3,6 +3,8 @@
 	* Fix various metric controller bugs.
 
 	* Complete cerebro-admin.
+
+	* Alter metric period logic and metric module period retrieval.
 	
 2005-07-20  Albert Chu  <chu11@llnl.gov>
 

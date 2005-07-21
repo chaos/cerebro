@@ -1,9 +1,9 @@
 \."#############################################################################
-\."$Id: cerebro_register_metric.3,v 1.2 2005-07-19 00:36:12 achu Exp $
+\."$Id: cerebro_register_metric.3,v 1.3 2005-07-21 20:15:45 achu Exp $
 \."#############################################################################
 .TH CEREBRO_REGISTER_METRIC 3 "May 2005" "LLNL" "LIBCEREBRO"
 .SH "NAME"
-cerebro_register_metric, cerebro_unregister_metric, cerebro_update_metric_value, cerebro_restart_metric \-
+cerebro_register_metric, cerebro_unregister_metric, cerebro_update_metric_value, cerebro_resend_metric \-
 cerebro metric monitoring routines
 .SH "SYNOPSIS"
 .B #include <cerebro.h>
@@ -14,7 +14,7 @@ cerebro metric monitoring routines
 .sp
 .BI "int cerebro_update_metric_value(cerebro_t handle, const char *metric_name, unsigned int metric_value_type, unsigned int metric_value_len, void *metric_value);"
 .sp
-.BI "int cerebro_restart_metric(cerebro_t handle, const char *metric_name);"
+.BI "int cerebro_resend_metric(cerebro_t handle, const char *metric_name);"
 .br
 .SH "DESCRIPTION"
 \fBcerebro_register_metric()\fR registers a new metric that can be propogated by
@@ -32,9 +32,10 @@ propogated by the
 .BR cerebrod(8)
 daemon.
 
-\fBcerebro_restart_metric()\fR restarts the monitoring of the
-specified metric.  Usually, this function is called to force a metric
-to be re-propogated.
+\fBcerebro_resend_metric()\fR resends the specified metric in the next 
+.BR cerebrod(8)
+heartbeat.  Usually,
+this function is called to force a metric to be re-propogated.
 
 Metrics can be registered and propogated only if the
 .BR cerebrod(8)

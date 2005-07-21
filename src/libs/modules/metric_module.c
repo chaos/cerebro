@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: metric_module.c,v 1.11 2005-07-01 17:13:50 achu Exp $
+ *  $Id: metric_module.c,v 1.12 2005-07-21 20:15:45 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -295,12 +295,14 @@ metric_module_get_metric_name(metric_modules_t handle, unsigned int index)
 }
 
 int
-metric_module_get_metric_period(metric_modules_t handle, unsigned int index)
+metric_module_get_metric_period(metric_modules_t handle, 
+                                unsigned int index,
+                                int *period)
 {
   if (_handle_index_check(handle, index) < 0)
     return -1;
   
-  return ((*(handle->module_info[index])->get_metric_period)());
+  return ((*(handle->module_info[index])->get_metric_period)(period));
 }
 
 int 
