@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_module.h,v 1.7 2005-07-22 17:21:07 achu Exp $
+ *  $Id: cerebro_metric_module.h,v 1.8 2005-07-22 17:45:33 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -112,10 +112,10 @@ typedef int (*Cerebro_metric_updated)(char *metric_name);
  * pthread_create
  *
  * The function will be passed a pointer to a 'Cerebro_metric_updated'
- * function that can be called when value is updated.  This thread can
- * perform any metric monitoring duties it pleases and optionally call
- * the 'Cerebro_metric_updated' function when a metric value is
- * updated.
+ * function can be called when the metric value is updated.  This
+ * thread can perform any metric monitoring duties it pleases and
+ * optionally call the 'Cerebro_metric_updated' function when a metric
+ * value is updated.
  *
  * Typically the thread is used to watch or monitor for some event and
  * locally update data so that cerebrod will propogate the newly

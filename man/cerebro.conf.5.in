@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro.conf.5.in,v 1.11 2005-07-22 17:21:07 achu Exp $
+\."$Id: cerebro.conf.5.in,v 1.12 2005-07-22 17:45:33 achu Exp $
 \."#############################################################################
 \."  Copyright (C) 2005 The Regents of the University of California.
 \."  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -133,6 +133,19 @@ Specify the number of listening threads the
 .B cerebrod
 listener server should execute.  The default executes 2 threads.
 .TP
+.I cerebrod_metric_controller ( on | off )
+Specify if the
+.B cerebrod
+daemon should turn on the metric controller.  Generally speaking, this
+option should be turned on if the
+.I cerebrod_speak
+option is turned on.  If the 
+.I cerebrod_speak
+option is turned off, the metric_controller will not be started.  The default
+turns this option on as long as the 
+.I cerebrod_speak
+option is turned on.
+.TP
 .I cerebrod_metric_server ( on | off )
 Specify if the
 .B cerebrod
@@ -167,6 +180,12 @@ option.  This option is turned off by default.
 .I cerebrod_listen_debug ( on | off )
 Turn on listen debugging.  Requires that debugging be turned on from
 the command line with the
+.I -d
+option.  This option is turned off by default.
+.TP
+.I cerebrod_metric_controller_debug ( on | off )
+Turn on metric controller debugging.  Requires that debugging be turned on
+from the command line with the
 .I -d
 option.  This option is turned off by default.
 .TP

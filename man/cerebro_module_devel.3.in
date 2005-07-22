@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro_module_devel.3.in,v 1.9 2005-07-22 17:21:07 achu Exp $
+\."$Id: cerebro_module_devel.3.in,v 1.10 2005-07-22 17:45:33 achu Exp $
 \."#############################################################################
 \."  Copyright (C) 2005 The Regents of the University of California.
 \."  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -213,6 +213,8 @@ struct cerebro_config {
   int cerebrod_listen_flag;
   int cerebrod_listen_threads;
   int cerebrod_listen_threads_flag;
+  int cerebrod_metric_controller;
+  int cerebrod_metric_controller_flag;
   int cerebrod_metric_server;
   int cerebrod_metric_server_flag;
   int cerebrod_metric_server_port;
@@ -221,11 +223,13 @@ struct cerebro_config {
   int cerebrod_metric_max_flag;
   int cerebrod_monitor_max;
   int cerebrod_monitor_max_flag;
-.if 1 \{
+.if @MANPAGE_DEBUG@ \{
   int cerebrod_speak_debug;
   int cerebrod_speak_debug_flag;
   int cerebrod_listen_debug;
   int cerebrod_listen_debug_flag;
+  int cerebrod_metric_controller_debug;
+  int cerebrod_metric_controller_debug_flag;
   int cerebrod_metric_server_debug;
   int cerebrod_metric_server_debug_flag;
 \}
@@ -233,17 +237,17 @@ struct cerebro_config {
 };
 .fi
 
-The 'hostnames' field should store an array of default hostnames for
-the libcerebro API should attempt to connect to.
+The 'cerebro_hostnames' field should store an array of default
+hostnames for the libcerebro API should attempt to connect to.
 
-The 'port' field should store the default port for
-the libcerebro API should attempt to connect to.
+The 'cerebro_port' field should store the default port for the
+libcerebro API should attempt to connect to.
 
-The 'timeout_len' field should store the default timeout length
-the libcerebro API should use to evaluate up vs. down nodes.
+The 'cerebro_timeout_len' field should store the default timeout
+length the libcerebro API should use to evaluate up vs. down nodes.
 
-The 'flags' field should store the default flags the libcerebro API
-should use.
+The 'cerebro_flags' field should store the default flags the
+libcerebro API should use.
 
 The 'cerebrod_heartbeat_frequency_min' and
 'cerebrod_heartbeat_frequency_max' fields store the minimum and
@@ -287,6 +291,10 @@ The 'cerebrod_listen_threads' field stores the number of listener
 threads that should be created in
 .BR cerebrod(8).
 
+The 'cerebrod_metric_controller' field is a boolean that turns on the
+.BR cerebrod(8)
+metric controller to receive metric control requests.
+
 The 'cerebrod_metric_server' field is a boolean that turns on the
 .BR cerebrod(8)
 metric server to receive metric data requests.
@@ -315,6 +323,10 @@ The 'cerebrod_listen_debug' field is a boolean that turns on listener
 debugging for
 .BR cerebrod.
 
+The 'cerebrod_metric_controller_debug' field is a boolean that turns on
+metric controller debugging for
+.BR cerebrod.
+
 The 'cerebrod_metric_server_debug' field is a boolean that turns on
 metric server debugging for
 .BR cerebrod.
@@ -338,12 +350,13 @@ type:
 .nf
 struct cerebro_metric_module_info {
 .in +2
-  char *metric_module_name;
   Cerebro_metric_setup setup;
   Cerebro_metric_cleanup cleanup;
   Cerebro_metric_get_metric_name get_metric_name;
+  Cerebro_metric_get_metric_period get_metric_period;
   Cerebro_metric_get_metric_value get_metric_value;
   Cerebro_metric_destroy_metric_value destroy_metric_value;
+  Cerebro_metric_get_metric_thread get_metric_thread;
 .in -2
 };
 .fi
@@ -375,6 +388,19 @@ typedef char *(*Cerebro_metric_get_metric_name)(void);
 The 'get_metric_name' function returns the name of the metric to be
 monitored, or NULL on error.
 
+The field 'get_metric_period' should point to a function of the following type:
+
+typedef int (*Cerebro_metric_get_metric_period)(int *period);
+
+The 'get_metric_period' function retrieves the period in seconds that
+the metric value should be read and propogated.  If the period is 0,
+the metric will be read and propogated with every cerebro
+heartbeat. If the period is < 0, the metric will be propogated only
+when instructed to. Note that the period is not precise, and is only
+an approximation.  Data is only propogated in cerebro heartbeats,
+therefore the period time granularity will be related to the cerebro
+heartbeat period.  It returns 0 on success, -1 on error.
+
 The field 'get_metric_value' should point to a function of the following type:
 
 typedef int (*Cerebro_metric_get_metric_value)(unsigned int *metric_value_type, unsigned int *metric_value_len, void **metric_value);
@@ -393,6 +419,37 @@ The 'destroy_metric_value' function is passed the metric value pointer
 received from 'get_metric_value'.  If necessary,
 'destroy_metric_value' should free allocated memory.  Returns 0 on
 success, -1 on error.
+
+The field 'get_metric_thread' should point to a function of the following type:
+
+typedef Cerebro_metric_thread_pointer (*Cerebro_metric_get_metric_thread)(void);
+
+The 'get_metric_thread' function returns a pointer of type:
+
+typedef void *(*Cerebro_metric_thread_pointer)(void *arg);
+
+which will be executed as a detached thread.  
+
+The function will be passed a pointer to a function of type:
+
+typedef int (*Cerebro_metric_updated)(char *metric_name);
+
+This thread can perform any metric monitoring duties it pleases and
+optionally call the 'Cerebro_metric_updated' function when a metric
+value is updated.
+
+Typically the thread is used to watch or monitor for some event and
+locally update data so that cerebrod will propogate the newly received
+data from a 'get_metric_value' call.
+ 
+If the user wishes to use mutexes within the metric thread to protect
+against concurrent access, the user is responsible for not putting the
+locks in situations that can lead to a deadlock.  The
+'Cerebro_metric_updated' function call may require locks to function
+appropriately within the cerebrod daemon.
+
+If no detached thread is required to be executed by this module, NULL
+should be returned.
 
 All of the above functions must be defined in the module and listed in
 the 'metric_module_info' structure.
