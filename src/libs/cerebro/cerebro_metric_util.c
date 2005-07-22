@@ -262,7 +262,7 @@ _metric_server_response_header_unmarshall(cerebro_t handle,
                                           const char *buf,
                                           unsigned int buflen)
 {
-  u_int32_t *mtypePtr, *mlenPtr;
+  u_int32_t *mtimePtr, *mtypePtr, *mlenPtr;
   int n, bufPtrlen, c = 0;
   char *bufPtr;
 
@@ -302,6 +302,15 @@ _metric_server_response_header_unmarshall(cerebro_t handle,
   if ((n = unmarshall_buffer(bufPtr, bufPtrlen, buf + c, buflen - c)) < 0)
     {
       CEREBRO_DBG(("unmarshall_buffer"));
+      handle->errnum = CEREBRO_ERR_INTERNAL;
+      return -1;
+    }
+  c += n;
+
+  mtimePtr = &(res->metric_value_received_time);
+  if ((n = unmarshall_u_int32(mtimePtr, buf + c,  buflen - c)) < 0)
+    {
+      CEREBRO_DBG(("unmarshall_u_int32"));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }

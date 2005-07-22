@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_server_protocol.h,v 1.4 2005-07-22 17:21:07 achu Exp $
+ *  $Id: cerebro_metric_server_protocol.h,v 1.5 2005-07-22 21:46:55 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -39,12 +39,14 @@
  * Server -> Client
 
  * - Stream of responses indicating metric_names or nodenames and
- *   metric values.  Respones may depend on the request flags.  After
- *   the stream of is complete, an "end of responses" response will
- *   indicate the end of stream and completion of the request.  This
- *   "end of responses" response will be sent even if no data is
- *   returned (i.e. only down nodes are requested, but all nodes are up,
- *   or no nodes are monitoring the indicated metric).
+ *   metric values.  Respones may depend on the request flags.  Met ric
+ *   receive times will be 0 for metrics in which a receive time makes no
+ *   sense (i.e. cluster node name). After the stream of is complete,
+ *   an "end of responses" response will indicate the end of stream
+ *   and completion of the request.  This "end of responses" response
+ *   will be sent even if no data is returned (i.e. only down nodes
+ *   are requested, but all nodes are up, or no nodes are monitoring
+ *   the indicated metric).
  *
  * - On errors, an error packet will contain the error code.
  *
@@ -54,7 +56,7 @@
  *   message.
  */
 
-#define CEREBRO_METRIC_SERVER_PROTOCOL_VERSION               4
+#define CEREBRO_METRIC_SERVER_PROTOCOL_VERSION               5
 #define CEREBRO_METRIC_SERVER_PROTOCOL_SERVER_TIMEOUT_LEN    3
 #define CEREBRO_METRIC_SERVER_PROTOCOL_CLIENT_TIMEOUT_LEN    5
 #define CEREBRO_METRIC_SERVER_PROTOCOL_CONNECT_TIMEOUT_LEN   5
@@ -103,6 +105,7 @@ struct cerebro_metric_server_response
   u_int32_t err_code;
   u_int8_t end;
   char name[CEREBRO_MAX_NAME_LEN];
+  u_int32_t metric_value_received_time;
   u_int32_t metric_value_type;
   u_int32_t metric_value_len;
   void *metric_value;
@@ -112,6 +115,7 @@ struct cerebro_metric_server_response
                                                     + sizeof(u_int32_t) \
                                                     + sizeof(u_int8_t) \
                                                     + CEREBRO_MAX_NAME_LEN \
+                                                    + sizeof(u_int32_t) \
                                                     + sizeof(u_int32_t) \
                                                     + sizeof(u_int32_t))
 

@@ -6,6 +6,9 @@
 
 	* Updated documentation with various updates.
 
+	* Added ability to propogate and retrieve last receive time for
+	metrics.
+
 2005-07-21  Albert Chu  <chu11@llnl.gov>
 
 	* Fix various metric controller bugs.

@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro_nodelist_metric_name.3,v 1.10 2005-07-22 17:21:07 achu Exp $
+\."$Id: cerebro_nodelist_metric_name.3,v 1.11 2005-07-22 21:46:54 achu Exp $
 \."#############################################################################
 \."  Copyright (C) 2005 The Regents of the University of California.
 \."  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -45,7 +45,7 @@ cerebro nodelist routines
 .sp
 .BI "int cerebro_nodelist_iterator_nodename(cerebro_nodelist_iterator_t nodelistItr, char **nodename);"
 .sp
-.BI "int cerebro_nodelist_iterator_metric_value(cerebro_nodelist_iterator_t nodelistItr, unsigned int *metric_value_type, unsigned int *metric_value_size, void **metric_value);"
+.BI "int cerebro_nodelist_iterator_metric_value(cerebro_nodelist_iterator_t nodelistItr, unsigned long metric_value_received_time, unsigned int *metric_value_type, unsigned int *metric_value_size, void **metric_value);"
 .sp
 .BI "int cerebro_nodelist_iterator_next(cerebro_nodelist_iterator_t nodelistItr);"
 .sp
@@ -71,9 +71,10 @@ nodelist will also be destroyed.
 \fBcerebro_nodelist_iterator_nodename\fR returns the nodename of the
 current node pointed at in the iterator.
 
-\fBcerebro_nodelist_iterator_metric_value\fR returns the metric type,
-metric value length, and metric value of the current data pointed at
-in the iterator.  The values are returned in 'metric_value_type',
+\fBcerebro_nodelist_iterator_metric_value\fR returns the metric
+receive time, type, length, and value of the current data pointed at
+in the iterator.  The data is returned in
+'metric_value_received_time', 'metric_value_type',
 'metric_value_len', and 'metric_value' respectively.
 
 \fBcerebro_nodelist_iterator_next\fR moves the iterator pointer forward.

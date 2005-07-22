@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.h,v 1.3 2005-07-22 17:21:07 achu Exp $
+ *  $Id: cerebrod_listener_data.h,v 1.4 2005-07-22 21:46:54 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -50,7 +50,7 @@
 struct cerebrod_listener_metric_data
 {
   char *metric_name;
-  u_int32_t last_received_time;
+  u_int32_t metric_value_received_time;
   u_int32_t metric_value_type;
   u_int32_t metric_value_len;
   void *metric_value;

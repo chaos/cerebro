@@ -241,6 +241,7 @@ _receive_metric_data_response(cerebro_t handle,
 
   if (_cerebro_nodelist_append(nodelist, 
                                nodename_buf,
+                               res->metric_value_received_time,
                                res->metric_value_type,
                                res->metric_value_len,
                                res->metric_value) < 0)

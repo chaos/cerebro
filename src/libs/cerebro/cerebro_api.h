@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_api.h,v 1.8 2005-07-22 17:21:07 achu Exp $
+ *  $Id: cerebro_api.h,v 1.9 2005-07-22 21:46:55 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -106,6 +106,7 @@ struct cerebro_metriclist_iterator {
  */
 struct cerebro_nodelist_data {
   char nodename[CEREBRO_MAX_NODENAME_LEN+1];
+  u_int32_t metric_value_received_time;
   u_int32_t metric_value_type;
   u_int32_t metric_value_len;
   void *metric_value;

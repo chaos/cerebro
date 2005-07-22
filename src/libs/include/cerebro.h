@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.17 2005-07-22 17:21:07 achu Exp $
+ *  $Id: cerebro.h,v 1.18 2005-07-22 21:46:55 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -457,6 +457,7 @@ int cerebro_nodelist_iterator_nodename(cerebro_nodelist_iterator_t nodelistItr,
  * Returns 0 on success, -1 on error
  */
 int cerebro_nodelist_iterator_metric_value(cerebro_nodelist_iterator_t nodelistItr,
+                                           unsigned long *metric_value_received_time,
                                            unsigned int *metric_value_type,
                                            unsigned int *metric_value_len,
                                            void **metric_value);

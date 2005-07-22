@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.21 2005-07-22 17:21:07 achu Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.22 2005-07-22 21:46:54 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -667,7 +667,7 @@ _metric_data_update(struct cerebrod_node_data *nd,
                      md->metric_value_type, hd->metric_value_type));
     }
   
-  md->last_received_time = received_time;
+  md->metric_value_received_time = received_time;
   md->metric_value_type = hd->metric_value_type;
   /* Realloc size */
   if (md->metric_value_len != hd->metric_value_len)

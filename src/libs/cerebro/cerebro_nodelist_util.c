@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_nodelist_util.c,v 1.8 2005-07-22 17:21:07 achu Exp $
+ *  $Id: cerebro_nodelist_util.c,v 1.9 2005-07-22 21:46:55 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -141,6 +141,7 @@ _cerebro_nodelist_create(cerebro_t handle, const char *metric_name)
 int 
 _cerebro_nodelist_append(cerebro_nodelist_t nodelist,
 			 const char *nodename,
+                         u_int32_t metric_value_received_time,
                          u_int32_t metric_value_type,
                          u_int32_t metric_value_len,
                          void *metric_value)
@@ -165,6 +166,7 @@ _cerebro_nodelist_append(cerebro_nodelist_t nodelist,
   memset(nd, '\0', sizeof(struct cerebro_nodelist_data));
 
   strncpy(nd->nodename, nodename, CEREBRO_MAX_NODENAME_LEN);
+  nd->metric_value_received_time = metric_value_received_time;
   nd->metric_value_type = metric_value_type;
   nd->metric_value_len = metric_value_len;
   if (metric_value)

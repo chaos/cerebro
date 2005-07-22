@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.h,v 1.9 2005-07-22 17:21:07 achu Exp $
+ *  $Id: wrappers.h,v 1.10 2005-07-22 21:46:55 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -180,9 +180,15 @@ int wrap_inet_pton(WRAPPERS_ARGS, int af, const char *src, void *dst);
 /* 
  * Time Wrappers 
  */
+#define Localtime(timep) \
+        wrap_localtime(__FILE__, __FUNCTION__, __LINE__, timep)
+#define Localtime_r(timep, result) \
+        wrap_localtime_r(__FILE__, __FUNCTION__, __LINE__, timep, result)
 #define Gettimeofday(tv, tz) \
         wrap_gettimeofday(WRAPPERS_DEBUG_ARGS, tv, tz)
 
+struct tm *wrap_localtime(WRAPPERS_ARGS, const time_t *timep);
+struct tm *wrap_localtime_r(WRAPPERS_ARGS, const time_t *timep, struct tm *result);
 int wrap_gettimeofday(WRAPPERS_ARGS, struct timeval *tv, struct timezone *tz);
 
 /* 

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.c,v 1.11 2005-07-22 17:21:07 achu Exp $
+ *  $Id: wrappers.c,v 1.12 2005-07-22 21:46:55 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -506,6 +506,38 @@ wrap_inet_pton(WRAPPERS_ARGS, int af, const char *src, void *dst)
     WRAPPERS_ERR_ERRNO("inet_pton");
 
   return rv;
+}
+
+struct tm *
+wrap_localtime(WRAPPERS_ARGS, const time_t *timep)
+{
+  struct tm *tmptr;
+  
+  assert(file && function);
+  
+  if (!timep)
+    WRAPPERS_ERR_INVALID_PARAMETERS("localtime");
+  
+  if (!(tmptr = localtime(timep)))
+    WRAPPERS_ERR_ERRNO("localtime");
+  
+  return tmptr;
+}
+
+struct tm *
+wrap_localtime_r(WRAPPERS_ARGS, const time_t *timep, struct tm *result)
+{
+  struct tm *tmptr;
+  
+  assert(file && function);
+  
+  if (!timep || !result)
+    WRAPPERS_ERR_INVALID_PARAMETERS("localtime_r");
+  
+  if (!(tmptr = localtime_r(timep, result)))
+    WRAPPERS_ERR_ERRNO("localtime_r");
+  
+  return tmptr;
 }
 
 int

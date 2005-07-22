@@ -11,7 +11,6 @@ Design
   - Check for root in lib?
   - will require protocol headers to be hidden?
   - password or something for userspace metrics?
-- Update time for each cerebro metric data?
 - nodelist
   - use own list instead of 'List' to store iterators?
 - strerror_r and errormsg_r funcs

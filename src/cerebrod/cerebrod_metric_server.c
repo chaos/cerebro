@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_server.c,v 1.25 2005-07-22 17:21:07 achu Exp $
+ *  $Id: cerebrod_metric_server.c,v 1.26 2005-07-22 21:46:55 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -211,6 +211,7 @@ _metric_server_response_marshall(struct cerebro_metric_server_response *res,
   c += Marshall_u_int32(res->err_code, buf + c, buflen - c);
   c += Marshall_u_int8(res->end, buf + c, buflen - c);
   c += Marshall_buffer(bufPtr, bufPtrlen, buf + c, buflen - c);
+  c += Marshall_u_int32(res->metric_value_received_time, buf + c, buflen - c);
 
   if ((n = marshall_metric(res->metric_value_type, 
                            res->metric_value_len,
@@ -348,6 +349,7 @@ _metric_server_respond_with_error(int fd, int32_t version, u_int32_t err_code)
 static int
 _metric_server_response_create(char *name,
                                unsigned int max_name_len,
+                               u_int32_t metric_value_recevied_time,
                                u_int32_t metric_value_type,
                                u_int32_t metric_value_len,
                                void *metric_value,
@@ -393,6 +395,7 @@ _metric_server_response_create(char *name,
 #endif /* CEREBRO_DEBUG */
   /* strncpy, b/c terminating character not required */
   strncpy(res->name, name, max_name_len);
+  res->metric_value_received_time = metric_value_recevied_time;
   res->metric_value_type = metric_value_type;
   res->metric_value_len = metric_value_len;
   
@@ -454,6 +457,7 @@ _metric_name_index_callback(void *data, const void *key, void *arg)
 
   if (_metric_server_response_create(metric_name, 
                                      CEREBRO_MAX_METRIC_NAME_LEN,
+                                     0,
                                      CEREBRO_METRIC_VALUE_TYPE_NONE,
                                      0,
                                      NULL,
@@ -507,6 +511,7 @@ _metric_data_evaluate(void *x, void *arg)
     {
       if (_metric_server_response_create(nd->nodename,
                                          CEREBRO_MAX_NODENAME_LEN,
+                                         0,
                                          CEREBRO_METRIC_VALUE_TYPE_NONE,
                                          0,
                                          NULL,
@@ -527,6 +532,7 @@ _metric_data_evaluate(void *x, void *arg)
 
       if (_metric_server_response_create(nd->nodename,
                                          CEREBRO_MAX_NODENAME_LEN,
+                                         nd->last_received_time,
                                          CEREBRO_METRIC_VALUE_TYPE_U_INT32,
                                          sizeof(u_int32_t),
                                          &updown_state,
@@ -547,6 +553,7 @@ _metric_data_evaluate(void *x, void *arg)
         {
           if (_metric_server_response_create(nd->nodename,
                                              CEREBRO_MAX_NODENAME_LEN,
+                                             0,
                                              CEREBRO_METRIC_VALUE_TYPE_NONE,
                                              0,
                                              NULL,
@@ -562,6 +569,7 @@ _metric_data_evaluate(void *x, void *arg)
         {
           if (_metric_server_response_create(nd->nodename,
                                              CEREBRO_MAX_NODENAME_LEN,
+                                             md->metric_value_received_time,
                                              md->metric_value_type,
                                              md->metric_value_len,
                                              md->metric_value,
@@ -575,6 +583,7 @@ _metric_data_evaluate(void *x, void *arg)
         {
           if (_metric_server_response_create(nd->nodename,
                                              CEREBRO_MAX_NODENAME_LEN,
+                                             0,
                                              CEREBRO_METRIC_VALUE_TYPE_NONE,
                                              0,
                                              NULL,

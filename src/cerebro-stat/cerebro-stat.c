@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro-stat.c,v 1.13 2005-07-22 17:21:07 achu Exp $
+ *  $Id: cerebro-stat.c,v 1.14 2005-07-22 21:46:54 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -55,10 +55,11 @@
 #include "list.h"
 #include "wrappers.h"
 
-#define CEREBRO_STAT_BUFLEN        16384
-#define CEREBRO_STAT_NONE_STRING   "(none)"
-#define CEREBRO_STAT_NEWLINE       0
-#define CEREBRO_STAT_HOSTRANGE     1
+#define CEREBRO_STAT_BUFLEN          16384
+#define CEREBRO_STAT_NONE_STRING     "(none)"
+#define CEREBRO_STAT_UNKNOWN_STRING  "unknown"
+#define CEREBRO_STAT_NEWLINE         0
+#define CEREBRO_STAT_HOSTRANGE       1
 
 /* 
  * External variables for getopt 
@@ -79,7 +80,7 @@ static char output_type = CEREBRO_STAT_NEWLINE;
 static cerebro_t handle;
 static int metric_list_flag = 0;
 static char *metric_name = NULL;
-
+static int metric_received_time_flag = 0;
 /*  
  * node_metric_data
  *
@@ -87,6 +88,7 @@ static char *metric_name = NULL;
  */
 struct node_metric_data {
   char *nodename;
+  unsigned long metric_value_received_time;
   unsigned int metric_value_type;
   unsigned int metric_value_len;
   void *metric_value;
@@ -147,7 +149,8 @@ _usage(void)
           "  -D         Output '%s' for down nodes\n"
           "  -N         Output '%s' for nodes not monitoring a metric\n"
           "  -n         Output nodes one per line\n"
-          "  -q         Output nodes in hostrange format\n", 
+          "  -q         Output nodes in hostrange format\n"
+          "  -t         Output metric receive times\n",
           CEREBRO_STAT_NONE_STRING, CEREBRO_STAT_NONE_STRING);
 #if CEREBRO_DEBUG
   fprintf(stderr,
@@ -223,6 +226,7 @@ _cmdline_parse(int argc, char **argv)
       {"none-if-not-monitored", 0, NULL, 'N'},
       {"newline",               0, NULL, 'n'},
       {"hostrange",             0, NULL, 'q'},
+      {"metric-recieve-time",   0, NULL, 't'},
 #if CEREBRO_DEBUG
       {"debug",                 0, NULL, 'd'},
 #endif /* CEREBRO_DEBUG */
@@ -232,7 +236,7 @@ _cmdline_parse(int argc, char **argv)
 
   assert(argv);
 
-  strcpy(options, "hvo:p:lm:UDNnq");
+  strcpy(options, "hvo:p:lm:UDNnqt");
 #if CEREBRO_DEBUG
   strcat(options, "d");
 #endif /* CEREBRO_DEBUG */
@@ -290,6 +294,9 @@ _cmdline_parse(int argc, char **argv)
         break;
       case 'q':
         output_type = CEREBRO_STAT_HOSTRANGE;
+        break;
+      case 't':
+        metric_received_time_flag++;
         break;
 #if CEREBRO_DEBUG
       case 'd':
@@ -528,11 +535,28 @@ _newline_output(List l)
 
   while ((data = list_next(litr)))
     {
-      char buf[CEREBRO_STAT_BUFLEN];
+      char vbuf[CEREBRO_STAT_BUFLEN];
 
-      memset(buf, '\0', CEREBRO_STAT_BUFLEN);
-      _metric_value_str(data, buf, CEREBRO_STAT_BUFLEN);
-      fprintf(stdout, "%s: %s\n", data->nodename, buf);
+      memset(vbuf, '\0', CEREBRO_STAT_BUFLEN);
+      _metric_value_str(data, vbuf, CEREBRO_STAT_BUFLEN);
+      if (metric_received_time_flag)
+        {
+          char tbuf[CEREBRO_STAT_BUFLEN];
+          
+          memset(tbuf, '\0', CEREBRO_STAT_BUFLEN);
+          if (data->metric_value_received_time)
+            {
+              time_t t = (time_t)data->metric_value_received_time;
+              struct tm *tm = Localtime(&t);
+              strftime(tbuf, CEREBRO_STAT_BUFLEN, "%F %I:%M:%S%P", tm);
+            }
+          else
+            snprintf(tbuf, CEREBRO_STAT_BUFLEN, CEREBRO_STAT_UNKNOWN_STRING);
+
+          fprintf(stdout, "%s(%s): %s\n", data->nodename, tbuf, vbuf);
+        }
+      else
+        fprintf(stdout, "%s: %s\n", data->nodename, vbuf);
     }
 
   /* No need to destroy list iterator, caller will destroy List */
@@ -682,6 +706,7 @@ _metric_data(void)
         }
 
       if (cerebro_nodelist_iterator_metric_value(nitr, 
+                                                 &(data->metric_value_received_time),
                                                  &(data->metric_value_type),
                                                  &(data->metric_value_len),
                                                  &(data->metric_value)) < 0)

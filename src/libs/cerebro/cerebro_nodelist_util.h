@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_nodelist_util.h,v 1.2 2005-07-22 17:21:07 achu Exp $
+ *  $Id: cerebro_nodelist_util.h,v 1.3 2005-07-22 21:46:55 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -59,9 +59,10 @@ cerebro_nodelist_t _cerebro_nodelist_create(cerebro_t handle,
  */
 int _cerebro_nodelist_append(cerebro_nodelist_t nodelist,
 			     const char *nodename,
-                             u_int32_t metric_type,
-                             u_int32_t metric_len,
-                             void *metric_data);
+                             u_int32_t metric_value_received_time,
+                             u_int32_t metric_value_type,
+                             u_int32_t metric_value_len,
+                             void *metric_value);
 
 /*
  * _cerebro_nodelist_sort
