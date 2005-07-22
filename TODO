@@ -22,8 +22,3 @@ Before distribution
 - devel package?
 - untabify
 - default installed cerebro.conf w/ instructions/examples
-
-GPL
-- place header on all headers
-- place on all c files
-- note on manpage ORIGINS

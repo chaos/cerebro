@@ -2,6 +2,8 @@
 
 	* man/cerebro.1.in: Removed.
 
+	* Added all GPL stuff.
+
 2005-07-21  Albert Chu  <chu11@llnl.gov>
 
 	* Fix various metric controller bugs.

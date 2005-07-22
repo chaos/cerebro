@@ -153,7 +153,7 @@ fi
 
 %files
 %defattr(-,root,root)
-%doc README NEWS ChangeLog 
+%doc README NEWS ChangeLog DISCLAIMER COPYING
 %config(noreplace) %{_sysconfdir}/init.d/cerebrod
 %{_includedir}/*
 %{_libdir}/libcerebro*
