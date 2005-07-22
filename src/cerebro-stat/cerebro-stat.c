@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro-stat.c,v 1.14 2005-07-22 21:46:54 achu Exp $
+ *  $Id: cerebro-stat.c,v 1.15 2005-07-22 21:49:07 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -226,7 +226,7 @@ _cmdline_parse(int argc, char **argv)
       {"none-if-not-monitored", 0, NULL, 'N'},
       {"newline",               0, NULL, 'n'},
       {"hostrange",             0, NULL, 'q'},
-      {"metric-recieve-time",   0, NULL, 't'},
+      {"metric-received-time",  0, NULL, 't'},
 #if CEREBRO_DEBUG
       {"debug",                 0, NULL, 'd'},
 #endif /* CEREBRO_DEBUG */
