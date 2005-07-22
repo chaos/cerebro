@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro-admin.c,v 1.4 2005-07-21 20:15:45 achu Exp $
+ *  $Id: cerebro-admin.c,v 1.5 2005-07-22 00:02:57 achu Exp $
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
@@ -94,11 +94,11 @@ _usage(void)
 	  "Usage: cerebro_admin [OPTIONS]...\n"
 	  "  -h         Print help and exit\n"
 	  "  -v         Print version and exit\n"
-          "  -m STRING  Specify metric name\n"
-          "  -r         Register a new metric\n"
-          "  -u         Unregister a new metric\n"
-          "  -p         Update a metric's value\n"
-          "  -s         Resend a metric\n"
+          "  -m STRING  Specify the metric name\n"
+          "  -r         Register the metric name\n"
+          "  -u         Unregister the metric name\n"
+          "  -p         Update the metric's value\n"
+          "  -s         Resend the metric\n"
           "  -t INT     Specify metric type\n"
           "     %d - none (default)\n"
           "     %d - int32\n"
