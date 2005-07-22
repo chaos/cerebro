@@ -159,7 +159,7 @@ fi
 %{_libdir}/libcerebro*
 %{_mandir}/*
 %{_sbindir}/cerebrod
-%attr(700,root,root) %{_sbindir}/cerebro-stat
+%{_sbindir}/cerebro-stat
 %attr(700,root,root) %{_sbindir}/cerebro-admin
 %if %{?_with_chaos:1}%{!?_with_chaos:0}
 %attr(700,root,root) %{_libdir}/cerebro/cerebro_clusterlist*

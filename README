@@ -11,9 +11,8 @@ project provides:
 
 - Less CPU interruption
 - No need to modify code to monitor new metrics
-- A C API to send and retrieve metric data
-- A dynamic module interface that allows new metrics to be added into
-  a cluster without any software updates.
+- A dynamic module, library, and command line interfaces that allows
+  new metrics to be monitored without any software updates.
 
 The Cerebro project should not be mistaken as a host monitoring system
 like Ganglia or Supermon.  The goal of Cerebro was to provide a simple
