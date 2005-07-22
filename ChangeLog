@@ -1,3 +1,7 @@
+2005-07-22  Albert Chu  <chu11@llnl.gov>
+
+	* man/cerebro.1.in: Removed.
+
 2005-07-21  Albert Chu  <chu11@llnl.gov>
 
 	* Fix various metric controller bugs.
