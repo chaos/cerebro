@@ -15,7 +15,6 @@ Design
   - use own list instead of 'List' to store iterators?
 - strerror_r and errormsg_r funcs
 - generic err message buffer in cerebro_t handle, i.e for conffile errors
-- use tables instead of lists in speaker_data to sort faster
 
 Before distribution
 - devel package?
