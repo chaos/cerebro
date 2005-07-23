@@ -3,13 +3,11 @@ This project as been named after a part of the central nervous system
 to pay homage to the the Ganglia project
 (http://ganglia.sourceforge.net).  A heavily modified version of
 Ganglia was once used at Lawrence Livermore National Laboratory to
-support a number of small features on our Linux clusters. 
+support a number of features on our Linux clusters.  However, 
+it later became necessary to develop a slightly different project.
 
-Over time, it became more and more difficult to support a heavily
-modified Ganglia, so the Cerebro project was born.  The Cerebro
-project provides:
+The Cerebro project provides:
 
-- Less CPU interruption
 - No need to modify code to monitor new metrics
 - A dynamic module, library, and command line interfaces that allows
   new metrics to be monitored without any software updates.
