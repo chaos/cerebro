@@ -11,3 +11,4 @@ Design
   - Check for root in lib?
   - will require protocol headers to be hidden?
   - password or something for userspace metrics?
+- limit host connections
