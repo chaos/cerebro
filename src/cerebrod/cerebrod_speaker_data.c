@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker_data.c,v 1.31 2005-07-22 17:21:07 achu Exp $
+ *  $Id: cerebrod_speaker_data.c,v 1.32 2005-07-25 17:20:18 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -229,7 +229,7 @@ _setup_metric_modules(void)
       metric_info = Malloc(sizeof(struct cerebrod_speaker_metric_info));
       /* No need to Strdup() the name in this case */
       metric_info->metric_name = metric_name;
-      metric_info->metric_origin = CEREBROD_METRIC_ORIGIN_MODULE;
+      metric_info->metric_origin = CEREBROD_METRIC_SPEAKER_ORIGIN_MODULE;
 
       metric_info->metric_period = metric_period;
       metric_info->index = i;
@@ -286,7 +286,7 @@ _destroy_speaker_metric_info(void *x)
 
   metric_info = (struct cerebrod_speaker_metric_info *)x;
 
-  if (metric_info->metric_origin & CEREBROD_METRIC_ORIGIN_USERSPACE)
+  if (metric_info->metric_origin & CEREBROD_METRIC_SPEAKER_ORIGIN_USERSPACE)
     {
       Free(metric_info->metric_name);
       if (metric_info->metric_value)
@@ -547,10 +547,10 @@ cerebrod_speaker_data_get_metric_data(struct cerebrod_heartbeat *hb,
       if (tv.tv_sec <= metric_info->next_call_time)
         break;
 
-      if (metric_info->metric_origin & CEREBROD_METRIC_ORIGIN_MODULE)
+      if (metric_info->metric_origin & CEREBROD_METRIC_SPEAKER_ORIGIN_MODULE)
         hd = _get_module_metric_value(metric_info);
 
-      if (metric_info->metric_origin & CEREBROD_METRIC_ORIGIN_USERSPACE)
+      if (metric_info->metric_origin & CEREBROD_METRIC_SPEAKER_ORIGIN_USERSPACE)
         {
           hd = _get_userspace_metric_value(metric_info);
           metric_info->next_call_time = UINT_MAX;
@@ -564,7 +564,7 @@ cerebrod_speaker_data_get_metric_data(struct cerebrod_heartbeat *hb,
           hb->metrics_len++;
         }
 
-      if (metric_info->metric_origin & CEREBROD_METRIC_ORIGIN_MODULE)
+      if (metric_info->metric_origin & CEREBROD_METRIC_SPEAKER_ORIGIN_MODULE)
         {
           if (metric_info->metric_period < 0)
             metric_info->next_call_time = UINT_MAX;

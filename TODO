@@ -5,10 +5,20 @@ Portability
 Cleanup
 - passthrough code cleanup
 
-Design
+Todo Features
 - Ability to flush metric from listener
   - requires protocol change, listener must also know metric origin?
   - Check for root in lib?
   - will require protocol headers to be hidden?
   - password or something for userspace metrics?
-- limit host connections
+
+Future Features
+- controller
+  - allow access through netowrk
+  - limit host connections based on host list or subnet
+  - munge based access?
+
+- listener
+  - limit data receving based on host list or subnet
+
+- event based monitoring

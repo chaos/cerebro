@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_server.c,v 1.26 2005-07-22 21:46:55 achu Exp $
+ *  $Id: cerebrod_metric_server.c,v 1.27 2005-07-25 17:20:18 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -60,9 +60,9 @@ extern pthread_mutex_t debug_output_mutex;
 #endif /* CEREBRO_DEBUG */
 
 extern List listener_data_list;
-extern hash_t metric_name_index;
+extern hash_t metric_names_index;
 extern pthread_mutex_t listener_data_lock;
-extern pthread_mutex_t metric_name_lock;
+extern pthread_mutex_t metric_names_lock;
 
 #define CEREBROD_METRIC_SERVER_BACKLOG 10
 
@@ -428,34 +428,34 @@ _metric_server_response_create(char *name,
 }
 
 /*  
- * _metric_name_index_callback
+ * _metric_names_index_callback
  *
  * Callback function to create metric name responses
  *
  * Return 0 on success, -1 on error
  */
 static int
-_metric_name_index_callback(void *data, const void *key, void *arg)
+_metric_names_index_callback(void *data, const void *key, void *arg)
 {
   struct cerebrod_metric_name_evaluation_data *ed;
-  char *metric_name;
+  struct cerebrod_metric_name_data *mnd;
 #if CEREBRO_DEBUG
   int rv;
 #endif /* CEREBRO_DEBUG */
 
   assert(data && arg);
 
-  metric_name = (char *)data;
+  mnd = (struct cerebrod_metric_name_data *)data;
   ed = (struct cerebrod_metric_name_evaluation_data *)arg;
   
 #if CEREBRO_DEBUG
   /* Should be called with lock already set */
-  rv = Pthread_mutex_trylock(&metric_name_lock);
+  rv = Pthread_mutex_trylock(&metric_names_lock);
   if (rv != EBUSY)
     CEREBRO_EXIT(("mutex not locked: rv=%d", rv));
 #endif /* CEREBRO_DEBUG */
 
-  if (_metric_server_response_create(metric_name, 
+  if (_metric_server_response_create(mnd->metric_name, 
                                      CEREBRO_MAX_METRIC_NAME_LEN,
                                      0,
                                      CEREBRO_METRIC_VALUE_TYPE_NONE,
@@ -687,18 +687,18 @@ _respond_with_metric_names(int fd, struct cerebro_metric_server_request *req)
 
   memset(&ed, '\0', sizeof(struct cerebrod_metric_name_evaluation_data));
 
-  Pthread_mutex_lock(&metric_name_lock);
+  Pthread_mutex_lock(&metric_names_lock);
   
-  if (!Hash_count(metric_name_index))
+  if (!Hash_count(metric_names_index))
     {
-      Pthread_mutex_unlock(&metric_name_lock);
+      Pthread_mutex_unlock(&metric_names_lock);
       goto end_response;
     }
 
   if (!(responses = list_create((ListDelF)free)))
     {
       CEREBRO_DBG(("list_create: %s", strerror(errno)));
-      Pthread_mutex_unlock(&metric_name_lock);
+      Pthread_mutex_unlock(&metric_names_lock);
       _metric_server_respond_with_error(fd, 
                                         req->version, 
                                         CEREBRO_METRIC_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
@@ -708,9 +708,9 @@ _respond_with_metric_names(int fd, struct cerebro_metric_server_request *req)
   ed.fd = fd;
   ed.responses = responses;
 
-  if (Hash_for_each(metric_name_index, _metric_name_index_callback, &ed) < 0)
+  if (Hash_for_each(metric_names_index, _metric_names_index_callback, &ed) < 0)
     {
-      Pthread_mutex_unlock(&metric_name_lock);
+      Pthread_mutex_unlock(&metric_names_lock);
       _metric_server_respond_with_error(fd,
                                         req->version,
                                         CEREBRO_METRIC_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
@@ -718,7 +718,7 @@ _respond_with_metric_names(int fd, struct cerebro_metric_server_request *req)
     }
 
   /* Transmission of the results can be done without this lock. */
-  Pthread_mutex_unlock(&metric_name_lock);
+  Pthread_mutex_unlock(&metric_names_lock);
 
   if (_responses_send_all(fd, responses) < 0)
     {
@@ -904,16 +904,16 @@ _metric_server_service_connection(void *arg)
       goto cleanup;
     }
 
-  Pthread_mutex_lock(&metric_name_lock);
-  if (!Hash_find(metric_name_index, metric_name_buf))
+  Pthread_mutex_lock(&metric_names_lock);
+  if (!Hash_find(metric_names_index, metric_name_buf))
     {
-      Pthread_mutex_unlock(&metric_name_lock);
+      Pthread_mutex_unlock(&metric_names_lock);
       _metric_server_respond_with_error(fd,
                                         req.version,
                                         CEREBRO_METRIC_SERVER_PROTOCOL_ERR_METRIC_INVALID);
       goto cleanup;
     }
-  Pthread_mutex_unlock(&metric_name_lock);
+  Pthread_mutex_unlock(&metric_names_lock);
   
   if (!req.timeout_len)
     req.timeout_len = CEREBRO_METRIC_SERVER_TIMEOUT_LEN_DEFAULT;

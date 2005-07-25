@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.h,v 1.4 2005-07-22 21:46:54 achu Exp $
+ *  $Id: cerebrod_listener_data.h,v 1.5 2005-07-25 17:20:18 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -43,6 +43,13 @@
 #include "hash.h"
 
 /* 
+ * Flags to define if a metric is a default metric, or something
+ * the listener received.
+ */
+#define CEREBROD_METRIC_LISTENER_ORIGIN_DEFAULT   0x00000001
+#define CEREBROD_METRIC_LISTENER_ORIGIN_MONITORED 0x00000002
+
+/* 
  * struct cerebrod_listener_metric_data
  *
  * Contains metric data for a node
@@ -81,6 +88,17 @@ struct cerebrod_monitor_module
   char *metric_name;
   int index;
   pthread_mutex_t monitor_lock;
+};
+
+/* 
+ * struct cerebrod_metric_name_data
+ *
+ * contains metric name and origin
+ */
+struct cerebrod_metric_name_data
+{
+  char *metric_name;
+  u_int32_t metric_origin;
 };
 
 /* 

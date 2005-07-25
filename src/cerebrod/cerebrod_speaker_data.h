@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker_data.h,v 1.9 2005-07-22 17:21:07 achu Exp $
+ *  $Id: cerebrod_speaker_data.h,v 1.10 2005-07-25 17:20:18 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -36,11 +36,11 @@
 /* 
  * Flags to define where a metric comes from.  Either it is monitored
  * by default by Cerebro, comes from a metric module, or has come from
- * userspace from a tool or lib calls.
+ * userspace from a tool or lib.
  */
-#define CEREBROD_METRIC_ORIGIN_DEFAULT    0x00000001
-#define CEREBROD_METRIC_ORIGIN_MODULE     0x00000002
-#define CEREBROD_METRIC_ORIGIN_USERSPACE  0x00000004
+#define CEREBROD_METRIC_SPEAKER_ORIGIN_DEFAULT    0x00000001
+#define CEREBROD_METRIC_SPEAKER_ORIGIN_MODULE     0x00000002
+#define CEREBROD_METRIC_SPEAKER_ORIGIN_USERSPACE  0x00000004
 
 /*
  * struct cerebrod_speaker_metric_info

@@ -1,3 +1,7 @@
+2005-07-25  Albert Chu  <chu11@llnl.gov>
+
+	* Added metric origins to metric names index in cerebrod.
+	
 2005-07-22  Albert Chu  <chu11@llnl.gov>
 
 	* man/cerebro.1.in: Removed.

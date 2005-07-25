@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_controller.c,v 1.21 2005-07-22 17:21:07 achu Exp $
+ *  $Id: cerebrod_metric_controller.c,v 1.22 2005-07-25 17:20:18 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -401,7 +401,7 @@ _register_metric(int fd, int32_t version, const char *metric_name)
 
   metric_info = Malloc(sizeof(struct cerebrod_speaker_metric_info));
   metric_info->metric_name = Strdup(metric_name);
-  metric_info->metric_origin = CEREBROD_METRIC_ORIGIN_USERSPACE;
+  metric_info->metric_origin = CEREBROD_METRIC_SPEAKER_ORIGIN_USERSPACE;
   /* 
    * Setting next_call_time to UINT_MAX means the data will never
    * be sent.
@@ -443,7 +443,7 @@ _unregister_metric(int fd, int32_t version, const char *metric_name)
       goto cleanup;
     }
 
-  if (!(metric_info->metric_origin & CEREBROD_METRIC_ORIGIN_USERSPACE))
+  if (!(metric_info->metric_origin & CEREBROD_METRIC_SPEAKER_ORIGIN_USERSPACE))
     {
       _send_metric_control_response(fd,
                                     version,
@@ -577,7 +577,7 @@ _update_metric(int fd,
       goto cleanup;
     }
   
-  if (!(metric_info->metric_origin & CEREBROD_METRIC_ORIGIN_USERSPACE))
+  if (!(metric_info->metric_origin & CEREBROD_METRIC_SPEAKER_ORIGIN_USERSPACE))
     {
       _send_metric_control_response(fd,
                                     version,
@@ -633,8 +633,8 @@ _resend_metric(int fd,
       goto cleanup;
     }
   
-  if (!(metric_info->metric_origin & CEREBROD_METRIC_ORIGIN_MODULE
-        || metric_info->metric_origin & CEREBROD_METRIC_ORIGIN_USERSPACE))
+  if (!(metric_info->metric_origin & CEREBROD_METRIC_SPEAKER_ORIGIN_MODULE
+        || metric_info->metric_origin & CEREBROD_METRIC_SPEAKER_ORIGIN_USERSPACE))
     {
       _send_metric_control_response(fd,
                                     version,

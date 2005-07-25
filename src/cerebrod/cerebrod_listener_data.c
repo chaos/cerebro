@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.22 2005-07-22 21:46:54 achu Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.23 2005-07-25 17:20:18 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -99,11 +99,11 @@ int listener_data_index_size;
 pthread_mutex_t listener_data_lock = PTHREAD_MUTEX_INITIALIZER;
 
 /* 
- * metric_name_index
+ * metric_names_index
  *
  * contains list of currently known metrics
  */
-hash_t metric_name_index = NULL;
+hash_t metric_names_index = NULL;
 
 /* 
  * metric_name_defaults
@@ -121,14 +121,14 @@ char *metric_name_defaults[] = {
 int metric_name_defaults_count = 3;
 
 /*  
- * metric_name_lock
+ * metric_names_lock
  *
  * lock to protect pthread access to the metric_name index
  *
  * Locking rule: Can be locked within a struct cerebrod_node_data
  * node_data_lock locked region.
  */
-pthread_mutex_t metric_name_lock = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t metric_names_lock = PTHREAD_MUTEX_INITIALIZER;
 
 /* 
  * monitor_handle
@@ -298,6 +298,26 @@ _setup_monitor_modules(void)
   return 0;
 }
 
+/* 
+ * _metric_name_data_destroy
+ *
+ * destroy metric name data
+ */
+static void
+_metric_name_data_destroy(void *data)
+{
+  struct cerebrod_metric_name_data *mnd;
+
+  assert(data);
+  
+  mnd = (struct cerebrod_metric_name_data *)data;
+
+  if (mnd->metric_origin & CEREBROD_METRIC_LISTENER_ORIGIN_MONITORED)
+    Free(mnd->metric_name);
+
+  Free(data);
+}
+
 void 
 cerebrod_listener_data_initialize(void)
 {
@@ -367,19 +387,25 @@ cerebrod_listener_data_initialize(void)
       int i, size;
       
       size = metric_name_defaults_count + conf.metric_max;
-      metric_name_index = Hash_create(size, 
-                                      (hash_key_f)hash_key_string, 
-                                      (hash_cmp_f)strcmp, 
-                                      (hash_del_f)NULL);
+      metric_names_index = Hash_create(size, 
+                                       (hash_key_f)hash_key_string, 
+                                       (hash_cmp_f)strcmp, 
+                                       (hash_del_f)_metric_name_data_destroy);
 
-      /* The hash is more for the speed over a list, it doesn't
-       * actually hold anything. So just make the key and the data the
-       * same thing
-       */
       for (i = 0; i < metric_name_defaults_count; i++)
         {
-          char *metric_name = metric_name_defaults[i];
-          Hash_insert(metric_name_index, metric_name, metric_name);
+          struct cerebrod_metric_name_data *mnd;
+
+          mnd = Malloc(sizeof(struct cerebrod_metric_name_data));
+          memset(mnd, '\0', sizeof(struct cerebrod_metric_name_data));
+
+          if (strlen(metric_name_defaults[i]) > CEREBRO_MAX_METRIC_NAME_LEN)
+            CEREBRO_EXIT(("default metric name length invalid"));
+
+          mnd->metric_name = metric_name_defaults[i];
+          mnd->metric_origin = CEREBROD_METRIC_LISTENER_ORIGIN_DEFAULT;
+
+          Hash_insert(metric_names_index, mnd->metric_name, mnd);
         }
     }
 
@@ -567,33 +593,38 @@ _listener_data_list_dump(void)
 static int
 _metric_name_output(void *data, const void *key, void *arg)
 {
+  struct cerebrod_metric_name_data *mnd;
+
   assert(data);
-  fprintf(stderr, "* %s\n", (char *)data);
+
+  mnd = (struct cerebrod_metric_name_data *)data;
+
+  fprintf(stderr, "* %s\n", mnd->metric_name);
   return 1;
 }
 #endif /* CEREBRO_DEBUG */
 
 /*
- * _metric_name_index_dump
+ * _metric_names_index_dump
  *
  * Dump contents of the metric name list
  */
 static void
-_metric_name_index_dump(void)
+_metric_names_index_dump(void)
 {
 #if CEREBRO_DEBUG
-  if (!(conf.debug && conf.listen_debug && metric_name_index))
+  if (!(conf.debug && conf.listen_debug && metric_names_index))
     return;
 
-  Pthread_mutex_lock(&metric_name_lock);
+  Pthread_mutex_lock(&metric_names_lock);
   Pthread_mutex_lock(&debug_output_mutex);
   fprintf(stderr, "**************************************\n");
   fprintf(stderr, "* Metric Name List\n");
   fprintf(stderr, "* -----------------------\n");
-  Hash_for_each(metric_name_index, _metric_name_output, NULL);
+  Hash_for_each(metric_names_index, _metric_name_output, NULL);
   fprintf(stderr, "**************************************\n");
   Pthread_mutex_unlock(&debug_output_mutex);
-  Pthread_mutex_unlock(&metric_name_lock);
+  Pthread_mutex_unlock(&metric_names_lock);
 #endif /* CEREBRO_DEBUG */
 }
 
@@ -616,7 +647,8 @@ _metric_data_update(struct cerebrod_node_data *nd,
   
   assert(nd && metric_name && hd && nd->metric_data);
 
-  if (!metric_name_index)
+  /* If metric server isn't running, metric_names_index is NULL */
+  if (!metric_names_index)
     return;
 
 #if CEREBRO_DEBUG
@@ -626,22 +658,25 @@ _metric_data_update(struct cerebrod_node_data *nd,
     CEREBRO_EXIT(("mutex not locked: rv=%d", rv));
 #endif /* CEREBRO_DEBUG */
   
-  Pthread_mutex_lock(&metric_name_lock);
-  if (!Hash_find(metric_name_index, metric_name))
+  Pthread_mutex_lock(&metric_names_lock);
+  if (!Hash_find(metric_names_index, metric_name))
     {
-      char *str;
+      struct cerebrod_metric_name_data *mnd;
       
-      if ((Hash_count(metric_name_index) - metric_name_defaults_count) >= conf.metric_max)
+      if ((Hash_count(metric_names_index) - metric_name_defaults_count) >= conf.metric_max)
         {
           CEREBRO_DBG(("too many metrics"));
-          Pthread_mutex_unlock(&metric_name_lock);
+          Pthread_mutex_unlock(&metric_names_lock);
           return;
         }
       
-      str = Strdup(metric_name);
-      Hash_insert(metric_name_index, str, str);
+      mnd = Malloc(sizeof(struct cerebrod_metric_name_data));
+      memset(mnd, '\0', sizeof(struct cerebrod_metric_name_data));
+      mnd->metric_name = Strdup(metric_name);
+      mnd->metric_origin = CEREBROD_METRIC_LISTENER_ORIGIN_MONITORED;
+      Hash_insert(metric_names_index, mnd->metric_name, mnd);
     }
-  Pthread_mutex_unlock(&metric_name_lock);             
+  Pthread_mutex_unlock(&metric_names_lock);             
 
   if (!(md = Hash_find(nd->metric_data, metric_name)))
     {
@@ -802,5 +837,5 @@ cerebrod_listener_data_update(char *nodename,
     _output_node_data_update(nd);
 
   _listener_data_list_dump();
-  _metric_name_index_dump();
+  _metric_names_index_dump();
 }
