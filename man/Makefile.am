@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.30 2005-07-22 21:46:54 achu Exp $
+## $Id: Makefile.am,v 1.31 2005-07-25 18:19:31 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -55,8 +55,7 @@ man8_MANS  = cerebro-admin.8 \
 	     cerebro-stat.8 \
 	     cerebrod.8
 
-EXTRA_DIST = cerebro.1 \
-	     libcerebro.3 \
+EXTRA_DIST = libcerebro.3 \
 	     cerebro.3 \
 	     cerebro_handle_create.3 \
 	     cerebro_handle_destroy.3 \
