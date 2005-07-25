@@ -1,6 +1,8 @@
 2005-07-25  Albert Chu  <chu11@llnl.gov>
 
 	* Added metric origins to metric names index in cerebrod.
+
+	* Fix server restart bug.
 	
 2005-07-22  Albert Chu  <chu11@llnl.gov>
 

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_server.c,v 1.28 2005-07-25 18:21:27 achu Exp $
+ *  $Id: cerebrod_metric_server.c,v 1.29 2005-07-25 18:27:07 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -956,6 +956,13 @@ _metric_server_setup_socket(void)
       goto cleanup;
     }
 
+  /* For quick start/restart */
+  if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(int)) < 0)
+    {
+      CEREBRO_DBG(("setsockopt: %s", strerror(errno)));
+      goto cleanup;
+    }
+
   /* Configuration checks ensure destination ip is on this machine if
    * it is a non-multicast address.
    */
@@ -973,13 +980,6 @@ _metric_server_setup_socket(void)
   if (listen(fd, CEREBROD_METRIC_SERVER_BACKLOG) < 0)
     {
       CEREBRO_DBG(("listen: %s", strerror(errno)));
-      goto cleanup;
-    }
-
-  /* For quick start/restart */
-  if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(int)) < 0)
-    {
-      CEREBRO_DBG(("setsockopt: %s", strerror(errno)));
       goto cleanup;
     }
 
