@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_server.c,v 1.27 2005-07-25 17:20:18 achu Exp $
+ *  $Id: cerebrod_metric_server.c,v 1.28 2005-07-25 18:21:27 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -998,7 +998,7 @@ cerebrod_metric_server(void *arg)
   _metric_server_initialize();
 
   if ((server_fd = _metric_server_setup_socket()) < 0)
-    CEREBRO_EXIT(("fd setup failed"));
+    CEREBRO_EXIT(("metric server fd setup failed"));
 
   for (;;)
     {

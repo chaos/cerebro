@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.79 2005-07-22 17:21:07 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.80 2005-07-25 18:21:27 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -329,7 +329,7 @@ cerebrod_speaker(void *arg)
 
   _speaker_initialize();
   if ((speaker_fd = _speaker_socket_setup()) < 0)
-    CEREBRO_EXIT(("speaker_fd setup failed"));
+    CEREBRO_EXIT(("speaker fd setup failed"));
 
   while (1)
     {

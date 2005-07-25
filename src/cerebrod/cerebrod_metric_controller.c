@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_controller.c,v 1.22 2005-07-25 17:20:18 achu Exp $
+ *  $Id: cerebrod_metric_controller.c,v 1.23 2005-07-25 18:21:27 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -808,7 +808,7 @@ cerebrod_metric_controller(void *arg)
   _metric_controller_initialize();
 
   if ((controller_fd = _metric_controller_setup_socket()) < 0)
-    CEREBRO_EXIT(("fd setup failed"));
+    CEREBRO_EXIT(("metric controller fd setup failed"));
 
   for (;;)
     {

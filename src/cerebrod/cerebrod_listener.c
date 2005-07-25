@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.117 2005-07-22 17:21:07 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.118 2005-07-25 18:21:27 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -171,7 +171,7 @@ _cerebrod_listener_initialize(void)
 
   Pthread_mutex_lock(&listener_fd_lock);
   if ((listener_fd = _listener_setup_socket()) < 0)
-    CEREBRO_EXIT(("listener_fd setup failed"));
+    CEREBRO_EXIT(("listener fd setup failed"));
   Pthread_mutex_unlock(&listener_fd_lock);
 
   if (!(clusterlist_handle = clusterlist_module_load()))
