@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro-admin.c,v 1.6 2005-07-22 17:21:07 achu Exp $
+ *  $Id: cerebro-admin.c,v 1.7 2005-07-26 01:02:58 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -55,6 +55,7 @@
 #define CEREBRO_ADMIN_UNREGISTER  1
 #define CEREBRO_ADMIN_UPDATE      2
 #define CEREBRO_ADMIN_RESEND      3
+#define CEREBRO_ADMIN_FLUSH       4
 
 /* 
  * External variables for getopt 
@@ -122,6 +123,7 @@ _usage(void)
           "  -u         Unregister the metric name\n"
           "  -p         Update the metric's value\n"
           "  -s         Resend the metric\n"
+          "  -f         Flush the metric\n"
           "  -t INT     Specify metric type\n"
           "     %d - none (default)\n"
           "     %d - int32\n"
@@ -180,6 +182,7 @@ _cmdline_parse(int argc, char **argv)
       {"unregister",        0, NULL, 'u'},
       {"update",            0, NULL, 'p'},
       {"resend",            0, NULL, 's'},
+      {"flush",             0, NULL, 'f'},
       {"metric-value-type", 1, NULL, 't'},
       {"metric-value",      1, NULL, 'l'},
 #if CEREBRO_DEBUG
@@ -191,7 +194,7 @@ _cmdline_parse(int argc, char **argv)
 
   assert(argv);
 
-  strcpy(options, "hvm:rupst:l:");
+  strcpy(options, "hvm:rupsft:l:");
 #if CEREBRO_DEBUG
   strcat(options, "d");
 #endif /* CEREBRO_DEBUG */
@@ -225,6 +228,9 @@ _cmdline_parse(int argc, char **argv)
         break;
       case 's':
         operation = CEREBRO_ADMIN_RESEND;
+        break;
+      case 'f':
+        operation = CEREBRO_ADMIN_FLUSH;
         break;
       case 't':
         metric_value_type = strtol(optarg, &ptr, 10);
@@ -353,13 +359,15 @@ main(int argc, char *argv[])
                                      metric_value_ptr);
   else if (operation == CEREBRO_ADMIN_RESEND)
     rv = cerebro_resend_metric(handle, metric_name);
+  else if (operation == CEREBRO_ADMIN_FLUSH)
+    rv = cerebro_flush_metric(handle, metric_name);
   
   if (rv < 0)
     {
       char *msg = cerebro_strerror(cerebro_errnum(handle));
       
       _try_nice_err_exit(cerebro_errnum(handle));
-      err_exit("%s: cerebro_register_metric: %s", func, msg);
+      err_exit("%s: %s", func, msg);
     }
   
   _cleanup_cerebro_stat();

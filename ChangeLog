@@ -7,6 +7,8 @@
 	* Add flush ability to metric controller.
 
 	* Added flush libcall and manpages.
+
+	* Added flush to cerebro-admin.
 	
 2005-07-22  Albert Chu  <chu11@llnl.gov>
 
