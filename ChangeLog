@@ -1,6 +1,8 @@
 2005-07-26  Albert Chu  <chu11@llnl.gov>
 
 	* Fix cerebro-admin and cerebro-stat bugs.
+
+	* Shorten slurm_state period.
 	
 2005-07-25  Albert Chu  <chu11@llnl.gov>
 

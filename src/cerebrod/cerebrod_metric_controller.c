@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_controller.c,v 1.25 2005-07-26 01:17:59 achu Exp $
+ *  $Id: cerebrod_metric_controller.c,v 1.26 2005-07-26 16:24:02 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -693,13 +693,17 @@ _flush_metric_data(void *x, void *arg)
     {
       struct cerebrod_listener_metric_data *md;
 
-      if (!(md = Hash_remove(nd->metric_data, metric_name)))
-        CEREBRO_EXIT(("illogical delete"));
-
-      /* XXX need destroy/delete func? */
-      Free(md->metric_name);
-      Free(md->metric_value);
-      Free(md);
+      if ((md = Hash_remove(nd->metric_data, metric_name)))
+        {
+          nd->metric_data_count--;
+          
+          /* XXX need destroy/delete func? */
+          Free(md->metric_name);
+          Free(md->metric_value);
+          Free(md);
+        }
+      else
+        CEREBRO_DBG(("illogical delete"));
     }
   Pthread_mutex_unlock(&(nd->node_data_lock));
 
@@ -718,6 +722,16 @@ _flush_metric(int fd, int32_t version, const char *metric_name)
 {
   struct cerebrod_metric_name_data *mnd;
   
+  /* 
+   * Algorithm note, flushing means flushing the *current* known
+   * contents.  It does not stop any update attempts currently in
+   * progress.
+   *
+   * Note that there is some racing here with the metric server, but
+   * it doesn't matter.  The metric server simply responds with
+   * whatever it has at the moment.
+   */
+
   Pthread_mutex_lock(&metric_names_lock);
   if (!(mnd = Hash_find(metric_names_index, metric_name)))
     {
@@ -737,13 +751,18 @@ _flush_metric(int fd, int32_t version, const char *metric_name)
       goto cleanup;
     }
 
-  Pthread_mutex_unlock(&metric_names_lock);
+  if ((mnd = Hash_remove(metric_names_index, metric_name)))
+    {
+      /* XXX need destroy function?? */
+      Free(mnd->metric_name);
+      Free(mnd);
+    }
+  else
+    CEREBRO_DBG(("illogical delete"));
   
-  /* 
-   * Algorithm note, flushing means flushing the *current* known
-   * contents.  It does not stop any update attempts currently in
-   * progress.
-   */
+
+  Pthread_mutex_unlock(&metric_names_lock);
+ 
 
   Pthread_mutex_lock(&listener_data_lock);
   if (list_for_each(listener_data_list, _flush_metric_data, (void *)metric_name) < 0)

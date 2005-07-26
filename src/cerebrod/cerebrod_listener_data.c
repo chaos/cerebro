@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.23 2005-07-25 17:20:18 achu Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.24 2005-07-26 16:24:02 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -532,7 +532,7 @@ _node_data_dump(void *x, void *arg)
           num = Hash_for_each(nd->metric_data, _metric_data_dump, nd->nodename);
           if (num != nd->metric_data_count)
             {
-              fprintf(stderr, "* invalid dump count: num=%d numnodes=%d",
+              fprintf(stderr, "* invalid dump count: num=%d data count=%d",
                       num, nd->metric_data_count);
             }
           else

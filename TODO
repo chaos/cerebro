@@ -8,6 +8,10 @@ Cleanup
 fixes
 - server restart, sometimes fails?
 
+Corner Cases
+- user runs 2 daemons, 1 speaker, 1 listener
+  - unix domain prot paths issue?
+
 Features
 - Ability to flush metric from listener
 

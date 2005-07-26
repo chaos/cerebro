@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.120 2005-07-22 17:21:07 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.121 2005-07-26 16:24:02 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -709,10 +709,8 @@ _cerebrod_calculate_configuration_data(void)
   if (!conf.listen)
     conf.metric_server = 0;
 
-  /* If the speaker is turned off, the metric controller must be
-   * turned off
-   */
-  if (!conf.speak)
+  /* Why would the user want the daemon to do nothing?  Oh well*/
+  if (!conf.speak && !conf.listen)
     conf.metric_controller = 0;
 }
 

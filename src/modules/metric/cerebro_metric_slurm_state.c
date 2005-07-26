@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_slurm_state.c,v 1.13 2005-07-22 17:21:07 achu Exp $
+ *  $Id: cerebro_metric_slurm_state.c,v 1.14 2005-07-26 16:24:02 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -186,7 +186,7 @@ slurm_state_metric_get_metric_period(int *period)
   /* The slurm_state is propogated every once in awhile.  The
    * slurm_state metric thread is more responsible for propogation..
    */
-  *period = 5*60;
+  *period = 60;
   return 0;
 }
 
