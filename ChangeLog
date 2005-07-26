@@ -3,6 +3,8 @@
 	* Added metric origins to metric names index in cerebrod.
 
 	* Fix server restart bug.
+
+	* Add flush ability to metric controller.
 	
 2005-07-22  Albert Chu  <chu11@llnl.gov>
 

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_controller.c,v 1.23 2005-07-25 18:21:27 achu Exp $
+ *  $Id: cerebrod_metric_controller.c,v 1.24 2005-07-26 00:38:52 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -52,12 +52,14 @@
 
 #include "cerebrod.h"
 #include "cerebrod_config.h"
+#include "cerebrod_listener_data.h"
 #include "cerebrod_metric_controller.h"
 #include "cerebrod_speaker_data.h"
 #include "cerebrod_util.h"
 
 #include "debug.h"
 #include "fd.h"
+#include "list.h"
 #include "metric_util.h"
 #include "network_util.h"
 #include "wrappers.h"
@@ -73,6 +75,14 @@ extern pthread_mutex_t debug_output_mutex;
 extern List metric_list;
 extern int metric_list_size;
 extern pthread_mutex_t metric_list_lock;
+
+/* 
+ * Listener Data
+ */
+extern List listener_data_list;
+extern pthread_mutex_t listener_data_lock;
+extern hash_t metric_names_index;
+extern pthread_mutex_t metric_names_lock;
 
 #define CEREBROD_METRIC_CONTROLLER_BACKLOG    5
 
@@ -613,9 +623,7 @@ _update_metric(int fd,
  * Returns 0 on success, -1 on error
  */
 static int
-_resend_metric(int fd, 
-               int32_t version, 
-               const char *metric_name)
+_resend_metric(int fd, int32_t version, const char *metric_name)
 {
   struct cerebrod_speaker_metric_info *metric_info;
   int rv = -1;
@@ -650,6 +658,105 @@ _resend_metric(int fd,
  cleanup:
   Pthread_mutex_unlock(&metric_list_lock);
   return rv;
+}
+
+/* 
+ * _flush_metric_data
+ *
+ * Flush metric data from the node
+ *
+ * Returns 0 on success, -1 on error
+ */
+static int
+_flush_metric_data(void *x, void *arg)
+{
+  struct cerebrod_node_data *nd;
+  char *metric_name;
+#if CEREBRO_DEBUG
+  int rv;
+#endif /* CEREBRO_DEBUG */
+
+  assert(x && arg);
+  
+  nd = (struct cerebrod_node_data *)x;
+  metric_name = (char *)arg;
+
+#if CEREBRO_DEBUG
+  /* Should be called with lock already set */
+  rv = Pthread_mutex_trylock(&listener_data_lock);
+  if (rv != EBUSY)
+    CEREBRO_EXIT(("mutex not locked: rv=%d", rv));
+#endif /* CEREBRO_DEBUG */
+  
+  Pthread_mutex_lock(&(nd->node_data_lock));
+  if (Hash_find(nd->metric_data, metric_name))
+    {
+      struct cerebrod_listener_metric_data *md;
+
+      if (!(md = Hash_remove(nd->metric_data, metric_name)))
+        CEREBRO_EXIT(("illogical delete"));
+
+      /* XXX need destroy/delete func? */
+      Free(md->metric_name);
+      Free(md->metric_value);
+      Free(md);
+    }
+  Pthread_mutex_unlock(&(nd->node_data_lock));
+
+  return 0;
+}
+
+/* 
+ * _flush_metric
+ *
+ * Flush a metric 
+ *
+ * Returns 0 on success, -1 on error
+ */
+static int
+_flush_metric(int fd, int32_t version, const char *metric_name)
+{
+  struct cerebrod_metric_name_data *mnd;
+  
+  Pthread_mutex_lock(&metric_names_lock);
+  if (!(mnd = Hash_find(metric_names_index, metric_name)))
+    {
+      Pthread_mutex_unlock(&metric_names_lock);
+      _send_metric_control_response(fd,
+                                    version,
+                                    CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_METRIC_INVALID);
+      goto cleanup;
+    }
+
+  if (!(mnd->metric_origin & CEREBROD_METRIC_LISTENER_ORIGIN_MONITORED))
+    {
+      Pthread_mutex_unlock(&metric_names_lock);
+      _send_metric_control_response(fd,
+                                    version,
+                                    CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_METRIC_INVALID);
+      goto cleanup;
+    }
+
+  Pthread_mutex_unlock(&metric_names_lock);
+  
+  /* 
+   * Algorithm note, flushing means flushing the *current* known
+   * contents.  It does not stop any update attempts currently in
+   * progress.
+   */
+
+  Pthread_mutex_lock(&listener_data_lock);
+  if (list_for_each(listener_data_list, _flush_metric_data, (void *)metric_name) < 0)
+    {
+      Pthread_mutex_unlock(&listener_data_lock);
+      goto cleanup;
+    }
+  Pthread_mutex_unlock(&listener_data_lock);
+
+  return 0;
+
+ cleanup:
+  return -1;
 }
 
 /* 
@@ -780,6 +887,12 @@ _metric_controller_service_connection(void *arg)
       if (_resend_metric(fd, version, metric_name_buf) < 0)
         goto cleanup;
     }
+  else if (req.command == CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_FLUSH
+           && conf.listen)
+    {
+      if (_flush_metric(fd, version, metric_name_buf) < 0)
+        goto cleanup;
+    }
   else
     {
       _send_metric_control_response(fd,
@@ -827,7 +940,7 @@ cerebrod_metric_controller(void *arg)
       
       if (fd < 0)
         continue;
-                                                                                      
+
       /* Pass off connection to thread */
       Pthread_attr_init(&attr);
       Pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
