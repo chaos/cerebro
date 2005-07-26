@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.25 2005-07-26 20:01:52 achu Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.26 2005-07-26 20:17:23 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -339,7 +339,7 @@ metric_name_data_create(const char *metric_name, u_int32_t metric_origin)
     CEREBRO_DBG(("metric name length invalid"));
 
   if (metric_origin & CEREBROD_METRIC_LISTENER_ORIGIN_DEFAULT)
-    mnd->metric_name = metric_name;
+    mnd->metric_name = (char *)metric_name;
   else
     mnd->metric_name = Strdup(metric_name);
 
