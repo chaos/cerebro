@@ -3,8 +3,6 @@ Portability
 - Multicast
 
 Cleanup
-- ensure all locks are encompassing given flush possibilities
-- not using wrappers reasonable?
 - passthrough code cleanup
 
 fixes
