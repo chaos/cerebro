@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.24 2005-07-26 16:24:02 achu Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.25 2005-07-26 20:01:52 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -163,6 +163,31 @@ _cerebrod_node_data_strcmp(void *x, void *y)
   return strcmp(a->nodename, b->nodename);
 }
 
+struct cerebrod_metric_data *
+metric_data_create(const char *metric_name)
+{
+  struct cerebrod_metric_data *md;
+
+  md = (struct cerebrod_metric_data *)Malloc(sizeof(struct cerebrod_metric_data));
+  memset(md, '\0', sizeof(struct cerebrod_metric_data));
+  md->metric_name = Strdup(metric_name);
+
+  return md;
+}
+
+void 
+metric_data_destroy(void *data)
+{
+  struct cerebrod_metric_data *md;
+  
+  assert(data);
+  
+  md = (struct cerebrod_metric_data *)data;
+  Free(md->metric_name);
+  Free(md->metric_value);
+  Free(md);
+}
+
 /* 
  * _cerebrod_node_data_create_and_init
  *
@@ -186,7 +211,7 @@ _cerebrod_node_data_create_and_init(const char *nodename)
     nd->metric_data = Hash_create(conf.metric_max, 
                                   (hash_key_f)hash_key_string,
                                   (hash_cmp_f)strcmp, 
-                                  (hash_del_f)NULL);
+                                  (hash_del_f)metric_data_destroy);
   else
     nd->metric_data = NULL;
   nd->metric_data_count = 0;
@@ -298,13 +323,33 @@ _setup_monitor_modules(void)
   return 0;
 }
 
-/* 
- * _metric_name_data_destroy
- *
- * destroy metric name data
- */
-static void
-_metric_name_data_destroy(void *data)
+struct cerebrod_metric_name_data *
+metric_name_data_create(const char *metric_name, u_int32_t metric_origin)
+{
+  struct cerebrod_metric_name_data *mnd;
+
+  assert(metric_name 
+         && (metric_origin >= CEREBROD_METRIC_LISTENER_ORIGIN_DEFAULT
+             && metric_origin <= CEREBROD_METRIC_LISTENER_ORIGIN_MONITORED));
+
+  mnd = Malloc(sizeof(struct cerebrod_metric_name_data));
+  memset(mnd, '\0', sizeof(struct cerebrod_metric_name_data));
+
+  if (strlen(metric_name) > CEREBRO_MAX_METRIC_NAME_LEN)
+    CEREBRO_DBG(("metric name length invalid"));
+
+  if (metric_origin & CEREBROD_METRIC_LISTENER_ORIGIN_DEFAULT)
+    mnd->metric_name = metric_name;
+  else
+    mnd->metric_name = Strdup(metric_name);
+
+  mnd->metric_origin = metric_origin;
+
+  return mnd;
+}
+
+void
+metric_name_data_destroy(void *data)
 {
   struct cerebrod_metric_name_data *mnd;
 
@@ -314,8 +359,7 @@ _metric_name_data_destroy(void *data)
 
   if (mnd->metric_origin & CEREBROD_METRIC_LISTENER_ORIGIN_MONITORED)
     Free(mnd->metric_name);
-
-  Free(data);
+  Free(mnd);
 }
 
 void 
@@ -390,20 +434,14 @@ cerebrod_listener_data_initialize(void)
       metric_names_index = Hash_create(size, 
                                        (hash_key_f)hash_key_string, 
                                        (hash_cmp_f)strcmp, 
-                                       (hash_del_f)_metric_name_data_destroy);
+                                       (hash_del_f)metric_name_data_destroy);
 
       for (i = 0; i < metric_name_defaults_count; i++)
         {
           struct cerebrod_metric_name_data *mnd;
 
-          mnd = Malloc(sizeof(struct cerebrod_metric_name_data));
-          memset(mnd, '\0', sizeof(struct cerebrod_metric_name_data));
-
-          if (strlen(metric_name_defaults[i]) > CEREBRO_MAX_METRIC_NAME_LEN)
-            CEREBRO_EXIT(("default metric name length invalid"));
-
-          mnd->metric_name = metric_name_defaults[i];
-          mnd->metric_origin = CEREBROD_METRIC_LISTENER_ORIGIN_DEFAULT;
+          mnd = metric_name_data_create(metric_name_defaults[i],
+                                        CEREBROD_METRIC_LISTENER_ORIGIN_DEFAULT);
 
           Hash_insert(metric_names_index, mnd->metric_name, mnd);
         }
@@ -470,12 +508,12 @@ _output_node_data_update(struct cerebrod_node_data *nd)
 static int
 _metric_data_dump(void *data, const void *key, void *arg)
 {
-  struct cerebrod_listener_metric_data *md;
+  struct cerebrod_metric_data *md;
   char *nodename, *buf;
  
   assert(data && key && arg);
  
-  md = (struct cerebrod_listener_metric_data *)data;
+  md = (struct cerebrod_metric_data *)data;
   nodename = (char *)arg;
  
   fprintf(stderr, "* %s: metric name=%s type=%d len=%d ",
@@ -640,7 +678,7 @@ _metric_data_update(struct cerebrod_node_data *nd,
                     struct cerebrod_heartbeat_metric *hd,
                     u_int32_t received_time)
 {
-  struct cerebrod_listener_metric_data *md;
+  struct cerebrod_metric_data *md;
 #if CEREBRO_DEBUG
   int rv;
 #endif /* CEREBRO_DEBUG */
@@ -669,11 +707,10 @@ _metric_data_update(struct cerebrod_node_data *nd,
           Pthread_mutex_unlock(&metric_names_lock);
           return;
         }
+
+      mnd = metric_name_data_create(metric_name,
+                                    CEREBROD_METRIC_LISTENER_ORIGIN_MONITORED);
       
-      mnd = Malloc(sizeof(struct cerebrod_metric_name_data));
-      memset(mnd, '\0', sizeof(struct cerebrod_metric_name_data));
-      mnd->metric_name = Strdup(metric_name);
-      mnd->metric_origin = CEREBROD_METRIC_LISTENER_ORIGIN_MONITORED;
       Hash_insert(metric_names_index, mnd->metric_name, mnd);
     }
   Pthread_mutex_unlock(&metric_names_lock);             
@@ -688,10 +725,8 @@ _metric_data_update(struct cerebrod_node_data *nd,
           CEREBRO_DBG(("too many metrics: nodename=%s", nd->nodename));
           return;
         }
-      
-      md = (struct cerebrod_listener_metric_data *)Malloc(sizeof(struct cerebrod_listener_metric_data));
-      memset(md, '\0', sizeof(struct cerebrod_listener_metric_data));
-      md->metric_name = Strdup(metric_name);
+
+      md = metric_data_create(metric_name);
       Hash_insert(nd->metric_data, md->metric_name, md);
       nd->metric_data_count++;
     }
@@ -704,6 +739,7 @@ _metric_data_update(struct cerebrod_node_data *nd,
   
   md->metric_value_received_time = received_time;
   md->metric_value_type = hd->metric_value_type;
+
   /* Realloc size */
   if (md->metric_value_len != hd->metric_value_len)
     {
