@@ -5,6 +5,8 @@
 	* Fix server restart bug.
 
 	* Add flush ability to metric controller.
+
+	* Added flush libcall and manpages.
 	
 2005-07-22  Albert Chu  <chu11@llnl.gov>
 

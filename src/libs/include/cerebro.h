@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.18 2005-07-22 21:46:55 achu Exp $
+ *  $Id: cerebro.h,v 1.19 2005-07-26 00:57:17 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -319,6 +319,15 @@ int cerebro_update_metric_value(cerebro_t handle,
  * Returns 0 on success, -1 on error
  */
 int cerebro_resend_metric(cerebro_t handle, const char *metric_name);
+
+/* 
+ * cerebro_flush_metric
+ *
+ * Flush a metric
+ *
+ * Returns 0 on success, -1 on error
+ */
+int cerebro_flush_metric(cerebro_t handle, const char *metric_name);
 
 /* 
  * Metriclist API

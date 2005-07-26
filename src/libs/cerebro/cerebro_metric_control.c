@@ -459,3 +459,14 @@ cerebro_resend_metric(cerebro_t handle, const char *metric_name)
                                  NULL);
 }
 
+int 
+cerebro_flush_metric(cerebro_t handle, const char *metric_name)
+{
+  return _cerebro_metric_control(handle, 
+                                 CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_FLUSH,
+                                 metric_name, 
+                                 CEREBRO_METRIC_VALUE_TYPE_NONE,
+                                 0,
+                                 NULL);
+}
+
