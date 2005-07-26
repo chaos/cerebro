@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_controller.c,v 1.24 2005-07-26 00:38:52 achu Exp $
+ *  $Id: cerebrod_metric_controller.c,v 1.25 2005-07-26 01:17:59 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -868,24 +868,28 @@ _metric_controller_service_connection(void *arg)
     {
       if (_register_metric(fd, version, metric_name_buf) < 0)
         goto cleanup;
+      _speaker_metric_names_dump();
     }
   else if (req.command == CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_UNREGISTER 
            && conf.speak)
     {
       if (_unregister_metric(fd, version, metric_name_buf) < 0)
         goto cleanup;
+      _speaker_metric_names_dump();
     }
   else if (req.command == CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_UPDATE 
            && conf.speak)
     {
       if (_update_metric(fd, version, metric_name_buf, &req) < 0)
         goto cleanup;
+      _speaker_metric_names_dump();
     }
   else if (req.command == CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_RESEND 
            && conf.speak)
     {
       if (_resend_metric(fd, version, metric_name_buf) < 0)
         goto cleanup;
+      _speaker_metric_names_dump();
     }
   else if (req.command == CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_FLUSH
            && conf.listen)
@@ -901,7 +905,6 @@ _metric_controller_service_connection(void *arg)
       goto cleanup;
     }
 
-  _speaker_metric_names_dump();
 
   _send_metric_control_response(fd,
                                 version,
