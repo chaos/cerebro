@@ -3,8 +3,6 @@ Portability
 - Multicast
 
 Cleanup
-- all create functions have destroys?
-- passthrough code cleanup
 
 Future Features
 - controller
