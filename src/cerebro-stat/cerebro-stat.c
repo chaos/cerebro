@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro-stat.c,v 1.16 2005-07-26 15:34:12 achu Exp $
+ *  $Id: cerebro-stat.c,v 1.17 2005-07-26 20:14:19 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -88,7 +88,7 @@ static int metric_received_time_flag = 0;
  */
 struct node_metric_data {
   char *nodename;
-  unsigned long metric_value_received_time;
+  unsigned int metric_value_received_time;
   unsigned int metric_value_type;
   unsigned int metric_value_len;
   void *metric_value;

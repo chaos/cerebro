@@ -3,6 +3,12 @@
 	* Fix cerebro-admin and cerebro-stat bugs.
 
 	* Shorten slurm_state period.
+
+	* API interface modifications.
+
+	* Code logic fixes.
+
+	* Code cleanup.
 	
 2005-07-25  Albert Chu  <chu11@llnl.gov>
 

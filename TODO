@@ -3,17 +3,8 @@ Portability
 - Multicast
 
 Cleanup
+- all create functions have destroys?
 - passthrough code cleanup
-
-fixes
-- server restart, sometimes fails?
-
-Corner Cases
-- user runs 2 daemons, 1 speaker, 1 listener
-  - unix domain prot paths issue?
-
-Features
-- Ability to flush metric from listener
 
 Future Features
 - controller
@@ -23,6 +14,6 @@ Future Features
   - munge based access?
 
 - listener
-  - limit data receving based on host list or subnet
+  - limit data receiving based on host list or subnet
 
 - event based monitoring
