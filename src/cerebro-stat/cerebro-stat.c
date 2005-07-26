@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro-stat.c,v 1.17 2005-07-26 20:14:19 achu Exp $
+ *  $Id: cerebro-stat.c,v 1.18 2005-07-26 22:30:56 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -49,13 +49,10 @@
 #include "cerebro/cerebro_error.h"
 #endif /* CEREBRO_DEBUG */
 
-#include "hostlist.h"
 #include "error.h"
-#include "hash.h"
-#include "list.h"
 #include "wrappers.h"
 
-#define CEREBRO_STAT_BUFLEN          16384
+#define CEREBRO_STAT_BUFLEN          65536
 #define CEREBRO_STAT_NONE_STRING     "(none)"
 #define CEREBRO_STAT_UNKNOWN_STRING  "unknown"
 #define CEREBRO_STAT_NEWLINE         0
@@ -81,6 +78,7 @@ static cerebro_t handle;
 static int metric_list_flag = 0;
 static char *metric_name = NULL;
 static int metric_received_time_flag = 0;
+
 /*  
  * node_metric_data
  *
@@ -318,12 +316,13 @@ _cmdline_parse(int argc, char **argv)
 }
 
 /* 
- * _try_nice_err_exit
+ * _clean_err_exit
  *
- * Check for and output "nice" error messages for certain errnums
+ * Check for and output "nice" error messages for certain errnums.  If
+ * a "nice" error message isn't available, just return.
  */
 static void
-_try_nice_err_exit(int errnum)
+_clean_err_exit(int errnum)
 {
   if (errnum == CEREBRO_ERR_CONNECT)
     err_exit("Cannot connect to server");
@@ -360,7 +359,7 @@ _metric_list(void)
     {
       char *msg = cerebro_strerror(cerebro_errnum(handle));
 
-      _try_nice_err_exit(cerebro_errnum(handle));
+      _clean_err_exit(cerebro_errnum(handle));
       err_exit("%s: cerebro_get_metric_names: %s", func, msg);
     }
   
@@ -394,8 +393,8 @@ _metric_list(void)
   while ((str = list_next(litr)))
     fprintf(stdout, "%s\n", str);
 
-  /* list_destroy() and cerebro_metriclist_destory() destroy iterators too */
-  (void)list_destroy(l);
+  /* List_destroy() and cerebro_metriclist_destory() destroy iterators too */
+  List_destroy(l);
   (void)cerebro_metriclist_destroy(m);
 }
 
@@ -409,66 +408,46 @@ _metric_value_str(struct node_metric_data *data, char *buf, unsigned int buflen)
 {
   const char *func = __FUNCTION__;
   unsigned int mtype, mlen;
-  int rv = 0;
+  int mlen_flag, rv = 0;
 
   assert(data && buf && buflen > 0);
 
   mtype = data->metric_value_type;
   mlen = data->metric_value_len;
 
+#if CEREBRO_DEBUG
   if (mtype == CEREBRO_METRIC_VALUE_TYPE_NONE)
-    {
-#if CEREBRO_DEBUG
-      if (mlen)
-        err_exit("%s: invalid metric length: %d %d", func, mtype, mlen);
-#endif /* CEREBRO_DEBUG */
-      rv = snprintf(buf, buflen, "%s", CEREBRO_STAT_NONE_STRING);
-    }
+    mlen_flag = (mlen) ? 1 : 0;
   else if (mtype == CEREBRO_METRIC_VALUE_TYPE_INT32)
-    {
-#if CEREBRO_DEBUG
-      if (mlen != sizeof(int32_t))
-        err_exit("%s: invalid metric length: %d %d", func, mtype, mlen);
-#endif /* CEREBRO_DEBUG */
-      rv = snprintf(buf, buflen, "%d", *((int32_t *)data->metric_value));
-    }
+    mlen_flag = (mlen != sizeof(int32_t)) ? 1 : 0;
   else if (mtype == CEREBRO_METRIC_VALUE_TYPE_U_INT32)
-    {
-#if CEREBRO_DEBUG
-      if (mlen != sizeof(u_int32_t))
-        err_exit("%s: invalid metric length: %d %d", func, mtype, mlen);
-#endif /* CEREBRO_DEBUG */
-      rv = snprintf(buf, buflen, "%u", *((u_int32_t *)data->metric_value));
-    }
+    mlen_flag = (mlen != sizeof(u_int32_t)) ? 1 : 0;
   else if (mtype == CEREBRO_METRIC_VALUE_TYPE_FLOAT)
-    {
-#if CEREBRO_DEBUG
-      if (mlen != sizeof(float))
-        err_exit("%s: invalid metric length: %d %d", func, mtype, mlen);
-#endif /* CEREBRO_DEBUG */
-      rv = snprintf(buf, buflen, "%f", *((float *)data->metric_value));
-    }
+    mlen_flag = (mlen != sizeof(float)) ? 1 : 0;
   else if (mtype == CEREBRO_METRIC_VALUE_TYPE_DOUBLE)
-    {
-#if CEREBRO_DEBUG
-      if (mlen != sizeof(double))
-        err_exit("%s: invalid metric length: %d %d", func, mtype, mlen);
-#endif /* CEREBRO_DEBUG */
-      rv = snprintf(buf, buflen, "%f", *((double *)data->metric_value));
-    }
+    mlen_flag = (mlen != sizeof(double)) ? 1 : 0;
   else if (mtype == CEREBRO_METRIC_VALUE_TYPE_STRING)
-    {
-#if CEREBRO_DEBUG
-      if (mlen > CEREBRO_MAX_METRIC_STRING_LEN)
-        err_exit("%s: invalid metric length: %d %d", func, mtype, mlen);
-#endif /* CEREBRO_DEBUG */
-      rv = snprintf(buf, buflen, "%s", (char *)data->metric_value);
-    }
-#if CEREBRO_DEBUG
+    mlen_flag = (mlen > CEREBRO_MAX_METRIC_STRING_LEN) ? 1 : 0;
   else
     err_exit("%s: invalid metric type: %d", func, mtype);
+
+  if (mlen_flag)
+    err_exit("%s: invalid metric length: %d %d", func, mtype, mlen);
 #endif /* CEREBRO_DEBUG */
 
+  if (mtype == CEREBRO_METRIC_VALUE_TYPE_NONE)
+    rv = snprintf(buf, buflen, "%s", CEREBRO_STAT_NONE_STRING);
+  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_INT32)
+    rv = snprintf(buf, buflen, "%d", *((int32_t *)data->metric_value));
+  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_U_INT32)
+    rv = snprintf(buf, buflen, "%u", *((u_int32_t *)data->metric_value));
+  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_FLOAT)
+    rv = snprintf(buf, buflen, "%f", *((float *)data->metric_value));
+  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_DOUBLE)
+    rv = snprintf(buf, buflen, "%f", *((double *)data->metric_value));
+  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_STRING)
+    rv = snprintf(buf, buflen, "%s", (char *)data->metric_value);
+  
   if (rv >= buflen)
     err_exit("%s: truncated output: %d", func, mlen);
 }
@@ -506,10 +485,10 @@ _cluster_nodes_output(List l)
 
       Hostlist_sort(hl);
       Hostlist_uniq(hl);
-
+      
       memset(hstr, '\0', CEREBRO_STAT_BUFLEN);
       Hostlist_ranged_string(hl, CEREBRO_STAT_BUFLEN, hstr);
-
+      
       fprintf(stdout, "%s\n", hstr);
     }
 
@@ -539,6 +518,7 @@ _newline_output(List l)
 
       memset(vbuf, '\0', CEREBRO_STAT_BUFLEN);
       _metric_value_str(data, vbuf, CEREBRO_STAT_BUFLEN);
+
       if (metric_received_time_flag)
         {
           char tbuf[CEREBRO_STAT_BUFLEN];
@@ -605,7 +585,9 @@ _hostrange_output_data(void *data, const void *key, void *arg)
 /* 
  * _hostrange_output
  *
- * Output metric data in hostrange format
+ * Output metric data in hostrange format.  The algorithm involves
+ * using the metric_value as a hash key.  Each hash item will then
+ * store the hosts with the same metric_value/key.
  */
 static void
 _hostrange_output(List l)
@@ -643,7 +625,6 @@ _hostrange_output(List l)
 
       if (!(hd = Hash_find(h, buf)))
         {
-          
           hd = Malloc(sizeof(struct hostrange_data));
           hd->hl = Hostlist_create(NULL);
           hd->key = Strdup(buf);
@@ -671,14 +652,13 @@ _metric_data(void)
   const char *func = __FUNCTION__;
   cerebro_nodelist_t n = NULL;
   cerebro_nodelist_iterator_t nitr = NULL;
-  struct node_metric_data *data = NULL;
   List l = NULL;
 
   if (!(n = cerebro_get_metric_data(handle, metric_name)))
     {
       char *msg = cerebro_strerror(cerebro_errnum(handle));
 
-      _try_nice_err_exit(cerebro_errnum(handle));
+      _clean_err_exit(cerebro_errnum(handle));
       err_exit("%s: cerebro_get_metric_data: %s", func, msg);
     }
   
@@ -693,10 +673,9 @@ _metric_data(void)
 
   while (!cerebro_nodelist_iterator_at_end(nitr))
     {
-      data = NULL;
+      struct node_metric_data *data = NULL;
 
-      if (!(data = malloc(sizeof(struct node_metric_data))))
-        err_exit("%s: malloc: %s", func, strerror(errno));
+      data = Malloc(sizeof(struct node_metric_data));
       memset(data, '\0', sizeof(struct node_metric_data));
 
       if (cerebro_nodelist_iterator_nodename(nitr, &(data->nodename)) < 0)
@@ -715,9 +694,8 @@ _metric_data(void)
           err_exit("%s: cerebro_nodelist_iterator_metric_value: %s", func, msg);
         }
 
-      if (!list_append(l, data))
-        err_exit("%s: list_append: %s", func, strerror(errno));
-
+      List_append(l, data);
+      
       if (cerebro_nodelist_iterator_next(nitr) < 0)
         {
           char *msg = cerebro_strerror(cerebro_nodelist_iterator_errnum(nitr));
@@ -732,8 +710,8 @@ _metric_data(void)
   else if (output_type == CEREBRO_STAT_HOSTRANGE)
     _hostrange_output(l);
 
-  /* list_destroy() and cerebro_nodelist_destory() destroy iterators too */
-  (void)list_destroy(l);
+  /* List_destroy() and cerebro_nodelist_destory() destroy iterators too */
+  List_destroy(l);
   (void)cerebro_nodelist_destroy(n);
 }
 

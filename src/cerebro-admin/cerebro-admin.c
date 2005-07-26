@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro-admin.c,v 1.8 2005-07-26 15:34:12 achu Exp $
+ *  $Id: cerebro-admin.c,v 1.9 2005-07-26 22:30:56 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -308,12 +308,13 @@ _cmdline_parse(int argc, char **argv)
 }
 
 /* 
- * _try_nice_err_exit
+ * _clean_err_exit
  *
- * Check for and output "nice" error messages for certain errnums
+ * Check for and output "nice" error messages for certain errnums.  If
+ * a "nice" error message isn't available, just return.
  */
 static void
-_try_nice_err_exit(int errnum)
+_clean_err_exit(int errnum)
 {
   if (errnum == CEREBRO_ERR_CONNECT)
     err_exit("Cannot connect to server");
@@ -366,7 +367,7 @@ main(int argc, char *argv[])
     {
       char *msg = cerebro_strerror(cerebro_errnum(handle));
       
-      _try_nice_err_exit(cerebro_errnum(handle));
+      _clean_err_exit(cerebro_errnum(handle));
       err_exit("%s: %s", func, msg);
     }
   
