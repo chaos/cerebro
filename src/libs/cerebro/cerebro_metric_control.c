@@ -213,7 +213,7 @@ _metric_control_request_send(cerebro_t handle,
   int req_len;
 
   if (!(command >= CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_REGISTER
-        && command <= CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_RESEND)
+        && command <= CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_FLUSH)
       || !metric_name
       || !(metric_value_type >= CEREBRO_METRIC_VALUE_TYPE_NONE
            && metric_value_type <= CEREBRO_METRIC_VALUE_TYPE_STRING))

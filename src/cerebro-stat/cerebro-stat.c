@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro-stat.c,v 1.15 2005-07-22 21:49:07 achu Exp $
+ *  $Id: cerebro-stat.c,v 1.16 2005-07-26 15:34:12 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -334,7 +334,7 @@ _try_nice_err_exit(int errnum)
   if (errnum == CEREBRO_ERR_VERSION_INCOMPATIBLE)
     err_exit("Server version not compatible");
   if (errnum == CEREBRO_ERR_METRIC_INVALID)
-    err_exit("Unknown metric name specified");
+    err_exit("Invalid metric name specified");
   if (errnum == CEREBRO_ERR_CONFIG_FILE)
     err_exit("Error parsing configuration file");
   if (errnum == CEREBRO_ERR_CONFIG_INPUT)

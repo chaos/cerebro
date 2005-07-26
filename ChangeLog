@@ -1,3 +1,7 @@
+2005-07-26  Albert Chu  <chu11@llnl.gov>
+
+	* Fix cerebro-admin and cerebro-stat bugs.
+	
 2005-07-25  Albert Chu  <chu11@llnl.gov>
 
 	* Added metric origins to metric names index in cerebrod.
