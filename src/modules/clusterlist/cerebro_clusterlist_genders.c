@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_genders.c,v 1.31 2005-07-22 17:21:07 achu Exp $
+ *  $Id: cerebro_clusterlist_genders.c,v 1.32 2005-07-27 00:03:38 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -180,8 +180,8 @@ genders_clusterlist_node_in_cluster(const char *node)
  */
 static int
 genders_clusterlist_get_nodename(const char *node, 
-				 char *buf, 
-				 unsigned int buflen)
+                                 char *buf, 
+                                 unsigned int buflen)
 {
   char nodebuf[CEREBRO_MAX_NODENAME_LEN+1];
   char *nodePtr = NULL;
