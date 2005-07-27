@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_controller.c,v 1.27 2005-07-26 20:01:52 achu Exp $
+ *  $Id: cerebrod_metric_controller.c,v 1.28 2005-07-27 00:29:22 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -48,7 +48,8 @@
 
 #include "cerebro.h"
 #include "cerebro/cerebro_constants.h"
-#include "cerebro/cerebro_metric_control_protocol.h"
+
+#include "protocol/cerebro_metric_control_protocol.h"
 
 #include "cerebrod.h"
 #include "cerebrod_config.h"
@@ -304,7 +305,7 @@ _send_metric_control_response(int fd, int32_t version, u_int32_t err_code)
          && err_code >= CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_SUCCESS
          && err_code <= CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_INTERNAL_ERROR);
 
-  memset(&res, '\0', CEREBRO_METRIC_SERVER_ERR_RESPONSE_LEN);
+  memset(&res, '\0', CEREBRO_METRIC_CONTROL_RESPONSE_LEN);
   res.version = version;
   res.err_code = err_code;
 

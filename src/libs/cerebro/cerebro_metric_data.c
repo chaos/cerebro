@@ -40,7 +40,8 @@
 #include "cerebro_clusterlist_util.h"
 #include "cerebro_nodelist_util.h"
 #include "cerebro_util.h"
-#include "cerebro/cerebro_metric_server_protocol.h"
+
+#include "protocol/cerebro_metric_server_protocol.h"
 
 #include "cerebro_metric_util.h"
 

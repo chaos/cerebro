@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_server.h,v 1.5 2005-07-22 17:21:07 achu Exp $
+ *  $Id: cerebrod_metric_server.h,v 1.6 2005-07-27 00:29:22 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -28,7 +28,7 @@
 #ifndef _CEREBROD_METRIC_SERVER_H
 #define _CEREBROD_METRIC_SERVER_H
 
-#include "cerebro/cerebro_metric_server_protocol.h"
+#include "protocol/cerebro_metric_server_protocol.h"
 
 #include "list.h"
  

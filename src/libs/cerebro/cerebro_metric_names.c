@@ -39,7 +39,8 @@
 #include "cerebro_api.h"
 #include "cerebro_metriclist_util.h"
 #include "cerebro_util.h"
-#include "cerebro/cerebro_metric_server_protocol.h"
+
+#include "protocol/cerebro_metric_server_protocol.h"
 
 #include "cerebro_metric_util.h"
 

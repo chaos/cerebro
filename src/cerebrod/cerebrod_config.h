@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.h,v 1.52 2005-07-22 17:21:07 achu Exp $
+ *  $Id: cerebrod_config.h,v 1.53 2005-07-27 00:29:22 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -34,7 +34,7 @@
 
 #include <netinet/in.h>
 
-#include "cerebro/cerebro_metric_server_protocol.h"
+#include "cerebro.h"
 
 #define CEREBROD_DEBUG_DEFAULT                        0
 #define CEREBROD_HEARTBEAT_FREQUENCY_MIN_DEFAULT      10

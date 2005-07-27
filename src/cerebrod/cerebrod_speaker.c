@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.80 2005-07-25 18:21:27 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.81 2005-07-27 00:29:22 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -43,7 +43,8 @@
 
 #include "cerebro.h"
 #include "cerebro/cerebro_constants.h"
-#include "cerebro/cerebrod_heartbeat_protocol.h"
+
+#include "protocol/cerebrod_heartbeat_protocol.h"
 
 #include "cerebrod_config.h"
 #include "cerebrod_heartbeat.h"

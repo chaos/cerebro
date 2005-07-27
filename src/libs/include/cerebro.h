@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.20 2005-07-26 20:14:19 achu Exp $
+ *  $Id: cerebro.h,v 1.21 2005-07-27 00:29:22 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -68,24 +68,31 @@
 #define CEREBRO_METRIC_FLAGS_MASK                  0x00000007
 
 /* 
- * Default available metrics
- */
-#define CEREBRO_METRIC_METRIC_NAMES               "metric_names"
-#define CEREBRO_METRIC_CLUSTER_NODES              "cluster_nodes"
-#define CEREBRO_METRIC_UPDOWN_STATE               "updown_state"
-
-#define CEREBRO_METRIC_UPDOWN_STATE_NODE_UP       1
-#define CEREBRO_METRIC_UPDOWN_STATE_NODE_DOWN     0
-
-/* 
  * Cerebro Metric Value Types
  */
-#define CEREBRO_METRIC_VALUE_TYPE_NONE     0
-#define CEREBRO_METRIC_VALUE_TYPE_INT32    1
-#define CEREBRO_METRIC_VALUE_TYPE_U_INT32  2
-#define CEREBRO_METRIC_VALUE_TYPE_FLOAT    3
-#define CEREBRO_METRIC_VALUE_TYPE_DOUBLE   4
-#define CEREBRO_METRIC_VALUE_TYPE_STRING   5
+#define CEREBRO_METRIC_VALUE_TYPE_NONE             0
+#define CEREBRO_METRIC_VALUE_TYPE_INT32            1
+#define CEREBRO_METRIC_VALUE_TYPE_U_INT32          2
+#define CEREBRO_METRIC_VALUE_TYPE_FLOAT            3
+#define CEREBRO_METRIC_VALUE_TYPE_DOUBLE           4
+#define CEREBRO_METRIC_VALUE_TYPE_STRING           5
+
+/* 
+ * Default metrics
+ */
+#define CEREBRO_METRIC_METRIC_NAMES                "metric_names"
+#define CEREBRO_METRIC_CLUSTER_NODES               "cluster_nodes"
+#define CEREBRO_METRIC_UPDOWN_STATE                "updown_state"
+
+#define CEREBRO_METRIC_UPDOWN_STATE_NODE_UP        1
+#define CEREBRO_METRIC_UPDOWN_STATE_NODE_DOWN      0
+
+/* 
+ * Metric Server defaults
+ */
+#define CEREBRO_METRIC_SERVER_PORT                 8852
+#define CEREBRO_METRIC_SERVER_TIMEOUT_LEN_DEFAULT  60
+#define CEREBRO_METRIC_SERVER_FLAGS_DEFAULT        0
 
 typedef struct cerebro *cerebro_t;
 

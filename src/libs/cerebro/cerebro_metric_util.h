@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_util.h,v 1.10 2005-07-22 17:21:07 achu Exp $
+ *  $Id: cerebro_metric_util.h,v 1.11 2005-07-27 00:29:22 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -29,7 +29,8 @@
 #define _CEREBRO_METRIC_UTIL_H
 
 #include "cerebro.h"
-#include "cerebro/cerebro_metric_server_protocol.h"
+
+#include "protocol/cerebro_metric_server_protocol.h"
 
 /* 
  * Cerebro_metric_receive_response

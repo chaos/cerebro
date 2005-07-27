@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.54 2005-07-22 16:01:05 achu Exp $
+## $Id: configure.ac,v 1.55 2005-07-27 00:29:22 achu Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -184,7 +184,7 @@ AC_CONFIG_FILES( \
   src/libs/common/Makefile \
   src/libs/debug/Makefile \
   src/libs/include/Makefile \
-  src/libs/include/cerebro/cerebro_metric_control_protocol.h \
+  src/libs/include/protocol/cerebro_metric_control_protocol.h \
   src/libs/modules/Makefile \
   src/libs/util/Makefile \
   src/libs/wrappers/Makefile \

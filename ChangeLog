@@ -11,6 +11,9 @@
 	* Code cleanup.
 
 	* Fix dist.
+
+	* Re-org protocol header files and make available #defines not
+	related to protocols.
 	
 2005-07-25  Albert Chu  <chu11@llnl.gov>
 

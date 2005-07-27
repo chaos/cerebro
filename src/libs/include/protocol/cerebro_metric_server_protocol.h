@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_server_protocol.h,v 1.5 2005-07-22 21:46:55 achu Exp $
+ *  $Id: cerebro_metric_server_protocol.h,v 1.1 2005-07-27 00:29:22 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -70,10 +70,6 @@
 
 #define CEREBRO_METRIC_SERVER_PROTOCOL_IS_LAST_RESPONSE      1
 #define CEREBRO_METRIC_SERVER_PROTOCOL_IS_NOT_LAST_RESPONSE  0
-
-#define CEREBRO_METRIC_SERVER_PORT                           8852
-#define CEREBRO_METRIC_SERVER_TIMEOUT_LEN_DEFAULT            60
-#define CEREBRO_METRIC_SERVER_FLAGS_DEFAULT                  0
 
 /*
  * struct cerebro_metric_server_request
