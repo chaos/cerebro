@@ -13,10 +13,12 @@ The Cerebro project provides:
   new metrics to be monitored without any software updates.
 
 The Cerebro project should not be mistaken as a host monitoring system
-like Ganglia or Supermon.  The goal of Cerebro was to provide a simple
-scalable tool to propogate a small amount of monitoring information
-across a cluster.  The tool is particularly useful for debugging on a
-cluster, where a new metric needs to be temporarly monitored.
+like Ganglia or Supermon.  The goal of Cerebro was to provide a
+simple, scalable tool with a wide range of user interfaces so that it
+would be easy to gather, propogate, and retrieve new monitoring
+information across a cluster.  For example, Cerebro may be
+particularly useful for temporarily debugging some metric on a
+cluster.
 
 Albert Chu
 chu11@llnl.gov
