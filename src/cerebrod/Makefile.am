@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.63 2005-07-11 20:35:34 achu Exp $
+## $Id: Makefile.am,v 1.64 2005-08-05 23:59:30 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -43,7 +43,13 @@ cerebrod_LDADD   = ../libs/cerebro_error/libcerebro_error.la \
 		   ../libs/debug/libdebug.la \
 		   ../libs/modules/libmodules.la \
 		   ../libs/util/libutil.la \
-		   ../libs/wrappers/libwrappers.la
+		   ../libs/wrappers/libwrappers.la \
+		   ../libs/wrappers/libwrappers_hash.la \
+		   ../libs/wrappers/libwrappers_hostlist.la \
+		   ../libs/wrappers/libwrappers_list.la \
+		   ../libs/wrappers/libwrappers_ltdl.la \
+		   ../libs/wrappers/libwrappers_marshall.la \
+		   ../libs/wrappers/libwrappers_pthread.la
 
 ../libs/cerebro_error/libcerebro_error.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
@@ -61,6 +67,24 @@ cerebrod_LDADD   = ../libs/cerebro_error/libcerebro_error.la \
 	@cd `dirname $@` && make `basename $@`
 
 ../libs/wrappers/libwrappers.la : force-dependency-check
+	@cd `dirname $@` && make `basename $@`
+
+../libs/wrappers/libwrappers_hash.la : force-dependency-check
+	@cd `dirname $@` && make `basename $@`
+
+../libs/wrappers/libwrappers_hostlist.la : force-dependency-check
+	@cd `dirname $@` && make `basename $@`
+
+../libs/wrappers/libwrappers_list.la : force-dependency-check
+	@cd `dirname $@` && make `basename $@`
+
+../libs/wrappers/libwrappers_ltdl.la : force-dependency-check
+	@cd `dirname $@` && make `basename $@`
+
+../libs/wrappers/libwrappers_marshall.la : force-dependency-check
+	@cd `dirname $@` && make `basename $@`
+
+../libs/wrappers/libwrappers_pthread.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
 force-dependency-check:

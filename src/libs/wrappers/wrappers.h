@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.h,v 1.11 2005-08-05 22:51:21 achu Exp $
+ *  $Id: wrappers.h,v 1.12 2005-08-05 23:59:30 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -71,6 +71,8 @@
 #include <signal.h>
 #include <dirent.h>
 
+#include "cerebro/cerebro_error.h"
+
 #include "hash.h"
 #include "hostlist.h"
 #include "list.h"
@@ -82,6 +84,24 @@
 
 #define WRAPPERS_ARGS \
         const char *file, const char *function, unsigned int line
+
+#define WRAPPERS_ERR_INVALID_PARAMETERS(func) \
+   do { \
+     cerebro_err_exit(func "(%s, %s, %d): invalid parameters", \
+                      file, function, line); \
+   } while(0);
+
+#define WRAPPERS_ERR_ERRNO(func) \
+   do { \
+     cerebro_err_exit(func "(%s, %s, %d): %s", \
+                      file, function, line, strerror(errno)); \
+   } while(0);
+
+#define WRAPPERS_ERR_MSG(func, msg) \
+   do { \
+     cerebro_err_exit(func "(%s, %s, %d): %s", \
+                      file, function, line, msg); \
+   } while(0);
 
 /* 
  * Memory/String Wrappers 
@@ -191,6 +211,22 @@ struct tm *wrap_localtime_r(WRAPPERS_ARGS, const time_t *timep, struct tm *resul
 int wrap_gettimeofday(WRAPPERS_ARGS, struct timeval *tv, struct timezone *tz);
 
 /* 
+ * Misc System Call Wrappers 
+ */
+#define Fork() \
+        wrap_fork(WRAPPERS_DEBUG_ARGS);
+#define Signal(signum, handler) \
+        wrap_signal(WRAPPERS_DEBUG_ARGS, signum, handler)
+#define Gethostname(name, len) \
+        wrap_gethostname(WRAPPERS_DEBUG_ARGS, name, len)
+
+typedef void (*Sighandler_t)(int);
+
+pid_t wrap_fork(WRAPPERS_ARGS);
+Sighandler_t wrap_signal(WRAPPERS_ARGS, int signum, Sighandler_t handler);
+int wrap_gethostname(WRAPPERS_ARGS, char *name, size_t len);
+
+/* 
  * Pthread Wrappers 
  */
 #define Pthread_create(thread, attr, start_routine, arg) \
@@ -227,22 +263,6 @@ int wrap_pthread_mutex_unlock(WRAPPERS_ARGS, pthread_mutex_t *mutex);
 int wrap_pthread_mutex_init(WRAPPERS_ARGS, pthread_mutex_t *mutex, const pthread_mutexattr_t *mutexattr);
 int wrap_pthread_cond_signal(WRAPPERS_ARGS, pthread_cond_t *cond);
 int wrap_pthread_cond_wait(WRAPPERS_ARGS, pthread_cond_t *cond, pthread_mutex_t *mutex);
-
-/* 
- * Misc System Call Wrappers 
- */
-#define Fork() \
-        wrap_fork(WRAPPERS_DEBUG_ARGS);
-#define Signal(signum, handler) \
-        wrap_signal(WRAPPERS_DEBUG_ARGS, signum, handler)
-#define Gethostname(name, len) \
-        wrap_gethostname(WRAPPERS_DEBUG_ARGS, name, len)
-
-typedef void (*Sighandler_t)(int);
-
-pid_t wrap_fork(WRAPPERS_ARGS);
-Sighandler_t wrap_signal(WRAPPERS_ARGS, int signum, Sighandler_t handler);
-int wrap_gethostname(WRAPPERS_ARGS, char *name, size_t len);
 
 /*
  * ltdl wrappers

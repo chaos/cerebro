@@ -1,21 +1,61 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.2 2005-08-05 22:51:21 achu Exp $
+## $Id: Makefile.am,v 1.3 2005-08-05 23:59:30 achu Exp $
 ##*****************************************************************************
 
 noinst_HEADERS	       = wrappers.h
 
-noinst_LTLIBRARIES     = libwrappers.la
+noinst_LTLIBRARIES     = libwrappers.la \
+			 libwrappers_hash.la \
+			 libwrappers_hostlist.la \
+			 libwrappers_list.la \
+			 libwrappers_ltdl.la \
+			 libwrappers_marshall.la \
+			 libwrappers_pthread.la
+
 libwrappers_la_CFLAGS  = -I$(srcdir)/../common \
 			 -I$(srcdir)/../include
 libwrappers_la_SOURCES = wrappers.c
 libwrappers_la_LIBADD  = ../cerebro_error/libcerebro_error.la \
-			 ../common/liberror.la \
-			 ../common/libfd.la \
-			 ../common/libhash.la \
-			 ../common/libhostlist.la \
-			 ../common/liblist.la \
-			 ../common/libltdl.la \
-			 ../common/libmarshall.la
+			 ../common/libfd.la 
+
+libwrappers_hash_la_CFLAGS  = -I$(srcdir)/../common \
+			      -I$(srcdir)/../include
+libwrappers_hash_la_SOURCES = wrappers_hash.c
+libwrappers_hash_la_LIBADD  = ../cerebro_error/libcerebro_error.la \
+			      ../common/libhash.la
+
+libwrappers_hostlist_la_CFLAGS  = -I$(srcdir)/../common \
+			          -I$(srcdir)/../include
+libwrappers_hostlist_la_SOURCES = wrappers_hostlist.c
+libwrappers_hostlist_la_LIBADD  = ../cerebro_error/libcerebro_error.la \
+			 	  ../common/liberror.la \
+			          ../common/libhostlist.la
+
+libwrappers_list_la_CFLAGS  = -I$(srcdir)/../common \
+			      -I$(srcdir)/../include
+libwrappers_list_la_SOURCES = wrappers_list.c
+libwrappers_list_la_LIBADD  = ../cerebro_error/libcerebro_error.la \
+			      ../common/liberror.la \
+		              ../common/liblist.la
+
+libwrappers_ltdl_la_CFLAGS  = -I$(srcdir)/../common \
+			      -I$(srcdir)/../include
+libwrappers_ltdl_la_SOURCES = wrappers_ltdl.c
+libwrappers_ltdl_la_LIBADD  = ../cerebro_error/libcerebro_error.la \
+			      ../common/liberror.la \
+		              ../common/libltdl.la
+
+libwrappers_marshall_la_CFLAGS  = -I$(srcdir)/../common \
+			          -I$(srcdir)/../include
+libwrappers_marshall_la_SOURCES = wrappers_marshall.c
+libwrappers_marshall_la_LIBADD  = ../cerebro_error/libcerebro_error.la \
+			      	  ../common/liberror.la \
+		              	  ../common/libmarshall.la
+
+libwrappers_pthread_la_CFLAGS  = -I$(srcdir)/../common \
+			         -I$(srcdir)/../include
+libwrappers_pthread_la_SOURCES = wrappers_pthread.c
+libwrappers_pthread_la_LIBADD  = ../cerebro_error/libcerebro_error.la
 
 ../cerebro_error/libcerebro_error.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
