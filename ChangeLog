@@ -7,6 +7,9 @@
 	* Fix some socket setup corner cases.
 
 	* tagged pre-lib-mem-rework-1
+
+	* Begin rework to make resident memory size and virutal memory
+	size smaller for cerebrod.
 	
 2005-08-04  Albert Chu  <chu11@llnl.gov>
 
