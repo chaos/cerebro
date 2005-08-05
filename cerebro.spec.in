@@ -33,6 +33,7 @@ Cerebro is a collection of cluster monitoring tools and libraries.
 %define _without_genders     --without-genders
 %define _without_hostsfile   --without-hostsfile
 %define _without_slurm_state --without-slurm-state
+%define _without_bgl_ciod    --without-bgl-ciod
 %ifarch ia64
 %define _with_boottime       --with-boottime
 %define _with_bootlog        --with-bootlog
@@ -45,6 +46,8 @@ Cerebro is a collection of cluster monitoring tools and libraries.
 %{!?_with_genders: %{!?_without_genders: %define _with_genders --with-genders}}
 %{!?_with_hostsfile: %{!?_without_hostsfile: %define _with_hostsfile --with-hostsfile}}
 %{!?_with_boottime: %{!?_without_boottime: %define _with_boottime --with-boottime}}
+%{!?_with_slurm_state: %{!?_without_slurm_state: %define _without_slurm_state --without-slurm-state}}
+%{!?_with_bgl_ciod: %{!?_without_bgl_ciod: %define _without_bgl_ciod --without-bgl-ciod}}
 %{!?_with_bootlog: %{!?_without_bootlog: %define _without_bootlog --without-bootlog}}
 %endif
 
@@ -89,6 +92,13 @@ Requires: cerebro
 %description metric-slurm-state
 Metric module to monitor slurm_state.
 
+%package metric-bgl-ciod
+Summary: bgl_ciod module(s)
+Group: System Environment/Base
+Requires: cerebro
+%description metric-bgl-ciod
+Metric module to monitor bgl_ciod.
+
 %if %{?_with_chaos:1}%{!?_with_chaos:0}
 %package bootlog
 Summary: bootlog module(s)
@@ -114,6 +124,8 @@ Bootlog monitoring module(s).
            %{?_without_boottime} \
            %{?_with_slurm_state} \
            %{?_without_slurm_state} \
+           %{?_with_bgl_ciod} \
+           %{?_without_bgl_ciod} \
            %{?_with_bootlog} \
            %{?_without_bootlog} \
            %{?_enable_debug}
@@ -197,6 +209,12 @@ fi
 %files metric-slurm-state
 %defattr(700,root,root)
 %{_libdir}/cerebro/cerebro_metric_slurm-state.*
+%endif
+
+%if %{?_with_bgl_ciod:1}%{!?_with_bgl_ciod:0}
+%files metric-bgl-ciod
+%defattr(700,root,root)
+%{_libdir}/cerebro/cerebro_metric_bgl-ciod.*
 %endif
 
 %endif
