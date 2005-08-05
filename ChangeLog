@@ -5,6 +5,8 @@
 	* Fix some unlink corner cases.
 
 	* Fix some socket setup corner cases.
+
+	* tagged pre-lib-mem-rework-1
 	
 2005-08-04  Albert Chu  <chu11@llnl.gov>
 
