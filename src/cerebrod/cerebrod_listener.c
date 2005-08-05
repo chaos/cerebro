@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.119 2005-07-27 00:29:22 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.120 2005-08-05 19:56:50 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -105,7 +105,7 @@ static int
 _listener_setup_socket(void)
 {
   struct sockaddr_in addr;
-  int fd;
+  int fd, optval = 1;
 
   if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {
@@ -134,6 +134,13 @@ _listener_setup_socket(void)
 	  CEREBRO_DBG(("setsockopt: %s", strerror(errno)));
           goto cleanup;
 	}
+    }
+
+  /* For quick start/restart */
+  if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(int)) < 0)
+    {
+      CEREBRO_DBG(("setsockopt: %s", strerror(errno)));
+      goto cleanup;
     }
 
   /* Configuration checks ensure destination ip is on this machine if

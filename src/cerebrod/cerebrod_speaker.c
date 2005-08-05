@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.81 2005-07-27 00:29:22 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.82 2005-08-05 19:56:50 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -94,7 +94,7 @@ static int
 _speaker_socket_setup(void)
 {
   struct sockaddr_in addr;
-  int fd;
+  int fd, optval = 1;
 
   if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {
@@ -140,6 +140,13 @@ _speaker_socket_setup(void)
 	  CEREBRO_DBG(("setsockopt: %s", strerror(errno)));
           goto cleanup;
 	}
+    }
+
+  /* For quick start/restart */
+  if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(int)) < 0)
+    {
+      CEREBRO_DBG(("setsockopt: %s", strerror(errno)));
+      goto cleanup;
     }
 
   memset(&addr, '\0', sizeof(struct sockaddr_in));
