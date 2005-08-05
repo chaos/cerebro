@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro_set_hostname.3,v 1.10 2005-07-26 00:57:17 achu Exp $
+\."$Id: cerebro_set_hostname.3,v 1.11 2005-08-05 15:48:57 achu Exp $
 \."#############################################################################
 \."  Copyright (C) 2005 The Regents of the University of California.
 \."  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -46,7 +46,8 @@ API should attempt to connect to.
 should attempt to connect to.
 
 \fBcerebro_set_timeout_len()\fR sets the default timeout_len to use to
-evaluate up vs. down nodes.
+evaluate up vs. down nodes.  A timeout length of 0 means the default
+timeout length will be used.
 
 \fBcerebro_set_flags()\fR sets the default flags the libcerebro API
 should use.  By default, no flags are set.  The following flags
