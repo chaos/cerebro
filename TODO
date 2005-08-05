@@ -3,6 +3,8 @@ Portability
 - Multicast
 
 Cleanup
+- Decrease RSS size
+  - re-work libs
 
 Future Features
 - controller

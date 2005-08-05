@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.8 2005-06-27 05:05:20 achu Exp $
+## $Id: Makefile.am,v 1.9 2005-08-05 00:19:32 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -17,9 +17,14 @@ if WITH_SLURM_STATE
 SLURM_STATE_METRIC_MODULE = cerebro_metric_slurm_state.la
 endif
 
+if WITH_BGL_CIOD
+BGL_CIOD_METRIC_MODULE = cerebro_metric_bgl_ciod.la
+endif
+
 modulelibdir = $(CEREBRO_MODULE_DIR)
 modulelib_LTLIBRARIES = $(BOOTTIME_METRIC_MODULE) \
-			$(SLURM_STATE_METRIC_MODULE)
+			$(SLURM_STATE_METRIC_MODULE) \
+			$(BGL_CIOD_METRIC_MODULE)
 
 MODULE_FLAGS = -module -avoid-version
 
@@ -36,6 +41,13 @@ cerebro_metric_slurm_state_la_LDFLAGS = $(MODULE_FLAGS) \
 cerebro_metric_slurm_state_la_CFLAGS  = -I$(srcdir)/../../libs/include \
 				        -I$(srcdir)/../../libs/debug
 cerebro_metric_slurm_state_la_LIBADD  = ../../libs/debug/libdebug.la
+
+cerebro_metric_bgl_ciod_la_SOURCES = cerebro_metric_bgl_ciod.c
+cerebro_metric_bgl_ciod_la_LDFLAGS = $(MODULE_FLAGS) \
+				     $(METRIC_OTHER_FLAGS)
+cerebro_metric_bgl_ciod_la_CFLAGS  = -I$(srcdir)/../../libs/include \
+				     -I$(srcdir)/../../libs/debug
+cerebro_metric_bgl_ciod_la_LIBADD  = ../../libs/debug/libdebug.la
 
 force-dependency-check:
 

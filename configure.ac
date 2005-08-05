@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.55 2005-07-27 00:29:22 achu Exp $
+## $Id: configure.ac,v 1.56 2005-08-05 00:19:32 achu Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -118,6 +118,13 @@ AM_CONDITIONAL(WITH_BOOTTIME, [test "$ac_with_boottime" = "yes"])
 AC_SLURM_STATE
 AC_SLURM_STATE_CONTROL_PATH
 AM_CONDITIONAL(WITH_SLURM_STATE, [test "$ac_with_slurm_state" = "yes"])
+
+#
+# Check to build bgl_ciod module(s)
+#
+AC_BGL_CIOD
+AC_BGL_CIOD_CONFIG_FILE
+AM_CONDITIONAL(WITH_BGL_CIOD, [test "$ac_with_bgl_ciod" = "yes"])
 
 #
 # Check to build bootlog module(s)
