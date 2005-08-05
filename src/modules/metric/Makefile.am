@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.9 2005-08-05 00:19:32 achu Exp $
+## $Id: Makefile.am,v 1.10 2005-08-05 22:51:21 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -48,6 +48,9 @@ cerebro_metric_bgl_ciod_la_LDFLAGS = $(MODULE_FLAGS) \
 cerebro_metric_bgl_ciod_la_CFLAGS  = -I$(srcdir)/../../libs/include \
 				     -I$(srcdir)/../../libs/debug
 cerebro_metric_bgl_ciod_la_LIBADD  = ../../libs/debug/libdebug.la
+
+../../libs/debug/libdebug.la : force-dependency-check
+	@cd `dirname $@` && make `basename $@`
 
 force-dependency-check:
 

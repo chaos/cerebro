@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.h,v 1.10 2005-07-22 21:46:55 achu Exp $
+ *  $Id: wrappers.h,v 1.11 2005-08-05 22:51:21 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -71,7 +71,6 @@
 #include <signal.h>
 #include <dirent.h>
 
-#include "error.h"
 #include "hash.h"
 #include "hostlist.h"
 #include "list.h"

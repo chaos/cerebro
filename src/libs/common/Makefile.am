@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.2 2005-07-05 16:23:47 achu Exp $
+## $Id: Makefile.am,v 1.3 2005-08-05 22:51:21 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -14,7 +14,14 @@ noinst_HEADERS = conffile.h \
 		 marshall.h \
 		 thread.h
 
-noinst_LTLIBRARIES = libcommon.la
+noinst_LTLIBRARIES = libcommon.la \
+                     liberror.la \
+		     libfd.la \
+		     libhash.la \
+		     libhostlist.la \
+		     liblist.la \
+		     libltdl.la \
+		     libmarshall.la
 
 libcommon_la_SOURCES = conffile.c \
 		       error.c \
@@ -27,3 +34,17 @@ libcommon_la_SOURCES = conffile.c \
 		       thread.c
 
 libcommon_la_LIBADD = $(LIBADD_DL)
+
+liberror_la_SOURCES = error.c
+
+libfd_la_SOURCES = fd.c
+
+libhash_la_SOURCES = hash.c thread.c
+
+libhostlist_la_SOURCES = hostlist.c
+
+liblist_la_SOURCES = list.c
+
+libltdl_la_SOURCES = ltdl.c
+
+libmarshall_la_SOURCES = marshall.c
