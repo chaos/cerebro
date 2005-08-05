@@ -1,6 +1,8 @@
 2005-08-05  Albert Chu  <chu11@llnl.gov>
 
 	* Some manpage fixing.
+
+	* Fix some unlink corner cases.
 	
 2005-08-04  Albert Chu  <chu11@llnl.gov>
 

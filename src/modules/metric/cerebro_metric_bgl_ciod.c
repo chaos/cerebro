@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_bgl_ciod.c,v 1.1 2005-08-05 00:19:32 achu Exp $
+ *  $Id: cerebro_metric_bgl_ciod.c,v 1.2 2005-08-05 19:43:31 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -37,27 +37,13 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <sys/select.h>
-#include <sys/un.h>
-#if TIME_WITH_SYS_TIME
-# include <sys/time.h>
-# include <time.h>
-#else  /* !TIME_WITH_SYS_TIME */
-# if HAVE_SYS_TIME_H
-#  include <sys/time.h>
-# else /* !HAVE_SYS_TIME_H */
-#  include <time.h>
-# endif /* !HAVE_SYS_TIME_H */
-#endif /* !TIME_WITH_SYS_TIME */
+#include <netinet/in.h>
+
 #if HAVE_UNISTD_H
 #include <unistd.h>
 #endif /* HAVE_UNISTD_H */
-#if HAVE_PTHREAD_H
-#include <pthread.h>
-#endif /* HAVE_PTHREAD_H */
 
 #include "cerebro.h"
-#include "cerebro/cerebro_constants.h"
 #include "cerebro/cerebro_metric_module.h"
 
 #include "debug.h"
@@ -65,11 +51,6 @@
 #define BGL_CIOD_METRIC_MODULE_NAME "bgl_ciod"
 #define BGL_CIOD_METRIC_NAME        "bgl_ciod"
 
-/*
- * metric_bgl_ciod
- *
- * cached system bgl_ciod
- */
 static u_int32_t metric_bgl_ciod = 0;
 
 /*
@@ -134,10 +115,18 @@ bgl_ciod_metric_get_metric_value(unsigned int *metric_value_type,
                                     unsigned int *metric_value_len,
                                     void **metric_value)
 {
+  struct sockaddr_in addr;
+  int fd;
+
   if (!metric_value_type || !metric_value_len || !metric_value)
     {
       CEREBRO_DBG(("invalid parameters"));
       return -1;
+    }
+
+  if ((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+    {
+      
     }
 
   *metric_value_type = CEREBRO_METRIC_VALUE_TYPE_U_INT32;

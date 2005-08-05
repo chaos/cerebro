@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker_data.h,v 1.10 2005-07-25 17:20:18 achu Exp $
+ *  $Id: cerebrod_speaker_data.h,v 1.11 2005-08-05 19:43:31 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -31,7 +31,7 @@
 #include <sys/types.h>
  
 #include "cerebro/cerebro_metric_module.h"
-#include "cerebro/cerebrod_heartbeat_protocol.h"
+#include "protocol/cerebrod_heartbeat_protocol.h"
 
 /* 
  * Flags to define where a metric comes from.  Either it is monitored

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_heartbeat.h,v 1.14 2005-07-22 17:21:07 achu Exp $
+ *  $Id: cerebrod_heartbeat.h,v 1.15 2005-08-05 19:43:31 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -28,7 +28,7 @@
 #ifndef _CEREBROD_HEARTBEAT_H
 #define _CEREBROD_HEARTBEAT_H
 
-#include "cerebro/cerebrod_heartbeat_protocol.h"
+#include "protocol/cerebrod_heartbeat_protocol.h"
 
 /*
  * cerebrod_heartbeat_destroy

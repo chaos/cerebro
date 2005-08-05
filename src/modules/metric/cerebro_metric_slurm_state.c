@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_slurm_state.c,v 1.14 2005-07-26 16:24:02 achu Exp $
+ *  $Id: cerebro_metric_slurm_state.c,v 1.15 2005-08-05 19:43:31 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -106,8 +106,15 @@ _slurm_state_setup_socket(void)
       goto cleanup;
     }
 
-  /* unlink is allowed to fail */ 
-  unlink(SLURM_STATE_CONTROL_PATH);
+  /* unlink is allowed to fail in some situations */
+  if (unlink(SLURM_STATE_CONTROL_PATH) < 0)
+    {
+      if (errno != ENOENT)
+        {
+          CEREBRO_DBG(("unlink: %s", strerror(errno)));
+          goto cleanup;
+        }
+    }
 
   memset(&addr, '\0', sizeof(struct sockaddr_un));
   addr.sun_family = AF_LOCAL;
