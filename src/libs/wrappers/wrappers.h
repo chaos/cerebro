@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.h,v 1.12 2005-08-05 23:59:30 achu Exp $
+ *  $Id: wrappers.h,v 1.13 2005-08-06 00:16:23 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -102,6 +102,8 @@
      cerebro_err_exit(func "(%s, %s, %d): %s", \
                       file, function, line, msg); \
    } while(0);
+
+#define UNUSED_WRAPPER    0
 
 /* 
  * Memory/String Wrappers 

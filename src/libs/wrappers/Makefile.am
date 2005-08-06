@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.3 2005-08-05 23:59:30 achu Exp $
+## $Id: Makefile.am,v 1.4 2005-08-06 00:16:23 achu Exp $
 ##*****************************************************************************
 
 noinst_HEADERS	       = wrappers.h
@@ -15,8 +15,7 @@ noinst_LTLIBRARIES     = libwrappers.la \
 libwrappers_la_CFLAGS  = -I$(srcdir)/../common \
 			 -I$(srcdir)/../include
 libwrappers_la_SOURCES = wrappers.c
-libwrappers_la_LIBADD  = ../cerebro_error/libcerebro_error.la \
-			 ../common/libfd.la 
+libwrappers_la_LIBADD  = ../cerebro_error/libcerebro_error.la
 
 libwrappers_hash_la_CFLAGS  = -I$(srcdir)/../common \
 			      -I$(srcdir)/../include
@@ -61,9 +60,6 @@ libwrappers_pthread_la_LIBADD  = ../cerebro_error/libcerebro_error.la
 	@cd `dirname $@` && make `basename $@`
 
 ../common/liberror.la : force-dependency-check
-	@cd `dirname $@` && make `basename $@`
-
-../common/libfd.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
 ../common/libhash.la : force-dependency-check
