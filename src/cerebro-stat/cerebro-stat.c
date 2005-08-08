@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro-stat.c,v 1.18 2005-07-26 22:30:56 achu Exp $
+ *  $id: cerebro-stat.c,v 1.18 2005/07/26 22:30:56 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -518,7 +518,6 @@ _newline_output(List l)
 
       memset(vbuf, '\0', CEREBRO_STAT_BUFLEN);
       _metric_value_str(data, vbuf, CEREBRO_STAT_BUFLEN);
-
       if (metric_received_time_flag)
         {
           char tbuf[CEREBRO_STAT_BUFLEN];
@@ -537,6 +536,7 @@ _newline_output(List l)
         }
       else
         fprintf(stdout, "%s: %s\n", data->nodename, vbuf);
+
     }
 
   /* No need to destroy list iterator, caller will destroy List */
@@ -668,8 +668,7 @@ _metric_data(void)
       err_exit("%s: cerebro_nodelist_iterator_create: %s", func, msg);
     }
 
-  if (!(l = list_create((ListDelF)free)))
-    err_exit("%s: list_create: %s", func, strerror(errno));
+  l = List_create((ListDelF)_Free);
 
   while (!cerebro_nodelist_iterator_at_end(nitr))
     {
