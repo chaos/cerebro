@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.68 2005-08-08 22:46:50 achu Exp $
+## $Id: Makefile.am,v 1.69 2005-08-08 23:01:33 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -38,11 +38,7 @@ cerebrod_CFLAGS  = -I$(srcdir)/../libs/common \
 		   -I$(srcdir)/../libs/modules \
 		   -I$(srcdir)/../libs/util \
 		   -I$(srcdir)/../libs/wrappers
-cerebrod_LDADD   = ../libs/cerebro_error/libcerebro_error.la \
-		   ../libs/common/libfd.la \
-		   ../libs/common/liblist.la \
-		   ../libs/debug/libdebug.la \
-		   ../libs/modules/libmodules.la \
+cerebrod_LDADD   = ../libs/common/libfd.la \
 		   ../libs/util/libutil_config.la \
 		   ../libs/util/libutil_metric.la \
 		   ../libs/util/libutil_network.la \
@@ -52,19 +48,7 @@ cerebrod_LDADD   = ../libs/cerebro_error/libcerebro_error.la \
 		   ../libs/wrappers/libwrappers_marshall.la \
 		   ../libs/wrappers/libwrappers_pthread.la
 
-../libs/cerebro_error/libcerebro_error.la : force-dependency-check
-	@cd `dirname $@` && make `basename $@`
-
 ../libs/common/libfd.la : force-dependency-check
-	@cd `dirname $@` && make `basename $@`
-
-../libs/common/liblist.la : force-dependency-check
-	@cd `dirname $@` && make `basename $@`
-
-../libs/debug/libdebug.la : force-dependency-check
-	@cd `dirname $@` && make `basename $@`
-
-../libs/modules/libmodules.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
 ../libs/util/libutil_config.la : force-dependency-check
