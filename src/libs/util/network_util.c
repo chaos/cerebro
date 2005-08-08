@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: network_util.c,v 1.3 2005-07-22 17:21:07 achu Exp $
+ *  $Id: network_util.c,v 1.4 2005-08-08 21:41:48 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -34,6 +34,10 @@
 #if STDC_HEADERS
 #include <string.h>
 #endif /* STDC_HEADERS */
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netdb.h>
 #include <sys/select.h>
 #if TIME_WITH_SYS_TIME
 # include <sys/time.h>
@@ -49,6 +53,10 @@
 #if HAVE_UNISTD_H
 #include <unistd.h>
 #endif /* HAVE_UNISTD_H */
+#if HAVE_FCNTL_H
+#include <fcntl.h>
+#endif /* HAVE_FCNTL_H */
+
 #include <errno.h>
 
 #include "cerebro.h"
@@ -56,6 +64,8 @@
 #include "network_util.h"
 
 #include "debug.h"
+
+#define GETHOSTBYNAME_AUX_BUFLEN 1024
 
 int
 receive_data(int fd,
@@ -162,5 +172,168 @@ receive_data(int fd,
   return bytes_read;
   
  cleanup:
+  return -1;
+}
+
+int 
+low_timeout_connect(const char *hostname,
+                    unsigned int port,
+                    unsigned int connect_timeout,
+                    unsigned int *errnum)
+{
+  int rv, old_flags, fd = -1;
+  struct sockaddr_in addr;
+#if HAVE_GETHOSTBYNAME_R_6
+  struct hostent hent;
+  int h_errnop;
+  char buf[GETHOSTBYNAME_AUX_BUFLEN];
+#endif /* HAVE_GETHOSTBYNAME_R_6 */
+  struct hostent *hptr;
+  
+  if (!hostname || !port || !connect_timeout)
+    {
+      CEREBRO_DBG(("invalid parameters"));
+      if (errnum)
+        *errnum = CEREBRO_ERR_INTERNAL;
+      return -1;
+    }
+  
+#if HAVE_GETHOSTBYNAME_R_6
+  memset(&hent, '\0', sizeof(struct hostent));
+  if (gethostbyname_r(hostname, 
+                      &hent, 
+                      buf, 
+                      GETHOSTBYNAME_AUX_BUFLEN, 
+                      &hptr, 
+                      &h_errnop) != 0)
+    {
+      CEREBRO_DBG(("gethostbyname_r: %s", hstrerror(h_errnop)));
+      if (errnum)
+        *errnum = CEREBRO_ERR_HOSTNAME;
+      return -1;
+    }
+#else  /* !HAVE_GETHOSTBYNAME_R */
+  /* valgrind will report a mem-leak in gethostbyname() */
+  if (!(hptr = gethostbyname(hostname)))
+    {
+      CEREBRO_DBG(("gethostbyname: %s", hstrerror(h_errno)));
+      if (errnum)
+        *errnum = CEREBRO_ERR_HOSTNAME;
+      return -1;
+    }
+#endif /* !HAVE_GETHOSTBYNAME_R */
+  
+  /* Alot of this code is from Unix Network Programming, by Stevens */
+  
+  if ((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+    {
+      CEREBRO_DBG(("socket: %s", strerror(errno)));
+      if (errnum)
+        *errnum = CEREBRO_ERR_INTERNAL;
+      goto cleanup;
+    }
+
+  bzero(&addr, sizeof(addr));
+  addr.sin_family = AF_INET;
+  addr.sin_port = htons(port);
+  addr.sin_addr = *((struct in_addr *)hptr->h_addr);
+  
+  if ((old_flags = fcntl(fd, F_GETFL, 0)) < 0)
+    {
+      CEREBRO_DBG(("fcntl: %s", strerror(errno)));
+      if (errnum)
+        *errnum = CEREBRO_ERR_INTERNAL;
+      goto cleanup;
+    }
+  
+  if (fcntl(fd, F_SETFL, old_flags | O_NONBLOCK) < 0)
+    {
+      CEREBRO_DBG(("fcntl: %s", strerror(errno)));
+      if (errnum)
+        *errnum = CEREBRO_ERR_INTERNAL;
+      goto cleanup;
+    }
+
+  rv = connect(fd, (struct sockaddr *)&addr, sizeof(struct sockaddr_in));
+  if (rv < 0 && errno != EINPROGRESS)
+    {
+      if (errnum)
+        *errnum = CEREBRO_ERR_CONNECT;
+      goto cleanup;
+    }
+  else if (rv < 0 && errno == EINPROGRESS)
+    {
+      fd_set rset, wset;
+      struct timeval tval;
+      
+      FD_ZERO(&rset);
+      FD_SET(fd, &rset);
+      FD_ZERO(&wset);
+      FD_SET(fd, &wset);
+      tval.tv_sec = connect_timeout;
+      tval.tv_usec = 0;
+      
+      if ((rv = select(fd+1, &rset, &wset, NULL, &tval)) < 0)
+        {
+          CEREBRO_DBG(("select: %s", strerror(errno)));
+          if (errnum)
+            *errnum = CEREBRO_ERR_INTERNAL;
+          goto cleanup;
+        }
+      
+      if (!rv)
+        {
+          if (errnum)
+            *errnum = CEREBRO_ERR_CONNECT_TIMEOUT;
+          goto cleanup;
+        }
+      else
+        {
+          if (FD_ISSET(fd, &rset) || FD_ISSET(fd, &wset))
+            {
+              int len, error;
+              
+              len = sizeof(int);
+              
+              if (getsockopt(fd, SOL_SOCKET, SO_ERROR, &error, &len) < 0)
+                {
+                  CEREBRO_DBG(("getsockopt: %s", strerror(errno)));
+                  if (errnum)
+                    *errnum = CEREBRO_ERR_INTERNAL;
+                  goto cleanup;
+                }
+              
+              if (error != 0)
+                {
+                  errno = error;
+                  if (errnum)
+                    *errnum = CEREBRO_ERR_CONNECT;
+                  goto cleanup;
+                }
+              /* else no error, connected within timeout length */
+            }
+          else
+            {
+              CEREBRO_DBG(("select returned bad data"));
+              if (errnum)
+                *errnum = CEREBRO_ERR_INTERNAL;
+              goto cleanup;
+            }
+        }
+    }
+  
+  /* reset flags */
+  if (fcntl(fd, F_SETFL, old_flags) < 0)
+    {
+      CEREBRO_DBG(("fcntl: %s", strerror(errno)));
+      if (errnum)
+        *errnum = CEREBRO_ERR_INTERNAL;
+      goto cleanup;
+    }
+
+  return fd;
+
+ cleanup:
+  close(fd);
   return -1;
 }

@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.5 2005-08-08 17:17:02 achu Exp $
+## $Id: Makefile.am,v 1.6 2005-08-08 21:41:48 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -36,7 +36,7 @@ libcommon_la_SOURCES = conffile.c \
 
 libcommon_la_LIBADD = $(LIBADD_DL)
 
-libconffile_la_SOURCES = conffile.c
+libconffile_la_SOURCES = conffile.c fd.c
 
 liberror_la_SOURCES = error.c
 

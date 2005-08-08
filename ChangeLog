@@ -1,6 +1,8 @@
 2005-08-08  Albert Chu  <chu11@llnl.gov>
 
 	* Continued work to lower virtual and resident memory size.
+
+	* Complete initial bgl ciod metric module work.
 	
 2005-08-05  Albert Chu  <chu11@llnl.gov>
 

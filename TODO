@@ -17,3 +17,6 @@ Future Features
   - limit data receiving based on host list or subnet
 
 - event based monitoring
+
+- Malloc looping
+  - so can avoid dieing on low memory conditions

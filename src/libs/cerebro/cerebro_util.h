@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_util.h,v 1.2 2005-07-22 17:21:07 achu Exp $
+ *  $Id: cerebro_util.h,v 1.3 2005-08-08 21:41:48 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -37,18 +37,5 @@
  * Returns 0 on succss, -1 on error
  */
 int _cerebro_handle_check(cerebro_t handle);
-
-/*
- * _cerebro_low_timeout_connect
- *
- * Setup a tcp connection to 'hostname' and 'port' using a connection
- * timeout of 'connect_timeout'.
- *
- * Return file descriptor on success, -1 on error.
- */
-int _cerebro_low_timeout_connect(cerebro_t handle,
-				 const char *hostname,
-				 unsigned int port,
-				 unsigned int connect_timeout);
 
 #endif /* _CEREBRO_UTIL_H */

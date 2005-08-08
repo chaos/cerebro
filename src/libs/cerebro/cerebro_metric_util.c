@@ -362,7 +362,8 @@ _get_metric_data(cerebro_t handle,
                  Cerebro_metric_receive_response receive_response)
 {
   int fd = -1, rv = -1;
-                                                                  
+  unsigned int errnum;
+
   if (!metric_name || !hostname || !receive_response)
     {
       CEREBRO_DBG(("invalid parameters"));
@@ -370,11 +371,14 @@ _get_metric_data(cerebro_t handle,
       return -1;
     }
   
-  if ((fd = _cerebro_low_timeout_connect(handle,
-                                         hostname,
-                                         port,
-                                         CEREBRO_METRIC_SERVER_PROTOCOL_CONNECT_TIMEOUT_LEN)) < 0)
-    goto cleanup;
+  if ((fd = low_timeout_connect(hostname,
+                                port,
+                                CEREBRO_METRIC_SERVER_PROTOCOL_CONNECT_TIMEOUT_LEN,
+                                &errnum)) < 0)
+    {
+      handle->errnum = errnum;
+      goto cleanup;
+    }
   
   if (_metric_server_request_send(handle,
                                   fd,

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: network_util.h,v 1.2 2005-07-22 17:21:07 achu Exp $
+ *  $Id: network_util.h,v 1.3 2005-08-08 21:41:48 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -41,6 +41,19 @@ int receive_data(int fd,
                  unsigned int buflen,
                  unsigned int timeout_len,
                  unsigned int *errnum);
+
+/*
+ * low_timeout_connect
+ *
+ * Setup a tcp connection to 'hostname' and 'port' using a connection
+ * timeout of 'connect_timeout'.
+ *
+ * Return file descriptor on success, -1 on error.
+ */
+int low_timeout_connect(const char *hostname,
+                        unsigned int port,
+                        unsigned int connect_timeout,
+                        unsigned int *errnum);
 
 
 #endif /* _NETWORK_UTIL_H */

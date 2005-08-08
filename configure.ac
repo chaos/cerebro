@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.56 2005-08-05 00:19:32 achu Exp $
+## $Id: configure.ac,v 1.57 2005-08-08 21:41:48 achu Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -156,7 +156,11 @@ AC_CHECK_FUNCS( \
   strspn \
   strtok_r \
   getopt_long \
+  gethostbyname \
+  gethostbyname_r
 )
+
+AC_caolan_FUNC_WHICH_GETHOSTBYNAME_R
 
 ACX_PTHREAD([], AC_MSG_ERROR([Posix threads required to build]))
 # Don't define WITH_PTHREADS, libcommon will not be built with

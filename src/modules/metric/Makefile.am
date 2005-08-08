@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.10 2005-08-05 22:51:21 achu Exp $
+## $Id: Makefile.am,v 1.11 2005-08-08 21:41:48 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -46,10 +46,20 @@ cerebro_metric_bgl_ciod_la_SOURCES = cerebro_metric_bgl_ciod.c
 cerebro_metric_bgl_ciod_la_LDFLAGS = $(MODULE_FLAGS) \
 				     $(METRIC_OTHER_FLAGS)
 cerebro_metric_bgl_ciod_la_CFLAGS  = -I$(srcdir)/../../libs/include \
-				     -I$(srcdir)/../../libs/debug
-cerebro_metric_bgl_ciod_la_LIBADD  = ../../libs/debug/libdebug.la
+				     -I$(srcdir)/../../libs/common \
+				     -I$(srcdir)/../../libs/debug \
+				     -I$(srcdir)/../../libs/util
+cerebro_metric_bgl_ciod_la_LIBADD  = ../../libs/common/libconffile.la \
+				     ../../libs/debug/libdebug.la \
+				     ../../libs/util/libutil_network.la
+
+../../libs/common/libconffile.la : force-dependency-check
+	@cd `dirname $@` && make `basename $@`
 
 ../../libs/debug/libdebug.la : force-dependency-check
+	@cd `dirname $@` && make `basename $@`
+
+../../libs/util/libutil_network.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
 force-dependency-check:
