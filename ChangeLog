@@ -2,6 +2,8 @@
 
 	* Continued work to lower virtual and resident memory size.
 
+	* Continued work to lesson binary size.
+
 	* Complete initial bgl ciod metric module work.
 	
 2005-08-05  Albert Chu  <chu11@llnl.gov>
