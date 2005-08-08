@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.64 2005-08-05 23:59:30 achu Exp $
+## $Id: Makefile.am,v 1.65 2005-08-08 17:17:02 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -39,7 +39,9 @@ cerebrod_CFLAGS  = -I$(srcdir)/../libs/common \
 		   -I$(srcdir)/../libs/util \
 		   -I$(srcdir)/../libs/wrappers
 cerebrod_LDADD   = ../libs/cerebro_error/libcerebro_error.la \
-		   ../libs/common/libcommon.la \
+		   ../libs/common/libfd.la \
+		   ../libs/common/libhash.la \
+		   ../libs/common/liblist.la \
 		   ../libs/debug/libdebug.la \
 		   ../libs/modules/libmodules.la \
 		   ../libs/util/libutil.la \
@@ -54,7 +56,13 @@ cerebrod_LDADD   = ../libs/cerebro_error/libcerebro_error.la \
 ../libs/cerebro_error/libcerebro_error.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
-../libs/common/libcommon.la : force-dependency-check
+../libs/common/libfd.la : force-dependency-check
+	@cd `dirname $@` && make `basename $@`
+
+../libs/common/libhash.la : force-dependency-check
+	@cd `dirname $@` && make `basename $@`
+
+../libs/common/liblist.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
 ../libs/debug/libdebug.la : force-dependency-check

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_util.c,v 1.8 2005-07-22 17:21:07 achu Exp $
+ *  $Id: cerebro_config_util.c,v 1.9 2005-08-08 17:17:02 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -40,7 +40,6 @@
 #include "cerebro_util.h"
 #include "cerebro/cerebro_config.h"
 
-#include "conffile.h"
 #include "config_module.h"
 #include "config_util.h"
 #include "debug.h"

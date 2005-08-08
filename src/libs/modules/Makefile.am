@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.4 2005-06-26 18:39:13 achu Exp $
+## $Id: Makefile.am,v 1.5 2005-08-08 17:17:02 achu Exp $
 ##*****************************************************************************
 
 noinst_HEADERS	       = clusterlist_module.h \
@@ -28,10 +28,10 @@ libmodules_la_SOURCES = clusterlist_module.c \
 			metric_module.c \
 			monitor_module.c \
 			module_util.c
-libmodules_la_LIBADD  = ../common/libcommon.la \
+libmodules_la_LIBADD  = ../common/libltdl.la \
 			../debug/libdebug.la
 
-../common/libcommon.la : force-dependency-check
+../common/libltdl.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
 ../debug/libdebug.la : force-dependency-check

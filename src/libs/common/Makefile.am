@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.4 2005-08-05 22:53:35 achu Exp $
+## $Id: Makefile.am,v 1.5 2005-08-08 17:17:02 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -49,5 +49,6 @@ libhostlist_la_SOURCES = hostlist.c
 liblist_la_SOURCES = list.c
 
 libltdl_la_SOURCES = ltdl.c
+libltdl_la_LIBADD = $(LIBADD_DL)
 
 libmarshall_la_SOURCES = marshall.c

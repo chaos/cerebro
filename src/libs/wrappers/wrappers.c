@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.c,v 1.14 2005-08-06 00:16:23 achu Exp $
+ *  $Id: wrappers.c,v 1.15 2005-08-08 17:17:02 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -104,7 +104,6 @@ wrap_strdup(WRAPPERS_ARGS, const char *s)
   return ptr;
 }
 
-#if UNUSED_WRAPPER
 char *
 wrap_strncpy(WRAPPERS_ARGS, char *dest, const char *src, size_t n)
 {
@@ -119,9 +118,7 @@ wrap_strncpy(WRAPPERS_ARGS, char *dest, const char *src, size_t n)
   dest[n-1] = '\0';
   return rv;
 }
-#endif /* UNUSED_WRAPPER */
 
-#if UNUSED_WRAPPER
 int 
 wrap_open(WRAPPERS_ARGS, const char *pathname, int flags, int mode)
 {
@@ -137,7 +134,6 @@ wrap_open(WRAPPERS_ARGS, const char *pathname, int flags, int mode)
 
   return fd;
 }
-#endif /* UNUSED_WRAPPER */
 
 int 
 wrap_close(WRAPPERS_ARGS, int fd)
@@ -152,7 +148,6 @@ wrap_close(WRAPPERS_ARGS, int fd)
   return rv;
 }
 
-#if UNUSED_WRAPPER
 ssize_t
 wrap_read(WRAPPERS_ARGS, int fd, void *buf, size_t count)
 {
@@ -172,9 +167,7 @@ wrap_read(WRAPPERS_ARGS, int fd, void *buf, size_t count)
   
   return rv;
 }
-#endif /* UNUSED_WRAPPER */
 
-#if UNUSED_WRAPPER
 ssize_t
 wrap_write(WRAPPERS_ARGS, int fd, const void *buf, size_t count)
 {
@@ -194,7 +187,6 @@ wrap_write(WRAPPERS_ARGS, int fd, const void *buf, size_t count)
 
   return rv;
 }
-#endif /* UNUSED_WRAPPER */
 
 int
 wrap_chdir(WRAPPERS_ARGS, const char *path)
@@ -212,7 +204,6 @@ wrap_chdir(WRAPPERS_ARGS, const char *path)
   return rv;
 }
 
-#if UNUSED_WRAPPER
 int 
 wrap_stat(WRAPPERS_ARGS, const char *path, struct stat *buf)
 {
@@ -228,7 +219,6 @@ wrap_stat(WRAPPERS_ARGS, const char *path, struct stat *buf)
 
   return rv;
 }
-#endif /* UNUSED_WRAPPER */
 
 mode_t
 wrap_umask(WRAPPERS_ARGS, mode_t mask)
@@ -239,7 +229,6 @@ wrap_umask(WRAPPERS_ARGS, mode_t mask)
   return umask(mask);
 }
 
-#if UNUSED_WRAPPER
 DIR *
 wrap_opendir(WRAPPERS_ARGS, const char *name)
 {
@@ -255,9 +244,7 @@ wrap_opendir(WRAPPERS_ARGS, const char *name)
 
   return rv;
 }
-#endif /* UNUSED_WRAPPER */
 
-#if UNUSED_WRAPPER
 int
 wrap_closedir(WRAPPERS_ARGS, DIR *dir)
 {
@@ -273,7 +260,6 @@ wrap_closedir(WRAPPERS_ARGS, DIR *dir)
 
   return rv;
 }
-#endif /* UNUSED_WRAPPER */
 
 int
 wrap_socket(WRAPPERS_ARGS, int domain, int type, int protocol)
@@ -288,7 +274,6 @@ wrap_socket(WRAPPERS_ARGS, int domain, int type, int protocol)
   return fd;
 }
 
-#if UNUSED_WRAPPER
 int 
 wrap_bind(WRAPPERS_ARGS, int sockfd, struct sockaddr *my_addr, socklen_t addrlen)
 {
@@ -304,9 +289,7 @@ wrap_bind(WRAPPERS_ARGS, int sockfd, struct sockaddr *my_addr, socklen_t addrlen
 
   return rv;
 }
-#endif /* UNUSED_WRAPPER */
 
-#if UNUSED_WRAPPER
 int 
 wrap_connect(WRAPPERS_ARGS, int sockfd, struct sockaddr *serv_addr, socklen_t addrlen)
 {
@@ -322,9 +305,7 @@ wrap_connect(WRAPPERS_ARGS, int sockfd, struct sockaddr *serv_addr, socklen_t ad
 
   return rv;
 }
-#endif /* UNUSED_WRAPPER */
 
-#if UNUSED_WRAPPER
 int 
 wrap_listen(WRAPPERS_ARGS, int s, int backlog)
 {
@@ -340,9 +321,7 @@ wrap_listen(WRAPPERS_ARGS, int s, int backlog)
 
   return rv;
 }
-#endif /* UNUSED_WRAPPER */
 
-#if UNUSED_WRAPPER
 int 
 wrap_accept(WRAPPERS_ARGS, int s, struct sockaddr *addr, socklen_t *addrlen)
 {
@@ -358,9 +337,7 @@ wrap_accept(WRAPPERS_ARGS, int s, struct sockaddr *addr, socklen_t *addrlen)
 
   return rv;
 }
-#endif /* UNUSED_WRAPPER */
 
-#if UNUSED_WRAPPER
 int 
 wrap_select(WRAPPERS_ARGS, int n, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout)
 {
@@ -401,9 +378,7 @@ wrap_select(WRAPPERS_ARGS, int n, fd_set *readfds, fd_set *writefds, fd_set *exc
 
   return rv;
 }
-#endif /* UNUSED_WRAPPER */
 
-#if UNUSED_WRAPPER
 int 
 wrap_poll(WRAPPERS_ARGS, struct pollfd *ufds, unsigned int nfds, int timeout)
 {
@@ -438,9 +413,7 @@ wrap_poll(WRAPPERS_ARGS, struct pollfd *ufds, unsigned int nfds, int timeout)
                                                                          
   return rv;
 }
-#endif /* UNUSED_WRAPPER */
 
-#if UNUSED_WRAPPER
 int
 wrap_getsockopt(WRAPPERS_ARGS, int s, int level, int optname, void *optval, socklen_t *optlen)
 {
@@ -456,9 +429,7 @@ wrap_getsockopt(WRAPPERS_ARGS, int s, int level, int optname, void *optval, sock
 
   return rv;
 }
-#endif /* UNUSED_WRAPPER */
 
-#if UNUSED_WRAPPER
 int
 wrap_setsockopt(WRAPPERS_ARGS, int s, int level, int optname, const void *optval, socklen_t optlen)
 {
@@ -474,9 +445,7 @@ wrap_setsockopt(WRAPPERS_ARGS, int s, int level, int optname, const void *optval
 
   return rv;
 }
-#endif /* UNUSED_WRAPPER */
 
-#if UNUSED_WRAPPER
 struct hostent *
 wrap_gethostbyname(WRAPPERS_ARGS, const char *name)
 {
@@ -492,9 +461,7 @@ wrap_gethostbyname(WRAPPERS_ARGS, const char *name)
 
   return rv;
 }
-#endif /* UNUSED_WRAPPER */
 
-#if UNUSED_WRAPPER
 const char *
 wrap_inet_ntop(WRAPPERS_ARGS, int af, const void *src, char *dst, socklen_t cnt)
 {
@@ -510,7 +477,6 @@ wrap_inet_ntop(WRAPPERS_ARGS, int af, const void *src, char *dst, socklen_t cnt)
   
   return rv;
 }
-#endif /* UNUSED_WRAPPER */
 
 int 
 wrap_inet_pton(WRAPPERS_ARGS, int af, const char *src, void *dst)
@@ -544,7 +510,6 @@ wrap_localtime(WRAPPERS_ARGS, const time_t *timep)
   return tmptr;
 }
 
-#if UNUSED_WRAPPER
 struct tm *
 wrap_localtime_r(WRAPPERS_ARGS, const time_t *timep, struct tm *result)
 {
@@ -560,7 +525,6 @@ wrap_localtime_r(WRAPPERS_ARGS, const time_t *timep, struct tm *result)
   
   return tmptr;
 }
-#endif /* UNUSED_WRAPPER */
 
 int
 wrap_gettimeofday(WRAPPERS_ARGS, struct timeval *tv, struct timezone *tz)
