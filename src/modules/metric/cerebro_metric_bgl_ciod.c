@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_bgl_ciod.c,v 1.3 2005-08-08 21:41:48 achu Exp $
+ *  $Id: cerebro_metric_bgl_ciod.c,v 1.4 2005-08-08 22:03:04 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -53,7 +53,7 @@
 #define BGL_CIOD_HOSTNAME                "localhost"
 #define BGL_CIOD_PORT                    7000
 #define BGL_CIOD_PERIOD_DEFAULT          60
-#define BGL_CIOD_FAILURE_MAX_DEFAULT     5 
+#define BGL_CIOD_FAILURE_MAX_DEFAULT     3
 #define BGL_CIOD_CONNECT_TIMEOUT_DEFAULT 5
 
 /*
