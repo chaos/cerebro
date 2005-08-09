@@ -1,6 +1,8 @@
 2005-08-09  Albert Chu  <chu11@llnl.gov>
 
 	* cerebro.spec.in: Add bglion build.
+
+	* Add init script for suse.
 	
 2005-08-08  Albert Chu  <chu11@llnl.gov>
 
