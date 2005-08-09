@@ -205,6 +205,9 @@ fi
 %attr(700,root,root) %{_libdir}/cerebro/cerebro_metric*
 %endif
 
+%if %{?_with_chaos:0}%{!?_with_chaos:1}
+%if %{?_with_bglion:0}%{!?_with_bglion:1} 
+
 %if %{?_with_gendersllnl:1}%{!?_with_gendersllnl:0}
 %files gendersllnl
 %defattr(700,root,root)
@@ -242,6 +245,7 @@ fi
 %{_libdir}/cerebro/cerebro_metric_bgl_ciod.*
 %endif
 
+%endif
 %endif
 
 %if %{?_with_chaos:1}%{!?_with_chaos:0}
