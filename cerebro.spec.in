@@ -233,13 +233,13 @@ fi
 %if %{?_with_slurm_state:1}%{!?_with_slurm_state:0}
 %files metric-slurm-state
 %defattr(700,root,root)
-%{_libdir}/cerebro/cerebro_metric_slurm-state.*
+%{_libdir}/cerebro/cerebro_metric_slurm_state.*
 %endif
 
 %if %{?_with_bgl_ciod:1}%{!?_with_bgl_ciod:0}
 %files metric-bgl-ciod
 %defattr(700,root,root)
-%{_libdir}/cerebro/cerebro_metric_bgl-ciod.*
+%{_libdir}/cerebro/cerebro_metric_bgl_ciod.*
 %endif
 
 %endif
