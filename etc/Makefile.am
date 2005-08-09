@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.3 2005-08-09 23:01:55 achu Exp $
+## $Id: Makefile.am,v 1.4 2005-08-09 23:05:22 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -13,4 +13,4 @@ install-data-hook:
 	else \
 		cp $(srcdir)/cerebrod-redhat $(DESTDIR)/$(sysconfdir)/init.d/cerebrod; \
 	fi
-	chmod 755 $(DESTDIR)/$(sysconfdir)/init.d/gmond
+	chmod 755 $(DESTDIR)/$(sysconfdir)/init.d/cerebrod
