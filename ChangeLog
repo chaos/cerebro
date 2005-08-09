@@ -1,3 +1,7 @@
+2005-08-09  Albert Chu  <chu11@llnl.gov>
+
+	* cerebro.spec.in: Add bglion build.
+	
 2005-08-08  Albert Chu  <chu11@llnl.gov>
 
 	* Continued work to lower virtual and resident memory size.

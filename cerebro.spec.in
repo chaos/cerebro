@@ -6,11 +6,21 @@ Release: @RELEASE@chaos.debug
 %else
 Release: @RELEASE@chaos
 %endif
+%endif
+%if %{?_with_bglion:1}%{!?_with_bglion:0} 
+%if %{?_with_debug:1}%{!?_with_debug:0}
+Release: @RELEASE@bglion.debug
 %else
+Release: @RELEASE@bglion
+%endif
+%endif
+%if %{!?_with_chaos:1}
+%if %{!?_with_bglion:1} 
 %if %{?_with_debug:1}%{!?_with_debug:0} 
 Release: @RELEASE@.debug
 %else 
 Release: @RELEASE@
+%endif
 %endif
 %endif
 
@@ -41,7 +51,20 @@ Cerebro is a collection of cluster monitoring tools and libraries.
 %define _without_boottime    --without-boottime
 %define _without_bootlog     --without-bootlog
 %endif
-%else
+%endif
+
+%if %{?_with_bglion:1}%{!?_with_bglion:0} 
+%define _without_gendersllnl --without-gendersllnl
+%define _without_genders     --without-genders
+%define _without_hostsfile   --without-hostsfile
+%define _without_boottime    --without-boottime
+%define _without_slurm_state --without-slurm-state
+%define _with_bgl_ciod       --with-bgl-ciod
+%define _without_bootlog     --without-bootlog
+%endif
+
+%if %{!?_with_chaos:1}
+%if %{!?_with_bglion:1} 
 %{!?_with_gendersllnl: %{!?_without_gendersllnl: %define _with_gendersllnl --with-gendersllnl}}
 %{!?_with_genders: %{!?_without_genders: %define _with_genders --with-genders}}
 %{!?_with_hostsfile: %{!?_without_hostsfile: %define _with_hostsfile --with-hostsfile}}
@@ -49,6 +72,7 @@ Cerebro is a collection of cluster monitoring tools and libraries.
 %{!?_with_slurm_state: %{!?_without_slurm_state: %define _without_slurm_state --without-slurm-state}}
 %{!?_with_bgl_ciod: %{!?_without_bgl_ciod: %define _without_bgl_ciod --without-bgl-ciod}}
 %{!?_with_bootlog: %{!?_without_bootlog: %define _without_bootlog --without-bootlog}}
+%endif
 %endif
 
 %if %{?_with_debug:1}%{!?_with_debug:0}
