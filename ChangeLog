@@ -1,3 +1,11 @@
+2005-08-09  Albert Chu  <chu11@llnl.gov>
+
+	* Added suse init script.
+
+	* META: Updated for errata release.
+	
+	* tagged cerebro-1-0-0-pre4-1
+
 2005-07-07  Albert Chu  <chu11@llnl.gov>
 
 	* Completed cerebro-stat tool.

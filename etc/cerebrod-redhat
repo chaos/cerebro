@@ -1,5 +1,5 @@
 #!/bin/sh
-# $Id: cerebrod-redhat,v 1.1 2005-08-09 22:41:17 achu Exp $
+# $Id: cerebrod-redhat,v 1.1.2.1 2005-08-09 23:43:52 achu Exp $
 #
 # chkconfig: 2345 70 40
 # description: cerebrod startup script
