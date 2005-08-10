@@ -2,6 +2,9 @@ Portability
 - IPv6
 - Multicast
 
+Test
+- Before full release re-check bootlog monitoring
+
 Cleanup
 
 Future Features
