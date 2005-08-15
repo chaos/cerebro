@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.57 2005-08-08 21:41:48 achu Exp $
+## $Id: configure.ac,v 1.58 2005-08-15 22:20:57 achu Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -144,9 +144,6 @@ AC_IPV6
 ##
 # Checks for library functions.
 ##
-AC_FUNC_MALLOC
-AC_FUNC_ALLOCA
-AC_FUNC_MMAP
 AC_CHECK_FUNCS( \
   strcmp \
   strlen \
