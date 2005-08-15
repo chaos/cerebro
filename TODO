@@ -6,6 +6,7 @@ Test
 - Before full release re-check bootlog monitoring
 
 Cleanup
+- Fix distcheck
 
 Future Features
 - controller
