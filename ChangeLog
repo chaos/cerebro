@@ -1,6 +1,8 @@
 2005-08-15  Albert Chu  <chu11@llnl.gov>
 
 	* configure.ac: Remove pointless autoconf calls.
+
+	* etc/Makefile.am: Fix distcheck bug
 	
 2005-08-09  Albert Chu  <chu11@llnl.gov>
 
