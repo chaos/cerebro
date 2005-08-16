@@ -1,3 +1,7 @@
+2005-08-16  Albert Chu  <chu11@llnl.gov>
+
+	* Various cleanup fixes.
+	
 2005-08-15  Albert Chu  <chu11@llnl.gov>
 
 	* configure.ac: Remove pointless autoconf calls.
