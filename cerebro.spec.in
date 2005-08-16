@@ -196,13 +196,13 @@ fi
 %{_mandir}/*
 %{_sbindir}/cerebrod
 %{_sbindir}/cerebro-stat
-%attr(700,root,root) %{_sbindir}/cerebro-admin
+%{_sbindir}/cerebro-admin
 %if %{?_with_chaos:1}%{!?_with_chaos:0}
-%attr(700,root,root) %{_libdir}/cerebro/cerebro_clusterlist*
-%attr(700,root,root) %{_libdir}/cerebro/cerebro_config*
+%{_libdir}/cerebro/cerebro_clusterlist*
+%{_libdir}/cerebro/cerebro_config*
 %endif
 %if %{?_with_bglion:1}%{!?_with_bglion:0} 
-%attr(700,root,root) %{_libdir}/cerebro/cerebro_metric*
+%{_libdir}/cerebro/cerebro_metric*
 %endif
 
 %if %{?_with_chaos:0}%{!?_with_chaos:1}
