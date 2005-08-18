@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.58 2005-08-15 22:20:57 achu Exp $
+## $Id: configure.ac,v 1.59 2005-08-18 16:41:52 achu Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -86,6 +86,7 @@ AC_CHECK_HEADERS( \
 AC_CEREBRO_MODULE_DIR
 AC_CEREBRO_CONFIG_FILE
 AC_CEREBRO_METRIC_CONTROL_PATH
+AC_CEREBROD_PATH
 
 #
 # Check to build gendersllnl module(s)
@@ -175,6 +176,8 @@ AC_CONFIG_FILES( \
   cerebro.spec \
   Makefile \
   etc/Makefile \
+  etc/cerebrod-redhat \
+  etc/cerebrod-suse \
   man/Makefile \
   man/cerebro-admin.8 \
   man/cerebro-stat.8 \
