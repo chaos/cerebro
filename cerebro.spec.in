@@ -1,8 +1,4 @@
-%if %{?_with_bglion:1}%{!?_with_bglion:0} 
-Name:    @PROJECT@-bglion 
-%else
 Name:    @PROJECT@ 
-%endif
 Version: @VERSION@
 %if %{?_with_chaos:1}%{!?_with_chaos:0}
 %if %{?_with_debug:1}%{!?_with_debug:0}
@@ -13,9 +9,9 @@ Release: @RELEASE@chaos
 %endif
 %if %{?_with_bglion:1}%{!?_with_bglion:0} 
 %if %{?_with_debug:1}%{!?_with_debug:0}
-Release: @RELEASE@debug
+Release: @RELEASE@bglion.debug
 %else
-Release: @RELEASE@
+Release: @RELEASE@bglion
 %endif
 %endif
 %if %{?_with_chaos:0}%{!?_with_chaos:1}
