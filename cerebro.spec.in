@@ -7,15 +7,15 @@ Release: @RELEASE@chaos.debug
 Release: @RELEASE@chaos
 %endif
 %endif
-%if %{?_with_bglion:1}%{!?_with_bglion:0} 
+%if %{?_with_bgl:1}%{!?_with_bgl:0} 
 %if %{?_with_debug:1}%{!?_with_debug:0}
-Release: @RELEASE@bglion.debug
+Release: @RELEASE@bgl.debug
 %else
-Release: @RELEASE@bglion
+Release: @RELEASE@bgl
 %endif
 %endif
 %if %{?_with_chaos:0}%{!?_with_chaos:1}
-%if %{?_with_bglion:0}%{!?_with_bglion:1} 
+%if %{?_with_bgl:0}%{!?_with_bgl:1} 
 %if %{?_with_debug:1}%{!?_with_debug:0} 
 Release: @RELEASE@.debug
 %else 
@@ -39,32 +39,34 @@ Conflicts: ganglia-monitor-core
 Cerebro is a collection of cluster monitoring tools and libraries.
 
 %if %{?_with_chaos:1}%{!?_with_chaos:0}
-%define _with_gendersllnl    --with-gendersllnl
-%define _without_genders     --without-genders
-%define _without_hostsfile   --without-hostsfile
-%define _without_slurm_state --without-slurm-state
-%define _without_bgl_ciod    --without-bgl-ciod
+%define _with_gendersllnl      --with-gendersllnl
+%define _without_genders       --without-genders
+%define _without_hostsfile     --without-hostsfile
+%define _with_chaos_config     --with-chaos-config
+%define _without_slurm_state   --without-slurm-state
+%define _without_bgl_ciod      --without-bgl-ciod
 %ifarch ia64
-%define _with_boottime       --with-boottime
-%define _with_bootlog        --with-bootlog
+%define _with_boottime         --with-boottime
+%define _with_bootlog          --with-bootlog
 %else
-%define _without_boottime    --without-boottime
-%define _without_bootlog     --without-bootlog
+%define _without_boottime      --without-boottime
+%define _without_bootlog       --without-bootlog
 %endif
 %endif
 
-%if %{?_with_bglion:1}%{!?_with_bglion:0} 
-%define _without_gendersllnl --without-gendersllnl
-%define _without_genders     --without-genders
-%define _without_hostsfile   --without-hostsfile
-%define _without_boottime    --without-boottime
-%define _without_slurm_state --without-slurm-state
-%define _with_bgl_ciod       --with-bgl-ciod
-%define _without_bootlog     --without-bootlog
+%if %{?_with_bgl:1}%{!?_with_bgl:0} 
+%define _without_gendersllnl   --without-gendersllnl
+%define _without_genders       --without-genders
+%define _without_hostsfile     --without-hostsfile
+%define _without_chaos_config  --without-chaos-config
+%define _without_boottime      --without-boottime
+%define _without_slurm_state   --without-slurm-state
+%define _with_bgl_ciod         --with-bgl-ciod
+%define _without_bootlog       --without-bootlog
 %endif
 
 %if %{?_with_chaos:0}%{!?_with_chaos:1}
-%if %{?_with_bglion:0}%{!?_with_bglion:1} 
+%if %{?_with_bgl:0}%{!?_with_bgl:1} 
 %{!?_with_gendersllnl: %{!?_without_gendersllnl: %define _with_gendersllnl --with-gendersllnl}}
 %{!?_with_genders: %{!?_without_genders: %define _with_genders --with-genders}}
 %{!?_with_hostsfile: %{!?_without_hostsfile: %define _with_hostsfile --with-hostsfile}}
@@ -79,45 +81,52 @@ Cerebro is a collection of cluster monitoring tools and libraries.
 %define _enable_debug --enable-debug
 %endif
 
-%package gendersllnl
-Summary: gendersllnl module(s)
+%package clusterlist-gendersllnl
+Summary: clusterlist gendersllnl module
 Group: System Environment/Base
 Requires: cerebro
 Requires: gendersllnl
 %description gendersllnl
-Gendersllnl module(s).
+Gendersllnl module
 
-%package genders
-Summary: genders module(s)
+%package clusterlist-genders
+Summary: clusterlist genders module
 Group: System Environment/Base
 Requires: cerebro
 Requires: genders >= 1.2
 %description genders
-Genders module(s).
+Genders module
 
-%package hostsfile
-Summary: hostsfile module(s)
+%package clusterlist-hostsfile
+Summary: clusterlist hostsfile module
 Group: System Environment/Base
 Requires: cerebro
 %description hostsfile
-Hostsfile module(s).
+Hostsfile module
+
+%package config-chaos
+Summary: config-chaos module
+Group: System Environment/Base
+Requires: cerebro
+%description config-chaos
+Config module for chaos.
 
 %package metric-boottime
-Summary: boottime module(s)
+Summary: boottime module
 Group: System Environment/Base
 Requires: cerebro
 %description metric-boottime
 Metric module to monitor boottime.
 
 %package metric-slurm-state
-Summary: slurm_state module(s)
+Summary: slurm_state module
 Group: System Environment/Base
 Requires: cerebro
 %description metric-slurm-state
 Metric module to monitor slurm_state.
 
 %package metric-bgl-ciod
-Summary: bgl_ciod module(s)
+Summary: bgl_ciod module
 Group: System Environment/Base
 Requires: cerebro
 %description metric-bgl-ciod
@@ -125,12 +134,12 @@ Metric module to monitor bgl_ciod.
 
 %if %{?_with_chaos:1}%{!?_with_chaos:0}
 %package bootlog
-Summary: bootlog module(s)
+Summary: bootlog module
 Group: System Environment/Base
 Requires: cerebro
 Requires: qsqsql
 %description bootlog
-Bootlog monitoring module(s).
+Bootlog monitoring module.
 %endif
 
 %prep
@@ -144,6 +153,8 @@ Bootlog monitoring module(s).
            %{?_without_genders} \
            %{?_with_hostsfile} \
            %{?_without_hostsfile} \
+           %{?_with_chaos_config} \
+           %{?_without_chaos_config} \
            %{?_with_boottime} \
            %{?_without_boottime} \
            %{?_with_slurm_state} \
@@ -201,30 +212,35 @@ fi
 %{_libdir}/cerebro/cerebro_clusterlist*
 %{_libdir}/cerebro/cerebro_config*
 %endif
-%if %{?_with_bglion:1}%{!?_with_bglion:0} 
+%if %{?_with_bgl:1}%{!?_with_bgl:0} 
 %{_libdir}/cerebro/cerebro_metric*
 %endif
 
 %if %{?_with_chaos:0}%{!?_with_chaos:1}
-%if %{?_with_bglion:0}%{!?_with_bglion:1} 
+%if %{?_with_bgl:0}%{!?_with_bgl:1} 
 
 %if %{?_with_gendersllnl:1}%{!?_with_gendersllnl:0}
-%files gendersllnl
+%files clusterlist-gendersllnl
 %defattr(700,root,root)
 %{_libdir}/cerebro/cerebro_clusterlist_gendersllnl.*
-%{_libdir}/cerebro/cerebro_config_gendersllnl.*
 %endif
 
 %if %{?_with_genders:1}%{!?_with_genders:0}
-%files genders
+%files clusterlist-genders
 %defattr(700,root,root)
 %{_libdir}/cerebro/cerebro_clusterlist_genders.*
 %endif
 
 %if %{?_with_hostsfile:1}%{!?_with_hostsfile:0}
-%files hostsfile
+%files clusterlist-hostsfile
 %defattr(700,root,root)
 %{_libdir}/cerebro/cerebro_clusterlist_hostsfile.*
+%endif
+
+%if %{?_with_chaos_config:1}%{!?_with_chaos_config:0}
+%files config-chaos
+%defattr(700,root,root)
+%{_libdir}/cerebro/cerebro_config_chaos.*
 %endif
 
 %if %{?_with_boottime:1}%{!?_with_boottime:0}

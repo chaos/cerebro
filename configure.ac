@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.59 2005-08-18 16:41:52 achu Exp $
+## $Id: configure.ac,v 1.60 2005-08-18 22:57:08 achu Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -89,46 +89,52 @@ AC_CEREBRO_METRIC_CONTROL_PATH
 AC_CEREBROD_PATH
 
 #
-# Check to build gendersllnl module(s)
+# Check to build gendersllnl module
 #
 AC_GENDERSLLNL
 AM_CONDITIONAL(WITH_GENDERSLLNL, [test "$ac_with_gendersllnl" = "yes"])
 
 #
-# Check to build genders module(s)
+# Check to build genders module
 #
 AC_GENDERS
 AM_CONDITIONAL(WITH_GENDERS, [test "$ac_with_genders" = "yes"])
 
 #
-# Check to build hostsfile module(s)
+# Check to build hostsfile module
 #
 AC_HOSTSFILE
 AC_HOSTSFILE_PATH
 AM_CONDITIONAL(WITH_HOSTSFILE, [test "$ac_with_hostsfile" = "yes"])
 
 #
-# Check to build boottime module(s)
+# Check to build chaos config module
+#
+AC_CHAOS_CONFIG
+AM_CONDITIONAL(WITH_CHAOS_CONFIG, [test "$ac_with_chaos_config" = "yes"])
+
+#
+# Check to build boottime module
 #
 AC_BOOTTIME
 AM_CONDITIONAL(WITH_BOOTTIME, [test "$ac_with_boottime" = "yes"])
 
 #
-# Check to build slurm_state module(s)
+# Check to build slurm_state module
 #
 AC_SLURM_STATE
 AC_SLURM_STATE_CONTROL_PATH
 AM_CONDITIONAL(WITH_SLURM_STATE, [test "$ac_with_slurm_state" = "yes"])
 
 #
-# Check to build bgl_ciod module(s)
+# Check to build bgl_ciod module
 #
 AC_BGL_CIOD
 AC_BGL_CIOD_CONFIG_FILE
 AM_CONDITIONAL(WITH_BGL_CIOD, [test "$ac_with_bgl_ciod" = "yes"])
 
 #
-# Check to build bootlog module(s)
+# Check to build bootlog module
 #
 AC_BOOTLOG
 AM_CONDITIONAL(WITH_BOOTLOG, [test "$ac_with_bootlog" = "yes"])

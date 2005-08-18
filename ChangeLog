@@ -1,6 +1,8 @@
 2005-08-18  Albert Chu  <chu11@llnl.gov>
 
 	* Various configuration fixes to ensure a good bgl ion build.
+
+	* Renamed gendersllnl config module the chaos config module.
 	
 2005-08-17  Albert Chu  <chu11@llnl.gov>
 

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: config_module.c,v 1.12 2005-07-22 17:21:07 achu Exp $
+ *  $Id: config_module.c,v 1.13 2005-08-18 22:57:08 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -54,7 +54,7 @@
  * dynamic configuration modules to search for by default
  */
 char *config_modules[] = {
-  "cerebro_config_gendersllnl.so",
+  "cerebro_config_chaos.so",
   NULL
 };
 int config_modules_len = 1;

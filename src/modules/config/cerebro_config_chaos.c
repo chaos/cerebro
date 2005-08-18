@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_gendersllnl.c,v 1.28 2005-07-22 17:21:07 achu Exp $
+ *  $Id: cerebro_config_chaos.c,v 1.1 2005-08-18 22:57:08 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -50,9 +50,9 @@
 
 extern int h_errno;
 
-#define GENDERSLLNL_CONFIG_MODULE_NAME "gendersllnl"
+#define CHAOS_CONFIG_MODULE_NAME "chaos"
 
-#define GENDERSLLNL_LARGE_CLUSTER_SIZE 512
+#define CHAOS_LARGE_CLUSTER_SIZE 512
 
 /*
  * gh
@@ -62,12 +62,12 @@ extern int h_errno;
 static genders_t gh = NULL;
 
 /*
- * gendersllnl_config_setup
+ * chaos_config_setup
  *
- * gendersllnl config module setup function
+ * chaos config module setup function
  */
 static int
-gendersllnl_config_setup(void)
+chaos_config_setup(void)
 {
   if (gh)
     {
@@ -107,12 +107,12 @@ gendersllnl_config_setup(void)
 }
 
 /*
- * gendersllnl_config_cleanup
+ * chaos_config_cleanup
  *
- * gendersllnl config module cleanup function
+ * chaos config module cleanup function
  */
 static int
-gendersllnl_config_cleanup(void)
+chaos_config_cleanup(void)
 {
   if (!gh)
     return 0;
@@ -125,7 +125,7 @@ gendersllnl_config_cleanup(void)
 }
 
 /* 
- * gendersllnl_config_load_config
+ * chaos_config_load_config
  *
  * config specifically for use on LLNL clusters. 'mgmt' nodes listen
  * and speak, while compute nodes only speak.  We always speak on the
@@ -136,7 +136,7 @@ gendersllnl_config_cleanup(void)
  * Returns 0 on success, -1 on error
  */
 int
-gendersllnl_config_load_config(struct cerebro_config *conf)
+chaos_config_load_config(struct cerebro_config *conf)
 {
   char altnamebuf[CEREBRO_MAX_NODENAME_LEN+1];
   int flag, numnodes;
@@ -171,7 +171,7 @@ gendersllnl_config_load_config(struct cerebro_config *conf)
       conf->cerebrod_speak_flag++;
       conf->cerebrod_listen = 1;
       conf->cerebrod_listen_flag++;
-      if (numnodes >= GENDERSLLNL_LARGE_CLUSTER_SIZE)
+      if (numnodes >= CHAOS_LARGE_CLUSTER_SIZE)
         {
           conf->cerebrod_listen_threads = 4;
           conf->cerebrod_listen_threads_flag++;
@@ -273,8 +273,8 @@ gendersllnl_config_load_config(struct cerebro_config *conf)
 
 struct cerebro_config_module_info config_module_info =
   {
-    GENDERSLLNL_CONFIG_MODULE_NAME,
-    &gendersllnl_config_setup,
-    &gendersllnl_config_cleanup,
-    &gendersllnl_config_load_config,
+    CHAOS_CONFIG_MODULE_NAME,
+    &chaos_config_setup,
+    &chaos_config_cleanup,
+    &chaos_config_load_config,
   };
