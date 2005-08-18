@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_bgl_ciod.c,v 1.4 2005-08-08 22:03:04 achu Exp $
+ *  $Id: cerebro_metric_bgl_ciod.c,v 1.5 2005-08-18 00:14:43 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -263,17 +263,12 @@ bgl_ciod_metric_get_metric_value(unsigned int *metric_value_type,
                                 bgl_ciod_connect_timeout,
                                 &errnum)) < 0)
     {
-      if (errnum == CEREBRO_ERR_CONNECT || errnum == CEREBRO_ERR_CONNECT_TIMEOUT)
-        {
-          bgl_ciod_failures++;
-          if (bgl_ciod_failures >= bgl_ciod_failure_max)
-            bgl_ciod_state = 0;
-        }
-      else
-        {
-          CEREBRO_DBG(("low_timeout_connect: %d", errnum));
-          return -1;
-        }
+      if (!(errnum == CEREBRO_ERR_CONNECT || errnum == CEREBRO_ERR_CONNECT_TIMEOUT))
+        CEREBRO_DBG(("low_timeout_connect: %d", errnum));
+      
+      bgl_ciod_failures++;
+      if (bgl_ciod_failures >= bgl_ciod_failure_max)
+        bgl_ciod_state = 0;
     }
   else
     {
