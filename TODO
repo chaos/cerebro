@@ -15,6 +15,7 @@ Future Features
 
 - listener
   - limit data receiving based on host list or subnet
+  - allow listening to multiple subnets/networks/ips/multciasts?
 
 - event based monitoring
 
