@@ -43,6 +43,7 @@ Cerebro is a collection of cluster monitoring tools and libraries.
 %define _without_genders       --without-genders
 %define _without_hostsfile     --without-hostsfile
 %define _with_chaos_config     --with-chaos-config
+%define _without_bgl_config    --without-bgl-config
 %define _without_slurm_state   --without-slurm-state
 %define _without_bgl_ciod      --without-bgl-ciod
 %ifarch ia64
@@ -59,6 +60,7 @@ Cerebro is a collection of cluster monitoring tools and libraries.
 %define _without_genders       --without-genders
 %define _without_hostsfile     --without-hostsfile
 %define _without_chaos_config  --without-chaos-config
+%define _with_bgl_config       --with-bgl-config
 %define _without_boottime      --without-boottime
 %define _without_slurm_state   --without-slurm-state
 %define _with_bgl_ciod         --with-bgl-ciod
@@ -70,6 +72,8 @@ Cerebro is a collection of cluster monitoring tools and libraries.
 %{!?_with_gendersllnl: %{!?_without_gendersllnl: %define _with_gendersllnl --with-gendersllnl}}
 %{!?_with_genders: %{!?_without_genders: %define _with_genders --with-genders}}
 %{!?_with_hostsfile: %{!?_without_hostsfile: %define _with_hostsfile --with-hostsfile}}
+%{!?_with_chaos_config: %{!?_without_chaos_config: %define _with_chaos_config --with-chaos-config}}
+%{!?_with_bgl_config: %{!?_without_bgl_config: %define _with_bgl_config --with-bgl-config}}
 %{!?_with_boottime: %{!?_without_boottime: %define _with_boottime --with-boottime}}
 %{!?_with_slurm_state: %{!?_without_slurm_state: %define _without_slurm_state --without-slurm-state}}
 %{!?_with_bgl_ciod: %{!?_without_bgl_ciod: %define _without_bgl_ciod --without-bgl-ciod}}
@@ -110,6 +114,13 @@ Group: System Environment/Base
 Requires: cerebro
 %description config-chaos
 Config module for chaos.
+
+%package config-bgl
+Summary: config-bgl module
+Group: System Environment/Base
+Requires: cerebro
+%description config-bgl
+Config module for bgl.
 
 %package metric-boottime
 Summary: boottime module
@@ -155,6 +166,8 @@ Bootlog monitoring module.
            %{?_without_hostsfile} \
            %{?_with_chaos_config} \
            %{?_without_chaos_config} \
+           %{?_with_bgl_config} \
+           %{?_without_bgl_config} \
            %{?_with_boottime} \
            %{?_without_boottime} \
            %{?_with_slurm_state} \
@@ -214,6 +227,7 @@ fi
 %endif
 %if %{?_with_bgl:1}%{!?_with_bgl:0} 
 %{_libdir}/cerebro/cerebro_metric*
+%{_libdir}/cerebro/cerebro_config*
 %endif
 
 %if %{?_with_chaos:0}%{!?_with_chaos:1}
@@ -241,6 +255,12 @@ fi
 %files config-chaos
 %defattr(700,root,root)
 %{_libdir}/cerebro/cerebro_config_chaos.*
+%endif
+
+%if %{?_with_bgl_config:1}%{!?_with_bgl_config:0}
+%files config-bgl
+%defattr(700,root,root)
+%{_libdir}/cerebro/cerebro_config_bgl.*
 %endif
 
 %if %{?_with_boottime:1}%{!?_with_boottime:0}
