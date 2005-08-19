@@ -153,6 +153,15 @@ Requires: qsqsql
 Bootlog monitoring module.
 %endif
 
+%if %{?_with_bgl:1}%{!?_with_bgl:0}
+%package bglion
+Summary: bglion module
+Group: System Environment/Base
+Requires: cerebro
+%description bglion
+bglion metric module.
+%endif
+
 %prep
 %setup  -q -n @PROJECT@-@VERSION@-@RELEASE@
 
@@ -226,7 +235,6 @@ fi
 %{_libdir}/cerebro/cerebro_config*
 %endif
 %if %{?_with_bgl:1}%{!?_with_bgl:0} 
-%{_libdir}/cerebro/cerebro_metric*
 %{_libdir}/cerebro/cerebro_config*
 %endif
 
@@ -291,4 +299,10 @@ fi
 %{_libdir}/cerebro/cerebro_metric_boottime.*
 %{_libdir}/cerebro/cerebro_monitor_bootlog.*
 %endif
+%endif
+
+%if %{?_with_bgl:1}%{!?_with_bgl:0}
+%files bglion
+%defattr(700,root,root)
+%{_libdir}/cerebro/cerebro_metric*
 %endif
