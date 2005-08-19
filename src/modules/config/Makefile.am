@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.14 2005-08-18 22:57:08 achu Exp $
+## $Id: Makefile.am,v 1.15 2005-08-19 00:04:10 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -11,6 +11,10 @@ endif
 
 if WITH_CHAOS_CONFIG
 CHAOS_CONFIG_MODULE = cerebro_config_chaos.la
+endif
+
+if WITH_BGL_CONFIG
+BGL_CONFIG_MODULE = cerebro_config_bgl.la
 endif
 
 modulelibdir = $(CEREBRO_MODULE_DIR)
@@ -25,6 +29,13 @@ cerebro_config_chaos_la_LDFLAGS = $(MODULE_FLAGS) \
 cerebro_config_chaos_la_CFLAGS  = -I$(srcdir)/../../libs/include \
 				  -I$(srcdir)/../../libs/debug
 cerebro_config_chaos_la_LIBADD  = ../../libs/debug/libdebug.la
+
+cerebro_config_bgl_la_SOURCES = cerebro_config_bgl.c
+cerebro_config_bgl_la_LDFLAGS = $(MODULE_FLAGS) \
+				$(CONFIG_OTHER_FLAGS)
+cerebro_config_bgl_la_CFLAGS  = -I$(srcdir)/../../libs/include \
+				-I$(srcdir)/../../libs/debug
+cerebro_config_bgl_la_LIBADD  = ../../libs/debug/libdebug.la
 
 ../../libs/debug/libdebug.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`

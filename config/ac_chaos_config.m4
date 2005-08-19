@@ -1,12 +1,12 @@
 ##*****************************************************************************
-## $Id: ac_chaos_config.m4,v 1.1 2005-08-18 22:57:08 achu Exp $
+## $Id: ac_chaos_config.m4,v 1.2 2005-08-19 00:04:07 achu Exp $
 ##*****************************************************************************
 
 AC_DEFUN([AC_CHAOS_CONFIG],
 [
-  AC_MSG_CHECKING([for whether to build chaos config modules])
+  AC_MSG_CHECKING([for whether to build chaos config module])
   AC_ARG_WITH([chaos-config],
-    AC_HELP_STRING([--with-chaos-config], [Build chaos config modules]),
+    AC_HELP_STRING([--with-chaos-config], [Build chaos config module]),
     [ case "$withval" in
         no)  ac_chaos_config_test=no ;;
         yes) ac_chaos_config_test=yes ;;

@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.60 2005-08-18 22:57:08 achu Exp $
+## $Id: configure.ac,v 1.61 2005-08-19 00:04:07 achu Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -112,6 +112,12 @@ AM_CONDITIONAL(WITH_HOSTSFILE, [test "$ac_with_hostsfile" = "yes"])
 #
 AC_CHAOS_CONFIG
 AM_CONDITIONAL(WITH_CHAOS_CONFIG, [test "$ac_with_chaos_config" = "yes"])
+
+#
+# Check to build bgl config module
+#
+AC_BGL_CONFIG
+AM_CONDITIONAL(WITH_BGL_CONFIG, [test "$ac_with_bgl_config" = "yes"])
 
 #
 # Check to build boottime module

@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro_module.3.in,v 1.7 2005-08-18 22:57:08 achu Exp $
+\."$Id: cerebro_module.3.in,v 1.8 2005-08-19 00:04:07 achu Exp $
 \."#############################################################################
 \."  Copyright (C) 2005 The Regents of the University of California.
 \."  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -89,13 +89,15 @@ the options specified in the configuration file.
 
 The following config modules are distributed:
 
-.ie @MANPAGE_CHAOS_CONFIG@ \{
+.if @MANPAGE_CHAOS_CONFIG@ \{
 Chaos - Configures 
 .B Cerebro specifically for use on LLNL clusters.
 
 \}
-.el \{
-No configuration modules are searched in this build.
+
+.if @MANPAGE_BGL_CONFIG@ \{
+Bgl - Configures 
+.B Cerebro specifically for use on BlueGene/L
 
 \}
 
