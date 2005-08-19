@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: hash.c,v 1.1 2005-06-17 20:54:08 achu Exp $
+ *  $Id: hash.c,v 1.2 2005-08-19 21:24:23 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2003-2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -86,7 +86,9 @@ static void hash_node_free (struct hash_node *node);
  *  Variables
  *****************************************************************************/
 
+#if 0
 static struct hash_node *hash_free_list = NULL;
+#endif
 
 #if WITH_PTHREADS
 static pthread_mutex_t hash_free_lock = PTHREAD_MUTEX_INITIALIZER;
@@ -394,11 +396,14 @@ hash_node_alloc (void)
  *  Memory is allocated in chunks of HASH_ALLOC.
  *  Returns a ptr to the object, or NULL if memory allocation fails.
  */
+#if 0
     int i;
+#endif
     struct hash_node *p = NULL;
 
     assert (HASH_ALLOC > 0);
     lsd_mutex_lock (&hash_free_lock);
+#if 0
     if (!hash_free_list) {
         if ((hash_free_list = malloc (HASH_ALLOC * sizeof (*p)))) {
             for (i = 0; i < HASH_ALLOC - 1; i++)
@@ -413,6 +418,10 @@ hash_node_alloc (void)
     else {
         errno = ENOMEM;
     }
+#else
+    if (!(p = malloc (sizeof(*p))))
+        errno = ENOMEM;
+#endif
     lsd_mutex_unlock (&hash_free_lock);
     return (p);
 }
@@ -426,8 +435,12 @@ hash_node_free (struct hash_node *node)
     assert (node != NULL);
     memset (node, 0, sizeof (*node));
     lsd_mutex_lock (&hash_free_lock);
+#if 0
     node->next = hash_free_list;
     hash_free_list = node;
+#else
+    free (node);
+#endif
     lsd_mutex_unlock (&hash_free_lock);
     return;
 }
