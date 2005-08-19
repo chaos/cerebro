@@ -90,7 +90,7 @@ Summary: clusterlist gendersllnl module
 Group: System Environment/Base
 Requires: cerebro
 Requires: gendersllnl
-%description gendersllnl
+%description clusterlist-gendersllnl
 Gendersllnl module
 
 %package clusterlist-genders
@@ -98,14 +98,14 @@ Summary: clusterlist genders module
 Group: System Environment/Base
 Requires: cerebro
 Requires: genders >= 1.2
-%description genders
+%description clusterlist-genders
 Genders module
 
 %package clusterlist-hostsfile
 Summary: clusterlist hostsfile module
 Group: System Environment/Base
 Requires: cerebro
-%description hostsfile
+%description clusterlist-hostsfile
 Hostsfile module
 
 %package config-chaos
