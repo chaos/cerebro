@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.82 2005-08-05 19:56:50 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.83 2005-08-19 23:09:20 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -68,18 +68,6 @@ extern pthread_mutex_t debug_output_mutex;
  * cached system nodename
  */
 static char cerebrod_nodename[CEREBRO_MAX_NODENAME_LEN+1];
-
-/*
- * speaker_init
- * speaker_init_cond
- * speaker_init_lock
- *
- * variables for synchronizing initialization between different pthreads
- * and signaling when it is complete
- */
-int speaker_init = 0;
-pthread_cond_t speaker_init_cond = PTHREAD_COND_INITIALIZER;
-pthread_mutex_t speaker_init_lock = PTHREAD_MUTEX_INITIALIZER;
 
 /* 
  * _speaker_socket_setup
@@ -180,10 +168,6 @@ _speaker_initialize(void)
   struct timeval tv;
   int i, len;
 
-  Pthread_mutex_lock(&speaker_init_lock);
-  if (speaker_init)
-    goto out;
-
   /* Cache Nodename */
   memset(cerebrod_nodename, '\0', CEREBRO_MAX_NODENAME_LEN+1);
   Gethostname(cerebrod_nodename, CEREBRO_MAX_NODENAME_LEN);
@@ -192,10 +176,10 @@ _speaker_initialize(void)
   Gettimeofday(&tv, NULL);
   seed = tv.tv_sec;
 
-  /* If a cluster is re-booted at the same time, each cluster node
-   * could be seeded with the same time.  In order to avoid this,
-   * we'll add the cluster nodename to the seed to give every cluster
-   * node atleast a constant different offset.
+  /* If each cluster node is re-booted at the same time, each cluster
+   * node could be seeded with the same random seed.  In order to
+   * avoid this, we'll add the cluster nodename to the seed to give
+   * every cluster node atleast a constant different offset.
    */
   len = strlen(cerebrod_nodename);
   for (i = 0; i < len; i++)
@@ -204,11 +188,6 @@ _speaker_initialize(void)
   srand(seed);
 
   cerebrod_speaker_data_initialize();
-
-  speaker_init++;
-  Pthread_cond_signal(&speaker_init_cond);
- out:
-  Pthread_mutex_unlock(&speaker_init_lock);
 }
 
 /*

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker_data.c,v 1.33 2005-07-27 00:29:22 achu Exp $
+ *  $Id: cerebrod_speaker_data.c,v 1.34 2005-08-19 23:09:20 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -305,9 +305,8 @@ cerebrod_speaker_data_initialize(void)
     goto out;
 
   /* 
-   * Must lock around this initialization routine, b/c update thread
-   * initialization in metric modules may call the updated state
-   * function that could update the next call time.
+   * Must lock in this initialization routine, b/c the update thread
+   * in a metric module may call the update state function.
    */
   Pthread_mutex_lock(&metric_list_lock);
 

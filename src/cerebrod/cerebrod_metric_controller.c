@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_controller.c,v 1.29 2005-08-05 19:43:31 achu Exp $
+ *  $Id: cerebrod_metric_controller.c,v 1.30 2005-08-19 23:09:20 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -110,6 +110,8 @@ _metric_controller_initialize(void)
   Pthread_mutex_lock(&metric_controller_init_lock);
   if (metric_controller_init)
     goto out;
+
+  cerebrod_speaker_data_initialize();
 
   Signal(SIGPIPE, SIG_IGN);
 
@@ -426,6 +428,7 @@ _register_metric(int fd, int32_t version, const char *metric_name)
   metric_info->metric_value_len = 0;
   metric_info->metric_value = NULL;
   List_append(metric_list, metric_info);
+  metric_list_size++;
   cerebrod_speaker_data_metric_list_sort();
 
   rv = 0;
@@ -468,7 +471,9 @@ _unregister_metric(int fd, int32_t version, const char *metric_name)
 
   if (List_delete_all(metric_list, _find_metric_name, (void *)metric_name) != 1)
     CEREBRO_DBG(("invalid list_delete_all"));
-  
+
+  metric_list_size--;
+
   rv = 0;
  cleanup:
   Pthread_mutex_unlock(&metric_list_lock);

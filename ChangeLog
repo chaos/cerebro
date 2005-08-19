@@ -2,6 +2,12 @@
 
 	* src/libs/common/list.c, src/libs/common/hash.c: Remove memory
 	buffering.
+
+	* Make speaker run in main() for lower memory usage.
+
+	* Fix metric controller corner case regarding metric list length.
+
+	* tag pre-low-memory-build
 	
 2005-08-18  Albert Chu  <chu11@llnl.gov>
 

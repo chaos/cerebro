@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.76 2005-07-22 17:21:07 achu Exp $
+ *  $Id: cerebrod.c,v 1.77 2005-08-19 23:09:20 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -149,28 +149,7 @@ main(int argc, char **argv)
       Pthread_mutex_unlock(&listener_init_lock);
     }
 
-  /* Start speaker */
-  if (conf.speak)
-    {
-      pthread_t thread;
-      pthread_attr_t attr;
-
-      Pthread_attr_init(&attr);
-      Pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-      Pthread_attr_setstacksize(&attr, CEREBROD_THREAD_STACKSIZE);
-      Pthread_create(&thread, &attr, cerebrod_speaker, NULL);
-      Pthread_attr_destroy(&attr);
-
-      /* Wait for initialization to complete */
-      Pthread_mutex_lock(&speaker_init_lock);
-      while (!speaker_init)
-        Pthread_cond_wait(&speaker_init_cond, &speaker_init_lock);
-      Pthread_mutex_unlock(&speaker_init_lock);
-    }
-
-  /* Start metric controller after speaker since metric data cannot be
-   * propogated until after the speaker has finished being setup.
-   */
+  /* Start metric controller - see comments at speaker below */ 
   if (conf.metric_controller)
     {
       pthread_t thread;
@@ -189,6 +168,22 @@ main(int argc, char **argv)
                           &metric_controller_init_lock);
       Pthread_mutex_unlock(&metric_controller_init_lock);
     }
+
+  /* Start speaker  
+   *
+   * It may make more logical sense to start the metric controller
+   * after the speaker since metric data cannot be propogated until
+   * after the speaker has finished being setup.  We run the speaker
+   * last b/c it is the common case.  Most machines (particularly
+   * compute nodes in a cluster) will only speak, and do nothing else.
+   * By having the speaker last, it does not need to run in a thread.
+   * We run it out of "main" instead to minimize memory usage by
+   * not needing to start the speaker in a thread.
+   */
+  if (conf.speak)
+    cerebrod_speaker(NULL);
+
+  /* If speaking, we do not reach this point */
 
   for (;;) 
     sleep(INT_MAX);
