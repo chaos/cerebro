@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_bgl.c,v 1.1 2005-08-19 00:04:10 achu Exp $
+ *  $Id: cerebro_config_bgl.c,v 1.2 2005-08-19 00:22:45 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -123,6 +123,8 @@ bgl_config_load_config(struct cerebro_config *conf)
       conf->cerebrod_speak_flag++;
       conf->cerebrod_listen = 1;
       conf->cerebrod_listen_flag++;
+      conf->cerebrod_metric_controller = 0;
+      conf->cerebrod_metric_controller_flag++;
       conf->cerebrod_metric_server = 1;
       conf->cerebrod_metric_server_flag++;
     }
@@ -132,6 +134,8 @@ bgl_config_load_config(struct cerebro_config *conf)
       conf->cerebrod_speak_flag++;
       conf->cerebrod_listen = 0;
       conf->cerebrod_listen_flag++;
+      conf->cerebrod_metric_controller = 0;
+      conf->cerebrod_metric_controller_flag++;
       conf->cerebrod_metric_server = 0;
       conf->cerebrod_metric_server_flag++;
       
