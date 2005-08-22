@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.h,v 1.53 2005-07-27 00:29:22 achu Exp $
+ *  $Id: cerebrod_config.h,v 1.54 2005-08-22 15:50:08 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -52,8 +52,6 @@
 #define CEREBROD_METRIC_SERVER_PORT_DEFAULT           CEREBRO_METRIC_SERVER_PORT
 #define CEREBROD_METRIC_MAX_DEFAULT                   8
 #define CEREBROD_MONITOR_MAX_DEFAULT                  8
-#define CEREBROD_CLUSTERLIST_MODULE_DEFAULT           NULL
-#define CEREBROD_CLUSTERLIST_MODULE_OPTIONS_DEFAULT   NULL
 #define CEREBROD_SPEAK_DEBUG_DEFAULT                  0
 #define CEREBROD_LISTEN_DEBUG_DEFAULT                 0
 #define CEREBROD_METRIC_CONTROLLER_DEBUG_DEFAULT      0

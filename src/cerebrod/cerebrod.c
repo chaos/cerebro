@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.77 2005-08-19 23:09:20 achu Exp $
+ *  $Id: cerebrod.c,v 1.78 2005-08-22 15:50:08 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -183,7 +183,7 @@ main(int argc, char **argv)
   if (conf.speak)
     cerebrod_speaker(NULL);
 
-  /* If speaking, we do not reach this point */
+  /* If speak is set, we do not reach this point */
 
   for (;;) 
     sleep(INT_MAX);

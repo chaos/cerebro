@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker_data.c,v 1.34 2005-08-19 23:09:20 achu Exp $
+ *  $Id: cerebrod_speaker_data.c,v 1.35 2005-08-22 15:50:08 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -300,7 +300,7 @@ _destroy_speaker_metric_info(void *x)
 void
 cerebrod_speaker_data_initialize(void)
 {
-  pthread_mutex_lock(&speaker_data_init_lock);
+  Pthread_mutex_lock(&speaker_data_init_lock);
   if (speaker_data_init)
     goto out;
 
