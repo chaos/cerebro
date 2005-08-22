@@ -8,6 +8,8 @@
 	* Fix metric controller corner case regarding metric list length.
 
 	* tag pre-low-memory-build
+
+	* tag pre-static-build
 	
 2005-08-18  Albert Chu  <chu11@llnl.gov>
 
