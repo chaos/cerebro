@@ -1,3 +1,9 @@
+2005-08-22  Albert Chu  <chu11@llnl.gov>
+
+	* Fix minor build issues.
+	
+	* tag pre-static-build
+	
 2005-08-19  Albert Chu  <chu11@llnl.gov>
 
 	* src/libs/common/list.c, src/libs/common/hash.c: Remove memory
@@ -9,8 +15,6 @@
 
 	* tag pre-low-memory-build
 
-	* tag pre-static-build
-	
 2005-08-18  Albert Chu  <chu11@llnl.gov>
 
 	* Various configuration fixes to ensure a good bgl ion build.
