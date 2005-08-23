@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.121 2005-07-26 16:24:02 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.122 2005-08-23 21:57:02 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -175,9 +175,9 @@ _cerebrod_cmdline_arguments_parse(int argc, char **argv)
   assert(argv);
 
   memset(options, '\0', sizeof(options));
-  strcat(options, "hvc:");
+  strcat(options, "hv");
 #if CEREBRO_DEBUG
-  strcat(options, "d");
+  strcat(options, "c:d");
 #endif /* CEREBRO_DEBUG */
 
   /* turn off output messages */
