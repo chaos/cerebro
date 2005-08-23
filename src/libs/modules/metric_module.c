@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: metric_module.c,v 1.13 2005-07-22 17:21:07 achu Exp $
+ *  $Id: metric_module.c,v 1.14 2005-08-23 21:10:14 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -44,7 +44,44 @@
 #include "module_util.h"
 
 #include "debug.h"
+#if !WITH_STATIC_MODULES
 #include "ltdl.h"
+#endif /* !WITH_STATIC_MODULES */
+
+#if WITH_STATIC_MODULES
+
+#if WITH_BOOTTIME
+extern struct cerebro_metric_module_info boottime_metric_module_info;
+#endif /* WITH_BOOTTIME */
+
+#if WITH_SLURM_STATE
+extern struct cerebro_metric_module_info slurm_state_metric_module_info;
+#endif /* WITH_SLURM_STATE */
+
+#if WITH_BGL_CIOD
+extern struct cerebro_metric_module_info bgl_ciod_metric_module_info;
+#endif /* WITH_BGL_CIOD */
+
+/*
+ * metric_modules
+ *
+ * metric modules statically compiled in
+ */
+void *metric_modules[] =
+  {
+#if WITH_BOOTTIME
+    &boottime_metric_module_info,
+#endif /* WITH_BOOTTIME */
+#if WITH_SLURM_STATE
+    &slurm_state_metric_module_info,
+#endif /* WITH_SLURM_STATE */
+#if WITH_BGL_CIOD
+    &bgl_ciod_metric_module_info,
+#endif /* WITH_BGL_CIOD */
+    NULL
+  };
+
+#endif /* WITH_STATIC_MODULES */
 
 #define METRIC_FILENAME_SIGNATURE  "cerebro_metric_"
 #define METRIC_MODULE_INFO_SYM     "metric_module_info"
@@ -61,7 +98,9 @@ struct metric_module
   int32_t magic;
   unsigned int modules_max;
   unsigned int modules_count;
+#if !WITH_STATIC_MODULES
   lt_dlhandle *dl_handle;
+#endif /* !WITH_STATIC_MODULES */
   struct cerebro_metric_module_info **module_info;
 };
 
@@ -73,21 +112,33 @@ struct metric_module
  * Return 1 is module is stored, 0 if not, -1 on fatal error
  */
 static int 
+#if WITH_STATIC_MODULES
+_metric_module_cb(void *handle, void *module_info)
+#else  /* !WITH_STATIC_MODULES */
 _metric_module_cb(void *handle, void *dl_handle, void *module_info)
+#endif /* !WITH_STATIC_MODULES */
 {
   metric_modules_t metric_handle;
   struct cerebro_metric_module_info *metric_module_info;
+#if !WITH_STATIC_MODULES
   lt_dlhandle metric_dl_handle;
-  
+#endif /* !WITH_STATIC_MODULES */
+                                                                                      
+#if WITH_STATIC_MODULES
+  if (!handle || !module_info)
+#else /* !WITH_STATIC_MODULES */
   if (!handle || !dl_handle || !module_info)
+#endif /* !WITH_STATIC_MODULES */
     {
       CEREBRO_DBG(("invalid parameters"));
       return -1;
     }
   
   metric_handle = handle;
-  metric_module_info = module_info;
+#if !WITH_STATIC_MODULES
   metric_dl_handle = dl_handle;
+#endif /* !WITH_STATIC_MODULES */
+  metric_module_info = module_info;
   
   if (metric_handle->magic != METRIC_MODULE_MAGIC_NUMBER)
     {
@@ -110,7 +161,9 @@ _metric_module_cb(void *handle, void *dl_handle, void *module_info)
 
   if (metric_handle->modules_count < metric_handle->modules_max)
     {
+#if !WITH_STATIC_MODULES
       metric_handle->dl_handle[metric_handle->modules_count] = metric_dl_handle;
+#endif /* !WITH_STATIC_MODULES */
       metric_handle->module_info[metric_handle->modules_count] = metric_module_info;
       metric_handle->modules_count++;
       return 1;
@@ -144,12 +197,14 @@ metric_modules_load(unsigned int modules_max)
   handle->modules_max = modules_max;
   handle->modules_count = 0;
 
+#if !WITH_STATIC_MODULES
   if (!(handle->dl_handle = (lt_dlhandle *)malloc(sizeof(lt_dlhandle)*handle->modules_max)))
     {
       CEREBRO_DBG(("malloc: %s", strerror(errno)));
       goto cleanup;
     }
   memset(handle->dl_handle, '\0', sizeof(lt_dlhandle)*handle->modules_max);
+#endif /* !WITH_STATIC_MODULES */
   
   if (!(handle->module_info = (struct cerebro_metric_module_info **)malloc(sizeof(struct cerebro_metric_module_info *)*handle->modules_max)))
     {
@@ -158,16 +213,22 @@ metric_modules_load(unsigned int modules_max)
     }
   memset(handle->module_info, '\0', sizeof(struct cerebro_metric_module_info *)*handle->modules_max);
 
+#if WITH_STATIC_MODULES
+  if ((rv = find_and_load_modules(metric_modules,
+                                  _metric_module_cb,
+                                  handle,
+                                  handle->modules_max)) < 0)
+    goto cleanup;
+#else  /* !WITH_STATIC_MODULES */
   if ((rv = find_and_load_modules(METRIC_MODULE_DIR,
                                   NULL,
-                                  0,
                                   METRIC_FILENAME_SIGNATURE,
                                   _metric_module_cb,
                                   METRIC_MODULE_INFO_SYM,
                                   handle,
                                   handle->modules_max)) < 0)
     goto cleanup;
-
+#endif /* !WITH_STATIC_MODULES */
   if (rv)
     goto out;
 
@@ -181,6 +242,7 @@ metric_modules_load(unsigned int modules_max)
  cleanup:
   if (handle)
     {
+#if !WITH_STATIC_MODULES
       if (handle->dl_handle)
         {
           int i;
@@ -188,6 +250,7 @@ metric_modules_load(unsigned int modules_max)
             lt_dlclose(handle->dl_handle[i]);
           free(handle->dl_handle);
         }
+#endif /* !WITH_STATIC_MODULES */
       if (handle->module_info)
         free(handle->module_info);
       free(handle);
@@ -248,6 +311,7 @@ metric_modules_unload(metric_modules_t handle)
   for (i = 0; i < handle->modules_count; i++)
     metric_module_cleanup(handle, i);
 
+#if !WITH_STATIC_MODULES
   if (handle->dl_handle)
     {
       for (i = 0; i < handle->modules_count; i++)
@@ -255,6 +319,8 @@ metric_modules_unload(metric_modules_t handle)
       free(handle->dl_handle);
       handle->dl_handle = NULL;
     }
+#endif /* !WITH_STATIC_MODULES */
+
   if (handle->module_info)
     {
       free(handle->module_info);

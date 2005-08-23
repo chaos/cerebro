@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_genders.c,v 1.32 2005-07-27 00:03:38 achu Exp $
+ *  $Id: cerebro_clusterlist_genders.c,v 1.33 2005-08-23 21:10:15 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -215,7 +215,11 @@ genders_clusterlist_get_nodename(const char *node,
   return cerebro_copy_nodename(nodePtr, buf, buflen);
 }
 
+#if WITH_STATIC_MODULES
+struct cerebro_clusterlist_module_info genders_clusterlist_module_info =
+#else  /* !WITH_STATIC_MODULES */
 struct cerebro_clusterlist_module_info clusterlist_module_info =
+#endif /* !WITH_STATIC_MODULES */
   {
     GENDERS_CLUSTERLIST_MODULE_NAME,
     &genders_clusterlist_setup,

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_hostsfile.c,v 1.30 2005-07-22 17:21:07 achu Exp $
+ *  $Id: cerebro_clusterlist_hostsfile.c,v 1.31 2005-08-23 21:10:15 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -501,7 +501,11 @@ hostsfile_clusterlist_get_nodename(const char *node,
   return cerebro_copy_nodename(nodePtr, buf, buflen);
 }
 
+#if WITH_STATIC_MODULES
+struct cerebro_clusterlist_module_info hostsfile_clusterlist_module_info =
+#else  /* !WITH_STATIC_MODULES */
 struct cerebro_clusterlist_module_info clusterlist_module_info =
+#endif /* !WITH_STATIC_MODULES */
   {
     HOSTSFILE_CLUSTERLIST_MODULE_NAME,
     &hostsfile_clusterlist_setup,

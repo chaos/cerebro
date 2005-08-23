@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.11 2005-08-08 21:41:48 achu Exp $
+## $Id: Makefile.am,v 1.12 2005-08-23 21:10:15 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -11,22 +11,38 @@ endif
 
 if WITH_BOOTTIME
 BOOTTIME_METRIC_MODULE = cerebro_metric_boottime.la
+BOOTTIME_STATIC_SOURCES = cerebro_metric_boottime.c
 endif
 
 if WITH_SLURM_STATE
 SLURM_STATE_METRIC_MODULE = cerebro_metric_slurm_state.la
+SLURM_STATE_STATIC_SOURCES = cerebro_metric_slurm_state.c
 endif
 
 if WITH_BGL_CIOD
 BGL_CIOD_METRIC_MODULE = cerebro_metric_bgl_ciod.la
+BGL_CIOD_STATIC_SOURCES = cerebro_metric_bgl_ciod.c
 endif
 
+if WITH_STATIC_MODULES
+noinst_LTLIBRARIES = libmetricmodules.la
+else
 modulelibdir = $(CEREBRO_MODULE_DIR)
 modulelib_LTLIBRARIES = $(BOOTTIME_METRIC_MODULE) \
 			$(SLURM_STATE_METRIC_MODULE) \
 			$(BGL_CIOD_METRIC_MODULE)
+endif
 
 MODULE_FLAGS = -module -avoid-version
+
+libmetricmodules_la_SOURCES = $(BOOTTIME_STATIC_SOURCES) \
+			      $(SLURM_STATE_STATIC_SOURCES) \
+			      $(BGL_CIOD_STATIC_SOURCES)
+libmetricmodules_la_CFLAGS = -I$(srcdir)/../../libs/include \
+			     -I$(srcdir)/../../libs/common \
+			     -I$(srcdir)/../../libs/debug \
+			     -I$(srcdir)/../../libs/util
+libmetricmodules_la_LDFLAGS = $(METRIC_OTHER_FLAGS)
 
 cerebro_metric_boottime_la_SOURCES = cerebro_metric_boottime.c
 cerebro_metric_boottime_la_LDFLAGS = $(MODULE_FLAGS) \

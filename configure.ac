@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.61 2005-08-19 00:04:07 achu Exp $
+## $Id: configure.ac,v 1.62 2005-08-23 21:10:14 achu Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -89,6 +89,12 @@ AC_CEREBRO_METRIC_CONTROL_PATH
 AC_CEREBROD_PATH
 
 #
+# Check for static module compilation
+#
+AC_STATIC_MODULES
+AM_CONDITIONAL(WITH_STATIC_MODULES, [test "$ac_with_static_modules" = "yes"])
+
+#
 # Check to build gendersllnl module
 #
 AC_GENDERSLLNL
@@ -144,6 +150,31 @@ AM_CONDITIONAL(WITH_BGL_CIOD, [test "$ac_with_bgl_ciod" = "yes"])
 #
 AC_BOOTLOG
 AM_CONDITIONAL(WITH_BOOTLOG, [test "$ac_with_bootlog" = "yes"])
+
+#
+# Determine which static module libraries do not need to be linked
+# against under a static module build
+#
+AM_CONDITIONAL(WITH_CLUSTERLIST_STATIC_MODULES, 
+               [(test "$ac_with_static_modules" = "yes") &&
+                (test "$ac_with_gendersllnl" = "yes" || 
+                 test "$ac_with_genders" = "yes" || 
+                 test "$ac_with_hostsfile" = "yes")])
+
+AM_CONDITIONAL(WITH_CONFIG_STATIC_MODULES,
+               [(test "$ac_with_static_modules" = "yes") &&
+                (test "$ac_with_chaos_config" = "yes" || 
+                 test "$ac_with_bgl_config" = "yes")])
+
+AM_CONDITIONAL(WITH_METRIC_STATIC_MODULES,
+               [(test "$ac_with_static_modules" = "yes") &&
+                (test "$ac_with_boottime" = "yes" || 
+                 test "$ac_with_slurm_state" = "yes" || 
+                 test "$ac_with_bgl_ciod" = "yes")])
+
+AM_CONDITIONAL(WITH_MONITOR_STATIC_MODULES,
+               [(test "$ac_with_static_modules" = "yes") &&
+                (test "$ac_with_bootlog" = "yes")])
 
 ##
 # Checks for typedefs, structures, and compiler characteristics.

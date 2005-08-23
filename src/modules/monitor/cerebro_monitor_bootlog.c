@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_monitor_bootlog.c,v 1.17 2005-07-22 17:21:07 achu Exp $
+ *  $Id: cerebro_monitor_bootlog.c,v 1.18 2005-08-23 21:10:15 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -389,7 +389,11 @@ bootlog_monitor_metric_update(const char *nodename,
   return -1;
 }
 
+#if WITH_STATIC_MODULES
+struct cerebro_monitor_module_info boottime_monitor_module_info =
+#else  /* !WITH_STATIC_MODULES */
 struct cerebro_monitor_module_info monitor_module_info =
+#endif /* !WITH_STATIC_MODULES */
   {
     BOOTLOG_MONITOR_MODULE_NAME,
     &bootlog_monitor_setup,

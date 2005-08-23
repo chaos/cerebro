@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.120 2005-08-05 19:56:50 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.121 2005-08-23 21:10:14 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -187,6 +187,18 @@ _cerebrod_listener_initialize(void)
   
   if (clusterlist_module_setup(clusterlist_handle) < 0)
     CEREBRO_EXIT(("clusterlist_module_setup"));
+
+#if CEREBRO_DEBUG
+  if (conf.debug && conf.listen_debug)
+    {
+      fprintf(stderr, "**************************************\n");
+      fprintf(stderr, "* Cerebro Clusterlist\n");
+      fprintf(stderr, "* -----------------------\n");
+      fprintf(stderr, "* Using Clusterlist: %s\n", 
+              clusterlist_module_name(clusterlist_handle));
+      fprintf(stderr, "**************************************\n");
+    }
+#endif /* CEREBRO_DEBUG */
 
   cerebrod_listener_data_initialize();
 

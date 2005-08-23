@@ -1,14 +1,18 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.4 2005-08-06 00:16:23 achu Exp $
+## $Id: Makefile.am,v 1.5 2005-08-23 21:10:14 achu Exp $
 ##*****************************************************************************
 
 noinst_HEADERS	       = wrappers.h
+
+if !WITH_STATIC_MODULES
+LTDL_WRAPPERS_LIB = libwrappers_ltdl.la
+endif
 
 noinst_LTLIBRARIES     = libwrappers.la \
 			 libwrappers_hash.la \
 			 libwrappers_hostlist.la \
 			 libwrappers_list.la \
-			 libwrappers_ltdl.la \
+			 $(LTDL_WRAPPERS_LIB) \
 			 libwrappers_marshall.la \
 			 libwrappers_pthread.la
 

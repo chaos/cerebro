@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: ac_bootlog.m4,v 1.2 2005-06-14 23:01:49 achu Exp $
+## $Id: ac_bootlog.m4,v 1.3 2005-08-23 21:10:14 achu Exp $
 ##*****************************************************************************
 
 AC_DEFUN([AC_BOOTLOG],
@@ -16,8 +16,8 @@ AC_DEFUN([AC_BOOTLOG],
   )
   AC_MSG_RESULT([${ac_bootlog_test=yes}])
   
-  # bootlog daemon can only be built as a dynamically loadable 
-  # module
+  # The bootlog module cannot be built statically, b/c the qsql library
+  # requires dynamically loadable modules
   if test "$ac_with_static_modules" != "yes" && 
      test "$ac_bootlog_test" = "yes"; then
      AC_CHECK_LIB([dl], [dlopen], [ac_bootlog_have_dl=yes], [])
@@ -27,7 +27,7 @@ AC_DEFUN([AC_BOOTLOG],
   fi
 
   if test "$ac_bootlog_have_qsql" = "yes"; then
-     AC_DEFINE([WITH_BOOTLOG], [1], [Define if you want to build bootlog.])
+     AC_DEFINE([WITH_BOOTLOG], [1], [Define if you want the bootlog module.])
      BOOTLOG_LIBS="-lqsql -ldl"
      MANPAGE_BOOTLOG=1
      ac_with_bootlog=yes

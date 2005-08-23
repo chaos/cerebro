@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: monitor_module.c,v 1.12 2005-07-22 17:21:07 achu Exp $
+ *  $Id: monitor_module.c,v 1.13 2005-08-23 21:10:14 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -44,7 +44,39 @@
 #include "module_util.h"
 
 #include "debug.h"
+#if !WITH_STATIC_MODULES
 #include "ltdl.h"
+#endif /* !WITH_STATIC_MODULES */
+
+#if WITH_STATIC_MODULES
+
+/* 
+ * The bootlog module cannot be built statically, b/c the qsql library
+ * requires dynamically loadable modules
+ */
+#if 0
+#if WITH_BOOTLOG
+extern struct cerebro_monitor_module_info bootlog_monitor_module_info;
+#endif /* WITH_BOOTLOG */
+#endif /* 0 */
+
+/*
+ * monitor_modules
+ *
+ * monitor modules statically compiled in
+ */
+void *monitor_modules[] =
+  {
+#if 0
+#if WITH_BOOTLOG
+    &bootlog_monitor_module_info,
+#endif /* WITH_BOOTLOG */
+#endif /* 0 */
+    NULL
+  };
+
+#endif /* WITH_STATIC_MODULES */
+
 
 #define MONITOR_FILENAME_SIGNATURE  "cerebro_monitor_"
 #define MONITOR_MODULE_INFO_SYM     "monitor_module_info"
@@ -61,7 +93,9 @@ struct monitor_module
   int32_t magic;
   unsigned int modules_max;
   unsigned int modules_count;
+#if !WITH_STATIC_MODULES
   lt_dlhandle *dl_handle;
+#endif /* !WITH_STATIC_MODULES */
   struct cerebro_monitor_module_info **module_info;
 };
 
@@ -73,21 +107,33 @@ struct monitor_module
  * Return 1 is module is stored, 0 if not, -1 on fatal error
  */
 static int 
+#if WITH_STATIC_MODULES
+_monitor_module_cb(void *handle, void *module_info)
+#else  /* !WITH_STATIC_MODULES */
 _monitor_module_cb(void *handle, void *dl_handle, void *module_info)
+#endif /* !WITH_STATIC_MODULES */
 {
   monitor_modules_t monitor_handle;
   struct cerebro_monitor_module_info *monitor_module_info;
+#if !WITH_STATIC_MODULES
   lt_dlhandle monitor_dl_handle;
-
+#endif /* !WITH_STATIC_MODULES */
+                                                                                      
+#if WITH_STATIC_MODULES
+  if (!handle || !module_info)
+#else /* !WITH_STATIC_MODULES */
   if (!handle || !dl_handle || !module_info)
+#endif /* !WITH_STATIC_MODULES */
     {
       CEREBRO_DBG(("invalid parameters"));
       return -1;
     }
 
   monitor_handle = handle;
-  monitor_module_info = module_info;
+#if !WITH_STATIC_MODULES
   monitor_dl_handle = dl_handle;
+#endif /* !WITH_STATIC_MODULES */
+  monitor_module_info = module_info;
 
   if (monitor_handle->magic != MONITOR_MODULE_MAGIC_NUMBER)
     {
@@ -107,7 +153,9 @@ _monitor_module_cb(void *handle, void *dl_handle, void *module_info)
 
   if (monitor_handle->modules_count < monitor_handle->modules_max)
     {
+#if !WITH_STATIC_MODULES
       monitor_handle->dl_handle[monitor_handle->modules_count] = monitor_dl_handle;
+#endif /* !WITH_STATIC_MODULES */
       monitor_handle->module_info[monitor_handle->modules_count] = monitor_module_info;
       monitor_handle->modules_count++;
       return 1;
@@ -141,12 +189,14 @@ monitor_modules_load(unsigned int modules_max)
   handle->modules_max = modules_max;
   handle->modules_count = 0;
 
+#if !WITH_STATIC_MODULES
   if (!(handle->dl_handle = (lt_dlhandle *)malloc(sizeof(lt_dlhandle)*handle->modules_max)))
     {
       CEREBRO_DBG(("malloc: %s", strerror(errno)));
       goto cleanup;
     }
   memset(handle->dl_handle, '\0', sizeof(lt_dlhandle)*handle->modules_max);
+#endif /* !WITH_STATIC_MODULES */
   
   if (!(handle->module_info = (struct cerebro_monitor_module_info * *)malloc(sizeof(struct cerebro_monitor_module_info *)*handle->modules_max)))
     {
@@ -155,15 +205,22 @@ monitor_modules_load(unsigned int modules_max)
     }
   memset(handle->module_info, '\0', sizeof(struct cerebro_monitor_module_info *)*handle->modules_max);
 
+#if WITH_STATIC_MODULES
+  if ((rv = find_and_load_modules(monitor_modules,
+                                  _monitor_module_cb,
+                                  handle,
+                                  handle->modules_max)) < 0)
+    goto cleanup;
+#else  /* !WITH_STATIC_MODULES */
   if ((rv = find_and_load_modules(MONITOR_MODULE_DIR,
                                   NULL,
-                                  0,
                                   MONITOR_FILENAME_SIGNATURE,
                                   _monitor_module_cb,
                                   MONITOR_MODULE_INFO_SYM,
                                   handle,
                                   handle->modules_max)) < 0)
     goto cleanup;
+#endif /* !WITH_STATIC_MODULES */
 
   if (rv)
     goto out;
@@ -178,6 +235,7 @@ monitor_modules_load(unsigned int modules_max)
  cleanup:
   if (handle)
     {
+#if !WITH_STATIC_MODULES
       if (handle->dl_handle)
         {
           int i;
@@ -185,6 +243,7 @@ monitor_modules_load(unsigned int modules_max)
             lt_dlclose(handle->dl_handle[i]);
           free(handle->dl_handle);
         }
+#endif /* !WITH_STATIC_MODULES */
       if (handle->module_info)
         free(handle->module_info);
       free(handle);
@@ -245,6 +304,7 @@ monitor_modules_unload(monitor_modules_t handle)
   for (i = 0; i < handle->modules_count; i++)
     monitor_module_cleanup(handle, i);
 
+#if !WITH_STATIC_MODULES
   if (handle->dl_handle)
     {
       for (i = 0; i < handle->modules_count; i++)
@@ -252,6 +312,8 @@ monitor_modules_unload(monitor_modules_t handle)
       free(handle->dl_handle);
       handle->dl_handle = NULL;
     }
+#endif /* !WITH_STATIC_MODULES */
+
   if (handle->module_info)
     {
       free(handle->module_info);

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: config_module.c,v 1.14 2005-08-19 00:04:10 achu Exp $
+ *  $Id: config_module.c,v 1.15 2005-08-23 21:10:14 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -45,11 +45,40 @@
 #include "module_util.h"
 
 #include "debug.h"
+#if !WITH_STATIC_MODULES
 #include "ltdl.h"
+#endif /* !WITH_STATIC_MODULES */
+
+#if WITH_STATIC_MODULES
+
+#if WITH_CHAOS_CONFIG
+extern struct cerebro_config_module_info chaos_config_module_info;
+#endif /* WITH_CHAOS_CONFIG */
+                                                                                      
+#if WITH_BGL_CONFIG
+extern struct cerebro_config_module_info bgl_config_module_info;
+#endif /* WITH_BGL_CONFIG */
 
 /*
  * config_modules
- * config_modules_len
+ *
+ * config modules statically compiled in
+ */
+void *config_modules[] =
+  {
+#if WITH_CHAOS_CONFIG
+    &chaos_config_module_info,
+#endif /* WITH_CHAOS_CONFIG */
+#if WITH_BGL_CONFIG
+    &bgl_config_module_info,
+#endif /* WITH_BGL_CONFIG */
+    NULL
+  };
+
+#else /* !WITH_STATIC_MODULES */
+
+/*
+ * config_modules
  *
  * dynamic configuration modules to search for by default
  */
@@ -58,11 +87,13 @@ char *config_modules[] = {
   "cerebro_config_bgl.so",
   NULL
 };
-int config_modules_len = 1;
+
+#endif /* !WITH_STATIC_MODULES */
 
 #define CONFIG_FILENAME_SIGNATURE      "cerebro_config_"
 #define CONFIG_MODULE_INFO_SYM         "config_module_info"
 #define CONFIG_MODULE_DIR              CONFIG_MODULE_BUILDDIR "/.libs"
+#define CONFIG_MODULE_MAX              1
 #define CONFIG_MODULE_MAGIC_NUMBER     0x33882211
 
 /* 
@@ -73,7 +104,9 @@ int config_modules_len = 1;
 struct config_module
 {
   int32_t magic;
+#if !WITH_STATIC_MODULES
   lt_dlhandle dl_handle;
+#endif /* !WITH_STATIC_MODULES */
   struct cerebro_config_module_info *module_info;
 };
 
@@ -87,21 +120,33 @@ extern struct cerebro_config_module_info default_config_module_info;
  * Return 1 is module is stored, 0 if not, -1 on fatal error
  */
 static int
+#if WITH_STATIC_MODULES
+_config_module_cb(void *handle, void *module_info)
+#else  /* !WITH_STATIC_MODULES */
 _config_module_cb(void *handle, void *dl_handle, void *module_info)
+#endif /* !WITH_STATIC_MODULES */
 {
   config_module_t config_handle;
   struct cerebro_config_module_info *config_module_info;
+#if !WITH_STATIC_MODULES
   lt_dlhandle config_dl_handle;
-  
+#endif /* !WITH_STATIC_MODULES */
+
+#if WITH_STATIC_MODULES
+  if (!handle || !module_info)
+#else /* !WITH_STATIC_MODULES */  
   if (!handle || !dl_handle || !module_info)
+#endif /* !WITH_STATIC_MODULES */
     {
       CEREBRO_DBG(("invalid parameters"));
       return -1;
     }
 
   config_handle = handle;
-  config_module_info = module_info;
+#if !WITH_STATIC_MODULES
   config_dl_handle = dl_handle;
+#endif /* !WITH_STATIC_MODULES */
+  config_module_info = module_info;
 
   if (config_handle->magic != CONFIG_MODULE_MAGIC_NUMBER)
     {
@@ -118,7 +163,9 @@ _config_module_cb(void *handle, void *dl_handle, void *module_info)
       return 0;
     }
 
+#if !WITH_STATIC_MODULES
   config_handle->dl_handle = config_dl_handle;
+#endif /* !WITH_STATIC_MODULES */
   config_handle->module_info = config_module_info;
   return 1;
 }
@@ -140,20 +187,29 @@ config_module_load(void)
   memset(handle, '\0', sizeof(struct config_module));
   handle->magic = CONFIG_MODULE_MAGIC_NUMBER;
 
+#if WITH_STATIC_MODULES
+  if ((rv = find_and_load_modules(config_modules,
+                                  _config_module_cb,
+                                  handle,
+                                  CONFIG_MODULE_MAX)) < 0)
+    goto cleanup;
+#else  /* !WITH_STATIC_MODULES */
   if ((rv = find_and_load_modules(CONFIG_MODULE_DIR,
                                   config_modules,
-                                  config_modules_len,
                                   CONFIG_FILENAME_SIGNATURE,
                                   _config_module_cb,
                                   CONFIG_MODULE_INFO_SYM,
                                   handle,
-                                  1)) < 0)
+                                  CONFIG_MODULE_MAX)) < 0)
     goto cleanup;
+#endif /* !WITH_STATIC_MODULES */
 
   if (rv)
     goto out;
 
+#if !WITH_STATIC_MODULES
   handle->dl_handle = NULL;
+#endif /* !WITH_STATIC_MODULES */
   handle->module_info = &default_config_module_info;
  out:
   return handle;
@@ -161,8 +217,10 @@ config_module_load(void)
  cleanup:
   if (handle)
     {
+#if !WITH_STATIC_MODULES
       if (handle->dl_handle)
         lt_dlclose(handle->dl_handle);
+#endif /* !WITH_STATIC_MODULES */
       free(handle);
     }
   module_cleanup();
@@ -199,8 +257,10 @@ config_module_unload(config_module_t handle)
   config_module_cleanup(handle);
 
   handle->magic = ~CONFIG_MODULE_MAGIC_NUMBER;
+#if !WITH_STATIC_MODULES
   if (handle->dl_handle)
     lt_dlclose(handle->dl_handle);
+#endif /* !WITH_STATIC_MODULES */
   handle->module_info = NULL;
   free(handle);
 

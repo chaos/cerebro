@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: ac_bgl_ciod.m4,v 1.1 2005-08-05 00:23:22 achu Exp $
+## $Id: ac_bgl_ciod.m4,v 1.2 2005-08-23 21:10:14 achu Exp $
 ##*****************************************************************************
 
 AC_DEFUN([AC_BGL_CIOD],
@@ -17,6 +17,7 @@ AC_DEFUN([AC_BGL_CIOD],
   AC_MSG_RESULT([${ac_bgl_ciod_test=yes}])
 
   if test "$ac_bgl_ciod_test" = "yes"; then
+     AC_DEFINE([WITH_BGL_CIOD], [1], [Define if you want the bgl_ciod module.])
      MANPAGE_BGL_CIOD=1
      ac_with_bgl_ciod=yes
   else

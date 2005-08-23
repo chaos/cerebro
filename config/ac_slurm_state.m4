@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: ac_slurm_state.m4,v 1.3 2005-07-18 22:06:47 achu Exp $
+## $Id: ac_slurm_state.m4,v 1.4 2005-08-23 21:10:14 achu Exp $
 ##*****************************************************************************
 
 AC_DEFUN([AC_SLURM_STATE],
@@ -17,6 +17,7 @@ AC_DEFUN([AC_SLURM_STATE],
   AC_MSG_RESULT([${ac_slurm_state_test=yes}])
 
   if test "$ac_slurm_state_test" = "yes"; then
+     AC_DEFINE([WITH_SLURM_STATE], [1], [Define if you want the slurm_state module.])
      MANPAGE_SLURM_STATE=1
      ac_with_slurm_state=yes
   else

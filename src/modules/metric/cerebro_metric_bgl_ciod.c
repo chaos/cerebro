@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_bgl_ciod.c,v 1.5 2005-08-18 00:14:43 achu Exp $
+ *  $Id: cerebro_metric_bgl_ciod.c,v 1.6 2005-08-23 21:10:15 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -306,7 +306,11 @@ bgl_ciod_metric_get_metric_thread(void)
   return NULL;
 }
 
+#if WITH_STATIC_MODULES
+struct cerebro_metric_module_info bgl_ciod_metric_module_info =
+#else  /* !WITH_STATIC_MODULES */
 struct cerebro_metric_module_info metric_module_info =
+#endif /* !WITH_STATIC_MODULES */
   {
     BGL_CIOD_METRIC_MODULE_NAME,
     &bgl_ciod_metric_setup,

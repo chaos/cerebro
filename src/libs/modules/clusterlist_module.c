@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: clusterlist_module.c,v 1.10 2005-07-22 17:21:07 achu Exp $
+ *  $Id: clusterlist_module.c,v 1.11 2005-08-23 21:10:14 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -44,11 +44,47 @@
 #include "module_util.h"
 
 #include "debug.h"
+#if !WITH_STATIC_MODULES
 #include "ltdl.h"
+#endif /* !WITH_STATIC_MODULES */
+
+#if WITH_STATIC_MODULES
+
+#if WITH_GENDERSLLNL
+extern struct cerebro_clusterlist_module_info gendersllnl_clusterlist_module_info;
+#endif /* WITH_GENDERSLLNL */
+
+#if WITH_GENDERS
+extern struct cerebro_clusterlist_module_info genders_clusterlist_module_info;
+#endif /* WITH_GENDERS */
+
+#if WITH_HOSTSFILE
+extern struct cerebro_clusterlist_module_info hostsfile_clusterlist_module_info;
+#endif /* WITH_HOSTSFILE */
 
 /*
  * clusterlist_modules
- * clusterlist_modules_len
+ *
+ * clusterlist modules statically compiled in
+ */
+void *clusterlist_modules[] =
+  {
+#if WITH_GENDERSLLNL
+    &gendersllnl_clusterlist_module_info,
+#endif /* WITH_GENDERSLLNL */
+#if WITH_GENDERS
+    &genders_clusterlist_module_info,
+#endif /* WITH_GENDERS */
+#if WITH_HOSTSFILE
+    &hostsfile_clusterlist_module_info,
+#endif /* WITH_HOSTSFILE */
+    NULL
+  };
+
+#else /* !WITH_STATIC_MODULES */
+
+/*
+ * clusterlist_modules
  *
  * dynamic clusterlist modules to search for by default
  */
@@ -58,11 +94,13 @@ char *clusterlist_modules[] = {
   "cerebro_clusterlist_hostsfile.so",
   NULL
 };
-int clusterlist_modules_len = 3;
+
+#endif /* !WITH_STATIC_MODULES */
 
 #define CLUSTERLIST_FILENAME_SIGNATURE  "cerebro_clusterlist_"
 #define CLUSTERLIST_MODULE_INFO_SYM     "clusterlist_module_info"
 #define CLUSTERLIST_MODULE_DIR          CLUSTERLIST_MODULE_BUILDDIR "/.libs"
+#define CLUSTERLIST_MODULE_MAX          1
 #define CLUSTERLIST_MODULE_MAGIC_NUMBER 0x33882200
 
 /* 
@@ -73,7 +111,9 @@ int clusterlist_modules_len = 3;
 struct clusterlist_module
 {
   int32_t magic;
+#if !WITH_STATIC_MODULES
   lt_dlhandle dl_handle;
+#endif /* !WITH_STATIC_MODULES */
   struct cerebro_clusterlist_module_info *module_info;
 };
 
@@ -87,21 +127,33 @@ extern struct cerebro_clusterlist_module_info default_clusterlist_module_info;
  * Return 1 is module is stored, 0 if not, -1 on fatal error
  */
 static int
+#if WITH_STATIC_MODULES
+_clusterlist_module_cb(void *handle, void *module_info)
+#else  /* !WITH_STATIC_MODULES */
 _clusterlist_module_cb(void *handle, void *dl_handle, void *module_info)
+#endif /* !WITH_STATIC_MODULES */
 {
   clusterlist_module_t clusterlist_handle;
   struct cerebro_clusterlist_module_info *clusterlist_module_info;
+#if !WITH_STATIC_MODULES
   lt_dlhandle clusterlist_dl_handle;
+#endif /* !WITH_STATIC_MODULES */
 
+#if WITH_STATIC_MODULES
+  if (!handle || !module_info)
+#else /* !WITH_STATIC_MODULES */
   if (!handle || !dl_handle || !module_info)
+#endif /* !WITH_STATIC_MODULES */
     {
       CEREBRO_DBG(("invalid parameters"));
       return -1;
     }
 
   clusterlist_handle = handle;
-  clusterlist_module_info = module_info;
+#if !WITH_STATIC_MODULES
   clusterlist_dl_handle = dl_handle;
+#endif /* !WITH_STATIC_MODULES */
+  clusterlist_module_info = module_info;
     
   if (clusterlist_handle->magic != CLUSTERLIST_MODULE_MAGIC_NUMBER)
     {
@@ -121,7 +173,9 @@ _clusterlist_module_cb(void *handle, void *dl_handle, void *module_info)
       return 0;
     }
 
+#if !WITH_STATIC_MODULES
   clusterlist_handle->dl_handle = clusterlist_dl_handle;
+#endif /* !WITH_STATIC_MODULES */
   clusterlist_handle->module_info = clusterlist_module_info;
   return 1;
 }
@@ -143,20 +197,29 @@ clusterlist_module_load(void)
   memset(handle, '\0', sizeof(struct clusterlist_module));
   handle->magic = CLUSTERLIST_MODULE_MAGIC_NUMBER;
       
+#if WITH_STATIC_MODULES
+  if ((rv = find_and_load_modules(clusterlist_modules,
+                                  _clusterlist_module_cb,
+                                  handle,
+                                  CLUSTERLIST_MODULE_MAX)) < 0)
+    goto cleanup;
+#else  /* !WITH_STATIC_MODULES */
   if ((rv = find_and_load_modules(CLUSTERLIST_MODULE_DIR,
                                   clusterlist_modules,
-                                  clusterlist_modules_len,
                                   CLUSTERLIST_FILENAME_SIGNATURE,
                                   _clusterlist_module_cb,
                                   CLUSTERLIST_MODULE_INFO_SYM,
                                   handle,
-                                  1)) < 0)
+                                  CLUSTERLIST_MODULE_MAX)) < 0)
     goto cleanup;
+#endif  /* !WITH_STATIC_MODULES */
   
   if (rv)
     goto out;
 
+#if !WITH_STATIC_MODULES
   handle->dl_handle = NULL;
+#endif /* !WITH_STATIC_MODULES */
   handle->module_info = &default_clusterlist_module_info;
  out:
   return handle;
@@ -164,8 +227,10 @@ clusterlist_module_load(void)
  cleanup:
   if (handle)
     {
+#if !WITH_STATIC_MODULES
       if (handle->dl_handle)
         lt_dlclose(handle->dl_handle);
+#endif /* !WITH_STATIC_MODULES */
       free(handle);
     }
   module_cleanup();
@@ -202,8 +267,10 @@ clusterlist_module_unload(clusterlist_module_t handle)
   clusterlist_module_cleanup(handle);
 
   handle->magic = ~CLUSTERLIST_MODULE_MAGIC_NUMBER;
+#if !WITH_STATIC_MODULES
   if (handle->dl_handle)
     lt_dlclose(handle->dl_handle);
+#endif /* !WITH_STATIC_MODULES */
   handle->module_info = NULL;
   free(handle);
 

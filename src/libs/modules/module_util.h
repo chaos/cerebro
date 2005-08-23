@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: module_util.h,v 1.3 2005-07-22 17:21:07 achu Exp $
+ *  $Id: module_util.h,v 1.4 2005-08-23 21:10:14 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -28,6 +28,10 @@
 #ifndef _MODULE_UTIL_H
 #define _MODULE_UTIL_H
 
+#if HAVE_CONFIG_H
+#include "config.h"
+#endif /* HAVE_CONFIG_H */
+
 /*
  * Module_callback
  *
@@ -36,7 +40,11 @@
  *
  * Returns 1 on success, 0 on failure, -1 on fatal error
  */
+#if WITH_STATIC_MODULES
+typedef int (*Module_callback)(void *handle, void *module_info);
+#else  /* !WITH_STATIC_MODULES */
 typedef int (*Module_callback)(void *handle, void *dl_handle, void *module_info);
+#endif /* !WITH_STATIC_MODULES */
 
 /*
  * find_and_load_modules
@@ -45,14 +53,20 @@ typedef int (*Module_callback)(void *handle, void *dl_handle, void *module_info)
  *
  * Returns 1 if modules are loaded, 0 if not, -1 on error
  */
+#if WITH_STATIC_MODULES
+int find_and_load_modules(void **modules_list,
+                          Module_callback module_cb,
+                          void *handle,
+                          unsigned int modules_max);
+#else /* !WITH_STATIC_MODULES */
 int find_and_load_modules(char *module_dir,
                           char **modules_list,
-                          int modules_list_len,
                           char *signature,
                           Module_callback module_cb,
                           char *module_info_sym,
                           void *handle,
                           unsigned int modules_max);
+#endif /* !WITH_STATIC_MODULES */
 
 /* 
  * module_setup

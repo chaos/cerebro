@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.5 2005-08-08 17:17:02 achu Exp $
+## $Id: Makefile.am,v 1.6 2005-08-23 21:10:14 achu Exp $
 ##*****************************************************************************
 
 noinst_HEADERS	       = clusterlist_module.h \
@@ -7,6 +7,31 @@ noinst_HEADERS	       = clusterlist_module.h \
 			 metric_module.h \
 			 monitor_module.h \
 			 module_util.h
+
+if WITH_CLUSTERLIST_STATIC_MODULES
+CLUSTERLIST_STATIC_LIB = ../../modules/clusterlist/libclusterlistmodules.la
+endif
+
+if WITH_CONFIG_STATIC_MODULES
+CONFIG_STATIC_LIB = ../../modules/config/libconfigmodules.la
+endif
+
+if WITH_METRIC_STATIC_MODULES
+METRIC_STATIC_LIB = ../../modules/metric/libmetricmodules.la
+endif
+
+if WITH_MONITOR_STATIC_MODULES
+MONITOR_STATIC_LIB = ../../modules/monitor/libmonitormodules.la
+endif
+
+if WITH_STATIC_MODULES
+STATIC_MODULE_LIBS = $(CLUSTERLIST_STATIC_LIB) \
+		     $(CONFIG_STATIC_LIB) \
+		     $(METRIC_STATIC_LIB) \
+		     $(MONITOR_STATIC_LIB)
+else
+LTDL_LIBS = ../common/libltdl.la
+endif
 
 clusterlist_module_builddir=`cd $(top_builddir)/src/modules/clusterlist && pwd`
 config_module_builddir=`cd $(top_builddir)/src/modules/config && pwd`
@@ -28,13 +53,26 @@ libmodules_la_SOURCES = clusterlist_module.c \
 			metric_module.c \
 			monitor_module.c \
 			module_util.c
-libmodules_la_LIBADD  = ../common/libltdl.la \
+libmodules_la_LIBADD  = $(LTDL_LIBS) \
+			$(STATIC_MODULE_LIBS) \
 			../debug/libdebug.la
 
 ../common/libltdl.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
 ../debug/libdebug.la : force-dependency-check
+	@cd `dirname $@` && make `basename $@`
+
+../../modules/clusterlist/libclusterlistmodules.la : force-dependency-check
+	@cd `dirname $@` && make `basename $@`
+
+../../modules/config/libconfigmodules.la : force-dependency-check
+	@cd `dirname $@` && make `basename $@`
+
+../../modules/metric/libmetricmodules.la : force-dependency-check
+	@cd `dirname $@` && make `basename $@`
+
+../../modules/monitor/libmonitormodules.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
 force-dependency-check:

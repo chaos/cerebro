@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_chaos.c,v 1.1 2005-08-18 22:57:08 achu Exp $
+ *  $Id: cerebro_config_chaos.c,v 1.2 2005-08-23 21:10:15 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -271,7 +271,11 @@ chaos_config_load_config(struct cerebro_config *conf)
   return 0;
 }
 
+#if WITH_STATIC_MODULES
+struct cerebro_config_module_info chaos_config_module_info =
+#else  /* !WITH_STATIC_MODULES */
 struct cerebro_config_module_info config_module_info =
+#endif /* !WITH_STATIC_MODULES */
   {
     CHAOS_CONFIG_MODULE_NAME,
     &chaos_config_setup,

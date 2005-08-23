@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_bgl.c,v 1.2 2005-08-19 00:22:45 achu Exp $
+ *  $Id: cerebro_config_bgl.c,v 1.3 2005-08-23 21:10:15 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -179,7 +179,11 @@ bgl_config_load_config(struct cerebro_config *conf)
   return 0;
 }
 
+#if WITH_STATIC_MODULES
+struct cerebro_config_module_info bgl_config_module_info =
+#else  /* !WITH_STATIC_MODULES */
 struct cerebro_config_module_info config_module_info =
+#endif /* !WITH_STATIC_MODULES */
   {
     BGL_CONFIG_MODULE_NAME,
     &bgl_config_setup,

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: module_util.c,v 1.14 2005-07-22 17:21:07 achu Exp $
+ *  $Id: module_util.c,v 1.15 2005-08-23 21:10:14 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -34,6 +34,7 @@
 #if STDC_HEADERS
 #include <string.h>
 #endif /* STDC_HEADERS */
+#if !WITH_STATIC_MODULES
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -41,12 +42,15 @@
 #include <unistd.h>
 #endif /* HAVE_UNISTD_H */
 #include <dirent.h>
+#endif /* !WITH_STATIC_MODULES */
 
 #include "cerebro.h"
 #include "cerebro/cerebro_constants.h"
 
 #include "debug.h"
+#if !WITH_STATIC_MODULES
 #include "ltdl.h"
+#endif /* !WITH_STATIC_MODULES */
 #include "module_util.h"
 
 /*  
@@ -56,6 +60,50 @@
  */
 int module_setup_count = 0;
 
+#if WITH_STATIC_MODULES
+int 
+find_and_load_modules(void **modules_list,
+                      Module_callback module_cb,
+                      void *handle,
+                      unsigned int modules_max)
+{
+  int found = 0;
+ 
+  /* modules_list need not be passed in */
+  if (!module_cb
+      || !handle
+      || !modules_max)
+    {
+      CEREBRO_DBG(("invalid parameters"));
+      return -1;
+    }
+
+  if (modules_list)
+    {
+      void *module_info;
+      int i = 0;
+
+      while ((module_info = modules_list[i]))
+        {
+          int flag;
+          
+          if ((flag = module_cb(handle, module_info)) < 0)
+            return -1;
+
+          if (flag)
+            found++;
+          
+          if (found >= modules_max)
+            goto out;
+
+          i++;
+        }
+    }
+
+ out:
+  return (found) ? 1 : 0;
+}
+#else /* !WITH_STATIC_MODULES */
 /* 
  * _load_module
  * 
@@ -125,7 +173,6 @@ _load_module(char *search_dir,
  *
  * - search_dir - directory to search
  * - modules_list - list of modules to search for
- * - modules_list_len - length of list
  * - module_cb - function to call when a possible module is found
  * - handle - pointer to module handle
  *
@@ -134,7 +181,6 @@ _load_module(char *search_dir,
 static int
 _find_known_module(char *search_dir,
                    char **modules_list,
-                   int modules_list_len,
                    Module_callback module_cb,
                    char *module_info_sym,
                    void *handle)
@@ -144,7 +190,6 @@ _find_known_module(char *search_dir,
 
   if (!search_dir
       || !modules_list
-      || !(modules_list_len > 0)
       || !module_cb
       || !module_info_sym
       || !handle)
@@ -160,7 +205,7 @@ _find_known_module(char *search_dir,
       return 0;
     }
 
-  for (i = 0; i < modules_list_len; i++)
+  while (modules_list[i])
     {
       struct dirent *dirent;
 
@@ -185,6 +230,7 @@ _find_known_module(char *search_dir,
             }
         }
       rewinddir(dir);
+      i++;
     }
 
  out:
@@ -280,7 +326,6 @@ _find_unknown_modules(char *search_dir,
 int 
 find_and_load_modules(char *module_dir,
                       char **modules_list,
-                      int modules_list_len,
                       char *signature,
                       Module_callback module_cb,
                       char *module_info_sym,
@@ -289,7 +334,7 @@ find_and_load_modules(char *module_dir,
 {
   int rv;
 
-  /* modules_list and modules_list_len need not be passed in */
+  /* modules_list need not be passed in */
   if (!module_dir
       || !signature
       || !module_cb
@@ -301,12 +346,11 @@ find_and_load_modules(char *module_dir,
       return -1;
     }
 
-  if (modules_list && modules_list_len)
+  if (modules_list)
     {
 #if CEREBRO_DEBUG
       if ((rv = _find_known_module(module_dir,
                                    modules_list,
-                                   modules_list_len,
                                    module_cb,
                                    module_info_sym,
                                    handle)) < 0)
@@ -318,7 +362,6 @@ find_and_load_modules(char *module_dir,
       
       if ((rv = _find_known_module(CEREBRO_MODULE_DIR,
                                    modules_list,
-                                   modules_list_len,
                                    module_cb,
                                    module_info_sym,
                                    handle)) < 0)
@@ -354,6 +397,7 @@ find_and_load_modules(char *module_dir,
 
   return 0;
 }
+#endif /* !WITH_STATIC_MODULES */
 
 int 
 module_setup(void)
@@ -361,11 +405,13 @@ module_setup(void)
   if (module_setup_count)
     goto out;
 
+#if !WITH_STATIC_MODULES
   if (lt_dlinit() != 0)
     {
       CEREBRO_DBG(("lt_dlinit: %s", lt_dlerror()));
       return -1;
     }
+#endif /* !WITH_STATIC_MODULES */
 
  out:
   module_setup_count++;
@@ -380,12 +426,15 @@ module_cleanup(void)
 
   if (!module_setup_count)
     {
+#if !WITH_STATIC_MODULES
       if (lt_dlexit() != 0)
         {
           CEREBRO_DBG(("lt_dlexit: %s", lt_dlerror()));
           return -1;
         }
+#endif /* !WITH_STATIC_MODULES */
     }
 
   return 0;
 }
+

@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.10 2005-06-27 05:05:20 achu Exp $
+## $Id: Makefile.am,v 1.11 2005-08-23 21:10:15 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -11,12 +11,24 @@ endif
 
 if WITH_BOOTLOG
 BOOTLOG_MONITOR_MODULE = cerebro_monitor_bootlog.la
+BOOTLOG_STATIC_SOURCES = cerebro_monitor_bootlog.c
+BOOTLOG_STATIC_LIBS = $(BOOTLOG_LIBS)
 endif
 
+if WITH_STATIC_MODULES
+noinst_LTLIBRARIES = libmonitormodules.la
+else
 modulelibdir = $(CEREBRO_MODULE_DIR)
 modulelib_LTLIBRARIES = $(BOOTLOG_MONITOR_MODULE)
+endif
 
 MODULE_FLAGS = -module -avoid-version
+
+libmonitormodules_la_SOURCES = $(BOOTLOG_STATIC_SOURCES)
+libmonitormodules_la_CFLAGS  = -I$(srcdir)/../../libs/include \
+			       -I$(srcdir)/../../libs/debug
+libmonitormodules_la_LDFLAGS = $(BOOTLOG_LIBS) \
+			       $(MONITOR_OTHER_FLAGS)
 
 cerebro_monitor_bootlog_la_SOURCES = cerebro_monitor_bootlog.c
 cerebro_monitor_bootlog_la_LDFLAGS = $(MODULE_FLAGS) \

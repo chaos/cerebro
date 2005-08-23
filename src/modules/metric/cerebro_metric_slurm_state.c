@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_slurm_state.c,v 1.15 2005-08-05 19:43:31 achu Exp $
+ *  $Id: cerebro_metric_slurm_state.c,v 1.16 2005-08-23 21:10:15 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -369,7 +369,11 @@ slurm_state_metric_get_metric_thread(void)
   return &slurm_state_metric_thread;
 }
 
+#if WITH_STATIC_MODULES
+struct cerebro_metric_module_info slurm_state_metric_module_info =
+#else  /* !WITH_STATIC_MODULES */
 struct cerebro_metric_module_info metric_module_info =
+#endif /* !WITH_STATIC_MODULES */
   {
     SLURM_STATE_METRIC_MODULE_NAME,
     &slurm_state_metric_setup,
