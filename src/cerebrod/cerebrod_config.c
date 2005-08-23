@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.122 2005-08-23 21:57:02 achu Exp $
+ *  $Id: cerebrod_config.c,v 1.123 2005-08-23 22:19:51 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -157,8 +157,8 @@ _version(void)
 static void
 _cerebrod_cmdline_arguments_parse(int argc, char **argv)
 { 
-  char c;
   char options[100];
+  int c;
 
 #if HAVE_GETOPT_LONG
   struct option long_options[] =
