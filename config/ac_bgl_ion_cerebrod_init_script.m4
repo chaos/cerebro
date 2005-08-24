@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: ac_bgl_ion_cerebrod_init_script.m4,v 1.1 2005-08-24 18:42:24 achu Exp $
+## $Id: ac_bgl_ion_cerebrod_init_script.m4,v 1.2 2005-08-24 19:02:17 achu Exp $
 ##*****************************************************************************
 
 AC_DEFUN([AC_BGL_ION_CEREBROD_INIT_SCRIPT],
@@ -14,7 +14,7 @@ AC_DEFUN([AC_BGL_ION_CEREBROD_INIT_SCRIPT],
       esac
     ]
   )
-  AC_MSG_RESULT([${ac_bgl_ion_cerebrod_init_script_test=yes}])
+  AC_MSG_RESULT([${ac_bgl_ion_cerebrod_init_script_test=no}])
 
   if test "$ac_bgl_ion_cerebrod_init_script_test" = "yes"; then
      BGL_ION_CEREBROD_INIT_SCRIPT=yes
@@ -24,5 +24,5 @@ AC_DEFUN([AC_BGL_ION_CEREBROD_INIT_SCRIPT],
      ac_with_bgl_ion_cerebrod_init_script_test=no
   fi
  
-  AC_SUBST(BGL_ION_CEREBROD_INIT_SCRIPT_TEST)
+  AC_SUBST(BGL_ION_CEREBROD_INIT_SCRIPT)
 ])
