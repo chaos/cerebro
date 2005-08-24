@@ -16,6 +16,9 @@ Future Features
 - listener
   - limit data receiving based on host list or subnet
   - allow listening to multiple subnets/networks/ips/multciasts?
+  - allow mixed listening
+    i.e. accept heartbeats from nodes in genders database and
+         nodes on a specific subnet. Would be useful for BGL.
 
 - event based monitoring
 
