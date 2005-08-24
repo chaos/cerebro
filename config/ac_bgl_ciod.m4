@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: ac_bgl_ciod.m4,v 1.2 2005-08-23 21:10:14 achu Exp $
+## $Id: ac_bgl_ciod.m4,v 1.3 2005-08-24 17:21:18 achu Exp $
 ##*****************************************************************************
 
 AC_DEFUN([AC_BGL_CIOD],
@@ -33,8 +33,8 @@ AC_DEFUN([AC_BGL_CIOD_CONFIG_FILE],
   BGL_CIOD_CONFIG_FILE="/etc/cerebro_bgl_ciod.conf"     
 
   AC_MSG_CHECKING([for the bgl ciod config file])
-  AC_ARG_WITH([bgl-ciod-control-path],
-    AC_HELP_STRING([--with-bgl-ciod-control-path], 
+  AC_ARG_WITH([bgl-ciod-config-file],
+    AC_HELP_STRING([--with-bgl-ciod-config-file], 
                    [Define bgl ciod config file]),
     [ case "$withval" in
         no)  ;;
