@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.64 2005-08-24 18:42:24 achu Exp $
+## $Id: configure.ac,v 1.65 2005-08-24 23:46:11 achu Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -92,6 +92,12 @@ AC_CEREBRO_METRIC_CONTROL_PATH
 #
 AC_STATIC_MODULES
 AM_CONDITIONAL(WITH_STATIC_MODULES, [test "$ac_with_static_modules" = "yes"])
+
+#
+# Check for cerebrod speaker only build
+#
+AC_CEREBROD_SPEAKER_ONLY
+AM_CONDITIONAL(WITH_CEREBROD_SPEAKER_ONLY, [test "$ac_with_cerebrod_speaker_only" = "yes"])
 
 #
 # Check to build gendersllnl module
@@ -211,8 +217,10 @@ ACX_PTHREAD([], AC_MSG_ERROR([Posix threads required to build]))
 # Don't define WITH_PTHREADS, libcommon will not be built with
 # pthreads.  Thread locking is the responsibility of binaries
 # AC_DEFINE(WITH_PTHREADS, 1, [Define pthreads])
-LIBS="$PTHREAD_LIBS $LIBS"
-CFLAGS="$PTHREAD_CFLAGS $CFLAGS"
+#
+# Set LIBS and CFLAGS in Makefile.am, not here
+# LIBS="$PTHREAD_LIBS $LIBS"
+# CFLAGS="$PTHREAD_CFLAGS $CFLAGS"
 
 AC_DEFINE(WITH_LSD_FATAL_ERROR_FUNC, 1, [Define lsd_fatal_error])
 

@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.69 2005-08-08 23:01:33 achu Exp $
+## $Id: Makefile.am,v 1.70 2005-08-24 23:46:11 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -19,6 +19,12 @@ noinst_HEADERS = cerebrod.h \
 #
 # cerebrod daemon
 #
+
+# For some reason pthread symbols can't be found when I 
+# add PTHREAD_CFLAGS to cerebrod_CFLAGS below.  Must be
+# due to some linker ordering issue.
+AM_CFLAGS = $(PTHREAD_CFLAGS)
+AM_LDFLAGS = $(PTHREAD_LIBS)
 
 sbin_PROGRAMS    = cerebrod
 cerebrod_SOURCES = cerebrod.c \
