@@ -1,5 +1,9 @@
 Name:    @PROJECT@ 
+%if %{?_with_bglion:1}%{!?_with_bglion:0}
+Version: @VERSION@-bglion
+%else
 Version: @VERSION@
+%endif
 %if %{?_with_chaos:1}%{!?_with_chaos:0}
 %if %{?_with_debug:1}%{!?_with_debug:0}
 Release: @RELEASE@chaos.debug
@@ -39,36 +43,51 @@ Conflicts: ganglia-monitor-core
 Cerebro is a collection of cluster monitoring tools and libraries.
 
 %if %{?_with_chaos:1}%{!?_with_chaos:0}
-%define _with_gendersllnl      --with-gendersllnl
-%define _without_genders       --without-genders
-%define _without_hostsfile     --without-hostsfile
-%define _with_chaos_config     --with-chaos-config
-%define _without_bgl_config    --without-bgl-config
-%define _without_slurm_state   --without-slurm-state
-%define _without_bgl_ciod      --without-bgl-ciod
+%define _with_gendersllnl           --with-gendersllnl
+%define _without_genders            --without-genders
+%define _without_hostsfile          --without-hostsfile
+%define _with_chaos_config          --with-chaos-config
+%define _without_bgl_config         --without-bgl-config
+%define _without_slurm_state        --without-slurm-state
+%define _without_bgl_ciod           --without-bgl-ciod
 %ifarch ia64
-%define _with_boottime         --with-boottime
-%define _with_bootlog          --with-bootlog
+%define _with_boottime              --with-boottime
+%define _with_bootlog               --with-bootlog
 %else
-%define _without_boottime      --without-boottime
-%define _without_bootlog       --without-bootlog
+%define _without_boottime           --without-boottime
+%define _without_bootlog            --without-bootlog
 %endif
 %endif
 
 %if %{?_with_bgl:1}%{!?_with_bgl:0} 
-%define _without_gendersllnl   --without-gendersllnl
-%define _without_genders       --without-genders
-%define _without_hostsfile     --without-hostsfile
-%define _without_chaos_config  --without-chaos-config
-%define _with_bgl_config       --with-bgl-config
-%define _without_boottime      --without-boottime
-%define _without_slurm_state   --without-slurm-state
-%define _with_bgl_ciod         --with-bgl-ciod
-%define _without_bootlog       --without-bootlog
+%define _without_gendersllnl        --without-gendersllnl
+%define _without_genders            --without-genders
+%define _without_hostsfile          --without-hostsfile
+%define _without_chaos_config       --without-chaos-config
+%define _with_bgl_config            --with-bgl-config
+%define _without_boottime           --without-boottime
+%define _without_slurm_state        --without-slurm-state
+%define _without_bgl_ciod           --without-bgl-ciod
+%define _without_bootlog            --without-bootlog
+%endif
+
+%if %{?_with_bglion:1}%{!?_with_bglion:0} 
+%define _without_gendersllnl        --without-gendersllnl
+%define _without_genders            --without-genders
+%define _without_hostsfile          --without-hostsfile
+%define _without_chaos_config       --without-chaos-config
+%define _with_bgl_config            --with-bgl-config
+%define _without_boottime           --without-boottime
+%define _without_slurm_state        --without-slurm-state
+%define _with_bgl_ciod              --without-bgl-ciod
+%define _without_bootlog            --without-bootlog
+%define _with_cerebro_config_file   --with-cerebro-config-file=/bgl/ion/etc/cerebro.conf
+%define _with_bgl_ciod_config_file  --with-bgl-ciod-config-file=/bgl/ion/etc/cerebro_bgl_ciod.conf
 %endif
 
 %if %{?_with_chaos:0}%{!?_with_chaos:1}
 %if %{?_with_bgl:0}%{!?_with_bgl:1} 
+%if %{?_with_bglion:0}%{!?_with_bglion:1} 
 %{!?_with_gendersllnl: %{!?_without_gendersllnl: %define _with_gendersllnl --with-gendersllnl}}
 %{!?_with_genders: %{!?_without_genders: %define _with_genders --with-genders}}
 %{!?_with_hostsfile: %{!?_without_hostsfile: %define _with_hostsfile --with-hostsfile}}
@@ -143,7 +162,6 @@ Requires: cerebro
 %description metric-bgl-ciod
 Metric module to monitor bgl_ciod.
 
-%if %{?_with_chaos:1}%{!?_with_chaos:0}
 %package bootlog
 Summary: bootlog module
 Group: System Environment/Base
@@ -151,16 +169,6 @@ Requires: cerebro
 Requires: qsqsql
 %description bootlog
 Bootlog monitoring module.
-%endif
-
-%if %{?_with_bgl:1}%{!?_with_bgl:0}
-%package bglion
-Summary: bglion module
-Group: System Environment/Base
-Requires: cerebro
-%description bglion
-bglion metric module.
-%endif
 
 %prep
 %setup  -q -n @PROJECT@-@VERSION@-@RELEASE@
@@ -185,6 +193,8 @@ bglion metric module.
            %{?_without_bgl_ciod} \
            %{?_with_bootlog} \
            %{?_without_bootlog} \
+           %{?_with_cerebro_config_file} \
+           %{?_with_bgl_ciod_config_file} \
            %{?_enable_debug}
 make 
 
@@ -236,6 +246,10 @@ fi
 %endif
 %if %{?_with_bgl:1}%{!?_with_bgl:0} 
 %{_libdir}/cerebro/cerebro_config*
+%endif
+%if %{?_with_bglion:1}%{!?_with_bglion:0} 
+%{_libdir}/cerebro/cerebro_config*
+%{_libdir}/cerebro/cerebro_metric*
 %endif
 
 %if %{?_with_chaos:0}%{!?_with_chaos:1}
@@ -289,6 +303,12 @@ fi
 %{_libdir}/cerebro/cerebro_metric_bgl_ciod.*
 %endif
 
+%if %{?_with_bootlog:1}%{!?_with_bootlog:0}
+%files monitor-bootlog
+%defattr(700,root,root)
+%{_libdir}/cerebro/cerebro_monitor_bootlog.*
+%endif
+
 %endif
 %endif
 
@@ -299,10 +319,4 @@ fi
 %{_libdir}/cerebro/cerebro_metric_boottime.*
 %{_libdir}/cerebro/cerebro_monitor_bootlog.*
 %endif
-%endif
-
-%if %{?_with_bgl:1}%{!?_with_bgl:0}
-%files bglion
-%defattr(700,root,root)
-%{_libdir}/cerebro/cerebro_metric*
 %endif

@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.62 2005-08-23 21:10:14 achu Exp $
+## $Id: configure.ac,v 1.63 2005-08-24 18:31:43 achu Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -219,8 +219,6 @@ AC_CONFIG_FILES( \
   cerebro.spec \
   Makefile \
   etc/Makefile \
-  etc/cerebrod-redhat \
-  etc/cerebrod-suse \
   man/Makefile \
   man/cerebro-admin.8 \
   man/cerebro-stat.8 \

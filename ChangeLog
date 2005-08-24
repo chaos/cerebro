@@ -4,6 +4,12 @@
 
 	* Added support for ubgl configuration and fixed up bgl
 	configuration.
+
+	* Fixed up spec file for bglion builds.
+
+	* Altered some init.d script generation.
+
+	* Fixed bug in bgl ciod config.
 	
 2005-08-23  Albert Chu  <chu11@llnl.gov>
 
