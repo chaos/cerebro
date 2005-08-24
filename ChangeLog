@@ -1,6 +1,9 @@
 2005-08-24  Albert Chu  <chu11@llnl.gov>
 
 	* Altered some debug message output conditions.
+
+	* Added support for ubgl configuration and fixed up bgl
+	configuration.
 	
 2005-08-23  Albert Chu  <chu11@llnl.gov>
 

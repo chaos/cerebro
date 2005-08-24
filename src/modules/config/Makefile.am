@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.16 2005-08-23 21:10:15 achu Exp $
+## $Id: Makefile.am,v 1.17 2005-08-24 16:26:05 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -25,7 +25,7 @@ noinst_LTLIBRARIES = libconfigmodules.la
 else
 modulelibdir = $(CEREBRO_MODULE_DIR)
 modulelib_LTLIBRARIES = $(CHAOS_CONFIG_MODULE) \
-		        $(BGL_CONFIG_MODULE) 
+			$(BGL_CONFIG_MODULE)
 endif
 
 MODULE_FLAGS = -module -avoid-version

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_bgl.c,v 1.3 2005-08-23 21:10:15 achu Exp $
+ *  $Id: cerebro_config_bgl.c,v 1.4 2005-08-24 16:26:05 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -55,9 +55,17 @@ extern int h_errno;
 
 #define BGL_CONFIG_MODULE_NAME "bgl"
 
-#define BGL_MGMT_NODE          "bgli"
-
 #define BGL_SUBNET             "172.0.0.1/8"
+
+#define BGL_MGMT               "bgli"
+
+#define UBGL_MGMT              "ubglsn"
+
+#define BGL_MGMT_IO            "bgli-io"
+
+#define UBGL_MGMT_IO           "ubglsn-io"
+
+#define UBGL_SIGNATURE         "ubgl"
 
 /*
  * bgl_config_setup
@@ -86,11 +94,11 @@ bgl_config_cleanup(void)
 /* 
  * bgl_config_load_config
  *
- * config specifically for use on BlueGene/L.  
+ * config specifically for use on BlueGene/L (BGL) and the smaller UBGL.  
  *
- * bgli listens, everyone else only speaks.
+ * The management nodes bgli/ubglsn listen, everyone else only speaks.
  *
- * singlecast speak to bgli.
+ * Heartbeat packets are singlecast to the management nodes.
  *
  * All communication is on the 172.*.*.* subnet.
  *
@@ -99,10 +107,11 @@ bgl_config_cleanup(void)
 int
 bgl_config_load_config(struct cerebro_config *conf)
 {
-  char buf[CEREBRO_MAX_NODENAME_LEN+1];
+  char hbuf[CEREBRO_MAX_NODENAME_LEN+1];
   char intf[INET_ADDRSTRLEN+1];
   struct hostent *h = NULL;
   struct in_addr in;
+  char *mgmt, *mgmtio;
 
   if (!conf)
     {
@@ -110,14 +119,26 @@ bgl_config_load_config(struct cerebro_config *conf)
       return -1;
     }
 
-  memset(buf, '\0', CEREBRO_MAX_NODENAME_LEN+1);
-  if (gethostname(buf, CEREBRO_MAX_NODENAME_LEN) < 0)
+  memset(hbuf, '\0', CEREBRO_MAX_NODENAME_LEN+1);
+  if (gethostname(hbuf, CEREBRO_MAX_NODENAME_LEN) < 0)
     {
       CEREBRO_DBG(("gethostname: %s", strerror(errno)));
       return -1;
     }
 
-  if (strstr(buf, BGL_MGMT_NODE))
+  /* Figure out which cluster we're on */
+  if (strstr(hbuf, UBGL_SIGNATURE))
+    {
+      mgmt = UBGL_MGMT;
+      mgmtio = UBGL_MGMT_IO;
+    }
+  else
+    {
+      mgmt = BGL_MGMT;
+      mgmtio = UBGL_MGMT_IO;
+    }
+
+  if (!strcasecmp(hbuf, BGL_MGMT) || !strcasecmp(hbuf, UBGL_MGMT))
     {
       conf->cerebrod_speak = 1;
       conf->cerebrod_speak_flag++;
@@ -140,12 +161,12 @@ bgl_config_load_config(struct cerebro_config *conf)
       conf->cerebrod_metric_server_flag++;
       
       memset(conf->cerebro_hostnames[0], '\0', CEREBRO_MAX_HOSTNAME_LEN+1);
-      strncpy(conf->cerebro_hostnames[0], BGL_MGMT_NODE, CEREBRO_MAX_HOSTNAME_LEN);
+      strncpy(conf->cerebro_hostnames[0], mgmt, CEREBRO_MAX_HOSTNAME_LEN);
       conf->cerebro_hostnames_len = 1;
       conf->cerebro_hostnames_flag++;
     }
 
-  if (!(h = gethostbyname(BGL_MGMT_NODE)))
+  if (!(h = gethostbyname(mgmtio)))
     {
       CEREBRO_DBG(("gethostbyname: %s", hstrerror(h_errno)));
       return -1;
