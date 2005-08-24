@@ -1,6 +1,14 @@
+2005-08-24  Albert Chu  <chu11@llnl.gov>
+
+	* Altered some debug message output conditions.
+	
 2005-08-23  Albert Chu  <chu11@llnl.gov>
 
 	* Re-added static module build option.
+
+	* Various minor fixes.
+
+	* Various minor fixes to make cerebro work on ppc. 
 	
 2005-08-22  Albert Chu  <chu11@llnl.gov>
 

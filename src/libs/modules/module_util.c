@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: module_util.c,v 1.15 2005-08-23 21:10:14 achu Exp $
+ *  $Id: module_util.c,v 1.16 2005-08-24 15:55:08 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -200,8 +200,11 @@ _find_known_module(char *search_dir,
 
   if (!(dir = opendir(search_dir)))
     {
-      /* Return 0, since dir may simply not exist */
-      CEREBRO_DBG(("opendir: %s: %s", search_dir, strerror(errno)));
+      if (errno != ENOENT)
+        {
+          CEREBRO_DBG(("opendir: %s: %s", search_dir, strerror(errno)));
+          return -1;
+        }
       return 0;
     }
 
@@ -281,8 +284,11 @@ _find_unknown_modules(char *search_dir,
 
   if (!(dir = opendir(search_dir)))
     {
-      /* Return 0, since dir may simply not exist */
-      CEREBRO_DBG(("opendir: %s: %s", search_dir, strerror(errno)));
+      if (errno != ENOENT)
+        {
+          CEREBRO_DBG(("opendir: %s: %s", search_dir, strerror(errno)));
+          return -1;
+        }
       return 0;
     }
 
