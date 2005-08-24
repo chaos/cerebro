@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: network_util.c,v 1.4 2005-08-08 21:41:48 achu Exp $
+ *  $Id: network_util.c,v 1.5 2005-08-24 18:42:24 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -183,11 +183,11 @@ low_timeout_connect(const char *hostname,
 {
   int rv, old_flags, fd = -1;
   struct sockaddr_in addr;
-#if HAVE_GETHOSTBYNAME_R_6
+#if HAVE_FUNC_GETHOSTBYNAME_R_6
   struct hostent hent;
   int h_errnop;
   char buf[GETHOSTBYNAME_AUX_BUFLEN];
-#endif /* HAVE_GETHOSTBYNAME_R_6 */
+#endif /* HAVE_FUNC_GETHOSTBYNAME_R_6 */
   struct hostent *hptr;
   
   if (!hostname || !port || !connect_timeout)
@@ -198,7 +198,7 @@ low_timeout_connect(const char *hostname,
       return -1;
     }
   
-#if HAVE_GETHOSTBYNAME_R_6
+#if HAVE_FUNC_GETHOSTBYNAME_R_6
   memset(&hent, '\0', sizeof(struct hostent));
   if (gethostbyname_r(hostname, 
                       &hent, 
@@ -212,7 +212,7 @@ low_timeout_connect(const char *hostname,
         *errnum = CEREBRO_ERR_HOSTNAME;
       return -1;
     }
-#else  /* !HAVE_GETHOSTBYNAME_R */
+#else  /* !HAVE_FUNC_GETHOSTBYNAME_R */
   /* valgrind will report a mem-leak in gethostbyname() */
   if (!(hptr = gethostbyname(hostname)))
     {
@@ -221,7 +221,7 @@ low_timeout_connect(const char *hostname,
         *errnum = CEREBRO_ERR_HOSTNAME;
       return -1;
     }
-#endif /* !HAVE_GETHOSTBYNAME_R */
+#endif /* !HAVE_FUNC_GETHOSTBYNAME_R */
   
   /* Alot of this code is from Unix Network Programming, by Stevens */
   

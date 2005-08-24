@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.63 2005-08-24 18:31:43 achu Exp $
+## $Id: configure.ac,v 1.64 2005-08-24 18:42:24 achu Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -86,7 +86,6 @@ AC_CHECK_HEADERS( \
 AC_CEREBRO_MODULE_DIR
 AC_CEREBRO_CONFIG_FILE
 AC_CEREBRO_METRIC_CONTROL_PATH
-AC_CEREBROD_PATH
 
 #
 # Check for static module compilation
@@ -150,6 +149,11 @@ AM_CONDITIONAL(WITH_BGL_CIOD, [test "$ac_with_bgl_ciod" = "yes"])
 #
 AC_BOOTLOG
 AM_CONDITIONAL(WITH_BOOTLOG, [test "$ac_with_bootlog" = "yes"])
+
+#
+# Check if we should use the special bgl ion init.d script
+#
+AC_BGL_ION_CEREBROD_INIT_SCRIPT
 
 #
 # Determine which static module libraries do not need to be linked

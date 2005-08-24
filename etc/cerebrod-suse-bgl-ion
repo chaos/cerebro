@@ -1,0 +1,48 @@
+#!/bin/sh
+# $Id: cerebrod-suse-bgl-ion,v 1.1 2005-08-24 18:42:24 achu Exp $
+#
+
+CEREBROD=/bgl/ion/usr/sbin/cerebrod
+ 
+. /etc/rc.status
+ 
+rc_reset
+
+case "$1" in
+    start)
+        echo -n "Starting cerebrod"
+        # achu: BG/L is F'ed up, we need this for some reason
+        LD_LIBRARY_PATH=/bgl/ion-toolchain/gnu/build-powerpc-bgl-linux-gnu/tempglibc-3.2-install/li
+        startproc $CEREBROD
+        rc_status -v
+        ;;
+    stop)
+        echo -n "Shutting down cerebrod"
+        killproc -TERM $CEREBROD
+        rc_status -v
+        ;;
+    restart)
+        $0 stop
+        $0 start
+        rc_status
+        ;;
+    status)
+        echo -n "Checking for cerebrod: "
+        checkproc $CEREBROD
+        rc_status -v
+        ;;
+    condrestart)
+        $0 status
+        if test $? = 0; then
+                $0 restart
+        else
+                rc_reset
+        fi
+        rc_status
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|status|restart|condrestart}"
+        exit 1
+        ;;
+esac
+rc_exit

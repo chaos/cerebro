@@ -10,6 +10,8 @@
 	* Altered some init.d script generation.
 
 	* Fixed bug in bgl ciod config.
+
+	* Fix gethostbyname bug.
 	
 2005-08-23  Albert Chu  <chu11@llnl.gov>
 
