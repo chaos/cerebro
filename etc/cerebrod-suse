@@ -1,5 +1,5 @@
 #!/bin/sh
-# $Id: cerebrod-suse.in,v 1.3 2005-08-18 16:41:52 achu Exp $
+# $Id: cerebrod-suse,v 1.4 2005-08-24 18:31:26 achu Exp $
 #
 ### BEGIN INIT INFO
 # Provides: cerebrod
@@ -10,7 +10,7 @@
 # Description:    Start cerebrod-
 ### END INIT INFO
 
-CEREBROD=@CEREBROD_PATH@
+CEREBROD=/usr/sbin/cerebrod
  
 . /etc/rc.status
  
