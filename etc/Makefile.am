@@ -1,10 +1,10 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.7 2005-08-24 19:02:17 achu Exp $
+## $Id: Makefile.am,v 1.8 2005-08-25 23:33:44 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
 
-EXTRA_DIST = cerebrod-redhat cerebrod-suse
+EXTRA_DIST = cerebrod-redhat cerebrod-suse cerebrod-suse-bgl-ion
  
 install-data-hook:
 	$(top_srcdir)/config/install-sh -m 755 -d $(DESTDIR)/$(sysconfdir)/init.d
