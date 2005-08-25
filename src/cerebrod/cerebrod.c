@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.79 2005-08-25 00:25:31 achu Exp $
+ *  $Id: cerebrod.c,v 1.80 2005-08-25 01:44:21 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -46,6 +46,7 @@
 #include "wrappers.h"
 
 #if CEREBRO_DEBUG
+#if !WITH_CEREBROD_NO_THREADS
 /*  
  * debug_output_mutex
  *
@@ -58,6 +59,7 @@
  * not lock around cerebro_err_debug or similar statements.
  */
 pthread_mutex_t debug_output_mutex = PTHREAD_MUTEX_INITIALIZER;
+#endif /* !WITH_CEREBROD_NO_THREADS */
 #endif /* CEREBRO_DEBUG */
 
 #if !WITH_CEREBROD_SPEAKER_ONLY

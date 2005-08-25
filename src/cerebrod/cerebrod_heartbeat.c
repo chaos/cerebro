@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_heartbeat.c,v 1.44 2005-07-22 17:21:07 achu Exp $
+ *  $Id: cerebrod_heartbeat.c,v 1.45 2005-08-25 01:44:21 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -68,13 +68,17 @@ void
 cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb)
 {
 #if CEREBRO_DEBUG
-  int i, rv;
+  int i;
+#if !WITH_CEREBROD_NO_THREADS
+  int rv;
+#endif /* !WITH_CEREBROD_NO_THREADS */
 
   assert(hb);
 
   if (!conf.debug)
     return;
 
+#if !WITH_CEREBROD_NO_THREADS
   rv = Pthread_mutex_trylock(&debug_output_mutex);
   if (rv != EBUSY)
     {
@@ -82,6 +86,7 @@ cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb)
               __FILE__, __FUNCTION__, __LINE__, rv);
       exit(1);
     }
+#endif /* !WITH_CEREBROD_NO_THREADS */
       
   fprintf(stderr, "**************************************\n");
   fprintf(stderr, "* Cerebrod Heartbeat:\n");     

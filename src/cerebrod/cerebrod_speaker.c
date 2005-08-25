@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.83 2005-08-19 23:09:20 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.84 2005-08-25 01:44:21 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -59,7 +59,9 @@
 
 extern struct cerebrod_config conf;
 #if CEREBRO_DEBUG
+#if !WITH_CEREBROD_NO_THREADS
 extern pthread_mutex_t debug_output_mutex;
+#endif /* !WITH_CEREBROD_NO_THREADS */
 #endif /* CEREBRO_DEBUG */
 
 /*
@@ -299,13 +301,17 @@ _cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb)
   if (!(conf.debug && conf.speak_debug))
     return;
 
+#if !WITH_CEREBROD_NO_THREADS
   Pthread_mutex_lock(&debug_output_mutex);
+#endif /* !WITH_CEREBROD_NO_THREADS */
   fprintf(stderr, "**************************************\n");
   fprintf(stderr, "* Sending Heartbeat\n");     
   fprintf(stderr, "* -----------------------\n");
   cerebrod_heartbeat_dump(hb);
   fprintf(stderr, "**************************************\n");
+#if !WITH_CEREBROD_NO_THREADS
   Pthread_mutex_unlock(&debug_output_mutex);
+#endif /* !WITH_CEREBROD_NO_THREADS */
 #endif /* CEREBRO_DEBUG */
 }
 

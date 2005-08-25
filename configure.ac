@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.65 2005-08-24 23:46:11 achu Exp $
+## $Id: configure.ac,v 1.66 2005-08-25 01:44:21 achu Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -97,7 +97,9 @@ AM_CONDITIONAL(WITH_STATIC_MODULES, [test "$ac_with_static_modules" = "yes"])
 # Check for cerebrod speaker only build
 #
 AC_CEREBROD_SPEAKER_ONLY
+AC_CEREBROD_NO_THREADS
 AM_CONDITIONAL(WITH_CEREBROD_SPEAKER_ONLY, [test "$ac_with_cerebrod_speaker_only" = "yes"])
+AM_CONDITIONAL(WITH_CEREBROD_NO_THREADS, [test "$ac_with_cerebrod_no_threads" = "yes"])
 
 #
 # Check to build gendersllnl module
