@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_util.c,v 1.31 2005-07-22 17:21:07 achu Exp $
+ *  $Id: cerebrod_util.c,v 1.32 2005-08-25 00:25:31 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -46,6 +46,8 @@
 extern struct cerebrod_config conf;
 
 #define CEREBROD_REINITIALIZE_TIME 2
+
+#if !WITH_CEREBROD_SPEAKER_ONLY
 
 /* 
  * _hash_removeall
@@ -116,6 +118,8 @@ cerebrod_rehash(hash_t *old_hash,
 
   *old_hash = new_hash;
 }
+
+#endif /* !WITH_CEREBROD_SPEAKER_ONLY */
 
 int
 cerebrod_reinit_socket(int old_fd, Cerebrod_socket_setup socket_setup, char *msg)

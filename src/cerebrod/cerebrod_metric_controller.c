@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_controller.c,v 1.30 2005-08-19 23:09:20 achu Exp $
+ *  $Id: cerebrod_metric_controller.c,v 1.31 2005-08-25 00:25:31 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -28,6 +28,8 @@
 #if HAVE_CONFIG_H
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
+
+#if !WITH_CEREBROD_SPEAKER_ONLY
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -978,3 +980,5 @@ cerebrod_metric_controller(void *arg)
 
   return NULL;			/* NOT REACHED */
 }
+
+#endif /* !WITH_CEREBROD_SPEAKER_ONLY */

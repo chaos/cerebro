@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.78 2005-08-22 15:50:08 achu Exp $
+ *  $Id: cerebrod.c,v 1.79 2005-08-25 00:25:31 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -60,7 +60,7 @@
 pthread_mutex_t debug_output_mutex = PTHREAD_MUTEX_INITIALIZER;
 #endif /* CEREBRO_DEBUG */
 
-extern struct cerebrod_config conf;
+#if !WITH_CEREBROD_SPEAKER_ONLY
 
 extern int listener_init;
 extern pthread_cond_t listener_init_cond;
@@ -74,9 +74,9 @@ extern int metric_server_init;
 extern pthread_cond_t metric_server_init_cond;
 extern pthread_mutex_t metric_server_init_lock;
 
-extern int speaker_init;
-extern pthread_cond_t speaker_init_cond;
-extern pthread_mutex_t speaker_init_lock;
+#endif /* !WITH_CEREBROD_SPEAKER_ONLY */
+
+extern struct cerebrod_config conf;
 
 int 
 main(int argc, char **argv)
@@ -103,6 +103,8 @@ main(int argc, char **argv)
    * open fds 
    */
   openlog(argv[0], LOG_ODELAY | LOG_PID, LOG_DAEMON);
+
+#if !WITH_CEREBROD_SPEAKER_ONLY
 
   /* Start metric server before the listener begins receiving data. */
   if (conf.metric_server)
@@ -168,6 +170,8 @@ main(int argc, char **argv)
                           &metric_controller_init_lock);
       Pthread_mutex_unlock(&metric_controller_init_lock);
     }
+
+#endif /* !WITH_CEREBROD_SPEAKER_ONLY */
 
   /* Start speaker  
    *

@@ -12,6 +12,8 @@
 	* Fixed bug in bgl ciod config.
 
 	* Fix gethostbyname bug.
+
+	* Add support for --with-cerebrod-speaker-only option.
 	
 2005-08-23  Albert Chu  <chu11@llnl.gov>
 
