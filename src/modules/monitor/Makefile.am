@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.11 2005-08-23 21:10:15 achu Exp $
+## $Id: Makefile.am,v 1.12 2005-08-25 18:23:42 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -16,7 +16,7 @@ BOOTLOG_STATIC_LIBS = $(BOOTLOG_LIBS)
 endif
 
 if WITH_STATIC_MODULES
-noinst_LTLIBRARIES = libmonitormodules.la
+noinst_LTLIBRARIES = libstaticmonitormodules.la
 else
 modulelibdir = $(CEREBRO_MODULE_DIR)
 modulelib_LTLIBRARIES = $(BOOTLOG_MONITOR_MODULE)
@@ -24,11 +24,11 @@ endif
 
 MODULE_FLAGS = -module -avoid-version
 
-libmonitormodules_la_SOURCES = $(BOOTLOG_STATIC_SOURCES)
-libmonitormodules_la_CFLAGS  = -I$(srcdir)/../../libs/include \
-			       -I$(srcdir)/../../libs/debug
-libmonitormodules_la_LDFLAGS = $(BOOTLOG_LIBS) \
-			       $(MONITOR_OTHER_FLAGS)
+libstaticmonitormodules_la_SOURCES = $(BOOTLOG_STATIC_SOURCES)
+libstaticmonitormodules_la_CFLAGS  = -I$(srcdir)/../../libs/include \
+			       	     -I$(srcdir)/../../libs/debug
+libstaticmonitormodules_la_LDFLAGS = $(BOOTLOG_LIBS) \
+			       	     $(MONITOR_OTHER_FLAGS)
 
 cerebro_monitor_bootlog_la_SOURCES = cerebro_monitor_bootlog.c
 cerebro_monitor_bootlog_la_LDFLAGS = $(MODULE_FLAGS) \

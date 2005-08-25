@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.18 2005-08-23 21:10:15 achu Exp $
+## $Id: Makefile.am,v 1.19 2005-08-25 18:23:42 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -35,7 +35,7 @@ CLUSTERLIST_UTIL_SOURCES = cerebro_clusterlist_util.c
 endif
 
 if WITH_STATIC_MODULES
-noinst_LTLIBRARIES = libclusterlistmodules.la
+noinst_LTLIBRARIES = libstaticclusterlistmodules.la
 else
 modulelibdir = $(CEREBRO_MODULE_DIR)
 modulelib_LTLIBRARIES = $(GENDERSLLNL_CLUSTERLIST_MODULE) \
@@ -46,17 +46,17 @@ endif
 
 MODULE_FLAGS = -module -avoid-version
 
-libclusterlistmodules_la_SOURCES = $(GENDERSLLNL_STATIC_SOURCES) \
-                                   $(GENDERS_STATIC_SOURCES) \
-                                   $(GENDERS_STATIC_UTIL_SOURCES) \
-                                   $(HOSTSFILE_STATIC_SOURCES) \
-                                   $(CLUSTERLIST_UTIL_SOURCES)
-libclusterlistmodules_la_CFLAGS  = -I$(srcdir)/../../libs/include \
-				   -I$(srcdir)/../../libs/common \
-				   -I$(srcdir)/../../libs/debug
-libclusterlistmodules_la_LDFLAGS = $(GENDERSLLNL_STATIC_LIBS) \
-				   $(GENDERS_STATIC_LIBS) \
-				   $(CLUSTERLIST_OTHER_FLAGS)
+libstaticclusterlistmodules_la_SOURCES = $(GENDERSLLNL_STATIC_SOURCES) \
+					 $(GENDERS_STATIC_SOURCES) \
+					 $(GENDERS_STATIC_UTIL_SOURCES) \
+					 $(HOSTSFILE_STATIC_SOURCES) \
+					 $(CLUSTERLIST_UTIL_SOURCES)
+libstaticclusterlistmodules_la_CFLAGS  = -I$(srcdir)/../../libs/include \
+				   	 -I$(srcdir)/../../libs/common \
+				   	 -I$(srcdir)/../../libs/debug
+libstaticclusterlistmodules_la_LDFLAGS = $(GENDERSLLNL_STATIC_LIBS) \
+					 $(GENDERS_STATIC_LIBS) \
+				   	 $(CLUSTERLIST_OTHER_FLAGS)
 
 cerebro_clusterlist_gendersllnl_la_SOURCES = cerebro_clusterlist_gendersllnl.c \
 					     cerebro_clusterlist_genders_util.c \
