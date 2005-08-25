@@ -1,3 +1,7 @@
+2005-08-25  Albert Chu  <chu11@llnl.gov>
+
+	* Update spec file for bglion build.
+	
 2005-08-24  Albert Chu  <chu11@llnl.gov>
 
 	* Altered some debug message output conditions.

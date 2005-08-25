@@ -81,6 +81,8 @@ Cerebro is a collection of cluster monitoring tools and libraries.
 %define _without_slurm_state        --without-slurm-state
 %define _with_bgl_ciod              --without-bgl-ciod
 %define _without_bootlog            --without-bootlog
+%define _with_cerebrod_speaker_only --with-cerebrod-speaker-only
+%define _with_cerebrod_no_threads   --with-cerebrod-no-threads
 %define _with_cerebro_config_file   --with-cerebro-config-file=/bgl/ion/etc/cerebro.conf
 %define _with_bgl_ciod_config_file  --with-bgl-ciod-config-file=/bgl/ion/etc/cerebro_bgl_ciod.conf
 %endif
@@ -193,6 +195,10 @@ Bootlog monitoring module.
            %{?_without_bgl_ciod} \
            %{?_with_bootlog} \
            %{?_without_bootlog} \
+           %{?_with_cerebrod_speaker_only} \
+           %{?_without_cerebrod_speaker_only} \
+           %{?_with_cerebrod_no_threads} \
+           %{?_without_cerebrod_no_threads} \
            %{?_with_cerebro_config_file} \
            %{?_with_bgl_ciod_config_file} \
            %{?_enable_debug}
