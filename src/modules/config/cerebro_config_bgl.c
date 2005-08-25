@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_bgl.c,v 1.4 2005-08-24 16:26:05 achu Exp $
+ *  $Id: cerebro_config_bgl.c,v 1.5 2005-08-25 23:05:03 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -42,8 +42,6 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
-
-#include <gendersllnl.h>
 
 #include "cerebro/cerebro_config_module.h"
 #include "cerebro/cerebro_constants.h"
