@@ -1,5 +1,5 @@
 #!/bin/sh
-# $Id: cerebrod-suse-bgl-ion,v 1.1 2005-08-24 18:42:24 achu Exp $
+# $Id: cerebrod-suse-bgl-ion,v 1.2 2005-08-25 23:43:18 achu Exp $
 #
 
 CEREBROD=/bgl/ion/usr/sbin/cerebrod
@@ -12,7 +12,7 @@ case "$1" in
     start)
         echo -n "Starting cerebrod"
         # achu: BG/L is F'ed up, we need this for some reason
-        LD_LIBRARY_PATH=/bgl/ion-toolchain/gnu/build-powerpc-bgl-linux-gnu/tempglibc-3.2-install/li
+        LD_LIBRARY_PATH=/bgl/ion-toolchain/gnu/build-powerpc-bgl-linux-gnu/tempglibc-3.2-install/lib
         startproc $CEREBROD
         rc_status -v
         ;;
