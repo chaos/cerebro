@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.6 2005-08-23 21:10:14 achu Exp $
+## $Id: Makefile.am,v 1.7 2005-08-25 18:25:12 achu Exp $
 ##*****************************************************************************
 
 noinst_HEADERS	       = clusterlist_module.h \
@@ -9,19 +9,19 @@ noinst_HEADERS	       = clusterlist_module.h \
 			 module_util.h
 
 if WITH_CLUSTERLIST_STATIC_MODULES
-CLUSTERLIST_STATIC_LIB = ../../modules/clusterlist/libclusterlistmodules.la
+CLUSTERLIST_STATIC_LIB = ../../modules/clusterlist/libstaticclusterlistmodules.la
 endif
 
 if WITH_CONFIG_STATIC_MODULES
-CONFIG_STATIC_LIB = ../../modules/config/libconfigmodules.la
+CONFIG_STATIC_LIB = ../../modules/config/libstaticconfigmodules.la
 endif
 
 if WITH_METRIC_STATIC_MODULES
-METRIC_STATIC_LIB = ../../modules/metric/libmetricmodules.la
+METRIC_STATIC_LIB = ../../modules/metric/libstaticmetricmodules.la
 endif
 
 if WITH_MONITOR_STATIC_MODULES
-MONITOR_STATIC_LIB = ../../modules/monitor/libmonitormodules.la
+MONITOR_STATIC_LIB = ../../modules/monitor/libstaticmonitormodules.la
 endif
 
 if WITH_STATIC_MODULES
@@ -63,16 +63,16 @@ libmodules_la_LIBADD  = $(LTDL_LIBS) \
 ../debug/libdebug.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
-../../modules/clusterlist/libclusterlistmodules.la : force-dependency-check
+../../modules/clusterlist/libstaticclusterlistmodules.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
-../../modules/config/libconfigmodules.la : force-dependency-check
+../../modules/config/libstaticconfigmodules.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
-../../modules/metric/libmetricmodules.la : force-dependency-check
+../../modules/metric/libstaticmetricmodules.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
-../../modules/monitor/libmonitormodules.la : force-dependency-check
+../../modules/monitor/libstaticmonitormodules.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
 force-dependency-check:
