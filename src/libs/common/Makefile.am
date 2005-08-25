@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.8 2005-08-23 21:10:14 achu Exp $
+## $Id: Makefile.am,v 1.9 2005-08-25 22:04:32 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -27,7 +27,7 @@ noinst_LTLIBRARIES = libconffile.la \
 		     $(LTDL_LIB) \
 		     libmarshall.la
 
-libconffile_la_SOURCES = conffile.c fd.c
+libconffile_la_SOURCES = conffile.c
 
 liberror_la_SOURCES = error.c
 

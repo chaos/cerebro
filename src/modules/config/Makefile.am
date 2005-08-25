@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.18 2005-08-25 18:23:42 achu Exp $
+## $Id: Makefile.am,v 1.19 2005-08-25 22:04:32 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -21,7 +21,7 @@ BGL_CONFIG_STATIC_SOURCES = cerebro_config_bgl.c
 endif
 
 if WITH_STATIC_MODULES
-noinst_LTLIBRARIES = libstaticonfigmodules.la
+noinst_LTLIBRARIES = libstaticconfigmodules.la
 else
 modulelibdir = $(CEREBRO_MODULE_DIR)
 modulelib_LTLIBRARIES = $(CHAOS_CONFIG_MODULE) \
@@ -30,12 +30,12 @@ endif
 
 MODULE_FLAGS = -module -avoid-version
 
-libstaticonfigmodules_la_SOURCES = $(CHAOS_CONFIG_STATIC_SOURCES) \
-			      	   $(BGL_CONFIG_STATIC_SOURCES)
-libstaticonfigmodules_la_CFLAGS  = -I$(srcdir)/../../libs/include \
-			      	   -I$(srcdir)/../../libs/debug
-libstaticonfigmodules_la_LDFLAGS = $(CHAOS_CONFIG__STATIC_LIBS) \
-			      	   $(CONFIG_OTHER_FLAGS)
+libstaticconfigmodules_la_SOURCES = $(CHAOS_CONFIG_STATIC_SOURCES) \
+			      	    $(BGL_CONFIG_STATIC_SOURCES)
+libstaticconfigmodules_la_CFLAGS  = -I$(srcdir)/../../libs/include \
+			      	    -I$(srcdir)/../../libs/debug
+libstaticconfigmodules_la_LDFLAGS = $(CHAOS_CONFIG__STATIC_LIBS) \
+			      	    $(CONFIG_OTHER_FLAGS)
 
 cerebro_config_chaos_la_SOURCES = cerebro_config_chaos.c
 cerebro_config_chaos_la_LDFLAGS = $(MODULE_FLAGS) \

@@ -1,10 +1,14 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.17 2005-08-08 21:41:48 achu Exp $
+## $Id: Makefile.am,v 1.18 2005-08-25 22:04:32 achu Exp $
 ##*****************************************************************************
 
 if WITH_GNU_LD
 CEREBRO_VERSION_SCRIPT = $(srcdir)/cerebro.map
 CEREBRO_OTHER_FLAGS = -Wl,--version-script=$(CEREBRO_VERSION_SCRIPT)
+endif
+
+if !WITH_STATIC_MODULES
+LTDL_LIBS = ../common/libltdl.la
 endif
 
 noinst_HEADERS	       = cerebro_api.h \
@@ -37,15 +41,47 @@ libcerebro_la_SOURCES = cerebro.c \
 libcerebro_la_LDFLAGS = -version-info @LIBCEREBRO_VERSION_INFO@ \
 			$(CEREBRO_OTHER_FLAGS)
 libcerebro_la_LIBADD  = ../cerebro_error/libcerebro_error.la \
+			../common/libconffile.la \
+			../common/libfd.la \
 			../common/liblist.la \
+			../common/libmarshall.la \
+			../debug/libdebug.la \
+			../modules/libclusterlistmodules.la \
+			../modules/libconfigmodules.la \
+			../modules/libmodules.la \
 			../util/libutil_config.la \
 			../util/libutil_metric.la \
-			../util/libutil_network.la
+			../util/libutil_network.la \
+			$(LTDL_LIBS)
 
 ../cerebro_error/libcerebro_error.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
+../common/libconffile.la : force-dependency-check
+	@cd `dirname $@` && make `basename $@`
+
+../common/libfd.la : force-dependency-check
+	@cd `dirname $@` && make `basename $@`
+
 ../common/liblist.la : force-dependency-check
+	@cd `dirname $@` && make `basename $@`
+
+../common/libltdl.la : force-dependency-check
+	@cd `dirname $@` && make `basename $@`
+
+../common/libmarshall.la : force-dependency-check
+	@cd `dirname $@` && make `basename $@`
+
+../debug/libdebug.la : force-dependency-check
+	@cd `dirname $@` && make `basename $@`
+
+../modules/libclusterlistmodules.la : force-dependency-check
+	@cd `dirname $@` && make `basename $@`
+
+../modules/libconfigmodules.la : force-dependency-check
+	@cd `dirname $@` && make `basename $@`
+
+../modules/libmodules.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
 ../util/libutil_config.la : force-dependency-check

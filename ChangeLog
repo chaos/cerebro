@@ -2,6 +2,10 @@
 
 	* Update spec file for bglion build.
 
+	* Major makefile rework.
+
+	* Modules libs split up.
+
 2005-08-24  Albert Chu  <chu11@llnl.gov>
 
 	* Altered some debug message output conditions.
