@@ -216,7 +216,7 @@ Bootlog monitoring module.
            %{?_without_cerebrod_no_threads} \
            %{?_with_cerebro_config_file} \
            %{?_with_bgl_ciod_config_file} \
-           %{?__with_bgl_ion_cerebrod_init_script} \
+           %{?_with_bgl_ion_cerebrod_init_script} \
            %{?_enable_static_modules} \
            %{?_enable_debug}
 make 
