@@ -1,3 +1,9 @@
+2005-08-26  Albert Chu  <chu11@llnl.gov>
+
+	* Fixed cerebrod-bgl-ion script.
+
+	* tagged cerebro-1-0-0-pre6
+	
 2005-08-25  Albert Chu  <chu11@llnl.gov>
 
 	* Update spec file for bglion build.
