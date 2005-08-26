@@ -100,6 +100,8 @@ Cerebro is a collection of cluster monitoring tools and libraries.
 %define _with_bgl_ciod_config_file         --with-bgl-ciod-config-file=/bgl/ion/etc/cerebro_bgl_ciod.conf
 %define _with_bgl_ion_cerebrod_init_script --with-bgl-ion-cerebrod-init-script
 %define _enable_static_modules             --enable-static-modules
+%define _with_bgl_ion_extra_options        --build="powerpc64-unknown-linux-gnu" --host=ppc --disable-glibtest --disable-gtktest --disable-mmx --disable-modules 
+
 %endif
 
 %if %{?_with_chaos:0}%{!?_with_chaos:1}
@@ -191,6 +193,22 @@ Bootlog monitoring module.
 %setup  -q -n @PROJECT@-@VERSION@-@RELEASE@
 
 %build
+%if %{?_with_bglion:1}%{!?_with_bglion:0} 
+# BlueGene/L ion node cross compiling stuff
+export CROSS_TOP=/bgl/ion-toolchain/linux-gnu
+export CXXCPP=$CROSS_TOP/bin/powerpc-bgl-linux-gnu-cpp
+export CXX=$CROSS_TOP/bin/powerpc-bgl-linux-gnu-g++
+export CPP=$CROSS_TOP/bin/powerpc-bgl-linux-gnu-cpp
+export CC=$CROSS_TOP/bin/powerpc-bgl-linux-gnu-gcc
+export LD=$CROSS_TOP/bin/powerpc-bgl-linux-gnu-ld
+export NM="$CROSS_TOP/bin/powerpc-bgl-linux-gnu-nm -B"
+export AR="$CROSS_TOP/bin/powerpc-bgl-linux-gnu-ar"
+export RANLIB=$CROSS_TOP/bin/powerpc-bgl-linux-gnu-ranlib
+export LDFLAGS=" -static -L$CROSS_TOP/powerpc-bgl-linux-gnu/lib -L$CROSS_TOP/lib/gcc-lib/powerpc-bgl-linux-gnu/3.2 -L$CROSS_TOP/lib -L/bgl/ion/lib"
+export CFLAGS="-D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -O2 -I /bgl/ion/include "
+export CPPFLAGS=" -I /bgl/ion/include "
+export CXXFLAGS="-D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -O2 -I /bgl/ion/include "
+%endif
 %configure --program-prefix=%{?_program_prefix:%{_program_prefix}} \
            %{?_with_gendersllnl} \
            %{?_without_gendersllnl} \
@@ -218,7 +236,8 @@ Bootlog monitoring module.
            %{?_with_bgl_ciod_config_file} \
            %{?_with_bgl_ion_cerebrod_init_script} \
            %{?_enable_static_modules} \
-           %{?_enable_debug}
+           %{?_enable_debug} \
+           %{?_with_bgl_ion_extra_options}
 make 
 
 %install
