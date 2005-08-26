@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.9 2005-08-26 17:14:01 achu Exp $
+## $Id: Makefile.am,v 1.10 2005-08-26 17:16:45 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -16,7 +16,7 @@ cerebro_stat_LDADD = ../libs/cerebro/libcerebro.la \
 		     ../libs/wrappers/libwrappers_hash.la \
 		     ../libs/wrappers/libwrappers_hostlist.la \
 		     ../libs/wrappers/libwrappers_list.la \
-		     ../libs/cerebro/libcerebro_error.la \
+		     ../libs/cerebro_error/libcerebro_error.la \
 		     ../libs/common/liberror.la \
 		     ../libs/common/libhash.la \
 		     ../libs/common/libhostlist.la \
