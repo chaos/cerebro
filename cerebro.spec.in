@@ -119,6 +119,7 @@ Cerebro is a collection of cluster monitoring tools and libraries.
 %{!?_with_bootlog: %{!?_without_bootlog: %define _without_bootlog --without-bootlog}}
 %endif
 %endif
+%endif
 
 %if %{?_with_debug:1}%{!?_with_debug:0}
 %define _enable_debug --enable-debug
