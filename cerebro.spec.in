@@ -50,19 +50,19 @@ Cerebro is a collection of cluster monitoring tools and libraries.
 # Special build for LLNL Linux CHAOS clusters
 #
 %if %{?_with_chaos:1}%{!?_with_chaos:0}
-%define _with_gendersllnl           --with-gendersllnl
-%define _without_genders            --without-genders
-%define _without_hostsfile          --without-hostsfile
-%define _with_chaos_config          --with-chaos-config
-%define _without_bgl_config         --without-bgl-config
-%define _without_slurm_state        --without-slurm-state
-%define _without_bgl_ciod           --without-bgl-ciod
+%define _with_gendersllnl                  --with-gendersllnl
+%define _without_genders                   --without-genders
+%define _without_hostsfile                 --without-hostsfile
+%define _with_chaos_config                 --with-chaos-config
+%define _without_bgl_config                --without-bgl-config
+%define _without_slurm_state               --without-slurm-state
+%define _without_bgl_ciod                  --without-bgl-ciod
 %ifarch ia64
-%define _with_boottime              --with-boottime
-%define _with_bootlog               --with-bootlog
+%define _with_boottime                     --with-boottime
+%define _with_bootlog                      --with-bootlog
 %else
-%define _without_boottime           --without-boottime
-%define _without_bootlog            --without-bootlog
+%define _without_boottime                  --without-boottime
+%define _without_bootlog                   --without-bootlog
 %endif
 %endif
 
@@ -70,35 +70,36 @@ Cerebro is a collection of cluster monitoring tools and libraries.
 # Special build for BlueGene/L front end nodes
 #
 %if %{?_with_bgl:1}%{!?_with_bgl:0} 
-%define _without_gendersllnl        --without-gendersllnl
-%define _without_genders            --without-genders
-%define _without_hostsfile          --without-hostsfile
-%define _without_chaos_config       --without-chaos-config
-%define _with_bgl_config            --with-bgl-config
-%define _without_boottime           --without-boottime
-%define _without_slurm_state        --without-slurm-state
-%define _without_bgl_ciod           --without-bgl-ciod
-%define _without_bootlog            --without-bootlog
+%define _without_gendersllnl               --without-gendersllnl
+%define _without_genders                   --without-genders
+%define _without_hostsfile                 --without-hostsfile
+%define _without_chaos_config              --without-chaos-config
+%define _with_bgl_config                   --with-bgl-config
+%define _without_boottime                  --without-boottime
+%define _without_slurm_state               --without-slurm-state
+%define _without_bgl_ciod                  --without-bgl-ciod
+%define _without_bootlog                   --without-bootlog
 %endif
 
 #
 # Special build for BlueGene/L ion nodes
 #
 %if %{?_with_bglion:1}%{!?_with_bglion:0} 
-%define _without_gendersllnl        --without-gendersllnl
-%define _without_genders            --without-genders
-%define _without_hostsfile          --without-hostsfile
-%define _without_chaos_config       --without-chaos-config
-%define _with_bgl_config            --with-bgl-config
-%define _without_boottime           --without-boottime
-%define _without_slurm_state        --without-slurm-state
-%define _with_bgl_ciod              --with-bgl-ciod
-%define _without_bootlog            --without-bootlog
-%define _with_cerebrod_speaker_only --with-cerebrod-speaker-only
-%define _with_cerebrod_no_threads   --with-cerebrod-no-threads
-%define _with_cerebro_config_file   --with-cerebro-config-file=/bgl/ion/etc/cerebro.conf
-%define _with_bgl_ciod_config_file  --with-bgl-ciod-config-file=/bgl/ion/etc/cerebro_bgl_ciod.conf
-%define _enable_static_modules      --enable-static-modules
+%define _without_gendersllnl               --without-gendersllnl
+%define _without_genders                   --without-genders
+%define _without_hostsfile                 --without-hostsfile
+%define _without_chaos_config              --without-chaos-config
+%define _with_bgl_config                   --with-bgl-config
+%define _without_boottime                  --without-boottime
+%define _without_slurm_state               --without-slurm-state
+%define _with_bgl_ciod                     --with-bgl-ciod
+%define _without_bootlog                   --without-bootlog
+%define _with_cerebrod_speaker_only        --with-cerebrod-speaker-only
+%define _with_cerebrod_no_threads          --with-cerebrod-no-threads
+%define _with_cerebro_config_file          --with-cerebro-config-file=/bgl/ion/etc/cerebro.conf
+%define _with_bgl_ciod_config_file         --with-bgl-ciod-config-file=/bgl/ion/etc/cerebro_bgl_ciod.conf
+%define _with_bgl_ion_cerebrod_init_script --with-bgl-ion-cerebrod-init-script
+%define _enable_static_modules             --enable-static-modules
 %endif
 
 %if %{?_with_chaos:0}%{!?_with_chaos:1}
@@ -215,6 +216,7 @@ Bootlog monitoring module.
            %{?_without_cerebrod_no_threads} \
            %{?_with_cerebro_config_file} \
            %{?_with_bgl_ciod_config_file} \
+           %{?__with_bgl_ion_cerebrod_init_script} \
            %{?_enable_static_modules} \
            %{?_enable_debug}
 make 
