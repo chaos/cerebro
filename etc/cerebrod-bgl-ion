@@ -1,11 +1,11 @@
 #!/bgl/ion/bin/bash
-# $Id: cerebrod-bgl-ion,v 1.3 2005-08-26 16:10:46 achu Exp $
+# $Id: cerebrod-bgl-ion,v 1.4 2005-08-26 16:21:49 achu Exp $
 #
                                                                                        
 case "$1" in
     start)
         echo "Starting cerebrod"
-        # achu: BG/L is F'ed up, we need this for some reason
+        # achu: BG/L is messed up, I have to do this
         LD_LIBRARY_PATH=/bgl/ion-toolchain/gnu/build-powerpc-bgl-linux-gnu/tempglibc-3\.2-install/lib
         export LD_LIBRARY_PATH
         /bgl/ion/usr/sbin/cerebrod
