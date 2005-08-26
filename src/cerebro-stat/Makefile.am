@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.7 2005-08-25 22:04:32 achu Exp $
+## $Id: Makefile.am,v 1.8 2005-08-26 17:08:19 achu Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -12,6 +12,7 @@ cerebro_stat_CFLAGS  = -I $(srcdir)/../libs/include \
 
 # Wierd linker issues, ordering here matters
 cerebro_stat_LDADD = ../libs/cerebro/libcerebro.la \
+		     ../libs/cerebro/libcerebro_error.la \
 		     ../libs/wrappers/libwrappers.la \
 		     ../libs/wrappers/libwrappers_hash.la \
 		     ../libs/wrappers/libwrappers_hostlist.la \
@@ -22,6 +23,9 @@ cerebro_stat_LDADD = ../libs/cerebro/libcerebro.la \
 		     ../libs/common/liblist.la
 
 ../libs/cerebro/libcerebro.la: force-dependency-check
+	@cd `dirname $@` && make `basename $@`
+
+../libs/cerebro_error/libcerebro_error.la: force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
 ../libs/common/liberror.la: force-dependency-check
