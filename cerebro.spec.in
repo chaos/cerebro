@@ -23,6 +23,7 @@ Release: @RELEASE@bglion
 %endif
 %if %{?_with_chaos:0}%{!?_with_chaos:1}
 %if %{?_with_bgl:0}%{!?_with_bgl:1} 
+%if %{?_with_bglion:0}%{!?_with_bglion:1} 
 %if %{?_with_debug:1}%{!?_with_debug:0} 
 Release: @RELEASE@.debug
 %else 
