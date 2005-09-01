@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_bgl_ciod.c,v 1.10 2005-09-01 22:18:48 achu Exp $
+ *  $Id: cerebro_metric_bgl_ciod.c,v 1.11 2005-09-01 22:21:32 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -278,7 +278,7 @@ bgl_ciod_metric_get_metric_value(unsigned int *metric_value_type,
         {
           if (bgl_ciod_state && !bgl_ciod_first_check)
             {
-              CEREBRO_DBG(("BGL ciod daemon transitioned down, errnum: %d", errnum));
+              CEREBRO_DBG(("BGL ciod daemon detected down, errnum: %d", errnum));
             }
           bgl_ciod_state = 0;
         }
@@ -287,7 +287,7 @@ bgl_ciod_metric_get_metric_value(unsigned int *metric_value_type,
     {
       bgl_ciod_failures = 0;
       if (!bgl_ciod_state && !bgl_ciod_first_check)
-        CEREBRO_DBG(("BGL ciod daemon transitioned up"));
+        CEREBRO_DBG(("BGL ciod daemon detected up"));
       bgl_ciod_state = 1;
       close(fd);
     }
