@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_bgl_ciod.c,v 1.7 2005-08-26 18:00:44 achu Exp $
+ *  $Id: cerebro_metric_bgl_ciod.c,v 1.8 2005-09-01 20:14:27 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -143,40 +143,33 @@ bgl_ciod_metric_setup(void)
   conffile_t cf = NULL;
   int num;
 
-  printf("%s: %d\n", __FUNCTION__, __LINE__);
   /* 
    * If any of this fails, who cares, just move on.
    */
 
-  printf("%s: %d\n", __FUNCTION__, __LINE__);
   if (!(cf = conffile_handle_create()))
     {
       CEREBRO_DBG(("conffile_handle_create"));
       goto cleanup;
     }
 
-  printf("%s: %d\n", __FUNCTION__, __LINE__);
   num = sizeof(options)/sizeof(struct conffile_option);
   if (conffile_parse(cf, BGL_CIOD_CONFIG_FILE, options, num, NULL, 0, 0) < 0)
     {
       char buf[CONFFILE_MAX_ERRMSGLEN];
 
-  printf("%s: %d\n", __FUNCTION__, __LINE__);
       /* Its not an error if the configuration file doesn't exist */
       if (conffile_errnum(cf) == CONFFILE_ERR_EXIST)
         goto cleanup;
 
-  printf("%s: %d\n", __FUNCTION__, __LINE__);
       if (conffile_errmsg(cf, buf, CONFFILE_MAX_ERRMSGLEN) < 0)
         CEREBRO_DBG(("conffile_parse: %d", conffile_errnum(cf)));
       else
         CEREBRO_DBG(("conffile_parse: %s", buf));
 
-  printf("%s: %d\n", __FUNCTION__, __LINE__);
       goto cleanup;
     }
 
-  printf("%s: %d\n", __FUNCTION__, __LINE__);
   if (period_flag)
     {
       if (period > 0)
@@ -185,7 +178,6 @@ bgl_ciod_metric_setup(void)
         CEREBRO_DBG(("invalid period input: %d", period));
     }
 
-  printf("%s: %d\n", __FUNCTION__, __LINE__);
   if (failure_max_flag)
     {
       if (failure_max > 0)
@@ -194,7 +186,6 @@ bgl_ciod_metric_setup(void)
         CEREBRO_DBG(("invalid failure_max input: %d", failure_max));
     }
 
-  printf("%s: %d\n", __FUNCTION__, __LINE__);
   if (connect_timeout_flag)
     {
       if (connect_timeout > 0)
@@ -203,7 +194,6 @@ bgl_ciod_metric_setup(void)
         CEREBRO_DBG(("invalid connect_timeout input: %d", connect_timeout));
     }
 
-  printf("%s: %d\n", __FUNCTION__, __LINE__);
  cleanup:
   conffile_handle_destroy(cf);
   return 0;
