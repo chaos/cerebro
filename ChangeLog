@@ -5,6 +5,9 @@
 
 	* src/modules/metric/cerebro_metric_bgl_ciod.c: Add additional
 	debug info.
+
+	* src/cerebrod/cerebrod_util.c (cerebrod_reinit_socket): Handle
+	additional corner case situations of a network or NIC going down.
 	
 2005-08-26  Albert Chu  <chu11@llnl.gov>
 

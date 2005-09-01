@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_util.c,v 1.32 2005-08-25 00:25:31 achu Exp $
+ *  $Id: cerebrod_util.c,v 1.33 2005-09-01 22:27:52 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -128,7 +128,12 @@ cerebrod_reinit_socket(int old_fd, Cerebrod_socket_setup socket_setup, char *msg
 
   assert(socket_setup && msg);
 
-  if (errno == EINVAL || errno == EBADF || errno == ENODEV || old_fd < 0)
+  if (errno == EINVAL 
+      || errno == EBADF 
+      || errno == ENODEV 
+      || errno == ENETDOWN
+      || errno == ENETUNREACH
+      || old_fd < 0)
     {
       if (!(old_fd < 0))
         close(old_fd);       /* no-wrapper, make best effort */
