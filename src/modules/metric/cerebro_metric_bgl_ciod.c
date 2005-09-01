@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_bgl_ciod.c,v 1.8 2005-09-01 20:14:27 achu Exp $
+ *  $Id: cerebro_metric_bgl_ciod.c,v 1.9 2005-09-01 21:08:01 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -69,6 +69,13 @@ static u_int32_t bgl_ciod_state = 0;
  * counts consecutive connection failures
  */
 static unsigned int bgl_ciod_failures = 0;
+
+/*  
+ * bgl_ciod_first_check
+ *
+ * Flag did indicates if the ciod daemon check is the first one
+ */
+static int bgl_ciod_first_check = 0;
 
 /* 
  * bgl_ciod_period
@@ -268,11 +275,17 @@ bgl_ciod_metric_get_metric_value(unsigned int *metric_value_type,
       
       bgl_ciod_failures++;
       if (bgl_ciod_failures >= bgl_ciod_failure_max)
-        bgl_ciod_state = 0;
+        {
+          if (bgl_ciod_state && !bgl_ciod_first_check)
+            CEREBRO_DBG("BGL ciod daemon transitioned down");
+          bgl_ciod_state = 0;
+        }
     }
   else
     {
       bgl_ciod_failures = 0;
+      if (!bgl_ciod_state && !bgl_ciod_first_check)
+        CEREBRO_DBG("BGL ciod daemon transitioned up");
       bgl_ciod_state = 1;
       close(fd);
     }
@@ -281,6 +294,7 @@ bgl_ciod_metric_get_metric_value(unsigned int *metric_value_type,
   *metric_value_len = sizeof(u_int32_t);
   *metric_value = (void *)&bgl_ciod_state;
 
+  bgl_ciod_first_check = 1;
   return 0;
 }
 

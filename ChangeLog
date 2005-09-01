@@ -2,6 +2,9 @@
 
 	* src/cerebro-stat/cerebro-stat.c (_hostrange_output_data): Sort
 	hostranges before output.
+
+	* src/modules/metric/cerebro_metric_bgl_ciod.c: Add additional
+	debug info.
 	
 2005-08-26  Albert Chu  <chu11@llnl.gov>
 
