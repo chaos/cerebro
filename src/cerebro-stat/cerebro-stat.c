@@ -576,6 +576,7 @@ _hostrange_output_data(void *data, const void *key, void *arg)
   hd = (struct hostrange_data *)data;
   
   memset(hstr, '\0', CEREBRO_STAT_BUFLEN);
+  Hostlist_sort(hd->hl);
   Hostlist_ranged_string(hd->hl, CEREBRO_STAT_BUFLEN, hstr);
 
   fprintf(stdout, "%s: %s\n", hstr, (char *)key);

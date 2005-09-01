@@ -1,3 +1,8 @@
+2005-09-01  Albert Chu  <chu11@llnl.gov>
+
+	* src/cerebro-stat/cerebro-stat.c (_hostrange_output_data): Sort
+	hostranges before output.
+	
 2005-08-26  Albert Chu  <chu11@llnl.gov>
 
 	* Fixed cerebrod-bgl-ion script.
