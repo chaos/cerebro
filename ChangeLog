@@ -8,6 +8,8 @@
 
 	* src/cerebrod/cerebrod_util.c (cerebrod_reinit_socket): Handle
 	additional corner case situations of a network or NIC going down.
+
+	* tagged cerebro-1-0-0-pre7
 	
 2005-08-26  Albert Chu  <chu11@llnl.gov>
 
