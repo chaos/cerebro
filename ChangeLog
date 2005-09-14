@@ -1,3 +1,11 @@
+2005-09-14  Albert Chu  <chu11@llnl.gov>
+
+	* Turn off metric controller by default on chaos systems.
+	
+2005-09-09  Albert Chu  <chu11@llnl.gov>
+
+	* Added additional monitoring functionality to bgl ciod module.
+	
 2005-09-01  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerebro-stat/cerebro-stat.c (_hostrange_output_data): Sort
