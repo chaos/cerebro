@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_chaos.c,v 1.2 2005-08-23 21:10:15 achu Exp $
+ *  $Id: cerebro_config_chaos.c,v 1.3 2005-09-14 22:33:50 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -176,6 +176,8 @@ chaos_config_load_config(struct cerebro_config *conf)
           conf->cerebrod_listen_threads = 4;
           conf->cerebrod_listen_threads_flag++;
         }
+      conf->cerebrod_metric_controller = 0;
+      conf->cerebrod_metric_controller_flag++;
       conf->cerebrod_metric_server = 1;
       conf->cerebrod_metric_server_flag++;
     }
@@ -188,6 +190,8 @@ chaos_config_load_config(struct cerebro_config *conf)
       conf->cerebrod_speak_flag++;
       conf->cerebrod_listen = 0;
       conf->cerebrod_listen_flag++;
+      conf->cerebrod_metric_controller = 0;
+      conf->cerebrod_metric_controller_flag++;
       conf->cerebrod_metric_server = 0;
       conf->cerebrod_metric_server_flag++;
 
