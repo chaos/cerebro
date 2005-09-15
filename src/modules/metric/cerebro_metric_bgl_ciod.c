@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_bgl_ciod.c,v 1.12 2005-09-14 22:34:19 achu Exp $
+ *  $Id: cerebro_metric_bgl_ciod.c,v 1.13 2005-09-15 23:21:50 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -293,7 +293,7 @@ _find_tcp_inode(unsigned int port, char *inode_buf, unsigned int inode_buflen)
   char filebuf[CEREBRO_MAX_PATH_LEN+1];
   char linebuf[BGL_DATA_BUFLEN+1];
   char portbuf[BGL_PORT_BUFLEN+1];
-  int len, fd = -1, rv = -1;
+  int len, fd = -1, found = -1;
 
   if (!port || !inode_buf || !inode_buflen)
     {
@@ -346,7 +346,7 @@ _find_tcp_inode(unsigned int port, char *inode_buf, unsigned int inode_buflen)
           if (inode_buflen > strlen(inode))
             {
               strcpy(inode_buf, inode);
-              rv = 0;
+              found = 1;
               break;
             }
         }
@@ -355,9 +355,12 @@ _find_tcp_inode(unsigned int port, char *inode_buf, unsigned int inode_buflen)
   if (len < 0)
     goto cleanup;
 
+  if (found < 0)
+    found = 0;
+
  cleanup:
   close(fd);
-  return rv;
+  return found;
 }
 
 /*
@@ -434,7 +437,6 @@ _find_processes(char *str, char pids[][BGL_MAX_PID_LEN], unsigned int pids_len)
       char filebuf[CEREBRO_MAX_PATH_LEN+1];
       char databuf[CEREBRO_MAX_PATH_LEN+1];
       struct stat statbuf;
-      int rv;
       
       if (!_is_pid(dirent->d_name))
         continue;
@@ -447,7 +449,7 @@ _find_processes(char *str, char pids[][BGL_MAX_PID_LEN], unsigned int pids_len)
         continue;
       
       memset(databuf, '\0', CEREBRO_MAX_PATH_LEN+1);
-      if ((rv = readlink(filebuf, databuf, CEREBRO_MAX_PATH_LEN)) < 0)
+      if (readlink(filebuf, databuf, CEREBRO_MAX_PATH_LEN) < 0)
         {
           /* EINVAL often occurs due to '.' or '..' directory entries */
           if (errno != EINVAL)
@@ -476,29 +478,29 @@ _find_processes(char *str, char pids[][BGL_MAX_PID_LEN], unsigned int pids_len)
 /* 
  * _contains_inode_socket
  *
- * Check if the path contains the inode socket
+ * Check if the str contains the inode socket
  * 
  * Returns 1 on yes, 0 on no, -1 on error
  */
 static int
-_contains_inode_socket(char *path, char *inode)
+_contains_inode_socket(char *str, char *inode)
 {
-  if (!path || !inode)
+  if (!str || !inode)
     {
       CEREBRO_DBG(("invalid parameters"));
       return -1;
     }
 
-  if (strstr(path, BGL_SOCKET_INODE))
+  if (strstr(str, BGL_SOCKET_INODE))
     {
       /* Format is socket:[inode] */
       char *p;
 
-      if (!(p = strchr(inode, ']')))
+      if (!(p = strchr(str, ']')))
         return 0;
       *p = '\0';
 
-      if (!(p = strchr(inode, '[')))
+      if (!(p = strchr(str, '[')))
         return 0;
       p++;
 
@@ -561,7 +563,7 @@ _find_inode_socket(char *pid,
         continue;
 
       memset(databuf, '\0', CEREBRO_MAX_PATH_LEN+1);
-      if ((rv = readlink(filebuf, databuf, CEREBRO_MAX_PATH_LEN)) < 0)
+      if (readlink(filebuf, databuf, CEREBRO_MAX_PATH_LEN) < 0)
         {
           /* EINVAL often occurs due to '.' or '..' directory entries */
           if (errno != EINVAL)
@@ -840,9 +842,23 @@ bgl_ciod_metric_get_metric_value(unsigned int *metric_value_type,
 
               for (i = 0; i < bgl_ciod_sockets_len; i++)
                 {
+                  char databuf[CEREBRO_MAX_PATH_LEN+1];
+                  struct stat statbuf;
                   int rv;
 
-                  if ((rv = _contains_inode_socket(bgl_ciod_sockets[i],
+                  if (stat(bgl_ciod_sockets[i], &statbuf) < 0)
+                    continue;
+
+                  memset(databuf, '\0', CEREBRO_MAX_PATH_LEN+1);
+                  if (readlink(bgl_ciod_sockets[i], 
+                               databuf, 
+                               CEREBRO_MAX_PATH_LEN) < 0)
+                    {
+                      CEREBRO_DBG(("readlink: %s", strerror(errno)));
+                      continue;
+                    }
+
+                  if ((rv = _contains_inode_socket(databuf,
                                                    bgl_ciod_inode)) < 0)
                     continue;
 
