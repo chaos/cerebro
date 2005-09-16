@@ -2,6 +2,8 @@
 
 	* Fix bgl_ciod monitoring bugs.
 	
+	* tagged cerebro-1-0-0-pre8
+
 2005-09-14  Albert Chu  <chu11@llnl.gov>
 
 	* Turn off metric controller by default on chaos systems.
