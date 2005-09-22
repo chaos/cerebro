@@ -1,3 +1,9 @@
+2005-09-22  Albert Chu  <chu11@llnl.gov>
+
+	* Attempt to monitor ciod daemons through /proc only.
+
+	* tagged cerebro-1-0-0-pre9
+	
 2005-09-15  Albert Chu  <chu11@llnl.gov>
 
 	* Fix bgl_ciod monitoring bugs.

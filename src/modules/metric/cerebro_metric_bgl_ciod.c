@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_bgl_ciod.c,v 1.13 2005-09-15 23:21:50 achu Exp $
+ *  $Id: cerebro_metric_bgl_ciod.c,v 1.14 2005-09-22 16:02:41 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -77,6 +77,8 @@
 #define BGL_INODE_BUFLEN                 64
 #define BGL_SOCKET_INODE                 "socket"
 
+#define BGL_CIOD_NO_CONNECT              1
+
 /*
  * bgl_ciod_state
  *
@@ -84,6 +86,14 @@
  */
 static u_int32_t bgl_ciod_state = 0;
 
+/* 
+ * bgl_ciod_period
+ *
+ * the monitoring period.
+ */
+static unsigned int bgl_ciod_period = BGL_CIOD_PERIOD_DEFAULT;
+
+#if !BGL_CIOD_NO_CONNECT
 /* 
  * bgl_ciod_failures
  *
@@ -97,13 +107,6 @@ static unsigned int bgl_ciod_failures = 0;
  * Flag did indicates if the ciod daemon was at some point detected up
  */
 static int bgl_ciod_was_up = 0;
-
-/* 
- * bgl_ciod_period
- *
- * the monitoring period.
- */
-static unsigned int bgl_ciod_period = BGL_CIOD_PERIOD_DEFAULT;
 
 /* 
  * bgl_ciod_failure_max
@@ -120,6 +123,7 @@ static unsigned int bgl_ciod_failure_max = BGL_CIOD_FAILURE_MAX_DEFAULT;
  * is in fact down.
  */
 static unsigned int bgl_ciod_connect_timeout = BGL_CIOD_CONNECT_TIMEOUT_DEFAULT;
+#endif /* !BGL_CIOD_NO_CONNECT */
 
 /* 
  * bgl_ciod_sockets
@@ -667,6 +671,7 @@ bgl_ciod_metric_setup(void)
         &period,
         0
       },
+#if BGL_CIOD_NO_CONNECT
       {
         "cerebro_bgl_ciod_failure_max",
         CONFFILE_OPTION_INT,
@@ -689,6 +694,7 @@ bgl_ciod_metric_setup(void)
         &connect_timeout,
         0
       },
+#endif /* BGL_CIOD_NO_CONNECT */
     };
   conffile_t cf = NULL;
   int num;
@@ -728,6 +734,7 @@ bgl_ciod_metric_setup(void)
         CEREBRO_DBG(("invalid period input: %d", period));
     }
 
+#if BGL_CIOD_NO_CONNECT
   if (failure_max_flag)
     {
       if (failure_max > 0)
@@ -743,7 +750,7 @@ bgl_ciod_metric_setup(void)
       else
         CEREBRO_DBG(("invalid connect_timeout input: %d", connect_timeout));
     }
-
+#endif /* BGL_CIOD_NO_CONNECT */
 
   _bgl_socket_paths_setup();
 
@@ -793,6 +800,57 @@ bgl_ciod_metric_get_metric_period(int *period)
   return 0;
 }
 
+/* 
+ * bgl_ciod_port_alive
+ *
+ * Returns 1 if a ciod port is found alive, 0 if not.  
+ */
+static int
+bgl_ciod_port_alive(void)
+{
+  if (!bgl_ciod_sockets_len)
+    _bgl_socket_paths_setup();
+
+  if (bgl_ciod_sockets_len)
+    {
+      int i, ciod_port_alive = 0;
+      
+      for (i = 0; i < bgl_ciod_sockets_len; i++)
+        {
+          char databuf[CEREBRO_MAX_PATH_LEN+1];
+          struct stat statbuf;
+          int rv;
+          
+          if (stat(bgl_ciod_sockets[i], &statbuf) < 0)
+            continue;
+          
+          memset(databuf, '\0', CEREBRO_MAX_PATH_LEN+1);
+          if (readlink(bgl_ciod_sockets[i], databuf, CEREBRO_MAX_PATH_LEN) < 0)
+            {
+              CEREBRO_DBG(("readlink: %s", strerror(errno)));
+              continue;
+            }
+
+          if ((rv = _contains_inode_socket(databuf, bgl_ciod_inode)) < 0)
+            continue;
+          
+          if (rv)
+            {
+              CEREBRO_DBG(("BGL ciod daemon via proc detected up"));
+              ciod_port_alive = 1;
+              break;
+            }
+        }
+      
+      if (ciod_port_alive)
+        return 1;
+      else
+        return 0;
+    }
+
+  return 0;
+}
+
 /*
  * bgl_ciod_metric_get_metric_value
  *
@@ -803,7 +861,9 @@ bgl_ciod_metric_get_metric_value(unsigned int *metric_value_type,
                                  unsigned int *metric_value_len,
                                  void **metric_value)
 {
+#if !BGL_CIOD_NO_CONNECT
   int fd, errnum;
+#endif /* !BGL_CIOD_NO_CONNECT */
 
   if (!metric_value_type || !metric_value_len || !metric_value)
     {
@@ -811,6 +871,12 @@ bgl_ciod_metric_get_metric_value(unsigned int *metric_value_type,
       return -1;
     }
 
+#if BGL_CIOD_NO_CONNECT
+  if (bgl_ciod_port_alive())
+    bgl_ciod_state = 1;
+  else
+    bgl_ciod_state = 0;
+#else  /* !BGL_CIOD_NO_CONNECT */
   if ((fd = low_timeout_connect(BGL_CIOD_HOSTNAME,
                                 BGL_CIOD_PORT,
                                 bgl_ciod_connect_timeout,
@@ -833,48 +899,9 @@ bgl_ciod_metric_get_metric_value(unsigned int *metric_value_type,
            * 7000 open, we'll say its up.
            */
 
-          if (!bgl_ciod_sockets_len)
-            _bgl_socket_paths_setup();
-
-          if (bgl_ciod_sockets_len)
-            {
-              int i, ciod_port_alive = 0;
-
-              for (i = 0; i < bgl_ciod_sockets_len; i++)
-                {
-                  char databuf[CEREBRO_MAX_PATH_LEN+1];
-                  struct stat statbuf;
-                  int rv;
-
-                  if (stat(bgl_ciod_sockets[i], &statbuf) < 0)
-                    continue;
-
-                  memset(databuf, '\0', CEREBRO_MAX_PATH_LEN+1);
-                  if (readlink(bgl_ciod_sockets[i], 
-                               databuf, 
-                               CEREBRO_MAX_PATH_LEN) < 0)
-                    {
-                      CEREBRO_DBG(("readlink: %s", strerror(errno)));
-                      continue;
-                    }
-
-                  if ((rv = _contains_inode_socket(databuf,
-                                                   bgl_ciod_inode)) < 0)
-                    continue;
-
-                  if (rv)
-                    {
-                      CEREBRO_DBG(("BGL ciod daemon via proc detected up"));
-                      ciod_port_alive = 1;
-                      break;
-                    }
-                }
-
-              if (!ciod_port_alive)
-                bgl_ciod_state = 0;
-            }
-          else
-              bgl_ciod_state = 0;
+          if (!bgl_ciod_port_alive())
+            bgl_ciod_state = 0;
+          /* else, let the bgl_ciod_state stay the same */
         }
     }
   else
@@ -886,7 +913,8 @@ bgl_ciod_metric_get_metric_value(unsigned int *metric_value_type,
       bgl_ciod_was_up = 1;
       close(fd);
     }
-  
+#endif /* !BGL_CIOD_NO_CONNECT */
+
   *metric_value_type = CEREBRO_METRIC_VALUE_TYPE_U_INT32;
   *metric_value_len = sizeof(u_int32_t);
   *metric_value = (void *)&bgl_ciod_state;
