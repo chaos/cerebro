@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_bgl_ciod.c,v 1.15 2005-09-22 16:07:30 achu Exp $
+ *  $Id: cerebro_metric_bgl_ciod.c,v 1.16 2005-09-22 17:28:59 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -839,7 +839,6 @@ bgl_ciod_port_alive(void)
           
           if (rv)
             {
-              CEREBRO_DBG(("BGL ciod daemon via proc detected up"));
               ciod_port_alive = 1;
               break;
             }
@@ -899,7 +898,10 @@ bgl_ciod_metric_get_metric_value(unsigned int *metric_value_type,
 
           if (!bgl_ciod_port_alive())
             bgl_ciod_state = 0;
-          /* else, let the bgl_ciod_state stay the same */
+          else
+            CEREBRO_DBG(("BGL ciod daemon via proc detected up"));
+
+          /* the bgl_ciod_state stays the same */
         }
     }
   else
