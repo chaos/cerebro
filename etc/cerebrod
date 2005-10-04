@@ -1,0 +1,106 @@
+#!/bin/sh
+# $Id: cerebrod,v 1.3 2005-10-04 20:51:46 achu Exp $
+#
+# chkconfig: 2345 70 40
+# description: cerebrod startup script
+#
+### BEGIN INIT INFO
+# Provides: cerebrod
+# Required-Start: $network $remote_fs $syslog
+# Required-Stop:  $network $remote_fs $syslog
+# Default-Start:  3 5
+# Default-Stop:   0 1 2 6
+# Description:    Start cerebrod-
+### END INIT INFO
+
+CEREBROD=/usr/sbin/cerebrod
+
+[ -f $CEREBROD ] || exit 1
+
+# Load Redhat or Suse appropriate libs
+if [ -f /etc/rc.d/init.d/functions ] ; then
+    . /etc/rc.d/init.d/functions
+    Xstart() {
+        daemon $CEREBROD
+        RETVAL=$?
+        echo
+        [ $RETVAL -eq 0 ] && touch /var/lock/subsys/cerebrod
+    }
+    Xstop() {
+        killproc cerebrod
+        RETVAL=$?
+        echo
+        [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/cerebrod
+    }
+    Xstatus() {
+        status cerebrod
+	RETVAL=$?
+    }
+    Xcondrestart() {
+        if test -e /var/lock/subsys/cerebrod; then
+	    $0 stop
+	    $0 start
+   	    RETVAL=$?
+        fi
+    }
+    Xexit() {
+	exit $RETVAL
+    }
+elif [ -f /etc/rc.status ] ; then
+    . /etc/rc.status
+    Xstart() {
+        startproc $CEREBROD
+        rc_status -v
+    }
+    Xstop() {
+        killproc -TERM $CEREBROD
+        rc_status -v
+    }
+    Xstatus() {
+        echo -n "Checking for cerebrod: "
+        checkproc $CEREBROD
+        rc_status -v
+    }
+    Xcondrestart() {
+        $0 status
+        if test $? = 0; then
+            $0 restart
+        else
+            rc_reset
+        fi
+        rc_status
+    }
+    Xexit() {
+	rc_exit
+    }
+else
+    echo "Unknown distribution type"
+    exit 1
+fi
+
+RETVAL=0
+
+case "$1" in
+   start)
+   	echo -n "Starting cerebrod: "
+        Xstart
+        ;;
+  stop)
+   	echo -n "Shutting down cerebrod: "
+	Xstop
+   	;;
+  restart|reload)
+   	$0 stop
+   	$0 start
+   	RETVAL=$?
+   	;;
+  status)
+        Xstatus
+   	;;
+  condrestart)
+        Xcondrestart
+   	;;
+  *)
+	echo "Usage: $0 {start|stop|restart|status|condrestart}"
+	exit 1
+esac

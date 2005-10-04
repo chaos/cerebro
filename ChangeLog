@@ -2,6 +2,10 @@
 
 	* Another attempt to monitor ciod daemons properly.
 
+	* etc/cerebrod-redhat, etc/cerebrod-suse: Removed files.
+
+	* etc/cerebrod: New file which handles Redhat and Suse systems.
+
 	* tagged cerebro-1-0-0-pre10
 	
 2005-09-22  Albert Chu  <chu11@llnl.gov>
