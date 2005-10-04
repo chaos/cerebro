@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_bgl_ciod.c,v 1.17 2005-10-04 17:32:21 achu Exp $
+ *  $Id: cerebro_metric_bgl_ciod.c,v 1.18 2005-10-04 18:01:57 achu Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -96,7 +96,7 @@ static unsigned int bgl_ciod_period = BGL_CIOD_PERIOD_DEFAULT;
 /* 
  * bgl_ciod_failures
  *
- * counts consecutive failures
+ * counts consecutive failures to detect ciod
  */
 static unsigned int bgl_ciod_failures = 0;
 
@@ -924,11 +924,11 @@ bgl_ciod_metric_get_metric_value(unsigned int *metric_value_type,
     }
   else
     {
-      bgl_ciod_failures = 0;
       if (!bgl_ciod_state && bgl_ciod_was_up)
         CEREBRO_DBG(("BGL ciod daemon back up"));
       bgl_ciod_state = 1;
       bgl_ciod_was_up = 1;
+      bgl_ciod_failures = 0;
       close(fd);
     }
 #else  /* !BGL_CIOD_CONNECT */
@@ -939,6 +939,7 @@ bgl_ciod_metric_get_metric_value(unsigned int *metric_value_type,
 
       bgl_ciod_state = 1;
       bgl_ciod_was_up = 1;
+      bgl_ciod_failures = 0;
     }
   else
     {
@@ -947,12 +948,32 @@ bgl_ciod_metric_get_metric_value(unsigned int *metric_value_type,
         {
           if (bgl_ciod_state && bgl_ciod_was_up)
             CEREBRO_DBG(("BGL ciod daemon detected down"));
-
-          bgl_ciod_state = 0;
-
+          
+          /* 
+           * There is a chance the ciod daemon's socket was closed,
+           * then later re-opened with a new inode.  We'll re-init all
+           * of the ciod sockets data, and try bgl_ciod_port_alive()
+           * one more time to see if it can find a new ciod daemon
+           * socket open.
+           */
           if (bgl_ciod_sockets_len)
-            _init_bgl_sockets_data();
+            {
+              _init_bgl_sockets_data();
+              if (bgl_ciod_port_alive())
+                {
+                  CEREBRO_DBG(("BGL ciod daemon found again"));
+
+                  bgl_ciod_state = 1;
+                  bgl_ciod_was_up = 1;
+                  bgl_ciod_failures = 0;
+                }
+              else
+                bgl_ciod_state = 0;
+            }
+          else
+            bgl_ciod_state = 0;
         }
+      /* else the bgl_ciod_state stays the same */
     }
 #endif /* !BGL_CIOD_CONNECT */
 
