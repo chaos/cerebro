@@ -1,7 +1,3 @@
-2005-10-05  Albert Chu  <chu11@llnl.gov>
-
-	* tagged pre-multi-listen-interface
-	
 2005-10-04  Albert Chu  <chu11@llnl.gov>
 
 	* Another attempt to monitor ciod daemons properly.
