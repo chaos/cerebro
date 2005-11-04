@@ -1,3 +1,8 @@
+2005-11-04  Albert Chu  <chu11@llnl.gov>
+
+	* cerebro.spec.in: Add %dir directive for %{libdir}/cerebro to fix
+	rpm install issue.
+	
 2005-10-24  Albert Chu  <chu11@llnl.gov>
 
 	* tagged cerebro-1-0-1
