@@ -48,7 +48,7 @@ Source: @PROJECT@-@VERSION@-@RELEASE@.tgz
 %if %{?_with_chaos:0}%{!?_with_chaos:1}
 %if %{?_with_bgl:0}%{!?_with_bgl:1} 
 %if %{?_with_bglion:0}%{!?_with_bglion:1} 
-Source: @PROJECT@-@VERSION@.tgz
+Source: @PROJECT@-@VERSION@.tar.gz
 %endif
 %endif
 %endif
