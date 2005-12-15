@@ -29,4 +29,3 @@ Future Features
   - so can try to avoid dieing on low memory conditions
     (i.e. before the linux oom killer finishes its job)
 
-- Make a single /etc/init.d script

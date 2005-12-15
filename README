@@ -7,27 +7,38 @@ A heavily modified version of Ganglia was once used at Lawrence
 Livermore National Laboratory, but as needs and demands changed, it
 became necessary to develop a slightly different tool.
 
-The goal of Cerebro was to provide:
-- A light cluster monitoring utility with less CPU interruption.
+Several of goals of Cerebro were to develop a monitoring tool that:
 
-- A set of libraries, tools, a dynamic module interface that allow
-users to monitor new metrics without any compilation or configuration
-changes.
+- Interrupted the CPU less frequently.
 
-- A dynamic module interface which allows the libraries and tools to
-have knowledge of every cluster node and allow for automatic
-configuration across a cluster.
+- Provide the user with a set of libraries, command-line tools, and a
+dynamic module interface that allow users to monitor new metrics
+without any re-compilation or configuration changes.
 
-- A dynamic module interface that allows for individual clusters to
+- Provide a dynamic module interface that allows individual clusters to
 monitor different metrics based solely on the modules installed.
+
+- Provide a dynamic module interface which allows the libraries and
+tools to have knowledge of every node in the cluster.
+
+- Provide a dynamic module interface which allows the libraries and
+tools to automatically configure itself across a cluster.
+
+- Remove XML overhead.
 
 At this point in time, the Cerebro project should not be mistaken for
 a full host monitoring system like Ganglia or Supermon, although it
-one day may be.  Several other ideas and concepts that were
-anticipated to go into the first release of Cerebro have been delayed
-to future releases.  (i.e. Version one didn't accomplish 100% of the
-goals and ideas I had, such is life :-) A list of future features are
-listed in the TODO.
+one day may be.  
+
+Future development goals include:
+
+- Security/access control features
+
+- Multiple subnet listening.
+
+- Confined listening configuration.
+
+- Event based monitoring.
 
 Albert Chu
 chu11@llnl.gov
