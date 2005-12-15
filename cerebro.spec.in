@@ -36,23 +36,17 @@ Release: @RELEASE@
 Summary: Cerebro cluster monitoring tools and libraries
 Group: System Environment/Base
 License: GPL
-%if %{?_with_chaos:1}%{!?_with_chaos:0}
-Source: @PROJECT@-@VERSION@-@RELEASE@.tgz
-%endif
-%if %{?_with_bgl:1}%{!?_with_bgl:0} 
-Source: @PROJECT@-@VERSION@-@RELEASE@.tgz
-%endif
-%if %{?_with_bglion:1}%{!?_with_bglion:0}
-Source: @PROJECT@-@VERSION@-@RELEASE@.tgz
-%endif
 %if %{?_with_chaos:0}%{!?_with_chaos:1}
 %if %{?_with_bgl:0}%{!?_with_bgl:1} 
 %if %{?_with_bglion:0}%{!?_with_bglion:1} 
 Source: @PROJECT@-@VERSION@.tar.gz
-%endif
-%endif
-%endif
+BuildRoot: %{_tmppath}/@PROJECT@-@VERSION@
+%else
+Source: @PROJECT@-@VERSION@-@RELEASE@.tgz
 BuildRoot: %{_tmppath}/@PROJECT@-@VERSION@-@RELEASE@
+%endif
+%endif
+%endif
 %if %{?_with_chaos:1}%{!?_with_chaos:0}
 Requires: gendersllnl
 Requires: genders >= 1.4

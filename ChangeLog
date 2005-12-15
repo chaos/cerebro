@@ -6,6 +6,8 @@
 
 	* README, TODO: Update for public release.
 
+	* cerebro.spec.in
+
 2005-11-04  Albert Chu  <chu11@llnl.gov>
 
 	* cerebro.spec.in: Add %dir directive for %{libdir}/cerebro to fix
