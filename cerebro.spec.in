@@ -210,7 +210,22 @@ Requires: qsqsql
 Bootlog monitoring module.
 
 %prep
+%if %{?_with_chaos:1}%{!?_with_chaos:0}
 %setup  -q -n @PROJECT@-@VERSION@-@RELEASE@
+%endif
+%if %{?_with_bgl:1}%{!?_with_bgl:0} 
+%setup  -q -n @PROJECT@-@VERSION@-@RELEASE@
+%endif
+%if %{?_with_bglion:1}%{!?_with_bglion:0}
+%setup  -q -n @PROJECT@-@VERSION@-@RELEASE@
+%endif
+%if %{?_with_chaos:0}%{!?_with_chaos:1}
+%if %{?_with_bgl:0}%{!?_with_bgl:1} 
+%if %{?_with_bglion:0}%{!?_with_bglion:1} 
+%setup  -q -n @PROJECT@-@VERSION@
+%endif
+%endif
+%endif
 
 %build
 %if %{?_with_bglion:1}%{!?_with_bglion:0} 
