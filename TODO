@@ -13,6 +13,9 @@ Future Features
   - user/password limited access?
   - munge based access?
 
+- controller/access rights
+  - need some security stuff
+
 - listener
   - limit data receiving based on host list or subnet
   - allow listening to multiple subnets/networks/ips/multciasts?

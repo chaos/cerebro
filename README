@@ -1,27 +1,33 @@
 Cerebro is a collection of cluster monitoring tools and libraries.
 This project has been named after a part of the central nervous system
 to pay homage to the the Ganglia project
-(http://ganglia.sourceforge.net).  A heavily modified version of
-Ganglia was once used at Lawrence Livermore National Laboratory to
-support a number of features on our Linux clusters.  As the needs and
-demands of Ganglia changed, it became necessary to develop a slightly
-different project.
+(http://ganglia.sourceforge.net).  
 
-The Cerebro project provides:
+A heavily modified version of Ganglia was once used at Lawrence
+Livermore National Laboratory, but as needs and demands changed, it
+became necessary to develop a slightly different tool.
 
-- No need to modify code to monitor new metrics
-- A dynamic module, library, and command line interface that allows
-  new metrics to be monitored without any software updates.
-- A dynamic module interface that allows for easy configuration
-  across an entire cluster.
-- A dynamic module interface that allows the software to have knowledge
-  of what each node in the cluster should be.
+The goal of Cerebro was to provide:
+- A light cluster monitoring utility with less CPU interruption.
 
-The Cerebro project should not be mistaken as a host monitoring system
-like Ganglia or Supermon.  The goal of Cerebro was to provide a
-simple, scalable tool with a wide range of user interfaces so that it
-would be easy to gather, propogate, and retrieve new monitoring
-information across a cluster.
+- A set of libraries, tools, a dynamic module interface that allow
+users to monitor new metrics without any compilation or configuration
+changes.
+
+- A dynamic module interface which allows the libraries and tools to
+have knowledge of every cluster node and allow for automatic
+configuration across a cluster.
+
+- A dynamic module interface that allows for individual clusters to
+monitor different metrics based solely on the modules installed.
+
+At this point in time, the Cerebro project should not be mistaken for
+a full host monitoring system like Ganglia or Supermon, although it
+one day may be.  Several other ideas and concepts that were
+anticipated to go into the first release of Cerebro have been delayed
+to future releases.  (i.e. Version one didn't accomplish 100% of the
+goals and ideas I had, such is life :-) A list of future features are
+listed in the TODO.
 
 Albert Chu
 chu11@llnl.gov
