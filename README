@@ -40,6 +40,35 @@ Future development goals include:
 
 - Event based monitoring.
 
+In order to install Cerebro, only the primary RPM (cerebro) need be
+installed.  However, additional features of Cerebro can be taken
+advantage of by installing a clusterlist module (cerebro-clusterlist)
+which allows Cerebro to recognize the hosts in the current cluster.
+
+The current clusterlist database formats supported are:
+
+Gendersllnl - For the most part, specifically used by Lawrence
+Livermore National Laboratory.
+
+Genders - Uses a genders database and the genders library to determine
+all nodes in the cluster.
+
+Hostsfile - Uses a file that lists the hostname of every node in the
+cluster on a separate line.
+
+In addition, other modules can be installed for cluster configuration
+(cerebro-config), metric monitoring (cerebro-metric), or metric
+logging (cerebro-monitor).
+
+The following metric modules are currently publicly distributed:
+
+boottime - Configures cerebro to also monitor cluster node boottimes.
+
+Several configuration and logging modules are included in the source
+code, but currently are considered too specific to LLNL needs and thus
+aren't distributed as RPMS.
+
+
 Albert Chu
 chu11@llnl.gov
 Lawrence Livermore National Laboratories    
