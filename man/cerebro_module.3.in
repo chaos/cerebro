@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro_module.3.in,v 1.8 2005-08-19 00:04:07 achu Exp $
+\."$Id: cerebro_module.3.in,v 1.9 2006-01-18 19:40:43 chu11 Exp $
 \."#############################################################################
 \."  Copyright (C) 2005 The Regents of the University of California.
 \."  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -43,13 +43,6 @@ one of a number of clusterlist modules.
 
 The following config modules are distributed:
 
-.if @MANPAGE_GENDERSLLNL@ \{
-gendersllnl - Reads and parses a genders database with LLNL specific
-attributes and values.  Can be passed a filename=value option to
-specify an non-default genders database location.
-
-\}
-
 .if @MANPAGE_GENDERS@ \{
 genders - Reads and parses a generic genders database.  Can be passed
 a filename=value option to specify an non-default genders database
@@ -89,17 +82,7 @@ the options specified in the configuration file.
 
 The following config modules are distributed:
 
-.if @MANPAGE_CHAOS_CONFIG@ \{
-Chaos - Configures 
-.B Cerebro specifically for use on LLNL clusters.
-
-\}
-
-.if @MANPAGE_BGL_CONFIG@ \{
-Bgl - Configures 
-.B Cerebro specifically for use on BlueGene/L
-
-\}
+No metric modules are built.
 
 Configuration modules are searched for in the
 .B Cerebro
@@ -144,14 +127,7 @@ whenever a packet with that metric is read.
 
 The following monitoring modules are distributed:
 
-.ie @MANPAGE_BOOTLOG@ \{
-bootlog - Stores boottime and last received time into a SQL database
-in a format for Quadrics diagnostics tools to utilize.
-\}
-.el \{
 No monitoring modules are built.
-
-\}
 
 Metric modules are searched for in the
 .B Cerebro

@@ -1,155 +1,25 @@
 Name:    @PROJECT@ 
 Version: @VERSION@
-%if %{?_with_chaos:1}%{!?_with_chaos:0}
-%if %{?_with_debug:1}%{!?_with_debug:0}
-Release: @RELEASE@chaos.debug
-%else
-Release: @RELEASE@chaos
-%endif
-%endif
-%if %{?_with_bgl:1}%{!?_with_bgl:0} 
-%if %{?_with_debug:1}%{!?_with_debug:0}
-Release: @RELEASE@bgl.debug
-%else
-Release: @RELEASE@bgl
-%endif
-%endif
-%if %{?_with_bglion:1}%{!?_with_bglion:0}
-%if %{?_with_debug:1}%{!?_with_debug:0}
-Release: @RELEASE@bglion.debug
-%else
-Release: @RELEASE@bglion
-%endif
-%endif
-%if %{?_with_chaos:0}%{!?_with_chaos:1}
-%if %{?_with_bgl:0}%{!?_with_bgl:1} 
-%if %{?_with_bglion:0}%{!?_with_bglion:1} 
-%if %{?_with_debug:1}%{!?_with_debug:0} 
-Release: @RELEASE@.debug
-%else 
 Release: @RELEASE@
-%endif
-%endif
-%endif
-%endif
 
 Summary: Cerebro cluster monitoring tools and libraries
 Group: System Environment/Base
 License: GPL
-%if %{?_with_chaos:1}%{!?_with_chaos:0}
-Source: @PROJECT@-@VERSION@-@RELEASE@.tgz
-BuildRoot: %{_tmppath}/@PROJECT@-@VERSION@-@RELEASE@
-%endif
-%if %{?_with_bgl:1}%{!?_with_bgl:0} 
-Source: @PROJECT@-@VERSION@-@RELEASE@.tgz
-BuildRoot: %{_tmppath}/@PROJECT@-@VERSION@-@RELEASE@
-%endif
-%if %{?_with_bglion:1}%{!?_with_bglion:0}
-Source: @PROJECT@-@VERSION@-@RELEASE@.tgz
-BuildRoot: %{_tmppath}/@PROJECT@-@VERSION@-@RELEASE@
-%endif
-%if %{?_with_chaos:0}%{!?_with_chaos:1}
-%if %{?_with_bgl:0}%{!?_with_bgl:1} 
-%if %{?_with_bglion:0}%{!?_with_bglion:1} 
 Source: @PROJECT@-@VERSION@.tar.gz
 BuildRoot: %{_tmppath}/@PROJECT@-@VERSION@
-%endif
-%endif
-%endif
-%if %{?_with_chaos:1}%{!?_with_chaos:0}
-Requires: gendersllnl
-Requires: genders >= 1.4
-Conflicts: ganglia-monitor-core
-%endif
 
 %description
 Cerebro is a collection of cluster monitoring tools and libraries.
 
-#
-# Special build for LLNL Linux CHAOS clusters
-#
-%if %{?_with_chaos:1}%{!?_with_chaos:0}
-%define _with_gendersllnl                  --with-gendersllnl
-%define _without_genders                   --without-genders
-%define _without_hostsfile                 --without-hostsfile
-%define _with_chaos_config                 --with-chaos-config
-%define _without_bgl_config                --without-bgl-config
-%define _without_slurm_state               --without-slurm-state
-%define _without_bgl_ciod                  --without-bgl-ciod
-%ifarch ia64
-%define _with_boottime                     --with-boottime
-%define _with_bootlog                      --with-bootlog
-%else
-%define _without_boottime                  --without-boottime
-%define _without_bootlog                   --without-bootlog
-%endif
-%endif
-
-#
-# Special build for BlueGene/L front end nodes
-#
-%if %{?_with_bgl:1}%{!?_with_bgl:0} 
-%define _without_gendersllnl               --without-gendersllnl
-%define _without_genders                   --without-genders
-%define _without_hostsfile                 --without-hostsfile
-%define _without_chaos_config              --without-chaos-config
-%define _with_bgl_config                   --with-bgl-config
-%define _without_boottime                  --without-boottime
-%define _without_slurm_state               --without-slurm-state
-%define _without_bgl_ciod                  --without-bgl-ciod
-%define _without_bootlog                   --without-bootlog
-%endif
-
-#
-# Special build for BlueGene/L ion nodes
-#
-%if %{?_with_bglion:1}%{!?_with_bglion:0} 
-%define _without_gendersllnl               --without-gendersllnl
-%define _without_genders                   --without-genders
-%define _without_hostsfile                 --without-hostsfile
-%define _without_chaos_config              --without-chaos-config
-%define _with_bgl_config                   --with-bgl-config
-%define _without_boottime                  --without-boottime
-%define _without_slurm_state               --without-slurm-state
-%define _with_bgl_ciod                     --with-bgl-ciod
-%define _without_bootlog                   --without-bootlog
-%define _with_cerebrod_speaker_only        --with-cerebrod-speaker-only
-%define _with_cerebrod_no_threads          --with-cerebrod-no-threads
-%define _with_cerebro_config_file          --with-cerebro-config-file=/bgl/ion/etc/cerebro.conf
-%define _with_bgl_ciod_config_file         --with-bgl-ciod-config-file=/bgl/ion/etc/cerebro_bgl_ciod.conf
-%define _with_bgl_ion_cerebrod_init_script --with-bgl-ion-cerebrod-init-script
-%define _enable_static_modules             --enable-static-modules
-%define _with_bgl_ion_extra_options        --build="powerpc64-unknown-linux-gnu" --host=ppc --disable-glibtest --disable-gtktest --disable-mmx --disable-modules 
-
-%endif
-
-%if %{?_with_chaos:0}%{!?_with_chaos:1}
-%if %{?_with_bgl:0}%{!?_with_bgl:1} 
-%if %{?_with_bglion:0}%{!?_with_bglion:1} 
-%{!?_with_gendersllnl: %{!?_without_gendersllnl: %define _with_gendersllnl --with-gendersllnl}}
 %{!?_with_genders: %{!?_without_genders: %define _with_genders --with-genders}}
 %{!?_with_hostsfile: %{!?_without_hostsfile: %define _with_hostsfile --with-hostsfile}}
-%{!?_with_chaos_config: %{!?_without_chaos_config: %define _without_chaos_config --without-chaos-config}}
-%{!?_with_bgl_config: %{!?_without_bgl_config: %define _without_bgl_config --without-bgl-config}}
 %{!?_with_boottime: %{!?_without_boottime: %define _with_boottime --with-boottime}}
 %{!?_with_slurm_state: %{!?_without_slurm_state: %define _without_slurm_state --without-slurm-state}}
 %{!?_with_bgl_ciod: %{!?_without_bgl_ciod: %define _without_bgl_ciod --without-bgl-ciod}}
-%{!?_with_bootlog: %{!?_without_bootlog: %define _without_bootlog --without-bootlog}}
-%endif
-%endif
-%endif
 
 %if %{?_with_debug:1}%{!?_with_debug:0}
 %define _enable_debug --enable-debug
 %endif
-
-%package clusterlist-gendersllnl
-Summary: clusterlist gendersllnl module
-Group: System Environment/Base
-Requires: cerebro
-Requires: gendersllnl
-%description clusterlist-gendersllnl
-Gendersllnl module
 
 %package clusterlist-genders
 Summary: clusterlist genders module
@@ -166,20 +36,6 @@ Requires: cerebro
 %description clusterlist-hostsfile
 Hostsfile module
 
-%package config-chaos
-Summary: config-chaos module
-Group: System Environment/Base
-Requires: cerebro
-%description config-chaos
-Config module for chaos.
-
-%package config-bgl
-Summary: config-bgl module
-Group: System Environment/Base
-Requires: cerebro
-%description config-bgl
-Config module for bgl.
-
 %package metric-boottime
 Summary: boottime module
 Group: System Environment/Base
@@ -194,85 +50,26 @@ Requires: cerebro
 %description metric-slurm-state
 Metric module to monitor slurm_state.
 
-%package metric-bgl-ciod
-Summary: bgl_ciod module
-Group: System Environment/Base
-Requires: cerebro
-%description metric-bgl-ciod
-Metric module to monitor bgl_ciod.
-
-%package bootlog
-Summary: bootlog module
-Group: System Environment/Base
-Requires: cerebro
-Requires: qsqsql
-%description bootlog
-Bootlog monitoring module.
-
 %prep
-%if %{?_with_chaos:1}%{!?_with_chaos:0}
-%setup  -q -n @PROJECT@-@VERSION@-@RELEASE@
-%endif
-%if %{?_with_bgl:1}%{!?_with_bgl:0} 
-%setup  -q -n @PROJECT@-@VERSION@-@RELEASE@
-%endif
-%if %{?_with_bglion:1}%{!?_with_bglion:0}
-%setup  -q -n @PROJECT@-@VERSION@-@RELEASE@
-%endif
-%if %{?_with_chaos:0}%{!?_with_chaos:1}
-%if %{?_with_bgl:0}%{!?_with_bgl:1} 
-%if %{?_with_bglion:0}%{!?_with_bglion:1} 
 %setup  -q -n @PROJECT@-@VERSION@
-%endif
-%endif
-%endif
 
 %build
-%if %{?_with_bglion:1}%{!?_with_bglion:0} 
-# BlueGene/L ion node cross compiling stuff
-export CROSS_TOP=/bgl/ion-toolchain/linux-gnu
-export CXXCPP=$CROSS_TOP/bin/powerpc-bgl-linux-gnu-cpp
-export CXX=$CROSS_TOP/bin/powerpc-bgl-linux-gnu-g++
-export CPP=$CROSS_TOP/bin/powerpc-bgl-linux-gnu-cpp
-export CC=$CROSS_TOP/bin/powerpc-bgl-linux-gnu-gcc
-export LD=$CROSS_TOP/bin/powerpc-bgl-linux-gnu-ld
-export NM="$CROSS_TOP/bin/powerpc-bgl-linux-gnu-nm -B"
-export AR="$CROSS_TOP/bin/powerpc-bgl-linux-gnu-ar"
-export RANLIB=$CROSS_TOP/bin/powerpc-bgl-linux-gnu-ranlib
-export LDFLAGS=" -static -L$CROSS_TOP/powerpc-bgl-linux-gnu/lib -L$CROSS_TOP/lib/gcc-lib/powerpc-bgl-linux-gnu/3.2 -L$CROSS_TOP/lib -L/bgl/ion/lib"
-export CFLAGS="-D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -O2 -I /bgl/ion/include "
-export CPPFLAGS=" -I /bgl/ion/include "
-export CXXFLAGS="-D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -O2 -I /bgl/ion/include "
-%endif
 %configure --program-prefix=%{?_program_prefix:%{_program_prefix}} \
-           %{?_with_gendersllnl} \
-           %{?_without_gendersllnl} \
            %{?_with_genders} \
            %{?_without_genders} \
            %{?_with_hostsfile} \
            %{?_without_hostsfile} \
-           %{?_with_chaos_config} \
-           %{?_without_chaos_config} \
-           %{?_with_bgl_config} \
-           %{?_without_bgl_config} \
            %{?_with_boottime} \
            %{?_without_boottime} \
            %{?_with_slurm_state} \
            %{?_without_slurm_state} \
-           %{?_with_bgl_ciod} \
-           %{?_without_bgl_ciod} \
-           %{?_with_bootlog} \
-           %{?_without_bootlog} \
            %{?_with_cerebrod_speaker_only} \
            %{?_without_cerebrod_speaker_only} \
            %{?_with_cerebrod_no_threads} \
            %{?_without_cerebrod_no_threads} \
            %{?_with_cerebro_config_file} \
-           %{?_with_bgl_ciod_config_file} \
-           %{?_with_bgl_ion_cerebrod_init_script} \
            %{?_enable_static_modules} \
-           %{?_enable_debug} \
-           %{?_with_bgl_ion_extra_options}
+           %{?_enable_debug}
 make 
 
 %install
@@ -318,23 +115,6 @@ fi
 %{_sbindir}/cerebrod
 %{_sbindir}/cerebro-stat
 %{_sbindir}/cerebro-admin
-%if %{?_with_chaos:1}%{!?_with_chaos:0}
-%{_libdir}/cerebro/cerebro_clusterlist*
-%{_libdir}/cerebro/cerebro_config*
-%endif
-%if %{?_with_bgl:1}%{!?_with_bgl:0} 
-%{_libdir}/cerebro/cerebro_config*
-%endif
-
-%if %{?_with_chaos:0}%{!?_with_chaos:1}
-%if %{?_with_bgl:0}%{!?_with_bgl:1} 
-%if %{?_with_bglion:0}%{!?_with_bglion:1} 
-
-%if %{?_with_gendersllnl:1}%{!?_with_gendersllnl:0}
-%files clusterlist-gendersllnl
-%defattr(700,root,root)
-%{_libdir}/cerebro/cerebro_clusterlist_gendersllnl.*
-%endif
 
 %if %{?_with_genders:1}%{!?_with_genders:0}
 %files clusterlist-genders
@@ -348,18 +128,6 @@ fi
 %{_libdir}/cerebro/cerebro_clusterlist_hostsfile.*
 %endif
 
-%if %{?_with_chaos_config:1}%{!?_with_chaos_config:0}
-%files config-chaos
-%defattr(700,root,root)
-%{_libdir}/cerebro/cerebro_config_chaos.*
-%endif
-
-%if %{?_with_bgl_config:1}%{!?_with_bgl_config:0}
-%files config-bgl
-%defattr(700,root,root)
-%{_libdir}/cerebro/cerebro_config_bgl.*
-%endif
-
 %if %{?_with_boottime:1}%{!?_with_boottime:0}
 %files metric-boottime
 %defattr(700,root,root)
@@ -370,29 +138,4 @@ fi
 %files metric-slurm-state
 %defattr(700,root,root)
 %{_libdir}/cerebro/cerebro_metric_slurm_state.*
-%endif
-
-%if %{?_with_bgl_ciod:1}%{!?_with_bgl_ciod:0}
-%files metric-bgl-ciod
-%defattr(700,root,root)
-%{_libdir}/cerebro/cerebro_metric_bgl_ciod.*
-%endif
-
-%if %{?_with_bootlog:1}%{!?_with_bootlog:0}
-%files monitor-bootlog
-%defattr(700,root,root)
-%{_libdir}/cerebro/cerebro_monitor_bootlog.*
-%endif
-
-%endif
-%endif
-%endif
-
-%if %{?_with_chaos:1}%{!?_with_chaos:0}
-%if %{?_with_bootlog:1}%{!?_with_bootlog:0}
-%files bootlog
-%defattr(700,root,root)
-%{_libdir}/cerebro/cerebro_metric_boottime.*
-%{_libdir}/cerebro/cerebro_monitor_bootlog.*
-%endif
 %endif

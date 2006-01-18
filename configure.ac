@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.66 2005-08-25 01:44:21 achu Exp $
+## $Id: configure.ac,v 1.67 2006-01-18 19:40:42 chu11 Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -102,12 +102,6 @@ AM_CONDITIONAL(WITH_CEREBROD_SPEAKER_ONLY, [test "$ac_with_cerebrod_speaker_only
 AM_CONDITIONAL(WITH_CEREBROD_NO_THREADS, [test "$ac_with_cerebrod_no_threads" = "yes"])
 
 #
-# Check to build gendersllnl module
-#
-AC_GENDERSLLNL
-AM_CONDITIONAL(WITH_GENDERSLLNL, [test "$ac_with_gendersllnl" = "yes"])
-
-#
 # Check to build genders module
 #
 AC_GENDERS
@@ -119,18 +113,6 @@ AM_CONDITIONAL(WITH_GENDERS, [test "$ac_with_genders" = "yes"])
 AC_HOSTSFILE
 AC_HOSTSFILE_PATH
 AM_CONDITIONAL(WITH_HOSTSFILE, [test "$ac_with_hostsfile" = "yes"])
-
-#
-# Check to build chaos config module
-#
-AC_CHAOS_CONFIG
-AM_CONDITIONAL(WITH_CHAOS_CONFIG, [test "$ac_with_chaos_config" = "yes"])
-
-#
-# Check to build bgl config module
-#
-AC_BGL_CONFIG
-AM_CONDITIONAL(WITH_BGL_CONFIG, [test "$ac_with_bgl_config" = "yes"])
 
 #
 # Check to build boottime module
@@ -146,47 +128,28 @@ AC_SLURM_STATE_CONTROL_PATH
 AM_CONDITIONAL(WITH_SLURM_STATE, [test "$ac_with_slurm_state" = "yes"])
 
 #
-# Check to build bgl_ciod module
-#
-AC_BGL_CIOD
-AC_BGL_CIOD_CONFIG_FILE
-AM_CONDITIONAL(WITH_BGL_CIOD, [test "$ac_with_bgl_ciod" = "yes"])
-
-#
-# Check to build bootlog module
-#
-AC_BOOTLOG
-AM_CONDITIONAL(WITH_BOOTLOG, [test "$ac_with_bootlog" = "yes"])
-
-#
-# Check if we should use the special bgl ion init.d script
-#
-AC_BGL_ION_CEREBROD_INIT_SCRIPT
-
-#
 # Determine which static module libraries do not need to be linked
 # against under a static module build
 #
 AM_CONDITIONAL(WITH_CLUSTERLIST_STATIC_MODULES, 
                [(test "$ac_with_static_modules" = "yes") &&
-                (test "$ac_with_gendersllnl" = "yes" || 
-                 test "$ac_with_genders" = "yes" || 
+                (test "$ac_with_genders" = "yes" || 
                  test "$ac_with_hostsfile" = "yes")])
 
+# Placeholder, please don't dailywtf me :-)
 AM_CONDITIONAL(WITH_CONFIG_STATIC_MODULES,
                [(test "$ac_with_static_modules" = "yes") &&
-                (test "$ac_with_chaos_config" = "yes" || 
-                 test "$ac_with_bgl_config" = "yes")])
+                (test "1" = "2")])
 
 AM_CONDITIONAL(WITH_METRIC_STATIC_MODULES,
                [(test "$ac_with_static_modules" = "yes") &&
                 (test "$ac_with_boottime" = "yes" || 
-                 test "$ac_with_slurm_state" = "yes" || 
-                 test "$ac_with_bgl_ciod" = "yes")])
+                 test "$ac_with_slurm_state" = "yes")])
 
+# Placeholder, please don't dailywtf me :-)
 AM_CONDITIONAL(WITH_MONITOR_STATIC_MODULES,
                [(test "$ac_with_static_modules" = "yes") &&
-                (test "$ac_with_bootlog" = "yes")])
+                (test "1" = "2")])
 
 ##
 # Checks for typedefs, structures, and compiler characteristics.

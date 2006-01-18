@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.14 2005-08-26 18:00:44 achu Exp $
+## $Id: Makefile.am,v 1.15 2006-01-18 19:40:43 chu11 Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -19,25 +19,18 @@ SLURM_STATE_METRIC_MODULE = cerebro_metric_slurm_state.la
 SLURM_STATE_STATIC_SOURCES = cerebro_metric_slurm_state.c
 endif
 
-if WITH_BGL_CIOD
-BGL_CIOD_METRIC_MODULE = cerebro_metric_bgl_ciod.la
-BGL_CIOD_STATIC_SOURCES = cerebro_metric_bgl_ciod.c
-endif
-
 if WITH_STATIC_MODULES
 noinst_LTLIBRARIES = libstaticmetricmodules.la
 else
 modulelibdir = $(CEREBRO_MODULE_DIR)
 modulelib_LTLIBRARIES = $(BOOTTIME_METRIC_MODULE) \
-			$(SLURM_STATE_METRIC_MODULE) \
-			$(BGL_CIOD_METRIC_MODULE)
+			$(SLURM_STATE_METRIC_MODULE)
 endif
 
 MODULE_FLAGS = -module -avoid-version
 
 libstaticmetricmodules_la_SOURCES = $(BOOTTIME_STATIC_SOURCES) \
-			      	    $(SLURM_STATE_STATIC_SOURCES) \
-			      	    $(BGL_CIOD_STATIC_SOURCES)
+			      	    $(SLURM_STATE_STATIC_SOURCES)
 libstaticmetricmodules_la_CFLAGS = -I$(srcdir)/../../libs/include \
 			     	   -I$(srcdir)/../../libs/common \
 			     	   -I$(srcdir)/../../libs/debug \
@@ -57,18 +50,6 @@ cerebro_metric_slurm_state_la_LDFLAGS = $(MODULE_FLAGS) \
 cerebro_metric_slurm_state_la_CFLAGS  = -I$(srcdir)/../../libs/include \
 				        -I$(srcdir)/../../libs/debug
 cerebro_metric_slurm_state_la_LIBADD  = ../../libs/debug/libdebug.la
-
-cerebro_metric_bgl_ciod_la_SOURCES = cerebro_metric_bgl_ciod.c
-cerebro_metric_bgl_ciod_la_LDFLAGS = $(MODULE_FLAGS) \
-				     $(METRIC_OTHER_FLAGS)
-cerebro_metric_bgl_ciod_la_CFLAGS  = -I$(srcdir)/../../libs/include \
-				     -I$(srcdir)/../../libs/common \
-				     -I$(srcdir)/../../libs/debug \
-				     -I$(srcdir)/../../libs/util
-cerebro_metric_bgl_ciod_la_LIBADD  = ../../libs/common/libconffile.la \
-				     ../../libs/common/libfd.la \
-				     ../../libs/debug/libdebug.la \
-				     ../../libs/util/libutil_network.la
 
 ../../libs/common/libconffile.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`

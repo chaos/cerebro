@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.19 2005-08-25 22:04:32 achu Exp $
+## $Id: Makefile.am,v 1.20 2006-01-18 19:40:43 chu11 Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -9,48 +9,19 @@ CONFIG_VERSION_SCRIPT = $(srcdir)/config.map
 CONFIG_OTHER_FLAGS = -Wl,--version-script=$(CONFIG_VERSION_SCRIPT)
 endif
 
-if WITH_CHAOS_CONFIG
-CHAOS_CONFIG_MODULE = cerebro_config_chaos.la
-CHAOS_CONFIG_STATIC_SOURCES = cerebro_config_chaos.c
-CHAOS_CONFIG_STATIC_LIBS = $(CHAOS_CONFIG_LIBS)
-endif
-
-if WITH_BGL_CONFIG
-BGL_CONFIG_MODULE = cerebro_config_bgl.la
-BGL_CONFIG_STATIC_SOURCES = cerebro_config_bgl.c
-endif
-
 if WITH_STATIC_MODULES
 noinst_LTLIBRARIES = libstaticconfigmodules.la
 else
 modulelibdir = $(CEREBRO_MODULE_DIR)
-modulelib_LTLIBRARIES = $(CHAOS_CONFIG_MODULE) \
-			$(BGL_CONFIG_MODULE)
 endif
 
 MODULE_FLAGS = -module -avoid-version
 
-libstaticconfigmodules_la_SOURCES = $(CHAOS_CONFIG_STATIC_SOURCES) \
-			      	    $(BGL_CONFIG_STATIC_SOURCES)
+libstaticconfigmodules_la_SOURCES = 
 libstaticconfigmodules_la_CFLAGS  = -I$(srcdir)/../../libs/include \
-			      	    -I$(srcdir)/../../libs/debug
-libstaticconfigmodules_la_LDFLAGS = $(CHAOS_CONFIG__STATIC_LIBS) \
-			      	    $(CONFIG_OTHER_FLAGS)
+                                    -I$(srcdir)/../../libs/debug
+libstaticconfigmodules_la_LDFLAGS = $(CONFIG_OTHER_FLAGS)
 
-cerebro_config_chaos_la_SOURCES = cerebro_config_chaos.c
-cerebro_config_chaos_la_LDFLAGS = $(MODULE_FLAGS) \
-				  $(CHAOS_CONFIG_LIBS) \
-				  $(CONFIG_OTHER_FLAGS)
-cerebro_config_chaos_la_CFLAGS  = -I$(srcdir)/../../libs/include \
-				  -I$(srcdir)/../../libs/debug
-cerebro_config_chaos_la_LIBADD  = ../../libs/debug/libdebug.la
-
-cerebro_config_bgl_la_SOURCES = cerebro_config_bgl.c
-cerebro_config_bgl_la_LDFLAGS = $(MODULE_FLAGS) \
-				$(CONFIG_OTHER_FLAGS)
-cerebro_config_bgl_la_CFLAGS  = -I$(srcdir)/../../libs/include \
-				-I$(srcdir)/../../libs/debug
-cerebro_config_bgl_la_LIBADD  = ../../libs/debug/libdebug.la
 
 ../../libs/debug/libdebug.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`

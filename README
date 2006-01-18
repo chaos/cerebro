@@ -47,9 +47,6 @@ which allows Cerebro to recognize the hosts in the current cluster.
 
 The current clusterlist database formats supported are:
 
-Gendersllnl - For the most part, specifically used by Lawrence
-Livermore National Laboratory.
-
 Genders - Uses a genders database and the genders library to determine
 all nodes in the cluster.
 
