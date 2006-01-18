@@ -51,7 +51,7 @@ Requires: cerebro
 Metric module to monitor slurm_state.
 
 %prep
-%setup  -q -n @PROJECT@-@VERSION@
+%setup  -q -n @PROJECT@-@VERSION@-@RELEASE@
 
 %build
 %configure --program-prefix=%{?_program_prefix:%{_program_prefix}} \
