@@ -5,8 +5,8 @@ Release: @RELEASE@
 Summary: Cerebro cluster monitoring tools and libraries
 Group: System Environment/Base
 License: GPL
-Source: @PROJECT@-@VERSION@.tar.gz
-BuildRoot: %{_tmppath}/@PROJECT@-@VERSION@
+Source: @PROJECT@-@VERSION@-@RELEASE@.tar.gz
+BuildRoot: %{_tmppath}/@PROJECT@-@VERSION@-@RELEASE@
 
 %description
 Cerebro is a collection of cluster monitoring tools and libraries.
