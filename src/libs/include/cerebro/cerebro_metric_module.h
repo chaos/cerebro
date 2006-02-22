@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_module.h,v 1.8 2005-07-22 17:45:33 achu Exp $
+ *  $Id: cerebro_metric_module.h,v 1.9 2006-02-22 06:08:28 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -27,6 +27,8 @@
 
 #ifndef _CEREBRO_METRIC_MODULE_H
 #define _CEREBRO_METRIC_MODULE_H
+
+#include <cerebro/cerebrod_heartbeat_protocol.h>
 
 /*
  * Cerebro_metric_setup
@@ -142,6 +144,25 @@ typedef void *(*Cerebro_metric_thread_pointer)(void *arg);
  */
 typedef Cerebro_metric_thread_pointer (*Cerebro_metric_get_metric_thread)(void);
 
+/* Cerebro_metric_send_heartbeat 
+ *
+ * function prototype to inform the cerebrod daemon to send
+ * a heartbeat.
+ *
+ * Returns 0 on success, -1 on error
+ */
+typedef int (*Cerebro_metric_send_heartbeat)(struct cerebrod_heartbeat *hb);
+
+/* 
+ * Cerebro_metric_send_heartbeat_function_pointer
+ *
+ * function prototype to give a Cerebro_metric_send_heartbeat function
+ * pointer to the metric module.
+ *
+ * Returns 0 on success, -1 on error
+ */
+typedef int (*Cerebro_metric_send_heartbeat_function_pointer)(Cerebro_metric_send_heartbeat function_pointer);
+
 /*
  * struct cerebro_metric_module_info 
  * 
@@ -158,6 +179,7 @@ struct cerebro_metric_module_info
   Cerebro_metric_get_metric_value get_metric_value;
   Cerebro_metric_destroy_metric_value destroy_metric_value;
   Cerebro_metric_get_metric_thread get_metric_thread;
+  Cerebro_metric_send_heartbeat_function_pointer send_heartbeat_function_pointer; 
 };
 
 #endif /* _CEREBRO_METRIC_MODULE_H */

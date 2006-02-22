@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_boottime.c,v 1.15 2005-08-23 21:10:15 achu Exp $
+ *  $Id: cerebro_metric_boottime.c,v 1.16 2006-02-22 06:08:28 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -224,6 +224,17 @@ boottime_metric_get_metric_thread(void)
   return NULL;
 }
 
+/*
+ * boottime_metric_send_heartbeat_function_pointer
+ *
+ * boottime metric module send_heartbeat_function_pointer function
+ */
+static int
+boottime_metric_send_heartbeat_function_pointer(Cerebro_metric_send_heartbeat function_pointer)
+{
+  return 0;
+}
+
 #if WITH_STATIC_MODULES
 struct cerebro_metric_module_info boottime_metric_module_info =
 #else  /* !WITH_STATIC_MODULES */
@@ -238,4 +249,5 @@ struct cerebro_metric_module_info metric_module_info =
     &boottime_metric_get_metric_value,
     &boottime_metric_destroy_metric_value,
     &boottime_metric_get_metric_thread,
+    &boottime_metric_send_heartbeat_function_pointer,
   };

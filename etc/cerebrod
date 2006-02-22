@@ -1,5 +1,5 @@
 #!/bin/sh
-# $Id: cerebrod,v 1.3 2005-10-04 20:51:46 achu Exp $
+# $Id: cerebrod,v 1.4 2006-02-22 06:08:26 chu11 Exp $
 #
 # chkconfig: 2345 70 40
 # description: cerebrod startup script
@@ -27,7 +27,7 @@ if [ -f /etc/rc.d/init.d/functions ] ; then
         [ $RETVAL -eq 0 ] && touch /var/lock/subsys/cerebrod
     }
     Xstop() {
-        killproc cerebrod
+        killproc cerebrod -TERM
         RETVAL=$?
         echo
         [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/cerebrod

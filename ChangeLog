@@ -1,3 +1,46 @@
+2006-02-22  Albert Chu  <chu11@llnl.gov>
+
+	Support new graceful shutdown metric module.
+
+	* src/modules/metric/cerebro_metric_shutdown.c: New file.
+	
+	* config/ac_shutdown.m4: New file.
+
+	* src/modules/metric/Makefile.am, configure.ac: Support new
+	metric.
+
+	* src/cerebrod/cerebrod_speaker.c (_speaker_socket_setup): Renamed
+	to _speaker_socket_create due to new use.
+
+	* src/cerebrod/cerebrod_speaker.c (cerebrod_send_heartbeat): New
+	function.
+
+	* man/cerebro_module.3.in: Update with new metric module info.
+
+	* src/libs/include/protocol/cerebro_metric_control_protocol.h.in,
+	src/libs/include/cerebro/cerebro_metric_server_protocol.h,
+	src/libs/include/cerebro/cerebrod_heartbeat_protocol.h: Moved to
+	src/libs/include/cerebro/.
+
+	* Globally adjust for .h file location changes.
+
+	* src/libs/include/cerebro/cerebro_metric_module.h: Support new
+	Cerebro_metric_send_heartbeat_function_pointer function.
+
+	* src/modules/metric/:  Support new
+	Cerebro_metric_send_heartbeat_function_pointer function.
+
+	* src/libs/modules/metric_module.h,
+	src/libs/modules/metric_module.c
+	(metric_module_send_heartbeat_function_pointer): New function.
+
+	* src/cerebrod/cerebrod_speaker_data.c (_setup_metric_modules):
+	Support Cerebro_metric_send_heartbeat_function_pointer
+	functionality.
+
+	* etc/cerebrod: Always kill via SIGTERM signal so it can be
+	captured.
+`	
 2006-01-18  Albert Chu  <chu11@llnl.gov>
 
 	* Removed localisms.

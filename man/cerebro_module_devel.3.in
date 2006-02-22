@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro_module_devel.3.in,v 1.12 2005-08-25 17:14:11 achu Exp $
+\."$Id: cerebro_module_devel.3.in,v 1.13 2006-02-22 06:08:27 chu11 Exp $
 \."#############################################################################
 \."  Copyright (C) 2005 The Regents of the University of California.
 \."  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -357,6 +357,7 @@ struct cerebro_metric_module_info {
   Cerebro_metric_get_metric_value get_metric_value;
   Cerebro_metric_destroy_metric_value destroy_metric_value;
   Cerebro_metric_get_metric_thread get_metric_thread;
+  Cerebro_metric_send_heartbeat_function_pointer send_heartbeat_function_pointer;
 .in -2
 };
 .fi
@@ -455,6 +456,16 @@ If the
 .B cerebrod
 daemon was built without threads, the 'get_metric_thread' function will
 never be called.
+
+The field 'send_heartbeat_function_pointer' should point to a function of the following type:
+
+typedef int (*Cerebro_metric_send_heartbeat_function_pointer)(Cerebro_metric_send_heartbeat function_pointer););
+
+The 'send_heartbeat_function_pointer' receives a pointer of the type:
+
+typedef int (*Cerebro_metric_send_heartbeat)(struct cerebrod_heartbeat *hb);
+
+The pointer will allow the metric module to send a heartbeat message.
 
 All of the above functions must be defined in the module and listed in
 the 'metric_module_info' structure.

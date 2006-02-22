@@ -29,3 +29,10 @@ Future Features
   - so can try to avoid dieing on low memory conditions
     (i.e. before the linux oom killer finishes its job)
 
+Enhancements
+- Should pass config to modules so they can configure/setup 
+  based on various conditions.
+- method for metric modules to send heartbeats by themselves when
+  they need to.
+- need way to send functions/pointers/etc. stuff between modules
+  without keeping on adding functions.

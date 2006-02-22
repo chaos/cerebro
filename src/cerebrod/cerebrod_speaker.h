@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.h,v 1.7 2005-07-22 17:21:07 achu Exp $
+ *  $Id: cerebrod_speaker.h,v 1.8 2006-02-22 06:08:28 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -28,6 +28,8 @@
 #ifndef _CEREBROD_SPEAKER_H
 #define _CEREBROD_SPEAKER_H
 
+#include "cerebro/cerebrod_heartbeat_protocol.h"
+
 /* 
  * cerebrod_speaker
  *
@@ -38,5 +40,14 @@
  * Executed in detached state, no return value.
  */
 void *cerebrod_speaker(void *);
+
+/* 
+ * cerebrod_send_heartbeat
+ *
+ * Sends a heartbeat.  Called by metric modules when necessary.
+ *
+ * Returns 0 on success, -1 on error.
+ */
+int cerebrod_send_heartbeat(struct cerebrod_heartbeat *hb);
 
 #endif /* _CEREBROD_SPEAKER_H */

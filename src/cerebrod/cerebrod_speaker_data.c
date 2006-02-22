@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker_data.c,v 1.36 2005-08-25 01:44:22 achu Exp $
+ *  $Id: cerebrod_speaker_data.c,v 1.37 2006-02-22 06:08:28 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -44,10 +44,11 @@
 #include "cerebro.h"
 #include "cerebro/cerebro_constants.h"
 
-#include "protocol/cerebrod_heartbeat_protocol.h"
+#include "cerebro/cerebrod_heartbeat_protocol.h"
 
 #include "cerebrod.h"
 #include "cerebrod_config.h"
+#include "cerebrod_speaker.h"
 #include "cerebrod_speaker_data.h"
 
 #include "debug.h"
@@ -247,6 +248,13 @@ _setup_metric_modules(void)
       if (metric_module_get_metric_period(metric_handle, i, &metric_period) < 0)
         {
           CEREBRO_DBG(("metric_module_get_metric_period: %s", module_name));
+          metric_module_cleanup(metric_handle, i);
+          continue;
+        }
+
+      if (metric_module_send_heartbeat_function_pointer(metric_handle, i, &cerebrod_send_heartbeat) < 0)
+        {
+          CEREBRO_DBG(("metric_module_send_heartbeat_function_pointer: %s", module_name));
           metric_module_cleanup(metric_handle, i);
           continue;
         }

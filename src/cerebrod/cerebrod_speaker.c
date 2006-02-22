@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.84 2005-08-25 01:44:21 achu Exp $
+ *  $Id: cerebrod_speaker.c,v 1.85 2006-02-22 06:08:28 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -44,7 +44,7 @@
 #include "cerebro.h"
 #include "cerebro/cerebro_constants.h"
 
-#include "protocol/cerebrod_heartbeat_protocol.h"
+#include "cerebro/cerebrod_heartbeat_protocol.h"
 
 #include "cerebrod_config.h"
 #include "cerebrod_heartbeat.h"
@@ -72,16 +72,16 @@ extern pthread_mutex_t debug_output_mutex;
 static char cerebrod_nodename[CEREBRO_MAX_NODENAME_LEN+1];
 
 /* 
- * _speaker_socket_setup
+ * _speaker_socket_create
  *
- * Create and setup the speaker socket.  Do not use wrappers in this
+ * Create and setup a speaker socket.  Do not use wrappers in this
  * function.  We want to give the daemon additional chances to
  * "survive" an error condition.
  *
  * Returns file descriptor on success, -1 on error
  */
 static int
-_speaker_socket_setup(void)
+_speaker_socket_create(void)
 {
   struct sockaddr_in addr;
   int fd, optval = 1;
@@ -321,7 +321,7 @@ cerebrod_speaker(void *arg)
   int speaker_fd;
 
   _speaker_initialize();
-  if ((speaker_fd = _speaker_socket_setup()) < 0)
+  if ((speaker_fd = _speaker_socket_create()) < 0)
     CEREBRO_EXIT(("speaker fd setup failed"));
 
   while (1)
@@ -361,7 +361,7 @@ cerebrod_speaker(void *arg)
         {
           if (rv < 0)
             speaker_fd = cerebrod_reinit_socket(speaker_fd, 
-                                                _speaker_socket_setup, 
+                                                _speaker_socket_create, 
                                                 "speaker: sendto");
           else
             CEREBRO_DBG(("sendto: invalid bytes sent"));
@@ -374,4 +374,70 @@ cerebrod_speaker(void *arg)
     }
 
   return NULL;			/* NOT REACHED */
+}
+
+int
+cerebrod_send_heartbeat(struct cerebrod_heartbeat *hb)
+{
+  int i, rv, hblen, buflen = 0;
+  unsigned int addrlen;
+  char *buf = NULL;
+  struct sockaddr *addr;
+  struct sockaddr_in hbaddr;
+  int fd;
+
+  if (!hb)
+    {
+      errno = EINVAL;
+      return -1;
+    }
+
+  /* To avoid issues with the primary speaker "thread", we create
+   * another fd
+   */
+  if ((fd = _speaker_socket_create()) < 0)
+    CEREBRO_EXIT(("speaker fd setup failed"));
+  
+  buflen = CEREBROD_HEARTBEAT_HEADER_LEN;
+  for (i = 0; i < hb->metrics_len; i++)
+    {
+      if (!hb->metrics[i])
+	{
+	  CEREBRO_DBG(("null metrics pointer"));
+	  errno = EINVAL;
+	  goto cleanup;
+	}
+      buflen += CEREBROD_HEARTBEAT_METRIC_HEADER_LEN;
+      buflen += hb->metrics[i]->metric_value_len;
+    }
+
+  buf = Malloc(buflen + 1);
+
+  if ((hblen = _heartbeat_marshall(hb, buf, buflen)) < 0)
+    {
+      CEREBRO_DBG(("_heartbeat_marshall"));
+      goto cleanup;
+    }
+
+  _cerebrod_heartbeat_dump(hb);
+      
+  memset(&hbaddr, '\0', sizeof(struct sockaddr_in));
+  hbaddr.sin_family = AF_INET;
+  hbaddr.sin_port = htons(conf.heartbeat_destination_port);
+  memcpy(&hbaddr.sin_addr, 
+	 &conf.heartbeat_destination_ip_in_addr, 
+	 sizeof(struct in_addr));
+
+  addr = (struct sockaddr *)&hbaddr;
+  addrlen = sizeof(struct sockaddr_in);
+  if ((rv = sendto(fd, buf, hblen, 0, addr, addrlen)) != hblen)
+    {
+      CEREBRO_DBG(("sendto: invalid bytes sent"));
+      goto cleanup;
+    }
+
+ cleanup:
+  Free(buf); 
+  close(fd);
+  return 0;
 }

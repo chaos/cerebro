@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.h,v 1.7 2005-07-27 00:29:22 achu Exp $
+ *  $Id: cerebrod_listener_data.h,v 1.8 2006-02-22 06:08:28 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -38,7 +38,7 @@
 
 #include <sys/types.h>
 
-#include "protocol/cerebrod_heartbeat_protocol.h"
+#include "cerebro/cerebrod_heartbeat_protocol.h"
 
 #include "hash.h"
 

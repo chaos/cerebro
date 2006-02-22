@@ -41,8 +41,7 @@
 #include <errno.h>
 
 #include "cerebro.h"
-
-#include "protocol/cerebro_metric_control_protocol.h"
+#include "cerebro/cerebro_metric_control_protocol.h"
 
 #include "cerebro_api.h"
 #include "cerebro_config_util.h"

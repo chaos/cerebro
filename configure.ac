@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.67 2006-01-18 19:40:42 chu11 Exp $
+## $Id: configure.ac,v 1.68 2006-02-22 06:08:25 chu11 Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -75,6 +75,7 @@ AC_CHECK_HEADERS( \
   unistd.h \
   getopt.h \
   pthread.h \
+  signal.h \
 )
 
 #
@@ -126,6 +127,12 @@ AM_CONDITIONAL(WITH_BOOTTIME, [test "$ac_with_boottime" = "yes"])
 AC_SLURM_STATE
 AC_SLURM_STATE_CONTROL_PATH
 AM_CONDITIONAL(WITH_SLURM_STATE, [test "$ac_with_slurm_state" = "yes"])
+
+#
+# Check to build shutdown module
+#
+AC_SHUTDOWN
+AM_CONDITIONAL(WITH_SHUTDOWN, [test "$ac_with_shutdown" = "yes"])
 
 #
 # Determine which static module libraries do not need to be linked
@@ -213,7 +220,7 @@ AC_CONFIG_FILES( \
   src/libs/common/Makefile \
   src/libs/debug/Makefile \
   src/libs/include/Makefile \
-  src/libs/include/protocol/cerebro_metric_control_protocol.h \
+  src/libs/include/cerebro/cerebro_metric_control_protocol.h \
   src/libs/modules/Makefile \
   src/libs/util/Makefile \
   src/libs/wrappers/Makefile \

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.122 2005-08-25 00:25:31 achu Exp $
+ *  $Id: cerebrod_listener.c,v 1.123 2006-02-22 06:08:27 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -45,8 +45,7 @@
 
 #include "cerebro.h"
 #include "cerebro/cerebro_constants.h"
-
-#include "protocol/cerebrod_heartbeat_protocol.h"
+#include "cerebro/cerebrod_heartbeat_protocol.h"
 
 #include "cerebrod_config.h"
 #include "cerebrod_heartbeat.h"
