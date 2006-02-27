@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: metric_module.c,v 1.15 2006-02-22 06:08:28 chu11 Exp $
+ *  $Id: metric_module.c,v 1.16 2006-02-27 22:42:26 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -436,7 +436,7 @@ metric_module_send_heartbeat_function_pointer(metric_modules_t handle,
 					      Cerebro_metric_send_heartbeat function_pointer)
 {
   if (_handle_index_check(handle, index) < 0)
-    return NULL;
+    return -1;
   
   return ((*(handle->module_info[index])->send_heartbeat_function_pointer)(function_pointer));
 }

@@ -13,6 +13,9 @@
 	* src/modules/clusterlist/cerebro_clusterlist_hostsfile.c
 	(list_strcmp): New function.
 
+	* src/libs/modules/metric_module.c
+	(metric_module_send_heartbeat_function_pointer): Fix return bug.
+
 2006-02-27  Albert Chu  <chu11@llnl.gov>
 	
 	* src/cerebrod/cerebrod_speaker.c (cerebrod_send_heartbeat): Fix
