@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.85 2006-02-22 06:08:28 chu11 Exp $
+ *  $Id: cerebrod_speaker.c,v 1.86 2006-02-27 17:05:58 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -382,9 +382,9 @@ cerebrod_send_heartbeat(struct cerebrod_heartbeat *hb)
   int i, rv, hblen, buflen = 0;
   unsigned int addrlen;
   char *buf = NULL;
-  struct sockaddr *addr;
   struct sockaddr_in hbaddr;
-  int fd;
+  int optval, fd = -1;
+  struct sockaddr_in addr;
 
   if (!hb)
     {
@@ -395,9 +395,81 @@ cerebrod_send_heartbeat(struct cerebrod_heartbeat *hb)
   /* To avoid issues with the primary speaker "thread", we create
    * another fd
    */
-  if ((fd = _speaker_socket_create()) < 0)
-    CEREBRO_EXIT(("speaker fd setup failed"));
+
+  /* XXX - Argh, I can't modify _speaker_socket_create to accept a
+   * port as a parameter b/c of passing _speaker_socket_create as a
+   * function pointer to cerebrod_reinit_socket.  So I pretty much am
+   * duplicating the function down here.  The only difference between
+   * this code is the use of port = 0.
+   *
+   * I'll clean this up later.
+   */
+
+  if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
+    {
+      CEREBRO_DBG(("socket: %s", strerror(errno)));
+      goto cleanup;
+    }
+
+  if (conf.multicast)
+    {
+      /* XXX: Probably lots of portability problems here */
+      struct ip_mreqn imr;
+      unsigned int optlen;
+      int optval;
+      
+      memset(&imr, '\0', sizeof(struct ip_mreqn));
+      memcpy(&imr.imr_multiaddr, 
+	     &conf.heartbeat_destination_ip_in_addr,
+	     sizeof(struct in_addr));
+      memcpy(&imr.imr_address, 
+	     &conf.heartbeat_network_interface_in_addr,
+	     sizeof(struct in_addr));
+      imr.imr_ifindex = conf.heartbeat_interface_index;
+      
+      optlen = sizeof(struct ip_mreqn);
+      if (setsockopt(fd, SOL_IP, IP_MULTICAST_IF, &imr, optlen) < 0)
+	{
+	  CEREBRO_DBG(("setsockopt: %s", strerror(errno)));
+          goto cleanup;
+	}
+
+      optval = 1;
+      optlen = sizeof(optval);
+      if (setsockopt(fd, SOL_IP, IP_MULTICAST_LOOP, &optval, optlen) < 0)
+	{
+	  CEREBRO_DBG(("setsockopt: %s", strerror(errno)));
+          goto cleanup;
+	}
+
+      optval = conf.heartbeat_ttl;
+      optlen = sizeof(optval);
+      if (setsockopt(fd, SOL_IP, IP_MULTICAST_TTL, &optval, optlen) < 0)
+	{
+	  CEREBRO_DBG(("setsockopt: %s", strerror(errno)));
+          goto cleanup;
+	}
+    }
+
+  /* For quick start/restart */
+  if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(int)) < 0)
+    {
+      CEREBRO_DBG(("setsockopt: %s", strerror(errno)));
+      goto cleanup;
+    }
   
+  memset(&addr, '\0', sizeof(struct sockaddr_in));
+  addr.sin_family = AF_INET;
+  addr.sin_port = htons(0);
+  memcpy(&addr.sin_addr,
+	 &conf.heartbeat_network_interface_in_addr,
+	 sizeof(struct in_addr));
+  if (bind(fd, (struct sockaddr *)&addr, sizeof(struct sockaddr_in)) < 0) 
+    {
+      CEREBRO_DBG(("bind: %s", strerror(errno)));
+      goto cleanup;
+    }
+
   buflen = CEREBROD_HEARTBEAT_HEADER_LEN;
   for (i = 0; i < hb->metrics_len; i++)
     {
@@ -428,9 +500,13 @@ cerebrod_send_heartbeat(struct cerebrod_heartbeat *hb)
 	 &conf.heartbeat_destination_ip_in_addr, 
 	 sizeof(struct in_addr));
 
-  addr = (struct sockaddr *)&hbaddr;
   addrlen = sizeof(struct sockaddr_in);
-  if ((rv = sendto(fd, buf, hblen, 0, addr, addrlen)) != hblen)
+  if ((rv = sendto(fd, 
+                   buf, 
+                   hblen, 
+                   0, 
+                   (struct sockaddr *)&hbaddr, 
+                   addrlen)) != hblen)
     {
       CEREBRO_DBG(("sendto: invalid bytes sent"));
       goto cleanup;

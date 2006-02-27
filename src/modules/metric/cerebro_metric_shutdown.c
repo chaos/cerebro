@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_shutdown.c,v 1.1 2006-02-22 06:09:04 chu11 Exp $
+ *  $Id: cerebro_metric_shutdown.c,v 1.2 2006-02-27 17:05:58 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -118,7 +118,7 @@ _metric_shutdown_handler(int signum)
   
   hd->metric_value_type = CEREBRO_METRIC_VALUE_TYPE_U_INT32;
   hd->metric_value_len = sizeof(u_int32_t);
-  metric_shutdown++;
+  metric_shutdown = 1;
   hd->metric_value = (void *)&metric_shutdown;
 
   hb->metrics[0] = hd;

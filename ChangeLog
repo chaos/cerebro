@@ -1,3 +1,12 @@
+2006-02-27  Albert Chu  <chu11@llnl.gov>
+	
+	* src/cerebrod/cerebrod_speaker.c (cerebrod_send_heartbeat): Fix
+	port assignment bug.
+
+	* src/modules/metric/cerebro_metric_shutdown.c
+	(_metric_shutdown_handler): Fix corner case when multiple
+	SIGTERM/SIGINT signals are received.
+	
 2006-02-22  Albert Chu  <chu11@llnl.gov>
 
 	Support new graceful shutdown metric module.
