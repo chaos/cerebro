@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.28 2006-02-27 18:38:17 chu11 Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.29 2006-02-27 20:47:20 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -181,7 +181,7 @@ void
 metric_data_destroy(void *data)
 {
   struct cerebrod_metric_data *md;
-  
+
   assert(data);
   
   md = (struct cerebrod_metric_data *)data;
@@ -220,6 +220,18 @@ _cerebrod_node_data_create_and_init(const char *nodename)
   return nd;
 }
 
+void
+cerebrod_monitor_module_destroy(void *data)
+{
+  struct cerebrod_monitor_module *monitor_module;
+  
+  assert(data);
+  
+  monitor_module = (struct cerebrod_monitor_module *)data;
+  Free(monitor_module->metric_names);
+  Free(monitor_module);
+}
+
 /* 
  * _setup_monitor_modules
  * 
@@ -231,7 +243,7 @@ _cerebrod_node_data_create_and_init(const char *nodename)
 static int
 _setup_monitor_modules(void)
 {
-  int i, monitor_index_len;
+  int i, monitor_module_count, monitor_index_len;
 
   if (!(monitor_handle = monitor_modules_load(conf.monitor_max)))
     {
@@ -239,13 +251,13 @@ _setup_monitor_modules(void)
       goto monitor_cleanup;
     }
 
-  if ((monitor_index_len = monitor_modules_count(monitor_handle)) < 0)
+  if ((monitor_module_count = monitor_modules_count(monitor_handle)) < 0)
     {
       CEREBRO_DBG(("monitor_modules_count"));
       goto monitor_cleanup;
     }
 
-  if (!monitor_index_len)
+  if (!monitor_module_count)
     {
 #if CEREBRO_DEBUG
       if (conf.debug && conf.listen_debug)
@@ -260,12 +272,18 @@ _setup_monitor_modules(void)
       goto monitor_cleanup;
     }
   
+  /* Each monitor module may wish to monitor multiple metrics.  We'll
+   * assuem there will never be more than 2 metrics per monitor module, and
+   * that will be enough to avoid all hash collisions.
+   */
+  monitor_index_len = monitor_module_count * 2;
+
   monitor_index = Hash_create(monitor_index_len, 
                               (hash_key_f)hash_key_string, 
                               (hash_cmp_f)strcmp, 
-                              (hash_del_f)_Free);
+                              (hash_del_f)cerebrod_monitor_module_destroy);
 
-  for (i = 0; i < monitor_index_len; i++)
+  for (i = 0; i < monitor_module_count; i++)
     {
       struct cerebrod_monitor_module *monitor_module;
       char *module_name, *metric_names;
@@ -297,12 +315,28 @@ _setup_monitor_modules(void)
         }
 
       monitor_module = Malloc(sizeof(struct cerebrod_monitor_module));
-      monitor_module->metric_names = metric_names;
+      monitor_module->metric_names = Strdup(metric_names);
       monitor_module->index = i;
       Pthread_mutex_init(&(monitor_module->monitor_lock), NULL);
 
-      Hash_insert(monitor_index, monitor_module->metric_names, monitor_module);
-      monitor_index_size++;
+      if (!strchr(monitor_module->metric_names, ','))
+        {
+          Hash_insert(monitor_index, monitor_module->metric_names, monitor_module);
+          monitor_index_size++;
+        }
+      else
+        {
+          char *metric, *metricbuf;
+          /* This monitoring module supports multiple metrics, must parse */
+          
+          metric = strtok_r(monitor_module->metric_names, ",", &metricbuf);
+          while (metric)
+            {
+              Hash_insert(monitor_index, metric, monitor_module);
+              monitor_index_size++;
+              metric = strtok_r(NULL, ",", &metricbuf);
+            }
+        }
     }
 
   if (!monitor_index_size)

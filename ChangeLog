@@ -1,4 +1,13 @@
 2006-02-27  Albert Chu  <chu11@llnl.gov>
+
+	* src/cerebrod/cerebrod_listener_data.c (_setup_monitor_modules):
+	Support multiple metrics in metric module.  Use new destroy
+	function.
+
+	* src/cerebrod/cerebrod_listener_data.c (cerebrod_monitor_module_destroy):
+	new function.
+	
+2006-02-27  Albert Chu  <chu11@llnl.gov>
 	
 	* src/cerebrod/cerebrod_speaker.c (cerebrod_send_heartbeat): Fix
 	port assignment bug.
