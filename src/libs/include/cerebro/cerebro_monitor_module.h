@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_monitor_module.h,v 1.3 2005-07-22 17:21:07 achu Exp $
+ *  $Id: cerebro_monitor_module.h,v 1.4 2006-02-27 18:38:18 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -49,24 +49,26 @@ typedef int (*Cerebro_monitor_setup)(void);
 typedef int (*Cerebro_monitor_cleanup)(void);
 
 /*
- * Cerebro_monitor_metric_name
+ * Cerebro_monitor_metric_names
  *
- * function prototype for monitor module to return the metric name
- * this module wishes to monitor.
+ * function prototype for monitor module to return the metric name(s)
+ * this module wishes to monitor.  Separate metric names are comma
+ * separated.
  *
  * Returns metric name on success, -1 on error
  */
-typedef char *(*Cerebro_monitor_metric_name)(void);
+typedef char *(*Cerebro_monitor_metric_names)(void);
 
 /*
  * Cerebro_monitor_metric_update
  *
- * function prototype for monitor module function to be updatd with a
+ * function prototype for monitor module function to be updated with a
  * new metric value.  Required to be defined by each monitor module.
  *
  * Returns 0 on success, -1 on error
  */
 typedef int (*Cerebro_monitor_metric_update)(const char *nodename,
+                                             const char *metric_name,
                                              unsigned int metric_value_type,
                                              unsigned int metric_value_len,
                                              void *metric_value);
@@ -82,7 +84,7 @@ struct cerebro_monitor_module_info
   char *monitor_module_name;
   Cerebro_monitor_setup setup;
   Cerebro_monitor_cleanup cleanup;
-  Cerebro_monitor_metric_name metric_name;
+  Cerebro_monitor_metric_names metric_names;
   Cerebro_monitor_metric_update metric_update;
 };
 

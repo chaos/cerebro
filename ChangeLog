@@ -6,7 +6,39 @@
 	* src/modules/metric/cerebro_metric_shutdown.c
 	(_metric_shutdown_handler): Fix corner case when multiple
 	SIGTERM/SIGINT signals are received.
+
+	* Beginning preparations to support multiple metrics logged by
+	same monitor module.
+
+	* src/cerebrod/cerebrod_listener_data.h,
+	src/cerebrod/cerebrod_listener_data.c (_setup_monitor_modules),
+	src/libs/include/cerebro/cerebro_monitor_module.h
+	(cerebro_monitor_module_info), src/libs/modules/monitor_module.c
+	(_monitor_module_cb): Rename "metric_name" to "metric_names"
+	appropriately.
+
+	* src/cerebrod/cerebrod_listener_data.c (_monitor_update): Update
+	call to new API.
+
+	* src/libs/include/cerebro/cerebro_monitor_module.h
+	(Cerebro_monitor_metric_name): Renamed typedef to
+	Cerebro_monitor_metric_names.
+
+	* src/libs/include/cerebro/cerebro_monitor_module.h
+	(Cerebro_monitor_metric_update): Updated with additional
+	metric_name parameter.
+
+	* src/libs/modules/monitor_module.h,
+	src/libs/modules/monitor_module.c (monitor_module_metric_name):
+	Rename to monitor_module_metric_names.
+
+	* src/libs/modules/monitor_module.h,
+	src/libs/modules/monitor_module.c
+        (monitor_module_metric_update): Updated with additional
+	metric_name parameter. Update call to new API.
 	
+	* man/cerebro_module_devel.3.in: Updated with new info.
+
 2006-02-22  Albert Chu  <chu11@llnl.gov>
 
 	Support new graceful shutdown metric module.

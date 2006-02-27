@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: monitor_module.c,v 1.13 2005-08-23 21:10:14 achu Exp $
+ *  $Id: monitor_module.c,v 1.14 2006-02-27 18:38:18 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -144,7 +144,7 @@ _monitor_module_cb(void *handle, void *dl_handle, void *module_info)
   if (!monitor_module_info->monitor_module_name
       || !monitor_module_info->setup
       || !monitor_module_info->cleanup
-      || !monitor_module_info->metric_name
+      || !monitor_module_info->metric_names
       || !monitor_module_info->metric_update)
     {
       CEREBRO_DBG(("invalid module info"));
@@ -368,18 +368,19 @@ monitor_module_cleanup(monitor_modules_t handle, unsigned int index)
 }
 
 char *
-monitor_module_metric_name(monitor_modules_t handle, unsigned int index)
+monitor_module_metric_names(monitor_modules_t handle, unsigned int index)
 {
   if (_handle_index_check(handle, index) < 0)
     return NULL;
 
-  return ((*(handle->module_info[index])->metric_name)());
+  return ((*(handle->module_info[index])->metric_names)());
 }
 
 int 
 monitor_module_metric_update(monitor_modules_t handle,
 			     unsigned int index,
 			     const char *nodename,
+                             const char *metric_name,
 			     unsigned int metric_value_type,
 			     unsigned int metric_value_len,
 			     void *metric_value)
@@ -388,6 +389,7 @@ monitor_module_metric_update(monitor_modules_t handle,
     return -1;
 
   return ((*(handle->module_info[index])->metric_update)(nodename,
+                                                         metric_name,
                                                          metric_value_type,
                                                          metric_value_len,
                                                          metric_value));

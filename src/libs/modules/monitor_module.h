@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: monitor_module.h,v 1.4 2005-07-22 17:21:07 achu Exp $
+ *  $Id: monitor_module.h,v 1.5 2006-02-27 18:38:18 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -77,11 +77,11 @@ int monitor_module_setup(monitor_modules_t handle, unsigned int index);
 int monitor_module_cleanup(monitor_modules_t handle, unsigned int index);
 
 /*
- * monitor_module_metric_name
+ * monitor_module_metric_names
  *
  * call monitor module metric_names function
  */
-char *monitor_module_metric_name(monitor_modules_t handle, unsigned int index);
+char *monitor_module_metric_names(monitor_modules_t handle, unsigned int index);
 
 /*
  * monitor_module_metric_update
@@ -91,6 +91,7 @@ char *monitor_module_metric_name(monitor_modules_t handle, unsigned int index);
 int monitor_module_metric_update(monitor_modules_t handle, 
 				 unsigned int index,
 				 const char *nodename,
+                                 const char *metric_name,
 				 unsigned int metric_value_type,
 				 unsigned int metric_value_len,
 				 void *metric_value);

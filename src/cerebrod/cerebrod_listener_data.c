@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.27 2005-08-25 00:25:31 achu Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.28 2006-02-27 18:38:17 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -268,7 +268,7 @@ _setup_monitor_modules(void)
   for (i = 0; i < monitor_index_len; i++)
     {
       struct cerebrod_monitor_module *monitor_module;
-      char *module_name, *metric_name;
+      char *module_name, *metric_names;
 
       module_name = monitor_module_name(monitor_handle, i);
 
@@ -289,7 +289,7 @@ _setup_monitor_modules(void)
           continue;
         }
 
-      if (!(metric_name = monitor_module_metric_name(monitor_handle, i)) < 0)
+      if (!(metric_names = monitor_module_metric_names(monitor_handle, i)) < 0)
         {
           CEREBRO_DBG(("monitor_module_metric_name failed: %s", module_name));
           monitor_module_cleanup(monitor_handle, i);
@@ -297,11 +297,11 @@ _setup_monitor_modules(void)
         }
 
       monitor_module = Malloc(sizeof(struct cerebrod_monitor_module));
-      monitor_module->metric_name = metric_name;
+      monitor_module->metric_names = metric_names;
       monitor_module->index = i;
       Pthread_mutex_init(&(monitor_module->monitor_lock), NULL);
 
-      Hash_insert(monitor_index, monitor_module->metric_name, monitor_module);
+      Hash_insert(monitor_index, monitor_module->metric_names, monitor_module);
       monitor_index_size++;
     }
 
@@ -792,6 +792,7 @@ _monitor_update(const char *nodename,
       monitor_module_metric_update(monitor_handle,
                                    monitor_module->index,
                                    nodename,
+                                   metric_name,
                                    hd->metric_value_type,
                                    hd->metric_value_len,
                                    hd->metric_value);

@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro_module_devel.3.in,v 1.13 2006-02-22 06:08:27 chu11 Exp $
+\."$Id: cerebro_module_devel.3.in,v 1.14 2006-02-27 18:38:17 chu11 Exp $
 \."#############################################################################
 \."  Copyright (C) 2005 The Regents of the University of California.
 \."  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -511,12 +511,12 @@ typedef int (*Cerebro_monitor_cleanup)(void);
 The 'cleanup' function cleans up the monitor module from earlier
 initializations.  It returns 0 on success, -1 on error.
 
-The field 'metric_name' should point to a function of the following type:
+The field 'metric_names' should point to a function of the following type:
 
-typedef char *(*Cerebro_monitor_metric_name)(void);
+typedef char *(*Cerebro_monitor_metric_names)(void);
 
-The 'metric_name' function returns the name of the metric the module
-wishes to monitor, or NULL on error.
+The 'metric_names' function returns the name(s) of the metric(s) the module
+wishes to monitor, or NULL on error.  Multiple metrics are comma separated.
 
 The field 'metric_update' should point to a function of the following type:
 
