@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_hostsfile.c,v 1.31 2005-08-23 21:10:15 achu Exp $
+ *  $Id: cerebro_clusterlist_hostsfile.c,v 1.32 2006-02-27 22:29:23 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -417,6 +417,25 @@ hostsfile_clusterlist_get_all_nodes(char ***nodes)
 }
 
 /*
+ * list_strcmp
+ *
+ * strcmp for list data structure 
+ */
+static int
+list_strcmp(void *x, void *key)
+{
+  if (!x || !key)
+    {
+      CEREBRO_DBG(("invalid parameters"));
+      return -1;
+    }
+
+  if (!strcmp((char *)x, (char *)key))
+    return 1;
+  return 0;
+}
+
+/*
  * hostsfile_clusterlist_node_in_cluster
  *
  * hostsfile clusterlist module node_in_cluster function
@@ -454,7 +473,7 @@ hostsfile_clusterlist_node_in_cluster(const char *node)
   else
     nodePtr = (char *)node;
 
-  ptr = list_find_first(hosts, (ListFindF)strcmp, nodePtr);
+  ptr = list_find_first(hosts, list_strcmp, nodePtr);
 
   return ((ptr) ? 1: 0);
 }
