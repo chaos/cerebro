@@ -50,6 +50,13 @@ Requires: cerebro
 %description metric-slurm-state
 Metric module to monitor slurm_state.
 
+%package metric-shutdown
+Summary: shutdown module
+Group: System Environment/Base
+Requires: cerebro
+%description metric-shutdown
+Metric module to monitor graceful shutdowns.
+
 %prep
 %setup  -q -n @PROJECT@-@VERSION@-@RELEASE@
 
