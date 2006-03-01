@@ -15,7 +15,7 @@ Cerebro is a collection of cluster monitoring tools and libraries.
 %{!?_with_hostsfile: %{!?_without_hostsfile: %define _with_hostsfile --with-hostsfile}}
 %{!?_with_boottime: %{!?_without_boottime: %define _with_boottime --with-boottime}}
 %{!?_with_slurm_state: %{!?_without_slurm_state: %define _without_slurm_state --without-slurm-state}}
-%{!?_with_bgl_ciod: %{!?_without_bgl_ciod: %define _without_bgl_ciod --without-bgl-ciod}}
+%{!?_with_shutdown: %{!?_without_shutdown: %define _without_shutdown --without-shutdown}}
 
 %if %{?_with_debug:1}%{!?_with_debug:0}
 %define _enable_debug --enable-debug
@@ -63,6 +63,8 @@ Metric module to monitor slurm_state.
            %{?_without_boottime} \
            %{?_with_slurm_state} \
            %{?_without_slurm_state} \
+           %{?_with_shutdown} \
+           %{?_without_shutdown} \
            %{?_with_cerebrod_speaker_only} \
            %{?_without_cerebrod_speaker_only} \
            %{?_with_cerebrod_no_threads} \
@@ -138,4 +140,10 @@ fi
 %files metric-slurm-state
 %defattr(700,root,root)
 %{_libdir}/cerebro/cerebro_metric_slurm_state.*
+%endif
+
+%if %{?_with_shutdown:1}%{!?_with_shutdown:0}
+%files metric-shutdown
+%defattr(700,root,root)
+%{_libdir}/cerebro/cerebro_metric_shutdown.*
 %endif

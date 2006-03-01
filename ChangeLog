@@ -1,6 +1,10 @@
 2006-02-28  Albert Chu  <chu11@llnl.gov>
 
 	* src/libs/include/Makefile.am: Fix typo.
+
+	* config/ac_shutdown.m4: Fix typos.
+
+	* cerebro.spec.in: Add shutdown module.
 	
 2006-02-27  Albert Chu  <chu11@llnl.gov>
 

@@ -1,12 +1,12 @@
 ##*****************************************************************************
-## $Id: ac_shutdown.m4,v 1.1 2006-02-22 06:09:04 chu11 Exp $
+## $Id: ac_shutdown.m4,v 1.2 2006-03-01 00:25:20 chu11 Exp $
 ##*****************************************************************************
 
 AC_DEFUN([AC_SHUTDOWN],
 [
-  AC_MSG_CHECKING([for whether to build slurm state module])
-  AC_ARG_WITH([slurm-state],
-    AC_HELP_STRING([--with-slurm-state], [Build slurm state module]),
+  AC_MSG_CHECKING([for whether to build shutdown module])
+  AC_ARG_WITH([shutdown],
+    AC_HELP_STRING([--with-shutdown], [Build shutdown module]),
     [ case "$withval" in
         no)  ac_shutdown_test=no ;;
         yes) ac_shutdown_test=yes ;;
