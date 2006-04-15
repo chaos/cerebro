@@ -1,3 +1,8 @@
+2006-04-14  Albert Chu  <chu11@llnl.gov>
+
+	* src/libs/common/error.h, src/libs/common/error.c: Add forgotten
+	copyright headers.
+	
 2006-02-28  Albert Chu  <chu11@llnl.gov>
 
 	* src/libs/include/Makefile.am: Fix typo.
@@ -65,6 +70,7 @@
 	
 	* man/cerebro_module_devel.3.in: Updated with new info.
 
+>>>>>>> 1.400
 2006-02-22  Albert Chu  <chu11@llnl.gov>
 
 	Support new graceful shutdown metric module.
