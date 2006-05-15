@@ -37,3 +37,7 @@ Enhancements
 - need way to send functions/pointers/etc. stuff between modules
   without keeping on adding functions.
 - logging/error output/something facility for modules
+
+
+Docs:
+user/admin guide
