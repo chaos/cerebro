@@ -61,11 +61,6 @@ The following metric modules are currently publicly distributed:
 
 boottime - Configures cerebro to also monitor cluster node boottimes.
 
-Several configuration and logging modules are included in the source
-code, but currently are considered too specific to LLNL needs and thus
-aren't distributed as RPMS.
-
-
 Albert Chu
 chu11@llnl.gov
 Lawrence Livermore National Laboratories    
