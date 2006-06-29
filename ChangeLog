@@ -78,7 +78,6 @@
 	
 	* man/cerebro_module_devel.3.in: Updated with new info.
 
->>>>>>> 1.400
 2006-02-22  Albert Chu  <chu11@llnl.gov>
 
 	Support new graceful shutdown metric module.
@@ -121,7 +120,7 @@
 
 	* etc/cerebrod: Always kill via SIGTERM signal so it can be
 	captured.
-`	
+	
 2006-01-18  Albert Chu  <chu11@llnl.gov>
 
 	* Removed localisms.
