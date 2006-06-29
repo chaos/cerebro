@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: config_util.c,v 1.13 2005-07-22 17:21:07 achu Exp $
+ *  $Id: config_util.c,v 1.14 2006-06-29 23:48:41 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -284,6 +284,17 @@ _load_config_file(struct cerebro_config *conf, unsigned int *errnum)
 	0
       },
       {
+	"cerebrod_heartbeat_source_network_interface", 
+	CONFFILE_OPTION_STRING, 
+	-1,
+	conffile_string, 
+	1, 
+	0, 
+	&(conf->cerebrod_heartbeat_source_network_interface_flag),
+	conf->cerebrod_heartbeat_source_network_interface, 
+	CEREBRO_MAX_NETWORK_INTERFACE_LEN
+      },
+      {
 	"cerebrod_heartbeat_destination_port", 
 	CONFFILE_OPTION_INT, 
 	-1,
@@ -304,17 +315,6 @@ _load_config_file(struct cerebro_config *conf, unsigned int *errnum)
 	&(conf->cerebrod_heartbeat_destination_ip_flag),
 	conf->cerebrod_heartbeat_destination_ip, 
 	CEREBRO_MAX_IPADDR_LEN
-      },
-      {
-	"cerebrod_heartbeat_network_interface", 
-	CONFFILE_OPTION_STRING, 
-	-1,
-	conffile_string, 
-	1, 
-	0, 
-	&(conf->cerebrod_heartbeat_network_interface_flag),
-	conf->cerebrod_heartbeat_network_interface, 
-	CEREBRO_MAX_NETWORK_INTERFACE_LEN
       },
       {
 	"cerebrod_heartbeat_ttl", 
@@ -576,6 +576,14 @@ _set_cerebro_config(struct cerebro_config *dest,
       dest->cerebrod_heartbeat_source_port_flag++;
     }
 
+  if (!dest->cerebrod_heartbeat_source_network_interface_flag
+      && src->cerebrod_heartbeat_source_network_interface_flag)
+    {
+      strcpy(dest->cerebrod_heartbeat_source_network_interface, 
+             src->cerebrod_heartbeat_source_network_interface);
+      dest->cerebrod_heartbeat_source_network_interface_flag++;
+    }
+
   if (!dest->cerebrod_heartbeat_destination_port_flag
       && src->cerebrod_heartbeat_destination_port_flag)
     {
@@ -588,14 +596,6 @@ _set_cerebro_config(struct cerebro_config *dest,
     {
       strcpy(dest->cerebrod_heartbeat_destination_ip, src->cerebrod_heartbeat_destination_ip);
       dest->cerebrod_heartbeat_destination_ip_flag++;
-    }
-
-  if (!dest->cerebrod_heartbeat_network_interface_flag
-      && src->cerebrod_heartbeat_network_interface_flag)
-    {
-      strcpy(dest->cerebrod_heartbeat_network_interface, 
-             src->cerebrod_heartbeat_network_interface);
-      dest->cerebrod_heartbeat_network_interface_flag++;
     }
 
   if (!dest->cerebrod_heartbeat_ttl_flag && src->cerebrod_heartbeat_ttl_flag)

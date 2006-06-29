@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.86 2006-02-27 17:05:58 chu11 Exp $
+ *  $Id: cerebrod_speaker.c,v 1.87 2006-06-29 23:48:41 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -92,7 +92,7 @@ _speaker_socket_create(void)
       goto cleanup;
     }
 
-  if (conf.multicast)
+  if (conf.destination_ip_is_multicast)
     {
       /* XXX: Probably lots of portability problems here */
       struct ip_mreqn imr;
@@ -104,9 +104,9 @@ _speaker_socket_create(void)
 	     &conf.heartbeat_destination_ip_in_addr,
 	     sizeof(struct in_addr));
       memcpy(&imr.imr_address, 
-	     &conf.heartbeat_network_interface_in_addr,
+	     &conf.heartbeat_source_network_interface_in_addr,
 	     sizeof(struct in_addr));
-      imr.imr_ifindex = conf.heartbeat_interface_index;
+      imr.imr_ifindex = conf.heartbeat_source_network_interface_index;
       
       optlen = sizeof(struct ip_mreqn);
       if (setsockopt(fd, SOL_IP, IP_MULTICAST_IF, &imr, optlen) < 0)
@@ -143,7 +143,7 @@ _speaker_socket_create(void)
   addr.sin_family = AF_INET;
   addr.sin_port = htons(conf.heartbeat_source_port);
   memcpy(&addr.sin_addr,
-	 &conf.heartbeat_network_interface_in_addr,
+	 &conf.heartbeat_source_network_interface_in_addr,
 	 sizeof(struct in_addr));
   if (bind(fd, (struct sockaddr *)&addr, sizeof(struct sockaddr_in)) < 0) 
     {
@@ -411,7 +411,7 @@ cerebrod_send_heartbeat(struct cerebrod_heartbeat *hb)
       goto cleanup;
     }
 
-  if (conf.multicast)
+  if (conf.destination_ip_is_multicast)
     {
       /* XXX: Probably lots of portability problems here */
       struct ip_mreqn imr;
@@ -423,9 +423,9 @@ cerebrod_send_heartbeat(struct cerebrod_heartbeat *hb)
 	     &conf.heartbeat_destination_ip_in_addr,
 	     sizeof(struct in_addr));
       memcpy(&imr.imr_address, 
-	     &conf.heartbeat_network_interface_in_addr,
+	     &conf.heartbeat_source_network_interface_in_addr,
 	     sizeof(struct in_addr));
-      imr.imr_ifindex = conf.heartbeat_interface_index;
+      imr.imr_ifindex = conf.heartbeat_source_network_interface_index;
       
       optlen = sizeof(struct ip_mreqn);
       if (setsockopt(fd, SOL_IP, IP_MULTICAST_IF, &imr, optlen) < 0)
@@ -462,7 +462,7 @@ cerebrod_send_heartbeat(struct cerebrod_heartbeat *hb)
   addr.sin_family = AF_INET;
   addr.sin_port = htons(0);
   memcpy(&addr.sin_addr,
-	 &conf.heartbeat_network_interface_in_addr,
+	 &conf.heartbeat_source_network_interface_in_addr,
 	 sizeof(struct in_addr));
   if (bind(fd, (struct sockaddr *)&addr, sizeof(struct sockaddr_in)) < 0) 
     {

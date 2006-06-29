@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.h,v 1.54 2005-08-22 15:50:08 achu Exp $
+ *  $Id: cerebrod_config.h,v 1.55 2006-06-29 23:48:41 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -40,9 +40,9 @@
 #define CEREBROD_HEARTBEAT_FREQUENCY_MIN_DEFAULT      10
 #define CEREBROD_HEARTBEAT_FREQUENCY_MAX_DEFAULT      20
 #define CEREBROD_HEARTBEAT_SOURCE_PORT_DEFAULT        8850
+#define CEREBROD_HEARTBEAT_SOURCE_NETWORK_INTERFACE_DEFAULT  NULL
 #define CEREBROD_HEARTBEAT_DESTINATION_PORT_DEFAULT   8851
 #define CEREBROD_HEARTBEAT_DESTINATION_IP_DEFAULT     "239.2.11.72"
-#define CEREBROD_HEARTBEAT_NETWORK_INTERFACE_DEFAULT  NULL
 #define CEREBROD_HEARTBEAT_TTL_DEFAULT                1
 #define CEREBROD_SPEAK_DEFAULT                        1
 #define CEREBROD_LISTEN_DEFAULT                       1
@@ -74,9 +74,9 @@ struct cerebrod_config
   int heartbeat_frequency_min;
   int heartbeat_frequency_max;
   int heartbeat_source_port;
+  char *heartbeat_source_network_interface;
   int heartbeat_destination_port;
   char *heartbeat_destination_ip;
-  char *heartbeat_network_interface;
   int heartbeat_ttl;
 
   int speak;
@@ -99,11 +99,11 @@ struct cerebrod_config
 
   /* Determined by cerebrod based on configuration */
 
-  int multicast;
+  int destination_ip_is_multicast;
   int heartbeat_frequency_ranged;
+  struct in_addr heartbeat_source_network_interface_in_addr;
   struct in_addr heartbeat_destination_ip_in_addr;
-  struct in_addr heartbeat_network_interface_in_addr;
-  int heartbeat_interface_index;
+  int heartbeat_source_network_interface_index;
 };
 
 /*

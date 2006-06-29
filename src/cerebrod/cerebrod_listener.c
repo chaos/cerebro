@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.123 2006-02-22 06:08:27 chu11 Exp $
+ *  $Id: cerebrod_listener.c,v 1.124 2006-06-29 23:48:41 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -114,20 +114,23 @@ _listener_setup_socket(void)
       goto cleanup;
     }
 
-  if (conf.multicast)
+  if (conf.destination_ip_is_multicast)
      {
       /* XXX: Probably lots of portability problems here */
       struct ip_mreqn imr;
       unsigned int optlen;
 
+      /* 
+       * XXX: FIX UP IN TRANSITION
+       */
       memset(&imr, '\0', sizeof(struct ip_mreqn));
       memcpy(&imr.imr_multiaddr,
              &conf.heartbeat_destination_ip_in_addr,
              sizeof(struct in_addr));
       memcpy(&imr.imr_address,
-             &conf.heartbeat_network_interface_in_addr,
+             &conf.heartbeat_source_network_interface_in_addr,
              sizeof(struct in_addr));
-      imr.imr_ifindex = conf.heartbeat_interface_index;
+      imr.imr_ifindex = conf.heartbeat_source_network_interface_index;
 
       optlen = sizeof(struct ip_mreqn);
       if (setsockopt(fd, SOL_IP, IP_ADD_MEMBERSHIP, &imr, optlen) < 0)

@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro_module_devel.3.in,v 1.14 2006-02-27 18:38:17 chu11 Exp $
+\."$Id: cerebro_module_devel.3.in,v 1.15 2006-06-29 23:48:41 chu11 Exp $
 \."#############################################################################
 \."  Copyright (C) 2005 The Regents of the University of California.
 \."  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -199,12 +199,12 @@ struct cerebro_config {
   int cerebrod_heartbeat_frequency_flag;
   int cerebrod_heartbeat_source_port;
   int cerebrod_heartbeat_source_port_flag;
+  char cerebrod_heartbeat_source_network_interface[CEREBRO_MAXNETWORKINTERFACELEN+1];
+  int cerebrod_heartbeat_source_network_interface_flag;
   int cerebrod_heartbeat_destination_port;
   int cerebrod_heartbeat_destination_port_flag;
   char cerebrod_heartbeat_destination_ip[CEREBRO_MAXIPADDRLEN+1];
   int cerebrod_heartbeat_destination_ip_flag;
-  char cerebrod_heartbeat_network_interface[CEREBRO_MAXNETWORKINTERFACELEN+1];
-  int cerebrod_heartbeat_network_interface_flag;
   int cerebrod_heartbeat_ttl;
   int cerebrod_heartbeat_ttl_flag;
   int cerebrod_speak;
@@ -258,6 +258,13 @@ The 'cerebrod_heartbeat_source_port' field stores the heartbeat source
 port for
 .BR cerebrod(8).
 
+The 'cerebrod_heartbeat_source_network_interface' field stores the heartbeat
+network interface for
+.BR cerebrod(8)
+to send heartbeat packets out of.  The network interface can be
+specified as a network interface, ip address, or a subnet using CIDR
+notation.
+
 The 'cerebrod_heartbeat_destination_port' field stores the heartbeat
 destination port for
 .BR cerebrod(8).
@@ -267,13 +274,6 @@ destination ip of heartbeat packets sent from
 .BR cerebrod(8).
 The destination IP address may be a single case or multicast IPv4
 address.
-
-The 'cerebrod_heartbeat_network_interface' field stores the heartbeat
-network interface for
-.BR cerebrod(8)
-to send heartbeat packets out of.  The network interface can be
-specified as a network interface, ip address, or a subnet using CIDR
-notation.
 
 The 'cerebrod_heartbeat_ttl' field stores the heartbeat time to live
 for heartbeat packets multicast from

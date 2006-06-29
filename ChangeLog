@@ -1,5 +1,21 @@
 2006-06-29  Albert Chu  <chu11@llnl.gov>
 
+	* tagged pre_config_multi_subnet_reorg
+
+	* src/libs/include/cerebro/cerebro_config.h,
+	src/libs/util/config_util.c, src/cerebrod/cerebrod_config.h,
+	src/cerebrod/cerebrod_config.c, src/cerebrod/cerebrod_listener.c,
+	src/cerebrod/cerebrod_speaker.c, man/cerebro.conf.5.in,
+	man/cerebro_module_devel.3.in: Globally rename/readjust
+	heartbeat_network_interface to heartbeat_source_network_interface.
+
+	* src/cerebrod/cerebrod_config.h,
+	src/cerebrod/cerebrod_config.c, src/cerebrod/cerebrod_listener.c,
+	src/cerebrod/cerebrod_speaker.c: Globally rename/readjust
+	multicast config to destination_ip_is_multicast.
+
+2006-06-29  Albert Chu  <chu11@llnl.gov>
+
 	* tagged cerebro-1-0-4
 	
 2006-06-26  Albert Chu  <chu11@llnl.gov>
