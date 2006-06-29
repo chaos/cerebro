@@ -1,3 +1,7 @@
+2006-06-29  Albert Chu  <chu11@llnl.gov>
+
+	* tagged cerebro-1-0-4
+	
 2006-06-26  Albert Chu  <chu11@llnl.gov>
 
 	* config/ac_cerebro_module_dir.m4: Cleanup using better workaround.
