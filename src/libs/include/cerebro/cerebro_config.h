@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config.h,v 1.5 2006-06-29 23:48:41 chu11 Exp $
+ *  $Id: cerebro_config.h,v 1.6 2006-07-03 20:40:50 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -74,6 +74,15 @@ struct cerebro_config
   int cerebrod_listen_flag;
   int cerebrod_listen_threads;
   int cerebrod_listen_threads_flag;
+  int cerebrod_listen_ports[CEREBRO_MAX_LISTENERS];
+  int cerebrod_listen_ports_len;
+  int cerebrod_listen_ports_flag;
+  char cerebrod_listen_ips[CEREBRO_MAX_LISTENERS][CEREBRO_MAX_IPADDR_LEN+1];
+  int cerebrod_listen_ips_len;
+  int cerebrod_listen_ips_flag;
+  char cerebrod_listen_network_interfaces[CEREBRO_MAX_LISTENERS][CEREBRO_MAX_NETWORK_INTERFACE_LEN+1];
+  int cerebrod_listen_network_interfaces_len;
+  int cerebrod_listen_network_interfaces_flag;
   int cerebrod_metric_controller;
   int cerebrod_metric_controller_flag;
   int cerebrod_metric_server;

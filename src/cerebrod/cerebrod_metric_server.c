@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_server.c,v 1.33 2006-02-22 06:08:28 chu11 Exp $
+ *  $Id: cerebrod_metric_server.c,v 1.34 2006-07-03 20:40:50 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -946,9 +946,11 @@ _metric_server_service_connection(void *arg)
  * "survive" an error condition.
  *
  * Returns file descriptor on success, -1 on error
+ *
+ * Note: num parameter unused in this function, here only to match function prototype
  */
 static int
-_metric_server_setup_socket(void)
+_metric_server_setup_socket(int num)
 {
   struct sockaddr_in addr;
   int fd, optval = 1;
@@ -1000,7 +1002,7 @@ cerebrod_metric_server(void *arg)
 
   _metric_server_initialize();
 
-  if ((server_fd = _metric_server_setup_socket()) < 0)
+  if ((server_fd = _metric_server_setup_socket(0)) < 0)
     CEREBRO_EXIT(("metric server fd setup failed"));
 
   for (;;)
@@ -1015,6 +1017,7 @@ cerebrod_metric_server(void *arg)
                        (struct sockaddr *)&client_addr, 
                        &client_addr_len)) < 0)
         server_fd = cerebrod_reinit_socket(server_fd, 
+                                           0,
                                            _metric_server_setup_socket, 
                                            "metric_server: accept");
       

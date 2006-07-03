@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_util.c,v 1.33 2005-09-01 22:27:52 achu Exp $
+ *  $Id: cerebrod_util.c,v 1.34 2006-07-03 20:40:50 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -122,7 +122,10 @@ cerebrod_rehash(hash_t *old_hash,
 #endif /* !WITH_CEREBROD_SPEAKER_ONLY */
 
 int
-cerebrod_reinit_socket(int old_fd, Cerebrod_socket_setup socket_setup, char *msg)
+cerebrod_reinit_socket(int old_fd, 
+                       int num,
+                       Cerebrod_socket_setup socket_setup, 
+                       char *msg)
 {
   int fd = old_fd;
 
@@ -138,7 +141,7 @@ cerebrod_reinit_socket(int old_fd, Cerebrod_socket_setup socket_setup, char *msg
       if (!(old_fd < 0))
         close(old_fd);       /* no-wrapper, make best effort */
 
-      if ((fd = socket_setup()) < 0)
+      if ((fd = socket_setup(num)) < 0)
         {
           CEREBRO_DBG(("%s: error re-initializing socket", msg));
 

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.124 2006-06-29 23:48:41 chu11 Exp $
+ *  $Id: cerebrod_listener.c,v 1.125 2006-07-03 20:40:50 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -41,6 +41,7 @@
 
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/select.h>
 #include <netinet/in.h>
 
 #include "cerebro.h"
@@ -78,13 +79,13 @@ pthread_cond_t listener_init_cond = PTHREAD_COND_INITIALIZER;
 pthread_mutex_t listener_init_lock = PTHREAD_MUTEX_INITIALIZER;
 
 /* 
- * listener_fd
- * listener_fd_lock
+ * listener_fds
+ * listener_fds_lock
  *
  * listener file descriptor and lock to protect concurrent access
  */
-int listener_fd = 0;
-pthread_mutex_t listener_fd_lock = PTHREAD_MUTEX_INITIALIZER;
+int listener_fds[CEREBRO_MAX_LISTENERS] = {0, 0, 0, 0};
+pthread_mutex_t listener_fds_lock = PTHREAD_MUTEX_INITIALIZER;
 
 /*
  * clusterlist_handle
@@ -100,13 +101,18 @@ clusterlist_module_t clusterlist_handle;
  * function.  We want to give the daemon additional chances to
  * "survive" an error condition.
  *
+ * In this socket setup function, 'num' is used as the file descriptor
+ * index.
+ * 
  * Returns file descriptor on success, -1 on error
  */
 static int
-_listener_setup_socket(void)
+_listener_setup_socket(int num)
 {
   struct sockaddr_in addr;
   int fd, optval = 1;
+
+  assert(num >= 0 && num < conf.listen_len);
 
   if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {
@@ -114,23 +120,20 @@ _listener_setup_socket(void)
       goto cleanup;
     }
 
-  if (conf.destination_ip_is_multicast)
+  if (conf.listen_ips_is_multicast[num])
      {
       /* XXX: Probably lots of portability problems here */
       struct ip_mreqn imr;
       unsigned int optlen;
 
-      /* 
-       * XXX: FIX UP IN TRANSITION
-       */
       memset(&imr, '\0', sizeof(struct ip_mreqn));
       memcpy(&imr.imr_multiaddr,
-             &conf.heartbeat_destination_ip_in_addr,
+             &conf.listen_ips_in_addr[num],
              sizeof(struct in_addr));
       memcpy(&imr.imr_address,
-             &conf.heartbeat_source_network_interface_in_addr,
+             &conf.listen_network_interfaces_in_addr[num],
              sizeof(struct in_addr));
-      imr.imr_ifindex = conf.heartbeat_source_network_interface_index;
+      imr.imr_ifindex = conf.listen_network_interfaces_index[num];
 
       optlen = sizeof(struct ip_mreqn);
       if (setsockopt(fd, SOL_IP, IP_ADD_MEMBERSHIP, &imr, optlen) < 0)
@@ -152,9 +155,9 @@ _listener_setup_socket(void)
    */
   memset(&addr, '\0', sizeof(struct sockaddr_in));
   addr.sin_family = AF_INET;
-  addr.sin_port = htons(conf.heartbeat_destination_port);
+  addr.sin_port = htons(conf.listen_ports[num]);
   memcpy(&addr.sin_addr, 
-         &conf.heartbeat_destination_ip_in_addr, 
+         &conf.listen_ips_in_addr[num],
          sizeof(struct in_addr));
   if (bind(fd, (struct sockaddr *)&addr, sizeof(struct sockaddr_in)) < 0)
     {
@@ -177,14 +180,19 @@ _listener_setup_socket(void)
 static void
 _cerebrod_listener_initialize(void)
 {
+  int i;
+
   Pthread_mutex_lock(&listener_init_lock);
   if (listener_init)
     goto out;
 
-  Pthread_mutex_lock(&listener_fd_lock);
-  if ((listener_fd = _listener_setup_socket()) < 0)
-    CEREBRO_EXIT(("listener fd setup failed"));
-  Pthread_mutex_unlock(&listener_fd_lock);
+  Pthread_mutex_lock(&listener_fds_lock);
+  for (i = 0; i < conf.listen_len; i++)
+    {
+      if ((listener_fds[i] = _listener_setup_socket(i)) < 0)
+        CEREBRO_EXIT(("listener fd setup failed"));
+    }
+  Pthread_mutex_unlock(&listener_fds_lock);
 
   if (!(clusterlist_handle = clusterlist_module_load()))
     CEREBRO_EXIT(("clusterlist_module_load"));
@@ -414,14 +422,34 @@ cerebrod_listener(void *arg)
       char nodename_buf[CEREBRO_MAX_NODENAME_LEN+1];
       char nodename_key[CEREBRO_MAX_NODENAME_LEN+1];
       struct timeval tv;
-      int recv_len, flag;
-      
-      Pthread_mutex_lock(&listener_fd_lock);
-      if ((recv_len = recvfrom(listener_fd, buf, buflen, 0, NULL, NULL)) < 0)
-        listener_fd = cerebrod_reinit_socket(listener_fd, 
-                                             _listener_setup_socket, 
-                                             "listener: recvfrom");
-      Pthread_mutex_unlock(&listener_fd_lock);
+      int recv_len, flag, i, count;
+      fd_set readfds;
+      int maxfd = 0;
+
+      FD_ZERO(&readfds);
+      Pthread_mutex_lock(&listener_fds_lock);
+      for (i = 0; i < conf.listen_len; i++)
+        {
+          if (listener_fds[i] > maxfd)
+            maxfd = listener_fds[i];
+          FD_SET(listener_fds[i], &readfds);
+        }
+
+      count = Select(maxfd + 1, &readfds, NULL, NULL, NULL);
+
+      for (i = 0; i < conf.listen_len; i++)
+        {
+          if (FD_ISSET(listener_fds[i], &readfds))
+            {
+              if ((recv_len = recvfrom(listener_fds[i], buf, buflen, 0, NULL, NULL)) < 0)
+                listener_fds[i] = cerebrod_reinit_socket(listener_fds[i], 
+                                                         i,
+                                                         _listener_setup_socket, 
+                                                         "listener: recvfrom");
+              break;
+            }
+        }
+      Pthread_mutex_unlock(&listener_fds_lock);
 
       /* No packet read */
       if (recv_len <= 0)

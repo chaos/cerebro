@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.68 2006-02-22 06:08:25 chu11 Exp $
+## $Id: configure.ac,v 1.69 2006-07-03 20:40:49 chu11 Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -35,7 +35,7 @@ AM_MAINTAINER_MODE
 # If any interfaces have been removed, set age = 0
 #
 
-LIBCEREBRO_CURRENT=0
+LIBCEREBRO_CURRENT=1
 LIBCEREBRO_REVISION=0
 LIBCEREBRO_AGE=0
 LIBCEREBRO_VERSION_INFO=$LIBCEREBRO_CURRENT:$LIBCEREBRO_REVISION:$LIBCEREBRO_AGE

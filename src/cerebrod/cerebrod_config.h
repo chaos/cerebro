@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.h,v 1.55 2006-06-29 23:48:41 chu11 Exp $
+ *  $Id: cerebrod_config.h,v 1.56 2006-07-03 20:40:50 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -35,27 +35,31 @@
 #include <netinet/in.h>
 
 #include "cerebro.h"
+#include "cerebro/cerebro_constants.h"
 
-#define CEREBROD_DEBUG_DEFAULT                        0
-#define CEREBROD_HEARTBEAT_FREQUENCY_MIN_DEFAULT      10
-#define CEREBROD_HEARTBEAT_FREQUENCY_MAX_DEFAULT      20
-#define CEREBROD_HEARTBEAT_SOURCE_PORT_DEFAULT        8850
+#define CEREBROD_DEBUG_DEFAULT                               0
+#define CEREBROD_HEARTBEAT_FREQUENCY_MIN_DEFAULT             10
+#define CEREBROD_HEARTBEAT_FREQUENCY_MAX_DEFAULT             20
+#define CEREBROD_HEARTBEAT_SOURCE_PORT_DEFAULT               8850
 #define CEREBROD_HEARTBEAT_SOURCE_NETWORK_INTERFACE_DEFAULT  NULL
-#define CEREBROD_HEARTBEAT_DESTINATION_PORT_DEFAULT   8851
-#define CEREBROD_HEARTBEAT_DESTINATION_IP_DEFAULT     "239.2.11.72"
-#define CEREBROD_HEARTBEAT_TTL_DEFAULT                1
-#define CEREBROD_SPEAK_DEFAULT                        1
-#define CEREBROD_LISTEN_DEFAULT                       1
-#define CEREBROD_LISTEN_THREADS_DEFAULT               2
-#define CEREBROD_METRIC_CONTROLLER_DEFAULT            1
-#define CEREBROD_METRIC_SERVER_DEFAULT                1
-#define CEREBROD_METRIC_SERVER_PORT_DEFAULT           CEREBRO_METRIC_SERVER_PORT
-#define CEREBROD_METRIC_MAX_DEFAULT                   8
-#define CEREBROD_MONITOR_MAX_DEFAULT                  8
-#define CEREBROD_SPEAK_DEBUG_DEFAULT                  0
-#define CEREBROD_LISTEN_DEBUG_DEFAULT                 0
-#define CEREBROD_METRIC_CONTROLLER_DEBUG_DEFAULT      0
-#define CEREBROD_METRIC_SERVER_DEBUG_DEFAULT          0
+#define CEREBROD_HEARTBEAT_DESTINATION_PORT_DEFAULT          8851
+#define CEREBROD_HEARTBEAT_DESTINATION_IP_DEFAULT            "239.2.11.72"
+#define CEREBROD_HEARTBEAT_TTL_DEFAULT                       1
+#define CEREBROD_SPEAK_DEFAULT                               1
+#define CEREBROD_LISTEN_DEFAULT                              1
+#define CEREBROD_LISTEN_THREADS_DEFAULT                      2
+#define CEREBROD_LISTEN_PORTS_DEFAULT                        8851
+#define CEREBROD_LISTEN_IPS_DEFAULT                          "239.2.11.72"
+#define CEREBROD_LISTEN_NETWORK_INTERFACE_DEFAULT            NULL
+#define CEREBROD_METRIC_CONTROLLER_DEFAULT                   1
+#define CEREBROD_METRIC_SERVER_DEFAULT                       1
+#define CEREBROD_METRIC_SERVER_PORT_DEFAULT                  CEREBRO_METRIC_SERVER_PORT
+#define CEREBROD_METRIC_MAX_DEFAULT                          8
+#define CEREBROD_MONITOR_MAX_DEFAULT                         8
+#define CEREBROD_SPEAK_DEBUG_DEFAULT                         0
+#define CEREBROD_LISTEN_DEBUG_DEFAULT                        0
+#define CEREBROD_METRIC_CONTROLLER_DEBUG_DEFAULT             0
+#define CEREBROD_METRIC_SERVER_DEBUG_DEFAULT                 0
 
 /*
  * struct cerebrod_config 
@@ -83,7 +87,12 @@ struct cerebrod_config
 
   int listen;
   int listen_threads;
-
+  int listen_ports[CEREBRO_MAX_LISTENERS];
+  int listen_ports_len;
+  char *listen_ips[CEREBRO_MAX_LISTENERS];
+  int listen_ips_len;
+  char *listen_network_interfaces[CEREBRO_MAX_LISTENERS];
+  int listen_network_interfaces_len;
   int metric_controller;
   int metric_server;
   int metric_server_port;
@@ -104,6 +113,11 @@ struct cerebrod_config
   struct in_addr heartbeat_source_network_interface_in_addr;
   struct in_addr heartbeat_destination_ip_in_addr;
   int heartbeat_source_network_interface_index;
+  int listen_ips_is_multicast[CEREBRO_MAX_LISTENERS];
+  struct in_addr listen_ips_in_addr[CEREBRO_MAX_LISTENERS];
+  struct in_addr listen_network_interfaces_in_addr[CEREBRO_MAX_LISTENERS];
+  int listen_network_interfaces_index[CEREBRO_MAX_LISTENERS];
+  int listen_len;
 };
 
 /*

@@ -1,3 +1,23 @@
+2006-07-03  Albert Chu  <chu11@llnl.gov>
+
+	* src/libs, src/cerebrod: Support new listner ports, ips, and
+	network interfaces.
+
+	* src/cerebrod/cerebrod_config.c
+	(_cerebrod_calculate_destination_ip_is_multicast_setting,
+	_cerebrod_calculate_heartbeat_frequency_ranged_setting,
+	_cerebrod_calculate_heartbeat_source_network_interface_in_addr_and_index,
+	_cerebrod_calculate_heartbeat_destination_ip_in_addr): Removed
+	functions.  Collapse code into
+	_cerebrod_calculate_configuration_data.
+
+	* man/cerebro.conf.5.in, man/cerebro_module_devel.3.in: Update
+	with new configs appropriately.
+
+	* Several minor bug fixes.
+
+	* configure.ac: Upped library version.
+	
 2006-06-29  Albert Chu  <chu11@llnl.gov>
 
 	* tagged pre_config_multi_subnet_reorg

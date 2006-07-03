@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro.conf.5.in,v 1.13 2006-06-29 23:48:40 chu11 Exp $
+\."$Id: cerebro.conf.5.in,v 1.14 2006-07-03 20:40:49 chu11 Exp $
 \."#############################################################################
 \."  Copyright (C) 2005 The Regents of the University of California.
 \."  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -132,6 +132,28 @@ The default configuration turns this option on.
 Specify the number of listening threads the 
 .B cerebrod
 listener server should execute.  The default executes 2 threads.
+.TP
+.I cerebrod_listen_ports port1 port2 port3 port4
+Specify up to four alternate ports that cerebrod should listen for
+packets on.  By default, port 8851 is assumed.
+.TP
+.I cerebrod_listen_ips ip1 ip2 ip3 ip4
+Specify up to four alternate ip addresses that cerebrod should listen
+for packets on.  By default, the multicast address 239.2.11.72 is
+assumed.
+.TP
+.I cerebrod_listen_network_interfaces nic1 nic2 nic3 nic4
+Specify up to four alternate network interfaces that cerebrod should
+listen for packets on.  The network interface can be specified as a
+network interface (i.e.  eth0), an ip address (i.e. 192.168.1.1) or a
+subnet using CIDR notation (i.e. 192.168.1.1/16).  By default, when a
+network interface is not specified,
+.B cerebrod
+will search for and select an appropriate network interface. If the
+machine running
+.B cerebrod
+contains multiple network interfaces, it would be recommended that the
+appropriate network interface be configured.
 .TP
 .I cerebrod_metric_controller ( on | off )
 Specify if the

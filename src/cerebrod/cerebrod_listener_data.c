@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.29 2006-02-27 20:47:20 chu11 Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.30 2006-07-03 20:40:50 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -719,11 +719,13 @@ _metric_data_update(struct cerebrod_node_data *nd,
   int rv;
 #endif /* CEREBRO_DEBUG */
   
-  assert(nd && metric_name && hd && nd->metric_data);
+  assert(nd && metric_name && hd);
 
   /* If metric server isn't running, metric_names_index is NULL */
   if (!metric_names_index)
     return;
+
+  assert(nd->metric_data);
 
 #if CEREBRO_DEBUG
   /* Should be called with lock already set */

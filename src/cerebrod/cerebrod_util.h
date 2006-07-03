@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_util.h,v 1.14 2005-07-22 17:21:07 achu Exp $
+ *  $Id: cerebrod_util.h,v 1.15 2006-07-03 20:40:50 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -63,7 +63,7 @@ void cerebrod_rehash(hash_t *old_hash,
  *
  * function prototype for a function that will return a socket.
  */
-typedef int (*Cerebrod_socket_setup)(void);
+typedef int (*Cerebrod_socket_setup)(int num);
 
 /* 
  * cerebrod_reinit_socket
@@ -80,10 +80,14 @@ typedef int (*Cerebrod_socket_setup)(void);
  * the previous time we got an errno EINVAL, EBADF, or
  * ENODEV.
  *
+ * The num is passed to the socket_setup function.  For some socket
+ * setup functions, they num will be a dummy value that is never used.
+ * 
  * Returns new (or possibley old) fd on success, -1 on error
  */
 int
 cerebrod_reinit_socket(int old_fd, 
+                       int num,
                        Cerebrod_socket_setup socket_setup,
                        char *msg);
 

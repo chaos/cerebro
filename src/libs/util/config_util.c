@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: config_util.c,v 1.14 2006-06-29 23:48:41 chu11 Exp $
+ *  $Id: config_util.c,v 1.15 2006-07-03 20:40:50 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -151,8 +151,7 @@ _cb_cerebrod_heartbeat_freq(conffile_t cf, struct conffile_data *data,
 /*
  * _cb_cerebro_hostnames
  *
- * conffile callback function that parses and stores an array of
- * strings
+ * callback function that parses and stores a list of hostnames
  *
  * Returns 0 on success, -1 on error
  */
@@ -194,6 +193,142 @@ _cb_cerebro_hostnames(conffile_t cf, struct conffile_data *data,
       conf->cerebro_hostnames_len = data->stringlist_len;
     }
 
+  return 0;
+}
+
+/*
+ * _cb_cerebrod_listen_ports
+ *
+ * callback function that parses and stores a list of ports
+ *
+ * Returns 0 on success, -1 on error
+ */
+static int
+_cb_cerebrod_listen_ports(conffile_t cf, struct conffile_data *data,
+                          char *optionname, int option_type, void *option_ptr,
+                          int option_data, void *app_ptr, int app_data)
+{
+  struct cerebro_config *conf;
+
+  if (!option_ptr)
+    {
+      conffile_seterrnum(cf, CONFFILE_ERR_PARAMETERS);
+      return -1;
+    }
+  
+  conf = (struct cerebro_config *)option_ptr;
+  
+  if (data->intlist_len > 0)
+    {
+      int i;
+
+      if (data->intlist_len > CEREBRO_MAX_LISTENERS)
+	{
+          conffile_seterrnum(cf, CONFFILE_ERR_PARSE_ARG_TOOMANY);
+          return -1;
+	}
+      
+      for (i = 0; i < data->intlist_len; i++)
+        conf->cerebrod_listen_ports[i] = data->intlist[i];
+      conf->cerebrod_listen_ports_len = data->intlist_len;
+    }
+
+  return 0;
+}
+
+/*
+ * _cb_cerebrod_listen_ips
+ *
+ * callback function that parses and stores a list of ips
+ *
+ * Returns 0 on success, -1 on error
+ */
+static int
+_cb_cerebrod_listen_ips(conffile_t cf, struct conffile_data *data,
+                        char *optionname, int option_type, void *option_ptr,
+                        int option_data, void *app_ptr, int app_data)
+{
+  struct cerebro_config *conf;
+
+  if (!option_ptr)
+    {
+      conffile_seterrnum(cf, CONFFILE_ERR_PARAMETERS);
+      return -1;
+    }
+  
+  conf = (struct cerebro_config *)option_ptr;
+  
+  if (data->stringlist_len > 0)
+    {
+      int i;
+
+      if (data->stringlist_len > CEREBRO_MAX_LISTENERS)
+	{
+          conffile_seterrnum(cf, CONFFILE_ERR_PARSE_ARG_TOOMANY);
+          return -1;
+	}
+      
+      for (i = 0; i < data->stringlist_len; i++)
+        {
+	  if (strlen(data->stringlist[i]) > CEREBRO_MAX_IPADDR_LEN)
+	    {
+	      conffile_seterrnum(cf, CONFFILE_ERR_PARSE_OVERFLOW_ARGLEN);
+	      return -1;
+	    }
+          
+	  strcpy(conf->cerebrod_listen_ips[i], data->stringlist[i]);
+        }
+      conf->cerebrod_listen_ips_len = data->stringlist_len;
+    }
+
+  return 0;
+}
+
+/*
+ * _cb_cerebrod_listen_network_interfaces
+ *
+ * callback function that parses and stores a list of network_interfaces
+ *
+ * Returns 0 on success, -1 on error
+ */
+static int
+_cb_cerebrod_listen_network_interfaces(conffile_t cf, struct conffile_data *data,
+                        char *optionname, int option_type, void *option_ptr,
+                        int option_data, void *app_ptr, int app_data)
+{
+  struct cerebro_config *conf;
+
+  if (!option_ptr)
+    {
+      conffile_seterrnum(cf, CONFFILE_ERR_PARAMETERS);
+      return -1;
+    }
+  
+  conf = (struct cerebro_config *)option_ptr;
+  
+  if (data->stringlist_len > 0)
+    {
+      int i;
+      
+      if (data->stringlist_len > CEREBRO_MAX_LISTENERS)
+	{
+          conffile_seterrnum(cf, CONFFILE_ERR_PARSE_ARG_TOOMANY);
+          return -1;
+	}
+      
+      for (i = 0; i < data->stringlist_len; i++)
+        {
+	  if (strlen(data->stringlist[i]) > CEREBRO_MAX_IPADDR_LEN)
+	    {
+	      conffile_seterrnum(cf, CONFFILE_ERR_PARSE_OVERFLOW_ARGLEN);
+	      return -1;
+	    }
+          
+	  strcpy(conf->cerebrod_listen_network_interfaces[i], data->stringlist[i]);
+        }
+      conf->cerebrod_listen_network_interfaces_len = data->stringlist_len;
+    }
+  
   return 0;
 }
 
@@ -359,6 +494,39 @@ _load_config_file(struct cerebro_config *conf, unsigned int *errnum)
 	&(conf->cerebrod_listen_threads_flag),
 	&(conf->cerebrod_listen_threads), 
 	0
+      },
+      {
+        "cerebrod_listen_ports",
+        CONFFILE_OPTION_LIST_INT,
+        -1,
+        _cb_cerebrod_listen_ports,
+        1,
+        0,
+        &(conf->cerebrod_listen_ports_flag),
+        conf,
+        0,
+      },
+      {
+        "cerebrod_listen_ips",
+        CONFFILE_OPTION_LIST_STRING,
+        -1,
+        _cb_cerebrod_listen_ips,
+        1,
+        0,
+        &(conf->cerebrod_listen_ips_flag),
+        conf,
+        0,
+      },
+      {
+        "cerebrod_listen_network_interfaces",
+        CONFFILE_OPTION_LIST_STRING,
+        -1,
+        _cb_cerebrod_listen_network_interfaces,
+        1,
+        0,
+        &(conf->cerebrod_listen_network_interfaces_flag),
+        conf,
+        0,
       },
       {
 	"cerebrod_metric_controller", 
@@ -620,6 +788,33 @@ _set_cerebro_config(struct cerebro_config *dest,
     {
       dest->cerebrod_listen_threads = src->cerebrod_listen_threads;
       dest->cerebrod_listen_threads_flag++;
+    }
+
+  if (!dest->cerebrod_listen_ports_flag && src->cerebrod_listen_ports_flag)
+    {
+      int i;
+      for (i = 0; i < src->cerebrod_listen_ports_len; i++)
+	dest->cerebrod_listen_ports[i] =  src->cerebrod_listen_ports[i];
+      dest->cerebrod_listen_ports_len = src->cerebrod_listen_ports_len;
+      dest->cerebrod_listen_ports_flag++;
+    }
+
+  if (!dest->cerebrod_listen_ips_flag && src->cerebrod_listen_ips_flag)
+    {
+      int i;
+      for (i = 0; i < src->cerebrod_listen_ips_len; i++)
+	strcpy(dest->cerebrod_listen_ips[i], src->cerebrod_listen_ips[i]);
+      dest->cerebrod_listen_ips_len = src->cerebrod_listen_ips_len;
+      dest->cerebrod_listen_ips_flag++;
+    }
+
+  if (!dest->cerebrod_listen_network_interfaces_flag && src->cerebrod_listen_network_interfaces_flag)
+    {
+      int i;
+      for (i = 0; i < src->cerebrod_listen_network_interfaces_len; i++)
+	strcpy(dest->cerebrod_listen_network_interfaces[i], src->cerebrod_listen_network_interfaces[i]);
+      dest->cerebrod_listen_network_interfaces_len = src->cerebrod_listen_network_interfaces_len;
+      dest->cerebrod_listen_network_interfaces_flag++;
     }
 
   if (!dest->cerebrod_metric_controller_flag && src->cerebrod_metric_controller_flag)
