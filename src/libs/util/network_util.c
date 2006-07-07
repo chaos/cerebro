@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: network_util.c,v 1.6 2005-08-24 19:02:17 achu Exp $
+ *  $Id: network_util.c,v 1.7 2006-07-07 23:40:53 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -306,8 +306,12 @@ low_timeout_connect(const char *hostname,
               if (error != 0)
                 {
                   errno = error;
-                  if (errnum)
+                  if (error == ECONNREFUSED)
                     *errnum = CEREBRO_ERR_CONNECT;
+                  else if (error == ETIMEDOUT)
+                    *errnum = CEREBRO_ERR_CONNECT_TIMEOUT;
+                  else
+                    *errnum = CEREBRO_ERR_INTERNAL;
                   goto cleanup;
                 }
               /* else no error, connected within timeout length */

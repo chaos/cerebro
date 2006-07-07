@@ -1,3 +1,8 @@
+2006-07-07  Albert Chu  <chu11@llnl.gov>
+
+	* src/libs/util/network_util.c (low_timeout_connect): Alter return
+	error based on getsockopt errno.
+	
 2006-07-03  Albert Chu  <chu11@llnl.gov>
 
 	* src/libs, src/cerebrod: Support new listner ports, ips, and
