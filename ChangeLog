@@ -1,3 +1,7 @@
+2006-07-26  Albert Chu  <chu11@llnl.gov>
+
+	* config/ac_cerebro_module_dir.m4: Revert changes to fix distcheck.
+	
 2006-07-07  Albert Chu  <chu11@llnl.gov>
 
 	* src/libs/util/network_util.c (low_timeout_connect): Alter return
