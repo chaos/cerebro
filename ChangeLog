@@ -1,3 +1,15 @@
+2006-08-25  Albert Chu  <chu11@llnl.gov>
+
+	Add metric module support for load averages.
+
+	* src/modules/metric/cerebro_metric_loadavg1.c,
+	src/modules/metric/cerebro_metric_loadavg5.c,
+	src/modules/metric/cerebro_metric_loadavg15.c,
+	config/ac_loadavg.m4: New files.
+	
+	* src/modules/metric/Makefile.am, configure.ac,
+	man/cerebro_module.3.in: Adjust appropriately for new metrics.
+	
 2006-07-26  Albert Chu  <chu11@llnl.gov>
 
 	* config/ac_cerebro_module_dir.m4: Revert changes to fix distcheck.

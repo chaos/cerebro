@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.69 2006-07-03 20:40:49 chu11 Exp $
+## $Id: configure.ac,v 1.70 2006-08-25 16:11:24 chu11 Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -122,6 +122,12 @@ AC_BOOTTIME
 AM_CONDITIONAL(WITH_BOOTTIME, [test "$ac_with_boottime" = "yes"])
 
 #
+# Check to build loadavg module
+#
+AC_LOADAVG
+AM_CONDITIONAL(WITH_LOADAVG, [test "$ac_with_loadavg" = "yes"])
+
+#
 # Check to build slurm_state module
 #
 AC_SLURM_STATE
@@ -151,6 +157,7 @@ AM_CONDITIONAL(WITH_CONFIG_STATIC_MODULES,
 AM_CONDITIONAL(WITH_METRIC_STATIC_MODULES,
                [(test "$ac_with_static_modules" = "yes") &&
                 (test "$ac_with_boottime" = "yes" || 
+                 test "$ac_with_loadavg" = "yes" || 
                  test "$ac_with_slurm_state" = "yes")])
 
 # Placeholder, please don't dailywtf me :-)

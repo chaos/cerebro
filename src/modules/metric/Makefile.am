@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.16 2006-02-22 06:08:28 chu11 Exp $
+## $Id: Makefile.am,v 1.17 2006-08-25 16:11:25 chu11 Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -12,6 +12,17 @@ endif
 if WITH_BOOTTIME
 BOOTTIME_METRIC_MODULE = cerebro_metric_boottime.la
 BOOTTIME_STATIC_SOURCES = cerebro_metric_boottime.c
+endif
+
+if WITH_LOADAVG
+LOADAVG1_METRIC_MODULE = cerebro_metric_loadavg1.la
+LOADAVG1_STATIC_SOURCES = cerebro_metric_loadavg1.c
+
+LOADAVG5_METRIC_MODULE = cerebro_metric_loadavg5.la
+LOADAVG5_STATIC_SOURCES = cerebro_metric_loadavg5.c
+
+LOADAVG15_METRIC_MODULE = cerebro_metric_loadavg15.la
+LOADAVG15_STATIC_SOURCES = cerebro_metric_loadavg15.c
 endif
 
 if WITH_SLURM_STATE
@@ -29,6 +40,9 @@ noinst_LTLIBRARIES = libstaticmetricmodules.la
 else
 modulelibdir = $(CEREBRO_MODULE_DIR)
 modulelib_LTLIBRARIES = $(BOOTTIME_METRIC_MODULE) \
+			$(LOADAVG1_METRIC_MODULE) \
+			$(LOADAVG5_METRIC_MODULE) \
+			$(LOADAVG15_METRIC_MODULE) \
 			$(SLURM_STATE_METRIC_MODULE) \
 			$(SHUTDOWN_METRIC_MODULE)
 endif
@@ -36,7 +50,10 @@ endif
 MODULE_FLAGS = -module -avoid-version
 
 libstaticmetricmodules_la_SOURCES = $(BOOTTIME_STATIC_SOURCES) \
-			      	    $(SLURM_STATE_STATIC_SOURCES) \
+				    $(LOADAVG1_STATIC_SOURCES) \
+				    $(LOADAVG5_STATIC_SOURCES) \
+				    $(LOADAVG15_STATIC_SOURCES) \
+				    $(SLURM_STATE_STATIC_SOURCES) \
 				    $(SHUTDOWN_STATIC_SOURCES)
 libstaticmetricmodules_la_CFLAGS = -I$(srcdir)/../../libs/include \
 			     	   -I$(srcdir)/../../libs/common \
@@ -50,6 +67,27 @@ cerebro_metric_boottime_la_LDFLAGS = $(MODULE_FLAGS) \
 cerebro_metric_boottime_la_CFLAGS  = -I$(srcdir)/../../libs/include \
 				     -I$(srcdir)/../../libs/debug
 cerebro_metric_boottime_la_LIBADD  = ../../libs/debug/libdebug.la
+
+cerebro_metric_loadavg1_la_SOURCES = cerebro_metric_loadavg1.c
+cerebro_metric_loadavg1_la_LDFLAGS = $(MODULE_FLAGS) \
+			             $(METRIC_OTHER_FLAGS)
+cerebro_metric_loadavg1_la_CFLAGS  = -I$(srcdir)/../../libs/include \
+				     -I$(srcdir)/../../libs/debug
+cerebro_metric_loadavg1_la_LIBADD  = ../../libs/debug/libdebug.la
+
+cerebro_metric_loadavg5_la_SOURCES = cerebro_metric_loadavg5.c
+cerebro_metric_loadavg5_la_LDFLAGS = $(MODULE_FLAGS) \
+			             $(METRIC_OTHER_FLAGS)
+cerebro_metric_loadavg5_la_CFLAGS  = -I$(srcdir)/../../libs/include \
+				     -I$(srcdir)/../../libs/debug
+cerebro_metric_loadavg5_la_LIBADD  = ../../libs/debug/libdebug.la
+
+cerebro_metric_loadavg15_la_SOURCES = cerebro_metric_loadavg15.c
+cerebro_metric_loadavg15_la_LDFLAGS = $(MODULE_FLAGS) \
+			              $(METRIC_OTHER_FLAGS)
+cerebro_metric_loadavg15_la_CFLAGS  = -I$(srcdir)/../../libs/include \
+				      -I$(srcdir)/../../libs/debug
+cerebro_metric_loadavg15_la_LIBADD  = ../../libs/debug/libdebug.la
 
 cerebro_metric_slurm_state_la_SOURCES = cerebro_metric_slurm_state.c
 cerebro_metric_slurm_state_la_LDFLAGS = $(MODULE_FLAGS) \
