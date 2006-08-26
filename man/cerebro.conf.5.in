@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro.conf.5.in,v 1.14 2006-07-03 20:40:49 chu11 Exp $
+\."$Id: cerebro.conf.5.in,v 1.15 2006-08-26 16:08:13 chu11 Exp $
 \."#############################################################################
 \."  Copyright (C) 2005 The Regents of the University of California.
 \."  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -186,7 +186,7 @@ Specify the metric server port.  The default server port is 8852.
 .TP
 .I cerebrod_metric_max num
 Specify the maximum number of metric modules the server is allowed to
-handle. The default value is 8.
+handle. The default value is 32.
 .TP
 .I cerebrod_monitor_max num
 Specify the maximum number of metric monitor modules the server is
