@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.70 2006-08-25 16:11:24 chu11 Exp $
+## $Id: configure.ac,v 1.71 2006-08-26 16:06:55 chu11 Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -122,10 +122,16 @@ AC_BOOTTIME
 AM_CONDITIONAL(WITH_BOOTTIME, [test "$ac_with_boottime" = "yes"])
 
 #
-# Check to build loadavg module
+# Check to build loadavg modules
 #
 AC_LOADAVG
 AM_CONDITIONAL(WITH_LOADAVG, [test "$ac_with_loadavg" = "yes"])
+
+#
+# Check to build memory modules
+#
+AC_MEMORY
+AM_CONDITIONAL(WITH_MEMORY, [test "$ac_with_memory" = "yes"])
 
 #
 # Check to build slurm_state module

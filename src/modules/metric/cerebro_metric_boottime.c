@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_boottime.c,v 1.16 2006-02-22 06:08:28 chu11 Exp $
+ *  $Id: cerebro_metric_boottime.c,v 1.17 2006-08-26 16:06:56 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -79,9 +79,9 @@ static int
 boottime_metric_setup(void)
 {
   int fd, len;
-  char *bootvalptr, *endptr, *tempptr;
+  char *bootvalptr;
   char buf[BOOTTIME_BUFLEN];
-  long int bootval;
+  unsigned long int bootval;
  
   if ((fd = open(BOOTTIME_FILE, O_RDONLY, 0)) < 0)
     {
@@ -97,33 +97,12 @@ boottime_metric_setup(void)
 
   bootvalptr = strstr(buf, BOOTTIME_KEYWORD);
   bootvalptr += strlen(BOOTTIME_KEYWORD);
-  if (bootvalptr < (buf + BOOTTIME_BUFLEN))
-    {
-      while(isspace(*bootvalptr))
-        bootvalptr++;
-
-      tempptr = bootvalptr;
-
-      while(!isspace(*tempptr) && *tempptr != '\0')
-        tempptr++;
-      *tempptr = '\0';
-    }
-  else
-    {
-      CEREBRO_DBG(("boottime file parse error"));
-      goto cleanup;
-    }
 
   errno = 0;
-  bootval = (u_int32_t)strtol(bootvalptr, &endptr, 10);
+  bootval = (u_int32_t)strtoul(bootvalptr, NULL, 10);
   if ((bootval == LONG_MIN || bootval == LONG_MAX) && errno == ERANGE)
     {
       CEREBRO_DBG(("boottime out of range"));
-      goto cleanup;
-    }
-  if ((bootvalptr + strlen(bootvalptr)) != endptr)
-    {
-      CEREBRO_DBG(("boottime value parse error"));
       goto cleanup;
     }
 

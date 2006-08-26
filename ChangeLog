@@ -1,3 +1,22 @@
+2006-08-26  Albert Chu  <chu11@llnl.gov>
+
+	* src/modules/metric/cerebro_metric_boottime.c
+	(boottime_metric_setup): Cleanup parsing code.
+
+	* src/modules/metric/cerebro_metric_memtotal.c,
+	src/modules/metric/cerebro_metric_memused.c,
+	src/modules/metric/cerebro_metric_memfree.c,
+	src/modules/metric/cerebro_metric_swaptotal.c,
+	src/modules/metric/cerebro_metric_swapused.c,
+	src/modules/metric/cerebro_metric_swapfree.c,
+	config/ac_memory.m4: New files.
+
+	* src/modules/metric/Makefile.am, configure.ac,
+	man/cerebro_module.3.in: Adjust appropriately for new metrics.
+
+	* src/cerebrod/cerebrod_config.h: Increase
+	CEREBROD_METRIC_MAX_DEFAULT.
+	
 2006-08-25  Albert Chu  <chu11@llnl.gov>
 
 	Add metric module support for load averages.
