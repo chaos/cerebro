@@ -1,3 +1,18 @@
+2006-08-27  Albert Chu  <chu11@llnl.gov>
+
+	* src/modules/metric/cerebro_metric_memory.h,
+	src/modules/metric/cerebro_metric_memory.c: New files.
+
+	* src/modules/metric/cerebro_metric_memtotal.c,
+	src/modules/metric/cerebro_metric_memused.c,
+	src/modules/metric/cerebro_metric_memfree.c,
+	src/modules/metric/cerebro_metric_swaptotal.c,
+	src/modules/metric/cerebro_metric_swapused.c,
+	src/modules/metric/cerebro_metric_swapfree.c: Adjusted to use
+	common function.
+
+	* src/modules/metric/Makefile.am: Adjust for new files.
+
 2006-08-26  Albert Chu  <chu11@llnl.gov>
 
 	* src/modules/metric/cerebro_metric_boottime.c

@@ -1,10 +1,12 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.19 2006-08-27 04:43:40 chu11 Exp $
+## $Id: Makefile.am,v 1.20 2006-08-27 05:23:53 chu11 Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
 
-noinst_HEADERS = cerebro_metric_loadavg.h
+noinst_HEADERS = \
+	cerebro_metric_loadavg.h \
+	cerebro_metric_memory.h
 
 if WITH_GNU_LD
 METRIC_VERSION_SCRIPT = $(srcdir)/metric.map
@@ -30,6 +32,8 @@ LOADAVG15_STATIC_SOURCES = cerebro_metric_loadavg15.c
 endif
 
 if WITH_MEMORY
+MEMORY_STATIC_SOURCES = cerebro_metric_memory.c
+
 MEMTOTAL_METRIC_MODULE = cerebro_metric_memtotal.la
 MEMTOTAL_STATIC_SOURCES = cerebro_metric_memtotal.c
 
@@ -84,6 +88,7 @@ libstaticmetricmodules_la_SOURCES = $(BOOTTIME_STATIC_SOURCES) \
 				    $(LOADAVG1_STATIC_SOURCES) \
 				    $(LOADAVG5_STATIC_SOURCES) \
 				    $(LOADAVG15_STATIC_SOURCES) \
+				    $(MEMORY_STATIC_SOURCES) \
 				    $(MEMTOTAL_STATIC_SOURCES) \
 				    $(MEMUSED_STATIC_SOURCES) \
 				    $(MEMFREE_STATIC_SOURCES) \
@@ -129,42 +134,48 @@ cerebro_metric_loadavg15_la_CFLAGS  = -I$(srcdir)/../../libs/include \
 				      -I$(srcdir)/../../libs/debug
 cerebro_metric_loadavg15_la_LIBADD  = ../../libs/debug/libdebug.la
 
-cerebro_metric_memtotal_la_SOURCES = cerebro_metric_memtotal.c
+cerebro_metric_memtotal_la_SOURCES = cerebro_metric_memtotal.c \
+				     cerebro_metric_memory.c 
 cerebro_metric_memtotal_la_LDFLAGS = $(MODULE_FLAGS) \
 				     $(METRIC_OTHER_FLAGS)
 cerebro_metric_memtotal_la_CFLAGS  = -I$(srcdir)/../../libs/include \
 				     -I$(srcdir)/../../libs/debug
 cerebro_metric_memtotal_la_LIBADD  = ../../libs/debug/libdebug.la
 
-cerebro_metric_memused_la_SOURCES = cerebro_metric_memused.c
+cerebro_metric_memused_la_SOURCES = cerebro_metric_memused.c \
+				    cerebro_metric_memory.c 
 cerebro_metric_memused_la_LDFLAGS = $(MODULE_FLAGS) \
 				    $(METRIC_OTHER_FLAGS)
 cerebro_metric_memused_la_CFLAGS  = -I$(srcdir)/../../libs/include \
 				    -I$(srcdir)/../../libs/debug
 cerebro_metric_memused_la_LIBADD  = ../../libs/debug/libdebug.la
 
-cerebro_metric_memfree_la_SOURCES = cerebro_metric_memfree.c
+cerebro_metric_memfree_la_SOURCES = cerebro_metric_memfree.c \
+				    cerebro_metric_memory.c 
 cerebro_metric_memfree_la_LDFLAGS = $(MODULE_FLAGS) \
 				    $(METRIC_OTHER_FLAGS)
 cerebro_metric_memfree_la_CFLAGS  = -I$(srcdir)/../../libs/include \
 				    -I$(srcdir)/../../libs/debug
 cerebro_metric_memfree_la_LIBADD  = ../../libs/debug/libdebug.la
 
-cerebro_metric_swaptotal_la_SOURCES = cerebro_metric_swaptotal.c
+cerebro_metric_swaptotal_la_SOURCES = cerebro_metric_swaptotal.c \
+				      cerebro_metric_memory.c 
 cerebro_metric_swaptotal_la_LDFLAGS = $(MODULE_FLAGS) \
 				      $(METRIC_OTHER_FLAGS)
 cerebro_metric_swaptotal_la_CFLAGS  = -I$(srcdir)/../../libs/include \
 				      -I$(srcdir)/../../libs/debug
 cerebro_metric_swaptotal_la_LIBADD  = ../../libs/debug/libdebug.la
 
-cerebro_metric_swapused_la_SOURCES = cerebro_metric_swapused.c
+cerebro_metric_swapused_la_SOURCES = cerebro_metric_swapused.c \
+				     cerebro_metric_memory.c 
 cerebro_metric_swapused_la_LDFLAGS = $(MODULE_FLAGS) \
 				     $(METRIC_OTHER_FLAGS)
 cerebro_metric_swapused_la_CFLAGS  = -I$(srcdir)/../../libs/include \
 				     -I$(srcdir)/../../libs/debug
 cerebro_metric_swapused_la_LIBADD  = ../../libs/debug/libdebug.la
 
-cerebro_metric_swapfree_la_SOURCES = cerebro_metric_swapfree.c
+cerebro_metric_swapfree_la_SOURCES = cerebro_metric_swapfree.c \
+				     cerebro_metric_memory.c 
 cerebro_metric_swapfree_la_LDFLAGS = $(MODULE_FLAGS) \
 				     $(METRIC_OTHER_FLAGS)
 cerebro_metric_swapfree_la_CFLAGS  = -I$(srcdir)/../../libs/include \

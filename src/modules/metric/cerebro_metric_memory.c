@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_loadavg.c,v 1.2 2006-08-27 05:23:53 chu11 Exp $
+ *  $Id: cerebro_metric_memory.c,v 1.1 2006-08-27 05:23:53 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -33,9 +33,9 @@
 #include <stdlib.h>
 #if STDC_HEADERS
 #include <string.h>
-#include <ctype.h>
 #endif /* STDC_HEADERS */
 #include <errno.h>
+#include <limits.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #if HAVE_UNISTD_H
@@ -44,66 +44,120 @@
 #if HAVE_FCNTL_H
 #include <fcntl.h>
 #endif /* HAVE_FCNTL_H */
+#include <assert.h>
 
 #include "cerebro.h"
-#include "cerebro/cerebro_constants.h"
 #include "cerebro/cerebro_metric_module.h"
 
 #include "debug.h"
 
-#define LOADAVG_FILE                "/proc/loadavg"
-#define LOADAVG_BUFLEN              4096
+#define MEMORY_FILE                "/proc/meminfo"
+#define MEMTOTAL_KEYWORD           "MemTotal"
+#define MEMFREE_KEYWORD            "MemFree"
+#define SWAPTOTAL_KEYWORD          "SwapTotal"
+#define SWAPFREE_KEYWORD           "SwapFree"
+#define MEMORY_BUFLEN              4096
 
-/*
- * cerebro_get_loadavgs
+/* 
+ * _read_memory
  *
- * Read load averages
+ * Returns 0 on success, -1 on error
  */
-int
-cerebro_metric_get_loadavgs(float *loadavg1,
-			    float *loadavg5,
-			    float *loadavg15)
+static int
+_read_memory(int fd,
+	     char *buf,
+	     char *keyword,
+	     unsigned long int *memvalptr)
 {
-  int fd, len;
-  float temp_loadavg1, temp_loadavg5, temp_loadavg15;
-  char buf[LOADAVG_BUFLEN];
+  char *parseptr;
+  unsigned long int memval;
   int rv = -1;
 
-  if ((fd = open(LOADAVG_FILE, O_RDONLY, 0)) < 0)
+  assert(buf);
+  assert(keyword);
+  assert(memvalptr);
+
+  if (!(parseptr = strstr(buf, keyword)))
+    {
+      CEREBRO_DBG(("memused file parse error"));
+      goto cleanup;
+    }
+  parseptr += strlen(keyword);
+  parseptr += 1;                /* for the ':' character */
+  
+  errno = 0;
+  memval = (u_int32_t)strtoul(parseptr, NULL, 10);
+  if ((memval == LONG_MIN || memval == LONG_MAX) && errno == ERANGE)
+    {
+      CEREBRO_DBG(("memtotal out of range"));
+      goto cleanup;
+    }
+  
+  *memvalptr = memval;
+  rv = 0;
+ cleanup:
+  return rv;
+}
+
+/*
+ * cerebro_metric_get_memory
+ *
+ * Read memory statistics
+ */
+int
+cerebro_metric_get_memory(u_int32_t *memtotal,
+			  u_int32_t *memfree,
+			  u_int32_t *swaptotal,
+			  u_int32_t *swapfree)
+{
+  int fd, len;
+  unsigned long int val;
+  char buf[MEMORY_BUFLEN];
+  int rv = -1;
+
+  if ((fd = open(MEMORY_FILE, O_RDONLY, 0)) < 0)
     {
       CEREBRO_DBG(("open: %s", strerror(errno)));
       goto cleanup;
     }
 
-  memset(buf, '\0', LOADAVG_BUFLEN);
-  if ((len = read(fd, buf, LOADAVG_BUFLEN)) < 0)
+  memset(buf, '\0', MEMORY_BUFLEN);
+  if ((len = read(fd, buf, MEMORY_BUFLEN)) < 0)
     {
       CEREBRO_DBG(("read: %s", strerror(errno)));
       goto cleanup;
     }
 
-  if (sscanf(buf, 
-	     "%f %f %f", 
-	     &temp_loadavg1, 
-	     &temp_loadavg5, 
-	     &temp_loadavg15) != 3)
+  if (memtotal)
     {
-      CEREBRO_DBG(("loadavg file parse error"));
-      goto cleanup;
+      if (_read_memory(fd, buf, MEMTOTAL_KEYWORD, &val) < 0)
+	goto cleanup;
+      *memtotal = val;
     }
-  
-  if (loadavg1)
-    *loadavg1 = temp_loadavg1;
 
-  if (loadavg5)
-    *loadavg5 = temp_loadavg5;
+  if (memfree)
+    {
+      if (_read_memory(fd, buf, MEMFREE_KEYWORD, &val) < 0)
+	goto cleanup;
+      *memfree = val;
+    }
 
-  if (loadavg15)
-    *loadavg15 = temp_loadavg15;
+  if (swaptotal)
+    {
+      if (_read_memory(fd, buf, SWAPTOTAL_KEYWORD, &val) < 0)
+	goto cleanup;
+      *swaptotal = val;
+    }
+
+  if (swapfree)
+    {
+      if (_read_memory(fd, buf, SWAPFREE_KEYWORD, &val) < 0)
+	goto cleanup;
+      *swapfree = val;
+    }
 
   rv = 0;
  cleanup:
   close(fd);
   return rv;
 }
-

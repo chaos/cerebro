@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_memused.c,v 1.1 2006-08-26 16:06:56 chu11 Exp $
+ *  $Id: cerebro_metric_memused.c,v 1.2 2006-08-27 05:23:53 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -33,29 +33,15 @@
 #include <stdlib.h>
 #if STDC_HEADERS
 #include <string.h>
-#include <ctype.h>
 #endif /* STDC_HEADERS */
 #include <errno.h>
-#include <limits.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#if HAVE_UNISTD_H
-#include <unistd.h>
-#endif /* HAVE_UNISTD_H */
-#if HAVE_FCNTL_H
-#include <fcntl.h>
-#endif /* HAVE_FCNTL_H */
 
 #include "cerebro.h"
-#include "cerebro/cerebro_constants.h"
 #include "cerebro/cerebro_metric_module.h"
 
+#include "cerebro_metric_memory.h"
 #include "debug.h"
 
-#define MEMUSED_FILE                "/proc/meminfo"
-#define MEMTOTAL_KEYWORD            "MemTotal"
-#define MEMFREE_KEYWORD             "MemFree"
-#define MEMUSED_BUFLEN              4096
 #define MEMUSED_METRIC_MODULE_NAME  "memused"
 #define MEMUSED_METRIC_NAME         "memused"
 
@@ -123,11 +109,8 @@ memused_metric_get_metric_value(unsigned int *metric_value_type,
                                  unsigned int *metric_value_len,
                                  void **metric_value)
 {
-  int fd, len;
-  unsigned long int memtotalval, memfreeval;
-  char *memvalptr;
+  u_int32_t memtotalval, memfreeval;
   u_int32_t *memusedptr = NULL;
-  char buf[MEMUSED_BUFLEN];
   int rv = -1;
 
   if (!metric_value_type || !metric_value_len || !metric_value)
@@ -135,58 +118,19 @@ memused_metric_get_metric_value(unsigned int *metric_value_type,
       CEREBRO_DBG(("invalid parameters"));
       return -1;
     }
- 
-  if ((fd = open(MEMUSED_FILE, O_RDONLY, 0)) < 0)
-    {
-      CEREBRO_DBG(("open: %s", strerror(errno)));
-      goto cleanup;
-    }
-
-  memset(buf, '\0', MEMUSED_BUFLEN);
-  if ((len = read(fd, buf, MEMUSED_BUFLEN)) < 0)
-    {
-      CEREBRO_DBG(("read: %s", strerror(errno)));
-      goto cleanup;
-    }
-
-  if (!(memvalptr = strstr(buf, MEMTOTAL_KEYWORD)))
-    {
-      CEREBRO_DBG(("memused file parse error"));
-      goto cleanup;
-    }
-  memvalptr += strlen(MEMTOTAL_KEYWORD);
-  memvalptr += 1;                /* for the ':' character */
-
-  errno = 0;
-  memtotalval = (u_int32_t)strtoul(memvalptr, NULL, 10);
-  if ((memtotalval == LONG_MIN || memtotalval == LONG_MAX) && errno == ERANGE)
-    {
-      CEREBRO_DBG(("memtotal out of range"));
-      goto cleanup;
-    }
-
-  if (!(memvalptr = strstr(buf, MEMFREE_KEYWORD)))
-    {
-      CEREBRO_DBG(("memused file parse error"));
-      goto cleanup;
-    }
-  memvalptr += strlen(MEMFREE_KEYWORD);
-  memvalptr += 1;                /* for the ':' character */
-
-  errno = 0;
-  memfreeval = (u_int32_t)strtoul(memvalptr, NULL, 10);
-  if ((memfreeval == LONG_MIN || memfreeval == LONG_MAX) && errno == ERANGE)
-    {
-      CEREBRO_DBG(("memfree out of range"));
-      goto cleanup;
-    }
-
+  
+  if (cerebro_metric_get_memory(&memtotalval,
+				&memfreeval,
+				NULL,
+				NULL) < 0)
+    goto cleanup;
+  
   if (!(memusedptr = (u_int32_t *)malloc(sizeof(u_int32_t))))
     {
       CEREBRO_DBG(("malloc: %s", strerror(errno)));
       goto cleanup;
     }
-
+  
   *memusedptr = memtotalval - memfreeval;
 
   *metric_value_type = CEREBRO_METRIC_VALUE_TYPE_U_INT32;
@@ -195,7 +139,6 @@ memused_metric_get_metric_value(unsigned int *metric_value_type,
 
   rv = 0;
  cleanup:
-  close(fd);
   if (rv < 0 && memusedptr)
     free(memusedptr);
   return rv;

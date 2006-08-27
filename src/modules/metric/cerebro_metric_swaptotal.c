@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_swaptotal.c,v 1.1 2006-08-26 16:06:56 chu11 Exp $
+ *  $Id: cerebro_metric_swaptotal.c,v 1.2 2006-08-27 05:23:53 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -33,28 +33,15 @@
 #include <stdlib.h>
 #if STDC_HEADERS
 #include <string.h>
-#include <ctype.h>
 #endif /* STDC_HEADERS */
 #include <errno.h>
-#include <limits.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#if HAVE_UNISTD_H
-#include <unistd.h>
-#endif /* HAVE_UNISTD_H */
-#if HAVE_FCNTL_H
-#include <fcntl.h>
-#endif /* HAVE_FCNTL_H */
 
 #include "cerebro.h"
-#include "cerebro/cerebro_constants.h"
 #include "cerebro/cerebro_metric_module.h"
 
+#include "cerebro_metric_memory.h"
 #include "debug.h"
 
-#define SWAPTOTAL_FILE                "/proc/meminfo"
-#define SWAPTOTAL_KEYWORD             "SwapTotal"
-#define SWAPTOTAL_BUFLEN              4096
 #define SWAPTOTAL_METRIC_MODULE_NAME  "swaptotal"
 #define SWAPTOTAL_METRIC_NAME         "swaptotal"
 
@@ -122,11 +109,8 @@ swaptotal_metric_get_metric_value(unsigned int *metric_value_type,
                                  unsigned int *metric_value_len,
                                  void **metric_value)
 {
-  int fd, len;
-  unsigned long int swaptotalval;
-  char *swaptotalvalptr;
+  u_int32_t swaptotalval;
   u_int32_t *swaptotalptr = NULL;
-  char buf[SWAPTOTAL_BUFLEN];
   int rv = -1;
 
   if (!metric_value_type || !metric_value_len || !metric_value)
@@ -134,42 +118,19 @@ swaptotal_metric_get_metric_value(unsigned int *metric_value_type,
       CEREBRO_DBG(("invalid parameters"));
       return -1;
     }
- 
-  if ((fd = open(SWAPTOTAL_FILE, O_RDONLY, 0)) < 0)
-    {
-      CEREBRO_DBG(("open: %s", strerror(errno)));
-      goto cleanup;
-    }
-
-  memset(buf, '\0', SWAPTOTAL_BUFLEN);
-  if ((len = read(fd, buf, SWAPTOTAL_BUFLEN)) < 0)
-    {
-      CEREBRO_DBG(("read: %s", strerror(errno)));
-      goto cleanup;
-    }
-
-  if (!(swaptotalvalptr = strstr(buf, SWAPTOTAL_KEYWORD)))
-    {
-      CEREBRO_DBG(("swaptotal file parse error"));
-      goto cleanup;
-    }
-  swaptotalvalptr += strlen(SWAPTOTAL_KEYWORD);
-  swaptotalvalptr += 1;                /* for the ':' character */
-
-  errno = 0;
-  swaptotalval = (u_int32_t)strtoul(swaptotalvalptr, NULL, 10);
-  if ((swaptotalval == LONG_MIN || swaptotalval == LONG_MAX) && errno == ERANGE)
-    {
-      CEREBRO_DBG(("swaptotal out of range"));
-      goto cleanup;
-    }
-
+  
+  if (cerebro_metric_get_memory(NULL,
+				NULL,
+				&swaptotalval,
+				NULL) < 0)
+    goto cleanup;
+  
   if (!(swaptotalptr = (u_int32_t *)malloc(sizeof(u_int32_t))))
     {
       CEREBRO_DBG(("malloc: %s", strerror(errno)));
       goto cleanup;
     }
-
+  
   *swaptotalptr = swaptotalval;
 
   *metric_value_type = CEREBRO_METRIC_VALUE_TYPE_U_INT32;
@@ -178,7 +139,6 @@ swaptotal_metric_get_metric_value(unsigned int *metric_value_type,
 
   rv = 0;
  cleanup:
-  close(fd);
   if (rv < 0 && swaptotalptr)
     free(swaptotalptr);
   return rv;
