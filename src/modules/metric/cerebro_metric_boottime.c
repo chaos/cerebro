@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_boottime.c,v 1.17 2006-08-26 16:06:56 chu11 Exp $
+ *  $Id: cerebro_metric_boottime.c,v 1.18 2006-08-27 04:43:40 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -33,7 +33,6 @@
 #include <stdlib.h>
 #if STDC_HEADERS
 #include <string.h>
-#include <ctype.h>
 #endif /* STDC_HEADERS */
 #include <errno.h>
 #include <limits.h>
@@ -47,7 +46,6 @@
 #endif /* HAVE_FCNTL_H */
 
 #include "cerebro.h"
-#include "cerebro/cerebro_constants.h"
 #include "cerebro/cerebro_metric_module.h"
 
 #include "debug.h"

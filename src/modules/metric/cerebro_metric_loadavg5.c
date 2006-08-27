@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_loadavg5.c,v 1.1 2006-08-25 16:11:26 chu11 Exp $
+ *  $Id: cerebro_metric_loadavg5.c,v 1.2 2006-08-27 04:43:40 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -33,27 +33,15 @@
 #include <stdlib.h>
 #if STDC_HEADERS
 #include <string.h>
-#include <ctype.h>
 #endif /* STDC_HEADERS */
 #include <errno.h>
-#include <limits.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#if HAVE_UNISTD_H
-#include <unistd.h>
-#endif /* HAVE_UNISTD_H */
-#if HAVE_FCNTL_H
-#include <fcntl.h>
-#endif /* HAVE_FCNTL_H */
 
 #include "cerebro.h"
-#include "cerebro/cerebro_constants.h"
 #include "cerebro/cerebro_metric_module.h"
 
+#include "cerebro_metric_loadavg.h"
 #include "debug.h"
 
-#define LOADAVG5_FILE                "/proc/loadavg"
-#define LOADAVG5_BUFLEN              4096
 #define LOADAVG5_METRIC_MODULE_NAME  "loadavg5"
 #define LOADAVG5_METRIC_NAME         "loadavg5"
 
@@ -121,10 +109,8 @@ loadavg5_metric_get_metric_value(unsigned int *metric_value_type,
                                  unsigned int *metric_value_len,
                                  void **metric_value)
 {
-  int fd, len;
-  float loadavg1, loadavg5, loadavg15;
+  float loadavg5;
   float *loadavgptr = NULL;
-  char buf[LOADAVG5_BUFLEN];
   int rv = -1;
 
   if (!metric_value_type || !metric_value_len || !metric_value)
@@ -132,25 +118,9 @@ loadavg5_metric_get_metric_value(unsigned int *metric_value_type,
       CEREBRO_DBG(("invalid parameters"));
       return -1;
     }
- 
-  if ((fd = open(LOADAVG5_FILE, O_RDONLY, 0)) < 0)
-    {
-      CEREBRO_DBG(("open: %s", strerror(errno)));
-      goto cleanup;
-    }
 
-  memset(buf, '\0', LOADAVG5_BUFLEN);
-  if ((len = read(fd, buf, LOADAVG5_BUFLEN)) < 0)
-    {
-      CEREBRO_DBG(("read: %s", strerror(errno)));
-      goto cleanup;
-    }
-
-  if (sscanf(buf, "%f %f %f", &loadavg1, &loadavg5, &loadavg15) != 3)
-    {
-      CEREBRO_DBG(("loadavg5 file parse error"));
-      goto cleanup;
-    }
+  if (cerebro_metric_get_loadavgs(NULL, &loadavg5, NULL) < 0)
+    goto cleanup;
   
   if (!(loadavgptr = (float *)malloc(sizeof(float))))
     {
@@ -166,7 +136,6 @@ loadavg5_metric_get_metric_value(unsigned int *metric_value_type,
 
   rv = 0;
  cleanup:
-  close(fd);
   if (rv < 0 && loadavgptr)
     free(loadavgptr);
   return rv;

@@ -18,7 +18,17 @@
 	CEREBROD_METRIC_MAX_DEFAULT.
 
 	* man/cerebro.conf.5.in: Update appropriately.
+
+	* src/modules/metric/cerebro_metric_loadavg.c,
+	src/modules/metric/cerebro_metric_loadavg.h: New files.
 	
+	* src/modules/metric/cerebro_metric_loadavg1.c,
+	src/modules/metric/cerebro_metric_loadavg5.c,
+	src/modules/metric/cerebro_metric_loadavg15.c: Adjusted to use
+	common function.
+
+	* src/modules/metric/Makefile.am: Adjust for new files.
+
 2006-08-25  Albert Chu  <chu11@llnl.gov>
 
 	Add metric module support for load averages.

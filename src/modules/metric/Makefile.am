@@ -1,8 +1,10 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.18 2006-08-26 16:06:56 chu11 Exp $
+## $Id: Makefile.am,v 1.19 2006-08-27 04:43:40 chu11 Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
+
+noinst_HEADERS = cerebro_metric_loadavg.h
 
 if WITH_GNU_LD
 METRIC_VERSION_SCRIPT = $(srcdir)/metric.map
@@ -15,6 +17,8 @@ BOOTTIME_STATIC_SOURCES = cerebro_metric_boottime.c
 endif
 
 if WITH_LOADAVG
+LOADAVG_STATIC_SOURCES = cerebro_metric_loadavg.c
+
 LOADAVG1_METRIC_MODULE = cerebro_metric_loadavg1.la
 LOADAVG1_STATIC_SOURCES = cerebro_metric_loadavg1.c
 
@@ -76,6 +80,7 @@ endif
 MODULE_FLAGS = -module -avoid-version
 
 libstaticmetricmodules_la_SOURCES = $(BOOTTIME_STATIC_SOURCES) \
+				    $(LOADAVG_STATIC_SOURCES) \
 				    $(LOADAVG1_STATIC_SOURCES) \
 				    $(LOADAVG5_STATIC_SOURCES) \
 				    $(LOADAVG15_STATIC_SOURCES) \
@@ -100,21 +105,24 @@ cerebro_metric_boottime_la_CFLAGS  = -I$(srcdir)/../../libs/include \
 				     -I$(srcdir)/../../libs/debug
 cerebro_metric_boottime_la_LIBADD  = ../../libs/debug/libdebug.la
 
-cerebro_metric_loadavg1_la_SOURCES = cerebro_metric_loadavg1.c
+cerebro_metric_loadavg1_la_SOURCES = cerebro_metric_loadavg1.c \
+				     cerebro_metric_loadavg.c
 cerebro_metric_loadavg1_la_LDFLAGS = $(MODULE_FLAGS) \
 			             $(METRIC_OTHER_FLAGS)
 cerebro_metric_loadavg1_la_CFLAGS  = -I$(srcdir)/../../libs/include \
 				     -I$(srcdir)/../../libs/debug
 cerebro_metric_loadavg1_la_LIBADD  = ../../libs/debug/libdebug.la
 
-cerebro_metric_loadavg5_la_SOURCES = cerebro_metric_loadavg5.c
+cerebro_metric_loadavg5_la_SOURCES = cerebro_metric_loadavg5.c \
+				     cerebro_metric_loadavg.c
 cerebro_metric_loadavg5_la_LDFLAGS = $(MODULE_FLAGS) \
 			             $(METRIC_OTHER_FLAGS)
 cerebro_metric_loadavg5_la_CFLAGS  = -I$(srcdir)/../../libs/include \
 				     -I$(srcdir)/../../libs/debug
 cerebro_metric_loadavg5_la_LIBADD  = ../../libs/debug/libdebug.la
 
-cerebro_metric_loadavg15_la_SOURCES = cerebro_metric_loadavg15.c
+cerebro_metric_loadavg15_la_SOURCES = cerebro_metric_loadavg15.c \
+				      cerebro_metric_loadavg.c
 cerebro_metric_loadavg15_la_LDFLAGS = $(MODULE_FLAGS) \
 			              $(METRIC_OTHER_FLAGS)
 cerebro_metric_loadavg15_la_CFLAGS  = -I$(srcdir)/../../libs/include \
