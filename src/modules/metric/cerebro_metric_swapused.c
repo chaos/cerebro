@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_swapused.c,v 1.2 2006-08-27 05:23:53 chu11 Exp $
+ *  $Id: cerebro_metric_swapused.c,v 1.3 2006-08-27 19:17:10 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -95,7 +95,7 @@ swapused_metric_get_metric_period(int *period)
       return -1;
     }
   
-  *period = 60;
+  *period = 300;
   return 0;
 }
 
