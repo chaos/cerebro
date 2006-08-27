@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_memory.c,v 1.2 2006-08-27 19:11:08 chu11 Exp $
+ *  $Id: cerebro_metric_memory.c,v 1.3 2006-08-27 19:36:27 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -166,6 +166,8 @@ cerebro_metric_get_memory(u_int32_t *memtotal,
 
       if (_read_memory(fd, buf, SWAPFREE_KEYWORD, &cache_swapfree) < 0)
 	goto cleanup;
+
+      last_read = now.tv_sec;
     }
 
   if (memtotal)
