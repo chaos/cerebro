@@ -27,6 +27,10 @@
 	CEREBRO_METRIC_VALUE_TYPE_INT64 and
 	CEREBRO_METRIC_VALUE_TYPE_U_INT64 metric value types.
 
+	* src/modules/metric/cerebro_metric_memory.c,
+	src/modules/metric/cerebro_metric_loadavg.c: Cache results rather
+	than reading the proc file everytime.
+
 2006-08-26  Albert Chu  <chu11@llnl.gov>
 
 	* src/modules/metric/cerebro_metric_boottime.c

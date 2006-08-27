@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_memory.c,v 1.1 2006-08-27 05:23:53 chu11 Exp $
+ *  $Id: cerebro_metric_memory.c,v 1.2 2006-08-27 19:11:08 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -44,6 +44,17 @@
 #if HAVE_FCNTL_H
 #include <fcntl.h>
 #endif /* HAVE_FCNTL_H */
+#if TIME_WITH_SYS_TIME
+# include <sys/time.h>
+# include <time.h>
+#else  /* !TIME_WITH_SYS_TIME */
+# if HAVE_SYS_TIME_H
+#  include <sys/time.h>
+# else /* !HAVE_SYS_TIME_H */
+#  include <time.h>
+# endif /* !HAVE_SYS_TIME_H */
+#endif /* !TIME_WITH_SYS_TIME */
+
 #include <assert.h>
 
 #include "cerebro.h"
@@ -57,6 +68,14 @@
 #define SWAPTOTAL_KEYWORD          "SwapTotal"
 #define SWAPFREE_KEYWORD           "SwapFree"
 #define MEMORY_BUFLEN              4096
+#define MEMORY_CACHETIMEOUT        5
+
+static unsigned long int cache_memtotal;
+static unsigned long int cache_memfree;
+static unsigned long int cache_swaptotal;
+static unsigned long int cache_swapfree;
+
+static unsigned long int last_read = 0;
 
 /* 
  * _read_memory
@@ -110,54 +129,60 @@ cerebro_metric_get_memory(u_int32_t *memtotal,
 			  u_int32_t *swaptotal,
 			  u_int32_t *swapfree)
 {
-  int fd, len;
-  unsigned long int val;
+  int len, fd = -1;
   char buf[MEMORY_BUFLEN];
+  struct timeval now;
   int rv = -1;
 
-  if ((fd = open(MEMORY_FILE, O_RDONLY, 0)) < 0)
+  if (gettimeofday(&now, NULL) < 0)
     {
-      CEREBRO_DBG(("open: %s", strerror(errno)));
+      CEREBRO_DBG(("gettimeofday: %s", strerror(errno)));
       goto cleanup;
     }
 
-  memset(buf, '\0', MEMORY_BUFLEN);
-  if ((len = read(fd, buf, MEMORY_BUFLEN)) < 0)
+  if ((now.tv_sec - last_read) > MEMORY_CACHETIMEOUT)
     {
-      CEREBRO_DBG(("read: %s", strerror(errno)));
-      goto cleanup;
+      if ((fd = open(MEMORY_FILE, O_RDONLY, 0)) < 0)
+	{
+	  CEREBRO_DBG(("open: %s", strerror(errno)));
+	  goto cleanup;
+	}
+      
+      memset(buf, '\0', MEMORY_BUFLEN);
+      if ((len = read(fd, buf, MEMORY_BUFLEN)) < 0)
+	{
+	  CEREBRO_DBG(("read: %s", strerror(errno)));
+	  goto cleanup;
+	}
+
+      if (_read_memory(fd, buf, MEMTOTAL_KEYWORD, &cache_memtotal) < 0)
+	goto cleanup;
+
+      if (_read_memory(fd, buf, MEMFREE_KEYWORD, &cache_memfree) < 0)
+	goto cleanup;
+
+      if (_read_memory(fd, buf, SWAPTOTAL_KEYWORD, &cache_swaptotal) < 0)
+	goto cleanup;
+
+      if (_read_memory(fd, buf, SWAPFREE_KEYWORD, &cache_swapfree) < 0)
+	goto cleanup;
     }
 
   if (memtotal)
-    {
-      if (_read_memory(fd, buf, MEMTOTAL_KEYWORD, &val) < 0)
-	goto cleanup;
-      *memtotal = val;
-    }
+    *memtotal = cache_memtotal;
 
   if (memfree)
-    {
-      if (_read_memory(fd, buf, MEMFREE_KEYWORD, &val) < 0)
-	goto cleanup;
-      *memfree = val;
-    }
+    *memfree = cache_memfree;
 
   if (swaptotal)
-    {
-      if (_read_memory(fd, buf, SWAPTOTAL_KEYWORD, &val) < 0)
-	goto cleanup;
-      *swaptotal = val;
-    }
+    *swaptotal = cache_swaptotal;
 
   if (swapfree)
-    {
-      if (_read_memory(fd, buf, SWAPFREE_KEYWORD, &val) < 0)
-	goto cleanup;
-      *swapfree = val;
-    }
+    *swapfree = cache_swapfree;
 
   rv = 0;
  cleanup:
-  close(fd);
+  if (fd >= 0)
+    close(fd);
   return rv;
 }
