@@ -13,6 +13,20 @@
 
 	* src/modules/metric/Makefile.am: Adjust for new files.
 
+	* src/libs/common/marshall.h, src/libs/common/marshall.c
+	(marshall_int64, marshall_u_int64, unmarshall_int64,
+	unmarshall_u_int64): New functions.
+	
+	* src/cerebro-admin/cerebro-admin.c (_usage, _cmdline_parse),
+	src/cerebro-stat/cerebro-stat.c (_metric_value_str),
+	src/cerebrod/cerebrod_heartbeat.c (cerebrod_heartbeat_dump),
+	src/cerebrod/cerebrod_listener_data.c (_metric_data_dump),
+	src/libs/util/metric_util.c (_check_metric_type_len,
+	_marshall_metric, _unmarshall_metric_value),
+	src/libs/include/cerebro.h: Support new
+	CEREBRO_METRIC_VALUE_TYPE_INT64 and
+	CEREBRO_METRIC_VALUE_TYPE_U_INT64 metric value types.
+
 2006-08-26  Albert Chu  <chu11@llnl.gov>
 
 	* src/modules/metric/cerebro_metric_boottime.c

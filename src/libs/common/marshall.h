@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: marshall.h,v 1.2 2005-07-22 17:21:07 achu Exp $
+ *  $Id: marshall.h,v 1.3 2006-08-27 18:27:35 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -51,11 +51,21 @@ int marshall_int8(int8_t val, char *buf, unsigned int buflen);
 int marshall_int32(int32_t val, char *buf, unsigned int buflen);
 
 /*
+ * marshall_int64
+ *
+ * marshall contents of a 64 bit integer
+ *
+ * Returns length of data copied into buffer, 0 if not enough buffer
+ * space available, -1 on error
+ */
+int marshall_int64(int64_t val, char *buf, unsigned int buflen);
+
+/*
  * marshall_u_int8
  *
  * marshall contents of an unsigned 8 bit integer
  *
- * Returns length of data copied into buffer, 0 if not enough buffer
+g * Returns length of data copied into buffer, 0 if not enough buffer
  * space available, -1 on error
  */
 int marshall_u_int8(u_int8_t val, char *buf, unsigned int buflen);
@@ -69,6 +79,16 @@ int marshall_u_int8(u_int8_t val, char *buf, unsigned int buflen);
  * space available, -1 on error
  */
 int marshall_u_int32(u_int32_t val, char *buf, unsigned int buflen);
+
+/*
+ * marshall_u_int64
+ *
+ * marshall contents of an unsigned 64 bit integer
+ *
+ * Returns length of data copied into buffer, 0 if not enough buffer
+ * space available, -1 on error
+ */
+int marshall_u_int64(u_int64_t val, char *buf, unsigned int buflen);
 
 /*
  * marshall_float
@@ -124,6 +144,16 @@ int unmarshall_int8(int8_t *val, const char *buf, unsigned int buflen);
 int unmarshall_int32(int32_t *val, const char *buf, unsigned int buflen);
 
 /*
+ * unmarshall_int64
+ *
+ * unmarshall contents of a 64 bit integer
+ *
+ * Returns length of data unmarshalled from buffer, 0 if buffer does
+ * not contain enough data, -1 on error
+ */
+int unmarshall_int64(int64_t *val, const char *buf, unsigned int buflen);
+
+/*
  * unmarshall_u_int8
  *
  * unmarshall contents of an unsigned 8 bit integer
@@ -142,6 +172,16 @@ int unmarshall_u_int8(u_int8_t *val, const char *buf, unsigned int buflen);
  * not contain enough data, -1 on error
  */
 int unmarshall_u_int32(u_int32_t *val, const char *buf, unsigned int buflen);
+
+/*
+ * unmarshall_u_int64
+ *
+ * unmarshall contents of an unsigned 64 bit integer
+ *
+ * Returns length of data unmarshalled from buffer, 0 if buffer does
+ * not contain enough data, -1 on error
+ */
+int unmarshall_u_int64(u_int64_t *val, const char *buf, unsigned int buflen);
 
 /*
  * unmarshall_float

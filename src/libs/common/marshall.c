@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: marshall.c,v 1.2 2005-07-22 17:21:07 achu Exp $
+ *  $Id: marshall.c,v 1.3 2006-08-27 18:27:35 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -76,6 +76,34 @@ marshall_int32(int32_t val, char *buf, unsigned int buflen)
 }
 
 int
+marshall_int64(int64_t val, char *buf, unsigned int buflen)
+{
+  if (!buf)
+    {
+      errno = EINVAL;
+      return -1;
+    }
+
+  if (buflen >= sizeof(int64_t))
+    {
+      int32_t word0, word1, *ptr;
+      ptr = (int32_t *)&val;
+#ifdef WORDS_BIGENDIAN
+      word0 = htonl(ptr[0]);
+      word1 = htonl(ptr[1]);
+#else  /* !WORDS_BIGENDIAN */
+      word0 = htonl(ptr[1]);
+      word1 = htonl(ptr[0]);
+#endif /* !WORDS_BIGENDIAN */
+      memcpy(buf, (void *)&word0, sizeof(int32_t));
+      memcpy(buf+sizeof(int32_t), (void *)&word1, sizeof(int32_t));
+      return (sizeof(int64_t));
+    }
+
+  return 0;
+}
+
+int
 marshall_u_int8(u_int8_t val, char *buf, unsigned int buflen)
 {
   if (!buf)
@@ -108,6 +136,34 @@ marshall_u_int32(u_int32_t val, char *buf, unsigned int buflen)
       memcpy(buf, (void *)&temp, sizeof(u_int32_t));
       return sizeof(u_int32_t);
     }
+  return 0;
+}
+
+int
+marshall_u_int64(u_int64_t val, char *buf, unsigned int buflen)
+{
+  if (!buf)
+    {
+      errno = EINVAL;
+      return -1;
+    }
+
+  if (buflen >= sizeof(u_int64_t))
+    {
+      u_int32_t word0, word1, *ptr;
+      ptr = (u_int32_t *)&val;
+#ifdef WORDS_BIGENDIAN
+      word0 = htonl(ptr[0]);
+      word1 = htonl(ptr[1]);
+#else  /* !WORDS_BIGENDIAN */
+      word0 = htonl(ptr[1]);
+      word1 = htonl(ptr[0]);
+#endif /* !WORDS_BIGENDIAN */
+      memcpy(buf, (void *)&word0, sizeof(u_int32_t));
+      memcpy(buf+sizeof(u_int32_t), (void *)&word1, sizeof(u_int32_t));
+      return (sizeof(u_int64_t));
+    }
+
   return 0;
 }
 
@@ -217,6 +273,34 @@ unmarshall_int32(int32_t *val, const char *buf, unsigned int buflen)
 }
 
 int
+unmarshall_int64(int64_t *val, const char *buf, unsigned int buflen)
+{
+  if (!val || !buf)
+    {
+      errno = EINVAL;
+      return -1;
+    }
+
+  if (buflen >= sizeof(int64_t))
+    {
+      int32_t word0, word1;
+      int32_t *ptr = (int32_t *)val;
+
+      memcpy((void *)&word0, buf, sizeof(int32_t));
+      memcpy((void *)&word1, buf+sizeof(int32_t), sizeof(int32_t));
+#ifdef WORDS_BIGENDIAN
+      ptr[0] = ntohl(word0);
+      ptr[1] = ntohl(word1);
+#else  /* !WORDS_BIGENDIAN */
+      ptr[0] = ntohl(word1);
+      ptr[1] = ntohl(word0);
+#endif /* !WORDS_BIGENDIAN */
+      return (sizeof(int64_t));
+    }
+  return 0;
+}
+
+int
 unmarshall_u_int8(u_int8_t *val, const char *buf, unsigned int buflen)
 {
   if (!val || !buf)
@@ -248,6 +332,34 @@ unmarshall_u_int32(u_int32_t *val, const char *buf, unsigned int buflen)
       memcpy((void *)&temp, buf, sizeof(u_int32_t));
       *val = ntohl(temp);
       return sizeof(u_int32_t);
+    }
+  return 0;
+}
+
+int
+unmarshall_u_int64(u_int64_t *val, const char *buf, unsigned int buflen)
+{
+  if (!val || !buf)
+    {
+      errno = EINVAL;
+      return -1;
+    }
+
+  if (buflen >= sizeof(u_int64_t))
+    {
+      u_int32_t word0, word1;
+      u_int32_t *ptr = (u_int32_t *)val;
+
+      memcpy((void *)&word0, buf, sizeof(u_int32_t));
+      memcpy((void *)&word1, buf+sizeof(u_int32_t), sizeof(u_int32_t));
+#ifdef WORDS_BIGENDIAN
+      ptr[0] = ntohl(word0);
+      ptr[1] = ntohl(word1);
+#else  /* !WORDS_BIGENDIAN */
+      ptr[0] = ntohl(word1);
+      ptr[1] = ntohl(word0);
+#endif /* !WORDS_BIGENDIAN */
+      return (sizeof(u_int64_t));
     }
   return 0;
 }

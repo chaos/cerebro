@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.21 2005-07-27 00:29:22 achu Exp $
+ *  $Id: cerebro.h,v 1.22 2006-08-27 18:27:35 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -76,6 +76,8 @@
 #define CEREBRO_METRIC_VALUE_TYPE_FLOAT            3
 #define CEREBRO_METRIC_VALUE_TYPE_DOUBLE           4
 #define CEREBRO_METRIC_VALUE_TYPE_STRING           5
+#define CEREBRO_METRIC_VALUE_TYPE_INT64            6
+#define CEREBRO_METRIC_VALUE_TYPE_U_INT64          7
 
 /* 
  * Default metrics

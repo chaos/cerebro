@@ -428,6 +428,10 @@ _metric_value_str(struct node_metric_data *data, char *buf, unsigned int buflen)
     mlen_flag = (mlen != sizeof(double)) ? 1 : 0;
   else if (mtype == CEREBRO_METRIC_VALUE_TYPE_STRING)
     mlen_flag = (mlen > CEREBRO_MAX_METRIC_STRING_LEN) ? 1 : 0;
+  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_INT64)
+    mlen_flag = (mlen != sizeof(int64_t)) ? 1 : 0;
+  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_U_INT64)
+    mlen_flag = (mlen != sizeof(u_int64_t)) ? 1 : 0;
   else
     err_exit("%s: invalid metric type: %d", func, mtype);
 
@@ -447,6 +451,10 @@ _metric_value_str(struct node_metric_data *data, char *buf, unsigned int buflen)
     rv = snprintf(buf, buflen, "%f", *((double *)data->metric_value));
   else if (mtype == CEREBRO_METRIC_VALUE_TYPE_STRING)
     rv = snprintf(buf, buflen, "%s", (char *)data->metric_value);
+  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_INT64)
+    rv = snprintf(buf, buflen, "%lld", *((int64_t *)data->metric_value));
+  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_U_INT64)
+    rv = snprintf(buf, buflen, "%llu", *((u_int64_t *)data->metric_value));
   
   if (rv >= buflen)
     err_exit("%s: truncated output: %d", func, mlen);

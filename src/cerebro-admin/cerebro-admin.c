@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro-admin.c,v 1.9 2005-07-26 22:30:56 achu Exp $
+ *  $Id: cerebro-admin.c,v 1.10 2006-08-27 18:27:34 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -79,6 +79,8 @@ u_int32_t metric_value_u_int32;
 float metric_value_float;
 double metric_value_double;
 char *metric_value_string;
+int64_t metric_value_int64;
+u_int64_t metric_value_u_int64;
 void *metric_value_ptr;
 
 /* 
@@ -131,14 +133,17 @@ _usage(void)
           "     %d - float\n"
           "     %d - double\n"
           "     %d - string\n"
+          "     %d - int64\n"
+          "     %d - u_int64\n"
           "  -l STRING  Specify metric value\n",
           CEREBRO_METRIC_VALUE_TYPE_NONE,
           CEREBRO_METRIC_VALUE_TYPE_INT32,
           CEREBRO_METRIC_VALUE_TYPE_U_INT32,
           CEREBRO_METRIC_VALUE_TYPE_FLOAT,
           CEREBRO_METRIC_VALUE_TYPE_DOUBLE,
-          CEREBRO_METRIC_VALUE_TYPE_STRING
-          );
+          CEREBRO_METRIC_VALUE_TYPE_STRING,
+          CEREBRO_METRIC_VALUE_TYPE_INT64,
+          CEREBRO_METRIC_VALUE_TYPE_U_INT64);
 #if CEREBRO_DEBUG
   fprintf(stderr,
           "  -d         Turn on debugging\n");
@@ -236,7 +241,7 @@ _cmdline_parse(int argc, char **argv)
         metric_value_type = strtol(optarg, &ptr, 10);
         if ((ptr != (optarg + strlen(optarg)))
             || !(metric_value_type >= CEREBRO_METRIC_VALUE_TYPE_NONE
-                 && metric_value_type <= CEREBRO_METRIC_VALUE_TYPE_STRING))
+                 && metric_value_type <= CEREBRO_METRIC_VALUE_TYPE_U_INT64))
           err_exit("invalid metric value type specified");
         break;
       case 'l':
@@ -304,6 +309,22 @@ _cmdline_parse(int argc, char **argv)
       if (metric_value_len > CEREBRO_MAX_METRIC_STRING_LEN)
         err_exit("string metric value too long");
       metric_value_ptr = metric_value_string;
+    }
+  else if (metric_value_type == CEREBRO_METRIC_VALUE_TYPE_INT64)
+    {
+      metric_value_int64 = (int64_t)strtoll(metric_value, &ptr, 10);
+      if (ptr != (metric_value + strlen(metric_value)))
+        err_exit("invalid metric value specified");
+      metric_value_len = sizeof(int64_t);
+      metric_value_ptr = &metric_value_int64;
+    }
+  else if (metric_value_type == CEREBRO_METRIC_VALUE_TYPE_U_INT64)
+    {
+      metric_value_u_int64 = (u_int64_t)strtoull(metric_value, &ptr, 10);
+      if (ptr != (metric_value + strlen(metric_value)))
+        err_exit("invalid metric value specified");
+      metric_value_len = sizeof(u_int64_t);
+      metric_value_ptr = &metric_value_u_int64;
     }
 }
 
