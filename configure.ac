@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.72 2006-08-27 21:35:51 chu11 Exp $
+## $Id: configure.ac,v 1.73 2006-08-27 22:03:32 chu11 Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -136,8 +136,8 @@ AM_CONDITIONAL(WITH_MEMORY, [test "$ac_with_memory" = "yes"])
 #
 # Check to build net modules
 #
-AC_NET
-AM_CONDITIONAL(WITH_NET, [test "$ac_with_net" = "yes"])
+AC_NETWORK
+AM_CONDITIONAL(WITH_NETWORK, [test "$ac_with_network" = "yes"])
 
 #
 # Check to build slurm_state module

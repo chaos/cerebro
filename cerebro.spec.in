@@ -43,6 +43,27 @@ Requires: cerebro
 %description metric-boottime
 Metric module to monitor boottime.
 
+%package metric-loadavg
+Summary: loadavg module
+Group: System Environment/Base
+Requires: cerebro
+%description metric-loadavg
+Metric modules to monitor loadavgs.
+
+%package metric-memory
+Summary: memory module
+Group: System Environment/Base
+Requires: cerebro
+%description metric-memory
+Metric modules to monitor memory usage.
+
+%package metric-network
+Summary: network module
+Group: System Environment/Base
+Requires: cerebro
+%description metric-network
+Metric modules to monitor network usage.
+
 %package metric-slurm-state
 Summary: slurm_state module
 Group: System Environment/Base

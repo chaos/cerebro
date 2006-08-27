@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_net.c,v 1.1 2006-08-27 21:35:52 chu11 Exp $
+ *  $Id: cerebro_metric_network.c,v 1.1 2006-08-27 22:03:32 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -60,9 +60,9 @@
 
 #include "debug.h"
 
-#define NET_FILE                "/proc/net/dev"
-#define NET_BUFLEN              4096
-#define NET_CACHETIMEOUT        5
+#define NETWORK_FILE                "/proc/net/dev"
+#define NETWORK_BUFLEN              4096
+#define NETWORK_CACHETIMEOUT        5
 
 static u_int64_t cache_bytesin;
 static u_int64_t cache_bytesout;
@@ -74,12 +74,12 @@ static u_int32_t cache_txerrs;
 static unsigned long int last_read = 0;
 
 /*
- * cerebro_metric_get_net
+ * cerebro_metric_get_network
  *
- * Read net statistics
+ * Read network statistics
  */
 int
-cerebro_metric_get_net(u_int64_t *bytesin,
+cerebro_metric_get_network(u_int64_t *bytesin,
 		       u_int64_t *bytesout,
 		       u_int32_t *packetsin,
 		       u_int32_t *packetsout,
@@ -87,7 +87,7 @@ cerebro_metric_get_net(u_int64_t *bytesin,
 		       u_int32_t *txerrs)
 {
   int len, fd = -1;
-  char buf[NET_BUFLEN];
+  char buf[NETWORK_BUFLEN];
   struct timeval now;
   u_int64_t total_bytesin = 0;
   u_int64_t total_bytesout = 0;
@@ -104,16 +104,16 @@ cerebro_metric_get_net(u_int64_t *bytesin,
       goto cleanup;
     }
 
-  if ((now.tv_sec - last_read) > NET_CACHETIMEOUT)
+  if ((now.tv_sec - last_read) > NETWORK_CACHETIMEOUT)
     {
-      if ((fd = open(NET_FILE, O_RDONLY, 0)) < 0)
+      if ((fd = open(NETWORK_FILE, O_RDONLY, 0)) < 0)
 	{
 	  CEREBRO_DBG(("open: %s", strerror(errno)));
 	  goto cleanup;
 	}
       
-      memset(buf, '\0', NET_BUFLEN);
-      if ((len = read(fd, buf, NET_BUFLEN)) < 0)
+      memset(buf, '\0', NETWORK_BUFLEN);
+      if ((len = read(fd, buf, NETWORK_BUFLEN)) < 0)
 	{
 	  CEREBRO_DBG(("read: %s", strerror(errno)));
 	  goto cleanup;
@@ -125,19 +125,19 @@ cerebro_metric_get_net(u_int64_t *bytesin,
       parseptr = buf;
       if (!(parseptr = strstr(parseptr, "\n")))
 	{
-	  CEREBRO_DBG(("%s parse error", NET_FILE));
+	  CEREBRO_DBG(("%s parse error", NETWORK_FILE));
 	  goto cleanup;
 	}
       parseptr++;
       if (!(parseptr = strstr(parseptr, "\n")))
 	{
-	  CEREBRO_DBG(("%s parse error", NET_FILE));
+	  CEREBRO_DBG(("%s parse error", NETWORK_FILE));
 	  goto cleanup;
 	}
       parseptr++;
       if (!(parseptr = strstr(parseptr, "\n")))
 	{
-	  CEREBRO_DBG(("%s parse error", NET_FILE));
+	  CEREBRO_DBG(("%s parse error", NETWORK_FILE));
 	  goto cleanup;
 	}
       parseptr++;
@@ -154,7 +154,7 @@ cerebro_metric_get_net(u_int64_t *bytesin,
 	  /* skip the device name */
 	  if (!(strptr = strstr(parseptr, ":")))
 	    {
-	      CEREBRO_DBG(("%s parse error", NET_FILE));
+	      CEREBRO_DBG(("%s parse error", NETWORK_FILE));
 	      goto cleanup;
 	    }
 	  strptr++;
@@ -162,67 +162,67 @@ cerebro_metric_get_net(u_int64_t *bytesin,
 	  rx_bytes = strtoull(strptr, &strptr, 10);
 	  if (!strptr)
 	    {
-	      CEREBRO_DBG(("%s parse error", NET_FILE));
+	      CEREBRO_DBG(("%s parse error", NETWORK_FILE));
 	      goto cleanup;
 	    }
 	  rx_packets = strtoul(strptr, &strptr, 10);
 	  if (!strptr)
 	    {
-	      CEREBRO_DBG(("%s parse error", NET_FILE));
+	      CEREBRO_DBG(("%s parse error", NETWORK_FILE));
 	      goto cleanup;
 	    }
 	  rx_errs = strtoul(strptr, &strptr, 10);
 	  if (!strptr)
 	    {
-	      CEREBRO_DBG(("%s parse error", NET_FILE));
+	      CEREBRO_DBG(("%s parse error", NETWORK_FILE));
 	      goto cleanup;
 	    }
  	  temp = strtoul(strptr, &strptr, 10); /* drop */
 	  if (!strptr)
 	    {
-	      CEREBRO_DBG(("%s parse error", NET_FILE));
+	      CEREBRO_DBG(("%s parse error", NETWORK_FILE));
 	      goto cleanup;
 	    }
  	  temp = strtoul(strptr, &strptr, 10); /* fifo */
 	  if (!strptr)
 	    {
-	      CEREBRO_DBG(("%s parse error", NET_FILE));
+	      CEREBRO_DBG(("%s parse error", NETWORK_FILE));
 	      goto cleanup;
 	    }
  	  temp = strtoul(strptr, &strptr, 10); /* frame */
 	  if (!strptr)
 	    {
-	      CEREBRO_DBG(("%s parse error", NET_FILE));
+	      CEREBRO_DBG(("%s parse error", NETWORK_FILE));
 	      goto cleanup;
 	    }
  	  temp = strtoul(strptr, &strptr, 10); /* compressed */
 	  if (!strptr)
 	    {
-	      CEREBRO_DBG(("%s parse error", NET_FILE));
+	      CEREBRO_DBG(("%s parse error", NETWORK_FILE));
 	      goto cleanup;
 	    }
  	  temp = strtoul(strptr, &strptr, 10); /* multicast */
 	  if (!strptr)
 	    {
-	      CEREBRO_DBG(("%s parse error", NET_FILE));
+	      CEREBRO_DBG(("%s parse error", NETWORK_FILE));
 	      goto cleanup;
 	    }
 	  tx_bytes = strtoull(strptr, &strptr, 10);
 	  if (!strptr)
 	    {
-	      CEREBRO_DBG(("%s parse error", NET_FILE));
+	      CEREBRO_DBG(("%s parse error", NETWORK_FILE));
 	      goto cleanup;
 	    }
 	  tx_packets = strtoul(strptr, &strptr, 10);
 	  if (!strptr)
 	    {
-	      CEREBRO_DBG(("%s parse error", NET_FILE));
+	      CEREBRO_DBG(("%s parse error", NETWORK_FILE));
 	      goto cleanup;
 	    }
 	  tx_errs = strtoul(strptr, &strptr, 10);
 	  if (!strptr)
 	    {
-	      CEREBRO_DBG(("%s parse error", NET_FILE));
+	      CEREBRO_DBG(("%s parse error", NETWORK_FILE));
 	      goto cleanup;
 	    }
 		
@@ -235,7 +235,7 @@ cerebro_metric_get_net(u_int64_t *bytesin,
 
 	  if (!(parseptr = strstr(parseptr, "\n")))
 	    {
-	      CEREBRO_DBG(("%s parse error", NET_FILE));
+	      CEREBRO_DBG(("%s parse error", NETWORK_FILE));
 	      goto cleanup;
 	    }
 	  parseptr++;

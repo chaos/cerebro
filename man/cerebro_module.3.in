@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro_module.3.in,v 1.12 2006-08-26 16:06:56 chu11 Exp $
+\."$Id: cerebro_module.3.in,v 1.13 2006-08-27 22:03:32 chu11 Exp $
 \."#############################################################################
 \."  Copyright (C) 2005 The Regents of the University of California.
 \."  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -129,6 +129,20 @@ swaptotal - Retrieves total swap space.
 swapused - Retrieves used swap space.
 
 swapfree - Retrieves free swap space.
+\}
+
+.if @MANPAGE_NETWORK@ \{
+bytesin - Retrieves total bytes received on the network.
+
+bytesout - Retrieves total bytes sent on the network.
+
+packetsin - Retrieves total packets received on the network.
+
+packetsout - Retrieves total packets sent on the network.
+
+rxerrs - Retrieves total receive errors.
+
+txerrs - Retrieves total transmission errors.
 \}
 
 .if @MANPAGE_SHUTDOWN@ \{

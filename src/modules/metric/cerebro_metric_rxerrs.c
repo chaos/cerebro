@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_rxerrs.c,v 1.1 2006-08-27 21:35:52 chu11 Exp $
+ *  $Id: cerebro_metric_rxerrs.c,v 1.2 2006-08-27 22:03:33 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -39,7 +39,7 @@
 #include "cerebro.h"
 #include "cerebro/cerebro_metric_module.h"
 
-#include "cerebro_metric_net.h"
+#include "cerebro_metric_network.h"
 #include "debug.h"
 
 #define RXERRS_METRIC_MODULE_NAME  "rxerrs"
@@ -119,12 +119,12 @@ rxerrs_metric_get_metric_value(unsigned int *metric_value_type,
       return -1;
     }
   
-  if (cerebro_metric_get_net(NULL,
-			     NULL,
-			     NULL,
-			     NULL,
-			     &rxerrsval,
-			     NULL) < 0)
+  if (cerebro_metric_get_network(NULL,
+                                 NULL,
+                                 NULL,
+                                 NULL,
+                                 &rxerrsval,
+                                 NULL) < 0)
     goto cleanup;
   
   if (!(rxerrsptr = (u_int32_t *)malloc(sizeof(u_int32_t))))

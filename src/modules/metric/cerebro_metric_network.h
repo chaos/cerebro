@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_net.h,v 1.1 2006-08-27 21:35:52 chu11 Exp $
+ *  $Id: cerebro_metric_network.h,v 1.1 2006-08-27 22:03:33 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -25,14 +25,14 @@
  *  59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.
 \*****************************************************************************/
 
-#ifndef _CEREBRO_METRIC_NET
-#define _CEREBRO_METRIC_NET
+#ifndef _CEREBRO_METRIC_NETWORK
+#define _CEREBRO_METRIC_NETWORK
 
-int cerebro_metric_get_net(u_int64_t *bytesin,
-			   u_int64_t *bytesout,
-			   u_int32_t *packetsin,
-			   u_int32_t *packetsout,
-			   u_int32_t *rxerrs,
-			   u_int32_t *txerrs);
+int cerebro_metric_get_network(u_int64_t *bytesin,
+                               u_int64_t *bytesout,
+                               u_int32_t *packetsin,
+                               u_int32_t *packetsout,
+                               u_int32_t *rxerrs,
+                               u_int32_t *txerrs);
 
-#endif /* _CEREBRO_METRIC_NET */
+#endif /* _CEREBRO_METRIC_NETWORK */
