@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_memory.c,v 1.4 2006-08-27 21:35:52 chu11 Exp $
+ *  $Id: cerebro_metric_memory.c,v 1.5 2006-08-27 21:40:50 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -86,7 +86,7 @@ static int
 _read_memory(int fd,
 	     char *buf,
 	     char *keyword,
-	     unsigned long int *memvalptr)
+	     u_int32_t *memvalptr)
 {
   char *parseptr;
   unsigned long int memval;
