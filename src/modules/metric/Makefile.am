@@ -1,12 +1,13 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.20 2006-08-27 05:23:53 chu11 Exp $
+## $Id: Makefile.am,v 1.21 2006-08-27 21:35:52 chu11 Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
 
 noinst_HEADERS = \
 	cerebro_metric_loadavg.h \
-	cerebro_metric_memory.h
+	cerebro_metric_memory.h \
+	cerebro_metric_net.h
 
 if WITH_GNU_LD
 METRIC_VERSION_SCRIPT = $(srcdir)/metric.map
@@ -53,6 +54,28 @@ SWAPFREE_METRIC_MODULE = cerebro_metric_swapfree.la
 SWAPFREE_STATIC_SOURCES = cerebro_metric_swapfree.c
 endif
 
+if WITH_MEMORY
+NET_STATIC_SOURCES = cerebro_metric_net.c
+
+BYTESIN_METRIC_MODULE = cerebro_metric_bytesin.la
+BYTESIN_STATIC_SOURCES = cerebro_metric_bytesin.c
+
+BYTESOUT_METRIC_MODULE = cerebro_metric_bytesout.la
+BYTESOUT_STATIC_SOURCES = cerebro_metric_bytesout.c
+
+PACKETSIN_METRIC_MODULE = cerebro_metric_packetsin.la
+PACKETSIN_STATIC_SOURCES = cerebro_metric_packetsin.c
+
+PACKETSOUT_METRIC_MODULE = cerebro_metric_packetsout.la
+PACKETSOUT_STATIC_SOURCES = cerebro_metric_packetsout.c
+
+RXERRS_METRIC_MODULE = cerebro_metric_rxerrs.la
+RXERRS_STATIC_SOURCES = cerebro_metric_rxerrs.c
+
+TXERRS_METRIC_MODULE = cerebro_metric_txerrs.la
+TXERRS_STATIC_SOURCES = cerebro_metric_txerrs.c
+endif
+
 if WITH_SLURM_STATE
 SLURM_STATE_METRIC_MODULE = cerebro_metric_slurm_state.la
 SLURM_STATE_STATIC_SOURCES = cerebro_metric_slurm_state.c
@@ -77,6 +100,12 @@ modulelib_LTLIBRARIES = $(BOOTTIME_METRIC_MODULE) \
 			$(SWAPTOTAL_METRIC_MODULE) \
 			$(SWAPUSED_METRIC_MODULE) \
 			$(SWAPFREE_METRIC_MODULE) \
+			$(BYTESIN_METRIC_MODULE) \
+			$(BYTESOUT_METRIC_MODULE) \
+			$(PACKETSIN_METRIC_MODULE) \
+			$(PACKETSOUT_METRIC_MODULE) \
+			$(RXERRS_METRIC_MODULE) \
+			$(TXERRS_METRIC_MODULE) \
 			$(SLURM_STATE_METRIC_MODULE) \
 			$(SHUTDOWN_METRIC_MODULE)
 endif
@@ -95,6 +124,13 @@ libstaticmetricmodules_la_SOURCES = $(BOOTTIME_STATIC_SOURCES) \
 				    $(SWAPTOTAL_STATIC_SOURCES) \
 				    $(SWAPUSED_STATIC_SOURCES) \
 				    $(SWAPFREE_STATIC_SOURCES) \
+				    $(NET_STATIC_SOURCES) \
+				    $(BYTESIN_STATIC_SOURCES) \
+				    $(BYTESOUT_STATIC_SOURCES) \
+				    $(PACKETSIN_STATIC_SOURCES) \
+				    $(PACKETSOUT_STATIC_SOURCES) \
+				    $(RXERRS_STATIC_SOURCES) \
+				    $(TXERRS_STATIC_SOURCES) \
 				    $(SLURM_STATE_STATIC_SOURCES) \
 				    $(SHUTDOWN_STATIC_SOURCES)
 libstaticmetricmodules_la_CFLAGS = -I$(srcdir)/../../libs/include \
@@ -181,6 +217,54 @@ cerebro_metric_swapfree_la_LDFLAGS = $(MODULE_FLAGS) \
 cerebro_metric_swapfree_la_CFLAGS  = -I$(srcdir)/../../libs/include \
 				     -I$(srcdir)/../../libs/debug
 cerebro_metric_swapfree_la_LIBADD  = ../../libs/debug/libdebug.la
+
+cerebro_metric_bytesin_la_SOURCES = cerebro_metric_bytesin.c \
+				    cerebro_metric_net.c 
+cerebro_metric_bytesin_la_LDFLAGS = $(MODULE_FLAGS) \
+				    $(METRIC_OTHER_FLAGS)
+cerebro_metric_bytesin_la_CFLAGS  = -I$(srcdir)/../../libs/include \
+				    -I$(srcdir)/../../libs/debug
+cerebro_metric_bytesin_la_LIBADD  = ../../libs/debug/libdebug.la
+
+cerebro_metric_bytesout_la_SOURCES = cerebro_metric_bytesout.c \
+				     cerebro_metric_net.c 
+cerebro_metric_bytesout_la_LDFLAGS = $(MODULE_FLAGS) \
+				     $(METRIC_OTHER_FLAGS)
+cerebro_metric_bytesout_la_CFLAGS  = -I$(srcdir)/../../libs/include \
+				     -I$(srcdir)/../../libs/debug
+cerebro_metric_bytesout_la_LIBADD  = ../../libs/debug/libdebug.la
+
+cerebro_metric_packetsin_la_SOURCES = cerebro_metric_packetsin.c \
+				      cerebro_metric_net.c 
+cerebro_metric_packetsin_la_LDFLAGS = $(MODULE_FLAGS) \
+				      $(METRIC_OTHER_FLAGS)
+cerebro_metric_packetsin_la_CFLAGS  = -I$(srcdir)/../../libs/include \
+				      -I$(srcdir)/../../libs/debug
+cerebro_metric_packetsin_la_LIBADD  = ../../libs/debug/libdebug.la
+
+cerebro_metric_packetsout_la_SOURCES = cerebro_metric_packetsout.c \
+				       cerebro_metric_net.c 
+cerebro_metric_packetsout_la_LDFLAGS = $(MODULE_FLAGS) \
+				       $(METRIC_OTHER_FLAGS)
+cerebro_metric_packetsout_la_CFLAGS  = -I$(srcdir)/../../libs/include \
+				       -I$(srcdir)/../../libs/debug
+cerebro_metric_packetsout_la_LIBADD  = ../../libs/debug/libdebug.la
+
+cerebro_metric_rxerrs_la_SOURCES = cerebro_metric_rxerrs.c \
+				   cerebro_metric_net.c 
+cerebro_metric_rxerrs_la_LDFLAGS = $(MODULE_FLAGS) \
+				   $(METRIC_OTHER_FLAGS)
+cerebro_metric_rxerrs_la_CFLAGS  = -I$(srcdir)/../../libs/include \
+				   -I$(srcdir)/../../libs/debug
+cerebro_metric_rxerrs_la_LIBADD  = ../../libs/debug/libdebug.la
+
+cerebro_metric_txerrs_la_SOURCES = cerebro_metric_txerrs.c \
+				   cerebro_metric_net.c 
+cerebro_metric_txerrs_la_LDFLAGS = $(MODULE_FLAGS) \
+				   $(METRIC_OTHER_FLAGS)
+cerebro_metric_txerrs_la_CFLAGS  = -I$(srcdir)/../../libs/include \
+				   -I$(srcdir)/../../libs/debug
+cerebro_metric_txerrs_la_LIBADD  = ../../libs/debug/libdebug.la
 
 cerebro_metric_slurm_state_la_SOURCES = cerebro_metric_slurm_state.c
 cerebro_metric_slurm_state_la_LDFLAGS = $(MODULE_FLAGS) \

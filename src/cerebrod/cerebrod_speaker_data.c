@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker_data.c,v 1.37 2006-02-22 06:08:28 chu11 Exp $
+ *  $Id: cerebrod_speaker_data.c,v 1.38 2006-08-27 21:35:51 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -597,7 +597,7 @@ cerebrod_speaker_data_get_metric_data(struct cerebrod_heartbeat *hb,
         break;
 
       if (metric_info->metric_origin & CEREBROD_METRIC_SPEAKER_ORIGIN_MODULE)
-        hd = _get_module_metric_value(metric_info);
+	hd = _get_module_metric_value(metric_info);
 
       if (metric_info->metric_origin & CEREBROD_METRIC_SPEAKER_ORIGIN_USERSPACE)
         {

@@ -31,6 +31,18 @@
 	src/modules/metric/cerebro_metric_loadavg.c: Cache results rather
 	than reading the proc file everytime.
 
+	* config/ac_net.m4, src/modules/metric/cerebro_metric_net.h,
+	src/modules/metric/cerebro_metric_net.c,
+	src/modules/metric/cerebro_metric_bytesin.c,
+	src/modules/metric/cerebro_metric_bytesout.c,
+	src/modules/metric/cerebro_metric_packetsin.c,
+	src/modules/metric/cerebro_metric_packetsout.c ,
+	src/modules/metric/cerebro_metric_rxerrs.c,
+	src/modules/metric/cerebro_metric_txerrs.c: New files.
+
+	* src/modules/metric/Makefile.am, configure.ac,
+	man/cerebro_module.3.in: Adjust appropriately for new metrics.
+
 2006-08-26  Albert Chu  <chu11@llnl.gov>
 
 	* src/modules/metric/cerebro_metric_boottime.c

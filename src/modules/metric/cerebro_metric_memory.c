@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_memory.c,v 1.3 2006-08-27 19:36:27 chu11 Exp $
+ *  $Id: cerebro_metric_memory.c,v 1.4 2006-08-27 21:35:52 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -70,10 +70,10 @@
 #define MEMORY_BUFLEN              4096
 #define MEMORY_CACHETIMEOUT        5
 
-static unsigned long int cache_memtotal;
-static unsigned long int cache_memfree;
-static unsigned long int cache_swaptotal;
-static unsigned long int cache_swapfree;
+static u_int32_t cache_memtotal;
+static u_int32_t cache_memfree;
+static u_int32_t cache_swaptotal;
+static u_int32_t cache_swapfree;
 
 static unsigned long int last_read = 0;
 
