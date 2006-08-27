@@ -31,8 +31,9 @@
 	src/modules/metric/cerebro_metric_loadavg.c: Cache results rather
 	than reading the proc file everytime.
 
-	* config/ac_net.m4, src/modules/metric/cerebro_metric_net.h,
-	src/modules/metric/cerebro_metric_net.c,
+	* config/ac_network.m4,
+	src/modules/metric/cerebro_metric_network.h,
+	src/modules/metric/cerebro_metric_network.c,
 	src/modules/metric/cerebro_metric_bytesin.c,
 	src/modules/metric/cerebro_metric_bytesout.c,
 	src/modules/metric/cerebro_metric_packetsin.c,
