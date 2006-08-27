@@ -14,6 +14,9 @@ Cerebro is a collection of cluster monitoring tools and libraries.
 %{!?_with_genders: %{!?_without_genders: %define _with_genders --with-genders}}
 %{!?_with_hostsfile: %{!?_without_hostsfile: %define _with_hostsfile --with-hostsfile}}
 %{!?_with_boottime: %{!?_without_boottime: %define _with_boottime --with-boottime}}
+%{!?_with_loadavg: %{!?_without_loadavg: %define _with_loadavg --with-loadavg}}
+%{!?_with_memory: %{!?_without_memory: %define _with_memory --with-memory}}
+%{!?_with_network: %{!?_without_network: %define _with_network --with-network}}
 %{!?_with_slurm_state: %{!?_without_slurm_state: %define _without_slurm_state --without-slurm-state}}
 %{!?_with_shutdown: %{!?_without_shutdown: %define _without_shutdown --without-shutdown}}
 
@@ -89,6 +92,12 @@ Metric module to monitor graceful shutdowns.
            %{?_without_hostsfile} \
            %{?_with_boottime} \
            %{?_without_boottime} \
+           %{?_with_loadavg} \
+           %{?_without_loadavg} \
+           %{?_with_memory} \
+           %{?_without_memory} \
+           %{?_with_network} \
+           %{?_without_network} \
            %{?_with_slurm_state} \
            %{?_without_slurm_state} \
            %{?_with_shutdown} \
@@ -162,6 +171,24 @@ fi
 %files metric-boottime
 %defattr(700,root,root)
 %{_libdir}/cerebro/cerebro_metric_boottime.*
+%endif
+
+%if %{?_with_loadavg:1}%{!?_with_loadavg:0}
+%files metric-loadavg
+%defattr(700,root,root)
+%{_libdir}/cerebro/cerebro_metric_loadavg.*
+%endif
+
+%if %{?_with_memory:1}%{!?_with_memory:0}
+%files metric-memory
+%defattr(700,root,root)
+%{_libdir}/cerebro/cerebro_metric_memory.*
+%endif
+
+%if %{?_with_network:1}%{!?_with_network:0}
+%files metric-network
+%defattr(700,root,root)
+%{_libdir}/cerebro/cerebro_metric_network.*
 %endif
 
 %if %{?_with_slurm_state:1}%{!?_with_slurm_state:0}

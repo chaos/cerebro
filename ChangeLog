@@ -44,6 +44,8 @@
 	* src/modules/metric/Makefile.am, configure.ac,
 	man/cerebro_module.3.in: Adjust appropriately for new metrics.
 
+	* cerebro.spec.in: Add new packets for new metrics.
+
 2006-08-26  Albert Chu  <chu11@llnl.gov>
 
 	* src/modules/metric/cerebro_metric_boottime.c
