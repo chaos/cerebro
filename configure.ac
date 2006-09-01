@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.73 2006-08-27 22:03:32 chu11 Exp $
+## $Id: configure.ac,v 1.74 2006-09-01 20:32:38 chu11 Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -170,6 +170,8 @@ AM_CONDITIONAL(WITH_METRIC_STATIC_MODULES,
                [(test "$ac_with_static_modules" = "yes") &&
                 (test "$ac_with_boottime" = "yes" || 
                  test "$ac_with_loadavg" = "yes" || 
+                 test "$ac_with_memory" = "yes" || 
+                 test "$ac_with_network" = "yes" || 
                  test "$ac_with_slurm_state" = "yes")])
 
 # Placeholder, please don't dailywtf me :-)

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_memory.c,v 1.5 2006-08-27 21:40:50 chu11 Exp $
+ *  $Id: cerebro_metric_memory.c,v 1.6 2006-09-01 20:32:38 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -55,8 +55,6 @@
 # endif /* !HAVE_SYS_TIME_H */
 #endif /* !TIME_WITH_SYS_TIME */
 
-#include <assert.h>
-
 #include "cerebro.h"
 #include "cerebro/cerebro_metric_module.h"
 
@@ -92,9 +90,23 @@ _read_memory(int fd,
   unsigned long int memval;
   int rv = -1;
 
-  assert(buf);
-  assert(keyword);
-  assert(memvalptr);
+  if (!buf)
+    {
+      CEREBRO_DBG(("buf null"));
+      goto cleanup;
+    }
+
+  if (!keyword)
+    {
+      CEREBRO_DBG(("keyword null"));
+      goto cleanup;
+    }
+
+  if (!memvalptr)
+    {
+      CEREBRO_DBG(("memvalptr null"));
+      goto cleanup;
+    }
 
   if (!(parseptr = strstr(buf, keyword)))
     {

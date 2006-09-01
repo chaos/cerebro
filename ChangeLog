@@ -1,3 +1,8 @@
+2006-09-01  Albert Chu  <chu11@llnl.gov>
+
+	* src/modules/metric/cerebro_metric_memory.c (_read_memory):
+	Replace asserts with DBG calls.
+	
 2006-08-27  Albert Chu  <chu11@llnl.gov>
 
 	* src/modules/metric/cerebro_metric_memory.h,
