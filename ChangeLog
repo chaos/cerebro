@@ -2,6 +2,8 @@
 
 	* src/modules/metric/cerebro_metric_memory.c (_read_memory):
 	Replace asserts with DBG calls.
+
+	* man/cerebro_module.3.in: Fixed typo.
 	
 2006-08-27  Albert Chu  <chu11@llnl.gov>
 
