@@ -1,3 +1,8 @@
+2006-09-05  Albert Chu  <chu11@llnl.gov>
+
+	* src/cerebrod/cerebrod_listener.c (cerebrod_listener): Fix
+	mem-leak corner case.
+	
 2006-09-01  Albert Chu  <chu11@llnl.gov>
 
 	* src/modules/metric/cerebro_metric_memory.c (_read_memory):

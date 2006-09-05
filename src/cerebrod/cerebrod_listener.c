@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.125 2006-07-03 20:40:50 chu11 Exp $
+ *  $Id: cerebrod_listener.c,v 1.126 2006-09-05 17:14:30 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -476,6 +476,7 @@ cerebrod_listener(void *arg)
       if (!strlen(nodename_buf))
         {
           CEREBRO_DBG(("received null nodename"));
+          cerebrod_heartbeat_destroy(hb);
           continue;
         }
 
@@ -486,6 +487,7 @@ cerebrod_listener(void *arg)
       if (!flag)
 	{
 	  CEREBRO_DBG(("received non-cluster packet: %s", nodename_buf));
+          cerebrod_heartbeat_destroy(hb);
 	  continue;
 	}
       
@@ -497,6 +499,7 @@ cerebrod_listener(void *arg)
 					  CEREBRO_MAX_NODENAME_LEN+1) < 0)
 	{
 	  CEREBRO_DBG(("clusterlist_module_get_nodename: %s", nodename_buf));
+          cerebrod_heartbeat_destroy(hb);
 	  continue;
 	}
 
