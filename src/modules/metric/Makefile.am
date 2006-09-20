@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.22 2006-08-27 22:03:32 chu11 Exp $
+## $Id: Makefile.am,v 1.23 2006-09-20 16:47:24 chu11 Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -54,7 +54,7 @@ SWAPFREE_METRIC_MODULE = cerebro_metric_swapfree.la
 SWAPFREE_STATIC_SOURCES = cerebro_metric_swapfree.c
 endif
 
-if WITH_MEMORY
+if WITH_NETWORK
 NETWORK_STATIC_SOURCES = cerebro_metric_network.c
 
 BYTESIN_METRIC_MODULE = cerebro_metric_bytesin.la

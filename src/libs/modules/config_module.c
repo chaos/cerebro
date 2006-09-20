@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: config_module.c,v 1.15 2005-08-23 21:10:14 achu Exp $
+ *  $Id: config_module.c,v 1.16 2006-09-20 16:47:24 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -51,14 +51,6 @@
 
 #if WITH_STATIC_MODULES
 
-#if WITH_CHAOS_CONFIG
-extern struct cerebro_config_module_info chaos_config_module_info;
-#endif /* WITH_CHAOS_CONFIG */
-                                                                                      
-#if WITH_BGL_CONFIG
-extern struct cerebro_config_module_info bgl_config_module_info;
-#endif /* WITH_BGL_CONFIG */
-
 /*
  * config_modules
  *
@@ -66,12 +58,6 @@ extern struct cerebro_config_module_info bgl_config_module_info;
  */
 void *config_modules[] =
   {
-#if WITH_CHAOS_CONFIG
-    &chaos_config_module_info,
-#endif /* WITH_CHAOS_CONFIG */
-#if WITH_BGL_CONFIG
-    &bgl_config_module_info,
-#endif /* WITH_BGL_CONFIG */
     NULL
   };
 
@@ -83,8 +69,6 @@ void *config_modules[] =
  * dynamic configuration modules to search for by default
  */
 char *config_modules[] = {
-  "cerebro_config_chaos.so",
-  "cerebro_config_bgl.so",
   NULL
 };
 

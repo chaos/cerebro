@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: metric_module.c,v 1.16 2006-02-27 22:42:26 chu11 Exp $
+ *  $Id: metric_module.c,v 1.17 2006-09-20 16:47:24 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -58,9 +58,17 @@ extern struct cerebro_metric_module_info boottime_metric_module_info;
 extern struct cerebro_metric_module_info slurm_state_metric_module_info;
 #endif /* WITH_SLURM_STATE */
 
-#if WITH_BGL_CIOD
-extern struct cerebro_metric_module_info bgl_ciod_metric_module_info;
-#endif /* WITH_BGL_CIOD */
+#if WITH_LOADAVG
+extern struct cerebro_metric_module_info loadavg_metric_module_info;
+#endif /* WITH_LOADAVG */
+
+#if WITH_MEMORY
+extern struct cerebro_metric_module_info memory_metric_module_info;
+#endif /* WITH_MEMORY */
+
+#if WITH_NETWORK
+extern struct cerebro_metric_module_info network_metric_module_info;
+#endif /* WITH_NETWORK */
 
 /*
  * metric_modules
@@ -75,9 +83,15 @@ void *metric_modules[] =
 #if WITH_SLURM_STATE
     &slurm_state_metric_module_info,
 #endif /* WITH_SLURM_STATE */
-#if WITH_BGL_CIOD
-    &bgl_ciod_metric_module_info,
-#endif /* WITH_BGL_CIOD */
+#if WITH_LOADAVG
+    &loadavg_metric_module_info,
+#endif /* WITH_LOADAVG */
+#if WITH_MEMORY
+    &memory_metric_module_info,
+#endif /* WITH_MEMORY */
+#if WITH_NETWORK
+    &network_metric_module_info,
+#endif /* WITH_NETWORK */
     NULL
   };
 

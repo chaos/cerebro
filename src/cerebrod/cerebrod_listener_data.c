@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.31 2006-08-27 18:27:34 chu11 Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.32 2006-09-20 16:47:24 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -295,7 +295,7 @@ _setup_monitor_modules(void)
         {
           Pthread_mutex_lock(&debug_output_mutex);
           fprintf(stderr, "**************************************\n");
-          fprintf(stderr, "* Settup up Monitor Module: %s\n", module_name);
+          fprintf(stderr, "* Setup Monitor Module: %s\n", module_name);
           fprintf(stderr, "**************************************\n");
           Pthread_mutex_unlock(&debug_output_mutex);
         }

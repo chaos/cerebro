@@ -1,3 +1,20 @@
+2006-09-20  Albert Chu  <chu11@llnl.gov>
+
+	* src/cerebrod/cerebrod_listener_data.c (_setup_monitor_modules): Fix typo.
+
+	* src/libs/modules/config_module.c,
+	src/libs/modules/metric_module.c,
+	src/libs/modules/monitor_module.c: Remove forgotten localisms.
+
+	* src/libs/modules/metric_module.c: Add forgotten modules.
+	
+	* src/modules/metric/Makefile.am: Fix typo.
+	
+2006-09-19  Albert Chu  <chu11@llnl.gov>
+
+	* src/cerebrod/cerebrod_listener_data.c (_setup_monitor_modules):
+	Fix typo.
+	
 2006-09-05  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerebrod/cerebrod_listener.c (cerebrod_listener): Fix

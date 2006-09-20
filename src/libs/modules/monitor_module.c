@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: monitor_module.c,v 1.14 2006-02-27 18:38:18 chu11 Exp $
+ *  $Id: monitor_module.c,v 1.15 2006-09-20 16:47:24 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -50,16 +50,6 @@
 
 #if WITH_STATIC_MODULES
 
-/* 
- * The bootlog module cannot be built statically, b/c the qsql library
- * requires dynamically loadable modules
- */
-#if 0
-#if WITH_BOOTLOG
-extern struct cerebro_monitor_module_info bootlog_monitor_module_info;
-#endif /* WITH_BOOTLOG */
-#endif /* 0 */
-
 /*
  * monitor_modules
  *
@@ -67,11 +57,6 @@ extern struct cerebro_monitor_module_info bootlog_monitor_module_info;
  */
 void *monitor_modules[] =
   {
-#if 0
-#if WITH_BOOTLOG
-    &bootlog_monitor_module_info,
-#endif /* WITH_BOOTLOG */
-#endif /* 0 */
     NULL
   };
 
