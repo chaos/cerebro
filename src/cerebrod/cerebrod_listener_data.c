@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.32 2006-09-20 16:47:24 chu11 Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.33 2006-09-22 16:32:18 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -244,6 +244,7 @@ static int
 _setup_monitor_modules(void)
 {
   int i, monitor_module_count, monitor_index_len;
+  List monitor_list = NULL;
 
   if (!(monitor_handle = monitor_modules_load(conf.monitor_max)))
     {
@@ -281,7 +282,9 @@ _setup_monitor_modules(void)
   monitor_index = Hash_create(monitor_index_len, 
                               (hash_key_f)hash_key_string, 
                               (hash_cmp_f)strcmp, 
-                              (hash_del_f)cerebrod_monitor_module_destroy);
+                              (hash_del_f)list_destroy);
+
+  
 
   for (i = 0; i < monitor_module_count; i++)
     {
@@ -321,19 +324,37 @@ _setup_monitor_modules(void)
 
       if (!strchr(monitor_module->metric_names, ','))
         {
-          Hash_insert(monitor_index, monitor_module->metric_names, monitor_module);
-          monitor_index_size++;
+	  if (!(monitor_list = Hash_find(monitor_index, monitor_module->metric_names)))
+	    {
+	      monitor_list = List_create((ListDelF)cerebrod_monitor_module_destroy);
+	      List_append(monitor_list, monitor_module);
+	      Hash_insert(monitor_index, monitor_module->metric_names, monitor_list);
+	      monitor_index_size++;
+	    }
+	  else
+	    List_append(monitor_list, monitor_module);
         }
       else
         {
           char *metric, *metricbuf;
-          /* This monitoring module supports multiple metrics, must parse */
+
+          /* This monitoring module supports multiple metrics, must
+	   * parse out each one
+	   */
           
           metric = strtok_r(monitor_module->metric_names, ",", &metricbuf);
           while (metric)
             {
-              Hash_insert(monitor_index, metric, monitor_module);
-              monitor_index_size++;
+	      if (!(monitor_list = Hash_find(monitor_index, monitor_module->metric_names)))
+		{
+		  monitor_list = List_create((ListDelF)cerebrod_monitor_module_destroy);
+		  List_append(monitor_list, monitor_module);
+		  Hash_insert(monitor_index, monitor_module->metric_names, monitor_list);
+		  monitor_index_size++;
+		}
+	      else
+		List_append(monitor_list, monitor_module);
+
               metric = strtok_r(NULL, ",", &metricbuf);
             }
         }
@@ -810,6 +831,8 @@ _monitor_update(const char *nodename,
                 struct cerebrod_heartbeat_metric *hd)
 {
   struct cerebrod_monitor_module *monitor_module;
+  List monitor_list;
+
 #if CEREBRO_DEBUG
   int rv;
 #endif /* CEREBRO_DEBUG */
@@ -825,18 +848,25 @@ _monitor_update(const char *nodename,
   if (rv != EBUSY)
     CEREBRO_EXIT(("mutex not locked: rv=%d", rv));
 #endif /* CEREBRO_DEBUG */
-  
-  if ((monitor_module = Hash_find(monitor_index, metric_name)))
+
+  if ((monitor_list = Hash_find(monitor_index, metric_name)))
     {
-      Pthread_mutex_lock(&monitor_module->monitor_lock);
-      monitor_module_metric_update(monitor_handle,
-                                   monitor_module->index,
-                                   nodename,
-                                   metric_name,
-                                   hd->metric_value_type,
-                                   hd->metric_value_len,
-                                   hd->metric_value);
-      Pthread_mutex_unlock(&monitor_module->monitor_lock);
+      ListIterator itr = NULL;
+
+      itr = List_iterator_create(monitor_list);
+      while ((monitor_module = list_next(itr)))
+	{
+	  Pthread_mutex_lock(&monitor_module->monitor_lock);
+	  monitor_module_metric_update(monitor_handle,
+				       monitor_module->index,
+				       nodename,
+				       metric_name,
+				       hd->metric_value_type,
+				       hd->metric_value_len,
+				       hd->metric_value);
+	  Pthread_mutex_unlock(&monitor_module->monitor_lock);
+	}
+      List_iterator_destroy(itr);
     }
 }
 

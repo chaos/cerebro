@@ -2,6 +2,9 @@
 
 	* src/cerebrod/cerebrod_speaker_data.c (_metric_is_updated): Fix
 	mem-leak.
+
+	* src/cerebrod/cerebrod_listener_data.c: Support multiple monitor
+	modules per metric name.
 	
 2006-09-20  Albert Chu  <chu11@llnl.gov>
 
