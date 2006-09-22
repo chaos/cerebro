@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker_data.c,v 1.38 2006-08-27 21:35:51 chu11 Exp $
+ *  $Id: cerebrod_speaker_data.c,v 1.39 2006-09-22 15:57:02 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -144,6 +144,7 @@ _metric_is_updated(char *metric_name)
     CEREBRO_DBG(("metric '%s' not found", metric_name));
 #endif /* CEREBRO_DEBUG */
 
+  List_iterator_destroy(itr);
   return (found) ? 0 : -1;
 }
 
