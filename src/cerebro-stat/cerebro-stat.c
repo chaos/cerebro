@@ -452,9 +452,9 @@ _metric_value_str(struct node_metric_data *data, char *buf, unsigned int buflen)
   else if (mtype == CEREBRO_METRIC_VALUE_TYPE_STRING)
     rv = snprintf(buf, buflen, "%s", (char *)data->metric_value);
   else if (mtype == CEREBRO_METRIC_VALUE_TYPE_INT64)
-    rv = snprintf(buf, buflen, "%lld", *((int64_t *)data->metric_value));
+    rv = snprintf(buf, buflen, "%ld", *((int64_t *)data->metric_value));
   else if (mtype == CEREBRO_METRIC_VALUE_TYPE_U_INT64)
-    rv = snprintf(buf, buflen, "%llu", *((u_int64_t *)data->metric_value));
+    rv = snprintf(buf, buflen, "%lu", *((u_int64_t *)data->metric_value));
   
   if (rv >= buflen)
     err_exit("%s: truncated output: %d", func, mlen);

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.33 2006-09-22 16:32:18 chu11 Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.34 2006-09-22 18:02:45 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -595,9 +595,9 @@ _metric_data_dump(void *data, const void *key, void *arg)
       Free(buf);
     }
   else if (md->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_INT64)
-    fprintf(stderr, "metric_value=%d", *((int64_t *)md->metric_value));
+    fprintf(stderr, "metric_value=%ld", *((int64_t *)md->metric_value));
   else if (md->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_U_INT64)
-    fprintf(stderr, "metric_value=%u", *((u_int64_t *)md->metric_value));
+    fprintf(stderr, "metric_value=%lu", *((u_int64_t *)md->metric_value));
   fprintf(stderr, "\n");
 
   return 1;

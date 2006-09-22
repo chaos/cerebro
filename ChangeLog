@@ -5,6 +5,8 @@
 
 	* src/cerebrod/cerebrod_listener_data.c: Support multiple monitor
 	modules per metric name.
+
+	* src/cerebrod, src/cerebro-stat: Fix compiler warnings.
 	
 2006-09-20  Albert Chu  <chu11@llnl.gov>
 
