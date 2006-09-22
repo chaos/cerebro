@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.34 2006-09-22 18:02:45 chu11 Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.35 2006-09-22 23:15:46 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -345,11 +345,11 @@ _setup_monitor_modules(void)
           metric = strtok_r(monitor_module->metric_names, ",", &metricbuf);
           while (metric)
             {
-	      if (!(monitor_list = Hash_find(monitor_index, monitor_module->metric_names)))
+	      if (!(monitor_list = Hash_find(monitor_index, metric)))
 		{
 		  monitor_list = List_create((ListDelF)cerebrod_monitor_module_destroy);
 		  List_append(monitor_list, monitor_module);
-		  Hash_insert(monitor_index, monitor_module->metric_names, monitor_list);
+		  Hash_insert(monitor_index, metric, monitor_list);
 		  monitor_index_size++;
 		}
 	      else
