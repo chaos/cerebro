@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.74 2006-09-01 20:32:38 chu11 Exp $
+## $Id: configure.ac,v 1.75 2006-09-25 17:29:10 chu11 Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -216,6 +216,8 @@ ACX_PTHREAD([], AC_MSG_ERROR([Posix threads required to build]))
 # CFLAGS="$PTHREAD_CFLAGS $CFLAGS"
 
 AC_DEFINE(WITH_LSD_FATAL_ERROR_FUNC, 1, [Define lsd_fatal_error])
+
+AC_CHECK_SIZEOF([long])
 
 ##
 # Epilogue.

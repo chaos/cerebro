@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_heartbeat.c,v 1.47 2006-09-22 18:02:45 chu11 Exp $
+ *  $Id: cerebrod_heartbeat.c,v 1.48 2006-09-25 17:29:10 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -134,6 +134,16 @@ cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb)
           fprintf(stderr, "value = %s", buf);
           Free(buf);
           break;
+#if SIZEOF_LONG == 4
+        case CEREBRO_METRIC_VALUE_TYPE_INT64:
+          fprintf(stderr, "value = %lld", 
+                  *((int64_t *)hb->metrics[i]->metric_value));
+          break;
+        case CEREBRO_METRIC_VALUE_TYPE_U_INT64:
+          fprintf(stderr, "value = %llu", 
+                  *((u_int64_t *)hb->metrics[i]->metric_value));
+          break;
+#else  /* SIZEOF_LONG == 8 */
         case CEREBRO_METRIC_VALUE_TYPE_INT64:
           fprintf(stderr, "value = %ld", 
                   *((int64_t *)hb->metrics[i]->metric_value));
@@ -142,6 +152,7 @@ cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb)
           fprintf(stderr, "value = %lu", 
                   *((u_int64_t *)hb->metrics[i]->metric_value));
           break;
+#endif /* SIZEOF_LONG == 8 */
         default:
           break;
         }

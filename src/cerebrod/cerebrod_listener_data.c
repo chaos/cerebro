@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.35 2006-09-22 23:15:46 chu11 Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.36 2006-09-25 17:29:10 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -594,11 +594,19 @@ _metric_data_dump(void *data, const void *key, void *arg)
       fprintf(stderr, "metric_value=%s", buf);
       Free(buf);
     }
+#if SIZEOF_LONG == 4
+  else if (md->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_INT64)
+    fprintf(stderr, "metric_value=%lld", *((int64_t *)md->metric_value));
+  else if (md->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_U_INT64)
+    fprintf(stderr, "metric_value=%llu", *((u_int64_t *)md->metric_value));
+  fprintf(stderr, "\n");
+#else /* SIZEOF_LONG == 8 */
   else if (md->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_INT64)
     fprintf(stderr, "metric_value=%ld", *((int64_t *)md->metric_value));
   else if (md->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_U_INT64)
     fprintf(stderr, "metric_value=%lu", *((u_int64_t *)md->metric_value));
   fprintf(stderr, "\n");
+#endif /* SIZEOF_LONG == 8 */
 
   return 1;
 }
