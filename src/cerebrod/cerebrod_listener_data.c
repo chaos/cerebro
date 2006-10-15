@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.36 2006-09-25 17:29:10 chu11 Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.37 2006-10-15 04:41:14 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -274,7 +274,7 @@ _setup_monitor_modules(void)
     }
   
   /* Each monitor module may wish to monitor multiple metrics.  We'll
-   * assuem there will never be more than 2 metrics per monitor module, and
+   * assume there will never be more than 2 metrics per monitor module, and
    * that will be enough to avoid all hash collisions.
    */
   monitor_index_len = monitor_module_count * 2;
