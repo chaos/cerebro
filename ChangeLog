@@ -1,3 +1,10 @@
+2006-XX-XX  Albert Chu  <chu11@llnl.gov>
+
+	Cerebro Event Monitoring Support
+
+	* src/libs/include/cerebro_event_protocol.h,
+	src/libs/include/cerebro_event_module.h: New files.
+
 2006-10-05  Albert Chu  <chu11@llnl.gov>
 
 	* configure.ac: Fixed library versioning mistake.  Up revision,
