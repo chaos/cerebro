@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.76.2.1 2006-10-17 06:18:12 chu11 Exp $
+## $Id: configure.ac,v 1.76.2.2 2006-10-24 05:23:00 chu11 Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -156,7 +156,7 @@ AM_CONDITIONAL(WITH_SHUTDOWN, [test "$ac_with_shutdown" = "yes"])
 # Check to build updown_event module
 #
 AC_UPDOWN_EVENT
-AM_CONDITIONAL(WITH_UPDOWN_EVENT, [test "$ac_with_update_event" = "yes"])
+AM_CONDITIONAL(WITH_UPDOWN_EVENT, [test "$ac_with_updown_event" = "yes"])
 
 #
 # Determine which static module libraries do not need to be linked

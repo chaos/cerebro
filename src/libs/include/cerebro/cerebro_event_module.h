@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_event_module.h,v 1.1.2.1 2006-10-16 14:50:21 chu11 Exp $
+ *  $Id: cerebro_event_module.h,v 1.1.2.2 2006-10-24 05:23:00 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -83,7 +83,7 @@ typedef int (*Cerebro_event_timeout_length)(void);
  * Returns 1 if event generated, 0 if not, -1 on error
  */
 typedef int (*Cerebro_event_node_timeout)(const char *nodename,
-                                          struct cerebro_event *event);
+                                          struct cerebro_event **event);
 
 /*
  * Cerebro_event_metric_data
@@ -99,7 +99,7 @@ typedef int (*Cerebro_event_metric_data)(const char *nodename,
                                          unsigned int metric_value_type,
                                          unsigned int metric_value_len,
                                          void *metric_value,
-                                         struct cerebro_event *event);
+                                         struct cerebro_event **event);
 
 /*
  * struct cerebro_event_module_info 

@@ -25,6 +25,8 @@ Future Features
 
 - event based monitoring
 
+- event based message generation/sending
+
 - Malloc looping
   - so can try to avoid dieing on low memory conditions
     (i.e. before the linux oom killer finishes its job)

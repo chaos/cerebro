@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_event_protocol.h,v 1.1.2.1 2006-10-16 14:50:21 chu11 Exp $
+ *  $Id: cerebro_event_protocol.h,v 1.1.2.2 2006-10-24 05:23:00 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -30,6 +30,8 @@
 
 #include <sys/types.h>
 #include <cerebro/cerebro_constants.h>
+
+#define CEREBRO_EVENT_PROTOCOL_VERSION 1
 
 /* 
  * struct cerebro_event
