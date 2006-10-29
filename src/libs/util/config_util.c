@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: config_util.c,v 1.15 2006-07-03 20:40:50 chu11 Exp $
+ *  $Id: config_util.c,v 1.16 2006-10-29 19:02:13 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -572,17 +572,6 @@ _load_config_file(struct cerebro_config *conf, unsigned int *errnum)
 	&(conf->cerebrod_metric_max), 
 	0
       },
-      {
-	"cerebrod_monitor_max", 
-	CONFFILE_OPTION_INT, 
-	-1,
-	conffile_int, 
-	1, 
-	0, 
-	&(conf->cerebrod_monitor_max_flag),
-	&(conf->cerebrod_monitor_max), 
-	0
-      },
 #if CEREBRO_DEBUG
       {
 	"cerebrod_speak_debug", 
@@ -840,12 +829,6 @@ _set_cerebro_config(struct cerebro_config *dest,
     {
       dest->cerebrod_metric_max = src->cerebrod_metric_max;
       dest->cerebrod_metric_max_flag++;
-    }
-
-  if (!dest->cerebrod_monitor_max_flag && src->cerebrod_monitor_max_flag)
-    {
-      dest->cerebrod_monitor_max = src->cerebrod_monitor_max;
-      dest->cerebrod_monitor_max_flag++;
     }
 
 #if CEREBRO_DEBUG

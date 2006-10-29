@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: vector.c,v 1.2 2006-10-29 17:09:37 chu11 Exp $
+ *  $Id: vector.c,v 1.3 2006-10-29 19:02:13 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -192,7 +192,7 @@ _alloc_data (Vector v, unsigned int length_increase)
   assert(vector_mutex_is_locked(&(v->mutex)));
   assert(length_increase);
 
-  if (!(ptr = (void **)realloc(v->data, length_increase)))
+  if (!(ptr = (void **)realloc(v->data, (v->length + length_increase)*sizeof(void *))))
     {
       errno = ENOMEM;
       return lsd_nomem_error(__FILE__, __LINE__, "data create");
@@ -355,6 +355,7 @@ vector_set (Vector v, void *x, unsigned int index)
             }
         }
       v->data[index] = x;
+      rv = x;
     }
   else
     {
@@ -363,6 +364,7 @@ vector_set (Vector v, void *x, unsigned int index)
 
       v->data[v->length - 1] = x;
       v->count++;
+      rv = x;
     }
 
  cleanup:

@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro_module_devel.3.in,v 1.16 2006-07-03 20:40:49 chu11 Exp $
+\."$Id: cerebro_module_devel.3.in,v 1.17 2006-10-29 19:02:12 chu11 Exp $
 \."#############################################################################
 \."  Copyright (C) 2005 The Regents of the University of California.
 \."  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -230,8 +230,6 @@ struct cerebro_config {
   int cerebrod_metric_server_port_flag;
   int cerebrod_metric_max;
   int cerebrod_metric_max_flag;
-  int cerebrod_monitor_max;
-  int cerebrod_monitor_max_flag;
 .if @MANPAGE_DEBUG@ \{
   int cerebrod_speak_debug;
   int cerebrod_speak_debug_flag;
@@ -331,11 +329,6 @@ The 'cerebrod_metric_max' field stores the maximum number of
 additional metrics the 
 .BR cerebrod(8)
 speaker is allowed to distribute.
-
-The 'cerebrod_monitor_max' field stores the maximum number of 
-metric monitors the 
-.BR cerebrod(8)
-listener is allowed to load.
 
 .if @MANPAGE_DEBUG@ \{
 

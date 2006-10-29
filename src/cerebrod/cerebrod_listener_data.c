@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.37 2006-10-15 04:41:14 chu11 Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.38 2006-10-29 19:02:13 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -246,7 +246,7 @@ _setup_monitor_modules(void)
   int i, monitor_module_count, monitor_index_len;
   List monitor_list = NULL;
 
-  if (!(monitor_handle = monitor_modules_load(conf.monitor_max)))
+  if (!(monitor_handle = monitor_modules_load()))
     {
       CEREBRO_DBG(("monitor_modules_load"));
       goto monitor_cleanup;
