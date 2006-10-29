@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: vector.c,v 1.1 2006-10-29 17:04:24 chu11 Exp $
+ *  $Id: vector.c,v 1.2 2006-10-29 17:09:37 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -283,7 +283,7 @@ vector_is_empty (Vector v)
   assert(v->magic == VECTOR_MAGIC);
   n = v->count;
   vector_mutex_unlock(&v->mutex);
-  return (v->count == 0);
+  return (n == 0);
 }
 
 int
@@ -326,6 +326,7 @@ vector_append (Vector v, void *x)
     goto cleanup;
 
   v->data[v->length - 1] = x;
+  v->count++;
   rv = x;
 
  cleanup:
@@ -361,6 +362,7 @@ vector_set (Vector v, void *x, unsigned int index)
         goto cleanup;
 
       v->data[v->length - 1] = x;
+      v->count++;
     }
 
  cleanup:
