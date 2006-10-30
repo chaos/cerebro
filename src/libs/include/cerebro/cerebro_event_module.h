@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_event_module.h,v 1.1.2.3 2006-10-30 17:51:08 chu11 Exp $
+ *  $Id: cerebro_event_module.h,v 1.1.2.4 2006-10-30 20:14:55 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -51,13 +51,22 @@ typedef int (*Cerebro_event_setup)(void);
 typedef int (*Cerebro_event_cleanup)(void);
 
 /*
+ * Cerebro_event_event_names
+ *
+ * function prototype for event module to return the event name(s)
+ * this module may generate.  Separate event names are comma separated.
+ *
+ * Returns event name(s) on success, -1 on error
+ */
+typedef char *(*Cerebro_event_event_names)(void);
+
+/*
  * Cerebro_event_metric_names
  *
  * function prototype for event module to return the metric name(s)
- * this module wishes to event.  Separate metric names are comma
- * separated.
+ * this module needs.  Separate metric names are comma separated.
  *
- * Returns metric name on success, -1 on error
+ * Returns metric name(s) on success, -1 on error
  */
 typedef char *(*Cerebro_event_metric_names)(void);
 
@@ -110,9 +119,9 @@ typedef int (*Cerebro_event_metric_update)(const char *nodename,
 struct cerebro_event_module_info
 {
   char *event_module_name;
-  char *event_name;
   Cerebro_event_setup setup;
   Cerebro_event_cleanup cleanup;
+  Cerebro_event_event_names event_names;
   Cerebro_event_metric_names metric_names;
   Cerebro_event_timeout_length timeout_length;
   Cerebro_event_node_timeout node_timeout;

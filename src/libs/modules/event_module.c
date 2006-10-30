@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: event_module.c,v 1.1.2.1 2006-10-30 19:55:34 chu11 Exp $
+ *  $Id: event_module.c,v 1.1.2.2 2006-10-30 20:14:55 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -134,9 +134,9 @@ _event_module_cb(void *handle, void *dl_handle, void *module_info)
     }
 
   if (!event_module_info->event_module_name
-      || !event_module_info->event_name
       || !event_module_info->setup
       || !event_module_info->cleanup
+      || !event_module_info->event_names
       || !event_module_info->metric_names
       || !event_module_info->timeout_length
       || !event_module_info->node_timeout

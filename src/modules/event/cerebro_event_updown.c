@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_event_updown.c,v 1.1.2.3 2006-10-30 17:51:08 chu11 Exp $
+ *  $Id: cerebro_event_updown.c,v 1.1.2.4 2006-10-30 20:14:55 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -47,6 +47,7 @@
 #include "list.h"
 
 #define UPDOWN_EVENT_MODULE_NAME     "updown"
+#define UPDOWN_EVENT_NAMES           "updown"
 #define UPDOWN_EVENT_NAME            "updown"
 #define UPDOWN_EVENT_METRIC_NAMES    "boottime"
 #define UPDOWN_EVENT_TIMEOUT_LENGTH  60
@@ -118,6 +119,17 @@ static int
 updown_event_cleanup(void)
 {
   return 0;
+}
+
+/*
+ * updown_event_event_names
+ *
+ * updown event module event_names function
+ */
+static char *
+updown_event_event_names(void)
+{
+  return UPDOWN_EVENT_NAMES;
 }
 
 /*
@@ -309,9 +321,9 @@ struct cerebro_event_module_info event_module_info =
 #endif /* !WITH_STATIC_MODULES */
   {
     UPDOWN_EVENT_MODULE_NAME,
-    UPDOWN_EVENT_NAME,
     &updown_event_setup,
     &updown_event_cleanup,
+    &updown_event_event_names,
     &updown_event_metric_names,
     &updown_event_timeout_length,
     &updown_event_node_timeout,
