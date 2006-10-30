@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: vector.c,v 1.3 2006-10-29 19:02:13 chu11 Exp $
+ *  $Id: vector.c,v 1.4 2006-10-30 17:08:52 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -400,7 +400,6 @@ vector_get (Vector v, unsigned int index)
     {
       errno = EINVAL;
       goto cleanup;
-
     }
   rv = v->data[index];
 
