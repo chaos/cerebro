@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_control_protocol.h.in,v 1.7 2006-02-22 06:08:28 chu11 Exp $
+ *  $Id: cerebro_metric_control_protocol.h.in,v 1.7.2.1 2006-10-30 00:58:34 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -57,6 +57,7 @@
 #define CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_METRIC_INVALID    3
 #define CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_PARAMETER_INVALID 4
 #define CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_PACKET_INVALID    5
+/* CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_METRIC_MAX currently not possible */
 #define CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_METRIC_MAX        6
 #define CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_INTERNAL_ERROR    7
 

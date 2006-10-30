@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: vector.h,v 1.1 2006-10-29 17:04:24 chu11 Exp $
+ *  $Id: vector.h,v 1.1.2.1 2006-10-30 00:58:34 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).

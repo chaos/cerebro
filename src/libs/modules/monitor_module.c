@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: monitor_module.c,v 1.15 2006-09-20 16:47:24 chu11 Exp $
+ *  $Id: monitor_module.c,v 1.15.2.1 2006-10-30 00:58:34 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -34,6 +34,7 @@
 #if STDC_HEADERS
 #include <string.h>
 #endif /* STDC_HEADERS */
+#include <limits.h>
 #include <errno.h>
 
 #include "cerebro.h"
@@ -47,6 +48,7 @@
 #if !WITH_STATIC_MODULES
 #include "ltdl.h"
 #endif /* !WITH_STATIC_MODULES */
+#include "vector.h"
 
 #if WITH_STATIC_MODULES
 
@@ -76,12 +78,11 @@ void *monitor_modules[] =
 struct monitor_module
 {
   int32_t magic;
-  unsigned int modules_max;
   unsigned int modules_count;
 #if !WITH_STATIC_MODULES
-  lt_dlhandle *dl_handle;
+  Vector dl_handles;
 #endif /* !WITH_STATIC_MODULES */
-  struct cerebro_monitor_module_info **module_info;
+  Vector module_infos;
 };
 
 /*
@@ -136,30 +137,34 @@ _monitor_module_cb(void *handle, void *dl_handle, void *module_info)
       return 0;
     }
 
-  if (monitor_handle->modules_count < monitor_handle->modules_max)
-    {
 #if !WITH_STATIC_MODULES
-      monitor_handle->dl_handle[monitor_handle->modules_count] = monitor_dl_handle;
-#endif /* !WITH_STATIC_MODULES */
-      monitor_handle->module_info[monitor_handle->modules_count] = monitor_module_info;
-      monitor_handle->modules_count++;
-      return 1;
+  if (!vector_set(monitor_handle->dl_handles, 
+                  monitor_dl_handle,
+                  monitor_handle->modules_count))
+    {
+      CEREBRO_DBG(("vector_set: %s", strerror(errno)));
+      return 0;
     }
-  else
-    return 0;
+#endif /* !WITH_STATIC_MODULES */
+  if (!vector_set(monitor_handle->module_infos,
+                  monitor_module_info, 
+                  monitor_handle->modules_count))
+    {
+      CEREBRO_DBG(("vector_set: %s", strerror(errno)));
+      vector_set(monitor_handle->dl_handles,
+                 NULL,
+                 monitor_handle->modules_count);
+      return 0;
+    }
+  monitor_handle->modules_count++;
+  return 1;
 }
 
 monitor_modules_t 
-monitor_modules_load(unsigned int modules_max)
+monitor_modules_load(void)
 {
   struct monitor_module *handle = NULL;
   int rv;
-
-  if (!modules_max)
-    {
-      CEREBRO_DBG(("modules_max invalid"));
-      return NULL;
-    }
 
   if (module_setup() < 0)
     return NULL;
@@ -171,30 +176,27 @@ monitor_modules_load(unsigned int modules_max)
     }
   memset(handle, '\0', sizeof(struct monitor_module));
   handle->magic = MONITOR_MODULE_MAGIC_NUMBER;
-  handle->modules_max = modules_max;
   handle->modules_count = 0;
 
 #if !WITH_STATIC_MODULES
-  if (!(handle->dl_handle = (lt_dlhandle *)malloc(sizeof(lt_dlhandle)*handle->modules_max)))
+  if (!(handle->dl_handles = vector_create((VectorDelF)lt_dlclose)))
     {
-      CEREBRO_DBG(("malloc: %s", strerror(errno)));
+      CEREBRO_DBG(("vector_create: %s", strerror(errno)));
       goto cleanup;
     }
-  memset(handle->dl_handle, '\0', sizeof(lt_dlhandle)*handle->modules_max);
 #endif /* !WITH_STATIC_MODULES */
   
-  if (!(handle->module_info = (struct cerebro_monitor_module_info * *)malloc(sizeof(struct cerebro_monitor_module_info *)*handle->modules_max)))
+  if (!(handle->module_infos = vector_create(NULL)))
     {
-      CEREBRO_DBG(("malloc: %s", strerror(errno)));
+      CEREBRO_DBG(("vector_create: %s", strerror(errno)));
       goto cleanup;
     }
-  memset(handle->module_info, '\0', sizeof(struct cerebro_monitor_module_info *)*handle->modules_max);
 
 #if WITH_STATIC_MODULES
   if ((rv = find_and_load_modules(monitor_modules,
                                   _monitor_module_cb,
                                   handle,
-                                  handle->modules_max)) < 0)
+                                  INT_MAX)) < 0)
     goto cleanup;
 #else  /* !WITH_STATIC_MODULES */
   if ((rv = find_and_load_modules(MONITOR_MODULE_DIR,
@@ -203,7 +205,7 @@ monitor_modules_load(unsigned int modules_max)
                                   _monitor_module_cb,
                                   MONITOR_MODULE_INFO_SYM,
                                   handle,
-                                  handle->modules_max)) < 0)
+                                  INT_MAX)) < 0)
     goto cleanup;
 #endif /* !WITH_STATIC_MODULES */
 
@@ -221,16 +223,11 @@ monitor_modules_load(unsigned int modules_max)
   if (handle)
     {
 #if !WITH_STATIC_MODULES
-      if (handle->dl_handle)
-        {
-          int i;
-          for (i = 0; i < handle->modules_count; i++)
-            lt_dlclose(handle->dl_handle[i]);
-          free(handle->dl_handle);
-        }
+      if (handle->dl_handles)
+        vector_destroy(handle->dl_handles);
 #endif /* !WITH_STATIC_MODULES */
-      if (handle->module_info)
-        free(handle->module_info);
+      if (handle->module_infos)
+        vector_destroy(handle->module_infos);
       free(handle);
     }
   module_cleanup();
@@ -290,23 +287,20 @@ monitor_modules_unload(monitor_modules_t handle)
     monitor_module_cleanup(handle, i);
 
 #if !WITH_STATIC_MODULES
-  if (handle->dl_handle)
+  if (handle->dl_handles)
     {
-      for (i = 0; i < handle->modules_count; i++)
-        lt_dlclose(handle->dl_handle[i]);
-      free(handle->dl_handle);
-      handle->dl_handle = NULL;
+      vector_destroy(handle->dl_handles);
+      handle->dl_handles = NULL;
     }
 #endif /* !WITH_STATIC_MODULES */
 
-  if (handle->module_info)
+  if (handle->module_infos)
     {
-      free(handle->module_info);
-      handle->module_info = NULL;
+      vector_destroy(handle->module_infos);
+      handle->module_infos = NULL;
     }
 
   handle->magic = ~MONITOR_MODULE_MAGIC_NUMBER;
-  handle->modules_max = 0;
   handle->modules_count = 0;
 
   free(handle);
@@ -328,37 +322,69 @@ monitor_modules_count(monitor_modules_t handle)
 char *
 monitor_module_name(monitor_modules_t handle, unsigned int index)
 {
+  struct cerebro_monitor_module_info *module_info;
+
   if (_handle_index_check(handle, index) < 0)
     return NULL;
 
-  return (handle->module_info[index])->monitor_module_name;
+  if (!(module_info = vector_get(handle->module_infos, index)))
+    {
+      CEREBRO_DBG(("vector_get: %s", strerror(errno)));
+      return NULL;
+    }
+
+  return module_info->monitor_module_name;
 }
 
 int 
 monitor_module_setup(monitor_modules_t handle, unsigned int index)
 {
+  struct cerebro_monitor_module_info *module_info;
+
   if (_handle_index_check(handle, index) < 0)
     return -1;
 
-  return ((*(handle->module_info[index])->setup)());
+  if (!(module_info = vector_get(handle->module_infos, index)))
+    {
+      CEREBRO_DBG(("vector_get: %s", strerror(errno)));
+      return -1;
+    }
+
+  return ((*module_info->setup)());
 }
 
 int 
 monitor_module_cleanup(monitor_modules_t handle, unsigned int index)
 {
+  struct cerebro_monitor_module_info *module_info;
+
   if (_handle_index_check(handle, index) < 0)
     return -1;
 
-  return ((*(handle->module_info[index])->cleanup)());
+  if (!(module_info = vector_get(handle->module_infos, index)))
+    {
+      CEREBRO_DBG(("vector_get: %s", strerror(errno)));
+      return -1;
+    }
+
+  return ((*module_info->cleanup)());
 }
 
 char *
 monitor_module_metric_names(monitor_modules_t handle, unsigned int index)
 {
+  struct cerebro_monitor_module_info *module_info;
+
   if (_handle_index_check(handle, index) < 0)
     return NULL;
 
-  return ((*(handle->module_info[index])->metric_names)());
+  if (!(module_info = vector_get(handle->module_infos, index)))
+    {
+      CEREBRO_DBG(("vector_get: %s", strerror(errno)));
+      return NULL;
+    }
+
+  return ((*module_info->metric_names)());
 }
 
 int 
@@ -370,12 +396,20 @@ monitor_module_metric_update(monitor_modules_t handle,
 			     unsigned int metric_value_len,
 			     void *metric_value)
 {
+  struct cerebro_monitor_module_info *module_info;
+
   if (_handle_index_check(handle, index) < 0)
     return -1;
 
-  return ((*(handle->module_info[index])->metric_update)(nodename,
-                                                         metric_name,
-                                                         metric_value_type,
-                                                         metric_value_len,
-                                                         metric_value));
+  if (!(module_info = vector_get(handle->module_infos, index)))
+    {
+      CEREBRO_DBG(("vector_get: %s", strerror(errno)));
+      return -1;
+    }
+
+  return ((*module_info->metric_update)(nodename,
+                                        metric_name,
+                                        metric_value_type,
+                                        metric_value_len,
+                                        metric_value));
 }

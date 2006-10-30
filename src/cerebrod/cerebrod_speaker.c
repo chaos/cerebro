@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.88 2006-07-03 20:40:50 chu11 Exp $
+ *  $Id: cerebrod_speaker.c,v 1.88.2.1 2006-10-30 00:58:34 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -344,6 +344,12 @@ cerebrod_speaker(void *arg)
 
       hb = _cerebrod_heartbeat_create(&buflen);
   
+      if (buflen >= CEREBRO_MAX_PACKET_LEN)
+        {
+          CEREBRO_DBG(("heartbeat exceeds maximum size: packet dropped"));
+          goto end_loop;
+        }
+
       buf = Malloc(buflen + 1);
 
       if ((hblen = _heartbeat_marshall(hb, buf, buflen)) < 0)
@@ -373,7 +379,8 @@ cerebrod_speaker(void *arg)
 
     end_loop:
       cerebrod_heartbeat_destroy(hb);
-      Free(buf);
+      if (buf)
+        Free(buf);
       sleep(sleep_time);
     }
 
@@ -414,6 +421,12 @@ cerebrod_send_heartbeat(struct cerebrod_heartbeat *hb)
       buflen += hb->metrics[i]->metric_value_len;
     }
 
+  if (buflen >= CEREBRO_MAX_PACKET_LEN)
+    {
+      CEREBRO_DBG(("heartbeat exceeds maximum size: packet dropped"));
+      goto cleanup;
+    }
+
   buf = Malloc(buflen + 1);
 
   if ((hblen = _heartbeat_marshall(hb, buf, buflen)) < 0)
@@ -444,7 +457,8 @@ cerebrod_send_heartbeat(struct cerebrod_heartbeat *hb)
     }
 
  cleanup:
-  Free(buf); 
+  if (buf)
+    Free(buf); 
   close(fd);
   return 0;
 }

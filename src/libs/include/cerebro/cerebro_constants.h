@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_constants.h,v 1.6 2006-07-03 20:40:50 chu11 Exp $
+ *  $Id: cerebro_constants.h,v 1.6.2.1 2006-10-30 00:58:34 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -38,7 +38,8 @@
 
 #define CEREBRO_MAX_PATH_LEN               512
 
-#define CEREBRO_MAX_PACKET_LEN             4096
+/* 65536 = 64K = Max UDP packet size */
+#define CEREBRO_MAX_PACKET_LEN             65536
 
 #define CEREBRO_MAX_IPADDR_LEN             64
 

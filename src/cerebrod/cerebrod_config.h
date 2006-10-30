@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.h,v 1.57 2006-08-26 16:06:56 chu11 Exp $
+ *  $Id: cerebrod_config.h,v 1.57.2.1 2006-10-30 00:58:34 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -54,8 +54,6 @@
 #define CEREBROD_METRIC_CONTROLLER_DEFAULT                   1
 #define CEREBROD_METRIC_SERVER_DEFAULT                       1
 #define CEREBROD_METRIC_SERVER_PORT_DEFAULT                  CEREBRO_METRIC_SERVER_PORT
-#define CEREBROD_METRIC_MAX_DEFAULT                          32
-#define CEREBROD_MONITOR_MAX_DEFAULT                         8
 #define CEREBROD_SPEAK_DEBUG_DEFAULT                         0
 #define CEREBROD_LISTEN_DEBUG_DEFAULT                        0
 #define CEREBROD_METRIC_CONTROLLER_DEBUG_DEFAULT             0
@@ -96,8 +94,6 @@ struct cerebrod_config
   int metric_controller;
   int metric_server;
   int metric_server_port;
-  int metric_max;
-  int monitor_max;
 
 #if CEREBRO_DEBUG
   int speak_debug;

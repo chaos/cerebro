@@ -9,6 +9,42 @@
 
 	* src/modules/event/cerebro_event_updown.c: New file.
 
+2006-10-29  Albert Chu  <chu11@llnl.gov>
+
+	* src/libs/common/vector.h, src/libs/common/vector.c: New files.
+
+	* src/libs/common/Makefile.am: Update appropriately.
+
+	Remove need for metric_max and monitor_max to limit number of
+	loadable modules.
+
+	* src/libs/modules/metric_module.h,
+	src/libs/modules/metric_module.c,
+	src/libs/modules/monitor_module.h,
+	src/libs/modules/monitor_module.c: Remove modules_max use, use
+	vectors instead.
+
+	* src/libs/util/config_util.c,
+	src/libs/include/cerebro/cerebro_config.h,
+	src/cerebrod/cerebrod_config.h, src/cerebrod/cerebrod_config.c,
+	src/cerebrod/cerebrod_listener_data.c,
+	src/cerebrod/cerebrod_speaker_data.c: Remove use of metric_max and
+	monitor_max as needed.
+	
+	* man/cerebro.conf.5.in, man/cerebro_module.3.in,
+	man/cerebro_module_devel.3.in: Adjust appropriately.
+
+	* src/libs/include/cerebro/cerebro_constants.h: Make
+	CEREBRO_MAX_PACKET_LEN same as max UDP size.
+
+	* src/cerebrod/cerebrod_listener.c (cerebrod_listener),
+	src/cerebrod/cerebrod_speaker.c (cerebrod_speaker,
+	cerebrod_speaker_send_heartbeat): Add checks for exceeded max
+	packet size.
+
+	* src/modules/metric/cerebro_metric_slurm_state.c
+	(slurm_state_metric_thread): Remove pointless check.
+
 2006-10-05  Albert Chu  <chu11@llnl.gov>
 
 	* configure.ac: Fixed library versioning mistake.  Up revision,

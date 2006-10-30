@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.126 2006-09-05 17:14:30 chu11 Exp $
+ *  $Id: cerebrod_listener.c,v 1.126.2.1 2006-10-30 00:58:34 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -290,12 +290,6 @@ _cerebrod_heartbeat_unmarshall(const char *buf, unsigned int buflen)
       return hb;
     }
   
-  if (hb->metrics_len > conf.metric_max)
-    {
-      CEREBRO_DBG(("reducing metrics_len: len=%d", hb->metrics_len));
-      hb->metrics_len = conf.metric_max;
-    }
-  
   size = sizeof(struct cerebrod_heartbeat_metric *)*(hb->metrics_len + 1);
   hb->metrics = Malloc(size);
   memset(hb->metrics, '\0', size);
@@ -401,20 +395,10 @@ _cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb)
 void *
 cerebrod_listener(void *arg)
 {
-  char *buf;
+  char buf[CEREBRO_MAX_PACKET_LEN];
   int buflen;
 
   _cerebrod_listener_initialize();
-
-  /* 
-   * Determine max buffer length since packets are variable length
-   */
-  buflen = CEREBROD_HEARTBEAT_HEADER_LEN + conf.metric_max * (CEREBROD_HEARTBEAT_METRIC_HEADER_LEN + CEREBRO_MAX_METRIC_STRING_LEN);
-  
-  if (buflen < CEREBRO_MAX_PACKET_LEN)
-    buflen = CEREBRO_MAX_PACKET_LEN;
-
-  buf = Malloc(buflen);
 
   for (;;)
     {
@@ -441,7 +425,12 @@ cerebrod_listener(void *arg)
         {
           if (FD_ISSET(listener_fds[i], &readfds))
             {
-              if ((recv_len = recvfrom(listener_fds[i], buf, buflen, 0, NULL, NULL)) < 0)
+              if ((recv_len = recvfrom(listener_fds[i], 
+                                       buf, 
+                                       CEREBRO_MAX_PACKET_LEN, 
+                                       0, 
+                                       NULL, 
+                                       NULL)) < 0)
                 listener_fds[i] = cerebrod_reinit_socket(listener_fds[i], 
                                                          i,
                                                          _listener_setup_socket, 
@@ -454,6 +443,12 @@ cerebrod_listener(void *arg)
       /* No packet read */
       if (recv_len <= 0)
 	continue;
+
+      if (recv_len >= CEREBRO_MAX_PACKET_LEN)
+        {
+	  CEREBRO_DBG(("received truncated packet"));
+          continue;
+        }
 
       if (_cerebrod_heartbeat_check_version(buf, recv_len) < 0)
         {

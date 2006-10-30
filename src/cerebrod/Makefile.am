@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.72 2005-08-25 22:04:32 achu Exp $
+## $Id: Makefile.am,v 1.72.2.1 2006-10-30 00:58:34 chu11 Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -40,7 +40,8 @@ CEREBROD_LDADDS = ../libs/cerebro_error/libcerebro_error.la \
 		  ../libs/common/libconffile.la \
 		  ../libs/common/libfd.la \
 		  ../libs/common/liblist.la \
-		  ../libs/common/libmarshall.la
+		  ../libs/common/libmarshall.la \
+		  ../libs/common/libvector.la
 else
 CEREBROD_LDADDS = ../libs/cerebro_error/libcerebro_error.la \
 		  ../libs/debug/libdebug.la \
@@ -60,7 +61,8 @@ CEREBROD_LDADDS = ../libs/cerebro_error/libcerebro_error.la \
 		  ../libs/common/libfd.la \
 		  ../libs/common/libhash.la \
 		  ../libs/common/liblist.la \
-		  ../libs/common/libmarshall.la
+		  ../libs/common/libmarshall.la \
+		  ../libs/common/libvector.la
 endif
 
 if !WITH_CEREBROD_NO_THREADS
@@ -113,6 +115,9 @@ cerebrod_LDADD   = $(CEREBROD_LDADDS) \
 	@cd `dirname $@` && make `basename $@`
 
 ../libs/common/libmarshall.la : force-dependency-check
+	@cd `dirname $@` && make `basename $@`
+
+../libs/common/libvector.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
 ../libs/debug/libdebug.la : force-dependency-check

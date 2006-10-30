@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_slurm_state.c,v 1.17 2006-02-22 06:08:28 chu11 Exp $
+ *  $Id: cerebro_metric_slurm_state.c,v 1.17.2.1 2006-10-30 00:58:34 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -323,7 +323,7 @@ slurm_state_metric_thread(void *arg)
                * sent.  We'll assume the connection died if partial
                * data was read.
                */
-              if (n > 0 && n < CEREBRO_MAX_PACKET_LEN)
+              if (n > 0)
                 {
                   CEREBRO_DBG(("unintended read: %d", n));
                   n = 0;

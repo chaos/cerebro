@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker_data.c,v 1.39 2006-09-22 15:57:02 chu11 Exp $
+ *  $Id: cerebrod_speaker_data.c,v 1.39.2.1 2006-10-30 00:58:34 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -177,7 +177,7 @@ _setup_metric_modules(void)
 #endif /* !WITH_CEREBROD_NO_THREADS */
 #endif /* CEREBRO_DEBUG */
 
-  if (!(metric_handle = metric_modules_load(conf.metric_max)))
+  if (!(metric_handle = metric_modules_load()))
     {
       CEREBRO_DBG(("metric_modules_load"));
       goto cleanup;

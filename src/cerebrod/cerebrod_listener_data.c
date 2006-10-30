@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.37 2006-10-15 04:41:14 chu11 Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.37.2.1 2006-10-30 00:58:34 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -53,9 +53,13 @@
 #include "monitor_module.h"
 #include "wrappers.h"
 
-#define LISTENER_DATA_INDEX_SIZE_DEFAULT   1024
-#define LISTENER_DATA_INDEX_SIZE_INCREMENT 1024
-#define LISTENER_DATA_REHASH_LIMIT         (listener_data_index_size*2)
+#define LISTENER_DATA_INDEX_SIZE_DEFAULT      1024
+#define LISTENER_DATA_INDEX_SIZE_INCREMENT    1024
+#define LISTENER_DATA_INDEX_SIZE_LIMIT        (listener_data_index_size*2)
+
+#define LISTENER_DATA_METRIC_NAMES_INDEX_SIZE 32
+
+#define LISTENER_DATA_METRIC_DATA_SIZE        32
 
 extern struct cerebrod_config conf;
 #if CEREBRO_DEBUG
@@ -102,10 +106,12 @@ pthread_mutex_t listener_data_lock = PTHREAD_MUTEX_INITIALIZER;
 
 /* 
  * metric_names_index
+ * metric_names_index_size
  *
  * contains list of currently known metrics
  */
 hash_t metric_names_index = NULL;
+int metric_names_index_size;
 
 /* 
  * metric_name_defaults
@@ -210,7 +216,7 @@ _cerebrod_node_data_create_and_init(const char *nodename)
   nd->last_received_time = 0;
   Pthread_mutex_init(&(nd->node_data_lock), NULL);
   if (conf.metric_server)
-    nd->metric_data = Hash_create(conf.metric_max, 
+    nd->metric_data = Hash_create(LISTENER_DATA_METRIC_DATA_SIZE, 
                                   (hash_key_f)hash_key_string,
                                   (hash_cmp_f)strcmp, 
                                   (hash_del_f)metric_data_destroy);
@@ -246,7 +252,7 @@ _setup_monitor_modules(void)
   int i, monitor_module_count, monitor_index_len;
   List monitor_list = NULL;
 
-  if (!(monitor_handle = monitor_modules_load(conf.monitor_max)))
+  if (!(monitor_handle = monitor_modules_load()))
     {
       CEREBRO_DBG(("monitor_modules_load"));
       goto monitor_cleanup;
@@ -487,7 +493,7 @@ cerebrod_listener_data_initialize(void)
     {
       int i, size;
       
-      size = metric_name_defaults_count + conf.metric_max;
+      size = metric_name_defaults_count + LISTENER_DATA_METRIC_NAMES_INDEX_SIZE;
       metric_names_index = Hash_create(size, 
                                        (hash_key_f)hash_key_string, 
                                        (hash_cmp_f)strcmp, 
@@ -772,13 +778,6 @@ _metric_data_update(struct cerebrod_node_data *nd,
     {
       struct cerebrod_metric_name_data *mnd;
       
-      if ((Hash_count(metric_names_index) - metric_name_defaults_count) >= conf.metric_max)
-        {
-          CEREBRO_DBG(("too many metrics"));
-          Pthread_mutex_unlock(&metric_names_lock);
-          return;
-        }
-
       mnd = metric_name_data_create(metric_name,
                                     CEREBROD_METRIC_LISTENER_ORIGIN_MONITORED);
       
@@ -788,15 +787,6 @@ _metric_data_update(struct cerebrod_node_data *nd,
 
   if (!(md = Hash_find(nd->metric_data, metric_name)))
     {
-      /* Should be impossible to hit due to checks in
-       * cerebrod_listener_data_update()
-       */
-      if (nd->metric_data_count >= conf.metric_max)
-        {
-          CEREBRO_DBG(("too many metrics: nodename=%s", nd->nodename));
-          return;
-        }
-
       md = metric_data_create(metric_name);
       Hash_insert(nd->metric_data, md->metric_name, md);
       nd->metric_data_count++;
@@ -898,7 +888,7 @@ cerebrod_listener_data_update(char *nodename,
   if (!(nd = Hash_find(listener_data_index, nodename)))
     {
       /* Re-hash if our hash is getting too small */
-      if ((listener_data_index_numnodes + 1) > LISTENER_DATA_REHASH_LIMIT)
+      if ((listener_data_index_numnodes + 1) > LISTENER_DATA_INDEX_SIZE_LIMIT)
 	cerebrod_rehash(&listener_data_index,
 			&listener_data_index_size,
 			LISTENER_DATA_INDEX_SIZE_INCREMENT,

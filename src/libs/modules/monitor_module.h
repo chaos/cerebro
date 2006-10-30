@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: monitor_module.h,v 1.5 2006-02-27 18:38:18 chu11 Exp $
+ *  $Id: monitor_module.h,v 1.5.2.1 2006-10-30 00:58:34 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -37,7 +37,7 @@ typedef struct monitor_module *monitor_modules_t;
  * 
  * Returns monitor module handle on success, NULL on error
  */
-monitor_modules_t monitor_modules_load(unsigned int monitors_max);
+monitor_modules_t monitor_modules_load(void);
 
 /*
  * monitor_modules_unload
