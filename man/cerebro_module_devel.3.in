@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro_module_devel.3.in,v 1.18 2006-10-30 00:55:50 chu11 Exp $
+\."$Id: cerebro_module_devel.3.in,v 1.19 2006-10-30 21:00:43 chu11 Exp $
 \."#############################################################################
 \."  Copyright (C) 2005 The Regents of the University of California.
 \."  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -32,6 +32,10 @@ Introduction to writing cerebro modules
 .B #include <cerebro/cerebro_config.h>
 .sp
 .B #include <cerebro/cerebro_config_module.h>
+.sp
+.B #include <cerebro/cerebro_metric_module.h>
+.sp
+.B #include <cerebro/cerebro_monitor_module.h>
 .sp
 .B #include <cerebro/cerebro_constants.h>
 .sp
