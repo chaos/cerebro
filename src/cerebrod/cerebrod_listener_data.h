@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.h,v 1.9 2006-02-27 18:38:17 chu11 Exp $
+ *  $Id: cerebrod_listener_data.h,v 1.10 2006-10-30 20:00:24 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -75,6 +75,7 @@ struct cerebrod_node_data
   u_int32_t last_received_time;
   pthread_mutex_t node_data_lock;
   hash_t metric_data;
+  int metric_data_size;
   int metric_data_count;
 };
 

@@ -1,3 +1,12 @@
+2006-10-30  Albert Chu  <chu11@llnl.gov>
+
+	* src/cerebrod/cerebrod_listener_data.c,
+	src/cerebrod/cerebrod_listener_data.h,
+	src/cerebrod/cerebrod_metric_controller.c,
+	src/cerebrod/cerebrod_metric_server.c,
+	src/cerebrod/cerebrod_util.c: Various code cleanup.  Rehash hashes
+	as needed.  Remove need for listener_data_list.
+	
 2006-10-29  Albert Chu  <chu11@llnl.gov>
 
 	* src/libs/common/vector.h, src/libs/common/vector.c: New files.
