@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.72.2.1 2006-10-30 00:58:34 chu11 Exp $
+## $Id: Makefile.am,v 1.72.2.2 2006-10-30 17:51:05 chu11 Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -32,6 +32,7 @@ CEREBROD_LDADDS = ../libs/cerebro_error/libcerebro_error.la \
 		  ../libs/modules/libmodules.la \
 		  ../libs/util/libutil_config.la \
 		  ../libs/modules/libconfigmodules.la \
+		  ../libs/modules/libeventmodules.la \
 		  ../libs/util/libutil_metric.la \
 		  ../libs/util/libutil_network.la \
 		  ../libs/wrappers/libwrappers.la \
@@ -50,6 +51,7 @@ CEREBROD_LDADDS = ../libs/cerebro_error/libcerebro_error.la \
 		  ../libs/util/libutil_network.la \
 		  ../libs/modules/libclusterlistmodules.la \
 		  ../libs/modules/libconfigmodules.la \
+		  ../libs/modules/libeventmodules.la \
 		  ../libs/modules/libmetricmodules.la \
 		  ../libs/modules/libmonitormodules.la \
 		  ../libs/modules/libmodules.la \
@@ -127,6 +129,9 @@ cerebrod_LDADD   = $(CEREBROD_LDADDS) \
 	@cd `dirname $@` && make `basename $@`
 
 ../libs/modules/libconfigmodules.la : force-dependency-check
+	@cd `dirname $@` && make `basename $@`
+
+../libs/modules/libeventmodules.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
 ../libs/modules/libmetricmodules.la : force-dependency-check

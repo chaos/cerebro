@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_event_module.h,v 1.1.2.2 2006-10-24 05:23:00 chu11 Exp $
+ *  $Id: cerebro_event_module.h,v 1.1.2.3 2006-10-30 17:51:08 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -86,7 +86,7 @@ typedef int (*Cerebro_event_node_timeout)(const char *nodename,
                                           struct cerebro_event **event);
 
 /*
- * Cerebro_event_metric_data
+ * Cerebro_event_metric_update
  *
  * function prototype for event module function to be given updated
  * metric data.  Required to be defined by each event module.  If
@@ -94,12 +94,12 @@ typedef int (*Cerebro_event_node_timeout)(const char *nodename,
  *
  * Returns 1 if event generated, 0 if not, -1 on error
  */
-typedef int (*Cerebro_event_metric_data)(const char *nodename,
-                                         const char *metric_name,
-                                         unsigned int metric_value_type,
-                                         unsigned int metric_value_len,
-                                         void *metric_value,
-                                         struct cerebro_event **event);
+typedef int (*Cerebro_event_metric_update)(const char *nodename,
+                                           const char *metric_name,
+                                           unsigned int metric_value_type,
+                                           unsigned int metric_value_len,
+                                           void *metric_value,
+                                           struct cerebro_event **event);
 
 /*
  * struct cerebro_event_module_info 
@@ -110,12 +110,13 @@ typedef int (*Cerebro_event_metric_data)(const char *nodename,
 struct cerebro_event_module_info
 {
   char *event_module_name;
+  char *event_name;
   Cerebro_event_setup setup;
   Cerebro_event_cleanup cleanup;
   Cerebro_event_metric_names metric_names;
   Cerebro_event_timeout_length timeout_length;
   Cerebro_event_node_timeout node_timeout;
-  Cerebro_event_metric_data metric_data;
+  Cerebro_event_metric_update metric_update;
 };
 
 #endif /* _CEREBRO_EVENT_MODULE_H */

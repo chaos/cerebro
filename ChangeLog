@@ -3,7 +3,12 @@
 	Cerebro Event Monitoring Support
 
 	* src/libs/include/cerebro_event_protocol.h,
-	src/libs/include/cerebro_event_module.h: New files.
+	src/libs/include/cerebro_event_module.h,
+	src/libs/modules/event_module.h, src/libs/modules/event_module.c:
+	New files.
+
+	* src/libs/include/Makefile.am, src/libs/modules/Makefile.am,
+	src/cerebrod/Makefile.am: Adjust appropriately.
 
 	Add Updown Module Event support
 

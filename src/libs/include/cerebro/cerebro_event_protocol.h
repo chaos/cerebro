@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_event_protocol.h,v 1.1.2.2 2006-10-24 05:23:00 chu11 Exp $
+ *  $Id: cerebro_event_protocol.h,v 1.1.2.3 2006-10-30 17:51:08 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -42,6 +42,7 @@ struct cerebro_event
 {
   int32_t version;
   char nodename[CEREBRO_MAX_NODENAME_LEN];
+  char event_name[CEREBRO_MAX_EVENT_NAME_LEN];
   u_int32_t event_value_type;
   u_int32_t event_value_size;
   void *event_value;
@@ -49,6 +50,7 @@ struct cerebro_event
 
 #define CEREBRO_EVENT_HEADER_LEN  (sizeof(int32_t) \
                                    + CEREBRO_MAX_NODENAME_LEN \
+                                   + CEREBRO_MAX_EVENT_NAME_LEN \
                                    + sizeof(u_int32_t) \
                                    + sizeof(u_int32_t))
 

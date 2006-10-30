@@ -1,9 +1,10 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.8 2005-08-25 22:04:32 achu Exp $
+## $Id: Makefile.am,v 1.8.2.1 2006-10-30 17:51:08 chu11 Exp $
 ##*****************************************************************************
 
 noinst_HEADERS	       = clusterlist_module.h \
 			 config_module.h \
+			 event_module.h \
 			 metric_module.h \
 			 monitor_module.h \
 			 module_util.h
@@ -16,6 +17,10 @@ if WITH_CONFIG_STATIC_MODULES
 CONFIG_STATIC_LIB = ../../modules/config/libstaticconfigmodules.la
 endif
 
+if WITH_EVENT_STATIC_MODULES
+EVENT_STATIC_LIB = ../../modules/event/libstaticeventmodules.la
+endif
+
 if WITH_METRIC_STATIC_MODULES
 METRIC_STATIC_LIB = ../../modules/metric/libstaticmetricmodules.la
 endif
@@ -26,11 +31,13 @@ endif
 
 clusterlist_module_builddir=`cd $(top_builddir)/src/modules/clusterlist && pwd`
 config_module_builddir=`cd $(top_builddir)/src/modules/config && pwd`
+event_module_builddir=`cd $(top_builddir)/src/modules/event && pwd`
 metric_module_builddir=`cd $(top_builddir)/src/modules/metric && pwd`
 monitor_module_builddir=`cd $(top_builddir)/src/modules/monitor && pwd`
 
 noinst_LTLIBRARIES    = libclusterlistmodules.la \
 			libconfigmodules.la \
+			libeventmodules.la \
 			libmetricmodules.la \
 			libmonitormodules.la \
 			libmodules.la
@@ -50,6 +57,13 @@ libconfigmodules_la_CFLAGS = -DCONFIG_MODULE_BUILDDIR=\"$(config_module_builddir
 libconfigmodules_la_SOURCES = config_module.c \
 			      config_module_default.c
 libconfigmodules_la_LIBADD = $(CONFIG_STATIC_LIB)
+
+libeventmodules_la_CFLAGS = -DEVENT_MODULE_BUILDDIR=\"$(event_module_builddir)\" \
+			    -I$(srcdir)/../common \
+			    -I$(srcdir)/../debug \
+			    -I$(srcdir)/../include
+libeventmodules_la_SOURCES = event_module.c
+libeventmodules_la_LIBADD = $(EVENT_STATIC_LIB)
 
 libmetricmodules_la_CFLAGS = -DMETRIC_MODULE_BUILDDIR=\"$(metric_module_builddir)\" \
 			     -I$(srcdir)/../common \
@@ -74,6 +88,9 @@ libmodules_la_SOURCES = module_util.c
 	@cd `dirname $@` && make `basename $@`
 
 ../../modules/config/libstaticconfigmodules.la : force-dependency-check
+	@cd `dirname $@` && make `basename $@`
+
+../../modules/event/libstaticeventmodules.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
 ../../modules/metric/libstaticmetricmodules.la : force-dependency-check

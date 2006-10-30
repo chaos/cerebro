@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_event_updown.c,v 1.1.2.2 2006-10-24 05:23:00 chu11 Exp $
+ *  $Id: cerebro_event_updown.c,v 1.1.2.3 2006-10-30 17:51:08 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -47,6 +47,7 @@
 #include "list.h"
 
 #define UPDOWN_EVENT_MODULE_NAME     "updown"
+#define UPDOWN_EVENT_NAME            "updown"
 #define UPDOWN_EVENT_METRIC_NAMES    "boottime"
 #define UPDOWN_EVENT_TIMEOUT_LENGTH  60
 #define UPDOWN_HASH_SIZE             1024
@@ -58,7 +59,7 @@
 /*
  * node_states
  *
- * Cache of recently accessed boottimes
+ * Maintain node state information
  */
 static hash_t node_states = NULL;
 
@@ -205,6 +206,7 @@ _create_event(const char *nodename, int state)
 
   event->version = CEREBRO_EVENT_PROTOCOL_VERSION;
   strncpy(event->nodename, nodename, CEREBRO_MAX_NODENAME_LEN);
+  strncpy(event->event_name, UPDOWN_EVENT_NAME, CEREBRO_MAX_EVENT_NAME_LEN);
   event->event_value_type = CEREBRO_METRIC_VALUE_TYPE_INT32;
   event->event_value_size = sizeof(int32_t);
   if (!(event->event_value = malloc(sizeof(int32_t))))
@@ -261,18 +263,18 @@ updown_event_node_timeout(const char *nodename,
 }
 
 /*
- * updown_event_metric_data
+ * updown_event_metric_update
  *
- * updown event module metric_data function.  Store results the
- * updown database appropriately.
+ * updown event module metric_update function.  Store results the
+ * updown cache appropriately.
  */
 static int 
-updown_event_metric_data(const char *nodename,
-                         const char *metric_name,
-                         unsigned int metric_value_type,
-                         unsigned int metric_value_len,
-                         void *metric_value,
-                         struct cerebro_event **event)
+updown_event_metric_update(const char *nodename,
+                           const char *metric_name,
+                           unsigned int metric_value_type,
+                           unsigned int metric_value_len,
+                           void *metric_value,
+                           struct cerebro_event **event)
 {
   int *state = NULL;
   int rv = 0;
@@ -301,16 +303,17 @@ updown_event_metric_data(const char *nodename,
 }
 
 #if WITH_STATIC_MODULES
-struct cerebro_event_module_info boottime_event_module_info =
+struct cerebro_event_module_info updown_event_module_info =
 #else  /* !WITH_STATIC_MODULES */
 struct cerebro_event_module_info event_module_info =
 #endif /* !WITH_STATIC_MODULES */
   {
     UPDOWN_EVENT_MODULE_NAME,
+    UPDOWN_EVENT_NAME,
     &updown_event_setup,
     &updown_event_cleanup,
     &updown_event_metric_names,
     &updown_event_timeout_length,
     &updown_event_node_timeout,
-    &updown_event_metric_data,
+    &updown_event_metric_update,
   };
