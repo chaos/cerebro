@@ -4,6 +4,7 @@
 	src/cerebrod/cerebrod_listener_data.h,
 	src/cerebrod/cerebrod_metric_controller.c,
 	src/cerebrod/cerebrod_metric_server.c,
+	src/libs/include/cerebro/cerebro_config.h,
 	src/cerebrod/cerebrod_util.c: Various code cleanup.  Rehash hashes
 	as needed.  Remove need for listener_data_list.
 	

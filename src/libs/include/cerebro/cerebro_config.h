@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config.h,v 1.7 2006-10-29 19:02:13 chu11 Exp $
+ *  $Id: cerebro_config.h,v 1.8 2006-10-30 20:55:24 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -89,8 +89,6 @@ struct cerebro_config
   int cerebrod_metric_server_flag;
   int cerebrod_metric_server_port;
   int cerebrod_metric_server_port_flag;
-  int cerebrod_metric_max;
-  int cerebrod_metric_max_flag;
 #if CEREBRO_DEBUG
   int cerebrod_speak_debug;
   int cerebrod_speak_debug_flag;
