@@ -10,9 +10,17 @@
 	* src/libs/include/Makefile.am, src/libs/modules/Makefile.am,
 	src/cerebrod/Makefile.am: Adjust appropriately.
 
+	* src/cerebrod/cerebrod_config.h, src/cerebrod/cerebrod_config.c,
+	src/libs/util/config_util.c,
+	src/libs/include/cerebro/cerebro_config.h: Support event server
+	config variables.
+
 	Add Updown Module Event support
 
 	* src/modules/event/cerebro_event_updown.c: New file.
+
+	* man/cerebro.conf.5.in, man/cerebro_module_devel.3.in: Update
+	appropriately.
 
 2006-10-29  Albert Chu  <chu11@llnl.gov>
 

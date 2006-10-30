@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.72.2.2 2006-10-30 17:51:05 chu11 Exp $
+## $Id: Makefile.am,v 1.72.2.3 2006-10-30 22:02:13 chu11 Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -32,7 +32,6 @@ CEREBROD_LDADDS = ../libs/cerebro_error/libcerebro_error.la \
 		  ../libs/modules/libmodules.la \
 		  ../libs/util/libutil_config.la \
 		  ../libs/modules/libconfigmodules.la \
-		  ../libs/modules/libeventmodules.la \
 		  ../libs/util/libutil_metric.la \
 		  ../libs/util/libutil_network.la \
 		  ../libs/wrappers/libwrappers.la \

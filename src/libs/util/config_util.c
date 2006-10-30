@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: config_util.c,v 1.15.2.1 2006-10-30 00:58:34 chu11 Exp $
+ *  $Id: config_util.c,v 1.15.2.2 2006-10-30 22:02:14 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -561,6 +561,28 @@ _load_config_file(struct cerebro_config *conf, unsigned int *errnum)
 	&(conf->cerebrod_metric_server_port), 
 	0
       },
+      {
+	"cerebrod_event_server", 
+	CONFFILE_OPTION_BOOL, 
+	-1,
+	conffile_bool, 
+	1, 
+	0, 
+	&(conf->cerebrod_event_server_flag),
+	&conf->cerebrod_event_server, 
+	0
+      },
+      {
+	"cerebrod_event_server_port", 
+	CONFFILE_OPTION_INT, 
+	-1,
+	conffile_int, 
+	1, 
+	0, 
+	&(conf->cerebrod_event_server_port_flag),
+	&(conf->cerebrod_event_server_port), 
+	0
+      },
 #if CEREBRO_DEBUG
       {
 	"cerebrod_speak_debug", 
@@ -604,6 +626,17 @@ _load_config_file(struct cerebro_config *conf, unsigned int *errnum)
 	0, 
 	&(conf->cerebrod_metric_server_debug_flag),
 	&conf->cerebrod_metric_server_debug, 
+	0
+      },
+      {
+	"cerebrod_event_server_debug", 
+	CONFFILE_OPTION_BOOL, 
+	-1,
+	conffile_bool, 
+	1, 
+	0, 
+	&(conf->cerebrod_event_server_debug_flag),
+	&conf->cerebrod_event_server_debug, 
 	0
       },
 #endif /* CEREBRO_DEBUG */
@@ -814,6 +847,19 @@ _set_cerebro_config(struct cerebro_config *dest,
       dest->cerebrod_metric_server_port_flag++;
     }
 
+  if (!dest->cerebrod_event_server_flag && src->cerebrod_event_server_flag)
+    {
+      dest->cerebrod_event_server = src->cerebrod_event_server;
+      dest->cerebrod_event_server_flag++;
+    }
+
+  if (!dest->cerebrod_event_server_port_flag
+      && src->cerebrod_event_server_port_flag) 
+    {
+      dest->cerebrod_event_server_port = src->cerebrod_event_server_port;
+      dest->cerebrod_event_server_port_flag++;
+    }
+
 #if CEREBRO_DEBUG
   if (!dest->cerebrod_speak_debug_flag && src->cerebrod_speak_debug_flag)
     {
@@ -839,6 +885,13 @@ _set_cerebro_config(struct cerebro_config *dest,
     {
       dest->cerebrod_metric_server_debug = src->cerebrod_metric_server_debug;
       dest->cerebrod_metric_server_debug_flag++;
+    }
+
+  if (!dest->cerebrod_event_server_debug_flag
+      && src->cerebrod_event_server_debug_flag)
+    {
+      dest->cerebrod_event_server_debug = src->cerebrod_event_server_debug;
+      dest->cerebrod_event_server_debug_flag++;
     }
 #endif /* CEREBRO_DEBUG */
 

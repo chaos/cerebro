@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_event_module.h,v 1.1.2.4 2006-10-30 20:14:55 chu11 Exp $
+ *  $Id: cerebro_event_module.h,v 1.1.2.5 2006-10-30 22:02:14 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -110,6 +110,15 @@ typedef int (*Cerebro_event_metric_update)(const char *nodename,
                                            void *metric_value,
                                            struct cerebro_event **event);
 
+/* 
+ * Cerebro_event_destroy
+ *
+ * function prototype for event module to destroy an event generated
+ * by a node_timeout of metric_update call.  Required to be defined by
+ * each event module.
+ */
+typedef void (*Cerebro_event_destroy)(struct cerebro_event *event);
+
 /*
  * struct cerebro_event_module_info 
  * 
@@ -126,6 +135,7 @@ struct cerebro_event_module_info
   Cerebro_event_timeout_length timeout_length;
   Cerebro_event_node_timeout node_timeout;
   Cerebro_event_metric_update metric_update;
+  Cerebro_event_destroy event_destroy;
 };
 
 #endif /* _CEREBRO_EVENT_MODULE_H */

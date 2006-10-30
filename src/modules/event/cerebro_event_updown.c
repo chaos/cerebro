@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_event_updown.c,v 1.1.2.4 2006-10-30 20:14:55 chu11 Exp $
+ *  $Id: cerebro_event_updown.c,v 1.1.2.5 2006-10-30 22:02:14 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -314,6 +314,24 @@ updown_event_metric_update(const char *nodename,
   return rv;
 }
 
+/*
+ * updown_event_destroy
+ *
+ * updown event module destroy function
+ */
+static void
+updown_event_destroy(struct cerebro_event *event)
+{
+  if (!event)
+    {
+      CEREBRO_DBG(("invalid parameters"));
+      return;
+    }
+
+  free(event->event_value);
+  free(event);
+}
+
 #if WITH_STATIC_MODULES
 struct cerebro_event_module_info updown_event_module_info =
 #else  /* !WITH_STATIC_MODULES */
@@ -328,4 +346,5 @@ struct cerebro_event_module_info event_module_info =
     &updown_event_timeout_length,
     &updown_event_node_timeout,
     &updown_event_metric_update,
+    &updown_event_destroy,
   };
