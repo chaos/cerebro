@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_controller.c,v 1.33 2006-07-03 20:40:50 chu11 Exp $
+ *  $Id: cerebrod_metric_controller.c,v 1.34 2006-10-30 00:55:50 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -403,14 +403,6 @@ _register_metric(int fd, int32_t version, const char *metric_name)
   assert(fd >= 0 && metric_name && conf.speak);
 
   Pthread_mutex_lock(&metric_list_lock);
-
-  if (metric_list_size >= conf.metric_max)
-    {
-      _send_metric_control_response(fd,
-                                    version,
-                                    CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_METRIC_MAX);
-      goto cleanup;
-    }
 
   if ((metric_info = _find_speaker_metric_info(metric_name)))
     {

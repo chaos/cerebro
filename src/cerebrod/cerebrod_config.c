@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.126 2006-10-29 19:02:12 chu11 Exp $
+ *  $Id: cerebrod_config.c,v 1.127 2006-10-30 00:55:50 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -120,7 +120,6 @@ _cerebrod_set_config_default(void)
   conf.metric_controller = CEREBROD_METRIC_CONTROLLER_DEFAULT;
   conf.metric_server = CEREBROD_METRIC_SERVER_DEFAULT;
   conf.metric_server_port = CEREBROD_METRIC_SERVER_PORT_DEFAULT;
-  conf.metric_max = CEREBROD_METRIC_MAX_DEFAULT;
 #if CEREBRO_DEBUG
   conf.speak_debug = CEREBROD_SPEAK_DEBUG_DEFAULT;
   conf.listen_debug = CEREBROD_LISTEN_DEBUG_DEFAULT;
@@ -315,8 +314,6 @@ _cerebrod_load_config(void)
     conf.metric_server = tconf.cerebrod_metric_server;
   if (tconf.cerebrod_metric_server_port_flag)
     conf.metric_server_port = tconf.cerebrod_metric_server_port;
-  if (tconf.cerebrod_metric_max_flag)
-    conf.metric_max = tconf.cerebrod_metric_max;
 #if CEREBRO_DEBUG
   if (tconf.cerebrod_speak_debug_flag)
     conf.speak_debug = tconf.cerebrod_speak_debug;
@@ -433,9 +430,6 @@ _cerebrod_config_error_check(void)
 
   if (conf.metric_server_port <= 0)
     cerebro_err_exit("metric server port '%d' invalid", conf.metric_server_port);
-
-  if (conf.metric_max <= 0)
-    cerebro_err_exit("metric max '%d' invalid", conf.metric_max);
 }
 
 /* 
@@ -916,7 +910,6 @@ _cerebrod_config_dump(void)
   fprintf(stderr, "* metric_controller: %d\n", conf.metric_controller);
   fprintf(stderr, "* metric_server: %d\n", conf.metric_server);
   fprintf(stderr, "* metric_server_port: %d\n", conf.metric_server_port);
-  fprintf(stderr, "* metric_max: %d\n", conf.metric_max);
   fprintf(stderr, "* speak_debug: %d\n", conf.speak_debug);
   fprintf(stderr, "* listen_debug: %d\n", conf.listen_debug);
   fprintf(stderr, "* metric_controller_debug: %d\n", conf.metric_controller_debug);
