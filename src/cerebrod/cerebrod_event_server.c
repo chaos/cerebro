@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_event.c,v 1.1.2.2 2006-10-31 15:03:13 chu11 Exp $
+ *  $Id: cerebrod_event_server.c,v 1.1.2.1 2006-10-31 15:17:27 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -44,7 +44,7 @@
 #include "cerebro/cerebro_event_protocol.h"
 
 #include "cerebrod_config.h"
-#include "cerebrod_event.h"
+#include "cerebrod_event_server.h"
 #include "cerebrod_util.h"
 
 #include "debug.h"

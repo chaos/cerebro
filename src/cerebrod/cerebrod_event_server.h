@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_event.h,v 1.1.2.2 2006-10-31 15:03:13 chu11 Exp $
+ *  $Id: cerebrod_event_server.h,v 1.1.2.1 2006-10-31 15:17:27 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -25,13 +25,13 @@
  *  59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.
 \*****************************************************************************/
 
-#ifndef _CEREBROD_EVENT_H
-#define _CEREBROD_EVENT_H
+#ifndef _CEREBROD_EVENT_SERVER_H
+#define _CEREBROD_EVENT_SERVER_H
 
 /* 
  * cerebrod_event_server
  *
- * Runs a cerebrod event management thread
+ * Runs the cerebrod event server thread
  *
  * Passed no argument
  * 
@@ -39,4 +39,4 @@
  */
 void *cerebrod_event_server(void *);
 
-#endif /* _CEREBROD_EVENT_H */
+#endif /* _CEREBROD_EVENT_SERVER_H */

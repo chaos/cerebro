@@ -15,6 +15,9 @@
 	src/libs/include/cerebro/cerebro_config.h: Support event server
 	config variables.
 
+	* src/cerebrod/cerebrod_event_server.h,
+	src/cerebrod/cerebrod_event_server.c: New files.
+
 	Add Updown Module Event support
 
 	* src/modules/event/cerebro_event_updown.c: New file.

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.80.2.2 2006-10-31 15:03:13 chu11 Exp $
+ *  $Id: cerebrod.c,v 1.80.2.3 2006-10-31 15:17:27 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -38,7 +38,7 @@
 #include "cerebrod.h"
 #include "cerebrod_daemon.h"
 #include "cerebrod_config.h"
-#include "cerebrod_event.h"
+#include "cerebrod_event_server.h"
 #include "cerebrod_listener.h"
 #include "cerebrod_metric_controller.h"
 #include "cerebrod_metric_server.h"
