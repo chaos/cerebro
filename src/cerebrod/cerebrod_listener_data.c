@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.44 2006-10-31 04:37:11 chu11 Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.45 2006-10-31 04:41:16 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -141,13 +141,13 @@ monitor_modules_t monitor_handle = NULL;
 
 /*
  * monitor_index
- * monitor_index_size
+ * monitor_index_count
  *
  * hash index to quickly determine what metrics are being
  * monitored by modules and what index they are.
  */
 hash_t monitor_index = NULL;
-int monitor_index_size = 0;
+int monitor_index_count = 0;
 
 struct cerebrod_metric_data *
 metric_data_create(const char *metric_name)
@@ -322,7 +322,7 @@ _setup_monitor_modules(void)
 	      monitor_list = List_create((ListDelF)_cerebrod_monitor_module_destroy);
 	      List_append(monitor_list, monitor_module);
 	      Hash_insert(monitor_index, monitor_module->metric_names, monitor_list);
-	      monitor_index_size++;
+	      monitor_index_count++;
 	    }
 	  else
 	    List_append(monitor_list, monitor_module);
@@ -343,7 +343,7 @@ _setup_monitor_modules(void)
 		  monitor_list = List_create((ListDelF)_cerebrod_monitor_module_destroy);
 		  List_append(monitor_list, monitor_module);
 		  Hash_insert(monitor_index, metric, monitor_list);
-		  monitor_index_size++;
+		  monitor_index_count++;
 		}
 	      else
 		List_append(monitor_list, monitor_module);
@@ -353,7 +353,7 @@ _setup_monitor_modules(void)
         }
     }
 
-  if (!monitor_index_size)
+  if (!monitor_index_count)
     goto cleanup;
 
   return 1;
@@ -369,7 +369,7 @@ _setup_monitor_modules(void)
       Hash_destroy(monitor_index);
       monitor_index = NULL;
     }
-  monitor_index_size = 0;
+  monitor_index_count = 0;
   return 0;
 }
 
