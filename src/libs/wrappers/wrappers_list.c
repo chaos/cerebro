@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers_list.c,v 1.1 2005-08-05 23:59:30 achu Exp $
+ *  $Id: wrappers_list.c,v 1.1.2.1 2006-10-31 23:41:29 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -140,6 +140,21 @@ wrap_list_sort(WRAPPERS_ARGS, List l, ListCmpF f)
 
   list_sort(l, f);
   return;
+}
+
+void *
+wrap_list_peek(WRAPPERS_ARGS, List l)
+{
+  void *rv;
+
+  assert(file && function);
+
+  if (!l)
+    WRAPPERS_ERR_INVALID_PARAMETERS("list_peek");
+  
+  rv = list_peek(l);
+
+  return rv;
 }
 
 ListIterator

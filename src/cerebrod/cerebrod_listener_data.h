@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.h,v 1.9.2.3 2006-10-31 19:14:31 chu11 Exp $
+ *  $Id: cerebrod_listener_data.h,v 1.9.2.4 2006-10-31 23:41:29 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -115,14 +115,26 @@ struct cerebrod_metric_name_data
 };
 
 /* 
- * struct cerebrod_event_timeout
+ * struct cerebrod_event_node_timeout
  *
  * contains information needed for timeout calculations
  */
-struct cerebrod_event_timeout
+struct cerebrod_event_node_timeout
 {
   char *nodename;
   u_int32_t last_received_time;
+  unsigned int timeout_occurred;
+};
+
+/* 
+ * struct cerebrod_timeout_data
+ *
+ * Store a timeout and it's string
+ */
+struct cerebrod_timeout_data
+{
+  unsigned int timeout;
+  char *timeout_str;
 };
 
 /* 
