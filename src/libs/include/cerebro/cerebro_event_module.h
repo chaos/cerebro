@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_event_module.h,v 1.1.2.5 2006-10-30 22:02:14 chu11 Exp $
+ *  $Id: cerebro_event_module.h,v 1.1.2.6 2006-10-31 17:38:06 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -135,7 +135,7 @@ struct cerebro_event_module_info
   Cerebro_event_timeout_length timeout_length;
   Cerebro_event_node_timeout node_timeout;
   Cerebro_event_metric_update metric_update;
-  Cerebro_event_destroy event_destroy;
+  Cerebro_event_destroy destroy;
 };
 
 #endif /* _CEREBRO_EVENT_MODULE_H */

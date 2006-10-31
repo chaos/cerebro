@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.37.2.4 2006-10-31 15:12:39 chu11 Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.37.2.5 2006-10-31 17:38:06 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -284,7 +284,7 @@ _setup_event_modules(void)
   List event_list = NULL;
 
   if (!conf.event_server)
-    return;
+    return 0;
 
   if (!(event_handle = event_modules_load()))
     {
@@ -1070,6 +1070,71 @@ _monitor_update(const char *nodename,
     }
 }
 
+/* 
+ * _event_update
+ *
+ * Send metric data to the appropriate event, if necessary.  The
+ * struct cerebrod_node_data lock should already be locked.
+ */
+static void
+_event_update(const char *nodename,
+              struct cerebrod_node_data *nd,
+              const char *metric_name,
+              struct cerebrod_heartbeat_metric *hd)
+{
+  struct cerebrod_event_module *event_module;
+  List event_list;
+  
+#if CEREBRO_DEBUG
+  int rv;
+#endif /* CEREBRO_DEBUG */
+  
+  assert(nodename && nd && metric_name && hd);
+
+  if (!event_index)
+    return;
+
+#if CEREBRO_DEBUG
+  /* Should be called with lock already set */
+  rv = Pthread_mutex_trylock(&nd->node_data_lock);
+  if (rv != EBUSY)
+    CEREBRO_EXIT(("mutex not locked: rv=%d", rv));
+#endif /* CEREBRO_DEBUG */
+
+  if ((event_list = Hash_find(event_index, metric_name)))
+    {
+      struct cerebro_event *event = NULL;
+      int rv;
+
+      ListIterator itr = NULL;
+
+      itr = List_iterator_create(event_list);
+      while ((event_module = list_next(itr)))
+	{
+	  Pthread_mutex_lock(&event_module->event_lock);
+	  rv = event_module_metric_update(event_handle,
+                                          event_module->index,
+                                          nodename,
+                                          metric_name,
+                                          hd->metric_value_type,
+                                          hd->metric_value_len,
+                                          hd->metric_value,
+                                          &event);
+          /* XXX
+           * 
+           * NEED TO DO SOMETHING WITH THE EVENT LATER ON
+           */
+          if (rv && event)
+            event_module_destroy(event_handle, 
+                                 event_module->index, 
+                                 event);
+
+	  Pthread_mutex_unlock(&event_module->event_lock);
+	}
+      List_iterator_destroy(itr);
+    }
+}
+
 void 
 cerebrod_listener_data_update(char *nodename,
                               struct cerebrod_heartbeat *hb,
@@ -1131,6 +1196,7 @@ cerebrod_listener_data_update(char *nodename,
 
           _metric_data_update(nd, metric_name_buf, hd, received_time);
           _monitor_update(nodename, nd, metric_name_buf, hd);
+          _event_update(nodename, nd, metric_name_buf, hd);
         }
 
       /* Can't call a debug output function in here, it can cause a

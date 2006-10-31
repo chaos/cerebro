@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: event_module.c,v 1.1.2.3 2006-10-31 06:26:36 chu11 Exp $
+ *  $Id: event_module.c,v 1.1.2.4 2006-10-31 17:38:06 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -140,7 +140,8 @@ _event_module_cb(void *handle, void *dl_handle, void *module_info)
       || !event_module_info->metric_names
       || !event_module_info->timeout_length
       || !event_module_info->node_timeout
-      || !event_module_info->metric_update)
+      || !event_module_info->metric_update
+      || !event_module_info->destroy)
     {
       CEREBRO_DBG(("invalid module info"));
       return 0;
@@ -477,4 +478,23 @@ event_module_metric_update(event_modules_t handle,
                                         metric_value_len,
                                         metric_value,
                                         event));
+}
+
+void 
+event_module_destroy(event_modules_t handle,
+                     unsigned int index,
+                     struct cerebro_event *event)
+{
+  struct cerebro_event_module_info *module_info;
+
+  if (_handle_index_check(handle, index) < 0)
+    return -1;
+
+  if (!(module_info = vector_get(handle->module_infos, index)))
+    {
+      CEREBRO_DBG(("vector_get: %s", strerror(errno)));
+      return -1;
+    }
+
+  return ((*module_info->destroy)(event));
 }

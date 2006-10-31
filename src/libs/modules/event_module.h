@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: event_module.h,v 1.1.2.2 2006-10-31 06:26:36 chu11 Exp $
+ *  $Id: event_module.h,v 1.1.2.3 2006-10-31 17:38:06 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -122,5 +122,14 @@ int event_module_metric_update(event_modules_t handle,
                                unsigned int metric_value_len,
                                void *metric_value,
                                struct cerebro_event **event);
+
+/*
+ * event_module_destroy
+ *
+ * call event module destroy function
+ */
+void event_module_destroy(event_modules_t handle,
+                          unsigned int index,
+                          struct cerebro_event *event);
 
 #endif /* _EVENT_MODULE_H */
