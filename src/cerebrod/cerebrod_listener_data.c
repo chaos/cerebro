@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.43 2006-10-31 04:32:22 chu11 Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.44 2006-10-31 04:37:11 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -305,7 +305,7 @@ _setup_monitor_modules(void)
 
       if (!(metric_names = monitor_module_metric_names(monitor_handle, i)) < 0)
         {
-          CEREBRO_DBG(("monitor_module_metric_name failed: %s", module_name));
+          CEREBRO_DBG(("monitor_module_metric_names failed: %s", module_name));
           monitor_module_cleanup(monitor_handle, i);
           continue;
         }
