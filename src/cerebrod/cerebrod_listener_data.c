@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.45 2006-10-31 04:41:16 chu11 Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.46 2006-10-31 15:05:44 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -283,6 +283,7 @@ _setup_monitor_modules(void)
     {
       struct cerebrod_monitor_module *monitor_module;
       char *module_name, *metric_names;
+      char *metricPtr, *metricbuf;
 
       module_name = monitor_module_name(monitor_handle, i);
 
@@ -315,41 +316,22 @@ _setup_monitor_modules(void)
       monitor_module->index = i;
       Pthread_mutex_init(&(monitor_module->monitor_lock), NULL);
 
-      if (!strchr(monitor_module->metric_names, ','))
-        {
-	  if (!(monitor_list = Hash_find(monitor_index, monitor_module->metric_names)))
-	    {
-	      monitor_list = List_create((ListDelF)_cerebrod_monitor_module_destroy);
-	      List_append(monitor_list, monitor_module);
-	      Hash_insert(monitor_index, monitor_module->metric_names, monitor_list);
-	      monitor_index_count++;
-	    }
-	  else
-	    List_append(monitor_list, monitor_module);
-        }
-      else
-        {
-          char *metric, *metricbuf;
-
-          /* This monitoring module supports multiple metrics, must
-	   * parse out each one
-	   */
+      /* The monitoring module may support multiple metrics */
           
-          metric = strtok_r(monitor_module->metric_names, ",", &metricbuf);
-          while (metric)
+      metricPtr = strtok_r(monitor_module->metric_names, ",", &metricbuf);
+      while (metricPtr)
+        {
+          if (!(monitor_list = Hash_find(monitor_index, metricPtr)))
             {
-	      if (!(monitor_list = Hash_find(monitor_index, metric)))
-		{
-		  monitor_list = List_create((ListDelF)_cerebrod_monitor_module_destroy);
-		  List_append(monitor_list, monitor_module);
-		  Hash_insert(monitor_index, metric, monitor_list);
-		  monitor_index_count++;
-		}
-	      else
-		List_append(monitor_list, monitor_module);
-
-              metric = strtok_r(NULL, ",", &metricbuf);
+              monitor_list = List_create((ListDelF)_cerebrod_monitor_module_destroy);
+              List_append(monitor_list, monitor_module);
+              Hash_insert(monitor_index, metricPtr, monitor_list);
+              monitor_index_count++;
             }
+          else
+            List_append(monitor_list, monitor_module);
+          
+          metricPtr = strtok_r(NULL, ",", &metricbuf);
         }
     }
 
