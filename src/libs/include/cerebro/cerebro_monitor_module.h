@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_monitor_module.h,v 1.4 2006-02-27 18:38:18 chu11 Exp $
+ *  $Id: cerebro_monitor_module.h,v 1.4.2.1 2006-10-31 06:33:47 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -55,7 +55,7 @@ typedef int (*Cerebro_monitor_cleanup)(void);
  * this module wishes to monitor.  Separate metric names are comma
  * separated.
  *
- * Returns metric name on success, -1 on error
+ * Returns metric name(s) on success, -1 on error
  */
 typedef char *(*Cerebro_monitor_metric_names)(void);
 

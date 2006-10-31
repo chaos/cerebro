@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_server.c,v 1.34 2006-07-03 20:40:50 chu11 Exp $
+ *  $Id: cerebrod_metric_server.c,v 1.34.2.1 2006-10-31 06:33:47 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -62,8 +62,8 @@ extern struct cerebrod_config conf;
 extern pthread_mutex_t debug_output_mutex;
 #endif /* CEREBRO_DEBUG */
 
-extern List listener_data_list;
-extern hash_t metric_names_index;
+extern hash_t listener_data;
+extern hash_t metric_names;
 extern pthread_mutex_t listener_data_lock;
 extern pthread_mutex_t metric_names_lock;
 
@@ -431,14 +431,14 @@ _metric_server_response_create(char *name,
 }
 
 /*  
- * _metric_names_index_callback
+ * _metric_names_callback
  *
  * Callback function to create metric name responses
  *
  * Return 0 on success, -1 on error
  */
 static int
-_metric_names_index_callback(void *data, const void *key, void *arg)
+_metric_names_callback(void *data, const void *key, void *arg)
 {
   struct cerebrod_metric_name_evaluation_data *ed;
   struct cerebrod_metric_name_data *mnd;
@@ -479,7 +479,7 @@ _metric_names_index_callback(void *data, const void *key, void *arg)
  * Return 0 on success, -1 on error
  */
 static int
-_metric_data_evaluate(void *x, void *arg)
+_metric_data_evaluate(void *x, const void *key, void *arg)
 {
   struct cerebrod_node_data *nd;
   struct cerebrod_metric_data_evaluation_data *ed;
@@ -692,7 +692,7 @@ _respond_with_metric_names(int fd, struct cerebro_metric_server_request *req)
 
   Pthread_mutex_lock(&metric_names_lock);
   
-  if (!Hash_count(metric_names_index))
+  if (!Hash_count(metric_names))
     {
       Pthread_mutex_unlock(&metric_names_lock);
       goto end_response;
@@ -711,7 +711,7 @@ _respond_with_metric_names(int fd, struct cerebro_metric_server_request *req)
   ed.fd = fd;
   ed.responses = responses;
 
-  if (Hash_for_each(metric_names_index, _metric_names_index_callback, &ed) < 0)
+  if (Hash_for_each(metric_names, _metric_names_callback, &ed) < 0)
     {
       Pthread_mutex_unlock(&metric_names_lock);
       _metric_server_respond_with_error(fd,
@@ -780,7 +780,7 @@ _respond_with_nodes(int fd,
 
   Pthread_mutex_lock(&listener_data_lock);
   
-  if (!List_count(listener_data_list))
+  if (!Hash_count(listener_data))
     {
       Pthread_mutex_unlock(&listener_data_lock);
       goto end_response;
@@ -803,7 +803,7 @@ _respond_with_nodes(int fd,
   ed.metric_name = metric_name;
   ed.responses = responses;
 
-  if (list_for_each(listener_data_list, _metric_data_evaluate, &ed) < 0)
+  if (hash_for_each(listener_data, _metric_data_evaluate, &ed) < 0)
     {
       Pthread_mutex_unlock(&listener_data_lock);
       _metric_server_respond_with_error(fd,
@@ -908,7 +908,7 @@ _metric_server_service_connection(void *arg)
     }
 
   Pthread_mutex_lock(&metric_names_lock);
-  if (!Hash_find(metric_names_index, metric_name_buf))
+  if (!Hash_find(metric_names, metric_name_buf))
     {
       Pthread_mutex_unlock(&metric_names_lock);
       _metric_server_respond_with_error(fd,
@@ -968,9 +968,6 @@ _metric_server_setup_socket(int num)
       goto cleanup;
     }
 
-  /* Configuration checks ensure destination ip is on this machine if
-   * it is a non-multicast address.
-   */
   memset(&addr, '\0', sizeof(struct sockaddr_in));
   addr.sin_family = AF_INET;
   addr.sin_port = htons(conf.metric_server_port);

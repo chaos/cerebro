@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: vector.c,v 1.3.2.1 2006-10-30 00:58:34 chu11 Exp $
+ *  $Id: vector.c,v 1.3.2.2 2006-10-31 06:33:47 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -400,7 +400,6 @@ vector_get (Vector v, unsigned int index)
     {
       errno = EINVAL;
       goto cleanup;
-
     }
   rv = v->data[index];
 
@@ -530,8 +529,6 @@ vector_iterator_reset (VectorIterator i)
 void
 vector_iterator_destroy (VectorIterator i)
 {
-  VectorIterator *pi;
-
   assert(i);
   assert(i->magic == VECTOR_ITERATOR_MAGIC);
   assert(i->magic = ~VECTOR_MAGIC);     /* clear magic via assert abuse */

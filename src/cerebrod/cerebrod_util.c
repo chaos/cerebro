@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_util.c,v 1.34 2006-07-03 20:40:50 chu11 Exp $
+ *  $Id: cerebrod_util.c,v 1.34.2.1 2006-10-31 06:33:47 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -89,7 +89,7 @@ cerebrod_rehash(hash_t *old_hash,
 {
   hash_t new_hash;
 
-  assert(old_hash && hash_size && hash_size_increment && hash_num && hash_mutex);
+  assert(old_hash && hash_size && hash_size_increment && hash_num);
 
 #if CEREBRO_DEBUG
   /* Should be called with lock already set */

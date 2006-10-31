@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_controller.c,v 1.33.2.1 2006-10-30 00:58:34 chu11 Exp $
+ *  $Id: cerebrod_metric_controller.c,v 1.33.2.2 2006-10-31 06:33:47 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -82,9 +82,9 @@ extern pthread_mutex_t metric_list_lock;
 /* 
  * Listener Data
  */
-extern List listener_data_list;
+extern hash_t listener_data;
 extern pthread_mutex_t listener_data_lock;
-extern hash_t metric_names_index;
+extern hash_t metric_names;
 extern pthread_mutex_t metric_names_lock;
 
 #define CEREBROD_METRIC_CONTROLLER_BACKLOG    5
@@ -674,7 +674,7 @@ _resend_metric(int fd, int32_t version, const char *metric_name)
  * Returns 0 on success, -1 on error
  */
 static int
-_flush_metric_data(void *x, void *arg)
+_flush_metric_data(void *x, const void *key, void *arg)
 {
   struct cerebrod_node_data *nd;
   char *metric_name;
@@ -735,7 +735,7 @@ _flush_metric(int fd, int32_t version, const char *metric_name)
    */
 
   Pthread_mutex_lock(&metric_names_lock);
-  if (!(mnd = Hash_find(metric_names_index, metric_name)))
+  if (!(mnd = Hash_find(metric_names, metric_name)))
     {
       Pthread_mutex_unlock(&metric_names_lock);
       _send_metric_control_response(fd,
@@ -753,7 +753,7 @@ _flush_metric(int fd, int32_t version, const char *metric_name)
       goto cleanup;
     }
 
-  if ((mnd = Hash_remove(metric_names_index, metric_name)))
+  if ((mnd = Hash_remove(metric_names, metric_name)))
     metric_name_data_destroy(mnd);
   else
     CEREBRO_DBG(("illogical delete"));
@@ -761,7 +761,7 @@ _flush_metric(int fd, int32_t version, const char *metric_name)
   Pthread_mutex_unlock(&metric_names_lock);
 
   Pthread_mutex_lock(&listener_data_lock);
-  if (list_for_each(listener_data_list, _flush_metric_data, (void *)metric_name) < 0)
+  if (hash_for_each(listener_data, _flush_metric_data, (void *)metric_name) < 0)
     {
       Pthread_mutex_unlock(&listener_data_lock);
       goto cleanup;

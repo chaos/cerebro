@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.37.2.1 2006-10-30 00:58:34 chu11 Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.37.2.2 2006-10-31 06:33:47 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -53,13 +53,14 @@
 #include "monitor_module.h"
 #include "wrappers.h"
 
-#define LISTENER_DATA_INDEX_SIZE_DEFAULT      1024
-#define LISTENER_DATA_INDEX_SIZE_INCREMENT    1024
-#define LISTENER_DATA_INDEX_SIZE_LIMIT        (listener_data_index_size*2)
+#define LISTENER_DATA_SIZE_DEFAULT              1024
+#define LISTENER_DATA_SIZE_INCREMENT            1024
 
-#define LISTENER_DATA_METRIC_NAMES_INDEX_SIZE 32
+#define LISTENER_DATA_METRIC_NAMES_SIZE_DEFAULT 32
+#define LISTENER_DATA_METRIC_NAMES_INCREMENT    32
 
-#define LISTENER_DATA_METRIC_DATA_SIZE        32
+#define LISTENER_DATA_METRIC_DATA_SIZE_DEFAULT  32
+#define LISTENER_DATA_METRIC_DATA_INCREMENT     32
 
 extern struct cerebrod_config conf;
 #if CEREBRO_DEBUG
@@ -77,24 +78,16 @@ extern clusterlist_module_t clusterlist_handle;
 int listener_data_init = 0;
 pthread_mutex_t listener_data_init_lock = PTHREAD_MUTEX_INITIALIZER;
 
-/* 
- * listener_data_list
- *
- * contains list of nodes and cluster_data
- */
-List listener_data_list = NULL;
-
 /*
- * listener_data_index
- * listener_data_index_numnodes
- * listener_data_index_size
+ * listener_data
+ * listener_data_numnodes
+ * listener_data_size
  *
- * hash index into cerebrod_listener_data list for faster access, number of
- * currently indexed entries, and index size
+ * hash of listener data, number of entries, and index size
  */
-hash_t listener_data_index = NULL;
-int listener_data_index_numnodes;
-int listener_data_index_size;
+hash_t listener_data = NULL;
+int listener_data_numnodes;
+int listener_data_size;
 
 /*  
  * listener_data_lock
@@ -105,13 +98,14 @@ int listener_data_index_size;
 pthread_mutex_t listener_data_lock = PTHREAD_MUTEX_INITIALIZER;
 
 /* 
- * metric_names_index
- * metric_names_index_size
+ * metric_names
+ * metric_names_size
  *
  * contains list of currently known metrics
  */
-hash_t metric_names_index = NULL;
-int metric_names_index_size;
+hash_t metric_names = NULL;
+int metric_names_size;
+int metric_names_count;
 
 /* 
  * metric_name_defaults
@@ -147,29 +141,13 @@ monitor_modules_t monitor_handle = NULL;
 
 /*
  * monitor_index
- * monitor_index_size
+ * monitor_index_count
  *
  * hash index to quickly determine what metrics are being
  * monitored by modules and what index they are.
  */
 hash_t monitor_index = NULL;
-int monitor_index_size = 0;
-
-/* 
- * _cerebrod_node_data_strcmp
- *
- * callback function for list_sort to sort node names
- */
-static int 
-_cerebrod_node_data_strcmp(void *x, void *y)
-{
-  struct cerebrod_node_data *a = x;
-  struct cerebrod_node_data *b = y;
-  
-  assert(x && y);
-
-  return strcmp(a->nodename, b->nodename);
-}
+int monitor_index_count = 0;
 
 struct cerebrod_metric_data *
 metric_data_create(const char *metric_name)
@@ -216,18 +194,29 @@ _cerebrod_node_data_create_and_init(const char *nodename)
   nd->last_received_time = 0;
   Pthread_mutex_init(&(nd->node_data_lock), NULL);
   if (conf.metric_server)
-    nd->metric_data = Hash_create(LISTENER_DATA_METRIC_DATA_SIZE, 
-                                  (hash_key_f)hash_key_string,
-                                  (hash_cmp_f)strcmp, 
-                                  (hash_del_f)metric_data_destroy);
+    {
+      nd->metric_data = Hash_create(LISTENER_DATA_METRIC_DATA_SIZE_DEFAULT, 
+                                    (hash_key_f)hash_key_string,
+                                    (hash_cmp_f)strcmp, 
+                                    (hash_del_f)metric_data_destroy);
+      nd->metric_data_size = LISTENER_DATA_METRIC_DATA_SIZE_DEFAULT;
+    }
   else
-    nd->metric_data = NULL;
+    {
+      nd->metric_data = NULL;
+      nd->metric_data_size = 0;
+    }
   nd->metric_data_count = 0;
   return nd;
 }
 
-void
-cerebrod_monitor_module_destroy(void *data)
+/* 
+ * _cerebrod_monitor_module_destroy
+ *
+ * Destroy a monitor_module struct.
+ */
+static void
+_cerebrod_monitor_module_destroy(void *data)
 {
   struct cerebrod_monitor_module *monitor_module;
   
@@ -255,13 +244,13 @@ _setup_monitor_modules(void)
   if (!(monitor_handle = monitor_modules_load()))
     {
       CEREBRO_DBG(("monitor_modules_load"));
-      goto monitor_cleanup;
+      goto cleanup;
     }
 
   if ((monitor_module_count = monitor_modules_count(monitor_handle)) < 0)
     {
       CEREBRO_DBG(("monitor_modules_count"));
-      goto monitor_cleanup;
+      goto cleanup;
     }
 
   if (!monitor_module_count)
@@ -276,7 +265,7 @@ _setup_monitor_modules(void)
           Pthread_mutex_unlock(&debug_output_mutex);
         }
 #endif /* CEREBRO_DEBUG */
-      goto monitor_cleanup;
+      goto cleanup;
     }
   
   /* Each monitor module may wish to monitor multiple metrics.  We'll
@@ -289,8 +278,6 @@ _setup_monitor_modules(void)
                               (hash_key_f)hash_key_string, 
                               (hash_cmp_f)strcmp, 
                               (hash_del_f)list_destroy);
-
-  
 
   for (i = 0; i < monitor_module_count; i++)
     {
@@ -318,7 +305,7 @@ _setup_monitor_modules(void)
 
       if (!(metric_names = monitor_module_metric_names(monitor_handle, i)) < 0)
         {
-          CEREBRO_DBG(("monitor_module_metric_name failed: %s", module_name));
+          CEREBRO_DBG(("monitor_module_metric_names failed: %s", module_name));
           monitor_module_cleanup(monitor_handle, i);
           continue;
         }
@@ -332,10 +319,10 @@ _setup_monitor_modules(void)
         {
 	  if (!(monitor_list = Hash_find(monitor_index, monitor_module->metric_names)))
 	    {
-	      monitor_list = List_create((ListDelF)cerebrod_monitor_module_destroy);
+	      monitor_list = List_create((ListDelF)_cerebrod_monitor_module_destroy);
 	      List_append(monitor_list, monitor_module);
 	      Hash_insert(monitor_index, monitor_module->metric_names, monitor_list);
-	      monitor_index_size++;
+	      monitor_index_count++;
 	    }
 	  else
 	    List_append(monitor_list, monitor_module);
@@ -353,10 +340,10 @@ _setup_monitor_modules(void)
             {
 	      if (!(monitor_list = Hash_find(monitor_index, metric)))
 		{
-		  monitor_list = List_create((ListDelF)cerebrod_monitor_module_destroy);
+		  monitor_list = List_create((ListDelF)_cerebrod_monitor_module_destroy);
 		  List_append(monitor_list, monitor_module);
 		  Hash_insert(monitor_index, metric, monitor_list);
-		  monitor_index_size++;
+		  monitor_index_count++;
 		}
 	      else
 		List_append(monitor_list, monitor_module);
@@ -366,12 +353,12 @@ _setup_monitor_modules(void)
         }
     }
 
-  if (!monitor_index_size)
-    goto monitor_cleanup;
+  if (!monitor_index_count)
+    goto cleanup;
 
   return 1;
 
- monitor_cleanup:
+ cleanup:
   if (monitor_handle)
     {
       monitor_modules_unload(monitor_handle);
@@ -382,7 +369,7 @@ _setup_monitor_modules(void)
       Hash_destroy(monitor_index);
       monitor_index = NULL;
     }
-  monitor_index_size = 0;
+  monitor_index_count = 0;
   return 0;
 }
 
@@ -445,20 +432,19 @@ cerebrod_listener_data_initialize(void)
 
   if (numnodes > 0)
     {
-      listener_data_index_numnodes = numnodes;
-      listener_data_index_size = numnodes;
+      listener_data_numnodes = numnodes;
+      listener_data_size = numnodes;
     }
   else
     {
-      listener_data_index_numnodes = 0;
-      listener_data_index_size = LISTENER_DATA_INDEX_SIZE_DEFAULT;
+      listener_data_numnodes = 0;
+      listener_data_size = LISTENER_DATA_SIZE_DEFAULT;
     }
 
-  listener_data_list = List_create((ListDelF)NULL);
-  listener_data_index = Hash_create(listener_data_index_size,
-                                    (hash_key_f)hash_key_string,
-                                    (hash_cmp_f)strcmp,
-                                    (hash_del_f)NULL);
+  listener_data = Hash_create(listener_data_size,
+                              (hash_key_f)hash_key_string,
+                              (hash_cmp_f)strcmp,
+                              (hash_del_f)NULL);
   
   /* If the clusterlist module contains nodes, retrieve all of these
    * nodes and put them into the cerebrod_listener_data list.  All updates
@@ -478,27 +464,25 @@ cerebrod_listener_data_initialize(void)
           
           nd = _cerebrod_node_data_create_and_init(nodes[i]);
 
-          List_append(listener_data_list, nd);
-          Hash_insert(listener_data_index, nd->nodename, nd);
+          Hash_insert(listener_data, nd->nodename, nd);
 
           free(nodes[i]);
         }
-
-      List_sort(listener_data_list, (ListCmpF)_cerebrod_node_data_strcmp);
 
       free(nodes);
     }
 
   if (conf.metric_server)
     {
-      int i, size;
+      int i;
       
-      size = metric_name_defaults_count + LISTENER_DATA_METRIC_NAMES_INDEX_SIZE;
-      metric_names_index = Hash_create(size, 
-                                       (hash_key_f)hash_key_string, 
-                                       (hash_cmp_f)strcmp, 
-                                       (hash_del_f)metric_name_data_destroy);
+      metric_names_size = metric_name_defaults_count + LISTENER_DATA_METRIC_NAMES_SIZE_DEFAULT;
+      metric_names = Hash_create(metric_names_size, 
+                                 (hash_key_f)hash_key_string, 
+                                 (hash_cmp_f)strcmp, 
+                                 (hash_del_f)metric_name_data_destroy);
 
+      metric_names_count = 0;
       for (i = 0; i < metric_name_defaults_count; i++)
         {
           struct cerebrod_metric_name_data *mnd;
@@ -506,12 +490,13 @@ cerebrod_listener_data_initialize(void)
           mnd = metric_name_data_create(metric_name_defaults[i],
                                         CEREBROD_METRIC_LISTENER_ORIGIN_DEFAULT);
 
-          Hash_insert(metric_names_index, mnd->metric_name, mnd);
+          Hash_insert(metric_names, mnd->metric_name, mnd);
+          metric_names_count++;
         }
     }
 
   if (_setup_monitor_modules() < 0)
-    CEREBRO_EXIT(("_setup_metric_modules"));
+    CEREBRO_EXIT(("_setup_monitor_modules"));
 
   listener_data_init++;
  out:
@@ -623,7 +608,7 @@ _metric_data_dump(void *data, const void *key, void *arg)
  * callback function from list_for_each to dump node data
  */
 static int
-_node_data_dump(void *x, void *arg)
+_node_data_dump(void *x, const void *key, void *arg)
 {
   struct cerebrod_node_data *nd;
 
@@ -660,12 +645,12 @@ _node_data_dump(void *x, void *arg)
 #endif /* CEREBRO_DEBUG */
 
 /*
- * _listener_data_list_dump
+ * _listener_data_dump
  *
  * Dump contents of node data list
  */
 static void
-_listener_data_list_dump(void)
+_listener_data_dump(void)
 {
 #if CEREBRO_DEBUG
   if (!(conf.debug && conf.listen_debug))
@@ -676,21 +661,21 @@ _listener_data_list_dump(void)
   fprintf(stderr, "**************************************\n");
   fprintf(stderr, "* Node Data List State\n");
   fprintf(stderr, "* -----------------------\n");
-  fprintf(stderr, "* Nodes: %d\n", listener_data_index_numnodes);
+  fprintf(stderr, "* Nodes: %d\n", listener_data_numnodes);
   fprintf(stderr, "* -----------------------\n");
-  if (listener_data_index_numnodes > 0)
+  if (listener_data_numnodes > 0)
     {
       int num;
       
-      num = List_for_each(listener_data_list, _node_data_dump, NULL);
-      if (num != listener_data_index_numnodes)
+      num = Hash_for_each(listener_data, _node_data_dump, NULL);
+      if (num != listener_data_numnodes)
         {
           fprintf(stderr, "* invalid dump count: num=%d numnodes=%d",
-                  num, listener_data_index_numnodes);
+                  num, listener_data_numnodes);
         }
     }
   else
-    fprintf(stderr, "_listener_data_list_dump: empty list\n");
+    fprintf(stderr, "_listener_data_dump: empty list\n");
   fprintf(stderr, "**************************************\n");
   Pthread_mutex_unlock(&debug_output_mutex);
   Pthread_mutex_unlock(&listener_data_lock);
@@ -718,15 +703,15 @@ _metric_name_output(void *data, const void *key, void *arg)
 #endif /* CEREBRO_DEBUG */
 
 /*
- * _metric_names_index_dump
+ * _metric_names_dump
  *
  * Dump contents of the metric name list
  */
 static void
-_metric_names_index_dump(void)
+_metric_names_dump(void)
 {
 #if CEREBRO_DEBUG
-  if (!(conf.debug && conf.listen_debug && metric_names_index))
+  if (!(conf.debug && conf.listen_debug && metric_names))
     return;
 
   Pthread_mutex_lock(&metric_names_lock);
@@ -734,7 +719,7 @@ _metric_names_index_dump(void)
   fprintf(stderr, "**************************************\n");
   fprintf(stderr, "* Metric Name List\n");
   fprintf(stderr, "* -----------------------\n");
-  Hash_for_each(metric_names_index, _metric_name_output, NULL);
+  Hash_for_each(metric_names, _metric_name_output, NULL);
   fprintf(stderr, "**************************************\n");
   Pthread_mutex_unlock(&debug_output_mutex);
   Pthread_mutex_unlock(&metric_names_lock);
@@ -760,8 +745,8 @@ _metric_data_update(struct cerebrod_node_data *nd,
   
   assert(nd && metric_name && hd);
 
-  /* If metric server isn't running, metric_names_index is NULL */
-  if (!metric_names_index)
+  /* If metric server isn't running, metric_names is NULL */
+  if (!metric_names)
     return;
 
   assert(nd->metric_data);
@@ -774,19 +759,36 @@ _metric_data_update(struct cerebrod_node_data *nd,
 #endif /* CEREBRO_DEBUG */
   
   Pthread_mutex_lock(&metric_names_lock);
-  if (!Hash_find(metric_names_index, metric_name))
+  if (!Hash_find(metric_names, metric_name))
     {
       struct cerebrod_metric_name_data *mnd;
+      
+      /* Re-hash if our hash is getting too small */
+      if ((metric_names_count + 1) > (metric_names_size*2))
+	cerebrod_rehash(&metric_names,
+			&metric_names_size,
+			LISTENER_DATA_METRIC_NAMES_INCREMENT,
+			metric_names_count,
+			&metric_names_lock);
       
       mnd = metric_name_data_create(metric_name,
                                     CEREBROD_METRIC_LISTENER_ORIGIN_MONITORED);
       
-      Hash_insert(metric_names_index, mnd->metric_name, mnd);
+      Hash_insert(metric_names, mnd->metric_name, mnd);
+      metric_names_count++;
     }
   Pthread_mutex_unlock(&metric_names_lock);             
-
+  
   if (!(md = Hash_find(nd->metric_data, metric_name)))
     {
+      /* Re-hash if our hash is getting too small */
+      if ((nd->metric_data_count + 1) > (nd->metric_data_size*2))
+	cerebrod_rehash(&nd->metric_data,
+			&nd->metric_data_size,
+			LISTENER_DATA_METRIC_DATA_INCREMENT,
+			nd->metric_data_count,
+			&nd->node_data_lock);
+
       md = metric_data_create(metric_name);
       Hash_insert(nd->metric_data, md->metric_name, md);
       nd->metric_data_count++;
@@ -881,24 +883,23 @@ cerebrod_listener_data_update(char *nodename,
   if (!listener_data_init)
     CEREBRO_EXIT(("initialization not complete"));
 
-  if (!listener_data_list || !listener_data_index)
+  if (!listener_data)
     CEREBRO_EXIT(("initialization not complete"));
 
   Pthread_mutex_lock(&listener_data_lock);
-  if (!(nd = Hash_find(listener_data_index, nodename)))
+  if (!(nd = Hash_find(listener_data, nodename)))
     {
       /* Re-hash if our hash is getting too small */
-      if ((listener_data_index_numnodes + 1) > LISTENER_DATA_INDEX_SIZE_LIMIT)
-	cerebrod_rehash(&listener_data_index,
-			&listener_data_index_size,
-			LISTENER_DATA_INDEX_SIZE_INCREMENT,
-			listener_data_index_numnodes,
+      if ((listener_data_numnodes + 1) > (listener_data_size*2))
+	cerebrod_rehash(&listener_data,
+			&listener_data_size,
+			LISTENER_DATA_SIZE_INCREMENT,
+			listener_data_numnodes,
 			&listener_data_lock);
 
       nd = _cerebrod_node_data_create_and_init(nodename);
-      List_append(listener_data_list, nd);
-      Hash_insert(listener_data_index, nd->nodename, nd);
-      listener_data_index_numnodes++;
+      Hash_insert(listener_data, nd->nodename, nd);
+      listener_data_numnodes++;
 
       /* Ok to call debug output function, since
        * listener_data_lock is locked.
@@ -943,8 +944,8 @@ cerebrod_listener_data_update(char *nodename,
   if (update_output_flag)
     _output_node_data_update(nd);
 
-  _listener_data_list_dump();
-  _metric_names_index_dump();
+  _listener_data_dump();
+  _metric_names_dump();
 }
 
 #endif /* !WITH_CEREBROD_SPEAKER_ONLY */
