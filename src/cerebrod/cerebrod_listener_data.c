@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.41 2006-10-31 02:59:29 chu11 Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.42 2006-10-31 03:26:13 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -496,7 +496,7 @@ cerebrod_listener_data_initialize(void)
     }
 
   if (_setup_monitor_modules() < 0)
-    CEREBRO_EXIT(("_setup_metric_modules"));
+    CEREBRO_EXIT(("_setup_monitor_modules"));
 
   listener_data_init++;
  out:
