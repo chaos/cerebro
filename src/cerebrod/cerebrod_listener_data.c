@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.40 2006-10-30 20:00:24 chu11 Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.41 2006-10-31 02:59:29 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -210,8 +210,13 @@ _cerebrod_node_data_create_and_init(const char *nodename)
   return nd;
 }
 
-void
-cerebrod_monitor_module_destroy(void *data)
+/* 
+ * _cerebrod_monitor_module_destroy
+ *
+ * Destroy a monitor_module struct.
+ */
+static void
+_cerebrod_monitor_module_destroy(void *data)
 {
   struct cerebrod_monitor_module *monitor_module;
   
@@ -314,7 +319,7 @@ _setup_monitor_modules(void)
         {
 	  if (!(monitor_list = Hash_find(monitor_index, monitor_module->metric_names)))
 	    {
-	      monitor_list = List_create((ListDelF)cerebrod_monitor_module_destroy);
+	      monitor_list = List_create((ListDelF)_cerebrod_monitor_module_destroy);
 	      List_append(monitor_list, monitor_module);
 	      Hash_insert(monitor_index, monitor_module->metric_names, monitor_list);
 	      monitor_index_size++;
@@ -335,7 +340,7 @@ _setup_monitor_modules(void)
             {
 	      if (!(monitor_list = Hash_find(monitor_index, metric)))
 		{
-		  monitor_list = List_create((ListDelF)cerebrod_monitor_module_destroy);
+		  monitor_list = List_create((ListDelF)_cerebrod_monitor_module_destroy);
 		  List_append(monitor_list, monitor_module);
 		  Hash_insert(monitor_index, metric, monitor_list);
 		  monitor_index_size++;
