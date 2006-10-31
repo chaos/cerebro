@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.h,v 1.9.2.2 2006-10-31 15:03:13 chu11 Exp $
+ *  $Id: cerebrod_listener_data.h,v 1.9.2.3 2006-10-31 19:14:31 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -112,6 +112,17 @@ struct cerebrod_metric_name_data
 {
   char *metric_name;
   u_int32_t metric_origin;
+};
+
+/* 
+ * struct cerebrod_event_timeout
+ *
+ * contains information needed for timeout calculations
+ */
+struct cerebrod_event_timeout
+{
+  char *nodename;
+  u_int32_t last_received_time;
 };
 
 /* 

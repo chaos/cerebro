@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.37.2.5 2006-10-31 17:38:06 chu11 Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.37.2.6 2006-10-31 19:14:30 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -62,6 +62,9 @@
 
 #define LISTENER_DATA_METRIC_DATA_SIZE_DEFAULT  32
 #define LISTENER_DATA_METRIC_DATA_INCREMENT     32
+
+#define EVENT_TIMEOUT_SIZE_DEFAULT              1024
+#define EVENT_TIMEOUT_SIZE_INCREMENT            1024
 
 extern struct cerebrod_config conf;
 #if CEREBRO_DEBUG
@@ -174,6 +177,26 @@ int monitor_index_count = 0;
  */
 List event_names = NULL;
 
+/* 
+ * event_timeout_data
+ * event_timeout_data_index
+ *
+ * data for calculating when nodes timeout and informing the
+ * appropriate modules.
+ */
+List event_timeout_data = NULL;
+hash_t event_timeout_index = NULL;
+int event_timeout_index_numnodes;
+int event_timeout_index_size;
+
+/*  
+ * event_timeout_lock
+ *
+ * lock to protect pthread access to both the event_timeout_data
+ * and event_timeout_index
+ */
+pthread_mutex_t event_timeout_lock = PTHREAD_MUTEX_INITIALIZER;
+
 struct cerebrod_metric_data *
 metric_data_create(const char *metric_name)
 {
@@ -267,6 +290,116 @@ _cerebrod_monitor_module_destroy(void *data)
   monitor_module = (struct cerebrod_monitor_module *)data;
   Free(monitor_module->metric_names);
   Free(monitor_module);
+}
+
+/* 
+ * _event_timeout_data_append
+ *
+ * Create entries for the event_timeout_data list and index
+ *
+ * Returns 0 on success, -1 on error
+ */
+static int
+_event_timeout_data_append(const char *nodename, u_int32_t time_now)
+{
+  struct cerebrod_event_timeout *td;
+
+  td = (struct cerebrod_event_timeout *)Malloc(sizeof(struct cerebrod_event_timeout));
+  td->nodename = (char *)nodename;
+  td->last_received_time = time_now;
+
+  List_append(event_timeout_data, td);
+  Hash_insert(event_timeout_index, td->nodename, td);
+  return 0;
+}
+
+/* 
+ * _event_timeout_for_each
+ *
+ * Create entries for the event_timeout_data list and index for the
+ * first time via Hash_for_each call to listener_data.
+ *
+ * Returns 0 on success, -1 on error
+ */
+static int
+_event_timeout_for_each(void *data, const void *key, void *arg)
+{
+  struct cerebrod_node_data *nd;
+  u_int32_t *time_now = (u_int32_t *)arg;
+
+  nd = (struct cerebrod_node_data *)data;
+
+  _event_timeout_data_append(nd->nodename, *time_now);
+  return 0;
+}
+
+/* 
+ * _event_timeout_compare
+ *
+ * Comparison for list sorting
+ */
+static int
+_event_timeout_compare(void *x, void *y)
+{
+  struct cerebrod_event_timeout *a;
+  struct cerebrod_event_timeout *b;
+
+  a = (struct cerebrod_event_timeout *)x;
+  b = (struct cerebrod_event_timeout *)y;
+
+  if (a->last_received_time < b->last_received_time)
+    return -1;
+  if (a->last_received_time > b->last_received_time)
+    return 1;
+  return 0;
+}
+
+/*
+ * _setup_event_timeout_data
+ *
+ * Setup event timeout calculation data structures. 
+ *
+ * Return 0 on success, -1 on error
+ */
+static int
+_setup_event_timeout_data(void)
+{
+  struct timeval tv;
+  int num;
+
+  assert(conf.event_server);
+  assert(listener_data);
+
+  event_timeout_data = List_create(NULL);
+  event_timeout_index = Hash_create(EVENT_TIMEOUT_SIZE_DEFAULT, 
+                                    (hash_key_f)hash_key_string,
+                                    (hash_cmp_f)strcmp, 
+                                    (hash_del_f)NULL);
+  
+  Gettimeofday(&tv, NULL);
+
+  num = Hash_for_each(listener_data, _event_timeout_for_each, &(tv.tv_sec));
+  if (num != listener_data_numnodes)
+    {
+      fprintf(stderr, "* invalid create count: num=%d numnodes=%d",
+              num, listener_data_numnodes);
+      goto cleanup;
+    }
+
+  return 0;
+
+ cleanup:
+  if (event_timeout_data)
+    {
+      List_destroy(event_timeout_data);
+      event_timeout_data = NULL;
+    }
+  if (event_timeout_index)
+    {
+      Hash_destroy(event_timeout_index);
+      event_timeout_index =  NULL;
+    }
+  return -1;
 }
 
 /*
@@ -419,6 +552,9 @@ _setup_event_modules(void)
   if (!event_index_count)
     goto cleanup;
 
+  if (_setup_event_timeout_data() < 0)
+    goto cleanup;
+
   return 1;
   
  cleanup:
@@ -440,7 +576,6 @@ _setup_event_modules(void)
   event_index_count = 0;
   return 0;
 }
-
 
 /* 
  * _setup_monitor_modules
@@ -1166,6 +1301,10 @@ cerebrod_listener_data_update(char *nodename,
       Hash_insert(listener_data, nd->nodename, nd);
       listener_data_numnodes++;
 
+      Pthread_mutex_lock(&event_timeout_lock);
+      _event_timeout_data_append(nd->nodename, received_time);
+      Pthread_mutex_unlock(&event_timeout_lock);
+
       /* Ok to call debug output function, since
        * listener_data_lock is locked.
        */
@@ -1176,8 +1315,15 @@ cerebrod_listener_data_update(char *nodename,
   Pthread_mutex_lock(&(nd->node_data_lock));
   if (received_time >= nd->last_received_time)
     {
+      struct cerebrod_event_timeout *td;
+
       nd->discovered = 1;
       nd->last_received_time = received_time;
+
+      Pthread_mutex_lock(&event_timeout_lock);
+      if ((td = Hash_find(event_timeout_index, nd->nodename)))
+        td->last_received_time = received_time;
+      Pthread_mutex_unlock(&event_timeout_lock);
 
       for (i = 0; i < hb->metrics_len; i++)
         {
