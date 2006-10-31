@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.80 2005-08-25 01:44:21 achu Exp $
+ *  $Id: cerebrod.c,v 1.80.2.1 2006-10-31 06:26:36 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -38,6 +38,7 @@
 #include "cerebrod.h"
 #include "cerebrod_daemon.h"
 #include "cerebrod_config.h"
+#include "cerebrod_event.h"
 #include "cerebrod_listener.h"
 #include "cerebrod_metric_controller.h"
 #include "cerebrod_metric_server.h"
@@ -75,6 +76,14 @@ extern pthread_mutex_t metric_controller_init_lock;
 extern int metric_server_init;
 extern pthread_cond_t metric_server_init_cond;
 extern pthread_mutex_t metric_server_init_lock;
+
+extern int event_manager_init;
+extern pthread_cond_t event_manager_init_cond;
+extern pthread_mutex_t event_manager_init_lock;
+
+extern int event_server_init;
+extern pthread_cond_t event_server_init_cond;
+extern pthread_mutex_t event_server_init_lock;
 
 #endif /* !WITH_CEREBROD_SPEAKER_ONLY */
 
@@ -125,6 +134,42 @@ main(int argc, char **argv)
       while (!metric_server_init)
         Pthread_cond_wait(&metric_server_init_cond, &metric_server_init_lock);
       Pthread_mutex_unlock(&metric_server_init_lock);
+    }
+
+  /* Start event manager & server before the listener begins receiving data */
+  if (conf.event_server)
+    {
+      pthread_t thread;
+      pthread_attr_t attr;
+      int i;
+
+      /* Need atleast one event management thread per listening thread */
+      for (i = 0; i < conf.listen_threads; i++)
+        {
+          Pthread_attr_init(&attr);
+          Pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+          Pthread_attr_setstacksize(&attr, CEREBROD_THREAD_STACKSIZE);
+          Pthread_create(&thread, &attr, cerebrod_event_manager, NULL);
+          Pthread_attr_destroy(&attr);
+        }
+
+      /* Wait for initialization to complete */
+      Pthread_mutex_lock(&event_manager_init_lock);
+      while (!event_manager_init)
+        Pthread_cond_wait(&event_manager_init_cond, &event_manager_init_lock);
+      Pthread_mutex_unlock(&event_manager_init_lock);
+
+      Pthread_attr_init(&attr);
+      Pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+      Pthread_attr_setstacksize(&attr, CEREBROD_THREAD_STACKSIZE);
+      Pthread_create(&thread, &attr, cerebrod_event_server, NULL);
+      Pthread_attr_destroy(&attr);
+
+      /* Wait for initialization to complete */
+      Pthread_mutex_lock(&event_server_init_lock);
+      while (!event_server_init)
+        Pthread_cond_wait(&event_server_init_cond, &event_server_init_lock);
+      Pthread_mutex_unlock(&event_server_init_lock);
     }
 
   /* Start listening server before speaker so that listener

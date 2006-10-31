@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: event_module.h,v 1.1.2.1 2006-10-30 19:55:34 chu11 Exp $
+ *  $Id: event_module.h,v 1.1.2.2 2006-10-31 06:26:36 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -77,6 +77,13 @@ int event_module_setup(event_modules_t handle, unsigned int index);
  * call event module cleanup function
  */
 int event_module_cleanup(event_modules_t handle, unsigned int index);
+
+/*
+ * event_module_event_names
+ *
+ * call event module event_names function
+ */
+char *event_module_event_names(event_modules_t handle, unsigned int index);
 
 /*
  * event_module_metric_names
