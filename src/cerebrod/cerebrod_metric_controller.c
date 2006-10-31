@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_controller.c,v 1.35 2006-10-30 20:00:24 chu11 Exp $
+ *  $Id: cerebrod_metric_controller.c,v 1.36 2006-10-31 04:32:22 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -674,7 +674,7 @@ _resend_metric(int fd, int32_t version, const char *metric_name)
  * Returns 0 on success, -1 on error
  */
 static int
-_flush_metric_data(void *x, void *key, void *arg)
+_flush_metric_data(void *x, const void *key, void *arg)
 {
   struct cerebrod_node_data *nd;
   char *metric_name;

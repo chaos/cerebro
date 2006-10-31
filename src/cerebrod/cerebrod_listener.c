@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.127 2006-10-30 00:55:50 chu11 Exp $
+ *  $Id: cerebrod_listener.c,v 1.128 2006-10-31 04:32:22 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -396,7 +396,6 @@ void *
 cerebrod_listener(void *arg)
 {
   char buf[CEREBRO_MAX_PACKET_LEN];
-  int buflen;
 
   _cerebrod_listener_initialize();
 

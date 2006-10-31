@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_server.c,v 1.36 2006-10-31 00:06:03 chu11 Exp $
+ *  $Id: cerebrod_metric_server.c,v 1.37 2006-10-31 04:32:22 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -479,7 +479,7 @@ _metric_names_callback(void *data, const void *key, void *arg)
  * Return 0 on success, -1 on error
  */
 static int
-_metric_data_evaluate(void *x, void *key, void *arg)
+_metric_data_evaluate(void *x, const void *key, void *arg)
 {
   struct cerebrod_node_data *nd;
   struct cerebrod_metric_data_evaluation_data *ed;

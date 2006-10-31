@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.42 2006-10-31 03:26:13 chu11 Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.43 2006-10-31 04:32:22 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -244,13 +244,13 @@ _setup_monitor_modules(void)
   if (!(monitor_handle = monitor_modules_load()))
     {
       CEREBRO_DBG(("monitor_modules_load"));
-      goto monitor_cleanup;
+      goto cleanup;
     }
 
   if ((monitor_module_count = monitor_modules_count(monitor_handle)) < 0)
     {
       CEREBRO_DBG(("monitor_modules_count"));
-      goto monitor_cleanup;
+      goto cleanup;
     }
 
   if (!monitor_module_count)
@@ -265,7 +265,7 @@ _setup_monitor_modules(void)
           Pthread_mutex_unlock(&debug_output_mutex);
         }
 #endif /* CEREBRO_DEBUG */
-      goto monitor_cleanup;
+      goto cleanup;
     }
   
   /* Each monitor module may wish to monitor multiple metrics.  We'll
@@ -354,11 +354,11 @@ _setup_monitor_modules(void)
     }
 
   if (!monitor_index_size)
-    goto monitor_cleanup;
+    goto cleanup;
 
   return 1;
 
- monitor_cleanup:
+ cleanup:
   if (monitor_handle)
     {
       monitor_modules_unload(monitor_handle);
@@ -608,7 +608,7 @@ _metric_data_dump(void *data, const void *key, void *arg)
  * callback function from list_for_each to dump node data
  */
 static int
-_node_data_dump(void *x, void *key, void *arg)
+_node_data_dump(void *x, const void *key, void *arg)
 {
   struct cerebrod_node_data *nd;
 
