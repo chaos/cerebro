@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.37.2.2 2006-10-31 06:33:47 chu11 Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.37.2.3 2006-10-31 15:03:13 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -48,6 +48,7 @@
 
 #include "clusterlist_module.h"
 #include "debug.h"
+#include "event_module.h"
 #include "hash.h"
 #include "list.h"
 #include "monitor_module.h"
@@ -132,12 +133,29 @@ int metric_name_defaults_count = 3;
  */
 pthread_mutex_t metric_names_lock = PTHREAD_MUTEX_INITIALIZER;
 
+/*
+ * event_handle
+ *
+ * Handle for event modules;
+ */
+event_modules_t event_handle = NULL;
+
 /* 
  * monitor_handle
  *
  * monitoring module handles
  */
 monitor_modules_t monitor_handle = NULL;
+
+/*
+ * event_index
+ * event_index_count
+ *
+ * hash indexes to quickly determine what metrics are needed
+ * by which modules.
+ */
+hash_t event_index = NULL;
+int event_index_count = 0;
 
 /*
  * monitor_index
@@ -148,6 +166,13 @@ monitor_modules_t monitor_handle = NULL;
  */
 hash_t monitor_index = NULL;
 int monitor_index_count = 0;
+
+/*
+ * event_names
+ *
+ * List of event names supported by the modules
+ */
+List event_names = NULL;
 
 struct cerebrod_metric_data *
 metric_data_create(const char *metric_name)
@@ -210,6 +235,23 @@ _cerebrod_node_data_create_and_init(const char *nodename)
   return nd;
 }
 
+/*
+ * _cerebrod_event_module_destroy
+ *
+ * Destroy a event_module struct.
+ */
+static void
+_cerebrod_event_module_destroy(void *data)
+{
+  struct cerebrod_event_module *event_module;
+
+  assert(data);
+
+  event_module = (struct cerebrod_event_module *)data;
+  Free(event_module->metric_names);
+  Free(event_module);
+}
+
 /* 
  * _cerebrod_monitor_module_destroy
  *
@@ -226,6 +268,224 @@ _cerebrod_monitor_module_destroy(void *data)
   Free(monitor_module->metric_names);
   Free(monitor_module);
 }
+
+/*
+ * _setup_event_modules
+ *
+ * Setup event modules.  Under almost any circumstance, don't return
+ * a -1 error, cerebro can go on without loading event modules.
+ *
+ * Return 1 if modules are loaded, 0 if not, -1 on error
+ */
+static int
+_setup_event_modules(void)
+{
+  int i, event_module_count, event_index_len;
+  List event_list = NULL;
+  char *eventnamePtr;
+
+  if (!conf.event_server)
+    return;
+
+  if (!(event_handle = event_modules_load()))
+    {
+      CEREBRO_DBG(("event_modules_load"));
+      goto cleanup;
+    }
+
+  if ((event_module_count = event_modules_count(event_handle)) < 0)
+    {
+      CEREBRO_DBG(("event_modules_count"));
+      goto cleanup;
+    }
+
+  if (!event_module_count)
+    {
+#if CEREBRO_DEBUG
+      if (conf.debug && conf.event_server_debug)
+        {
+          Pthread_mutex_lock(&debug_output_mutex);
+          fprintf(stderr, "**************************************\n");
+          fprintf(stderr, "* No Event Modules Found\n");
+          fprintf(stderr, "**************************************\n");
+          Pthread_mutex_unlock(&debug_output_mutex);
+        }
+#endif /* CEREBRO_DEBUG */
+      goto cleanup;
+    }
+
+  /* Each event module may want multiple metrics and/or offer multiple
+   * event names.  We'll assume there will never be more than 2 per
+   * event module, and that will be enough to avoid all hash
+   * collisions.
+   */
+  event_index_len = event_module_count * 2;
+
+  event_index = Hash_create(event_index_len,
+                            (hash_key_f)hash_key_string,
+                            (hash_cmp_f)strcmp,
+                            (hash_del_f)list_destroy);
+
+  event_names = List_create((ListDelF)_Free);
+
+  for (i = 0; i < event_module_count; i++)
+    {
+      struct cerebrod_event_module *event_module;
+      char *module_name, *module_metric_names, *module_event_names;
+
+      module_name = event_module_name(event_handle, i);
+
+#if CEREBRO_DEBUG
+      if (conf.debug && conf.event_server_debug)
+        {
+          Pthread_mutex_lock(&debug_output_mutex);
+          fprintf(stderr, "**************************************\n");
+          fprintf(stderr, "* Setup Event Module: %s\n", module_name);
+          fprintf(stderr, "**************************************\n");
+          Pthread_mutex_unlock(&debug_output_mutex);
+        }
+#endif /* CEREBRO_DEBUG */
+
+      if (event_module_setup(event_handle, i) < 0)
+        {
+          CEREBRO_DBG(("event_module_setup failed: %s", module_name));
+          continue;
+        }
+
+      if (!(module_metric_names = event_module_metric_names(event_handle, i)) < 0)
+        {
+          CEREBRO_DBG(("event_module_metric_names failed: %s", module_name));
+          event_module_cleanup(event_handle, i);
+          continue;
+        }
+
+      if (!(module_event_names = event_module_event_names(event_handle, i)) < 0)
+        {
+          CEREBRO_DBG(("event_module_event_names failed: %s", module_name));
+          event_module_cleanup(event_handle, i);
+          continue;
+        }
+
+      event_module = Malloc(sizeof(struct cerebrod_event_module));
+      event_module->metric_names = Strdup(module_metric_names);
+      event_module->index = i;
+      Pthread_mutex_init(&(event_module->event_lock), NULL);
+
+      if (!strchr(event_module->metric_names, ','))
+        {
+          if (!(event_list = Hash_find(event_index, event_module->metric_names)))
+            {
+              event_list = List_create((ListDelF)_cerebrod_event_module_destroy);
+              List_append(event_list, event_module);
+              Hash_insert(event_index, event_module->metric_names, event_list);
+              event_index_count++;
+            }
+          else
+            List_append(event_list, event_module);
+        }
+      else
+        {
+          char *metric, *metricbuf;
+
+          /* This event module supports multiple metrics, must
+           * parse out each one
+           */
+          
+          metric = strtok_r(event_module->metric_names, ",", &metricbuf);
+          while (metric)
+            {
+              if (!(event_list = Hash_find(event_index, metric)))
+                {
+                  event_list = List_create((ListDelF)_cerebrod_event_module_destroy);
+                  List_append(event_list, event_module);
+                  Hash_insert(event_index, metric, event_list);
+                  event_index_count++;
+                }
+              else
+                List_append(event_list, event_module);
+
+              metric = strtok_r(NULL, ",", &metricbuf);
+            }
+        }
+
+      if (!strchr(module_event_names, ','))
+        {
+          if (!list_find_first(event_names,
+                               (ListFindF)strcmp,
+                               module_event_names))
+            {
+              eventnamePtr = Strdup(module_event_names);
+              List_append(event_names, eventnamePtr);
+#if CEREBRO_DEBUG
+              if (conf.debug && conf.event_server_debug)
+                {
+                  Pthread_mutex_lock(&debug_output_mutex);
+                  fprintf(stderr, "**************************************\n");
+                  fprintf(stderr, "* Event Name: %s\n", eventnamePtr);
+                  fprintf(stderr, "**************************************\n");
+                  Pthread_mutex_unlock(&debug_output_mutex);
+                }
+#endif /* CEREBRO_DEBUG */
+            }
+        }
+      else
+        {
+          char *eventname, *eventbuf;
+
+          /* This event module supports multiple events, must parse
+           * out each one
+           */
+
+          eventname = strtok_r(module_event_names, ",", &eventbuf);
+          while (eventname)
+            {
+              if (!list_find_first(event_names,
+                                   (ListFindF)strcmp,
+                                   eventname))
+                {
+                  eventnamePtr = Strdup(eventname);
+                  List_append(event_names, eventnamePtr);
+#if CEREBRO_DEBUG
+                  if (conf.debug && conf.event_server_debug)
+                    {
+                      Pthread_mutex_lock(&debug_output_mutex);
+                      fprintf(stderr, "**************************************\n");
+                      fprintf(stderr, "* Event Name: %s\n", eventnamePtr);
+                      fprintf(stderr, "**************************************\n");
+                      Pthread_mutex_unlock(&debug_output_mutex);
+                    }
+#endif /* CEREBRO_DEBUG */
+                }
+              eventname = strtok_r(NULL, ",", &eventbuf);
+            }
+        }
+    }
+  
+  if (!event_index_count)
+    goto cleanup;
+
+  return 1;
+  
+ cleanup:
+  if (event_handle)
+    {
+      event_modules_unload(event_handle);
+      event_handle = NULL;
+    }
+  if (event_index)
+    {
+      Hash_destroy(event_index);
+      event_index = NULL;
+    }
+  if (event_names)
+    {
+      List_destroy(event_names);
+      event_names = NULL;
+    }
+  event_index_count = 0;
+  return 0;
+}
+
 
 /* 
  * _setup_monitor_modules
@@ -494,6 +754,9 @@ cerebrod_listener_data_initialize(void)
           metric_names_count++;
         }
     }
+
+  if (_setup_event_modules() < 0)
+    CEREBRO_EXIT(("_setup_event_modules"));
 
   if (_setup_monitor_modules() < 0)
     CEREBRO_EXIT(("_setup_monitor_modules"));

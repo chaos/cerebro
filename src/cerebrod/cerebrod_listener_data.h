@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.h,v 1.9.2.1 2006-10-31 06:33:47 chu11 Exp $
+ *  $Id: cerebrod_listener_data.h,v 1.9.2.2 2006-10-31 15:03:13 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -77,6 +77,18 @@ struct cerebrod_node_data
   hash_t metric_data;
   int metric_data_size;
   int metric_data_count;
+};
+
+/*
+ * struct cerebrod_event_module
+ *
+ * contains cerebrod event module metric information
+ */
+struct cerebrod_event_module
+{
+  char *metric_names;
+  int index;
+  pthread_mutex_t event_lock;
 };
 
 /*

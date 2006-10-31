@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_event.h,v 1.1.2.1 2006-10-31 06:26:36 chu11 Exp $
+ *  $Id: cerebrod_event.h,v 1.1.2.2 2006-10-31 15:03:13 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -27,29 +27,6 @@
 
 #ifndef _CEREBROD_EVENT_H
 #define _CEREBROD_EVENT_H
-
-/*
- * struct cerebrod_event_module
- *
- * contains cerebrod event module metric information
- */
-struct cerebrod_event_module
-{
-  char *metric_names;
-  int index;
-  pthread_mutex_t event_lock;
-};
- 
-/* 
- * cerebrod_event_manager
- *
- * Runs a cerebrod event management thread
- *
- * Passed no argument
- * 
- * Executed in detached state, no return value.
- */
-void *cerebrod_event_manager(void *);
 
 /* 
  * cerebrod_event_server
