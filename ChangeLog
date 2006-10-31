@@ -2,6 +2,8 @@
 
 	* src/cerebrod/cerebrod_listener_data.c (_setup_monitor_modules):
 	Cleanup strtok code.
+
+	* Various continued code cleanup.
 	
 2006-10-30  Albert Chu  <chu11@llnl.gov>
 
