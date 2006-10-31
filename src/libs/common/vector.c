@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: vector.c,v 1.4 2006-10-30 17:08:52 chu11 Exp $
+ *  $Id: vector.c,v 1.5 2006-10-31 06:27:56 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -529,8 +529,6 @@ vector_iterator_reset (VectorIterator i)
 void
 vector_iterator_destroy (VectorIterator i)
 {
-  VectorIterator *pi;
-
   assert(i);
   assert(i->magic == VECTOR_ITERATOR_MAGIC);
   assert(i->magic = ~VECTOR_MAGIC);     /* clear magic via assert abuse */
