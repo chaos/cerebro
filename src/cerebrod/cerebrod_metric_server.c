@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_server.c,v 1.35 2006-10-30 20:00:24 chu11 Exp $
+ *  $Id: cerebrod_metric_server.c,v 1.36 2006-10-31 00:06:03 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -968,9 +968,6 @@ _metric_server_setup_socket(int num)
       goto cleanup;
     }
 
-  /* Configuration checks ensure destination ip is on this machine if
-   * it is a non-multicast address.
-   */
   memset(&addr, '\0', sizeof(struct sockaddr_in));
   addr.sin_family = AF_INET;
   addr.sin_port = htons(conf.metric_server_port);
