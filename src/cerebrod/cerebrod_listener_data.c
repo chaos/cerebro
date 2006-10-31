@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.47 2006-10-31 18:20:12 chu11 Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.48 2006-10-31 18:35:49 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -92,8 +92,7 @@ int listener_data_size;
 /*  
  * listener_data_lock
  *
- * lock to protect pthread access to both the cluster_data list and
- * cluster_data_index
+ * lock to protect pthread access to listener_data
  */
 pthread_mutex_t listener_data_lock = PTHREAD_MUTEX_INITIALIZER;
 
