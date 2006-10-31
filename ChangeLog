@@ -22,6 +22,11 @@
 	* man/cerebro.conf.5.in, man/cerebro_module_devel.3.in: Update
 	appropriately.
 
+2006-10-31  Albert Chu  <chu11@llnl.gov>
+
+	* src/cerebrod/cerebrod_listener_data.c (_setup_monitor_modules):
+	Cleanup strtok code.
+	
 2006-10-30  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerebrod/cerebrod_listener_data.c,

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.37.2.3 2006-10-31 15:03:13 chu11 Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.37.2.4 2006-10-31 15:12:39 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -282,7 +282,6 @@ _setup_event_modules(void)
 {
   int i, event_module_count, event_index_len;
   List event_list = NULL;
-  char *eventnamePtr;
 
   if (!conf.event_server)
     return;
@@ -332,6 +331,8 @@ _setup_event_modules(void)
     {
       struct cerebrod_event_module *event_module;
       char *module_name, *module_metric_names, *module_event_names;
+      char *metricPtr, *metricbuf;
+      char *eventnamePtr, *eventbuf, *eventnamestr;
 
       module_name = event_module_name(event_handle, i);
 
@@ -371,93 +372,47 @@ _setup_event_modules(void)
       event_module->index = i;
       Pthread_mutex_init(&(event_module->event_lock), NULL);
 
-      if (!strchr(event_module->metric_names, ','))
+      /* The monitoring module may support multiple metrics */
+          
+      metricPtr = strtok_r(event_module->metric_names, ",", &metricbuf);
+      while (metricPtr)
         {
-          if (!(event_list = Hash_find(event_index, event_module->metric_names)))
+          if (!(event_list = Hash_find(event_index, metricPtr)))
             {
               event_list = List_create((ListDelF)_cerebrod_event_module_destroy);
               List_append(event_list, event_module);
-              Hash_insert(event_index, event_module->metric_names, event_list);
+              Hash_insert(event_index, metricPtr, event_list);
               event_index_count++;
             }
           else
             List_append(event_list, event_module);
-        }
-      else
-        {
-          char *metric, *metricbuf;
-
-          /* This event module supports multiple metrics, must
-           * parse out each one
-           */
           
-          metric = strtok_r(event_module->metric_names, ",", &metricbuf);
-          while (metric)
-            {
-              if (!(event_list = Hash_find(event_index, metric)))
-                {
-                  event_list = List_create((ListDelF)_cerebrod_event_module_destroy);
-                  List_append(event_list, event_module);
-                  Hash_insert(event_index, metric, event_list);
-                  event_index_count++;
-                }
-              else
-                List_append(event_list, event_module);
-
-              metric = strtok_r(NULL, ",", &metricbuf);
-            }
+          metricPtr = strtok_r(NULL, ",", &metricbuf);
         }
 
-      if (!strchr(module_event_names, ','))
+      /* The monitoring module may support multiple event names */
+
+      eventnamePtr = strtok_r(module_event_names, ",", &eventbuf);
+      while (eventnamePtr)
         {
           if (!list_find_first(event_names,
                                (ListFindF)strcmp,
-                               module_event_names))
+                               eventnamePtr))
             {
-              eventnamePtr = Strdup(module_event_names);
-              List_append(event_names, eventnamePtr);
+              eventnamestr = Strdup(eventnamePtr);
+              List_append(event_names, eventnamestr);
 #if CEREBRO_DEBUG
               if (conf.debug && conf.event_server_debug)
                 {
                   Pthread_mutex_lock(&debug_output_mutex);
                   fprintf(stderr, "**************************************\n");
-                  fprintf(stderr, "* Event Name: %s\n", eventnamePtr);
+                  fprintf(stderr, "* Event Name: %s\n", eventnamestr);
                   fprintf(stderr, "**************************************\n");
                   Pthread_mutex_unlock(&debug_output_mutex);
                 }
 #endif /* CEREBRO_DEBUG */
             }
-        }
-      else
-        {
-          char *eventname, *eventbuf;
-
-          /* This event module supports multiple events, must parse
-           * out each one
-           */
-
-          eventname = strtok_r(module_event_names, ",", &eventbuf);
-          while (eventname)
-            {
-              if (!list_find_first(event_names,
-                                   (ListFindF)strcmp,
-                                   eventname))
-                {
-                  eventnamePtr = Strdup(eventname);
-                  List_append(event_names, eventnamePtr);
-#if CEREBRO_DEBUG
-                  if (conf.debug && conf.event_server_debug)
-                    {
-                      Pthread_mutex_lock(&debug_output_mutex);
-                      fprintf(stderr, "**************************************\n");
-                      fprintf(stderr, "* Event Name: %s\n", eventnamePtr);
-                      fprintf(stderr, "**************************************\n");
-                      Pthread_mutex_unlock(&debug_output_mutex);
-                    }
-#endif /* CEREBRO_DEBUG */
-                }
-              eventname = strtok_r(NULL, ",", &eventbuf);
-            }
+          eventnamePtr = strtok_r(NULL, ",", &eventbuf);
         }
     }
   
@@ -543,6 +498,7 @@ _setup_monitor_modules(void)
     {
       struct cerebrod_monitor_module *monitor_module;
       char *module_name, *metric_names;
+      char *metricPtr, *metricbuf;
 
       module_name = monitor_module_name(monitor_handle, i);
 
@@ -575,41 +531,22 @@ _setup_monitor_modules(void)
       monitor_module->index = i;
       Pthread_mutex_init(&(monitor_module->monitor_lock), NULL);
 
-      if (!strchr(monitor_module->metric_names, ','))
-        {
-	  if (!(monitor_list = Hash_find(monitor_index, monitor_module->metric_names)))
-	    {
-	      monitor_list = List_create((ListDelF)_cerebrod_monitor_module_destroy);
-	      List_append(monitor_list, monitor_module);
-	      Hash_insert(monitor_index, monitor_module->metric_names, monitor_list);
-	      monitor_index_count++;
-	    }
-	  else
-	    List_append(monitor_list, monitor_module);
-        }
-      else
-        {
-          char *metric, *metricbuf;
-
-          /* This monitoring module supports multiple metrics, must
-	   * parse out each one
-	   */
+      /* The monitoring module may support multiple metrics */
           
-          metric = strtok_r(monitor_module->metric_names, ",", &metricbuf);
-          while (metric)
+      metricPtr = strtok_r(monitor_module->metric_names, ",", &metricbuf);
+      while (metricPtr)
+        {
+          if (!(monitor_list = Hash_find(monitor_index, metricPtr)))
             {
-	      if (!(monitor_list = Hash_find(monitor_index, metric)))
-		{
-		  monitor_list = List_create((ListDelF)_cerebrod_monitor_module_destroy);
-		  List_append(monitor_list, monitor_module);
-		  Hash_insert(monitor_index, metric, monitor_list);
-		  monitor_index_count++;
-		}
-	      else
-		List_append(monitor_list, monitor_module);
-
-              metric = strtok_r(NULL, ",", &metricbuf);
+              monitor_list = List_create((ListDelF)_cerebrod_monitor_module_destroy);
+              List_append(monitor_list, monitor_module);
+              Hash_insert(monitor_index, metricPtr, monitor_list);
+              monitor_index_count++;
             }
+          else
+            List_append(monitor_list, monitor_module);
+          
+          metricPtr = strtok_r(NULL, ",", &metricbuf);
         }
     }
 
