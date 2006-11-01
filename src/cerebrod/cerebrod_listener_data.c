@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.37.2.8 2006-11-01 00:18:06 chu11 Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.37.2.9 2006-11-01 17:35:54 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -353,7 +353,7 @@ _event_node_timeout_data_append(const char *nodename, u_int32_t time_now)
  * Create entries for the event_node_timeout_data list and index for the
  * first time via Hash_for_each call to listener_data.
  *
- * Returns 0 on success, -1 on error
+ * Returns 1 on success, 0 if not, -1 on error
  */
 static int
 _event_node_timeout_for_each(void *data, const void *key, void *arg)
@@ -364,7 +364,7 @@ _event_node_timeout_for_each(void *data, const void *key, void *arg)
   nd = (struct cerebrod_node_data *)data;
 
   _event_node_timeout_data_append(nd->nodename, *time_now);
-  return 0;
+  return 1;
 }
 
 /* 
@@ -438,7 +438,7 @@ _setup_event_node_timeout_data(void)
   num = Hash_for_each(listener_data, _event_node_timeout_for_each, &(tv.tv_sec));
   if (num != listener_data_numnodes)
     {
-      fprintf(stderr, "* invalid create count: num=%d numnodes=%d",
+      fprintf(stderr, "* invalid create count: num=%d numnodes=%d\n",
               num, listener_data_numnodes);
       goto cleanup;
     }
@@ -528,7 +528,7 @@ _setup_event_modules(void)
       struct cerebrod_event_module *event_module;
       char *module_name, *module_metric_names, *module_event_names;
       char *metricPtr, *metricbuf;
-      char *eventnamePtr, *eventbuf, *eventnamestr;
+      char *eventnamePtr, *eventbuf;
       int timeout;
 
       module_name = event_module_name(event_handle, i);
@@ -573,6 +573,7 @@ _setup_event_modules(void)
 
       event_module = Malloc(sizeof(struct cerebrod_event_module));
       event_module->metric_names = Strdup(module_metric_names);
+      event_module->event_names = Strdup(module_event_names);
       event_module->index = i;
       Pthread_mutex_init(&(event_module->event_lock), NULL);
 
@@ -596,21 +597,20 @@ _setup_event_modules(void)
 
       /* The monitoring module may support multiple event names */
 
-      eventnamePtr = strtok_r(module_event_names, ",", &eventbuf);
+      eventnamePtr = strtok_r(event_module->event_names, ",", &eventbuf);
       while (eventnamePtr)
         {
           if (!list_find_first(event_names,
                                (ListFindF)strcmp,
                                eventnamePtr))
             {
-              eventnamestr = Strdup(eventnamePtr);
-              List_append(event_names, eventnamestr);
+              List_append(event_names, eventnamePtr);
 #if CEREBRO_DEBUG
               if (conf.debug && conf.event_server_debug)
                 {
                   Pthread_mutex_lock(&debug_output_mutex);
                   fprintf(stderr, "**************************************\n");
-                  fprintf(stderr, "* Event Name: %s\n", eventnamestr);
+                  fprintf(stderr, "* Event Name: %s\n", eventnamePtr);
                   fprintf(stderr, "**************************************\n");
                   Pthread_mutex_unlock(&debug_output_mutex);
                 }
@@ -626,11 +626,12 @@ _setup_event_modules(void)
 
           if (!(t = List_find_first(event_module_timeouts, _timeout_data_find, &timeout)))
             {
+              /* XXX - to fix */
               char strbuf[64];
 
               t = (struct cerebrod_timeout_data *)Malloc(sizeof(struct cerebrod_timeout_data));
               t->timeout = timeout;
-              snprintf(strbuf, "%d\n", timeout);
+              snprintf(strbuf, 64, "%d", timeout);
               t->timeout_str = Strdup(strbuf);
 
               List_append(event_module_timeouts, t);
