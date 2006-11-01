@@ -25,10 +25,28 @@
 	* man/cerebro.conf.5.in, man/cerebro_module_devel.3.in: Update
 	appropriately.
 
+	Misc
+
+	* src/libs/wrappers/wrappers.h, src/libs/wrappers/wrappers_list.c:
+	Add list_peek wrapper.
+	
+2006-11-01  Albert Chu  <chu11@llnl.gov>
+
+	* src/cerebrod/cerebrod_monitor.h,
+	src/cerebrod/cerebrod_monitor.c: New files.
+
+	* src/cerebrod/cerebrod_listener_data.h,
+	src/cerebrod/cerebrod_listener_data.c: Cleanup by moving monitor
+	module code to new files above.
+
+	* src/cerebrod/Makefile.am: Updated for new files.
+	
 2006-10-31  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerebrod/cerebrod_listener_data.c (_setup_monitor_modules):
 	Cleanup strtok code.
+
+	* Various continued code cleanup.
 	
 2006-10-30  Albert Chu  <chu11@llnl.gov>
 
