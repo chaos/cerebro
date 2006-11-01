@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.49 2006-11-01 00:26:53 chu11 Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.50 2006-11-01 23:25:13 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -44,13 +44,13 @@
 
 #include "cerebrod_config.h"
 #include "cerebrod_listener_data.h"
+#include "cerebrod_monitor.h"
 #include "cerebrod_util.h"
 
 #include "clusterlist_module.h"
 #include "debug.h"
 #include "hash.h"
 #include "list.h"
-#include "monitor_module.h"
 #include "wrappers.h"
 
 #define LISTENER_DATA_SIZE_DEFAULT              1024
@@ -110,8 +110,7 @@ int metric_names_count;
  * metric_name_defaults
  * metric_name_defaults_count
  *
- * Default metrics, which don't count against the maximum
- * number of metrics that can be monitored.
+ * Default metrics
  */
 char *metric_name_defaults[] = {
   CEREBRO_METRIC_METRIC_NAMES,
@@ -130,23 +129,6 @@ int metric_name_defaults_count = 3;
  * node_data_lock locked region.
  */
 pthread_mutex_t metric_names_lock = PTHREAD_MUTEX_INITIALIZER;
-
-/* 
- * monitor_handle
- *
- * monitoring module handles
- */
-monitor_modules_t monitor_handle = NULL;
-
-/*
- * monitor_index
- * monitor_index_count
- *
- * hash index to quickly determine what metrics are being
- * monitored by modules and what index they are.
- */
-hash_t monitor_index = NULL;
-int monitor_index_count = 0;
 
 struct cerebrod_metric_data *
 metric_data_create(const char *metric_name)
@@ -207,151 +189,6 @@ _cerebrod_node_data_create_and_init(const char *nodename)
     }
   nd->metric_data_count = 0;
   return nd;
-}
-
-/* 
- * _cerebrod_monitor_module_destroy
- *
- * Destroy a monitor_module struct.
- */
-static void
-_cerebrod_monitor_module_destroy(void *data)
-{
-  struct cerebrod_monitor_module *monitor_module;
-  
-  assert(data);
-  
-  monitor_module = (struct cerebrod_monitor_module *)data;
-  Free(monitor_module->metric_names);
-  Free(monitor_module);
-}
-
-/* 
- * _setup_monitor_modules
- * 
- * Setup monitor modules.  Under almost any circumstance, don't return
- * a -1 error, cerebro can go on without loading monitor modules.
- *
- * Return 1 if modules are loaded, 0 if not, -1 on error
- */
-static int
-_setup_monitor_modules(void)
-{
-  int i, monitor_module_count, monitor_index_len;
-  List monitor_list = NULL;
-
-  if (!(monitor_handle = monitor_modules_load()))
-    {
-      CEREBRO_DBG(("monitor_modules_load"));
-      goto cleanup;
-    }
-
-  if ((monitor_module_count = monitor_modules_count(monitor_handle)) < 0)
-    {
-      CEREBRO_DBG(("monitor_modules_count"));
-      goto cleanup;
-    }
-
-  if (!monitor_module_count)
-    {
-#if CEREBRO_DEBUG
-      if (conf.debug && conf.listen_debug)
-        {
-          Pthread_mutex_lock(&debug_output_mutex);
-          fprintf(stderr, "**************************************\n");
-          fprintf(stderr, "* No Monitor Modules Found\n");
-          fprintf(stderr, "**************************************\n");
-          Pthread_mutex_unlock(&debug_output_mutex);
-        }
-#endif /* CEREBRO_DEBUG */
-      goto cleanup;
-    }
-  
-  /* Each monitor module may wish to monitor multiple metrics.  We'll
-   * assume there will never be more than 2 metrics per monitor module, and
-   * that will be enough to avoid all hash collisions.
-   */
-  monitor_index_len = monitor_module_count * 2;
-
-  monitor_index = Hash_create(monitor_index_len, 
-                              (hash_key_f)hash_key_string, 
-                              (hash_cmp_f)strcmp, 
-                              (hash_del_f)list_destroy);
-
-  for (i = 0; i < monitor_module_count; i++)
-    {
-      struct cerebrod_monitor_module *monitor_module;
-      char *module_name, *metric_names;
-      char *metricPtr, *metricbuf;
-
-      module_name = monitor_module_name(monitor_handle, i);
-
-#if CEREBRO_DEBUG
-      if (conf.debug && conf.listen_debug)
-        {
-          Pthread_mutex_lock(&debug_output_mutex);
-          fprintf(stderr, "**************************************\n");
-          fprintf(stderr, "* Setup Monitor Module: %s\n", module_name);
-          fprintf(stderr, "**************************************\n");
-          Pthread_mutex_unlock(&debug_output_mutex);
-        }
-#endif /* CEREBRO_DEBUG */
-
-      if (monitor_module_setup(monitor_handle, i) < 0)
-        {
-          CEREBRO_DBG(("monitor_module_setup failed: %s", module_name));
-          continue;
-        }
-
-      if (!(metric_names = monitor_module_metric_names(monitor_handle, i)) < 0)
-        {
-          CEREBRO_DBG(("monitor_module_metric_names failed: %s", module_name));
-          monitor_module_cleanup(monitor_handle, i);
-          continue;
-        }
-
-      monitor_module = Malloc(sizeof(struct cerebrod_monitor_module));
-      monitor_module->metric_names = Strdup(metric_names);
-      monitor_module->index = i;
-      Pthread_mutex_init(&(monitor_module->monitor_lock), NULL);
-
-      /* The monitoring module may support multiple metrics */
-          
-      metricPtr = strtok_r(monitor_module->metric_names, ",", &metricbuf);
-      while (metricPtr)
-        {
-          if (!(monitor_list = Hash_find(monitor_index, metricPtr)))
-            {
-              monitor_list = List_create((ListDelF)_cerebrod_monitor_module_destroy);
-              List_append(monitor_list, monitor_module);
-              Hash_insert(monitor_index, metricPtr, monitor_list);
-              monitor_index_count++;
-            }
-          else
-            List_append(monitor_list, monitor_module);
-          
-          metricPtr = strtok_r(NULL, ",", &metricbuf);
-        }
-    }
-
-  if (!monitor_index_count)
-    goto cleanup;
-
-  return 1;
-
- cleanup:
-  if (monitor_handle)
-    {
-      monitor_modules_unload(monitor_handle);
-      monitor_handle = NULL;
-    }
-  if (monitor_index)
-    {
-      Hash_destroy(monitor_index);
-      monitor_index = NULL;
-    }
-  monitor_index_count = 0;
-  return 0;
 }
 
 struct cerebrod_metric_name_data *
@@ -476,8 +313,8 @@ cerebrod_listener_data_initialize(void)
         }
     }
 
-  if (_setup_monitor_modules() < 0)
-    CEREBRO_EXIT(("_setup_monitor_modules"));
+  if (cerebrod_monitor_modules_setup() < 0)
+    CEREBRO_EXIT(("cerebrod_monitor_modules_setup"));
 
   listener_data_init++;
  out:
@@ -795,58 +632,6 @@ _metric_data_update(struct cerebrod_node_data *nd,
   memcpy(md->metric_value, hd->metric_value, hd->metric_value_len);
 }
 
-/* 
- * _monitor_update
- *
- * Send metric data to the appropriate monitor, if necessary.  The
- * struct cerebrod_node_data lock should already be locked.
- */
-static void
-_monitor_update(const char *nodename,
-                struct cerebrod_node_data *nd,
-                const char *metric_name,
-                struct cerebrod_heartbeat_metric *hd)
-{
-  struct cerebrod_monitor_module *monitor_module;
-  List monitor_list;
-
-#if CEREBRO_DEBUG
-  int rv;
-#endif /* CEREBRO_DEBUG */
-  
-  assert(nodename && nd && metric_name && hd);
-
-  if (!monitor_index)
-    return;
-
-#if CEREBRO_DEBUG
-  /* Should be called with lock already set */
-  rv = Pthread_mutex_trylock(&nd->node_data_lock);
-  if (rv != EBUSY)
-    CEREBRO_EXIT(("mutex not locked: rv=%d", rv));
-#endif /* CEREBRO_DEBUG */
-
-  if ((monitor_list = Hash_find(monitor_index, metric_name)))
-    {
-      ListIterator itr = NULL;
-
-      itr = List_iterator_create(monitor_list);
-      while ((monitor_module = list_next(itr)))
-	{
-	  Pthread_mutex_lock(&monitor_module->monitor_lock);
-	  monitor_module_metric_update(monitor_handle,
-				       monitor_module->index,
-				       nodename,
-				       metric_name,
-				       hd->metric_value_type,
-				       hd->metric_value_len,
-				       hd->metric_value);
-	  Pthread_mutex_unlock(&monitor_module->monitor_lock);
-	}
-      List_iterator_destroy(itr);
-    }
-}
-
 void 
 cerebrod_listener_data_update(char *nodename,
                               struct cerebrod_heartbeat *hb,
@@ -907,7 +692,7 @@ cerebrod_listener_data_update(char *nodename,
             }
 
           _metric_data_update(nd, metric_name_buf, hd, received_time);
-          _monitor_update(nodename, nd, metric_name_buf, hd);
+          cerebrod_monitor_modules_update(nodename, nd, metric_name_buf, hd);
         }
 
       /* Can't call a debug output function in here, it can cause a
