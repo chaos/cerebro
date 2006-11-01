@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.37.2.7 2006-10-31 23:41:29 chu11 Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.37.2.8 2006-11-01 00:18:06 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -1404,18 +1404,21 @@ cerebrod_listener_data_update(char *nodename,
       Hash_insert(listener_data, nd->nodename, nd);
       listener_data_numnodes++;
 
-      Pthread_mutex_lock(&event_node_timeout_lock);
-      /* Re-hash if our hash is getting too small */
-      if ((event_node_timeout_index_numnodes + 1) > (event_node_timeout_index_size*2))
-	cerebrod_rehash(&event_node_timeout_index,
-			&event_node_timeout_index_size,
-                        EVENT_NODE_TIMEOUT_SIZE_INCREMENT,
-			event_node_timeout_index_numnodes,
-			&event_node_timeout_lock);
+      if (event_index)
+        {
+          Pthread_mutex_lock(&event_node_timeout_lock);
+          /* Re-hash if our hash is getting too small */
+          if ((event_node_timeout_index_numnodes + 1) > (event_node_timeout_index_size*2))
+            cerebrod_rehash(&event_node_timeout_index,
+                            &event_node_timeout_index_size,
+                            EVENT_NODE_TIMEOUT_SIZE_INCREMENT,
+                            event_node_timeout_index_numnodes,
+                            &event_node_timeout_lock);
 
-      _event_node_timeout_data_append(nd->nodename, received_time);
-      event_node_timeout_index_numnodes++;
-      Pthread_mutex_unlock(&event_node_timeout_lock);
+          _event_node_timeout_data_append(nd->nodename, received_time);
+          event_node_timeout_index_numnodes++;
+          Pthread_mutex_unlock(&event_node_timeout_lock);
+        }
 
       /* Ok to call debug output function, since
        * listener_data_lock is locked.
@@ -1432,13 +1435,16 @@ cerebrod_listener_data_update(char *nodename,
       nd->discovered = 1;
       nd->last_received_time = received_time;
 
-      Pthread_mutex_lock(&event_node_timeout_lock);
-      if ((td = Hash_find(event_node_timeout_index, nd->nodename)))
+      if (event_index)
         {
-          td->last_received_time = received_time;
-          td->timeout_occurred = 0;
+          Pthread_mutex_lock(&event_node_timeout_lock);
+          if ((td = Hash_find(event_node_timeout_index, nd->nodename)))
+            {
+              td->last_received_time = received_time;
+              td->timeout_occurred = 0;
+            }
+          Pthread_mutex_unlock(&event_node_timeout_lock);
         }
-      Pthread_mutex_unlock(&event_node_timeout_lock);
 
       for (i = 0; i < hb->metrics_len; i++)
         {
@@ -1457,7 +1463,8 @@ cerebrod_listener_data_update(char *nodename,
 
           _metric_data_update(nd, metric_name_buf, hd, received_time);
           _monitor_update(nodename, nd, metric_name_buf, hd);
-          _event_update(nodename, nd, metric_name_buf, hd);
+          if (event_index)
+            _event_update(nodename, nd, metric_name_buf, hd);
         }
 
       /* Can't call a debug output function in here, it can cause a
