@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_monitor_update.c,v 1.1 2006-11-02 00:05:09 chu11 Exp $
+ *  $Id: cerebrod_monitor_update.c,v 1.2 2006-11-02 01:22:34 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -76,13 +76,11 @@ monitor_modules_t monitor_handle = NULL;
 
 /*
  * monitor_index
- * monitor_index_count
  *
  * hash index to quickly determine what metrics are being
  * monitored by modules and what index they are.
  */
 hash_t monitor_index = NULL;
-int monitor_index_count = 0;
 
 /* 
  * _cerebrod_monitor_module_info_destroy
@@ -109,7 +107,7 @@ _cerebrod_monitor_module_info_destroy(void *data)
 int
 cerebrod_monitor_modules_setup(void)
 {
-  int i, monitor_module_count, monitor_index_len;
+  int i, monitor_module_count, monitor_index_len, monitor_index_count = 0;
   List monitor_list = NULL;
 #if CEREBRO_DEBUG
   int rv;
@@ -232,7 +230,6 @@ cerebrod_monitor_modules_setup(void)
       Hash_destroy(monitor_index);
       monitor_index = NULL;
     }
-  monitor_index_count = 0;
   return 0;
 }
 
