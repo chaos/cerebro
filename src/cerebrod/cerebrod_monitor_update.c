@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_monitor.c,v 1.1 2006-11-01 23:25:13 chu11 Exp $
+ *  $Id: cerebrod_monitor_update.c,v 1.1 2006-11-02 00:05:09 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -43,7 +43,7 @@
 #include "cerebro/cerebro_constants.h"
 
 #include "cerebrod_config.h"
-#include "cerebrod_monitor.h"
+#include "cerebrod_monitor_update.h"
 #include "cerebrod_util.h"
 
 #include "debug.h"

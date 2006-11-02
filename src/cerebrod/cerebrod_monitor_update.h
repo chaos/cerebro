@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_monitor.h,v 1.1 2006-11-01 23:25:13 chu11 Exp $
+ *  $Id: cerebrod_monitor_update.h,v 1.1 2006-11-02 00:05:09 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -25,8 +25,8 @@
  *  59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.
 \*****************************************************************************/
 
-#ifndef _CEREBROD_MONITOR_H
-#define _CEREBROD_MONITOR_H
+#ifndef _CEREBROD_MONITOR_UPDATE_H
+#define _CEREBROD_MONITOR_UPDATE_H
 
 #if HAVE_CONFIG_H
 #include "config.h"
@@ -70,4 +70,4 @@ void cerebrod_monitor_modules_update(const char *nodename,
                                      const char *metric_name,
                                      struct cerebrod_heartbeat_metric *hd);
 
-#endif /* _CEREBROD_MONITOR_H */
+#endif /* _CEREBROD_MONITOR_UPDATE_H */
