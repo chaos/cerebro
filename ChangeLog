@@ -32,8 +32,8 @@
 	
 2006-11-01  Albert Chu  <chu11@llnl.gov>
 
-	* src/cerebrod/cerebrod_monitor.h,
-	src/cerebrod/cerebrod_monitor.c: New files.
+	* src/cerebrod/cerebrod_monitor_update.h,
+	src/cerebrod/cerebrod_monitor_update.c: New files.
 
 	* src/cerebrod/cerebrod_listener_data.h,
 	src/cerebrod/cerebrod_listener_data.c: Cleanup by moving monitor
