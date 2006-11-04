@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.37.2.12 2006-11-02 05:30:47 chu11 Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.37.2.13 2006-11-04 01:21:22 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -680,8 +680,6 @@ cerebrod_listener_data_update(char *nodename,
   Pthread_mutex_lock(&(nd->node_data_lock));
   if (received_time >= nd->last_received_time)
     {
-      struct cerebrod_event_node_timeout *td;
-
       nd->discovered = 1;
       nd->last_received_time = received_time;
 

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_event_update.c,v 1.1.2.1 2006-11-03 01:22:40 chu11 Exp $
+ *  $Id: cerebrod_event_update.c,v 1.1.2.2 2006-11-04 01:21:22 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -45,6 +45,7 @@
 #include "cerebrod_config.h"
 #include "cerebrod_listener_data.h"
 #include "cerebrod_event_update.h"
+#include "cerebrod_event_server.h"
 #include "cerebrod_util.h"
 
 #include "debug.h"
@@ -475,7 +476,6 @@ cerebrod_event_modules_setup(void)
                                       _event_module_timeout_data_find_callback, 
                                       &timeout)))
             {
-              /* XXX - to fix */
               char strbuf[64];
 
               mtd = (struct cerebrod_event_module_timeout_data *)Malloc(sizeof(struct cerebrod_event_module_timeout_data));
@@ -635,23 +635,23 @@ cerebrod_event_modules_update(const char *nodename,
       while ((event_module = list_next(itr)))
 	{
 	  Pthread_mutex_lock(&event_module->event_lock);
-	  rv = event_module_metric_update(event_handle,
-                                          event_module->index,
-                                          nodename,
-                                          metric_name,
-                                          hd->metric_value_type,
-                                          hd->metric_value_len,
-                                          hd->metric_value,
-                                          &event);
-          /* XXX
-           * 
-           * NEED TO DO SOMETHING WITH THE EVENT LATER ON
-           */
-          if (rv && event)
-            event_module_destroy(event_handle, 
-                                 event_module->index, 
-                                 event);
+	  if ((rv = event_module_metric_update(event_handle,
+                                               event_module->index,
+                                               nodename,
+                                               metric_name,
+                                               hd->metric_value_type,
+                                               hd->metric_value_len,
+                                               hd->metric_value,
+                                               &event)) < 0)
+            {
+              CEREBRO_DBG(("event_module_metric_update"));
+              goto loop_next;
+            }
 
+          if (rv && event)
+            cerebrod_queue_event(event, event_module->index);
+
+        loop_next:
 	  Pthread_mutex_unlock(&event_module->event_lock);
 	}
       List_iterator_destroy(itr);

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: event_module.c,v 1.1.2.4 2006-10-31 17:38:06 chu11 Exp $
+ *  $Id: event_module.c,v 1.1.2.5 2006-11-04 01:21:22 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -488,12 +488,12 @@ event_module_destroy(event_modules_t handle,
   struct cerebro_event_module_info *module_info;
 
   if (_handle_index_check(handle, index) < 0)
-    return -1;
+    return;
 
   if (!(module_info = vector_get(handle->module_infos, index)))
     {
       CEREBRO_DBG(("vector_get: %s", strerror(errno)));
-      return -1;
+      return;
     }
 
   return ((*module_info->destroy)(event));

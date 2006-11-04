@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_event_node_timeout_monitor.c,v 1.1.2.1 2006-11-02 05:30:47 chu11 Exp $
+ *  $Id: cerebrod_event_node_timeout_monitor.c,v 1.1.2.2 2006-11-04 01:21:22 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -44,6 +44,7 @@
 
 #include "cerebrod_config.h"
 #include "cerebrod_event_node_timeout_monitor.h"
+#include "cerebrod_event_server.h"
 #include "cerebrod_event_update.h"
 
 #include "debug.h"
@@ -92,6 +93,8 @@ _event_node_timeout_monitor_initialize(void)
   Pthread_mutex_lock(&event_node_timeout_monitor_init_lock);
   if (event_node_timeout_monitor_init)
     goto out;
+
+  /* I don't think there's anything to do? */
 
   event_node_timeout_monitor_init++;
   Pthread_cond_signal(&event_node_timeout_monitor_init_cond);
@@ -167,6 +170,17 @@ cerebrod_event_node_timeout_monitor(void *arg)
                     {
                       List modules_list;
 
+#if CEREBRO_DEBUG
+                      if (conf.event_server_debug)
+                        {
+                          Pthread_mutex_lock(&debug_output_mutex);
+                          fprintf(stderr, "**************************************\n");
+                          fprintf(stderr, "* Timeout: %s\n", ntd->nodename);
+                          fprintf(stderr, "**************************************\n");
+                          Pthread_mutex_unlock(&debug_output_mutex);
+                        }
+#endif /* CEREBRO_DEBUG */
+
                       if ((modules_list = Hash_find(event_module_timeout_index, 
                                                     mtd->timeout_str)))
                         {
@@ -181,20 +195,19 @@ cerebrod_event_node_timeout_monitor(void *arg)
                               int rv;
 
                               Pthread_mutex_lock(&event_module->event_lock);
-                              rv = event_module_node_timeout(event_handle,
-                                                             event_module->index,
-                                                             ntd->nodename, 
-                                                             &event);
-                              /* XXX
-                               *
-                               * NEED TO DO SOMETHING WITH THE EVENT LATER ON
-                               */
-                              if (rv && event)
+                              if ((rv = event_module_node_timeout(event_handle,
+                                                                  event_module->index,
+                                                                  ntd->nodename, 
+                                                                  &event)) < 0)
                                 {
-                                  event_module_destroy(event_handle,
-                                                       event_module->index,
-                                                       event);
+                                  CEREBRO_DBG(("event_module_node_timeout"));
+                                  goto loop_next;
                                 }
+
+                              if (rv && event)
+                                cerebrod_queue_event(event, event_module->index);
+
+                            loop_next:
                               Pthread_mutex_unlock(&event_module->event_lock);
                             }
 

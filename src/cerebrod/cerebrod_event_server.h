@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_event_server.h,v 1.1.2.1 2006-10-31 15:17:27 chu11 Exp $
+ *  $Id: cerebrod_event_server.h,v 1.1.2.2 2006-11-04 01:21:22 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -27,6 +27,34 @@
 
 #ifndef _CEREBROD_EVENT_SERVER_H
 #define _CEREBROD_EVENT_SERVER_H
+
+#include "cerebro/cerebro_event_protocol.h"
+
+struct cerebrod_event_to_send
+{
+  char *event_name;
+  int index;
+  struct cerebro_event *event;
+};
+
+/*
+ * cerebrod_queue_event
+ *
+ * Queue an event for sending
+ */
+void cerebrod_queue_event(struct cerebro_event *event, unsigned int index);
+
+/* 
+ * cerebrod_event_queue_monitor
+ *
+ * Runs the cerebrod event queue monitor which will send out events
+ * when signaled.
+ *
+ * Passed no argument
+ * 
+ * Executed in detached state, no return value.
+ */
+void *cerebrod_event_queue_monitor(void *);
 
 /* 
  * cerebrod_event_server

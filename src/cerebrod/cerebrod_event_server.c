@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_event_server.c,v 1.1.2.1 2006-10-31 15:17:27 chu11 Exp $
+ *  $Id: cerebrod_event_server.c,v 1.1.2.2 2006-11-04 01:21:22 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -48,6 +48,7 @@
 #include "cerebrod_util.h"
 
 #include "debug.h"
+#include "event_module.h"
 #include "fd.h"
 #include "network_util.h"
 #include "wrappers.h"
@@ -70,6 +71,214 @@ extern pthread_mutex_t debug_output_mutex;
 int event_server_init = 0;
 pthread_cond_t event_server_init_cond = PTHREAD_COND_INITIALIZER;
 pthread_mutex_t event_server_init_lock = PTHREAD_MUTEX_INITIALIZER;
+
+/* 
+ * event_queue_monitor_init
+ * event_queue_monitor_init_cond
+ * event_queue_monitor_init_lock
+ *
+ * variables for synchronizing initialization between different pthreads
+ * and signaling when it is complete
+ */
+int event_queue_monitor_init = 0;
+pthread_cond_t event_queue_monitor_init_cond = PTHREAD_COND_INITIALIZER;
+pthread_mutex_t event_queue_monitor_init_lock = PTHREAD_MUTEX_INITIALIZER;
+
+/* 
+ * event_queue
+ * event_queue_cond
+ * event_queue_lock
+ *
+ * queue of events to send out and the conditional variable and mutex
+ * for exclusive access and signaling.
+ */
+List event_queue = NULL;
+pthread_cond_t event_queue_cond = PTHREAD_COND_INITIALIZER;
+pthread_mutex_t event_queue_lock = PTHREAD_MUTEX_INITIALIZER;
+
+extern event_modules_t event_handle;
+extern hash_t event_index;
+
+void
+cerebrod_queue_event(struct cerebro_event *event, unsigned int index)
+{
+  struct cerebrod_event_to_send *ets;
+
+  assert(event);
+  assert(event_queue);
+
+  Pthread_mutex_lock(&event_queue_lock);
+
+  ets = (struct cerebrod_event_to_send *)Malloc(sizeof(struct cerebrod_event_to_send));
+  ets->event_name = event->event_name;
+  ets->index = index;
+  ets->event = event;
+  
+  Pthread_cond_signal(&event_queue_cond);
+  Pthread_mutex_unlock(&event_queue_lock);
+}
+
+/* 
+ * _cerebrod_event_to_send_destroy
+ */
+static void
+_cerebrod_event_to_send_destroy(void *x)
+{
+  struct cerebrod_event_to_send *ets;
+
+  assert(x);
+  assert(event_handle);
+
+  ets = (struct cerebrod_event_to_send *)x;
+  event_module_destroy(event_handle, ets->index, ets->event);
+  Free(ets);
+}
+
+/*
+ * _event_queue_monitor_initialize
+ *
+ * perform metric queue_monitor initialization
+ */
+static void
+_event_queue_monitor_initialize(void)
+{
+  Pthread_mutex_lock(&event_queue_monitor_init_lock);
+  if (event_queue_monitor_init)
+    goto out;
+
+  event_queue = List_create((ListDelF)_cerebrod_event_to_send_destroy);
+
+  event_queue_monitor_init++;
+  Pthread_cond_signal(&event_queue_monitor_init_cond);
+ out:
+  Pthread_mutex_unlock(&event_queue_monitor_init_lock);
+}
+
+/* 
+ * _event_dump
+ *
+ * Output event debugging info
+ */
+static void
+_event_dump(struct cerebro_event *event)
+{
+#if CEREBRO_DEBUG
+  if (conf.event_server_debug)
+    {
+      char *buf;
+
+      Pthread_mutex_lock(&debug_output_mutex);
+      fprintf(stderr, "**************************************\n");
+      fprintf(stderr, "* Cerebrod Event:\n");
+      fprintf(stderr, "* ---------------\n");
+      fprintf(stderr, "* Version: %d\n", event->version);
+      fprintf(stderr, "* Nodename: %s\n", event->nodename);
+      fprintf(stderr, "* Event_Name: %s\n", event->event_name);
+      fprintf(stderr, "* Value Type: %d\n", event->event_value_type);
+      fprintf(stderr, "* Value Len: %d\n", event->event_value_len);
+
+      switch(event->event_value_type)
+        {
+        case CEREBRO_METRIC_VALUE_TYPE_NONE:
+          break;
+        case CEREBRO_METRIC_VALUE_TYPE_INT32:
+          fprintf(stderr, "value = %d",
+                  *((int32_t *)event->event_value));
+          break;
+        case CEREBRO_METRIC_VALUE_TYPE_U_INT32:
+          fprintf(stderr, "value = %u",
+                  *((u_int32_t *)event->event_value));
+          break;
+        case CEREBRO_METRIC_VALUE_TYPE_FLOAT:
+          fprintf(stderr, "value = %f",
+                  *((float *)event->event_value));
+          break;
+        case CEREBRO_METRIC_VALUE_TYPE_DOUBLE:
+          fprintf(stderr, "value = %f",
+                  *((double *)event->event_value));
+          break;
+        case CEREBRO_METRIC_VALUE_TYPE_STRING:
+          /* Watch for NUL termination */
+          buf = Malloc(event->event_value_len + 1);
+          memset(buf, '\0', event->event_value_len + 1);
+          memcpy(buf,
+                 event->event_value,
+                 event->event_value_len);
+          fprintf(stderr, "value = %s", buf);
+          Free(buf);
+          break;
+#if SIZEOF_LONG == 4
+        case CEREBRO_METRIC_VALUE_TYPE_INT64:
+          fprintf(stderr, "value = %lld",
+                  *((int64_t *)event->event_value));
+          break;
+        case CEREBRO_METRIC_VALUE_TYPE_U_INT64:
+          fprintf(stderr, "value = %llu",
+                  *((u_int64_t *)event->event_value));
+          break;
+#else  /* SIZEOF_LONG == 8 */
+        case CEREBRO_METRIC_VALUE_TYPE_INT64:
+          fprintf(stderr, "value = %ld",
+                  *((int64_t *)event->event_value));
+          break;
+        case CEREBRO_METRIC_VALUE_TYPE_U_INT64:
+          fprintf(stderr, "value = %lu",
+                  *((u_int64_t *)event->event_value));
+          break;
+#endif /* SIZEOF_LONG == 8 */
+        default:
+          break;
+        }
+      fprintf(stderr, "**************************************\n");
+      Pthread_mutex_unlock(&debug_output_mutex);
+    }
+#endif /* CEREBRO_DEBUG */
+}
+
+void *
+cerebrod_event_queue_monitor(void *arg)
+{
+  _event_queue_monitor_initialize();
+
+  /* 
+   * achu: The listener and thus event update initialization is
+   * started after this thread is started.  So the and event_index may
+   * not be set up the first time this loop is reached.  
+   *
+   * However, it must be set after the condition is signaled, b/c the
+   * listener (and thus event update code) and event node timeout
+   * thread begin after the listener is setup.
+   *
+   * Thus, we put the event_queue assert inside the loop.
+   */
+  for (;;)
+    {
+      struct cerebro_event *event;
+      ListIterator itr;
+
+      Pthread_mutex_lock(&event_queue_lock);
+      assert(event_queue);
+      while (list_count(event_queue) == 0)
+        Pthread_cond_wait(&event_queue_cond, &event_queue_lock);
+
+      itr = List_iterator_create(event_queue);
+      while ((event = list_next(itr)))
+        {
+          _event_dump(event);
+          /* 
+           * XXX 
+           *
+           * Send the events somewhere, do something with them.
+           */
+          List_delete(itr);
+        }
+      List_iterator_destroy(itr);
+
+      Pthread_mutex_unlock(&event_queue_lock);
+    }
+
+  return NULL;			/* NOT REACHED */
+}
 
 /*
  * _event_server_initialize

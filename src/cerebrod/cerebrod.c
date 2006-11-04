@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.80.2.5 2006-11-02 05:30:47 chu11 Exp $
+ *  $Id: cerebrod.c,v 1.80.2.6 2006-11-04 01:21:22 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -82,6 +82,10 @@ extern int event_node_timeout_monitor_init;
 extern pthread_cond_t event_node_timeout_monitor_init_cond;
 extern pthread_mutex_t event_node_timeout_monitor_init_lock;
 
+extern int event_queue_monitor_init;
+extern pthread_cond_t event_queue_monitor_init_cond;
+extern pthread_mutex_t event_queue_monitor_init_lock;
+
 extern int event_server_init;
 extern pthread_cond_t event_server_init_cond;
 extern pthread_mutex_t event_server_init_lock;
@@ -137,7 +141,9 @@ main(int argc, char **argv)
       Pthread_mutex_unlock(&metric_server_init_lock);
     }
 
-  /* Start event server before the listener begins receiving data */
+  /* Start the event queue monitor before the listener thread, since
+   * the listener thread could get data to generate an event.
+   */
   if (conf.event_server)
     {
       pthread_t thread;
@@ -146,14 +152,14 @@ main(int argc, char **argv)
       Pthread_attr_init(&attr);
       Pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
       Pthread_attr_setstacksize(&attr, CEREBROD_THREAD_STACKSIZE);
-      Pthread_create(&thread, &attr, cerebrod_event_server, NULL);
+      Pthread_create(&thread, &attr, cerebrod_event_queue_monitor, NULL);
       Pthread_attr_destroy(&attr);
 
       /* Wait for initialization to complete */
-      Pthread_mutex_lock(&event_server_init_lock);
-      while (!event_server_init)
-        Pthread_cond_wait(&event_server_init_cond, &event_server_init_lock);
-      Pthread_mutex_unlock(&event_server_init_lock);
+      Pthread_mutex_lock(&event_queue_monitor_init_lock);
+      while (!event_queue_monitor_init)
+        Pthread_cond_wait(&event_queue_monitor_init_cond, &event_queue_monitor_init_lock);
+      Pthread_mutex_unlock(&event_queue_monitor_init_lock);
     }
 
   /* Start listening server before speaker so that listener
@@ -182,13 +188,26 @@ main(int argc, char **argv)
       Pthread_mutex_unlock(&listener_init_lock);
     }
 
-  /* Start event node timeout thread after the listener thread, since
-   * it uses date created by the listener thread.
+  /* Start all the event server and node timeout threads after the
+   * listener thread, since they use data created by the listener
+   * thread.
    */
   if (conf.event_server)
     {
       pthread_t thread;
       pthread_attr_t attr;
+
+      Pthread_attr_init(&attr);
+      Pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+      Pthread_attr_setstacksize(&attr, CEREBROD_THREAD_STACKSIZE);
+      Pthread_create(&thread, &attr, cerebrod_event_server, NULL);
+      Pthread_attr_destroy(&attr);
+
+      /* Wait for initialization to complete */
+      Pthread_mutex_lock(&event_server_init_lock);
+      while (!event_server_init)
+        Pthread_cond_wait(&event_server_init_cond, &event_server_init_lock);
+      Pthread_mutex_unlock(&event_server_init_lock);
 
       Pthread_attr_init(&attr);
       Pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
