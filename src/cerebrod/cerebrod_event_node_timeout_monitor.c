@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_event_node_timeout_monitor.c,v 1.1.2.2 2006-11-04 01:21:22 chu11 Exp $
+ *  $Id: cerebrod_event_node_timeout_monitor.c,v 1.1.2.3 2006-11-04 01:22:30 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -175,7 +175,7 @@ cerebrod_event_node_timeout_monitor(void *arg)
                         {
                           Pthread_mutex_lock(&debug_output_mutex);
                           fprintf(stderr, "**************************************\n");
-                          fprintf(stderr, "* Timeout: %s\n", ntd->nodename);
+                          fprintf(stderr, "* Event Node Timeout: %s\n", ntd->nodename);
                           fprintf(stderr, "**************************************\n");
                           Pthread_mutex_unlock(&debug_output_mutex);
                         }
