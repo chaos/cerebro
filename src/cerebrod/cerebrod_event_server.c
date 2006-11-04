@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_event_server.c,v 1.1.2.8 2006-11-04 07:45:59 chu11 Exp $
+ *  $Id: cerebrod_event_server.c,v 1.1.2.9 2006-11-04 17:10:44 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -36,7 +36,6 @@
 #if STDC_HEADERS
 #include <string.h>
 #endif /* STDC_HEADERS */
-#include <sys/poll.h>
 #include <errno.h>
 #include <assert.h>
 
@@ -334,7 +333,7 @@ cerebrod_event_queue_monitor(void *arg)
           _event_dump(ets->event);
           
           Pthread_mutex_lock(&event_connections_lock);
-          if ((connections = Hash_find(event_connections, ets->event_name)))
+          if ((connections = Hash_find(event_connections_index, ets->event_name)))
             {
               char buf[CEREBRO_MAX_PACKET_LEN];
               int elen;
@@ -358,7 +357,19 @@ cerebrod_event_queue_monitor(void *arg)
                               || errno == ENODEV
                               || errno == ENETDOWN
                               || errno == ENETUNREACH)
-                            List_delete(citr);
+                            {
+#if CEREBRO_DEBUG
+                              if (conf.event_server_debug)
+                                {
+                                  Pthread_mutex_lock(&debug_output_mutex);
+                                  fprintf(stderr, "**************************************\n");
+                                  fprintf(stderr, "* Event Connection Died: errno = %d\n", errno);
+                                  fprintf(stderr, "**************************************\n");
+                                  Pthread_mutex_unlock(&debug_output_mutex);
+                                }
+#endif /* CEREBRO_DEBUG */
+                              List_delete(citr);
+                            }
                           continue;
                         }
                     }
@@ -391,21 +402,23 @@ _event_server_initialize(void)
   if (event_server_init)
     goto out;
 
-  Signal(SIGPIPE, SIG_IGN);
-
   /* achu:
    *
-   * This hash must be created in this initialize and not the queue
-   * initialize, b/c the event names list is generated during the
-   * listener initialization (which is done after the queue
+   * This hash must be created in this initialize and not the
+   * queue_monitor initialize, b/c the event names list is generated
+   * during the listener initialization (which is done after the
+   * queue_monitor initialization but before the server
    * initialization).
    */
+  assert(event_names);
   event_names_count = List_count(event_names);
   event_connections = List_create((ListDelF)_Free);
   event_connections_index = Hash_create(event_names_count,
                                         (hash_key_f)hash_key_string,
                                         (hash_cmp_f)strcmp,
                                         (hash_del_f)list_destroy);
+
+  Signal(SIGPIPE, SIG_IGN);
 
   event_server_init++;
   Pthread_cond_signal(&event_server_init_cond);
@@ -467,7 +480,29 @@ _event_server_setup_socket(int num)
   return -1;
 }
 
+/* 
+ * _event_connections_find_fd
+ *
+ * Used by List for finding a matching fd
+ *
+ * Return 1 if fd matches, 0 if not
+ */
+static int
+_event_connections_find_fd(void *x, void *key)
+{
+  struct cerebrod_event_connection_data *ecd;
+  int *fd;
 
+  assert(x);
+  assert(key);
+
+  ecd = (struct cerebrod_event_connection_data *)x;
+  fd = (int *)key;
+  
+  if (ecd->fd == fd)
+    return 1;
+  return 0;
+}
 
 void *
 cerebrod_event_server(void *arg)
@@ -481,49 +516,116 @@ cerebrod_event_server(void *arg)
 
   for (;;)
     {
-#if 0
-      int fd, client_addr_len;
-      struct sockaddr_in client_addr;
-
-      /* XXX
-       * need to do a select, so dead connections can be
-       * cleaned up appropriately.
-       */
-      
-      client_addr_len = sizeof(struct sockaddr_in);
-      if ((fd = accept(server_fd,
-                       (struct sockaddr *)&client_addr,
-                       &client_addr_len)) < 0)
-        server_fd = cerebrod_reinit_socket(server_fd,
-                                           0,
-                                           _event_server_setup_socket,
-                                           "event_server: accept");
-      if (fd < 0)
-        continue;
-#endif
-
-#if 0
+      ListIterator eitr;
+      struct cerebrod_event_connection_data *ecd;
       struct pollfd *pfds;
       int pfdslen;
       int i;
 
-      /* achu:
-       * 
-       * No need to lock here.  At this point, the event_connections
-       * list and index cannot be changed by either thread.
-       *
-       * The + 1 is b/c of the server_fd.
-       */
+       /* Note that the list_count won't grow larger after the first
+        * mutex block, b/c the cerebrod_event_queue_monitor thread can
+        * never add to the event_connections.  It can only shrink it.
+        */
+      Pthread_mutex_lock(&event_connections_lock);
+      pfdslen = List_count(event_connections);
+      Pthread_mutex_unlock(&event_connections_lock);
 
-      pfdslen = List_count(event_connections) + 1;
+      /* The + 1 is b/c of the server_fd. */
+      pfdslen++;
+
       pfds = Malloc(sizeof(struct pollfd) * pfdslen);
       memset(pfds, '\0', sizeof(struct pollfd) * pfdslen);
 
+      pfds[0].fd = server_fd;
+      pfds[0].events = POLLIN;
+      pfds[0].revents = 0;
+
+      i = 1;
+      Pthread_mutex_lock(&event_connections_lock);
+      eitr = List_iterator_create(event_connections);
+      while ((ecd = list_next(eitr)))
+        {
+          pfds[i].fd = ecd->fd;
+          pfds[i].events = POLLIN;
+          pfds[i].revents = 0;
+          i++;
+        }
+      List_iterator_destroy(eitr);
+      Pthread_mutex_unlock(&event_connections_lock);
+      
       Poll(pfds, pfdslen, -1);
 
+      /* Deal with the server fd first */
+      if (pfds[0].revents & POLLERR)
+        CEREBRO_DBG(("server_fd POLLERR"));
+      else if (pfds[0].revents & POLLIN)
+        {
+          int fd, client_addr_len;
+          struct sockaddr_in client_addr;
+
+          client_addr_len = sizeof(struct sockaddr_in);
+          if ((fd = accept(server_fd,
+                           (struct sockaddr *)&client_addr,
+                           &client_addr_len)) < 0)
+            server_fd = cerebrod_reinit_socket(server_fd,
+                                               0,
+                                               _event_server_setup_socket,
+                                               "event_server: accept");
+          if (fd >= 0)
+            {
+              /* XXX
+               * deal with this
+               */
+            }
+        }
+
+      /* Deal with the connecting fds */
+      for (i = 1; i < pfdslen; i++)
+        {
+          if (pfds[i].revents & POLLERR)
+            {
+              CEREBRO_DBG(("fd = %d POLLERR", pfds[i].fd));
+              Pthread_mutex_lock(&event_connections_lock);
+              /* XXX - delete from hash too */
+              List_delete_all(event_connections, 
+                              _event_connections_find_fd,
+                              &pfds[i].fd);
+              Pthread_mutex_unlock(&event_connections_lock);
+              continue;
+            }
+
+          if (pfds[i].revents & POLLIN)
+            {
+              char buf[CEREBRO_MAX_PACKET_LEN];
+              int n;
+
+              /* We should not expect any actual data.  If
+               * we get some, just eat it and move on.
+               *
+               * The common situation is that the client
+               * closes the connection.  So we need to delete
+               * our fd.
+               */
+
+              n = fd_read_n(pfds[i].fd, 
+                            buf,
+                            CEREBRO_MAX_PACKET_LEN);
+              if (n < 0)
+                CEREBRO_DBG(("fd_read_n = %s", strerror(errno)));
+
+              if (n <= 0)
+                {
+                  Pthread_mutex_lock(&event_connections_lock);
+                  /* XXX - delete from hash too */
+                  List_delete_all(event_connections, 
+                                  _event_connections_find_fd,
+                                  &pfds[i].fd);
+                  Pthread_mutex_unlock(&event_connections_lock);
+                }
+            }
+        }
       
-#endif;      
-      
+      Free(pfds);
     }
 
   return NULL;			/* NOT REACHED */
