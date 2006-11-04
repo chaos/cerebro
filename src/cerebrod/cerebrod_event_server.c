@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_event_server.c,v 1.1.2.7 2006-11-04 05:11:57 chu11 Exp $
+ *  $Id: cerebrod_event_server.c,v 1.1.2.8 2006-11-04 07:45:59 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -36,6 +36,7 @@
 #if STDC_HEADERS
 #include <string.h>
 #endif /* STDC_HEADERS */
+#include <sys/poll.h>
 #include <errno.h>
 #include <assert.h>
 
@@ -101,11 +102,13 @@ pthread_mutex_t event_queue_lock = PTHREAD_MUTEX_INITIALIZER;
 
 /* 
  * event_connections
+ * event_connections_index
  * event_connections_lock
  *
  * hash of file descriptors to send event info to.
  */
-hash_t event_connections = NULL;
+List event_connections = NULL;
+hash_t event_connections_index = NULL;
 pthread_mutex_t event_connections_lock = PTHREAD_MUTEX_INITIALIZER;
  
 extern event_modules_t event_handle;
@@ -398,10 +401,11 @@ _event_server_initialize(void)
    * initialization).
    */
   event_names_count = List_count(event_names);
-  event_connections = Hash_create(event_names_count,
-                                  (hash_key_f)hash_key_string,
-                                  (hash_cmp_f)strcmp,
-                                  (hash_del_f)list_destroy);
+  event_connections = List_create((ListDelF)_Free);
+  event_connections_index = Hash_create(event_names_count,
+                                        (hash_key_f)hash_key_string,
+                                        (hash_cmp_f)strcmp,
+                                        (hash_del_f)list_destroy);
 
   event_server_init++;
   Pthread_cond_signal(&event_server_init_cond);
@@ -463,6 +467,8 @@ _event_server_setup_socket(int num)
   return -1;
 }
 
+
+
 void *
 cerebrod_event_server(void *arg)
 {
@@ -475,8 +481,14 @@ cerebrod_event_server(void *arg)
 
   for (;;)
     {
+#if 0
       int fd, client_addr_len;
       struct sockaddr_in client_addr;
+
+      /* XXX
+       * need to do a select, so dead connections can be
+       * cleaned up appropriately.
+       */
       
       client_addr_len = sizeof(struct sockaddr_in);
       if ((fd = accept(server_fd,
@@ -488,6 +500,29 @@ cerebrod_event_server(void *arg)
                                            "event_server: accept");
       if (fd < 0)
         continue;
+#endif
+
+#if 0
+      struct pollfd *pfds;
+      int pfdslen;
+      int i;
+
+      /* achu:
+       * 
+       * No need to lock here.  At this point, the event_connections
+       * list and index cannot be changed by either thread.
+       *
+       * The + 1 is b/c of the server_fd.
+       */
+
+      pfdslen = List_count(event_connections) + 1;
+      pfds = Malloc(sizeof(struct pollfd) * pfdslen);
+      memset(pfds, '\0', sizeof(struct pollfd) * pfdslen);
+
+      Poll(pfds, pfdslen, -1);
+
+      
+#endif;      
       
     }
 

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_event_protocol.h,v 1.1.2.4 2006-11-04 01:21:22 chu11 Exp $
+ *  $Id: cerebro_event_protocol.h,v 1.1.2.5 2006-11-04 07:45:59 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -53,5 +53,39 @@ struct cerebro_event
                                    + CEREBRO_MAX_EVENT_NAME_LEN \
                                    + sizeof(u_int32_t) \
                                    + sizeof(u_int32_t))
+
+/* Event server protocol
+ *
+ * Client -> Server
+ * - Event request.
+ *
+ * Server -> Client
+ * - When events occur, respones with event data will be returned.
+ *   Client is responsible for polling appropriately.
+ *
+ * - On errors, an error packet will contain the error code and
+ *   the server will close the connection automatically.
+ *
+ * Client -> Server
+ * - Client can close the connection at any time by closing the 
+ *   TCP connection.
+ *
+ * Notes:
+ * - Require a smaller timeout len for the server than the client,
+ *   so the server can respond to the client with a meaningful error
+ *   message.
+ */
+
+#define CEREBRO_EVENT_SERVER_PROTOCOL_VERSION               1
+#define CEREBRO_EVENT_SERVER_PROTOCOL_SERVER_TIMEOUT_LEN    3
+#define CEREBRO_EVENT_SERVER_PROTOCOL_CLIENT_TIMEOUT_LEN    5
+#define CEREBRO_EVENT_SERVER_PROTOCOL_CONNECT_TIMEOUT_LEN   5
+
+#define CEREBRO_EVENT_SERVER_PROTOCOL_ERR_SUCCESS           0
+#define CEREBRO_EVENT_SERVER_PROTOCOL_ERR_VERSION_INVALID   1
+#define CEREBRO_EVENT_SERVER_PROTOCOL_ERR_EVENT_INVALID     2
+#define CEREBRO_EVENT_SERVER_PROTOCOL_ERR_PARAMETER_INVALID 3
+#define CEREBRO_EVENT_SERVER_PROTOCOL_ERR_PACKET_INVALID    4
+#define CEREBRO_EVENT_SERVER_PROTOCOL_ERR_INTERNAL_ERROR    5
 
 #endif /* _CEREBRO_EVENT_PROTOCOL_H */
