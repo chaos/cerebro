@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_event_protocol.h,v 1.1.2.7 2006-11-04 19:29:15 chu11 Exp $
+ *  $Id: cerebro_event_protocol.h,v 1.1.2.8 2006-11-04 21:20:58 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -40,10 +40,10 @@
  *
  * Server -> Client
  * - When events occur, respones with event data will be returned.
- *   Client is responsible for polling appropriately.
- *
- * - On errors, an error packet will contain the error code and
- *   the server will close the connection automatically.
+ *   Client is responsible for polling appropriately.  A single
+ *   packet will be returned once at the beginning to signal
+ *   if things were setup properly or if an error occurred.  After
+ *   this the server will send events to the client appropriately.
  *
  * Client -> Server
  * - Client can close the connection at any time by closing the 
@@ -83,6 +83,20 @@ struct cerebro_event_server_request
                                                   + CEREBRO_MAX_EVENT_NAME_LEN \
                                                   + sizeof(u_int32_t))
 
+/*
+ * struct cerebro_event_server_response
+ *
+ * defines a event server invalid version or packet response
+ */
+struct cerebro_event_server_response
+{
+  int32_t version;
+  u_int32_t err_code;
+};
+
+#define CEREBRO_EVENT_SERVER_RESPONSE_LEN  (sizeof(int32_t) \
+                                            + sizeof(u_int32_t))
+
 /* 
  * struct cerebro_event
  *
@@ -105,19 +119,5 @@ struct cerebro_event
                                    + CEREBRO_MAX_EVENT_NAME_LEN \
                                    + sizeof(u_int32_t) \
                                    + sizeof(u_int32_t))
-
-/*
- * struct cerebro_event_server_err_response
- *
- * defines a event server invalid version or packet response
- */
-struct cerebro_event_server_err_response
-{
-  int32_t version;
-  u_int32_t err_code;
-};
-
-#define CEREBRO_EVENT_SERVER_ERR_RESPONSE_LEN  (sizeof(int32_t) \
-                                                + sizeof(u_int32_t))
 
 #endif /* _CEREBRO_EVENT_PROTOCOL_H */

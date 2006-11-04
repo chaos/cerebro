@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_event_server.c,v 1.1.2.11 2006-11-04 19:29:15 chu11 Exp $
+ *  $Id: cerebrod_event_server.c,v 1.1.2.12 2006-11-04 21:20:57 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -43,6 +43,7 @@
 #include "cerebro/cerebro_constants.h"
 #include "cerebro/cerebro_event_protocol.h"
 
+#include "cerebrod.h"
 #include "cerebrod_config.h"
 #include "cerebrod_event_server.h"
 #include "cerebrod_util.h"
@@ -528,6 +529,260 @@ _delete_event_connection_fd(int fd)
   List_iterator_destroy(eitr);
 }
 
+/*
+ * _event_server_response_marshall
+ *
+ * marshall contents of a event response packet buffer
+ *
+ * Returns length written to buffer on success, -1 on error
+ */
+static int
+_event_server_response_marshall(struct cerebro_event_server_response *res,
+                                char *buf,
+                                unsigned int buflen)
+{
+  int len = 0;
+  
+  assert(res && buf && buflen >= CEREBRO_EVENT_SERVER_RESPONSE_LEN);
+  
+  memset(buf, '\0', buflen);
+  len += Marshall_int32(res->version, buf + len, buflen - len);
+  len += Marshall_u_int32(res->err_code, buf + len, buflen - len);
+  return len;
+}
+
+/*
+ * _event_server_response
+ *
+ * respond to the event_server_request with an error
+ *
+ * Return 0 on success, -1 on error
+ */
+static int
+_event_server_response(int fd, int32_t version, u_int32_t err_code)
+{
+  struct cerebro_event_server_response res;
+  char buf[CEREBRO_MAX_PACKET_LEN];
+  int res_len, buflen;
+
+  assert(fd >= 0
+         && err_code >= CEREBRO_EVENT_SERVER_PROTOCOL_ERR_SUCCESS
+         && err_code <= CEREBRO_EVENT_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
+
+  memset(&res, '\0', CEREBRO_EVENT_SERVER_RESPONSE_LEN);
+  res.version = version;
+  res.err_code = err_code;
+
+  if ((res_len = _event_server_response_marshall(&res, 
+                                                 buf, 
+                                                 buflen)) < 0)
+    return -1;
+
+  if (fd_write_n(fd, buf, res_len) < 0)
+    {
+      CEREBRO_DBG(("fd_write_n: %s", strerror(errno)));
+      return -1;
+    }
+
+  return 0;
+}
+
+/*
+ * _event_server_request_check_version
+ *
+ * Check that the version is correct prior to unmarshalling
+ *
+ * Returns 0 if version is correct, -1 if not
+ */
+static int
+_event_server_request_check_version(const char *buf,
+                                    unsigned int buflen,
+                                    int32_t *version)
+{
+  assert(buflen >= sizeof(int32_t) && version);
+
+  if (!Unmarshall_int32(version, buf, buflen))
+    {
+      CEREBRO_DBG(("version could not be unmarshalled"));
+      return -1;
+    }
+
+  if (*version != CEREBRO_EVENT_SERVER_PROTOCOL_VERSION)
+    return -1;
+  
+  return 0;
+}
+
+/*
+ * _event_server_request_unmarshall
+ *
+ * unmarshall contents of a event server request packet buffer
+ *
+ * Returns 0 on success, -1 on error
+ */
+static int
+_event_server_request_unmarshall(struct cerebro_event_server_request *req,
+                                 const char *buf,
+                                 unsigned int buflen)
+{
+  int bufPtrlen, c = 0;
+  char *bufPtr;
+  
+  assert(req && buf);
+
+  bufPtr = req->event_name;
+  bufPtrlen = sizeof(req->event_name);
+  c += Unmarshall_int32(&(req->version), buf + c, buflen - c);
+  c += Unmarshall_buffer(bufPtr, bufPtrlen, buf + c, buflen - c);
+  c += Unmarshall_u_int32(&(req->flags), buf + c, buflen - c);
+
+  if (c != CEREBRO_EVENT_SERVER_REQUEST_PACKET_LEN)
+    return -1;
+
+  return 0;
+}
+
+/*
+ * _event_server_request_dump
+ *
+ * dump contents of a event server request
+ */
+static void
+_event_server_request_dump(struct cerebro_event_server_request *req)
+{
+#if CEREBRO_DEBUG
+  char event_name_buf[CEREBRO_MAX_EVENT_NAME_LEN+1];
+
+  assert(req);
+
+  if (!(conf.debug && conf.event_server_debug))
+    return;
+
+  Pthread_mutex_lock(&debug_output_mutex);
+  fprintf(stderr, "**************************************\n");
+  fprintf(stderr, "* Event Server Request Received:\n");
+  fprintf(stderr, "* ------------------------\n");
+  fprintf(stderr, "* Version: %d\n", req->version);
+  /* Guarantee ending '\0' character */
+  memset(event_name_buf, '\0', CEREBRO_MAX_EVENT_NAME_LEN+1);
+  memcpy(event_name_buf, req->event_name, CEREBRO_MAX_EVENT_NAME_LEN);
+  fprintf(stderr, "* Event_name: %s\n", event_name_buf);
+  fprintf(stderr, "* Flags: %x\n", req->flags);
+  fprintf(stderr, "**************************************\n");
+  Pthread_mutex_unlock(&debug_output_mutex);
+#endif /* CEREBRO_DEBUG */
+}
+
+/* 
+ * _event_names_compare
+ *
+ * Comparison for list_find
+ *
+ * Return 1 if key matches, 0 if not
+ */
+static int
+_event_names_compare(void *x, void *key)
+{
+  assert(x);
+  assert(key);
+
+  if (!strcmp((char *)x, (char *)key))
+    return 1;
+  return 0;
+}
+
+/*
+ * _event_server_service_connection
+ *
+ * Thread to service a connection from a client to receive event
+ * packets.  Use wrapper functions minimally, b/c we want to return
+ * errors to the user instead of exitting with errors.
+ *
+ * Passed int * pointer to client TCP socket file descriptor
+ *
+ * Executed in detached state, no return value.
+ */
+static void *
+_event_server_service_connection(void *arg)
+{
+  int fd, recv_len;
+  struct cerebro_event_server_request req;
+  char buf[CEREBRO_MAX_PACKET_LEN];
+  char event_name_buf[CEREBRO_MAX_EVENT_NAME_LEN+1];
+  int32_t version;
+
+  fd = *((int *)arg);
+
+  memset(&req, '\0', sizeof(struct cerebro_event_server_request));
+
+  if ((recv_len = receive_data(fd,
+                               CEREBRO_EVENT_SERVER_REQUEST_PACKET_LEN,
+                               buf,
+                               CEREBRO_MAX_PACKET_LEN,
+                               CEREBRO_EVENT_SERVER_PROTOCOL_CLIENT_TIMEOUT_LEN,
+                               NULL)) < 0)
+    goto cleanup;
+
+  if (recv_len < sizeof(version))
+    goto cleanup;
+
+  if (_event_server_request_check_version(buf, recv_len, &version) < 0)
+    {
+      _event_server_response(fd,
+                             version,
+                             CEREBRO_EVENT_SERVER_PROTOCOL_ERR_VERSION_INVALID);
+      goto cleanup;
+    }
+
+  if (recv_len != CEREBRO_EVENT_SERVER_REQUEST_PACKET_LEN)
+    {
+      _event_server_response(fd,
+                             version,
+                             CEREBRO_EVENT_SERVER_PROTOCOL_ERR_PACKET_INVALID);
+      goto cleanup;
+    }
+
+  if (_event_server_request_unmarshall(&req, buf, recv_len) < 0)
+    {
+      _event_server_response(fd,
+                             version,
+                             CEREBRO_EVENT_SERVER_PROTOCOL_ERR_PACKET_INVALID);
+      goto cleanup;
+    }
+
+  _event_server_request_dump(&req);
+
+  /* Guarantee ending '\0' character */
+  memset(event_name_buf, '\0', CEREBRO_MAX_EVENT_NAME_LEN+1);
+  memcpy(event_name_buf, req.event_name, CEREBRO_MAX_EVENT_NAME_LEN);
+
+  if (!strlen(event_name_buf))
+    {
+      _event_server_response(fd,
+                             req.version,
+                             CEREBRO_EVENT_SERVER_PROTOCOL_ERR_EVENT_INVALID);
+      goto cleanup;
+    }
+
+  /* Event names is not changeable - so no need for a lock */
+  if (!List_find_first(event_names, _event_names_compare, event_name_buf))
+    {
+      _event_server_response(fd,
+                             req.version,
+                             CEREBRO_EVENT_SERVER_PROTOCOL_ERR_EVENT_INVALID);
+      goto cleanup;
+    }
+
+  _event_server_response(fd,
+                         req.version,
+                         CEREBRO_EVENT_SERVER_PROTOCOL_ERR_SUCCESS);
+  
+ cleanup:
+  Free(arg);
+  Close(fd);
+  return NULL;
+}
+
 void *
 cerebrod_event_server(void *arg)
 {
@@ -597,9 +852,21 @@ cerebrod_event_server(void *arg)
                                                "event_server: accept");
           if (fd >= 0)
             {
-              /* XXX
-               * deal with this
-               */
+              pthread_t thread;
+              pthread_attr_t attr;
+              int *arg;
+
+              /* Pass off connection to thread */
+              Pthread_attr_init(&attr);
+              Pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+              Pthread_attr_setstacksize(&attr, CEREBROD_THREAD_STACKSIZE);
+              arg = Malloc(sizeof(int));
+              *arg = fd;
+              Pthread_create(&thread,
+                             &attr,
+                             _event_server_service_connection,
+                             (void *)arg);
+              Pthread_attr_destroy(&attr);
             }
         }
 
