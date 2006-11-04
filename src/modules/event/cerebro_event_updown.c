@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_event_updown.c,v 1.1.2.7 2006-11-04 01:35:18 chu11 Exp $
+ *  $Id: cerebro_event_updown.c,v 1.1.2.8 2006-11-04 19:29:15 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -217,6 +217,7 @@ _create_event(const char *nodename, int state)
     }
 
   event->version = CEREBRO_EVENT_PROTOCOL_VERSION;
+  event->err_code = CEREBRO_EVENT_SERVER_PROTOCOL_ERR_SUCCESS;
   strncpy(event->nodename, nodename, CEREBRO_MAX_NODENAME_LEN);
   strncpy(event->event_name, UPDOWN_EVENT_NAME, CEREBRO_MAX_EVENT_NAME_LEN);
   event->event_value_type = CEREBRO_METRIC_VALUE_TYPE_INT32;

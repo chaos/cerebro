@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_event_server.c,v 1.1.2.10 2006-11-04 19:23:16 chu11 Exp $
+ *  $Id: cerebrod_event_server.c,v 1.1.2.11 2006-11-04 19:29:15 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -273,7 +273,7 @@ _event_marshall(struct cerebro_event *event,
   memset(buf, '\0', buflen);
 
   c += Marshall_int32(event->version, buf + c, buflen - c);
-
+  c += Marshall_u_int32(event->err_code, buf + c, buflen - c);
   bufPtr = event->nodename;
   bufPtrlen = sizeof(event->nodename);
   c += Marshall_buffer(bufPtr, bufPtrlen, buf + c, buflen - c);
