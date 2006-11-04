@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_event_protocol.h,v 1.1.2.5 2006-11-04 07:45:59 chu11 Exp $
+ *  $Id: cerebro_event_protocol.h,v 1.1.2.6 2006-11-04 19:25:59 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -32,27 +32,6 @@
 #include <cerebro/cerebro_constants.h>
 
 #define CEREBRO_EVENT_PROTOCOL_VERSION 1
-
-/* 
- * struct cerebro_event
- *
- * defines an event that will be returned to listeners
- */
-struct cerebro_event 
-{
-  int32_t version;
-  char nodename[CEREBRO_MAX_NODENAME_LEN];
-  char event_name[CEREBRO_MAX_EVENT_NAME_LEN];
-  u_int32_t event_value_type;
-  u_int32_t event_value_len;
-  void *event_value;
-};
-
-#define CEREBRO_EVENT_HEADER_LEN  (sizeof(int32_t) \
-                                   + CEREBRO_MAX_NODENAME_LEN \
-                                   + CEREBRO_MAX_EVENT_NAME_LEN \
-                                   + sizeof(u_int32_t) \
-                                   + sizeof(u_int32_t))
 
 /* Event server protocol
  *
@@ -87,5 +66,56 @@ struct cerebro_event
 #define CEREBRO_EVENT_SERVER_PROTOCOL_ERR_PARAMETER_INVALID 3
 #define CEREBRO_EVENT_SERVER_PROTOCOL_ERR_PACKET_INVALID    4
 #define CEREBRO_EVENT_SERVER_PROTOCOL_ERR_INTERNAL_ERROR    5
+
+/*
+ * struct cerebro_event_server_request
+ *
+ * defines a event server data request
+ */
+struct cerebro_event_server_request
+{
+  int32_t version;
+  char event_name[CEREBRO_MAX_EVENT_NAME_LEN];
+  u_int32_t flags;
+};
+
+#define CEREBRO_EVENT_SERVER_REQUEST_PACKET_LEN  (sizeof(int32_t) \
+                                                  + CEREBRO_MAX_EVENT_NAME_LEN \
+                                                  + sizeof(u_int32_t))
+
+/* 
+ * struct cerebro_event
+ *
+ * defines an event that can be returned to listeners
+ */
+struct cerebro_event 
+{
+  int32_t version;
+  char nodename[CEREBRO_MAX_NODENAME_LEN];
+  char event_name[CEREBRO_MAX_EVENT_NAME_LEN];
+  u_int32_t event_value_type;
+  u_int32_t event_value_len;
+  void *event_value;
+};
+
+#define CEREBRO_EVENT_HEADER_LEN  (sizeof(int32_t) \
+                                   + CEREBRO_MAX_NODENAME_LEN \
+                                   + CEREBRO_MAX_EVENT_NAME_LEN \
+                                   + sizeof(u_int32_t) \
+                                   + sizeof(u_int32_t))
+
+/*
+ * struct cerebro_event_server_err_response
+ *
+ * defines a event server invalid version or packet response
+ */
+struct cerebro_event_server_err_response
+{
+  int32_t version;
+  u_int32_t err_code;
+};
+
+#define CEREBRO_EVENT_SERVER_ERR_RESPONSE_LEN  (sizeof(int32_t) \
+                                                + sizeof(u_int32_t))
 
 #endif /* _CEREBRO_EVENT_PROTOCOL_H */
