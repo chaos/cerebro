@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_event_server.c,v 1.1.2.4 2006-11-04 01:43:42 chu11 Exp $
+ *  $Id: cerebrod_event_server.c,v 1.1.2.5 2006-11-04 01:45:53 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -231,6 +231,7 @@ _event_dump(struct cerebro_event *event)
         default:
           break;
         }
+      fprintf(stderr, "\n");
       fprintf(stderr, "**************************************\n");
       Pthread_mutex_unlock(&debug_output_mutex);
     }
