@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_event_server.c,v 1.1.2.9 2006-11-04 17:10:44 chu11 Exp $
+ *  $Id: cerebrod_event_server.c,v 1.1.2.10 2006-11-04 19:23:16 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -480,28 +480,52 @@ _event_server_setup_socket(int num)
   return -1;
 }
 
-/* 
- * _event_connections_find_fd
- *
- * Used by List for finding a matching fd
- *
- * Return 1 if fd matches, 0 if not
- */
-static int
-_event_connections_find_fd(void *x, void *key)
+static void
+_delete_event_connection_fd(int fd)
 {
   struct cerebrod_event_connection_data *ecd;
-  int *fd;
+  ListIterator eitr;
+#if CEREBRO_DEBUG
+  int rv;
+#endif /* CEREBRO_DEBUG */
 
-  assert(x);
-  assert(key);
+  assert(fd >= 0);
 
-  ecd = (struct cerebrod_event_connection_data *)x;
-  fd = (int *)key;
+#if CEREBRO_DEBUG
+  /* Should be called with lock already set */
+  rv = Pthread_mutex_trylock(&event_connections_lock);
+  if (rv != EBUSY)
+    CEREBRO_EXIT(("mutex not locked: rv=%d", rv));
+#endif /* CEREBRO_DEBUG */
   
-  if (ecd->fd == fd)
-    return 1;
-  return 0;
+  eitr = List_iterator_create(event_connections);
+  while ((ecd = list_next(eitr)))
+    {
+      if (ecd->fd == fd)
+        {
+          List connections;
+          if ((connections = Hash_find(event_connections_index, 
+                                       ecd->event_name)))
+            {
+              ListIterator citr;
+              int *fdPtr;
+
+              citr = List_iterator_create(connections);
+              while ((fdPtr = list_next(citr)))
+                {
+                  if (*fdPtr == fd) 
+                    {
+                      List_delete(citr);
+                      break;
+                    }
+                }
+              List_iterator_destroy(citr);
+            }
+          List_delete(eitr);
+          break;
+        }
+    }
+  List_iterator_destroy(eitr);
 }
 
 void *
@@ -586,10 +610,7 @@ cerebrod_event_server(void *arg)
             {
               CEREBRO_DBG(("fd = %d POLLERR", pfds[i].fd));
               Pthread_mutex_lock(&event_connections_lock);
-              /* XXX - delete from hash too */
-              List_delete_all(event_connections, 
-                              _event_connections_find_fd,
-                              &pfds[i].fd);
+              _delete_event_connection_fd(pfds[i].fd);
               Pthread_mutex_unlock(&event_connections_lock);
               continue;
             }
@@ -616,10 +637,7 @@ cerebrod_event_server(void *arg)
               if (n <= 0)
                 {
                   Pthread_mutex_lock(&event_connections_lock);
-                  /* XXX - delete from hash too */
-                  List_delete_all(event_connections, 
-                                  _event_connections_find_fd,
-                                  &pfds[i].fd);
+                  _delete_event_connection_fd(pfds[i].fd);
                   Pthread_mutex_unlock(&event_connections_lock);
                 }
             }
