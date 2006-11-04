@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_event_server.c,v 1.1.2.2 2006-11-04 01:21:22 chu11 Exp $
+ *  $Id: cerebrod_event_server.c,v 1.1.2.3 2006-11-04 01:40:05 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -114,6 +114,8 @@ cerebrod_queue_event(struct cerebro_event *event, unsigned int index)
   ets->index = index;
   ets->event = event;
   
+  List_append(event_queue, ets);
+
   Pthread_cond_signal(&event_queue_cond);
   Pthread_mutex_unlock(&event_queue_lock);
 }
