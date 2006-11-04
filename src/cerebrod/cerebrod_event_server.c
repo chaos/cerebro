@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_event_server.c,v 1.1.2.3 2006-11-04 01:40:05 chu11 Exp $
+ *  $Id: cerebrod_event_server.c,v 1.1.2.4 2006-11-04 01:43:42 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -255,7 +255,7 @@ cerebrod_event_queue_monitor(void *arg)
    */
   for (;;)
     {
-      struct cerebro_event *event;
+      struct cerebrod_event_to_send *ets;
       ListIterator itr;
 
       Pthread_mutex_lock(&event_queue_lock);
@@ -264,9 +264,9 @@ cerebrod_event_queue_monitor(void *arg)
         Pthread_cond_wait(&event_queue_cond, &event_queue_lock);
 
       itr = List_iterator_create(event_queue);
-      while ((event = list_next(itr)))
+      while ((ets = list_next(itr)))
         {
-          _event_dump(event);
+          _event_dump(ets->event);
           /* 
            * XXX 
            *
