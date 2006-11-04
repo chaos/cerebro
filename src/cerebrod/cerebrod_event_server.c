@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_event_server.c,v 1.1.2.5 2006-11-04 01:45:53 chu11 Exp $
+ *  $Id: cerebrod_event_server.c,v 1.1.2.6 2006-11-04 04:22:38 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -50,6 +50,9 @@
 #include "debug.h"
 #include "event_module.h"
 #include "fd.h"
+#include "hash.h"
+#include "list.h"
+#include "metric_util.h"
 #include "network_util.h"
 #include "wrappers.h"
 
@@ -96,8 +99,16 @@ List event_queue = NULL;
 pthread_cond_t event_queue_cond = PTHREAD_COND_INITIALIZER;
 pthread_mutex_t event_queue_lock = PTHREAD_MUTEX_INITIALIZER;
 
+/* 
+ * event_connections
+ *
+ * hash of file descriptors to send event info to.
+ */
+hash_t event_connections = NULL;
+ 
 extern event_modules_t event_handle;
 extern hash_t event_index;
+extern List event_names;
 
 void
 cerebrod_queue_event(struct cerebro_event *event, unsigned int index)
@@ -238,6 +249,52 @@ _event_dump(struct cerebro_event *event)
 #endif /* CEREBRO_DEBUG */
 }
 
+/* 
+ * _event_marshall
+ *
+ * marshall event packet
+ *
+ * Returns length written to buffer on success, -1 on error
+ */
+static int
+_event_marshall(struct cerebro_event *event,
+                char *buf,
+                unsigned int buflen)
+{
+  int bufPtrlen, n, c = 0;
+  char *bufPtr;
+  
+  assert(event && buf && buflen >= CEREBRO_EVENT_HEADER_LEN);
+
+  memset(buf, '\0', buflen);
+
+  c += Marshall_int32(event->version, buf + c, buflen - c);
+
+  bufPtr = event->nodename;
+  bufPtrlen = sizeof(event->nodename);
+  c += Marshall_buffer(bufPtr, bufPtrlen, buf + c, buflen - c);
+  bufPtr = event->event_name;
+  bufPtrlen = sizeof(event->event_name);
+  c += Marshall_buffer(bufPtr, bufPtrlen, buf + c, buflen - c);
+
+  c += Marshall_u_int32(event->event_value_type, buf + c, buflen - c);
+  c += Marshall_u_int32(event->event_value_len, buf + c, buflen - c);
+
+  if ((n = marshall_metric(event->event_value_type,
+                           event->event_value_len,
+                           event->event_value,
+                           buf + c,
+                           buflen - c,
+                           NULL)) < 0)
+    goto cleanup;
+  c += n;
+
+  return c;
+
+ cleanup:
+  return -1;
+}
+
 void *
 cerebrod_event_queue_monitor(void *arg)
 {
@@ -257,25 +314,54 @@ cerebrod_event_queue_monitor(void *arg)
   for (;;)
     {
       struct cerebrod_event_to_send *ets;
-      ListIterator itr;
+      ListIterator eitr;
 
       Pthread_mutex_lock(&event_queue_lock);
       assert(event_queue);
       while (list_count(event_queue) == 0)
         Pthread_cond_wait(&event_queue_cond, &event_queue_lock);
 
-      itr = List_iterator_create(event_queue);
-      while ((ets = list_next(itr)))
+      eitr = List_iterator_create(event_queue);
+      while ((ets = list_next(eitr)))
         {
+          List connections;
+
           _event_dump(ets->event);
-          /* 
-           * XXX 
-           *
-           * Send the events somewhere, do something with them.
-           */
-          List_delete(itr);
+          
+          if ((connections = Hash_find(event_connections, ets->event_name)))
+            {
+              char buf[CEREBRO_MAX_PACKET_LEN];
+              int elen;
+
+              if ((elen = _event_marshall(ets->event, 
+                                          buf, 
+                                          CEREBRO_MAX_PACKET_LEN)) > 0)
+                {
+                  ListIterator citr;
+                  int *fd;
+
+                  citr = List_iterator_create(connections);
+                  while ((fd = list_next(citr)))
+                    {
+                      if (fd_write_n(*fd, buf, elen) < 0)
+                        {
+                          CEREBRO_DBG(("fd_write_n: %s", strerror(errno)));
+                          if (errno == EPIPE
+                              || errno == EINVAL
+                              || errno == EBADF
+                              || errno == ENODEV
+                              || errno == ENETDOWN
+                              || errno == ENETUNREACH)
+                            List_delete(citr);
+                          continue;
+                        }
+                    }
+                  List_iterator_destroy(citr);
+                }
+            }
+          List_delete(eitr);
         }
-      List_iterator_destroy(itr);
+      List_iterator_destroy(eitr);
 
       Pthread_mutex_unlock(&event_queue_lock);
     }
@@ -291,11 +377,26 @@ cerebrod_event_queue_monitor(void *arg)
 static void
 _event_server_initialize(void)
 {
+  int event_names_count;
+
   Pthread_mutex_lock(&event_server_init_lock);
   if (event_server_init)
     goto out;
 
   Signal(SIGPIPE, SIG_IGN);
+
+  /* achu:
+   *
+   * This hash must be created in this initialize and not the queue
+   * initialize, b/c the event names list is generated during the
+   * listener initialization (which is done after the queue
+   * initialization).
+   */
+  event_names_count = List_count(event_names);
+  event_connections = Hash_create(event_names_count,
+                                  (hash_key_f)hash_key_string,
+                                  (hash_cmp_f)strcmp,
+                                  (hash_del_f)list_destroy);
 
   event_server_init++;
   Pthread_cond_signal(&event_server_init_cond);
