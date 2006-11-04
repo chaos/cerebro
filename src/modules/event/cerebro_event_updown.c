@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_event_updown.c,v 1.1.2.6 2006-11-04 01:24:23 chu11 Exp $
+ *  $Id: cerebro_event_updown.c,v 1.1.2.7 2006-11-04 01:35:18 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -229,6 +229,8 @@ _create_event(const char *nodename, int state)
   
   *((int *)event->event_value) = state;
 
+  return event;
+
  cleanup:
   if (event)
     {
@@ -264,7 +266,7 @@ updown_event_node_timeout(const char *nodename,
   /* XXX - in here for debugging */
   if (*state == UPDOWN_EVENT_STATE_INIT)
     {
-      struct cerebro_event *eventPtr;
+      struct cerebro_event *eventPtr = NULL;
       if ((eventPtr = _create_event(nodename, UPDOWN_EVENT_STATE_DOWN)))
         {
           *event = eventPtr;
@@ -275,7 +277,7 @@ updown_event_node_timeout(const char *nodename,
 
   if (*state == UPDOWN_EVENT_STATE_UP)
     {
-      struct cerebro_event *eventPtr;
+      struct cerebro_event *eventPtr = NULL;
       if ((eventPtr = _create_event(nodename, UPDOWN_EVENT_STATE_DOWN)))
         {
           *event = eventPtr;
@@ -315,7 +317,7 @@ updown_event_metric_update(const char *nodename,
 
   if (*state == UPDOWN_EVENT_STATE_DOWN)
     {
-      struct cerebro_event *eventPtr;
+      struct cerebro_event *eventPtr = NULL;
       if ((eventPtr = _create_event(nodename, UPDOWN_EVENT_STATE_UP)))
         {
           *event = eventPtr;
