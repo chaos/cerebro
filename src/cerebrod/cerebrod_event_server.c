@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_event_server.c,v 1.1.2.6 2006-11-04 04:22:38 chu11 Exp $
+ *  $Id: cerebrod_event_server.c,v 1.1.2.7 2006-11-04 05:11:57 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -101,10 +101,12 @@ pthread_mutex_t event_queue_lock = PTHREAD_MUTEX_INITIALIZER;
 
 /* 
  * event_connections
+ * event_connections_lock
  *
  * hash of file descriptors to send event info to.
  */
 hash_t event_connections = NULL;
+pthread_mutex_t event_connections_lock = PTHREAD_MUTEX_INITIALIZER;
  
 extern event_modules_t event_handle;
 extern hash_t event_index;
@@ -328,6 +330,7 @@ cerebrod_event_queue_monitor(void *arg)
 
           _event_dump(ets->event);
           
+          Pthread_mutex_lock(&event_connections_lock);
           if ((connections = Hash_find(event_connections, ets->event_name)))
             {
               char buf[CEREBRO_MAX_PACKET_LEN];
@@ -359,6 +362,8 @@ cerebrod_event_queue_monitor(void *arg)
                   List_iterator_destroy(citr);
                 }
             }
+          Pthread_mutex_unlock(&event_connections_lock);
+
           List_delete(eitr);
         }
       List_iterator_destroy(eitr);
