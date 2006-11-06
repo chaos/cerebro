@@ -4,8 +4,14 @@
 
 	* src/libs/include/cerebro_event_protocol.h,
 	src/libs/include/cerebro_event_module.h,
-	src/libs/modules/event_module.h, src/libs/modules/event_module.c:
-	New files.
+	src/libs/modules/event_module.h, src/libs/modules/event_module.c,
+	src/libs/cerebro/cerebro_event.c: New files.
+
+	* src/libs/include/cerebro.h: Add event API functions.
+
+	* src/libs/cerebro_api.h: Add event API support into struct cerebro.
+
+	* src/libs/cerebro.c (cerebro_handle_create): Add event API support.
 
 	* src/libs/include/Makefile.am, src/libs/modules/Makefile.am,
 	src/cerebrod/Makefile.am: Adjust appropriately.

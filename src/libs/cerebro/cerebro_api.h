@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_api.h,v 1.9 2005-07-22 21:46:55 achu Exp $
+ *  $Id: cerebro_api.h,v 1.9.2.1 2006-11-06 05:54:13 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -71,6 +71,7 @@ struct cerebro {
   clusterlist_module_t clusterlist_handle;
   List metriclists;
   List nodelists;
+  List event_fds;
 };
 
 /* 

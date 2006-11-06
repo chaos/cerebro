@@ -1,3 +1,10 @@
+event stuff
+manpages
+"metric_value" -> rename??
+- or create "event_value"?
+- flags for future?
+ - need event flags and metric flags, different?
+
 Portability
 - IPv6
 - Multicast

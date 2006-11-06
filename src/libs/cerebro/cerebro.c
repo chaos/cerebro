@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.c,v 1.8 2005-07-22 17:21:07 achu Exp $
+ *  $Id: cerebro.c,v 1.8.2.1 2006-11-06 05:54:13 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -98,9 +98,14 @@ cerebro_handle_create(void)
   if (!(handle->nodelists = list_create((ListDelF)cerebro_nodelist_destroy)))
     goto cleanup;
 
+  if (!(handle->event_fds = list_create((ListDelF)free)))
+    goto cleanup;
+
   return handle;
 
  cleanup:
+  if (handle->event_fds)
+    list_destroy(handle->event_fds);
   if (handle)
     free(handle);
   return NULL;
@@ -142,6 +147,8 @@ cerebro_handle_destroy(cerebro_t handle)
   handle->metriclists = NULL;
   list_destroy(handle->nodelists);
   handle->nodelists = NULL;
+  list_destroy(handle->event_fds);
+  handle->event_fds = NULL;
   
   handle->errnum = CEREBRO_ERR_SUCCESS;
   handle->magic = ~CEREBRO_MAGIC_NUMBER;
