@@ -5,6 +5,9 @@
 
 	* src/libs/cerebro/cerebro.c (cerebro_handle_create): Fix cleanup
 	corner case.
+
+	* src/libs/cerebro/cerebro_metric_util.c
+	(_metric_server_request_send, _get_metric_data): Fix flags type.
 	
 2006-11-01  Albert Chu  <chu11@llnl.gov>
 

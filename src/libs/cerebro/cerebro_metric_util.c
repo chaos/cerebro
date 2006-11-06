@@ -156,7 +156,7 @@ _metric_server_request_send(cerebro_t handle,
                             int fd,
                             const char *metric_name,
                             unsigned int timeout_len,
-                            int flags)
+                            unsigned int flags)
 {
   struct cerebro_metric_server_request req;
   char buf[CEREBRO_MAX_PACKET_LEN];
@@ -358,7 +358,7 @@ _get_metric_data(cerebro_t handle,
                  const char *hostname,
                  unsigned int port,
                  unsigned int timeout_len,
-                 int flags,
+                 unsigned int flags,
                  Cerebro_metric_receive_response receive_response)
 {
   int fd = -1, rv = -1;
