@@ -2,6 +2,9 @@
 
 	* man/cerebro_nodelist_metric_name.3: Fix typos and add forgotten
 	value types.
+
+	* src/libs/cerebro/cerebro.c (cerebro_handle_create): Fix cleanup
+	corner case.
 	
 2006-11-01  Albert Chu  <chu11@llnl.gov>
 
