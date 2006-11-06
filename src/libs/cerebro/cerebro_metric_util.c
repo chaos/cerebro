@@ -171,8 +171,8 @@ _metric_server_request_send(cerebro_t handle,
 
   req.version = CEREBRO_METRIC_SERVER_PROTOCOL_VERSION;
   strncpy(req.metric_name, metric_name, CEREBRO_MAX_METRIC_NAME_LEN);
-  req.flags = flags;
   req.timeout_len = timeout_len;
+  req.flags = flags;
 
   if ((req_len = _metric_server_request_marshall(handle,
                                                  &req,
