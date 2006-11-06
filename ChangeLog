@@ -1,3 +1,8 @@
+2006-11-05  Albert Chu  <chu11@llnl.gov>
+
+	* man/cerebro_nodelist_metric_name.3: Fix typos and add forgotten
+	value types.
+	
 2006-11-01  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerebrod/cerebrod_monitor_update.h,
