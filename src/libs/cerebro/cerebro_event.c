@@ -656,6 +656,7 @@ _event_value_unmarshall(cerebro_t handle,
 int
 cerebro_event_parse(cerebro_t handle, 
                     int fd,
+                    char **nodename,
                     unsigned int *event_value_type,
                     unsigned int *event_value_len,
                     void **event_value)
@@ -666,7 +667,8 @@ cerebro_event_parse(cerebro_t handle,
   int bytes_read, vbytes_read, n;
   unsigned int errnum;
   char *vbuf = NULL;
-  void *event_value_buf = NULL;
+  char *nodename_ptr = NULL;
+  void *event_value_ptr = NULL;
       
   if (_cerebro_handle_check(handle) < 0)
     goto cleanup;
@@ -772,19 +774,34 @@ cerebro_event_parse(cerebro_t handle,
         {
           if (_event_value_unmarshall(handle,
                                       &event,
-                                      &event_value_buf,
+                                      &event_value_ptr,
                                       vbuf,
                                       vbytes_read) < 0)
             goto cleanup;
           
-          event.event_value = event_value_buf;
-          event_value_buf = NULL;
+          event.event_value = event_value_ptr;
+          event_value_ptr = NULL;
         }
       else
         event.event_value = NULL;
 
       free(vbuf);
       vbuf = NULL;
+    }
+
+  if (nodename)
+    {
+      char nodename_buf[CEREBRO_MAX_NODENAME_LEN + 1];
+
+      /* To ensure null string at end */
+      memset(nodename_buf, '\0', CEREBRO_MAX_NODENAME_LEN + 1);
+      memcpy(nodename_buf, event.nodename, CEREBRO_MAX_NODENAME_LEN);
+      
+      if (!(*nodename = strdup(nodename_buf)))
+        {
+          handle->errnum = CEREBRO_ERR_OUTMEM;
+          goto cleanup;
+        }
     }
 
   if (event_value_type)
@@ -796,7 +813,7 @@ cerebro_event_parse(cerebro_t handle,
   if (event_value)
     {
       *event_value = event.event_value;
-      /* Remove other point to the data, so it can't be freed */
+      /* Remove other pointer to the data, so it can't be freed */
       event.event_value = NULL;
     }
 
@@ -806,8 +823,8 @@ cerebro_event_parse(cerebro_t handle,
  cleanup:
   if (vbuf)
     free(vbuf);
-  if (event_value_buf)
-    free(event_value_buf);
+  if (event_value_ptr)
+    free(event_value_ptr);
   if (event.event_value)
     free(event.event_value);
   return -1;

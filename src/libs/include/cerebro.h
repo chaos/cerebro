@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.22.2.3 2006-11-07 01:49:09 chu11 Exp $
+ *  $Id: cerebro.h,v 1.22.2.4 2006-11-07 18:21:17 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -69,7 +69,7 @@
 #define CEREBRO_METRIC_FLAGS_NONE_IF_NOT_MONITORED 0x00000004
 #define CEREBRO_METRIC_FLAGS_MASK                  0x00000007
 
-/* B
+/* 
  * Cerebro Metric Value Types
  */
 #define CEREBRO_METRIC_VALUE_TYPE_NONE             0
@@ -292,12 +292,13 @@ int cerebro_event_unregister(cerebro_t handle, int fd);
  * cerebro_event_parse
  *
  * Parse event data when there is data to read on the file descriptor.
- * User is responsible for freeing event_value memory.
+ * User is responsible for freeing nodename and event_value memory.
  *
  * Returns 0 and event data on success, -1 on error
  */
 int cerebro_event_parse(cerebro_t handle,
                         int fd,
+                        char **nodename,
                         unsigned int *event_value_type,
                         unsigned int *event_value_len,
                         void **event_value);

@@ -1,5 +1,7 @@
 event stuff
-manpages
+manpages for lib API
+manpage for cerebro-stat
+
 "metric_value" -> rename??
 - or create "event_value"?
 - flags for future?
