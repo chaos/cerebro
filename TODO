@@ -4,6 +4,8 @@ manpages
 - or create "event_value"?
 - flags for future?
  - need event flags and metric flags, different?
+- up age/lib stuff in configure.ac
+
 
 Portability
 - IPv6
