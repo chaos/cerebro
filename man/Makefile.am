@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.32 2005-07-26 00:57:17 achu Exp $
+## $Id: Makefile.am,v 1.32.2.1 2006-11-07 23:22:07 chu11 Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -22,6 +22,10 @@ man3_MANS  = libcerebro.3 \
 	     cerebro_set_timeout_len.3 \
 	     cerebro_get_flags.3 \
 	     cerebro_set_flags.3 \
+	     cerebro_event_register.3 \
+	     cerebro_event_unregister.3 \
+	     cerebro_event_parse.3 \
+	     cerebro_event.3 \
 	     cerebro_get_metric_names.3 \
 	     cerebro_get_metric_data.3 \
 	     cerebro_register_metric.3 \
@@ -74,6 +78,10 @@ EXTRA_DIST = libcerebro.3 \
 	     cerebro_set_timeout_len.3 \
 	     cerebro_get_flags.3 \
 	     cerebro_set_flags.3 \
+	     cerebro_event_register.3 \
+	     cerebro_event_unregister.3 \
+	     cerebro_event_parse.3 \
+	     cerebro_event.3 \
 	     cerebro_get_metric_names.3 \
 	     cerebro_get_metric_data.3 \
 	     cerebro_register_metric.3 \

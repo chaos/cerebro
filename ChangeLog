@@ -30,12 +30,16 @@
 
 	* src/cerebro-stat/cerebro-stat.c: Add event monitoring support.
 
+	* man/cerebro-stat.8.in, man/cerebro.conf.5.in,
+	man/cerebro_module_devel.3.in: Update appropriately.
+
+	* man/cerebro_event.3, man/cerebro_event_register.3,
+	man/cerebro_event_unregister.3, man/cerebro_event_parse.3: New
+	files.
+	
 	Add Updown Module Event support
 
 	* src/modules/event/cerebro_event_updown.c: New file.
-
-	* man/cerebro.conf.5.in, man/cerebro_module_devel.3.in: Update
-	appropriately.
 
 	Misc
 
