@@ -643,8 +643,6 @@ _event_value_unmarshall(cerebro_t handle,
       goto cleanup;
     }
 
-  
-
   *event_value = evalue;
   return 0;
 
@@ -731,7 +729,7 @@ cerebro_event_parse(cerebro_t handle,
 
   if (_event_server_err_check(handle, buf, bytes_read) < 0)
     goto cleanup;
-  
+
   if (_event_header_unmarshall(handle,
                                &event,
                                buf,

@@ -28,6 +28,8 @@
 	src/cerebrod/cerebrod_event_update.h,
 	src/cerebrod/cerebrod_event_update.c: New files.
 
+	* src/cerebro-stat/cerebro-stat.c: Add event monitoring support.
+
 	Add Updown Module Event support
 
 	* src/modules/event/cerebro_event_updown.c: New file.

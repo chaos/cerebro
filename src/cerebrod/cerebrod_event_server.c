@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_event_server.c,v 1.1.2.12 2006-11-04 21:20:57 chu11 Exp $
+ *  $Id: cerebrod_event_server.c,v 1.1.2.13 2006-11-07 22:46:11 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -200,19 +200,19 @@ _event_dump(struct cerebro_event *event)
         case CEREBRO_METRIC_VALUE_TYPE_NONE:
           break;
         case CEREBRO_METRIC_VALUE_TYPE_INT32:
-          fprintf(stderr, "value = %d",
+          fprintf(stderr, "* Value = %d",
                   *((int32_t *)event->event_value));
           break;
         case CEREBRO_METRIC_VALUE_TYPE_U_INT32:
-          fprintf(stderr, "value = %u",
+          fprintf(stderr, "* Value = %u",
                   *((u_int32_t *)event->event_value));
           break;
         case CEREBRO_METRIC_VALUE_TYPE_FLOAT:
-          fprintf(stderr, "value = %f",
+          fprintf(stderr, "* Value = %f",
                   *((float *)event->event_value));
           break;
         case CEREBRO_METRIC_VALUE_TYPE_DOUBLE:
-          fprintf(stderr, "value = %f",
+          fprintf(stderr, "* Value = %f",
                   *((double *)event->event_value));
           break;
         case CEREBRO_METRIC_VALUE_TYPE_STRING:
@@ -222,25 +222,25 @@ _event_dump(struct cerebro_event *event)
           memcpy(buf,
                  event->event_value,
                  event->event_value_len);
-          fprintf(stderr, "value = %s", buf);
+          fprintf(stderr, "* Value = %s", buf);
           Free(buf);
           break;
 #if SIZEOF_LONG == 4
         case CEREBRO_METRIC_VALUE_TYPE_INT64:
-          fprintf(stderr, "value = %lld",
+          fprintf(stderr, "* Value = %lld",
                   *((int64_t *)event->event_value));
           break;
         case CEREBRO_METRIC_VALUE_TYPE_U_INT64:
-          fprintf(stderr, "value = %llu",
+          fprintf(stderr, "* Value = %llu",
                   *((u_int64_t *)event->event_value));
           break;
 #else  /* SIZEOF_LONG == 8 */
         case CEREBRO_METRIC_VALUE_TYPE_INT64:
-          fprintf(stderr, "value = %ld",
+          fprintf(stderr, "* Value = %ld",
                   *((int64_t *)event->event_value));
           break;
         case CEREBRO_METRIC_VALUE_TYPE_U_INT64:
-          fprintf(stderr, "value = %lu",
+          fprintf(stderr, "* Value = %lu",
                   *((u_int64_t *)event->event_value));
           break;
 #endif /* SIZEOF_LONG == 8 */
@@ -281,9 +281,6 @@ _event_marshall(struct cerebro_event *event,
   bufPtr = event->event_name;
   bufPtrlen = sizeof(event->event_name);
   c += Marshall_buffer(bufPtr, bufPtrlen, buf + c, buflen - c);
-
-  c += Marshall_u_int32(event->event_value_type, buf + c, buflen - c);
-  c += Marshall_u_int32(event->event_value_len, buf + c, buflen - c);
 
   if ((n = marshall_metric(event->event_value_type,
                            event->event_value_len,
@@ -413,7 +410,7 @@ _event_server_initialize(void)
    */
   assert(event_names);
   event_names_count = List_count(event_names);
-  event_connections = List_create((ListDelF)_Free);
+  event_connections = List_create((ListDelF)free);
   event_connections_index = Hash_create(event_names_count,
                                         (hash_key_f)hash_key_string,
                                         (hash_cmp_f)strcmp,
@@ -563,7 +560,7 @@ _event_server_response(int fd, int32_t version, u_int32_t err_code)
 {
   struct cerebro_event_server_response res;
   char buf[CEREBRO_MAX_PACKET_LEN];
-  int res_len, buflen;
+  int res_len;
 
   assert(fd >= 0
          && err_code >= CEREBRO_EVENT_SERVER_PROTOCOL_ERR_SUCCESS
@@ -575,7 +572,7 @@ _event_server_response(int fd, int32_t version, u_int32_t err_code)
 
   if ((res_len = _event_server_response_marshall(&res, 
                                                  buf, 
-                                                 buflen)) < 0)
+                                                 CEREBRO_MAX_PACKET_LEN)) < 0)
     return -1;
 
   if (fd_write_n(fd, buf, res_len) < 0)
@@ -694,27 +691,27 @@ _event_names_compare(void *x, void *key)
 /*
  * _event_server_service_connection
  *
- * Thread to service a connection from a client to receive event
- * packets.  Use wrapper functions minimally, b/c we want to return
- * errors to the user instead of exitting with errors.
+ * Service a connection from a client to receive event packets.  Use
+ * wrapper functions minimally, b/c we want to return errors to the
+ * user instead of exitting with errors.
  *
- * Passed int * pointer to client TCP socket file descriptor
- *
- * Executed in detached state, no return value.
  */
-static void *
-_event_server_service_connection(void *arg)
+static void
+_event_server_service_connection(int fd)
 {
-  int fd, recv_len;
+  int recv_len;
   struct cerebro_event_server_request req;
+  struct cerebrod_event_connection_data *ecd = NULL;
   char buf[CEREBRO_MAX_PACKET_LEN];
   char event_name_buf[CEREBRO_MAX_EVENT_NAME_LEN+1];
+  char *event_name_ptr = NULL;
   int32_t version;
+  int *fdptr;
+  List connections = NULL;
 
-  fd = *((int *)arg);
+  assert(fd >= 0);
 
   memset(&req, '\0', sizeof(struct cerebro_event_server_request));
-
   if ((recv_len = receive_data(fd,
                                CEREBRO_EVENT_SERVER_REQUEST_PACKET_LEN,
                                buf,
@@ -765,22 +762,97 @@ _event_server_service_connection(void *arg)
     }
 
   /* Event names is not changeable - so no need for a lock */
-  if (!List_find_first(event_names, _event_names_compare, event_name_buf))
+  if (!(event_name_ptr = list_find_first(event_names, 
+                                         _event_names_compare,
+                                         event_name_buf)))
     {
       _event_server_response(fd,
                              req.version,
                              CEREBRO_EVENT_SERVER_PROTOCOL_ERR_EVENT_INVALID);
       goto cleanup;
     }
+  
+  if (!(ecd = (struct cerebrod_event_connection_data *)malloc(sizeof(struct cerebrod_event_connection_data))))
+    {
+      CEREBRO_DBG(("malloc: %s", strerror(errno)));
+      _event_server_response(fd,
+                             req.version,
+                             CEREBRO_EVENT_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
+      goto cleanup;
+    }
+  
+  ecd->event_name = event_name_ptr;
+  ecd->fd = fd;
+
+  if (!list_append(event_connections, ecd))
+    {
+      CEREBRO_DBG(("list_append: %s", strerror(errno)));
+      _event_server_response(fd,
+                             req.version,
+                             CEREBRO_EVENT_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
+      goto cleanup;
+    }
+
+  if (!(connections = Hash_find(event_connections_index, 
+                                ecd->event_name)))
+    {
+      if (!(connections = list_create((ListDelF)free)))
+        {
+          CEREBRO_DBG(("list_create: %s", strerror(errno)));
+          _event_server_response(fd,
+                                 req.version,
+                                 CEREBRO_EVENT_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
+          goto cleanup;
+        }
+
+      if (!Hash_insert(event_connections_index, ecd->event_name, connections))
+        {
+          CEREBRO_DBG(("list_create: %s", strerror(errno)));
+          _event_server_response(fd,
+                                 req.version,
+                                 CEREBRO_EVENT_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
+          list_destroy(connections);
+          goto cleanup;
+        }
+    }
+
+  if (!(fdptr = (int *)malloc(sizeof(int))))
+    {
+      CEREBRO_DBG(("malloc: %s", strerror(errno)));
+      _event_server_response(fd,
+                             req.version,
+                             CEREBRO_EVENT_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
+      goto cleanup;
+    }
+
+  *fdptr = fd;
+  Pthread_mutex_lock(&event_connections_lock);
+  if (!list_append(connections, fdptr))
+    {
+      CEREBRO_DBG(("malloc: %s", strerror(errno)));
+      _event_server_response(fd,
+                             req.version,
+                             CEREBRO_EVENT_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
+      goto cleanup;
+      
+    }
+  Pthread_mutex_unlock(&event_connections_lock);
+  /* Clear this pointer so we know it's stored away in a list */
+  fdptr = NULL;
 
   _event_server_response(fd,
                          req.version,
                          CEREBRO_EVENT_SERVER_PROTOCOL_ERR_SUCCESS);
+
+  return;
   
  cleanup:
-  Free(arg);
-  Close(fd);
-  return NULL;
+  if (ecd)
+    free(ecd);
+  if (fdptr)
+    free(fdptr);
+  close(fd);
+  return;
 }
 
 void *
@@ -851,23 +923,7 @@ cerebrod_event_server(void *arg)
                                                _event_server_setup_socket,
                                                "event_server: accept");
           if (fd >= 0)
-            {
-              pthread_t thread;
-              pthread_attr_t attr;
-              int *arg;
-
-              /* Pass off connection to thread */
-              Pthread_attr_init(&attr);
-              Pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-              Pthread_attr_setstacksize(&attr, CEREBROD_THREAD_STACKSIZE);
-              arg = Malloc(sizeof(int));
-              *arg = fd;
-              Pthread_create(&thread,
-                             &attr,
-                             _event_server_service_connection,
-                             (void *)arg);
-              Pthread_attr_destroy(&attr);
-            }
+            _event_server_service_connection(fd);
         }
 
       /* Deal with the connecting fds */
@@ -903,6 +959,16 @@ cerebrod_event_server(void *arg)
 
               if (n <= 0)
                 {
+#if CEREBRO_DEBUG
+                  if (conf.debug && conf.event_server_debug)
+                    {
+                      Pthread_mutex_lock(&debug_output_mutex);
+                      fprintf(stderr, "**************************************\n");
+                      fprintf(stderr, "* Event Server Close Fd: %d\n", pfds[i].fd);
+                      fprintf(stderr, "**************************************\n");
+                      Pthread_mutex_unlock(&debug_output_mutex);
+                    }
+#endif /* CEREBRO_DEBUG */
                   Pthread_mutex_lock(&event_connections_lock);
                   _delete_event_connection_fd(pfds[i].fd);
                   Pthread_mutex_unlock(&event_connections_lock);

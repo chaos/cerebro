@@ -765,7 +765,7 @@ _event_data(void)
       char *msg = cerebro_strerror(cerebro_errnum(handle));
 
       _clean_err_exit(cerebro_errnum(handle));
-      err_exit("%s: cerebro_get_metric_data: %s", func, msg);
+      err_exit("%s: cerebro_event_register: %s", func, msg);
     }
   
   while (1)
@@ -800,7 +800,7 @@ _event_data(void)
               char *msg = cerebro_strerror(cerebro_errnum(handle));
               
               _clean_err_exit(cerebro_errnum(handle));
-              err_exit("%s: cerebro_get_metric_data: %s", func, msg);
+              err_exit("%s: cerebro_event_parse: %s", func, msg);
             }
 
           
@@ -820,10 +820,10 @@ _event_data(void)
           
           free(nodename);
           free(event_value);
-        }
-      
-      (void)cerebro_event_unregister(handle, fd);
+        }     
     }
+
+  (void)cerebro_event_unregister(handle, fd);
 }
 
 int 
