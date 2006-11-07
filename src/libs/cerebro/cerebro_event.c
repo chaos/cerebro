@@ -34,6 +34,7 @@
 #if STDC_HEADERS
 #include <string.h>
 #endif /* STDC_HEADERS */
+#include <sys/poll.h>
 #include <errno.h>
 
 #include "cerebro.h"
@@ -46,6 +47,7 @@
 #include "debug.h"
 #include "fd.h"
 #include "marshall.h"
+#include "metric_util.h"
 #include "network_util.h"
 
 /*
@@ -178,7 +180,7 @@ _event_server_protocol_err_code_conversion(u_int32_t err_code)
 }
 
 /*
- * _event_server_response_check
+ * _event_server_err_check
  *
  * Check that the version and error code are good prior to
  * unmarshalling
@@ -186,9 +188,9 @@ _event_server_protocol_err_code_conversion(u_int32_t err_code)
  * Returns 0 on success, -1 on error
  */
 static int
-_event_server_response_check(cerebro_t handle,
-                             const char *buf,
-                             unsigned int buflen)
+_event_server_err_check(cerebro_t handle,
+                        const char *buf,
+                        unsigned int buflen)
 {
   int n, len = 0;
   int32_t version;
@@ -296,7 +298,7 @@ _event_connection(cerebro_t handle,
       goto cleanup;
     }
   
-  if (_event_server_response_check(handle, buf, bytes_read) < 0)
+  if (_event_server_err_check(handle, buf, bytes_read) < 0)
     goto cleanup;
 
   return fd;
@@ -496,6 +498,161 @@ cerebro_event_unregister(cerebro_t handle, int fd)
   return 0;
 }
 
+/*
+ * _event_header_unmarshall
+ *
+ * Unmarshall contents of a event server event header
+ *
+ * Returns 0 on success, -1 on error
+ */
+static int
+_event_header_unmarshall(cerebro_t handle,
+                         struct cerebro_event *event,
+                         const char *buf,
+                         unsigned int buflen)
+{
+  u_int32_t *etypePtr, *elenPtr;
+  int n, bufPtrlen, c = 0;
+  char *bufPtr;
+
+  if (!event || !buf || buflen < CEREBRO_EVENT_HEADER_LEN)
+    {
+      CEREBRO_DBG(("invalid pointers"));
+      handle->errnum = CEREBRO_ERR_INTERNAL;
+      return -1;
+    }
+
+  if ((n = unmarshall_int32(&(event->version), buf + c, buflen - c)) < 0)
+    {
+      CEREBRO_DBG(("unmarshall_int32"));
+      handle->errnum = CEREBRO_ERR_INTERNAL;
+      return -1;
+    }
+  c += n;
+
+  if ((n = unmarshall_u_int32(&(event->err_code), buf + c, buflen - c)) < 0)
+    {
+      CEREBRO_DBG(("unmarshall_u_int32"));
+      handle->errnum = CEREBRO_ERR_INTERNAL;
+      return -1;
+    }
+  c += n;
+
+  bufPtr = event->nodename;
+  bufPtrlen = sizeof(event->nodename);
+  if ((n = unmarshall_buffer(bufPtr, bufPtrlen, buf + c, buflen - c)) < 0)
+    {
+      CEREBRO_DBG(("unmarshall_buffer"));
+      handle->errnum = CEREBRO_ERR_INTERNAL;
+      return -1;
+    }
+  c += n;
+
+  bufPtr = event->event_name;
+  bufPtrlen = sizeof(event->event_name);
+  if ((n = unmarshall_buffer(bufPtr, bufPtrlen, buf + c, buflen - c)) < 0)
+    {
+      CEREBRO_DBG(("unmarshall_buffer"));
+      handle->errnum = CEREBRO_ERR_INTERNAL;
+      return -1;
+    }
+  c += n;
+
+  etypePtr = &(event->event_value_type);
+  if ((n = unmarshall_u_int32(etypePtr, buf + c,  buflen - c)) < 0)
+    {
+      CEREBRO_DBG(("unmarshall_u_int32"));
+      handle->errnum = CEREBRO_ERR_INTERNAL;
+      return -1;
+    }
+  c += n;
+
+  elenPtr = &(event->event_value_len);
+  if ((n = unmarshall_u_int32(elenPtr, buf + c, buflen - c)) < 0)
+    {
+      CEREBRO_DBG(("unmarshall_u_int32"));
+      handle->errnum = CEREBRO_ERR_INTERNAL;
+      return -1;
+    }
+  c += n;
+
+  if (c != CEREBRO_EVENT_HEADER_LEN)
+    {
+      handle->errnum = CEREBRO_ERR_PROTOCOL;
+      return -1;
+    }
+
+  return 0;
+}
+
+/*
+ * _event_value_unmarshall
+ *
+ * Unmarshall contents of an event
+ *
+ * Returns 0 on success, -1 on error
+ */
+static int
+_event_value_unmarshall(cerebro_t handle,
+                        struct cerebro_event *event,
+                        void **event_value,
+                        const char *buf,
+                        unsigned int buflen)
+{
+  int errnum = 0, evalue_len = 0;
+  void *evalue = NULL;
+  u_int32_t etype, elen;
+
+#if CEREBRO_DEBUG
+  if (!event
+      || event->event_value_type == CEREBRO_METRIC_VALUE_TYPE_NONE
+      || !event_value
+      || !buf)
+    {
+      CEREBRO_DBG(("invalid parameters"));
+      handle->errnum = CEREBRO_ERR_INTERNAL;
+      return -1;
+    }
+#endif /* CEREBRO_DEBUG */
+  
+  etype = event->event_value_type;
+  elen = event->event_value_len;
+
+  /* Special case for ending null character */
+  if (etype == CEREBRO_METRIC_VALUE_TYPE_STRING)
+    evalue_len = buflen + 1;
+  else
+    evalue_len = buflen;
+
+  if (!(evalue = malloc(buflen)))
+    {
+      handle->errnum = CEREBRO_ERR_OUTMEM;
+      return -1;
+    }
+  memset(evalue, '\0', evalue_len);
+
+  if (unmarshall_metric_value(etype,
+                              elen,
+                              evalue,
+                              evalue_len,
+                              buf,
+                              buflen,
+                              &errnum) < 0)
+    {
+      handle->errnum = errnum;
+      goto cleanup;
+    }
+
+  
+
+  *event_value = evalue;
+  return 0;
+
+ cleanup:
+  free(evalue);
+  return -1;
+}
+
 int
 cerebro_event_parse(cerebro_t handle, 
                     int fd,
@@ -503,6 +660,14 @@ cerebro_event_parse(cerebro_t handle,
                     unsigned int *event_value_len,
                     void **event_value)
 {
+  struct cerebro_event event;
+  char buf[CEREBRO_MAX_PACKET_LEN];
+  struct pollfd pfd;
+  int bytes_read, vbytes_read, n;
+  unsigned int errnum;
+  char *vbuf = NULL;
+  void *event_value_buf = NULL;
+      
   if (_cerebro_handle_check(handle) < 0)
     goto cleanup;
 
@@ -519,29 +684,131 @@ cerebro_event_parse(cerebro_t handle,
       handle->errnum = CEREBRO_ERR_PARAMETERS;
       goto cleanup;
     }
+  
+  pfd.fd = fd;
+  pfd.events = POLLIN;
+  pfd.revents = 0;
 
-  /* XXX - read and parse event */
+  if ((n = poll(&pfd, 1, 0)) < 0)
+    {
+      CEREBRO_DBG(("poll: %s", strerror(errno)));
+      handle->errnum = CEREBRO_ERR_INTERNAL;
+      goto cleanup;
+    }
+  
+  if (!n)
+    {
+      handle->errnum = CEREBRO_ERR_EVENT_NOT_RECEIVED;
+      goto cleanup;
+    }
+
+  if (!(pfd.revents & POLLIN))
+    {
+      handle->errnum = CEREBRO_ERR_EVENT_NOT_RECEIVED;
+      goto cleanup;
+    }
+
+  memset(&event, '\0', sizeof(struct cerebro_event));
+
+  if ((bytes_read = receive_data(fd,
+                                 CEREBRO_EVENT_HEADER_LEN,
+                                 buf,
+                                 CEREBRO_MAX_PACKET_LEN,
+                                 CEREBRO_EVENT_SERVER_PROTOCOL_CLIENT_TIMEOUT_LEN,
+                                 &errnum)) < 0)
+    {
+      handle->errnum = errnum;
+      goto cleanup;
+    }
+  
+  if (bytes_read < CEREBRO_EVENT_HEADER_LEN)
+    {
+      handle->errnum = CEREBRO_ERR_PROTOCOL;
+      goto cleanup;
+    }
+
+  if (_event_server_err_check(handle, buf, bytes_read) < 0)
+    goto cleanup;
+  
+  if (_event_header_unmarshall(handle,
+                               &event,
+                               buf,
+                               bytes_read) < 0)
+    goto cleanup;
+
+  if (check_metric_type_len(event.event_value_type, 
+                            event.event_value_len) < 0)
+    {
+      handle->errnum = CEREBRO_ERR_PROTOCOL;
+      goto cleanup;
+    }
+
+  if (event.event_value_len)
+    {
+      if (!(vbuf = malloc(event.event_value_len)))
+        {
+          handle->errnum = CEREBRO_ERR_OUTMEM;
+          goto cleanup;
+        }
+
+      if ((vbytes_read = receive_data(fd,
+                                      event.event_value_len,
+                                      vbuf,
+                                      event.event_value_len,
+                                      CEREBRO_EVENT_SERVER_PROTOCOL_CLIENT_TIMEOUT_LEN,
+                                      &errnum)) < 0)
+        {
+          handle->errnum = errnum;
+          goto cleanup;
+        }
+      
+      if (vbytes_read != event.event_value_len)
+        {
+          handle->errnum = CEREBRO_ERR_PROTOCOL;
+          goto cleanup;
+        } 
+      
+      if (event_value)
+        {
+          if (_event_value_unmarshall(handle,
+                                      &event,
+                                      &event_value_buf,
+                                      vbuf,
+                                      vbytes_read) < 0)
+            goto cleanup;
+          
+          event.event_value = event_value_buf;
+          event_value_buf = NULL;
+        }
+      else
+        event.event_value = NULL;
+
+      free(vbuf);
+      vbuf = NULL;
+    }
 
   if (event_value_type)
-    ;
+    *event_value_type = event.event_value_type;
   
   if (event_value_len)
-    ;
+    *event_value_len = event.event_value_len;
 
   if (event_value)
-    ;
-
-#if 0
-  if (_cerebro_event_get_data(handle,
-                               nodelist,
-                               event_name,
-                               _receive_event_data_response) < 0)
-    goto cleanup;
-#endif
+    {
+      *event_value = event.event_value;
+      /* Remove other point to the data, so it can't be freed */
+      event.event_value = NULL;
+    }
 
   handle->errnum = CEREBRO_ERR_SUCCESS;
   return 0;
   
  cleanup:
+  if (vbuf)
+    free(vbuf);
+  if (event_value_buf)
+    free(event_value_buf);
+  if (event.event_value)
+    free(event.event_value);
   return -1;
 }

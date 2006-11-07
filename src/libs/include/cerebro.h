@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.22.2.2 2006-11-06 05:54:13 chu11 Exp $
+ *  $Id: cerebro.h,v 1.22.2.3 2006-11-07 01:49:09 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -51,13 +51,14 @@
 #define CEREBRO_ERR_EVENT_INVALID            17
 #define CEREBRO_ERR_METRIC_MAX               18
 #define CEREBRO_ERR_END_OF_LIST              19
-#define CEREBRO_ERR_CONFIG_FILE              20
-#define CEREBRO_ERR_CONFIG_MODULE            21
-#define CEREBRO_ERR_CONFIG_INPUT             22
-#define CEREBRO_ERR_CLUSTERLIST_MODULE       23
-#define CEREBRO_ERR_OUTMEM                   24
-#define CEREBRO_ERR_INTERNAL                 25
-#define CEREBRO_ERR_ERRNUMRANGE              26
+#define CEREBRO_ERR_EVENT_NOT_RECEIVED       20
+#define CEREBRO_ERR_CONFIG_FILE              21
+#define CEREBRO_ERR_CONFIG_MODULE            22
+#define CEREBRO_ERR_CONFIG_INPUT             23
+#define CEREBRO_ERR_CLUSTERLIST_MODULE       24
+#define CEREBRO_ERR_OUTMEM                   25
+#define CEREBRO_ERR_INTERNAL                 26
+#define CEREBRO_ERR_ERRNUMRANGE              27
 
 /* 
  * Cerebro Flags
