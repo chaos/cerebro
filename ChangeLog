@@ -40,6 +40,26 @@
 	* src/libs/wrappers/wrappers.h, src/libs/wrappers/wrappers_list.c:
 	Add list_peek wrapper.
 	
+2006-11-07  Albert Chu  <chu11@llnl.gov>
+
+	* src/cerebro-stat/cerebro-stat.c (main): Fix seg-fault corner
+	case.
+	
+2006-11-06  Albert Chu  <chu11@llnl.gov>
+
+	* src/libs/cerebro/cerebro_metric_data.c
+	(_metric_value_unmarshall): Remove unnecessary code.
+	
+2006-11-05  Albert Chu  <chu11@llnl.gov>
+
+	* man/cerebro_nodelist_metric_name.3: Fix typos and add forgotten
+	value types.
+
+	* src/libs/cerebro/cerebro.c (cerebro_handle_create): Fix cleanup
+	corner case.
+
+	* src/libs/cerebro/cerebro_metric_util.c: Various code cleanup.
+	
 2006-11-01  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerebrod/cerebrod_monitor_update.h,

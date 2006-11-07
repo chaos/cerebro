@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro_nodelist_metric_name.3,v 1.12 2005-07-26 20:14:19 achu Exp $
+\."$Id: cerebro_nodelist_metric_name.3,v 1.12.2.1 2006-11-07 19:34:34 chu11 Exp $
 \."#############################################################################
 \."  Copyright (C) 2005 The Regents of the University of California.
 \."  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -106,6 +106,10 @@ CEREBRO_METRIC_VALUE_TYPE_DOUBLE - double
 
 CEREBRO_METRIC_VALUE_TYPE_STRING - NUL terminated string
 
+CEREBRO_METRIC_VALUE_TYPE_INT64 - 64 bit integer
+
+CEREBRO_METRIC_VALUE_TYPE_U_INT64 - 64 bit unsigned integer
+
 .SH "RETURN VALUES"
 For \fBcerebro_nodelist_metric_name\fR, the metric name for the
 nodelist is returned on success.  On error, -1 is returned.
@@ -122,7 +126,7 @@ exists, 0 if not, On error, -1 is returned.
 For \fBcerebro_nodelist_iterator_at_end\fR, 1 is returned if the end
 of the list has been reached, 0 if not.  On error, -1 is returned.
 
-For fBcerebro_nodelist_destroy\fR,
+For \fBcerebro_nodelist_destroy\fR,
 \fBcerebro_nodelist_iterator_nodename\fR,
 \fBcerebro_nodelist_iterator_metric_value\fR
 \fBcerebro_nodelist_iterator_reset\fR, and

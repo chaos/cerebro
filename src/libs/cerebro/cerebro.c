@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.c,v 1.8.2.1 2006-11-06 05:54:13 chu11 Exp $
+ *  $Id: cerebro.c,v 1.8.2.2 2006-11-07 19:34:34 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -104,6 +104,10 @@ cerebro_handle_create(void)
   return handle;
 
  cleanup:
+  if (handle->metriclists)
+    list_destroy(handle->metriclists);
+  if (handle->nodelists)
+    list_destroy(handle->nodelists);
   if (handle->event_fds)
     list_destroy(handle->event_fds);
   if (handle)
