@@ -743,7 +743,8 @@ main(int argc, char *argv[])
 
   _cmdline_parse(argc, argv);
   
-  if (metric_list_flag || !strcmp(metric_name, CEREBRO_METRIC_METRIC_NAMES))
+  if (metric_list_flag 
+      || (metric_name && !strcmp(metric_name, CEREBRO_METRIC_METRIC_NAMES)))
     _metric_list();
 
   if (metric_name)
