@@ -65,7 +65,7 @@ _metric_value_unmarshall(cerebro_t handle,
                          const char *buf,
                          unsigned int buflen)
 {
-  int n, errnum = 0, mvalue_len = 0;
+  int errnum = 0, mvalue_len = 0;
   void *mvalue = NULL;
   u_int32_t mtype, mlen;
 
@@ -97,20 +97,20 @@ _metric_value_unmarshall(cerebro_t handle,
     }
   memset(mvalue, '\0', mvalue_len);
 
-  if ((n = unmarshall_metric_value(mtype, 
-                                   mlen,
-                                   mvalue,
-                                   mvalue_len,
-                                   buf,
-                                   buflen,
-                                   &errnum)) < 0)
+  if (unmarshall_metric_value(mtype, 
+                              mlen,
+                              mvalue,
+                              mvalue_len,
+                              buf,
+                              buflen,
+                              &errnum) < 0)
     {
       handle->errnum = errnum;
       goto cleanup;
     }
 
   *metric_value = mvalue;
-  return n;
+  return 0;
 
  cleanup:
   free(mvalue);

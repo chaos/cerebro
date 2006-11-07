@@ -1,3 +1,8 @@
+2006-11-06  Albert Chu  <chu11@llnl.gov>
+
+	* src/libs/cerebro/cerebro_metric_data.c
+	(_metric_value_unmarshall): Remove unnecessary code.
+	
 2006-11-05  Albert Chu  <chu11@llnl.gov>
 
 	* man/cerebro_nodelist_metric_name.3: Fix typos and add forgotten
