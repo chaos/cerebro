@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_nodelist_util.c,v 1.9 2005-07-22 21:46:55 achu Exp $
+ *  $Id: cerebro_nodelist_util.c,v 1.10 2006-11-08 00:34:04 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -173,7 +173,7 @@ _cerebro_nodelist_append(cerebro_nodelist_t nodelist,
     {
       int len;
 
-      if (metric_value_type == CEREBRO_METRIC_VALUE_TYPE_STRING)
+      if (metric_value_type == CEREBRO_DATA_VALUE_TYPE_STRING)
         len = metric_value_len + 1;
       else
         len = metric_value_len;

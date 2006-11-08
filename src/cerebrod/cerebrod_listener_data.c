@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.51 2006-11-02 00:05:09 chu11 Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.52 2006-11-08 00:34:04 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -44,11 +44,13 @@
 
 #include "cerebrod_config.h"
 #include "cerebrod_listener_data.h"
+#include "cerebrod_event_update.h"
 #include "cerebrod_monitor_update.h"
 #include "cerebrod_util.h"
 
 #include "clusterlist_module.h"
 #include "debug.h"
+#include "event_module.h"
 #include "hash.h"
 #include "list.h"
 #include "wrappers.h"
@@ -313,6 +315,9 @@ cerebrod_listener_data_initialize(void)
         }
     }
 
+  if (cerebrod_event_modules_setup() < 0)
+    CEREBRO_EXIT(("cerebrod_event_modules_setup"));
+
   if (cerebrod_monitor_modules_setup() < 0)
     CEREBRO_EXIT(("cerebrod_monitor_modules_setup"));
 
@@ -386,15 +391,15 @@ _metric_data_dump(void *data, const void *key, void *arg)
           nodename, md->metric_name, md->metric_value_type, 
           md->metric_value_len);
 
-  if (md->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_INT32)
+  if (md->metric_value_type == CEREBRO_DATA_VALUE_TYPE_INT32)
     fprintf(stderr, "metric_value=%d", *((int32_t *)md->metric_value));
-  else if (md->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_U_INT32)
+  else if (md->metric_value_type == CEREBRO_DATA_VALUE_TYPE_U_INT32)
     fprintf(stderr, "metric_value=%u", *((u_int32_t *)md->metric_value));
-  else if (md->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_FLOAT)
+  else if (md->metric_value_type == CEREBRO_DATA_VALUE_TYPE_FLOAT)
     fprintf(stderr, "metric_value=%f", *((float *)md->metric_value));
-  else if (md->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_DOUBLE)
+  else if (md->metric_value_type == CEREBRO_DATA_VALUE_TYPE_DOUBLE)
     fprintf(stderr, "metric_value=%f", *((double *)md->metric_value));
-  else if (md->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_STRING)
+  else if (md->metric_value_type == CEREBRO_DATA_VALUE_TYPE_STRING)
     {
       /* Watch for NUL termination */
       buf = Malloc(md->metric_value_len + 1);
@@ -404,15 +409,15 @@ _metric_data_dump(void *data, const void *key, void *arg)
       Free(buf);
     }
 #if SIZEOF_LONG == 4
-  else if (md->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_INT64)
+  else if (md->metric_value_type == CEREBRO_DATA_VALUE_TYPE_INT64)
     fprintf(stderr, "metric_value=%lld", *((int64_t *)md->metric_value));
-  else if (md->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_U_INT64)
+  else if (md->metric_value_type == CEREBRO_DATA_VALUE_TYPE_U_INT64)
     fprintf(stderr, "metric_value=%llu", *((u_int64_t *)md->metric_value));
   fprintf(stderr, "\n");
 #else /* SIZEOF_LONG == 8 */
-  else if (md->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_INT64)
+  else if (md->metric_value_type == CEREBRO_DATA_VALUE_TYPE_INT64)
     fprintf(stderr, "metric_value=%ld", *((int64_t *)md->metric_value));
-  else if (md->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_U_INT64)
+  else if (md->metric_value_type == CEREBRO_DATA_VALUE_TYPE_U_INT64)
     fprintf(stderr, "metric_value=%lu", *((u_int64_t *)md->metric_value));
   fprintf(stderr, "\n");
 #endif /* SIZEOF_LONG == 8 */
@@ -663,6 +668,8 @@ cerebrod_listener_data_update(char *nodename,
       Hash_insert(listener_data, nd->nodename, nd);
       listener_data_numnodes++;
 
+      cerebrod_event_add_node_timeout_data(nd, received_time);
+      
       /* Ok to call debug output function, since
        * listener_data_lock is locked.
        */
@@ -675,6 +682,8 @@ cerebrod_listener_data_update(char *nodename,
     {
       nd->discovered = 1;
       nd->last_received_time = received_time;
+
+      cerebrod_event_update_node_received_time(nd, received_time);
 
       for (i = 0; i < hb->metrics_len; i++)
         {
@@ -693,6 +702,7 @@ cerebrod_listener_data_update(char *nodename,
 
           _metric_data_update(nd, metric_name_buf, hd, received_time);
           cerebrod_monitor_modules_update(nodename, nd, metric_name_buf, hd);
+          cerebrod_event_modules_update(nodename, nd, metric_name_buf, hd);
         }
 
       /* Can't call a debug output function in here, it can cause a

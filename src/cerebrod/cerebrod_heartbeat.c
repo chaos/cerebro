@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_heartbeat.c,v 1.48 2006-09-25 17:29:10 chu11 Exp $
+ *  $Id: cerebrod_heartbeat.c,v 1.49 2006-11-08 00:34:04 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -106,25 +106,25 @@ cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb)
       
       switch(hb->metrics[i]->metric_value_type)
         {
-        case CEREBRO_METRIC_VALUE_TYPE_NONE:
+        case CEREBRO_DATA_VALUE_TYPE_NONE:
           break;
-        case CEREBRO_METRIC_VALUE_TYPE_INT32:
+        case CEREBRO_DATA_VALUE_TYPE_INT32:
           fprintf(stderr, "value = %d", 
                   *((int32_t *)hb->metrics[i]->metric_value));
           break;
-        case CEREBRO_METRIC_VALUE_TYPE_U_INT32:
+        case CEREBRO_DATA_VALUE_TYPE_U_INT32:
           fprintf(stderr, "value = %u", 
                   *((u_int32_t *)hb->metrics[i]->metric_value));
           break;
-        case CEREBRO_METRIC_VALUE_TYPE_FLOAT:
+        case CEREBRO_DATA_VALUE_TYPE_FLOAT:
           fprintf(stderr, "value = %f", 
                       *((float *)hb->metrics[i]->metric_value));
           break;
-        case CEREBRO_METRIC_VALUE_TYPE_DOUBLE:
+        case CEREBRO_DATA_VALUE_TYPE_DOUBLE:
           fprintf(stderr, "value = %f", 
                   *((double *)hb->metrics[i]->metric_value));
           break;
-        case CEREBRO_METRIC_VALUE_TYPE_STRING:
+        case CEREBRO_DATA_VALUE_TYPE_STRING:
           /* Watch for NUL termination */
           buf = Malloc(hb->metrics[i]->metric_value_len + 1);
           memset(buf, '\0', hb->metrics[i]->metric_value_len + 1);
@@ -135,20 +135,20 @@ cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb)
           Free(buf);
           break;
 #if SIZEOF_LONG == 4
-        case CEREBRO_METRIC_VALUE_TYPE_INT64:
+        case CEREBRO_DATA_VALUE_TYPE_INT64:
           fprintf(stderr, "value = %lld", 
                   *((int64_t *)hb->metrics[i]->metric_value));
           break;
-        case CEREBRO_METRIC_VALUE_TYPE_U_INT64:
+        case CEREBRO_DATA_VALUE_TYPE_U_INT64:
           fprintf(stderr, "value = %llu", 
                   *((u_int64_t *)hb->metrics[i]->metric_value));
           break;
 #else  /* SIZEOF_LONG == 8 */
-        case CEREBRO_METRIC_VALUE_TYPE_INT64:
+        case CEREBRO_DATA_VALUE_TYPE_INT64:
           fprintf(stderr, "value = %ld", 
                   *((int64_t *)hb->metrics[i]->metric_value));
           break;
-        case CEREBRO_METRIC_VALUE_TYPE_U_INT64:
+        case CEREBRO_DATA_VALUE_TYPE_U_INT64:
           fprintf(stderr, "value = %lu", 
                   *((u_int64_t *)hb->metrics[i]->metric_value));
           break;

@@ -78,6 +78,7 @@ static cerebro_t handle;
 static int metric_list_flag = 0;
 static char *metric_name = NULL;
 static int metric_received_time_flag = 0;
+static char *event_name = NULL;
 
 /*  
  * node_metric_data
@@ -148,8 +149,10 @@ _usage(void)
           "  -N         Output '%s' for nodes not monitoring a metric\n"
           "  -n         Output nodes one per line\n"
           "  -q         Output nodes in hostrange format\n"
-          "  -t         Output metric receive times\n",
-          CEREBRO_STAT_NONE_STRING, CEREBRO_STAT_NONE_STRING);
+          "  -t         Output metric receive times\n"
+          "  -e STRING  Monitor the specified event\n",
+          CEREBRO_STAT_NONE_STRING, 
+          CEREBRO_STAT_NONE_STRING);
 #if CEREBRO_DEBUG
   fprintf(stderr,
           "  -d         Turn on debugging\n");
@@ -225,23 +228,24 @@ _cmdline_parse(int argc, char **argv)
       {"newline",               0, NULL, 'n'},
       {"hostrange",             0, NULL, 'q'},
       {"metric-received-time",  0, NULL, 't'},
+      {"event",                 1, NULL, 'e'},
 #if CEREBRO_DEBUG
       {"debug",                 0, NULL, 'd'},
 #endif /* CEREBRO_DEBUG */
       {0, 0, 0, 0},
-  };
+    };
 #endif /* HAVE_GETOPT_LONG */
 
   assert(argv);
 
-  strcpy(options, "hvo:p:lm:UDNnqt");
+  strcpy(options, "hvo:p:lm:UDNnqte:");
 #if CEREBRO_DEBUG
   strcat(options, "d");
 #endif /* CEREBRO_DEBUG */
-
+  
   /* turn off output messages printed by getopt_long */
   opterr = 0;
-
+  
 #if HAVE_GETOPT_LONG
   while ((c = getopt_long(argc, argv, options, loptions, NULL)) != -1)
 #else
@@ -296,6 +300,9 @@ _cmdline_parse(int argc, char **argv)
       case 't':
         metric_received_time_flag++;
         break;
+      case 'e':
+        event_name = optarg;
+        break;
 #if CEREBRO_DEBUG
       case 'd':
         cerebro_err_set_flags(CEREBRO_ERROR_STDERR);
@@ -308,10 +315,12 @@ _cmdline_parse(int argc, char **argv)
       }
     }
 
-  if (metric_list_flag && metric_name)
-    err_exit("Cannot specify both --metric-list and --metric options");
-
-  if (!metric_list_flag && !metric_name)
+  if (((metric_list_flag ? 1 : 0)
+       + (metric_name ? 1 : 0)
+       + (event_name ? 1 : 0)) > 1)
+    err_exit("Specify one of --metric-list, --metric, and --event options");
+  
+  if (!metric_list_flag && !metric_name && !event_name)
     _usage();
 }
 
@@ -334,6 +343,8 @@ _clean_err_exit(int errnum)
     err_exit("Server version not compatible");
   if (errnum == CEREBRO_ERR_METRIC_INVALID)
     err_exit("Invalid metric name specified");
+  if (errnum == CEREBRO_ERR_EVENT_INVALID)
+    err_exit("Invalid event name specified");
   if (errnum == CEREBRO_ERR_CONFIG_FILE)
     err_exit("Error parsing configuration file");
   if (errnum == CEREBRO_ERR_CONFIG_INPUT)
@@ -404,33 +415,33 @@ _metric_list(void)
  * Get the metric value string
  */
 static void
-_metric_value_str(struct node_metric_data *data, char *buf, unsigned int buflen)
+_metric_value_str(unsigned int mtype,
+                  unsigned int mlen,
+                  void *mvalue,
+                  char *buf, 
+                  unsigned int buflen)
 {
   const char *func = __FUNCTION__;
-  unsigned int mtype, mlen;
   int mlen_flag, rv = 0;
 
-  assert(data && buf && buflen > 0);
-
-  mtype = data->metric_value_type;
-  mlen = data->metric_value_len;
+  assert(mvalue && buf && buflen > 0);
 
 #if CEREBRO_DEBUG
-  if (mtype == CEREBRO_METRIC_VALUE_TYPE_NONE)
+  if (mtype == CEREBRO_DATA_VALUE_TYPE_NONE)
     mlen_flag = (mlen) ? 1 : 0;
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_INT32)
+  else if (mtype == CEREBRO_DATA_VALUE_TYPE_INT32)
     mlen_flag = (mlen != sizeof(int32_t)) ? 1 : 0;
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_U_INT32)
+  else if (mtype == CEREBRO_DATA_VALUE_TYPE_U_INT32)
     mlen_flag = (mlen != sizeof(u_int32_t)) ? 1 : 0;
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_FLOAT)
+  else if (mtype == CEREBRO_DATA_VALUE_TYPE_FLOAT)
     mlen_flag = (mlen != sizeof(float)) ? 1 : 0;
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_DOUBLE)
+  else if (mtype == CEREBRO_DATA_VALUE_TYPE_DOUBLE)
     mlen_flag = (mlen != sizeof(double)) ? 1 : 0;
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_STRING)
-    mlen_flag = (mlen > CEREBRO_MAX_METRIC_STRING_LEN) ? 1 : 0;
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_INT64)
+  else if (mtype == CEREBRO_DATA_VALUE_TYPE_STRING)
+    mlen_flag = (mlen > CEREBRO_MAX_DATA_STRING_LEN) ? 1 : 0;
+  else if (mtype == CEREBRO_DATA_VALUE_TYPE_INT64)
     mlen_flag = (mlen != sizeof(int64_t)) ? 1 : 0;
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_U_INT64)
+  else if (mtype == CEREBRO_DATA_VALUE_TYPE_U_INT64)
     mlen_flag = (mlen != sizeof(u_int64_t)) ? 1 : 0;
   else
     err_exit("%s: invalid metric type: %d", func, mtype);
@@ -439,28 +450,28 @@ _metric_value_str(struct node_metric_data *data, char *buf, unsigned int buflen)
     err_exit("%s: invalid metric length: %d %d", func, mtype, mlen);
 #endif /* CEREBRO_DEBUG */
 
-  if (mtype == CEREBRO_METRIC_VALUE_TYPE_NONE)
+  if (mtype == CEREBRO_DATA_VALUE_TYPE_NONE)
     rv = snprintf(buf, buflen, "%s", CEREBRO_STAT_NONE_STRING);
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_INT32)
-    rv = snprintf(buf, buflen, "%d", *((int32_t *)data->metric_value));
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_U_INT32)
-    rv = snprintf(buf, buflen, "%u", *((u_int32_t *)data->metric_value));
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_FLOAT)
-    rv = snprintf(buf, buflen, "%f", *((float *)data->metric_value));
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_DOUBLE)
-    rv = snprintf(buf, buflen, "%f", *((double *)data->metric_value));
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_STRING)
-    rv = snprintf(buf, buflen, "%s", (char *)data->metric_value);
+  else if (mtype == CEREBRO_DATA_VALUE_TYPE_INT32)
+    rv = snprintf(buf, buflen, "%d", *((int32_t *)mvalue));
+  else if (mtype == CEREBRO_DATA_VALUE_TYPE_U_INT32)
+    rv = snprintf(buf, buflen, "%u", *((u_int32_t *)mvalue));
+  else if (mtype == CEREBRO_DATA_VALUE_TYPE_FLOAT)
+    rv = snprintf(buf, buflen, "%f", *((float *)mvalue));
+  else if (mtype == CEREBRO_DATA_VALUE_TYPE_DOUBLE)
+    rv = snprintf(buf, buflen, "%f", *((double *)mvalue));
+  else if (mtype == CEREBRO_DATA_VALUE_TYPE_STRING)
+    rv = snprintf(buf, buflen, "%s", (char *)mvalue);
 #if SIZEOF_LONG == 4
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_INT64)
-    rv = snprintf(buf, buflen, "%lld", *((int64_t *)data->metric_value));
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_U_INT64)
-    rv = snprintf(buf, buflen, "%llu", *((u_int64_t *)data->metric_value));
+  else if (mtype == CEREBRO_DATA_VALUE_TYPE_INT64)
+    rv = snprintf(buf, buflen, "%lld", *((int64_t *)mvalue));
+  else if (mtype == CEREBRO_DATA_VALUE_TYPE_U_INT64)
+    rv = snprintf(buf, buflen, "%llu", *((u_int64_t *)mvalue));
 #else  /* SIZEOF_LONG == 8 */
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_INT64)
-    rv = snprintf(buf, buflen, "%ld", *((int64_t *)data->metric_value));
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_U_INT64)
-    rv = snprintf(buf, buflen, "%lu", *((u_int64_t *)data->metric_value));
+  else if (mtype == CEREBRO_DATA_VALUE_TYPE_INT64)
+    rv = snprintf(buf, buflen, "%ld", *((int64_t *)mvalue));
+  else if (mtype == CEREBRO_DATA_VALUE_TYPE_U_INT64)
+    rv = snprintf(buf, buflen, "%lu", *((u_int64_t *)mvalue));
 #endif /* SIZEOF_LONG == 8 */
   
   if (rv >= buflen)
@@ -532,7 +543,11 @@ _newline_output(List l)
       char vbuf[CEREBRO_STAT_BUFLEN];
 
       memset(vbuf, '\0', CEREBRO_STAT_BUFLEN);
-      _metric_value_str(data, vbuf, CEREBRO_STAT_BUFLEN);
+      _metric_value_str(data->metric_value_type,
+                        data->metric_value_len,
+                        data->metric_value,
+                        vbuf,
+                        CEREBRO_STAT_BUFLEN);
       if (metric_received_time_flag)
         {
           char tbuf[CEREBRO_STAT_BUFLEN];
@@ -637,7 +652,11 @@ _hostrange_output(List l)
       char buf[CEREBRO_STAT_BUFLEN];
       struct hostrange_data *hd;
 
-      _metric_value_str(data, buf, CEREBRO_STAT_BUFLEN);
+      _metric_value_str(data->metric_value_type,
+                        data->metric_value_len,
+                        data->metric_value, 
+                        buf, 
+                        CEREBRO_STAT_BUFLEN);
 
       if (!(hd = Hash_find(h, buf)))
         {
@@ -730,6 +749,83 @@ _metric_data(void)
   (void)cerebro_nodelist_destroy(n);
 }
 
+/*
+ * _event_data
+ *
+ * Monitor event data
+ */
+static void
+_event_data(void)
+{
+  const char *func = __FUNCTION__;
+  int fd;
+
+  if ((fd = cerebro_event_register(handle, event_name)) < 0)
+    {
+      char *msg = cerebro_strerror(cerebro_errnum(handle));
+
+      _clean_err_exit(cerebro_errnum(handle));
+      err_exit("%s: cerebro_event_register: %s", func, msg);
+    }
+  
+  while (1)
+    {
+      struct pollfd pfd;
+      int n;
+
+      pfd.fd = fd;
+      pfd.events = POLLIN;
+      pfd.revents = 0;
+  
+      n = Poll(&pfd, 1, -1);
+
+      if (n && pfd.revents & POLLIN)
+        {
+          char vbuf[CEREBRO_STAT_BUFLEN];
+          char tbuf[CEREBRO_STAT_BUFLEN];
+          char *nodename;
+          unsigned int event_value_type;
+          unsigned int event_value_len;
+          void *event_value;
+          time_t t;
+          struct tm *tm;
+
+          if (cerebro_event_parse(handle,
+                                  fd,
+                                  &nodename,
+                                  &event_value_type,
+                                  &event_value_len,
+                                  &event_value) < 0)
+            {
+              char *msg = cerebro_strerror(cerebro_errnum(handle));
+              
+              _clean_err_exit(cerebro_errnum(handle));
+              err_exit("%s: cerebro_event_parse: %s", func, msg);
+            }
+
+          
+          memset(vbuf, '\0', CEREBRO_STAT_BUFLEN);
+          _metric_value_str(event_value_type,
+                            event_value_len,
+                            event_value,
+                            vbuf,
+                            CEREBRO_STAT_BUFLEN);
+          
+          memset(tbuf, '\0', CEREBRO_STAT_BUFLEN);
+          t = time(NULL);
+          tm = Localtime(&t);
+          strftime(tbuf, CEREBRO_STAT_BUFLEN, "%F %I:%M:%S%P", tm);
+          
+          fprintf(stdout, "%s(%s): %s\n", nodename, tbuf, vbuf);
+          
+          free(nodename);
+          free(event_value);
+        }     
+    }
+
+  (void)cerebro_event_unregister(handle, fd);
+}
+
 int 
 main(int argc, char *argv[]) 
 {
@@ -743,12 +839,16 @@ main(int argc, char *argv[])
 
   _cmdline_parse(argc, argv);
   
+  /* Checks in _cmdline_parse ensure only one of the below will be called */
   if (metric_list_flag 
       || (metric_name && !strcmp(metric_name, CEREBRO_METRIC_METRIC_NAMES)))
     _metric_list();
 
   if (metric_name)
     _metric_data();
+
+  if (event_name)
+    _event_data();
 
   _cleanup_cerebro_stat();
   exit(0);

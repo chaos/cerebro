@@ -1,3 +1,6 @@
+Before Release
+- up age/lib stuff in configure.ac
+
 Portability
 - IPv6
 - Multicast
@@ -24,6 +27,8 @@ Future Features
          nodes on a specific subnet. Would be useful for BGL.
 
 - event based monitoring
+
+- event based message generation/sending
 
 - Malloc looping
   - so can try to avoid dieing on low memory conditions

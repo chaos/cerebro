@@ -1,0 +1,154 @@
+\."#############################################################################
+\."$Id: cerebro_event.3,v 1.2 2006-11-08 00:34:03 chu11 Exp $
+\."#############################################################################
+\."  Copyright (C) 2005 The Regents of the University of California.
+\."  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
+\."  Written by Albert Chu <chu11@llnl.gov>.
+\."  UCRL-CODE-155989 All rights reserved.
+\."
+\."  This file is part of Cerebro, a collection of cluster monitoring tools
+\."  and libraries.  For details, see <http://www.llnl.gov/linux/cerebro/>.
+\."
+\."  Cerebro is free software; you can redistribute it and/or modify it under
+\."  the terms of the GNU General Public License as published by the Free
+\."  Software Foundation; either version 2 of the License, or (at your option)
+\."  any later version.
+\."
+\."  Cerebro is distributed in the hope that it will be useful, but WITHOUT ANY
+\."  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+\."  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+\."  details.
+\."
+\."  You should have received a copy of the GNU General Public License along
+\."  with Cerebro; if not, write to the Free Software Foundation, Inc.,
+\."  59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.
+\."#############################################################################
+.TH CEREBRO_EVENT_REGISTER 3 "May 2005" "LLNL" "LIBCEREBRO"
+.SH "NAME"
+cerebro_event_register, cerebro_event_unregister, cerebro_event_parse \- 
+event monitoring routines
+.SH "SYNOPSIS"
+.B #include <cerebro.h>
+.sp
+.BI "int cerebro_event_register(cerebro_t handle, const char *event_name);"
+.sp
+.BI "int cerebro_event_unregister(cerebro_t handle, int fd);"
+.sp
+.BI "int cerebro_event_parse(cerebro_t handle, int fd, char **nodename, unsigned int *event_value_type, unsigned int *event_value_size, void **event_value);"
+.br
+.SH "DESCRIPTION"
+\fBcerebro_event_register\fR registers a connection the
+.B cerebrod
+event server informing the server that event notification for event
+\fIevent_name\fR is desired.  The function returns a file descriptor
+that the user is expected to wait for incoming messages using
+.B select(2)
+or
+.B poll(2).
+
+\fBcerebro_event_unregister\fR unregisters the event.  If it is
+easier, the user may instead simply close the file descriptor.
+
+\fBcerebro_event_parse\fR should be called when an event has arrived
+on the file descriptor returned by \fBcerebro_event_register\fR.  The
+nodename, type, length, and value of the event are returned to the
+user in 'nodename', 'event_value_type', 'event_value_len', and
+'event_value' respectively.  The user is responsible for freeing the
+memory created for nodename and event_value using
+.B free(3).
+
+.br
+.SH "EVENT VALUE TYPES"
+The following event value types can be returned by
+\fBcerebro_event_parse\fR.  They can be used to
+determine the data type the 'event_value' result points to.
+
+CEREBRO_DATA_VALUE_TYPE_NONE - No metric value
+
+CEREBRO_DATA_VALUE_TYPE_INT32 - 32 bit integer
+
+CEREBRO_DATA_VALUE_TYPE_U_INT32 - 32 bit unsigned integer
+
+CEREBRO_DATA_VALUE_TYPE_FLOAT - float
+
+CEREBRO_DATA_VALUE_TYPE_DOUBLE - double
+
+CEREBRO_DATA_VALUE_TYPE_STRING - NUL terminated string
+
+CEREBRO_DATA_VALUE_TYPE_INT64 - 64 bit integer
+
+CEREBRO_DATA_VALUE_TYPE_U_INT64 - 64 bit unsigned integer
+
+.SH "RETURN VALUES"
+For \fBcerebro_event_register\fR, a file descriptor is returned
+on success.  On error, -1 is returned.
+
+For \fBcerebro_event_unregister\fR and \fBcerebro_event_parse\fR, 0 is
+returned on success.  On error, -1 is returned.
+
+On errors, an error code is returned in \fIhandle\fR.  The error
+code can be retrieved via
+.BR cerebro_errnum(3)
+, and a description of the error code can be retrieved via
+.BR cerebro_strerror(3).
+
+.br
+.SH "ERRORS"
+.TP
+.B CEREBRO_ERR_NULLHANDLE
+The \fIhandle\fR parameter is NULL.
+.TP
+.B CEREBRO_ERR_MAGIC_NUMBER
+\fIhandle\fR has an incorrect magic number.  \fIhandle\fR does not
+point to an appropriate structure or has already been destroyed.
+.TP
+.B CEREBRO_ERR_PARAMETERS
+Invalid parameter passed in.
+.TP
+.B CEREBRO_ERR_HOSTNAME
+Invalid hostname specified.
+.TP
+.B CEREBRO_ERR_CONNECT
+Error connecting to
+.B cerebrod
+event server.
+.TP
+.B CEREBRO_ERR_CONNECT_TIMEOUT
+Timed out connecting to
+.B cerebrod
+event server.
+.TP
+.B CEREBRO_ERR_PROTOCOL
+Error during protocol communication.
+.TP
+.B CEREBRO_ERR_PROTOCOL_TIMEOUT
+Timeout during protocol communication.
+.TP
+.B CEREBRO_ERR_VERSION_INCOMPATIBLE
+Version incompatible with the event server.
+.TP
+.B CEREBRO_ERR_EVENT_INVALID
+The specified event name is unknown to the event server.
+.TP
+.B CEREBRO_ERR_CONFIG_FILE
+A config file error occurred.
+.TP
+.B CEREBRO_ERR_CONFIG_MODULE
+A config module error occurred.
+.TP 
+.B CEREBRO_ERR_EVENT_NOT_RECEIVED
+An event has not yet been fully received.
+.TP
+.B CEREBRO_ERR_CONFIG_INPUT
+A config input is invalid.
+.TP
+.B CEREBRO_ERR_OUTMEM
+Out of memory.
+.TP
+.B CEREBRO_ERR_INTERNAL
+An internal system error occurred.
+.br
+.SH "FILES"
+/usr/include/cerebro.h
+.SH "SEE ALSO"
+select(2), poll(2), free(3), cerebro_errnum(3), cerebro_strerror(3)

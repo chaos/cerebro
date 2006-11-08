@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_slurm_state.c,v 1.18 2006-10-30 00:55:50 chu11 Exp $
+ *  $Id: cerebro_metric_slurm_state.c,v 1.19 2006-11-08 00:34:05 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -213,7 +213,7 @@ slurm_state_metric_get_metric_value(unsigned int *metric_value_type,
       return -1;
     }
 
-  *metric_value_type = CEREBRO_METRIC_VALUE_TYPE_U_INT32;
+  *metric_value_type = CEREBRO_DATA_VALUE_TYPE_U_INT32;
   *metric_value_len = sizeof(u_int32_t);
   *metric_value = (void *)&metric_slurm_state;
 

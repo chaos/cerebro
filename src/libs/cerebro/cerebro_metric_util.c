@@ -48,7 +48,6 @@
 #include "debug.h"
 #include "fd.h"
 #include "marshall.h"
-#include "metric_util.h"
 #include "network_util.h"
 
 /*

@@ -1,5 +1,63 @@
 2006-11-07  Albert Chu  <chu11@llnl.gov>
 
+	Add Cerebro Event Monitoring Support (from branch
+	'cerebro_event_branch', tag 'cerebro_event_final')
+
+	* src/libs/include/cerebro_event_protocol.h,
+	src/libs/include/cerebro_event_module.h,
+	src/libs/modules/event_module.h, src/libs/modules/event_module.c,
+	src/libs/cerebro/cerebro_event.c: New files.
+
+	* src/libs/include/cerebro.h: Add event API functions.
+
+	* src/libs/cerebro_api.h: Add event API support into struct cerebro.
+
+	* src/libs/cerebro.c (cerebro_handle_create): Add event API support.
+
+	* src/libs/include/Makefile.am, src/libs/modules/Makefile.am,
+	src/cerebrod/Makefile.am: Adjust appropriately.
+
+	* src/cerebrod/cerebrod_config.h, src/cerebrod/cerebrod_config.c,
+	src/libs/util/config_util.c,
+	src/libs/include/cerebro/cerebro_config.h: Support event server
+	config variables.
+
+	* src/cerebrod/cerebrod_event_server.h,
+	src/cerebrod/cerebrod_event_server.c,
+	src/cerebrod/cerebrod_event_node_timeout_monitor.h,
+	src/cerebrod/cerebrod_event_node_timeout_monitor.c,
+	src/cerebrod/cerebrod_event_update.h,
+	src/cerebrod/cerebrod_event_update.c: New files.
+
+	* src/cerebro-stat/cerebro-stat.c: Add event monitoring support.
+
+	* man/cerebro-stat.8.in, man/cerebro.conf.5.in,
+	man/cerebro_module_devel.3.in: Update appropriately.
+
+	* man/cerebro_event.3, man/cerebro_event_register.3,
+	man/cerebro_event_unregister.3, man/cerebro_event_parse.3: New
+	files.
+	
+	Add Updown Module Event support
+
+	* src/modules/event/cerebro_event_updown.c: New file.
+
+	Misc
+
+	* src/libs/wrappers/wrappers.h, src/libs/wrappers/wrappers_list.c:
+	Add list_peek wrapper.
+
+	* Globally rename "METRIC_VALUE_TYPE" to "DATA_VALUE_TYPE" for
+	consistency with event data types. 
+
+	* src/libs/util/metric_util.h, src/libs/util/metric_util.c:
+	Renamed to data_util.h and data_util.c.
+
+	* src/: Globally readjust many variable/function/comments due to
+	change from "metric" to "data" in naming.
+
+2006-11-07  Albert Chu  <chu11@llnl.gov>
+
 	* src/cerebro-stat/cerebro-stat.c (main): Fix seg-fault corner
 	case.
 	
@@ -83,7 +141,7 @@
 
 	* src/modules/metric/cerebro_metric_slurm_state.c
 	(slurm_state_metric_thread): Remove pointless check.
-
+	
 2006-10-05  Albert Chu  <chu11@llnl.gov>
 
 	* configure.ac: Fixed library versioning mistake.  Up revision,

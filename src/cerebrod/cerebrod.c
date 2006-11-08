@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.80 2005-08-25 01:44:21 achu Exp $
+ *  $Id: cerebrod.c,v 1.81 2006-11-08 00:34:04 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -38,6 +38,8 @@
 #include "cerebrod.h"
 #include "cerebrod_daemon.h"
 #include "cerebrod_config.h"
+#include "cerebrod_event_node_timeout_monitor.h"
+#include "cerebrod_event_server.h"
 #include "cerebrod_listener.h"
 #include "cerebrod_metric_controller.h"
 #include "cerebrod_metric_server.h"
@@ -75,6 +77,18 @@ extern pthread_mutex_t metric_controller_init_lock;
 extern int metric_server_init;
 extern pthread_cond_t metric_server_init_cond;
 extern pthread_mutex_t metric_server_init_lock;
+
+extern int event_node_timeout_monitor_init;
+extern pthread_cond_t event_node_timeout_monitor_init_cond;
+extern pthread_mutex_t event_node_timeout_monitor_init_lock;
+
+extern int event_queue_monitor_init;
+extern pthread_cond_t event_queue_monitor_init_cond;
+extern pthread_mutex_t event_queue_monitor_init_lock;
+
+extern int event_server_init;
+extern pthread_cond_t event_server_init_cond;
+extern pthread_mutex_t event_server_init_lock;
 
 #endif /* !WITH_CEREBROD_SPEAKER_ONLY */
 
@@ -127,6 +141,27 @@ main(int argc, char **argv)
       Pthread_mutex_unlock(&metric_server_init_lock);
     }
 
+  /* Start the event queue monitor before the listener thread, since
+   * the listener thread could get data to generate an event.
+   */
+  if (conf.event_server)
+    {
+      pthread_t thread;
+      pthread_attr_t attr;
+
+      Pthread_attr_init(&attr);
+      Pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+      Pthread_attr_setstacksize(&attr, CEREBROD_THREAD_STACKSIZE);
+      Pthread_create(&thread, &attr, cerebrod_event_queue_monitor, NULL);
+      Pthread_attr_destroy(&attr);
+
+      /* Wait for initialization to complete */
+      Pthread_mutex_lock(&event_queue_monitor_init_lock);
+      while (!event_queue_monitor_init)
+        Pthread_cond_wait(&event_queue_monitor_init_cond, &event_queue_monitor_init_lock);
+      Pthread_mutex_unlock(&event_queue_monitor_init_lock);
+    }
+
   /* Start listening server before speaker so that listener
    * can receive packets from a later created speaker
    */
@@ -151,6 +186,41 @@ main(int argc, char **argv)
       while (!listener_init)
         Pthread_cond_wait(&listener_init_cond, &listener_init_lock);
       Pthread_mutex_unlock(&listener_init_lock);
+    }
+
+  /* Start all the event server and node timeout threads after the
+   * listener thread, since they use data created by the listener
+   * thread.
+   */
+  if (conf.event_server)
+    {
+      pthread_t thread;
+      pthread_attr_t attr;
+
+      Pthread_attr_init(&attr);
+      Pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+      Pthread_attr_setstacksize(&attr, CEREBROD_THREAD_STACKSIZE);
+      Pthread_create(&thread, &attr, cerebrod_event_server, NULL);
+      Pthread_attr_destroy(&attr);
+
+      /* Wait for initialization to complete */
+      Pthread_mutex_lock(&event_server_init_lock);
+      while (!event_server_init)
+        Pthread_cond_wait(&event_server_init_cond, &event_server_init_lock);
+      Pthread_mutex_unlock(&event_server_init_lock);
+
+      Pthread_attr_init(&attr);
+      Pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+      Pthread_attr_setstacksize(&attr, CEREBROD_THREAD_STACKSIZE);
+      Pthread_create(&thread, &attr, cerebrod_event_node_timeout_monitor, NULL);
+      Pthread_attr_destroy(&attr);
+
+      /* Wait for initialization to complete */
+      Pthread_mutex_lock(&event_node_timeout_monitor_init_lock);
+      while (!event_node_timeout_monitor_init)
+        Pthread_cond_wait(&event_node_timeout_monitor_init_cond, 
+                          &event_node_timeout_monitor_init_lock);
+      Pthread_mutex_unlock(&event_node_timeout_monitor_init_lock);
     }
 
   /* Start metric controller - see comments at speaker below */ 

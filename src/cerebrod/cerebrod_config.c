@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.127 2006-10-30 00:55:50 chu11 Exp $
+ *  $Id: cerebrod_config.c,v 1.128 2006-11-08 00:34:04 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -120,11 +120,14 @@ _cerebrod_set_config_default(void)
   conf.metric_controller = CEREBROD_METRIC_CONTROLLER_DEFAULT;
   conf.metric_server = CEREBROD_METRIC_SERVER_DEFAULT;
   conf.metric_server_port = CEREBROD_METRIC_SERVER_PORT_DEFAULT;
+  conf.event_server = CEREBROD_EVENT_SERVER_DEFAULT;
+  conf.event_server_port = CEREBROD_EVENT_SERVER_PORT_DEFAULT;
 #if CEREBRO_DEBUG
   conf.speak_debug = CEREBROD_SPEAK_DEBUG_DEFAULT;
   conf.listen_debug = CEREBROD_LISTEN_DEBUG_DEFAULT;
   conf.metric_controller_debug = CEREBROD_METRIC_CONTROLLER_DEBUG_DEFAULT;
   conf.metric_server_debug = CEREBROD_METRIC_SERVER_DEBUG_DEFAULT;
+  conf.event_server_debug = CEREBROD_EVENT_SERVER_DEBUG_DEFAULT;
 #endif /* CEREBRO_DEBUG */
 }
 
@@ -314,6 +317,10 @@ _cerebrod_load_config(void)
     conf.metric_server = tconf.cerebrod_metric_server;
   if (tconf.cerebrod_metric_server_port_flag)
     conf.metric_server_port = tconf.cerebrod_metric_server_port;
+  if (tconf.cerebrod_event_server_flag)
+    conf.event_server = tconf.cerebrod_event_server;
+  if (tconf.cerebrod_event_server_port_flag)
+    conf.event_server_port = tconf.cerebrod_event_server_port;
 #if CEREBRO_DEBUG
   if (tconf.cerebrod_speak_debug_flag)
     conf.speak_debug = tconf.cerebrod_speak_debug;
@@ -323,6 +330,8 @@ _cerebrod_load_config(void)
     conf.metric_controller_debug = tconf.cerebrod_metric_controller_debug;
   if (tconf.cerebrod_metric_server_debug_flag)
     conf.metric_server_debug = tconf.cerebrod_metric_server_debug;
+  if (tconf.cerebrod_event_server_debug_flag)
+    conf.event_server_debug = tconf.cerebrod_event_server_debug;
 #endif /* CEREBRO_DEBUG */
 }
 
@@ -430,6 +439,9 @@ _cerebrod_config_error_check(void)
 
   if (conf.metric_server_port <= 0)
     cerebro_err_exit("metric server port '%d' invalid", conf.metric_server_port);
+
+  if (conf.event_server_port <= 0)
+    cerebro_err_exit("event server port '%d' invalid", conf.event_server_port);
 }
 
 /* 
@@ -778,11 +790,14 @@ _cerebrod_calculate_configuration_data(void)
         }
     }
 
-  /* If the listening server is turned off, the metric server must be
-   * turned off
+  /* If the listening server is turned off, the metric or event server
+   * must be turned off
    */
   if (!conf.listen)
-    conf.metric_server = 0;
+    {
+      conf.metric_server = 0;
+      conf.event_server = 0;
+    }
 
   /* Why would the user want the daemon to do nothing?  Oh well*/
   if (!conf.speak && !conf.listen)
@@ -858,6 +873,10 @@ _cerebrod_configuration_data_error_check(void)
 	cerebro_err_exit("metric server port '%d' cannot be identical "
                          "to heartbeat source port", conf.metric_server_port);
 
+      if (conf.metric_server_port == conf.event_server_port)
+	cerebro_err_exit("metric server port '%d' cannot be identical "
+                         "to event server port", conf.metric_server_port);
+
       for (i = 0; i < conf.listen_len; i++)
         {
           if (conf.metric_server_port == conf.listen_ports[i])
@@ -910,10 +929,13 @@ _cerebrod_config_dump(void)
   fprintf(stderr, "* metric_controller: %d\n", conf.metric_controller);
   fprintf(stderr, "* metric_server: %d\n", conf.metric_server);
   fprintf(stderr, "* metric_server_port: %d\n", conf.metric_server_port);
+  fprintf(stderr, "* event_server: %d\n", conf.event_server);
+  fprintf(stderr, "* event_server_port: %d\n", conf.event_server_port);
   fprintf(stderr, "* speak_debug: %d\n", conf.speak_debug);
   fprintf(stderr, "* listen_debug: %d\n", conf.listen_debug);
   fprintf(stderr, "* metric_controller_debug: %d\n", conf.metric_controller_debug);
   fprintf(stderr, "* metric_server_debug: %d\n", conf.metric_server_debug);
+  fprintf(stderr, "* event_server_debug: %d\n", conf.event_server_debug);
   fprintf(stderr, "* -------------------------------\n");
   fprintf(stderr, "* Calculated Configuration\n");
   fprintf(stderr, "* -------------------------------\n");

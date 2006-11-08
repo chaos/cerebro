@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.75 2006-11-02 00:05:09 chu11 Exp $
+## $Id: Makefile.am,v 1.76 2006-11-08 00:34:04 chu11 Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -7,6 +7,9 @@
 noinst_HEADERS = cerebrod.h \
 		 cerebrod_config.h \
                  cerebrod_daemon.h \
+		 cerebrod_event_node_timeout_monitor.h \
+		 cerebrod_event_server.h \
+		 cerebrod_event_update.h \
 		 cerebrod_heartbeat.h \
 		 cerebrod_listener.h \
 		 cerebrod_listener_data.h \
@@ -33,7 +36,7 @@ CEREBROD_LDADDS = ../libs/cerebro_error/libcerebro_error.la \
 		  ../libs/modules/libmodules.la \
 		  ../libs/util/libutil_config.la \
 		  ../libs/modules/libconfigmodules.la \
-		  ../libs/util/libutil_metric.la \
+		  ../libs/util/libutil_data.la \
 		  ../libs/util/libutil_network.la \
 		  ../libs/wrappers/libwrappers.la \
 		  ../libs/wrappers/libwrappers_list.la \
@@ -47,10 +50,11 @@ else
 CEREBROD_LDADDS = ../libs/cerebro_error/libcerebro_error.la \
 		  ../libs/debug/libdebug.la \
 		  ../libs/util/libutil_config.la \
-		  ../libs/util/libutil_metric.la \
+		  ../libs/util/libutil_data.la \
 		  ../libs/util/libutil_network.la \
 		  ../libs/modules/libclusterlistmodules.la \
 		  ../libs/modules/libconfigmodules.la \
+		  ../libs/modules/libeventmodules.la \
 		  ../libs/modules/libmetricmodules.la \
 		  ../libs/modules/libmonitormodules.la \
 		  ../libs/modules/libmodules.la \
@@ -79,6 +83,9 @@ sbin_PROGRAMS    = cerebrod
 cerebrod_SOURCES = cerebrod.c \
 		   cerebrod_config.c \
                    cerebrod_daemon.c \
+		   cerebrod_event_node_timeout_monitor.c \
+		   cerebrod_event_server.c \
+		   cerebrod_event_update.c \
 		   cerebrod_heartbeat.c \
 		   cerebrod_listener.c \
 		   cerebrod_listener_data.c \
@@ -131,6 +138,9 @@ cerebrod_LDADD   = $(CEREBROD_LDADDS) \
 ../libs/modules/libconfigmodules.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
+../libs/modules/libeventmodules.la : force-dependency-check
+	@cd `dirname $@` && make `basename $@`
+
 ../libs/modules/libmetricmodules.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
@@ -143,7 +153,7 @@ cerebrod_LDADD   = $(CEREBROD_LDADDS) \
 ../libs/util/libutil_config.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
-../libs/util/libutil_metric.la : force-dependency-check
+../libs/util/libutil_data.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
 ../libs/util/libutil_network.la : force-dependency-check

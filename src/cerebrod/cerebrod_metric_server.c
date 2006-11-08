@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_server.c,v 1.37 2006-10-31 04:32:22 chu11 Exp $
+ *  $Id: cerebrod_metric_server.c,v 1.38 2006-11-08 00:34:04 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -53,7 +53,7 @@
 #include "debug.h"
 #include "fd.h"
 #include "list.h"
-#include "metric_util.h"
+#include "data_util.h"
 #include "network_util.h"
 #include "wrappers.h"
 
@@ -216,12 +216,12 @@ _metric_server_response_marshall(struct cerebro_metric_server_response *res,
   c += Marshall_buffer(bufPtr, bufPtrlen, buf + c, buflen - c);
   c += Marshall_u_int32(res->metric_value_received_time, buf + c, buflen - c);
 
-  if ((n = marshall_metric(res->metric_value_type, 
-                           res->metric_value_len,
-                           res->metric_value,
-                           buf + c,
-                           buflen - c,
-                           NULL)) < 0)
+  if ((n = marshall_data(res->metric_value_type, 
+                         res->metric_value_len,
+                         res->metric_value,
+                         buf + c,
+                         buflen - c,
+                         NULL)) < 0)
     goto cleanup;
   c += n;
 
@@ -362,9 +362,9 @@ _metric_server_response_create(char *name,
 
   assert(name && max_name_len && responses);
   
-  if ((metric_value_type == CEREBRO_METRIC_VALUE_TYPE_NONE 
+  if ((metric_value_type == CEREBRO_DATA_VALUE_TYPE_NONE 
        && metric_value_len)
-      || (metric_value_type != CEREBRO_METRIC_VALUE_TYPE_NONE 
+      || (metric_value_type != CEREBRO_DATA_VALUE_TYPE_NONE 
           && !metric_value_len))
     {
       CEREBRO_DBG(("bogus metric: type=%d len=%d", 
@@ -461,7 +461,7 @@ _metric_names_callback(void *data, const void *key, void *arg)
   if (_metric_server_response_create(mnd->metric_name, 
                                      CEREBRO_MAX_METRIC_NAME_LEN,
                                      0,
-                                     CEREBRO_METRIC_VALUE_TYPE_NONE,
+                                     CEREBRO_DATA_VALUE_TYPE_NONE,
                                      0,
                                      NULL,
                                      ed->responses) < 0)
@@ -515,7 +515,7 @@ _metric_data_evaluate(void *x, const void *key, void *arg)
       if (_metric_server_response_create(nd->nodename,
                                          CEREBRO_MAX_NODENAME_LEN,
                                          0,
-                                         CEREBRO_METRIC_VALUE_TYPE_NONE,
+                                         CEREBRO_DATA_VALUE_TYPE_NONE,
                                          0,
                                          NULL,
                                          ed->responses) < 0)
@@ -536,7 +536,7 @@ _metric_data_evaluate(void *x, const void *key, void *arg)
       if (_metric_server_response_create(nd->nodename,
                                          CEREBRO_MAX_NODENAME_LEN,
                                          nd->last_received_time,
-                                         CEREBRO_METRIC_VALUE_TYPE_U_INT32,
+                                         CEREBRO_DATA_VALUE_TYPE_U_INT32,
                                          sizeof(u_int32_t),
                                          &updown_state,
                                          ed->responses) < 0)
@@ -557,7 +557,7 @@ _metric_data_evaluate(void *x, const void *key, void *arg)
           if (_metric_server_response_create(nd->nodename,
                                              CEREBRO_MAX_NODENAME_LEN,
                                              0,
-                                             CEREBRO_METRIC_VALUE_TYPE_NONE,
+                                             CEREBRO_DATA_VALUE_TYPE_NONE,
                                              0,
                                              NULL,
                                              ed->responses) < 0)
@@ -587,7 +587,7 @@ _metric_data_evaluate(void *x, const void *key, void *arg)
           if (_metric_server_response_create(nd->nodename,
                                              CEREBRO_MAX_NODENAME_LEN,
                                              0,
-                                             CEREBRO_METRIC_VALUE_TYPE_NONE,
+                                             CEREBRO_DATA_VALUE_TYPE_NONE,
                                              0,
                                              NULL,
                                              ed->responses) < 0)

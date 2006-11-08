@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_shutdown.c,v 1.2 2006-02-27 17:05:58 chu11 Exp $
+ *  $Id: cerebro_metric_shutdown.c,v 1.3 2006-11-08 00:34:05 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -116,7 +116,7 @@ _metric_shutdown_handler(int signum)
   /* need not overflow */
   strncpy(hd->metric_name, SHUTDOWN_METRIC_NAME, CEREBRO_MAX_METRIC_NAME_LEN);
   
-  hd->metric_value_type = CEREBRO_METRIC_VALUE_TYPE_U_INT32;
+  hd->metric_value_type = CEREBRO_DATA_VALUE_TYPE_U_INT32;
   hd->metric_value_len = sizeof(u_int32_t);
   metric_shutdown = 1;
   hd->metric_value = (void *)&metric_shutdown;
@@ -222,7 +222,7 @@ shutdown_metric_get_metric_value(unsigned int *metric_value_type,
       return -1;
     }
 
-  *metric_value_type = CEREBRO_METRIC_VALUE_TYPE_U_INT32;
+  *metric_value_type = CEREBRO_DATA_VALUE_TYPE_U_INT32;
   *metric_value_len = sizeof(u_int32_t);
   *metric_value = (void *)&metric_shutdown;
   return 0;

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker_data.c,v 1.40 2006-10-29 19:02:13 chu11 Exp $
+ *  $Id: cerebrod_speaker_data.c,v 1.41 2006-11-08 00:34:04 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -53,7 +53,7 @@
 
 #include "debug.h"
 #include "metric_module.h"
-#include "metric_util.h"
+#include "data_util.h"
 #include "wrappers.h"
 
 extern struct cerebrod_config conf;
@@ -432,20 +432,20 @@ _get_module_metric_value(struct cerebrod_speaker_metric_info *metric_info)
       goto cleanup;
     }
 
-  if (mtype == CEREBRO_METRIC_VALUE_TYPE_STRING 
-      && mlen > CEREBRO_MAX_METRIC_STRING_LEN)
+  if (mtype == CEREBRO_DATA_VALUE_TYPE_STRING 
+      && mlen > CEREBRO_MAX_DATA_STRING_LEN)
     {
       CEREBRO_DBG(("truncate metric string: %d", mlen));
-      mlen = CEREBRO_MAX_METRIC_STRING_LEN;
+      mlen = CEREBRO_MAX_DATA_STRING_LEN;
     }
  
-  if (mtype == CEREBRO_METRIC_VALUE_TYPE_STRING && !mlen)
+  if (mtype == CEREBRO_DATA_VALUE_TYPE_STRING && !mlen)
     {
       CEREBRO_DBG(("adjusting metric type to none"));
-      mtype = CEREBRO_METRIC_VALUE_TYPE_NONE;
+      mtype = CEREBRO_DATA_VALUE_TYPE_NONE;
     }
 
-  if (check_metric_type_len_value(mtype, mlen, mvalue) < 0)
+  if (check_data_type_len_value(mtype, mlen, mvalue) < 0)
     goto cleanup;
 
   hd->metric_value_type = mtype;
@@ -500,7 +500,7 @@ _get_userspace_metric_value(struct cerebrod_speaker_metric_info *metric_info)
   mtype = metric_info->metric_value_type;
   mlen = metric_info->metric_value_len;
   mvalue = metric_info->metric_value;
-  if (check_metric_type_len_value(mtype, mlen, mvalue) < 0)
+  if (check_data_type_len_value(mtype, mlen, mvalue) < 0)
     goto cleanup;
 
   hd = Malloc(sizeof(struct cerebrod_heartbeat_metric));

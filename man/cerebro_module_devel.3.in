@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro_module_devel.3.in,v 1.19 2006-10-30 21:00:43 chu11 Exp $
+\."$Id: cerebro_module_devel.3.in,v 1.20 2006-11-08 00:34:03 chu11 Exp $
 \."#############################################################################
 \."  Copyright (C) 2005 The Regents of the University of California.
 \."  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -32,6 +32,8 @@ Introduction to writing cerebro modules
 .B #include <cerebro/cerebro_config.h>
 .sp
 .B #include <cerebro/cerebro_config_module.h>
+.sp
+.B #include <cerebro/cerebro_event_module.h>
 .sp
 .B #include <cerebro/cerebro_metric_module.h>
 .sp
@@ -232,6 +234,10 @@ struct cerebro_config {
   int cerebrod_metric_server_flag;
   int cerebrod_metric_server_port;
   int cerebrod_metric_server_port_flag;
+  int cerebrod_event_server;
+  int cerebrod_event_server_flag;
+  int cerebrod_event_server_port;
+  int cerebrod_event_server_port_flag;
 .if @MANPAGE_DEBUG@ \{
   int cerebrod_speak_debug;
   int cerebrod_speak_debug_flag;
@@ -241,6 +247,8 @@ struct cerebro_config {
   int cerebrod_metric_controller_debug_flag;
   int cerebrod_metric_server_debug;
   int cerebrod_metric_server_debug_flag;
+  int cerebrod_event_server_debug;
+  int cerebrod_event_server_debug_flag;
 \}
 .in -2
 };
@@ -327,6 +335,14 @@ The 'cerebrod_metric_server_port' field stores the metric server
 port for 
 .BR cerebrod(8).
 
+The 'cerebrod_event_server' field is a boolean that turns on the
+.BR cerebrod(8)
+event server to receive event data requests.
+
+The 'cerebrod_event_server_port' field stores the event server
+port for 
+.BR cerebrod(8).
+
 .if @MANPAGE_DEBUG@ \{
 
 The 'cerebrod_speak_debug' field is a boolean that turns on speaker
@@ -343,6 +359,10 @@ metric controller debugging for
 
 The 'cerebrod_metric_server_debug' field is a boolean that turns on
 metric server debugging for
+.BR cerebrod.
+
+The 'cerebrod_event_server_debug' field is a boolean that turns on
+event server debugging for
 .BR cerebrod.
 
 \}
@@ -543,6 +563,109 @@ Returns the 0 on success, -1 on error.
 All of the above functions must be defined in the module and listed in
 the 'monitor_module_info' structure.
 
+.SH "EVENT MODULES"
+A cerebro event module of the name 'foobar' can be written by
+compiling a shared object library with the filename
+cerebro_event_foobar.so, and installing it in the cerebro
+package library directory @CEREBRO_MODULE_DIR@.
+
+The event module should define a structure of the following
+type:
+
+.nf
+struct cerebro_event_module_info {
+.in +2
+  char *event_module_name;
+  Cerebro_event_setup setup;
+  Cerebro_event_cleanup cleanup;
+  Cerebro_event_event_names event_names;
+  Cerebro_event_metric_names metric_names;
+  Cerebro_event_timeout_length timeout_length;
+  Cerebro_event_node_timeout node_timeout;
+  Cerebro_event_metric_update metric_update;
+  Cerebro_event_destroy destroy;
+.in -2
+};
+.fi
+
+The structure should be named 'event_module_info' and be populated
+with the following information.
+
+The field 'event_module_name' should indicate the name of the
+event module.
+
+The field 'setup' should point to a function of the following type:
+
+typedef int (*Cerebro_event_setup)(void);
+
+The 'setup' function sets up the event module with whatever
+initialization is necessary.  It returns 0 on success, -1 on error.
+
+The field 'cleanup' should point to a function of the following type:
+
+typedef int (*Cerebro_event_cleanup)(void);
+
+The 'cleanup' function cleans up the event module from earlier
+initializations.  It returns 0 on success, -1 on error.
+
+The field 'event_names' should point to a function of the following type:
+
+typedef char *(*Cerebro_event_event_names)(void);
+
+The 'event_names' function returns the name(s) of the event(s) the
+module can generate.  NULL is returned on error.  Multiple metrics are
+comma separated.
+
+The field 'metric_names' should point to a function of the following type:
+
+typedef char *(*Cerebro_event_metric_names)(void);
+
+The 'metric_names' function returns the name(s) of the metric(s) the
+module should be sent to know if it should generate an event.  NULL is
+returned on error.  Multiple metrics are comma separated.
+
+The field 'timeout_length' should point to a function of the following type:
+
+typedef int (*Cerebro_event_timeout_length)(void);
+
+The 'timeout_length' function returns the timeout length in seconds the
+module wishes to be notified if a node times out.  Returns 0 if a
+timeout notification is not desired.
+
+The field 'node_timeout' should point to a function of the following type:
+
+typedef int (*Cerebro_event_node_timeout)(const char *nodename,
+                                          struct cerebro_event **event);
+
+The 'node_timeout' function is called when a node timeout occurs.  If
+it wishes to generate an event, it should fill in the appropriate
+event structure.  Returns 1 if an event is generated, 0 if not, -1 on
+error.
+
+The field 'metric_update' should point to a function of the following type:
+
+typedef int (*Cerebro_event_metric_update)(const char *nodename,
+                                           const char *metric_name,
+                                           unsigned int metric_value_type,
+                                           unsigned int metric_value_len,
+                                           void *metric_value,
+                                           struct cerebro_event **event);
+
+The 'metric_update' function is called whenever the metric is received
+from a node.  The nodename the metric was received from, metric value
+type, metric value length, and metric value are passed in as arguments
+and an event is generated if needed.  Returns 1 if an event is
+generated, 0 if not, -1 on error.
+
+The field 'destroy' should point to a function of the following type:
+
+typedef void (*Cerebro_event_destroy)(struct cerebro_event *event);
+
+The 'destroy' function is called to free any memory generated by
+the 'node_timeout' or 'metric_update' functions.
+
+All of the above functions must be defined in the module and listed in
+the 'event_module_info' structure.
 
 .SH "SEE ALSO"
 libcerebro(3), cerebro_module(3), cerebro.conf(5), cerebrod(8)

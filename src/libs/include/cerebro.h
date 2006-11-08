@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.22 2006-08-27 18:27:35 chu11 Exp $
+ *  $Id: cerebro.h,v 1.23 2006-11-08 00:34:04 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -48,15 +48,17 @@
 #define CEREBRO_ERR_OVERFLOW                 14
 #define CEREBRO_ERR_NODE_NOTFOUND            15
 #define CEREBRO_ERR_METRIC_INVALID           16
-#define CEREBRO_ERR_METRIC_MAX               17
-#define CEREBRO_ERR_END_OF_LIST              18
-#define CEREBRO_ERR_CONFIG_FILE              19
-#define CEREBRO_ERR_CONFIG_MODULE            20
-#define CEREBRO_ERR_CONFIG_INPUT             21
-#define CEREBRO_ERR_CLUSTERLIST_MODULE       22
-#define CEREBRO_ERR_OUTMEM                   23
-#define CEREBRO_ERR_INTERNAL                 24
-#define CEREBRO_ERR_ERRNUMRANGE              25
+#define CEREBRO_ERR_EVENT_INVALID            17
+#define CEREBRO_ERR_METRIC_MAX               18
+#define CEREBRO_ERR_END_OF_LIST              19
+#define CEREBRO_ERR_EVENT_NOT_RECEIVED       20
+#define CEREBRO_ERR_CONFIG_FILE              21
+#define CEREBRO_ERR_CONFIG_MODULE            22
+#define CEREBRO_ERR_CONFIG_INPUT             23
+#define CEREBRO_ERR_CLUSTERLIST_MODULE       24
+#define CEREBRO_ERR_OUTMEM                   25
+#define CEREBRO_ERR_INTERNAL                 26
+#define CEREBRO_ERR_ERRNUMRANGE              27
 
 /* 
  * Cerebro Flags
@@ -68,16 +70,16 @@
 #define CEREBRO_METRIC_FLAGS_MASK                  0x00000007
 
 /* 
- * Cerebro Metric Value Types
+ * Cerebro Data Value Types
  */
-#define CEREBRO_METRIC_VALUE_TYPE_NONE             0
-#define CEREBRO_METRIC_VALUE_TYPE_INT32            1
-#define CEREBRO_METRIC_VALUE_TYPE_U_INT32          2
-#define CEREBRO_METRIC_VALUE_TYPE_FLOAT            3
-#define CEREBRO_METRIC_VALUE_TYPE_DOUBLE           4
-#define CEREBRO_METRIC_VALUE_TYPE_STRING           5
-#define CEREBRO_METRIC_VALUE_TYPE_INT64            6
-#define CEREBRO_METRIC_VALUE_TYPE_U_INT64          7
+#define CEREBRO_DATA_VALUE_TYPE_NONE             0
+#define CEREBRO_DATA_VALUE_TYPE_INT32            1
+#define CEREBRO_DATA_VALUE_TYPE_U_INT32          2
+#define CEREBRO_DATA_VALUE_TYPE_FLOAT            3
+#define CEREBRO_DATA_VALUE_TYPE_DOUBLE           4
+#define CEREBRO_DATA_VALUE_TYPE_STRING           5
+#define CEREBRO_DATA_VALUE_TYPE_INT64            6
+#define CEREBRO_DATA_VALUE_TYPE_U_INT64          7
 
 /* 
  * Default metrics
@@ -90,11 +92,13 @@
 #define CEREBRO_METRIC_UPDOWN_STATE_NODE_DOWN      0
 
 /* 
- * Metric Server defaults
+ * Server defaults
  */
 #define CEREBRO_METRIC_SERVER_PORT                 8852
 #define CEREBRO_METRIC_SERVER_TIMEOUT_LEN_DEFAULT  60
 #define CEREBRO_METRIC_SERVER_FLAGS_DEFAULT        0
+
+#define CEREBRO_EVENT_SERVER_PORT                  8853
 
 typedef struct cerebro *cerebro_t;
 
@@ -261,6 +265,43 @@ int cerebro_get_flags(cerebro_t handle);
  * Returns 0 on success, -1 on error
  */
 int cerebro_set_flags(cerebro_t handle, unsigned int flags);
+
+/* 
+ * Event Retrieval API
+ */
+
+/* 
+ * cerebro_event_register
+ *
+ * Setup a file descriptor for event polling.
+ *
+ * Returns a file descriptor for polling on success, -1 on error
+ */
+int cerebro_event_register(cerebro_t handle, const char *event_name);
+
+/* 
+ * cerebro_event_unregister
+ *
+ * Tear down event file descriptor
+ *
+ * Returns 0 on success, -1 on error
+ */
+int cerebro_event_unregister(cerebro_t handle, int fd);
+
+/* 
+ * cerebro_event_parse
+ *
+ * Parse event data when there is data to read on the file descriptor.
+ * User is responsible for freeing nodename and event_value memory.
+ *
+ * Returns 0 and event data on success, -1 on error
+ */
+int cerebro_event_parse(cerebro_t handle,
+                        int fd,
+                        char **nodename,
+                        unsigned int *event_value_type,
+                        unsigned int *event_value_len,
+                        void **event_value);
 
 /* 
  * Metric Retrieval API

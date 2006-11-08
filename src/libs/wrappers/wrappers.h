@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.h,v 1.14 2005-08-08 21:41:48 achu Exp $
+ *  $Id: wrappers.h,v 1.15 2006-11-08 00:34:04 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -304,6 +304,8 @@ int wrap_lt_dlclose(WRAPPERS_ARGS, void *handle);
         wrap_list_for_each(WRAPPERS_DEBUG_ARGS, l, f, arg)
 #define List_sort(l, f) \
         wrap_list_sort(WRAPPERS_DEBUG_ARGS, l, f)
+#define List_peek(l) \
+        wrap_list_peek(WRAPPERS_DEBUG_ARGS, l)
 #define List_iterator_create(l) \
         wrap_list_iterator_create(WRAPPERS_DEBUG_ARGS, l)
 #define List_iterator_destroy(i) \
@@ -319,6 +321,7 @@ void * wrap_list_find_first (WRAPPERS_ARGS, List l, ListFindF f, void *key);
 int wrap_list_delete_all(WRAPPERS_ARGS, List l, ListFindF f, void *key);
 int wrap_list_for_each(WRAPPERS_ARGS, List l, ListForF f, void *arg);
 void wrap_list_sort(WRAPPERS_ARGS, List l, ListCmpF f);
+void *wrap_list_peek(WRAPPERS_ARGS, List l);
 ListIterator wrap_list_iterator_create(WRAPPERS_ARGS, List l);
 void wrap_list_iterator_destroy(WRAPPERS_ARGS, ListIterator i);
 int wrap_list_delete(WRAPPERS_ARGS, ListIterator i);

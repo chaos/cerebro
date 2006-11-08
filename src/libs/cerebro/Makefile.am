@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.18 2005-08-25 22:04:32 achu Exp $
+## $Id: Makefile.am,v 1.19 2006-11-08 00:34:04 chu11 Exp $
 ##*****************************************************************************
 
 if WITH_GNU_LD
@@ -29,6 +29,7 @@ libcerebro_la_CFLAGS  = -D_REENTRANT \
 libcerebro_la_SOURCES = cerebro.c \
 			cerebro_clusterlist_util.c \
 			cerebro_config_util.c \
+			cerebro_event.c \
 			cerebro_metric_control.c \
 			cerebro_metric_data.c \
 			cerebro_metric_names.c \
@@ -50,7 +51,7 @@ libcerebro_la_LIBADD  = ../cerebro_error/libcerebro_error.la \
 			../modules/libconfigmodules.la \
 			../modules/libmodules.la \
 			../util/libutil_config.la \
-			../util/libutil_metric.la \
+			../util/libutil_data.la \
 			../util/libutil_network.la \
 			$(LTDL_LIBS)
 
@@ -87,7 +88,7 @@ libcerebro_la_LIBADD  = ../cerebro_error/libcerebro_error.la \
 ../util/libutil_config.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
-../util/libutil_metric.la : force-dependency-check
+../util/libutil_data.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
 ../util/libutil_network.la : force-dependency-check

@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: libcerebro.3,v 1.19 2005-07-26 20:14:19 achu Exp $
+\."$Id: libcerebro.3,v 1.20 2006-11-08 00:34:03 chu11 Exp $
 \."#############################################################################
 \."  Copyright (C) 2005 The Regents of the University of California.
 \."  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -61,6 +61,12 @@ or down
 .BI "int cerebro_get_flags(cerebro_t handle);"
 .sp
 .BI "int cerebro_set_flags(cerebro_t handle, unsigned int flags);"
+.sp
+.BI "int cerebro_event_register(cerebro_t handle, const char *event_name);"
+.sp
+.BI "int cerebro_event_unregister(cerebro_t handle, int fd);"
+.sp
+.BI "int cerebro_event_parse(cerebro_t handle, int fd, char **nodename, unsigned int *event_value_type, unsigned int *event_value_size, void **event_value);"
 .sp
 .BI "cerebro_metriclist_t cerebro_get_metric_names(cerebro_t handle);"
 .sp

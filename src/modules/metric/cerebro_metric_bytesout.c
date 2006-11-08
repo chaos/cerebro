@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_bytesout.c,v 1.2 2006-08-27 22:03:32 chu11 Exp $
+ *  $Id: cerebro_metric_bytesout.c,v 1.3 2006-11-08 00:34:05 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -135,7 +135,7 @@ bytesout_metric_get_metric_value(unsigned int *metric_value_type,
   
   *bytesoutptr = bytesoutval;
 
-  *metric_value_type = CEREBRO_METRIC_VALUE_TYPE_U_INT64;
+  *metric_value_type = CEREBRO_DATA_VALUE_TYPE_U_INT64;
   *metric_value_len = sizeof(u_int64_t);
   *metric_value = (void *)bytesoutptr;
 

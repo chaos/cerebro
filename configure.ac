@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.76 2006-10-05 22:03:14 chu11 Exp $
+## $Id: configure.ac,v 1.77 2006-11-08 00:34:03 chu11 Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -153,6 +153,12 @@ AC_SHUTDOWN
 AM_CONDITIONAL(WITH_SHUTDOWN, [test "$ac_with_shutdown" = "yes"])
 
 #
+# Check to build updown_event module
+#
+AC_UPDOWN_EVENT
+AM_CONDITIONAL(WITH_UPDOWN_EVENT, [test "$ac_with_updown_event" = "yes"])
+
+#
 # Determine which static module libraries do not need to be linked
 # against under a static module build
 #
@@ -165,6 +171,10 @@ AM_CONDITIONAL(WITH_CLUSTERLIST_STATIC_MODULES,
 AM_CONDITIONAL(WITH_CONFIG_STATIC_MODULES,
                [(test "$ac_with_static_modules" = "yes") &&
                 (test "1" = "2")])
+
+AM_CONDITIONAL(WITH_EVENT_STATIC_MODULES,
+               [(test "$ac_with_static_modules" = "yes") &&
+                (test "$ac_with_updown_event" = "yes")])
 
 AM_CONDITIONAL(WITH_METRIC_STATIC_MODULES,
                [(test "$ac_with_static_modules" = "yes") &&
@@ -250,6 +260,7 @@ AC_CONFIG_FILES( \
   src/modules/Makefile \
   src/modules/clusterlist/Makefile \
   src/modules/config/Makefile \
+  src/modules/event/Makefile \
   src/modules/metric/Makefile \
   src/modules/monitor/Makefile \
 )

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_controller.c,v 1.36 2006-10-31 04:32:22 chu11 Exp $
+ *  $Id: cerebrod_metric_controller.c,v 1.37 2006-11-08 00:34:04 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -63,7 +63,7 @@
 #include "debug.h"
 #include "fd.h"
 #include "list.h"
-#include "metric_util.h"
+#include "data_util.h"
 #include "network_util.h"
 #include "wrappers.h"
 
@@ -420,7 +420,7 @@ _register_metric(int fd, int32_t version, const char *metric_name)
    * be sent.
    */
   metric_info->next_call_time = UINT_MAX;
-  metric_info->metric_value_type = CEREBRO_METRIC_VALUE_TYPE_NONE;
+  metric_info->metric_value_type = CEREBRO_DATA_VALUE_TYPE_NONE;
   metric_info->metric_value_len = 0;
   metric_info->metric_value = NULL;
   List_append(metric_list, metric_info);
@@ -522,13 +522,13 @@ _receive_metric_value(int fd,
   mtype = req->metric_value_type;
   mlen = req->metric_value_len;
 
-  if ((n = unmarshall_metric_value(mtype,
-                                   mlen,
-                                   mvalue,
-                                   req->metric_value_len,
-                                   vbuf,
-                                   vbytes_read,
-                                   NULL)) < 0)
+  if ((n = unmarshall_data_value(mtype,
+                                 mlen,
+                                 mvalue,
+                                 req->metric_value_len,
+                                 vbuf,
+                                 vbytes_read,
+                                 NULL)) < 0)
     goto cleanup;
   
   req->metric_value = mvalue;
@@ -559,16 +559,16 @@ _update_metric(int fd,
 
   req->metric_value = NULL;
 
-  if (req->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_STRING &&
+  if (req->metric_value_type == CEREBRO_DATA_VALUE_TYPE_STRING &&
       !req->metric_value_len)
     {
       CEREBRO_DBG(("adjusting metric type to none"));
-      req->metric_value_type = CEREBRO_METRIC_VALUE_TYPE_NONE;
+      req->metric_value_type = CEREBRO_DATA_VALUE_TYPE_NONE;
     }
 
   mtype = req->metric_value_type;
   mlen = req->metric_value_len;
-  if (check_metric_type_len(mtype, mlen) < 0)
+  if (check_data_type_len(mtype, mlen) < 0)
     {
       _send_metric_control_response(fd,
                                     version,

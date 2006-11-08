@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro.conf.5.in,v 1.17 2006-10-30 00:55:50 chu11 Exp $
+\."$Id: cerebro.conf.5.in,v 1.18 2006-11-08 00:34:03 chu11 Exp $
 \."#############################################################################
 \."  Copyright (C) 2005 The Regents of the University of California.
 \."  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -183,6 +183,22 @@ option is turned on.
 .TP
 .I cerebrod_metric_server_port num
 Specify the metric server port.  The default server port is 8852.
+.TP
+.I cerebrod_event_server ( on | off )
+Specify if the
+.B cerebrod
+daemon should turn on the event server.  Generally speaking, this
+option should be turned on if the
+.I cerebrod_listen
+option is turned on.  If the 
+.I cerebrod_listen
+option is turned off, the event_server will not be started.  The default
+turns this option on as long as the 
+.I cerebrod_listen
+option is turned on.
+.TP
+.I cerebrod_event_server_port num
+Specify the event server port.  The default server port is 8853.
 .if @MANPAGE_DEBUG@ \{
 .TP
 .I cerebrod_speak_debug ( on | off )
@@ -205,6 +221,12 @@ option.  This option is turned off by default.
 .TP
 .I cerebrod_metric_server_debug ( on | off )
 Turn on metric server debugging.  Requires that debugging be turned on
+from the command line with the
+.I -d
+option.  This option is turned off by default.
+.TP
+.I cerebrod_event_server_debug ( on | off )
+Turn on event server debugging.  Requires that debugging be turned on
 from the command line with the
 .I -d
 option.  This option is turned off by default.
