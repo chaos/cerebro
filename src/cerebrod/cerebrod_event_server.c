@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_event_server.c,v 1.1.2.13 2006-11-07 22:46:11 chu11 Exp $
+ *  $Id: cerebrod_event_server.c,v 1.1.2.14 2006-11-08 00:19:02 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -53,7 +53,7 @@
 #include "fd.h"
 #include "hash.h"
 #include "list.h"
-#include "metric_util.h"
+#include "data_util.h"
 #include "network_util.h"
 #include "wrappers.h"
 
@@ -197,25 +197,25 @@ _event_dump(struct cerebro_event *event)
 
       switch(event->event_value_type)
         {
-        case CEREBRO_METRIC_VALUE_TYPE_NONE:
+        case CEREBRO_DATA_VALUE_TYPE_NONE:
           break;
-        case CEREBRO_METRIC_VALUE_TYPE_INT32:
+        case CEREBRO_DATA_VALUE_TYPE_INT32:
           fprintf(stderr, "* Value = %d",
                   *((int32_t *)event->event_value));
           break;
-        case CEREBRO_METRIC_VALUE_TYPE_U_INT32:
+        case CEREBRO_DATA_VALUE_TYPE_U_INT32:
           fprintf(stderr, "* Value = %u",
                   *((u_int32_t *)event->event_value));
           break;
-        case CEREBRO_METRIC_VALUE_TYPE_FLOAT:
+        case CEREBRO_DATA_VALUE_TYPE_FLOAT:
           fprintf(stderr, "* Value = %f",
                   *((float *)event->event_value));
           break;
-        case CEREBRO_METRIC_VALUE_TYPE_DOUBLE:
+        case CEREBRO_DATA_VALUE_TYPE_DOUBLE:
           fprintf(stderr, "* Value = %f",
                   *((double *)event->event_value));
           break;
-        case CEREBRO_METRIC_VALUE_TYPE_STRING:
+        case CEREBRO_DATA_VALUE_TYPE_STRING:
           /* Watch for NUL termination */
           buf = Malloc(event->event_value_len + 1);
           memset(buf, '\0', event->event_value_len + 1);
@@ -226,20 +226,20 @@ _event_dump(struct cerebro_event *event)
           Free(buf);
           break;
 #if SIZEOF_LONG == 4
-        case CEREBRO_METRIC_VALUE_TYPE_INT64:
+        case CEREBRO_DATA_VALUE_TYPE_INT64:
           fprintf(stderr, "* Value = %lld",
                   *((int64_t *)event->event_value));
           break;
-        case CEREBRO_METRIC_VALUE_TYPE_U_INT64:
+        case CEREBRO_DATA_VALUE_TYPE_U_INT64:
           fprintf(stderr, "* Value = %llu",
                   *((u_int64_t *)event->event_value));
           break;
 #else  /* SIZEOF_LONG == 8 */
-        case CEREBRO_METRIC_VALUE_TYPE_INT64:
+        case CEREBRO_DATA_VALUE_TYPE_INT64:
           fprintf(stderr, "* Value = %ld",
                   *((int64_t *)event->event_value));
           break;
-        case CEREBRO_METRIC_VALUE_TYPE_U_INT64:
+        case CEREBRO_DATA_VALUE_TYPE_U_INT64:
           fprintf(stderr, "* Value = %lu",
                   *((u_int64_t *)event->event_value));
           break;
@@ -282,12 +282,12 @@ _event_marshall(struct cerebro_event *event,
   bufPtrlen = sizeof(event->event_name);
   c += Marshall_buffer(bufPtr, bufPtrlen, buf + c, buflen - c);
 
-  if ((n = marshall_metric(event->event_value_type,
-                           event->event_value_len,
-                           event->event_value,
-                           buf + c,
-                           buflen - c,
-                           NULL)) < 0)
+  if ((n = marshall_data(event->event_value_type,
+                         event->event_value_len,
+                         event->event_value,
+                         buf + c,
+                         buflen - c,
+                         NULL)) < 0)
     goto cleanup;
   c += n;
 

@@ -47,7 +47,7 @@
 #include "debug.h"
 #include "fd.h"
 #include "marshall.h"
-#include "metric_util.h"
+#include "data_util.h"
 #include "network_util.h"
 
 /*
@@ -605,7 +605,7 @@ _event_value_unmarshall(cerebro_t handle,
 
 #if CEREBRO_DEBUG
   if (!event
-      || event->event_value_type == CEREBRO_METRIC_VALUE_TYPE_NONE
+      || event->event_value_type == CEREBRO_DATA_VALUE_TYPE_NONE
       || !event_value
       || !buf)
     {
@@ -619,7 +619,7 @@ _event_value_unmarshall(cerebro_t handle,
   elen = event->event_value_len;
 
   /* Special case for ending null character */
-  if (etype == CEREBRO_METRIC_VALUE_TYPE_STRING)
+  if (etype == CEREBRO_DATA_VALUE_TYPE_STRING)
     evalue_len = buflen + 1;
   else
     evalue_len = buflen;
@@ -631,13 +631,13 @@ _event_value_unmarshall(cerebro_t handle,
     }
   memset(evalue, '\0', evalue_len);
 
-  if (unmarshall_metric_value(etype,
-                              elen,
-                              evalue,
-                              evalue_len,
-                              buf,
-                              buflen,
-                              &errnum) < 0)
+  if (unmarshall_data_value(etype,
+                            elen,
+                            evalue,
+                            evalue_len,
+                            buf,
+                            buflen,
+                            &errnum) < 0)
     {
       handle->errnum = errnum;
       goto cleanup;
@@ -665,7 +665,6 @@ cerebro_event_parse(cerebro_t handle,
   int bytes_read, vbytes_read, n;
   unsigned int errnum;
   char *vbuf = NULL;
-  char *nodename_ptr = NULL;
   void *event_value_ptr = NULL;
       
   if (_cerebro_handle_check(handle) < 0)
@@ -736,8 +735,8 @@ cerebro_event_parse(cerebro_t handle,
                                bytes_read) < 0)
     goto cleanup;
 
-  if (check_metric_type_len(event.event_value_type, 
-                            event.event_value_len) < 0)
+  if (check_data_type_len(event.event_value_type, 
+                          event.event_value_len) < 0)
     {
       handle->errnum = CEREBRO_ERR_PROTOCOL;
       goto cleanup;

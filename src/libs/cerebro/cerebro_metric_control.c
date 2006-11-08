@@ -50,7 +50,7 @@
 #include "debug.h"
 #include "fd.h"
 #include "marshall.h"
-#include "metric_util.h"
+#include "data_util.h"
 #include "network_util.h"
 
 /* 
@@ -177,12 +177,12 @@ _metric_control_request_marshall(cerebro_t handle,
     }
   c += n;
 
-  if ((n = marshall_metric(req->metric_value_type,
-                           req->metric_value_len,
-                           req->metric_value,
-                           buf + c,
-                           buflen - c,
-                           &errnum)) < 0)
+  if ((n = marshall_data(req->metric_value_type,
+                         req->metric_value_len,
+                         req->metric_value,
+                         buf + c,
+                         buflen - c,
+                         &errnum)) < 0)
     {
       handle->errnum = errnum;
       return -1;
@@ -215,8 +215,8 @@ _metric_control_request_send(cerebro_t handle,
   if (!(command >= CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_REGISTER
         && command <= CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_FLUSH)
       || !metric_name
-      || !(metric_value_type >= CEREBRO_METRIC_VALUE_TYPE_NONE
-           && metric_value_type <= CEREBRO_METRIC_VALUE_TYPE_STRING))
+      || !(metric_value_type >= CEREBRO_DATA_VALUE_TYPE_NONE
+           && metric_value_type <= CEREBRO_DATA_VALUE_TYPE_STRING))
     {
       CEREBRO_DBG(("invalid parameters"));
       handle->errnum = CEREBRO_ERR_INTERNAL;
@@ -225,18 +225,18 @@ _metric_control_request_send(cerebro_t handle,
 
   if (command == CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_UPDATE)
     {
-      if (metric_value_type == CEREBRO_METRIC_VALUE_TYPE_STRING
-          && metric_value_len > CEREBRO_MAX_METRIC_STRING_LEN)
+      if (metric_value_type == CEREBRO_DATA_VALUE_TYPE_STRING
+          && metric_value_len > CEREBRO_MAX_DATA_STRING_LEN)
         {
           CEREBRO_DBG(("truncate metric string: %d", metric_value_len));
-          metric_value_len = CEREBRO_MAX_METRIC_STRING_LEN;
+          metric_value_len = CEREBRO_MAX_DATA_STRING_LEN;
         }
       
-      if (metric_value_type == CEREBRO_METRIC_VALUE_TYPE_STRING
+      if (metric_value_type == CEREBRO_DATA_VALUE_TYPE_STRING
           && !metric_value_len)
         {
           CEREBRO_DBG(("adjusting metric type to none"));
-          metric_value_type = CEREBRO_METRIC_VALUE_TYPE_NONE;
+          metric_value_type = CEREBRO_DATA_VALUE_TYPE_NONE;
         }      
     }
   
@@ -417,7 +417,7 @@ cerebro_register_metric(cerebro_t handle, const char *metric_name)
   return _cerebro_metric_control(handle, 
                                  CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_REGISTER,
                                  metric_name, 
-                                 CEREBRO_METRIC_VALUE_TYPE_NONE,
+                                 CEREBRO_DATA_VALUE_TYPE_NONE,
                                  0,
                                  NULL);
 }
@@ -428,7 +428,7 @@ cerebro_unregister_metric(cerebro_t handle, const char *metric_name)
   return _cerebro_metric_control(handle, 
                                  CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_UNREGISTER,
                                  metric_name, 
-                                 CEREBRO_METRIC_VALUE_TYPE_NONE,
+                                 CEREBRO_DATA_VALUE_TYPE_NONE,
                                  0,
                                  NULL);
 }
@@ -454,7 +454,7 @@ cerebro_resend_metric(cerebro_t handle, const char *metric_name)
   return _cerebro_metric_control(handle, 
                                  CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_RESEND,
                                  metric_name, 
-                                 CEREBRO_METRIC_VALUE_TYPE_NONE,
+                                 CEREBRO_DATA_VALUE_TYPE_NONE,
                                  0,
                                  NULL);
 }
@@ -465,7 +465,7 @@ cerebro_flush_metric(cerebro_t handle, const char *metric_name)
   return _cerebro_metric_control(handle, 
                                  CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_FLUSH,
                                  metric_name, 
-                                 CEREBRO_METRIC_VALUE_TYPE_NONE,
+                                 CEREBRO_DATA_VALUE_TYPE_NONE,
                                  0,
                                  NULL);
 }

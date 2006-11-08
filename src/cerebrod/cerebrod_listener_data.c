@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.37.2.13 2006-11-04 01:21:22 chu11 Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.37.2.14 2006-11-08 00:19:02 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -391,15 +391,15 @@ _metric_data_dump(void *data, const void *key, void *arg)
           nodename, md->metric_name, md->metric_value_type, 
           md->metric_value_len);
 
-  if (md->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_INT32)
+  if (md->metric_value_type == CEREBRO_DATA_VALUE_TYPE_INT32)
     fprintf(stderr, "metric_value=%d", *((int32_t *)md->metric_value));
-  else if (md->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_U_INT32)
+  else if (md->metric_value_type == CEREBRO_DATA_VALUE_TYPE_U_INT32)
     fprintf(stderr, "metric_value=%u", *((u_int32_t *)md->metric_value));
-  else if (md->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_FLOAT)
+  else if (md->metric_value_type == CEREBRO_DATA_VALUE_TYPE_FLOAT)
     fprintf(stderr, "metric_value=%f", *((float *)md->metric_value));
-  else if (md->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_DOUBLE)
+  else if (md->metric_value_type == CEREBRO_DATA_VALUE_TYPE_DOUBLE)
     fprintf(stderr, "metric_value=%f", *((double *)md->metric_value));
-  else if (md->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_STRING)
+  else if (md->metric_value_type == CEREBRO_DATA_VALUE_TYPE_STRING)
     {
       /* Watch for NUL termination */
       buf = Malloc(md->metric_value_len + 1);
@@ -409,15 +409,15 @@ _metric_data_dump(void *data, const void *key, void *arg)
       Free(buf);
     }
 #if SIZEOF_LONG == 4
-  else if (md->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_INT64)
+  else if (md->metric_value_type == CEREBRO_DATA_VALUE_TYPE_INT64)
     fprintf(stderr, "metric_value=%lld", *((int64_t *)md->metric_value));
-  else if (md->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_U_INT64)
+  else if (md->metric_value_type == CEREBRO_DATA_VALUE_TYPE_U_INT64)
     fprintf(stderr, "metric_value=%llu", *((u_int64_t *)md->metric_value));
   fprintf(stderr, "\n");
 #else /* SIZEOF_LONG == 8 */
-  else if (md->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_INT64)
+  else if (md->metric_value_type == CEREBRO_DATA_VALUE_TYPE_INT64)
     fprintf(stderr, "metric_value=%ld", *((int64_t *)md->metric_value));
-  else if (md->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_U_INT64)
+  else if (md->metric_value_type == CEREBRO_DATA_VALUE_TYPE_U_INT64)
     fprintf(stderr, "metric_value=%lu", *((u_int64_t *)md->metric_value));
   fprintf(stderr, "\n");
 #endif /* SIZEOF_LONG == 8 */

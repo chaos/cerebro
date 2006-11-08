@@ -45,6 +45,15 @@
 
 	* src/libs/wrappers/wrappers.h, src/libs/wrappers/wrappers_list.c:
 	Add list_peek wrapper.
+
+	* Globally rename "METRIC_VALUE_TYPE" to "DATA_VALUE_TYPE" for
+	consistency with event data types. 
+
+	* src/libs/util/metric_util.h, src/libs/util/metric_util.c:
+	Renamed to data_util.h and data_util.c.
+
+	* src/: Globally readjust many variable/function/comments due to
+	change from "metric" to "data" in naming.
 	
 2006-11-07  Albert Chu  <chu11@llnl.gov>
 

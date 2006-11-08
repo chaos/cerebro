@@ -1,13 +1,5 @@
-event stuff
-manpages for lib API
-manpage for cerebro-stat
-
-"metric_value" -> rename??
-- or create "event_value"?
-- flags for future?
- - need event flags and metric flags, different?
+Before Release
 - up age/lib stuff in configure.ac
-
 
 Portability
 - IPv6

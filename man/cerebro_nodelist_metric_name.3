@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro_nodelist_metric_name.3,v 1.12.2.1 2006-11-07 19:34:34 chu11 Exp $
+\."$Id: cerebro_nodelist_metric_name.3,v 1.12.2.2 2006-11-08 00:19:01 chu11 Exp $
 \."#############################################################################
 \."  Copyright (C) 2005 The Regents of the University of California.
 \."  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -94,21 +94,21 @@ The following metric value types can be returned by
 \fBcerebro_nodelist_iterator_metric_value\fR.  They can be used to
 determine the data type the 'metric_value' result points to.
 
-CEREBRO_METRIC_VALUE_TYPE_NONE - No metric value
+CEREBRO_DATA_VALUE_TYPE_NONE - No metric value
 
-CEREBRO_METRIC_VALUE_TYPE_INT32 - 32 bit integer
+CEREBRO_DATA_VALUE_TYPE_INT32 - 32 bit integer
 
-CEREBRO_METRIC_VALUE_TYPE_U_INT32 - 32 bit unsigned integer
+CEREBRO_DATA_VALUE_TYPE_U_INT32 - 32 bit unsigned integer
 
-CEREBRO_METRIC_VALUE_TYPE_FLOAT - float
+CEREBRO_DATA_VALUE_TYPE_FLOAT - float
 
-CEREBRO_METRIC_VALUE_TYPE_DOUBLE - double
+CEREBRO_DATA_VALUE_TYPE_DOUBLE - double
 
-CEREBRO_METRIC_VALUE_TYPE_STRING - NUL terminated string
+CEREBRO_DATA_VALUE_TYPE_STRING - NUL terminated string
 
-CEREBRO_METRIC_VALUE_TYPE_INT64 - 64 bit integer
+CEREBRO_DATA_VALUE_TYPE_INT64 - 64 bit integer
 
-CEREBRO_METRIC_VALUE_TYPE_U_INT64 - 64 bit unsigned integer
+CEREBRO_DATA_VALUE_TYPE_U_INT64 - 64 bit unsigned integer
 
 .SH "RETURN VALUES"
 For \fBcerebro_nodelist_metric_name\fR, the metric name for the

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro-admin.c,v 1.10 2006-08-27 18:27:34 chu11 Exp $
+ *  $Id: cerebro-admin.c,v 1.10.2.1 2006-11-08 00:19:01 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -71,7 +71,7 @@ extern int optind, opterr, optopt;
 static cerebro_t handle;
 int operation = -1;
 char *metric_name = NULL;
-unsigned int metric_value_type = CEREBRO_METRIC_VALUE_TYPE_NONE;
+unsigned int metric_value_type = CEREBRO_DATA_VALUE_TYPE_NONE;
 unsigned int metric_value_len = 0;
 char *metric_value = NULL;
 int32_t metric_value_int32;
@@ -136,14 +136,14 @@ _usage(void)
           "     %d - int64\n"
           "     %d - u_int64\n"
           "  -l STRING  Specify metric value\n",
-          CEREBRO_METRIC_VALUE_TYPE_NONE,
-          CEREBRO_METRIC_VALUE_TYPE_INT32,
-          CEREBRO_METRIC_VALUE_TYPE_U_INT32,
-          CEREBRO_METRIC_VALUE_TYPE_FLOAT,
-          CEREBRO_METRIC_VALUE_TYPE_DOUBLE,
-          CEREBRO_METRIC_VALUE_TYPE_STRING,
-          CEREBRO_METRIC_VALUE_TYPE_INT64,
-          CEREBRO_METRIC_VALUE_TYPE_U_INT64);
+          CEREBRO_DATA_VALUE_TYPE_NONE,
+          CEREBRO_DATA_VALUE_TYPE_INT32,
+          CEREBRO_DATA_VALUE_TYPE_U_INT32,
+          CEREBRO_DATA_VALUE_TYPE_FLOAT,
+          CEREBRO_DATA_VALUE_TYPE_DOUBLE,
+          CEREBRO_DATA_VALUE_TYPE_STRING,
+          CEREBRO_DATA_VALUE_TYPE_INT64,
+          CEREBRO_DATA_VALUE_TYPE_U_INT64);
 #if CEREBRO_DEBUG
   fprintf(stderr,
           "  -d         Turn on debugging\n");
@@ -240,8 +240,8 @@ _cmdline_parse(int argc, char **argv)
       case 't':
         metric_value_type = strtol(optarg, &ptr, 10);
         if ((ptr != (optarg + strlen(optarg)))
-            || !(metric_value_type >= CEREBRO_METRIC_VALUE_TYPE_NONE
-                 && metric_value_type <= CEREBRO_METRIC_VALUE_TYPE_U_INT64))
+            || !(metric_value_type >= CEREBRO_DATA_VALUE_TYPE_NONE
+                 && metric_value_type <= CEREBRO_DATA_VALUE_TYPE_U_INT64))
           err_exit("invalid metric value type specified");
         break;
       case 'l':
@@ -262,15 +262,15 @@ _cmdline_parse(int argc, char **argv)
   if (!metric_name || operation < 0)
     _usage();
 
-  if (metric_value_type != CEREBRO_METRIC_VALUE_TYPE_NONE && !metric_value)
+  if (metric_value_type != CEREBRO_DATA_VALUE_TYPE_NONE && !metric_value)
     err_exit("invalid metric value specified");
 
-  if (metric_value_type == CEREBRO_METRIC_VALUE_TYPE_NONE)
+  if (metric_value_type == CEREBRO_DATA_VALUE_TYPE_NONE)
     {
       metric_value_len = 0;
       metric_value_ptr = NULL;
     }
-  else if (metric_value_type == CEREBRO_METRIC_VALUE_TYPE_INT32)
+  else if (metric_value_type == CEREBRO_DATA_VALUE_TYPE_INT32)
     {
       metric_value_int32 = (int32_t)strtol(metric_value, &ptr, 10);
       if (ptr != (metric_value + strlen(metric_value)))
@@ -278,7 +278,7 @@ _cmdline_parse(int argc, char **argv)
       metric_value_len = sizeof(int32_t);
       metric_value_ptr = &metric_value_int32;
     }
-  else if (metric_value_type == CEREBRO_METRIC_VALUE_TYPE_U_INT32)
+  else if (metric_value_type == CEREBRO_DATA_VALUE_TYPE_U_INT32)
     {
       metric_value_u_int32 = (u_int32_t)strtoul(metric_value, &ptr, 10);
       if (ptr != (metric_value + strlen(metric_value)))
@@ -286,7 +286,7 @@ _cmdline_parse(int argc, char **argv)
       metric_value_len = sizeof(u_int32_t);
       metric_value_ptr = &metric_value_u_int32;
     }
-  else if (metric_value_type == CEREBRO_METRIC_VALUE_TYPE_FLOAT)
+  else if (metric_value_type == CEREBRO_DATA_VALUE_TYPE_FLOAT)
     {
       metric_value_float = (float)strtod(metric_value, &ptr);
       if (ptr != (metric_value + strlen(metric_value)))
@@ -294,7 +294,7 @@ _cmdline_parse(int argc, char **argv)
       metric_value_len = sizeof(float);
       metric_value_ptr = &metric_value_float;
     }
-  else if (metric_value_type == CEREBRO_METRIC_VALUE_TYPE_DOUBLE)
+  else if (metric_value_type == CEREBRO_DATA_VALUE_TYPE_DOUBLE)
     {
       metric_value_double = strtod(metric_value, &ptr);
       if (ptr != (metric_value + strlen(metric_value)))
@@ -302,15 +302,15 @@ _cmdline_parse(int argc, char **argv)
       metric_value_len = sizeof(double);
       metric_value_ptr = &metric_value_double;
     }
-  else if (metric_value_type == CEREBRO_METRIC_VALUE_TYPE_STRING)
+  else if (metric_value_type == CEREBRO_DATA_VALUE_TYPE_STRING)
     {
       metric_value_string = metric_value;
       metric_value_len = strlen(metric_value_string);
-      if (metric_value_len > CEREBRO_MAX_METRIC_STRING_LEN)
+      if (metric_value_len > CEREBRO_MAX_DATA_STRING_LEN)
         err_exit("string metric value too long");
       metric_value_ptr = metric_value_string;
     }
-  else if (metric_value_type == CEREBRO_METRIC_VALUE_TYPE_INT64)
+  else if (metric_value_type == CEREBRO_DATA_VALUE_TYPE_INT64)
     {
       metric_value_int64 = (int64_t)strtoll(metric_value, &ptr, 10);
       if (ptr != (metric_value + strlen(metric_value)))
@@ -318,7 +318,7 @@ _cmdline_parse(int argc, char **argv)
       metric_value_len = sizeof(int64_t);
       metric_value_ptr = &metric_value_int64;
     }
-  else if (metric_value_type == CEREBRO_METRIC_VALUE_TYPE_U_INT64)
+  else if (metric_value_type == CEREBRO_DATA_VALUE_TYPE_U_INT64)
     {
       metric_value_u_int64 = (u_int64_t)strtoull(metric_value, &ptr, 10);
       if (ptr != (metric_value + strlen(metric_value)))

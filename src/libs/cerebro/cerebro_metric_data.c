@@ -48,7 +48,7 @@
 #include "debug.h"
 #include "fd.h"
 #include "marshall.h"
-#include "metric_util.h"
+#include "data_util.h"
 #include "network_util.h"
 
 /* 
@@ -71,7 +71,7 @@ _metric_value_unmarshall(cerebro_t handle,
 
 #if CEREBRO_DEBUG
   if (!res 
-      || res->metric_value_type == CEREBRO_METRIC_VALUE_TYPE_NONE 
+      || res->metric_value_type == CEREBRO_DATA_VALUE_TYPE_NONE 
       || !metric_value 
       || !buf)
     {
@@ -85,7 +85,7 @@ _metric_value_unmarshall(cerebro_t handle,
   mlen = res->metric_value_len;
 
   /* Special case for ending null character */
-  if (mtype == CEREBRO_METRIC_VALUE_TYPE_STRING)
+  if (mtype == CEREBRO_DATA_VALUE_TYPE_STRING)
     mvalue_len = buflen + 1;
   else
     mvalue_len = buflen;
@@ -97,13 +97,13 @@ _metric_value_unmarshall(cerebro_t handle,
     }
   memset(mvalue, '\0', mvalue_len);
 
-  if (unmarshall_metric_value(mtype, 
-                              mlen,
-                              mvalue,
-                              mvalue_len,
-                              buf,
-                              buflen,
-                              &errnum) < 0)
+  if (unmarshall_data_value(mtype, 
+                            mlen,
+                            mvalue,
+                            mvalue_len,
+                            buf,
+                            buflen,
+                            &errnum) < 0)
     {
       handle->errnum = errnum;
       goto cleanup;
@@ -224,7 +224,7 @@ _receive_metric_data_response(cerebro_t handle,
 
   mtype = res->metric_value_type;
   mlen = res->metric_value_len;
-  if (check_metric_type_len(mtype, mlen) < 0)
+  if (check_data_type_len(mtype, mlen) < 0)
     {
       handle->errnum = CEREBRO_ERR_PROTOCOL;
       goto cleanup;

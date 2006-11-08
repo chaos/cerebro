@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.22.2.4 2006-11-07 18:21:17 chu11 Exp $
+ *  $Id: cerebro.h,v 1.22.2.5 2006-11-08 00:19:02 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -70,16 +70,16 @@
 #define CEREBRO_METRIC_FLAGS_MASK                  0x00000007
 
 /* 
- * Cerebro Metric Value Types
+ * Cerebro Data Value Types
  */
-#define CEREBRO_METRIC_VALUE_TYPE_NONE             0
-#define CEREBRO_METRIC_VALUE_TYPE_INT32            1
-#define CEREBRO_METRIC_VALUE_TYPE_U_INT32          2
-#define CEREBRO_METRIC_VALUE_TYPE_FLOAT            3
-#define CEREBRO_METRIC_VALUE_TYPE_DOUBLE           4
-#define CEREBRO_METRIC_VALUE_TYPE_STRING           5
-#define CEREBRO_METRIC_VALUE_TYPE_INT64            6
-#define CEREBRO_METRIC_VALUE_TYPE_U_INT64          7
+#define CEREBRO_DATA_VALUE_TYPE_NONE             0
+#define CEREBRO_DATA_VALUE_TYPE_INT32            1
+#define CEREBRO_DATA_VALUE_TYPE_U_INT32          2
+#define CEREBRO_DATA_VALUE_TYPE_FLOAT            3
+#define CEREBRO_DATA_VALUE_TYPE_DOUBLE           4
+#define CEREBRO_DATA_VALUE_TYPE_STRING           5
+#define CEREBRO_DATA_VALUE_TYPE_INT64            6
+#define CEREBRO_DATA_VALUE_TYPE_U_INT64          7
 
 /* 
  * Default metrics

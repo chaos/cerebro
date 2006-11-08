@@ -427,21 +427,21 @@ _metric_value_str(unsigned int mtype,
   assert(mvalue && buf && buflen > 0);
 
 #if CEREBRO_DEBUG
-  if (mtype == CEREBRO_METRIC_VALUE_TYPE_NONE)
+  if (mtype == CEREBRO_DATA_VALUE_TYPE_NONE)
     mlen_flag = (mlen) ? 1 : 0;
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_INT32)
+  else if (mtype == CEREBRO_DATA_VALUE_TYPE_INT32)
     mlen_flag = (mlen != sizeof(int32_t)) ? 1 : 0;
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_U_INT32)
+  else if (mtype == CEREBRO_DATA_VALUE_TYPE_U_INT32)
     mlen_flag = (mlen != sizeof(u_int32_t)) ? 1 : 0;
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_FLOAT)
+  else if (mtype == CEREBRO_DATA_VALUE_TYPE_FLOAT)
     mlen_flag = (mlen != sizeof(float)) ? 1 : 0;
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_DOUBLE)
+  else if (mtype == CEREBRO_DATA_VALUE_TYPE_DOUBLE)
     mlen_flag = (mlen != sizeof(double)) ? 1 : 0;
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_STRING)
-    mlen_flag = (mlen > CEREBRO_MAX_METRIC_STRING_LEN) ? 1 : 0;
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_INT64)
+  else if (mtype == CEREBRO_DATA_VALUE_TYPE_STRING)
+    mlen_flag = (mlen > CEREBRO_MAX_DATA_STRING_LEN) ? 1 : 0;
+  else if (mtype == CEREBRO_DATA_VALUE_TYPE_INT64)
     mlen_flag = (mlen != sizeof(int64_t)) ? 1 : 0;
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_U_INT64)
+  else if (mtype == CEREBRO_DATA_VALUE_TYPE_U_INT64)
     mlen_flag = (mlen != sizeof(u_int64_t)) ? 1 : 0;
   else
     err_exit("%s: invalid metric type: %d", func, mtype);
@@ -450,27 +450,27 @@ _metric_value_str(unsigned int mtype,
     err_exit("%s: invalid metric length: %d %d", func, mtype, mlen);
 #endif /* CEREBRO_DEBUG */
 
-  if (mtype == CEREBRO_METRIC_VALUE_TYPE_NONE)
+  if (mtype == CEREBRO_DATA_VALUE_TYPE_NONE)
     rv = snprintf(buf, buflen, "%s", CEREBRO_STAT_NONE_STRING);
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_INT32)
+  else if (mtype == CEREBRO_DATA_VALUE_TYPE_INT32)
     rv = snprintf(buf, buflen, "%d", *((int32_t *)mvalue));
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_U_INT32)
+  else if (mtype == CEREBRO_DATA_VALUE_TYPE_U_INT32)
     rv = snprintf(buf, buflen, "%u", *((u_int32_t *)mvalue));
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_FLOAT)
+  else if (mtype == CEREBRO_DATA_VALUE_TYPE_FLOAT)
     rv = snprintf(buf, buflen, "%f", *((float *)mvalue));
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_DOUBLE)
+  else if (mtype == CEREBRO_DATA_VALUE_TYPE_DOUBLE)
     rv = snprintf(buf, buflen, "%f", *((double *)mvalue));
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_STRING)
+  else if (mtype == CEREBRO_DATA_VALUE_TYPE_STRING)
     rv = snprintf(buf, buflen, "%s", (char *)mvalue);
 #if SIZEOF_LONG == 4
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_INT64)
+  else if (mtype == CEREBRO_DATA_VALUE_TYPE_INT64)
     rv = snprintf(buf, buflen, "%lld", *((int64_t *)mvalue));
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_U_INT64)
+  else if (mtype == CEREBRO_DATA_VALUE_TYPE_U_INT64)
     rv = snprintf(buf, buflen, "%llu", *((u_int64_t *)mvalue));
 #else  /* SIZEOF_LONG == 8 */
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_INT64)
+  else if (mtype == CEREBRO_DATA_VALUE_TYPE_INT64)
     rv = snprintf(buf, buflen, "%ld", *((int64_t *)mvalue));
-  else if (mtype == CEREBRO_METRIC_VALUE_TYPE_U_INT64)
+  else if (mtype == CEREBRO_DATA_VALUE_TYPE_U_INT64)
     rv = snprintf(buf, buflen, "%lu", *((u_int64_t *)mvalue));
 #endif /* SIZEOF_LONG == 8 */
   

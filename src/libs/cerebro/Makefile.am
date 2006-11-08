@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.18.2.1 2006-11-06 05:54:13 chu11 Exp $
+## $Id: Makefile.am,v 1.18.2.2 2006-11-08 00:19:02 chu11 Exp $
 ##*****************************************************************************
 
 if WITH_GNU_LD
@@ -51,7 +51,7 @@ libcerebro_la_LIBADD  = ../cerebro_error/libcerebro_error.la \
 			../modules/libconfigmodules.la \
 			../modules/libmodules.la \
 			../util/libutil_config.la \
-			../util/libutil_metric.la \
+			../util/libutil_data.la \
 			../util/libutil_network.la \
 			$(LTDL_LIBS)
 
@@ -88,7 +88,7 @@ libcerebro_la_LIBADD  = ../cerebro_error/libcerebro_error.la \
 ../util/libutil_config.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
-../util/libutil_metric.la : force-dependency-check
+../util/libutil_data.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
 ../util/libutil_network.la : force-dependency-check

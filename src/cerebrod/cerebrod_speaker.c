@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.88.2.1 2006-10-30 00:58:34 chu11 Exp $
+ *  $Id: cerebrod_speaker.c,v 1.88.2.2 2006-11-08 00:19:02 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -54,7 +54,7 @@
 
 #include "debug.h"
 #include "metric_module.h"
-#include "metric_util.h"
+#include "data_util.h"
 #include "wrappers.h"
 
 extern struct cerebrod_config conf;
@@ -262,24 +262,24 @@ _heartbeat_marshall(struct cerebrod_heartbeat *hb,
 
       c += Marshall_buffer(mname, mnamelen, buf + c, buflen - c);
 
-      if (mtype == CEREBRO_METRIC_VALUE_TYPE_NONE && mlen)
+      if (mtype == CEREBRO_DATA_VALUE_TYPE_NONE && mlen)
         {
           CEREBRO_DBG(("adjusting metric len to 0"));
           mlen = 0;
         }
 
-      if (mtype == CEREBRO_METRIC_VALUE_TYPE_STRING && !mlen)
+      if (mtype == CEREBRO_DATA_VALUE_TYPE_STRING && !mlen)
         {
           CEREBRO_DBG(("adjusting metric type to none"));
-          mtype = CEREBRO_METRIC_VALUE_TYPE_NONE;
+          mtype = CEREBRO_DATA_VALUE_TYPE_NONE;
         }
 
-      if ((n = marshall_metric(mtype, 
-                               mlen,
-                               mvalue,
-                               buf + c,
-                               buflen - c,
-                               NULL)) < 0)
+      if ((n = marshall_data(mtype, 
+                             mlen,
+                             mvalue,
+                             buf + c,
+                             buflen - c,
+                             NULL)) < 0)
         goto cleanup;
       c += n;
     }

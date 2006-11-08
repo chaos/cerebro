@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_loadavg5.c,v 1.2 2006-08-27 04:43:40 chu11 Exp $
+ *  $Id: cerebro_metric_loadavg5.c,v 1.2.2.1 2006-11-08 00:19:02 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -130,7 +130,7 @@ loadavg5_metric_get_metric_value(unsigned int *metric_value_type,
 
   *loadavgptr = loadavg5;
 
-  *metric_value_type = CEREBRO_METRIC_VALUE_TYPE_FLOAT;
+  *metric_value_type = CEREBRO_DATA_VALUE_TYPE_FLOAT;
   *metric_value_len = sizeof(float);
   *metric_value = (void *)loadavgptr;
 

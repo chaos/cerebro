@@ -1,13 +1,13 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.8 2005-08-25 22:04:32 achu Exp $
+## $Id: Makefile.am,v 1.8.2.1 2006-11-08 00:19:02 chu11 Exp $
 ##*****************************************************************************
 
 noinst_HEADERS	   = config_util.h \
-		     metric_util.h \
+		     data_util.h \
 		     network_util.h
 
 noinst_LTLIBRARIES = libutil_config.la \
-		     libutil_metric.la \
+		     libutil_data.la \
 		     libutil_network.la
 
 libutil_config_la_CFLAGS  = -I$(srcdir)/../common \
@@ -16,10 +16,10 @@ libutil_config_la_CFLAGS  = -I$(srcdir)/../common \
 			    -I$(srcdir)/../modules
 libutil_config_la_SOURCES = config_util.c
 
-libutil_metric_la_CFLAGS  = -I$(srcdir)/../common \
-			    -I$(srcdir)/../debug \
-			    -I$(srcdir)/../include
-libutil_metric_la_SOURCES = metric_util.c
+libutil_data_la_CFLAGS  = -I$(srcdir)/../common \
+		          -I$(srcdir)/../debug \
+			  -I$(srcdir)/../include
+libutil_data_la_SOURCES = data_util.c
 
 libutil_network_la_CFLAGS  = -I$(srcdir)/../common \
 			     -I$(srcdir)/../debug \

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.126.2.2 2006-10-31 06:33:47 chu11 Exp $
+ *  $Id: cerebrod_listener.c,v 1.126.2.3 2006-11-08 00:19:02 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -56,7 +56,7 @@
 
 #include "clusterlist_module.h"
 #include "debug.h"
-#include "metric_util.h"
+#include "data_util.h"
 #include "wrappers.h"
 
 extern struct cerebrod_config conf;
@@ -309,28 +309,28 @@ _cerebrod_heartbeat_unmarshall(const char *buf, unsigned int buflen)
         goto cleanup;
       c += n;
       
-      if ((n = unmarshall_metric_type_len(&(hd->metric_value_type),
-                                          &(hd->metric_value_len),
-                                          buf + c, 
-                                          buflen - c,
-                                          NULL)) < 0)
+      if ((n = unmarshall_data_type_len(&(hd->metric_value_type),
+                                        &(hd->metric_value_len),
+                                        buf + c, 
+                                        buflen - c,
+                                        NULL)) < 0)
         goto cleanup;
       c += n;
       
-      if (check_metric_type_len(hd->metric_value_type, hd->metric_value_len) < 0)
+      if (check_data_type_len(hd->metric_value_type, hd->metric_value_len) < 0)
         goto cleanup;
 
       hd->metric_value = NULL;
       if (hd->metric_value_len)
         {
           hd->metric_value = Malloc(hd->metric_value_len);
-          if ((n = unmarshall_metric_value(hd->metric_value_type, 
-                                           hd->metric_value_len,
-                                           hd->metric_value,
-                                           hd->metric_value_len,
-                                           buf + c,
-                                           buflen - c,
-                                           NULL)) < 0)
+          if ((n = unmarshall_data_value(hd->metric_value_type, 
+                                         hd->metric_value_len,
+                                         hd->metric_value,
+                                         hd->metric_value_len,
+                                         buf + c,
+                                         buflen - c,
+                                         NULL)) < 0)
             goto cleanup;
           c += n;
         }
