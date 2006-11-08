@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_event_updown.c,v 1.1.2.8 2006-11-04 19:29:15 chu11 Exp $
+ *  $Id: cerebro_event_updown.c,v 1.1.2.9 2006-11-08 00:18:16 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -220,7 +220,7 @@ _create_event(const char *nodename, int state)
   event->err_code = CEREBRO_EVENT_SERVER_PROTOCOL_ERR_SUCCESS;
   strncpy(event->nodename, nodename, CEREBRO_MAX_NODENAME_LEN);
   strncpy(event->event_name, UPDOWN_EVENT_NAME, CEREBRO_MAX_EVENT_NAME_LEN);
-  event->event_value_type = CEREBRO_METRIC_VALUE_TYPE_INT32;
+  event->event_value_type = CEREBRO_DATA_VALUE_TYPE_INT32;
   event->event_value_len = sizeof(int32_t);
   if (!(event->event_value = malloc(sizeof(int32_t))))
     {
@@ -263,8 +263,8 @@ updown_event_node_timeout(const char *nodename,
         return -1;
     }
 
-#if 1
-  /* XXX - in here for debugging */
+#if 0
+  /* For debugging */
   if (*state == UPDOWN_EVENT_STATE_INIT)
     {
       struct cerebro_event *eventPtr = NULL;
