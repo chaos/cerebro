@@ -1,13 +1,10 @@
+
 Before Release
 - up age/lib stuff in configure.ac
 
 Portability
 - IPv6
 - Multicast
-
-Test
-
-Cleanup
 
 Future Features
 - controller
@@ -21,14 +18,9 @@ Future Features
 
 - listener
   - limit data receiving based on host list or subnet
-  - allow listening to multiple subnets/networks/ips/multciasts?
   - allow mixed listening
     i.e. accept heartbeats from nodes in genders database and
          nodes on a specific subnet. Would be useful for BGL.
-
-- event based monitoring
-
-- event based message generation/sending
 
 - Malloc looping
   - so can try to avoid dieing on low memory conditions
@@ -42,7 +34,6 @@ Enhancements
 - need way to send functions/pointers/etc. stuff between modules
   without keeping on adding functions.
 - logging/error output/something facility for modules
-- Fix modules loading so that max metrics config isn't required.
 
 Docs:
 user/admin guide
