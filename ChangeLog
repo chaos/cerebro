@@ -1,3 +1,9 @@
+2006-11-09  Albert Chu  <chu11@llnl.gov>
+
+	* src/cerebro-stat/cerebro-stat.c, man/cerebro-stat.8.in: Adjust
+	wording so "metric server" refers to a "metric server" or "event
+	server".
+	
 2006-11-08  Albert Chu  <chu11@llnl.gov>
 
 	* src/libs/include/Makefile.am: Add cerebro_event_protocol.h.
