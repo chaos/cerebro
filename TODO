@@ -1,4 +1,3 @@
-
 Before Release
 - up age/lib stuff in configure.ac
 
@@ -25,6 +24,10 @@ Future Features
 - Malloc looping
   - so can try to avoid dieing on low memory conditions
     (i.e. before the linux oom killer finishes its job)
+
+- speaker
+  - metrics can be per heartbeat or not
+    - specified via modules/controller
 
 Enhancements
 - Should pass config to modules so they can configure/setup 
