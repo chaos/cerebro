@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_event_node_timeout_monitor.c,v 1.2 2006-11-08 00:34:04 chu11 Exp $
+ *  $Id: cerebrod_event_node_timeout_monitor.c,v 1.3 2006-11-09 23:20:08 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -134,11 +134,11 @@ cerebrod_event_node_timeout_monitor(void *arg)
 {
   ListIterator timesitr;
 
+  _event_node_timeout_monitor_initialize();
+
   /* Don't bother if there aren't any event modules */
   if (!event_index)
     return NULL;
-
-  _event_node_timeout_monitor_initialize();
 
   timesitr = List_iterator_create(event_module_timeouts);
 

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metriclist_util.c,v 1.7 2005-07-22 17:21:07 achu Exp $
+ *  $Id: cerebro_namelist_util.c,v 1.1 2006-11-09 23:20:08 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -38,51 +38,51 @@
 
 #include "cerebro.h"
 #include "cerebro_api.h"
-#include "cerebro_metriclist_util.h"
+#include "cerebro_namelist_util.h"
 
 #include "debug.h"
 #include "list.h"
 
 int
-_cerebro_metriclist_check(cerebro_metriclist_t metriclist)
+_cerebro_namelist_check(cerebro_namelist_t namelist)
 {
-  if (!metriclist || metriclist->magic != CEREBRO_METRICLIST_MAGIC_NUMBER)
+  if (!namelist || namelist->magic != CEREBRO_NAMELIST_MAGIC_NUMBER)
     return -1;
                                                                                       
-  if (!metriclist->metric_names
-      || !metriclist->iterators
-      || !metriclist->handle)
+  if (!namelist->metric_names
+      || !namelist->iterators
+      || !namelist->handle)
     {
-      CEREBRO_DBG(("invalid metriclist data"));
-      metriclist->errnum = CEREBRO_ERR_INTERNAL;
+      CEREBRO_DBG(("invalid namelist data"));
+      namelist->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
                                                                                       
-  if (metriclist->handle->magic != CEREBRO_MAGIC_NUMBER)
+  if (namelist->handle->magic != CEREBRO_MAGIC_NUMBER)
     {
       CEREBRO_DBG(("handle destroyed"));
-      metriclist->errnum = CEREBRO_ERR_MAGIC_NUMBER;
+      namelist->errnum = CEREBRO_ERR_MAGIC_NUMBER;
       return -1;
     }
                                                                                       
   return 0;
 }
 
-cerebro_metriclist_t 
-_cerebro_metriclist_create(cerebro_t handle)
+cerebro_namelist_t 
+_cerebro_namelist_create(cerebro_t handle)
 {
-  cerebro_metriclist_t metriclist = NULL;
+  cerebro_namelist_t namelist = NULL;
 
-  if (!(metriclist = (cerebro_metriclist_t)malloc(sizeof(struct cerebro_metriclist))))
+  if (!(namelist = (cerebro_namelist_t)malloc(sizeof(struct cerebro_namelist))))
     {
       handle->errnum = CEREBRO_ERR_OUTMEM;
       goto cleanup;
     }
 
-  memset(metriclist, '\0', sizeof(struct cerebro_metriclist));
-  metriclist->magic = CEREBRO_METRICLIST_MAGIC_NUMBER;
+  memset(namelist, '\0', sizeof(struct cerebro_namelist));
+  namelist->magic = CEREBRO_NAMELIST_MAGIC_NUMBER;
 
-  if (!(metriclist->metric_names = list_create((ListDelF)free)))
+  if (!(namelist->metric_names = list_create((ListDelF)free)))
     {
       handle->errnum = CEREBRO_ERR_OUTMEM;
       goto cleanup;
@@ -91,61 +91,61 @@ _cerebro_metriclist_create(cerebro_t handle)
   /* No delete function, list_destroy() on 'metric_names' will take care of
    * deleting iterators.
    */
-  if (!(metriclist->iterators = list_create(NULL)))
+  if (!(namelist->iterators = list_create(NULL)))
     {
       handle->errnum = CEREBRO_ERR_OUTMEM;
       goto cleanup;
     }
 
-  if (!list_append(handle->metriclists, metriclist))
+  if (!list_append(handle->namelists, namelist))
     {
       CEREBRO_DBG(("list_append: %s", strerror(errno)));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       goto cleanup;
     }
   
-  metriclist->handle = handle;
+  namelist->handle = handle;
 
-  return metriclist;
+  return namelist;
       
  cleanup:
-  if (metriclist)
+  if (namelist)
     {
-      if (metriclist->metric_names)
-        list_destroy(metriclist->metric_names);
-      if (metriclist->iterators)
-        list_destroy(metriclist->iterators);
-      free(metriclist);
+      if (namelist->metric_names)
+        list_destroy(namelist->metric_names);
+      if (namelist->iterators)
+        list_destroy(namelist->iterators);
+      free(namelist);
     }
   return NULL;
 }
 
 int 
-_cerebro_metriclist_append(cerebro_metriclist_t metriclist, 
+_cerebro_namelist_append(cerebro_namelist_t namelist, 
                            const char *metric_name)
 {
   char *str = NULL;
 
-  if (_cerebro_metriclist_check(metriclist) < 0)
+  if (_cerebro_namelist_check(namelist) < 0)
     return -1;
 
   if (!metric_name || strlen(metric_name) > CEREBRO_MAX_METRIC_NAME_LEN)
     {
       CEREBRO_DBG(("metric_name invalid"));
-      metriclist->errnum = CEREBRO_ERR_INTERNAL;
+      namelist->errnum = CEREBRO_ERR_INTERNAL;
       goto cleanup;
     }
 
   if (!(str = strdup(metric_name)))
     {
-      metriclist->errnum = CEREBRO_ERR_OUTMEM;
+      namelist->errnum = CEREBRO_ERR_OUTMEM;
       goto cleanup;
     }
 
-  if (!list_append(metriclist->metric_names, str))
+  if (!list_append(namelist->metric_names, str))
     {
       CEREBRO_DBG(("list_append: %s", strerror(errno)));
-      metriclist->errnum = CEREBRO_ERR_INTERNAL;
+      namelist->errnum = CEREBRO_ERR_INTERNAL;
       goto cleanup;
     }
   

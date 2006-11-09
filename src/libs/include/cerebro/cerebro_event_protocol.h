@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_event_protocol.h,v 1.2 2006-11-08 00:34:04 chu11 Exp $
+ *  $Id: cerebro_event_protocol.h,v 1.3 2006-11-09 23:20:08 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -38,12 +38,18 @@
  * Client -> Server
  * - Event request.
  *
- * Server -> Client
+ * Server -> Client (If event requested)
  * - When events occur, respones with event data will be returned.
- *   Client is responsible for polling appropriately.  A single
- *   packet will be returned once at the beginning to signal
- *   if things were setup properly or if an error occurred.  After
- *   this the server will send events to the client appropriately.
+ *   Client is responsible for polling appropriately.  A single response
+ *   packet will be returned once at the beginning to signal if things
+ *   were setup properly or if an error occurred.  After this the server
+ *   will send events to the client when they occur.
+ *
+ * Server -> Client (If event names requested)
+ * - Stream of responses indicating event_names.  After the stream of
+ *   is complete, an "end of responses" response will indicate the end
+ *   of stream and completion of the request.  This "end of responses"
+ *   response will be sent even if no event names exist.
  *
  * Client -> Server
  * - Client can close the connection at any time by closing the 
@@ -66,6 +72,9 @@
 #define CEREBRO_EVENT_SERVER_PROTOCOL_ERR_PARAMETER_INVALID 3
 #define CEREBRO_EVENT_SERVER_PROTOCOL_ERR_PACKET_INVALID    4
 #define CEREBRO_EVENT_SERVER_PROTOCOL_ERR_INTERNAL_ERROR    5
+
+#define CEREBRO_EVENT_SERVER_PROTOCOL_IS_LAST_RESPONSE      1
+#define CEREBRO_EVENT_SERVER_PROTOCOL_IS_NOT_LAST_RESPONSE  0
 
 /*
  * struct cerebro_event_server_request
@@ -92,10 +101,14 @@ struct cerebro_event_server_response
 {
   int32_t version;
   u_int32_t err_code;
+  u_int8_t end;
+  char event_name[CEREBRO_MAX_EVENT_NAME_LEN];
 };
 
 #define CEREBRO_EVENT_SERVER_RESPONSE_LEN  (sizeof(int32_t) \
-                                            + sizeof(u_int32_t))
+                                            + sizeof(u_int32_t) \
+                                            + sizeof(u_int8_t) \
+                                            + CEREBRO_MAX_EVENT_NAME_LEN)
 
 /* 
  * struct cerebro_event

@@ -3,6 +3,26 @@
 	* src/cerebro-stat/cerebro-stat.c, man/cerebro-stat.8.in: Adjust
 	wording so "metric server" refers to a "metric server" or "event
 	server".
+
+	* src/cerebrod/cerebrod_event_server.h,
+	src/cerebrod/cerebrod_event.c, src/libs/include/cerebro.h,
+	src/libs/include/cerebro/cerebro_event_protocol.h,
+	src/libs/cerebro/cerebro_event.c, src/cerebro-stat/cerebro-stat.c:
+	Support 'event_names' retrieval.  Includes modification to
+	metriclist structures to be used generically for metric names or
+	event names.
+
+	* man/cerebro_get_event_names.3,
+	src/libs/cerebro/cerebro_event_names.c: New files.
+	
+	* src/cerebrod/cerebrod_metric_server.c: Various code cleanup.
+
+	* man/: Adjust manpages appropriately for new functions and
+	changes.
+
+	* man/: Various minor cleanup.
+
+	* src/cerebrod/: Fix various minor bugs.
 	
 2006-11-08  Albert Chu  <chu11@llnl.gov>
 

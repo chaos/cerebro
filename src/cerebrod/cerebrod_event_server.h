@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_event_server.h,v 1.2 2006-11-08 00:34:04 chu11 Exp $
+ *  $Id: cerebrod_event_server.h,v 1.3 2006-11-09 23:20:08 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -30,6 +30,8 @@
 
 #include "cerebro/cerebro_event_protocol.h"
 
+#include "list.h"
+
 /* 
  * struct cerebrod_event_to_send
  *
@@ -52,6 +54,17 @@ struct cerebrod_event_connection_data
 {
   char *event_name;
   int fd;
+};
+
+/*
+ * struct cerebrod_event_names_response_data
+ *
+ * Holds data for callback functions
+ */
+struct cerebrod_event_names_response_data
+{
+  int fd;
+  List responses;
 };
 
 /*

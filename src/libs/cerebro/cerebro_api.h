@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_api.h,v 1.10 2006-11-08 00:34:04 chu11 Exp $
+ *  $Id: cerebro_api.h,v 1.11 2006-11-09 23:20:08 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -43,8 +43,8 @@
  * Magic number for cerebro handle
  */
 #define CEREBRO_MAGIC_NUMBER                     0xF00F1234
-#define CEREBRO_METRICLIST_MAGIC_NUMBER          0xF00F2345
-#define CEREBRO_METRICLIST_ITERATOR_MAGIC_NUMBER 0xF00F3456
+#define CEREBRO_NAMELIST_MAGIC_NUMBER          0xF00F2345
+#define CEREBRO_NAMELIST_ITERATOR_MAGIC_NUMBER 0xF00F3456
 #define CEREBRO_NODELIST_MAGIC_NUMBER            0xF00F4567
 #define CEREBRO_NODELIST_ITERATOR_MAGIC_NUMBER   0xF00F5678
 
@@ -69,17 +69,17 @@ struct cerebro {
   int32_t loaded_state;
   struct cerebro_config config_data;
   clusterlist_module_t clusterlist_handle;
-  List metriclists;
+  List namelists;
   List nodelists;
   List event_fds;
 };
 
 /* 
- * struct cerebro_metriclist
+ * struct cerebro_namelist
  *
  * Used for nodelist interface
  */
-struct cerebro_metriclist {
+struct cerebro_namelist {
   int32_t magic;
   int32_t errnum;
   List metric_names;
@@ -88,16 +88,16 @@ struct cerebro_metriclist {
 };
 
 /* 
- * struct cerebro_metriclist_iterator
+ * struct cerebro_namelist_iterator
  *
  * Used for nodelist iterator interface
  */
-struct cerebro_metriclist_iterator {
+struct cerebro_namelist_iterator {
   int32_t magic;
   int32_t errnum;
   ListIterator itr;
   char *current;
-  struct cerebro_metriclist *metriclist;
+  struct cerebro_namelist *namelist;
 };
 
 /* 

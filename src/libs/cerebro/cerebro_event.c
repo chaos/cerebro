@@ -40,6 +40,7 @@
 #include "cerebro.h"
 #include "cerebro_api.h"
 #include "cerebro_config_util.h"
+#include "cerebro_namelist_util.h"
 #include "cerebro_util.h"
 
 #include "cerebro/cerebro_event_protocol.h"
@@ -236,6 +237,76 @@ _event_server_err_check(cerebro_t handle,
       return -1;
     }
 
+  /* Note: We don't care about the 'end' or the 'event_name' portions
+   * of the response when we're just looking for an error code.
+   */
+
+  return 0;
+}
+
+/*
+ * _event_server_response_unmarshall
+ *
+ * Unmarshall contents of a event server response
+ *
+ * Returns 0 on success, -1 on error
+ */
+static int
+_event_server_response_unmarshall(cerebro_t handle,
+                                  struct cerebro_event_server_response *res,
+                                  const char *buf,
+                                  unsigned int buflen)
+{
+  int n, bufPtrlen, c = 0;
+  char *bufPtr;
+
+  if (!res || !buf || buflen < CEREBRO_EVENT_SERVER_RESPONSE_LEN)
+    {
+      CEREBRO_DBG(("invalid pointers"));
+      handle->errnum = CEREBRO_ERR_INTERNAL;
+      return -1;
+    }
+
+  if ((n = unmarshall_int32(&(res->version), buf + c, buflen - c)) < 0)
+    {
+      CEREBRO_DBG(("unmarshall_int32"));
+      handle->errnum = CEREBRO_ERR_INTERNAL;
+      return -1;
+    }
+  c += n;
+
+  if ((n = unmarshall_u_int32(&(res->err_code), buf + c, buflen - c)) < 0)
+    {
+      CEREBRO_DBG(("unmarshall_u_int32"));
+      handle->errnum = CEREBRO_ERR_INTERNAL;
+      return -1;
+    }
+  c += n;
+
+  if ((n = unmarshall_u_int8(&(res->end), buf + c, buflen - c)) < 0)
+    {
+      CEREBRO_DBG(("unmarshall_u_int8"));
+      handle->errnum = CEREBRO_ERR_INTERNAL;
+      return -1;
+    }
+  c += n;
+
+  bufPtr = res->event_name;
+  bufPtrlen = sizeof(res->event_name);
+  if ((n = unmarshall_buffer(bufPtr, bufPtrlen, buf + c, buflen - c)) < 0)
+    {
+      CEREBRO_DBG(("unmarshall_buffer"));
+      handle->errnum = CEREBRO_ERR_INTERNAL;
+      return -1;
+    }
+  c += n;
+  
+  if (c != CEREBRO_EVENT_SERVER_RESPONSE_LEN)
+    {
+      handle->errnum = CEREBRO_ERR_PROTOCOL;
+      return -1;
+    }
+  
   return 0;
 }
 
@@ -253,8 +324,6 @@ _event_connection(cerebro_t handle,
                   unsigned int port,
                   int flags)
 {
-  char buf[CEREBRO_MAX_PACKET_LEN];
-  int bytes_read;
   unsigned int errnum;
   int fd = -1;
 
@@ -279,26 +348,6 @@ _event_connection(cerebro_t handle,
                                  fd,
                                  event_name,
                                  flags) < 0)
-    goto cleanup;
-
-  if ((bytes_read = receive_data(fd,
-                                 CEREBRO_EVENT_SERVER_RESPONSE_LEN,
-                                 buf,
-                                 CEREBRO_MAX_PACKET_LEN,
-                                 CEREBRO_EVENT_SERVER_PROTOCOL_CLIENT_TIMEOUT_LEN,
-                                 &errnum)) < 0)
-    {
-      handle->errnum = errnum;
-      goto cleanup;
-    }
-
-  if (bytes_read < CEREBRO_EVENT_SERVER_RESPONSE_LEN)
-    {
-      handle->errnum = CEREBRO_ERR_PROTOCOL;
-      goto cleanup;
-    }
-  
-  if (_event_server_err_check(handle, buf, bytes_read) < 0)
     goto cleanup;
 
   return fd;
@@ -406,10 +455,115 @@ _setup_event_connection(cerebro_t handle, const char *event_name)
   return -1;
 }
 
+/*
+ * _get_event_names
+ *
+ * Get event names and store it appropriately
+ *
+ * Returns 0 on success, -1 on error
+ */
+static int
+_get_event_names(cerebro_t handle,
+                 int fd,
+                 cerebro_namelist_t namelist)
+{
+  int rv = -1;
+
+  if (fd < 0 || !namelist)
+    {
+      CEREBRO_DBG(("invalid parameters"));
+      handle->errnum = CEREBRO_ERR_INTERNAL;
+      return -1;
+    }
+
+  while (1)
+    {
+      struct cerebro_event_server_response res;
+      char event_name_buf[CEREBRO_MAX_EVENT_NAME_LEN+1];
+      char buf[CEREBRO_MAX_PACKET_LEN];
+      int bytes_read;
+      unsigned int errnum;
+      
+      if ((bytes_read = receive_data(fd,
+                                     CEREBRO_EVENT_SERVER_RESPONSE_LEN,
+                                     buf,
+                                     CEREBRO_MAX_PACKET_LEN,
+                                     CEREBRO_EVENT_SERVER_PROTOCOL_CLIENT_TIMEOUT_LEN,
+                                     &errnum)) < 0)
+        {
+          handle->errnum = errnum;
+          goto cleanup;
+        }
+      
+      if (bytes_read < CEREBRO_EVENT_SERVER_RESPONSE_LEN)
+        {
+          handle->errnum = CEREBRO_ERR_PROTOCOL;
+          goto cleanup;
+        }
+      
+      if (_event_server_err_check(handle, buf, bytes_read) < 0)
+        goto cleanup;
+      
+      if (_event_server_response_unmarshall(handle,
+                                            &res,
+                                            buf,
+                                            bytes_read) < 0)
+        goto cleanup;
+      
+      if (res.end == CEREBRO_EVENT_SERVER_PROTOCOL_IS_LAST_RESPONSE)
+        break;
+      
+      /* Guarantee ending '\0' character */
+      memset(event_name_buf, '\0', CEREBRO_MAX_EVENT_NAME_LEN+1);
+      memcpy(event_name_buf, res.event_name, CEREBRO_MAX_EVENT_NAME_LEN);
+      
+      if (_cerebro_namelist_append(namelist, event_name_buf) < 0)
+        goto cleanup;
+    }
+
+  rv = 0;
+ cleanup:
+  close(fd);
+  return rv;
+}
+
+cerebro_namelist_t
+cerebro_get_event_names(cerebro_t handle)
+{
+  struct cerebro_namelist *namelist = NULL;
+  int fd = -1;
+
+  if (_cerebro_handle_check(handle) < 0)
+    goto cleanup;
+
+  if (!(namelist = _cerebro_namelist_create(handle)))
+    goto cleanup;
+
+  if ((fd = _setup_event_connection(handle, CEREBRO_EVENT_NAMES)) < 0)
+    goto cleanup;
+  
+  if (_get_event_names(handle, fd, namelist) < 0)
+    goto cleanup;
+
+  close(fd);
+  handle->errnum = CEREBRO_ERR_SUCCESS;
+  return namelist;
+
+ cleanup:
+  if (namelist)
+    (void)cerebro_namelist_destroy(namelist);
+  if (fd >= 0)
+    close(fd);
+  return NULL;
+}
+
 int
 cerebro_event_register(cerebro_t handle, const char *event_name)
 {
+  char buf[CEREBRO_MAX_PACKET_LEN];
+  int bytes_read;
   int fd = -1, *fdPtr = NULL;
+  unsigned int errnum;
 
   if (_cerebro_handle_check(handle) < 0)
     goto cleanup;
@@ -421,6 +575,26 @@ cerebro_event_register(cerebro_t handle, const char *event_name)
     }
   
   if ((fd = _setup_event_connection(handle, event_name)) < 0)
+    goto cleanup;
+
+  if ((bytes_read = receive_data(fd,
+                                 CEREBRO_EVENT_SERVER_RESPONSE_LEN,
+                                 buf,
+                                 CEREBRO_MAX_PACKET_LEN,
+                                 CEREBRO_EVENT_SERVER_PROTOCOL_CLIENT_TIMEOUT_LEN,
+                                 &errnum)) < 0)
+    {
+      handle->errnum = errnum;
+      goto cleanup;
+    }
+
+  if (bytes_read < CEREBRO_EVENT_SERVER_RESPONSE_LEN)
+    {
+      handle->errnum = CEREBRO_ERR_PROTOCOL;
+      goto cleanup;
+    }
+  
+  if (_event_server_err_check(handle, buf, bytes_read) < 0)
     goto cleanup;
 
   if (!(fdPtr = (int *)malloc(sizeof(int))))

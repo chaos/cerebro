@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_server_protocol.h,v 1.7 2006-02-22 06:08:28 chu11 Exp $
+ *  $Id: cerebro_metric_server_protocol.h,v 1.8 2006-11-09 23:20:08 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -37,7 +37,6 @@
  * - Metric request.
  * 
  * Server -> Client
-
  * - Stream of responses indicating metric_names or nodenames and
  *   metric values.  Respones may depend on the request flags.  Met ric
  *   receive times will be 0 for metrics in which a receive time makes no

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_server.c,v 1.38 2006-11-08 00:34:04 chu11 Exp $
+ *  $Id: cerebrod_metric_server.c,v 1.39 2006-11-09 23:20:08 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -680,13 +680,13 @@ _responses_send_all(int fd, List responses)
  * Return 0 on success, -1 on error
  */
 static int
-_respond_with_metric_names(int fd, struct cerebro_metric_server_request *req)
+_respond_with_metric_names(int fd)
 {
   struct cerebrod_metric_name_evaluation_data ed;
   List responses = NULL;
   int rv = -1;
 
-  assert(fd >= 0 && req);
+  assert(fd >= 0);
 
   memset(&ed, '\0', sizeof(struct cerebrod_metric_name_evaluation_data));
 
@@ -703,7 +703,7 @@ _respond_with_metric_names(int fd, struct cerebro_metric_server_request *req)
       CEREBRO_DBG(("list_create: %s", strerror(errno)));
       Pthread_mutex_unlock(&metric_names_lock);
       _metric_server_respond_with_error(fd, 
-                                        req->version, 
+                                        CEREBRO_METRIC_SERVER_PROTOCOL_VERSION, 
                                         CEREBRO_METRIC_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
       goto cleanup;
     }
@@ -711,11 +711,11 @@ _respond_with_metric_names(int fd, struct cerebro_metric_server_request *req)
   ed.fd = fd;
   ed.responses = responses;
 
-  if (Hash_for_each(metric_names, _metric_names_callback, &ed) < 0)
+  if (hash_for_each(metric_names, _metric_names_callback, &ed) < 0)
     {
       Pthread_mutex_unlock(&metric_names_lock);
       _metric_server_respond_with_error(fd,
-                                        req->version,
+                                        CEREBRO_METRIC_SERVER_PROTOCOL_VERSION,
                                         CEREBRO_METRIC_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
       goto cleanup;
     }
@@ -726,7 +726,7 @@ _respond_with_metric_names(int fd, struct cerebro_metric_server_request *req)
   if (_responses_send_all(fd, responses) < 0)
     {
       _metric_server_respond_with_error(fd,
-                                        req->version,
+                                        CEREBRO_METRIC_SERVER_PROTOCOL_VERSION,
                                         CEREBRO_METRIC_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
       goto cleanup;
     }
@@ -923,7 +923,7 @@ _metric_server_service_connection(void *arg)
   
   if (!strcmp(metric_name_buf, CEREBRO_METRIC_METRIC_NAMES))
     {
-      if (_respond_with_metric_names(fd, &req) < 0)
+      if (_respond_with_metric_names(fd) < 0)
         goto cleanup;
     }
   else
@@ -934,7 +934,7 @@ _metric_server_service_connection(void *arg)
 
  cleanup:
   Free(arg);
-  Close(fd);
+  close(fd);
   return NULL;
 }
 

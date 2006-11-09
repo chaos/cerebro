@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro_get_metric_names.3,v 1.4 2006-11-09 23:20:08 chu11 Exp $
+\."$Id: cerebro_get_event_names.3,v 1.1 2006-11-09 23:20:08 chu11 Exp $
 \."#############################################################################
 \."  Copyright (C) 2005 The Regents of the University of California.
 \."  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -23,22 +23,22 @@
 \."  with Cerebro; if not, write to the Free Software Foundation, Inc.,
 \."  59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.
 \."#############################################################################
-.TH CEREBRO_GET_METRIC_NAMES 3 "May 2005" "LLNL" "LIBCEREBRO"
+.TH CEREBRO_GET_EVENT_NAMES 3 "May 2005" "LLNL" "LIBCEREBRO"
 .SH "NAME"
-cerebro_get_metric_names \- retrieve available cerebro metric names
+cerebro_get_event_names \- retrieve available cerebro event names
 .SH "SYNOPSIS"
 .B #include <cerebro.h>
 .sp
-.BI "cerebro_namelist_t cerebro_get_metric_names(cerebro_t handle);"
+.BI "cerebro_namelist_t cerebro_get_event_names(cerebro_t handle);"
 .br
 .SH "DESCRIPTION"
-\fBcerebro_get_metric_names()\fR retrieves a list of metric names available for 
-retrieval with
-.B cerebro_get_metric_data(3).
-The metric names are returned in a cerebro namelist.  The cerebro
+\fBcerebro_get_event_names()\fR retrieves a list of event names available for 
+registration with
+.B cerebro_event_register(3).
+The event names are returned in a cerebro namelist.  The cerebro
 namelist can then be operated on by the cerebro namelist routines.
 
-The default behavior of \fBcerebro_get_metric_names()\fR can be altered by
+The default behavior of \fBcerebro_get_event_names()\fR can be altered by
 setting alternate defaults using
 .B cerebro_set_hostname(3),
 or
@@ -72,12 +72,12 @@ Invalid hostname specified.
 .B CEREBRO_ERR_CONNECT
 Error connecting to 
 .B cerebrod
-metric server.
+event server.
 .TP
 .B CEREBRO_ERR_CONNECT_TIMEOUT
 Timed out connecting to
 .B cerebrod
-metric server.
+event server.
 .TP
 .B CEREBRO_ERR_PROTOCOL
 Error during protocol communication.
@@ -86,7 +86,7 @@ Error during protocol communication.
 Timeout during protocol communication.
 .TP
 .B CEREBRO_ERR_VERSION_INCOMPATIBLE
-Version incompatible with the metric server.
+Version incompatible with the event server.
 .TP
 .B CEREBRO_ERR_CONFIG_FILE
 A config file error occurred.

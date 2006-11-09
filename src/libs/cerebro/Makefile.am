@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.19 2006-11-08 00:34:04 chu11 Exp $
+## $Id: Makefile.am,v 1.20 2006-11-09 23:20:08 chu11 Exp $
 ##*****************************************************************************
 
 if WITH_GNU_LD
@@ -15,7 +15,7 @@ noinst_HEADERS	       = cerebro_api.h \
 			 cerebro_clusterlist_util.h \
 			 cerebro_config_util.h \
 			 cerebro_metric_util.h \
-			 cerebro_metriclist_util.h \
+			 cerebro_namelist_util.h \
 			 cerebro_nodelist_util.h \
 			 cerebro_util.h
 
@@ -34,8 +34,8 @@ libcerebro_la_SOURCES = cerebro.c \
 			cerebro_metric_data.c \
 			cerebro_metric_names.c \
 			cerebro_metric_util.c \
-			cerebro_metriclist.c \
-			cerebro_metriclist_util.c \
+			cerebro_namelist.c \
+			cerebro_namelist_util.c \
 			cerebro_nodelist.c \
 			cerebro_nodelist_util.c \
 			cerebro_util.c

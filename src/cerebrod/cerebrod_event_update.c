@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_event_update.c,v 1.2 2006-11-08 00:34:04 chu11 Exp $
+ *  $Id: cerebrod_event_update.c,v 1.3 2006-11-09 23:20:08 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -125,6 +125,18 @@ int event_node_timeout_data_index_size;
  * and event_node_timeout_data_index
  */
 pthread_mutex_t event_node_timeout_data_lock = PTHREAD_MUTEX_INITIALIZER;
+
+/*
+ * event_queue
+ * event_queue_cond
+ * event_queue_lock
+ *
+ * queue of events to send out and the conditional variable and mutex
+ * for exclusive access and signaling.
+ */
+List event_queue = NULL;
+pthread_cond_t event_queue_cond = PTHREAD_COND_INITIALIZER;
+pthread_mutex_t event_queue_lock = PTHREAD_MUTEX_INITIALIZER;
 
 /*
  * _cerebrod_event_module_info_destroy
@@ -296,6 +308,22 @@ _setup_event_node_timeout_data(void)
       event_node_timeout_data_index =  NULL;
     }
   return -1;
+}
+
+/* 
+ * _cerebrod_event_to_send_destroy
+ */
+static void
+_cerebrod_event_to_send_destroy(void *x)
+{
+  struct cerebrod_event_to_send *ets;
+
+  assert(x);
+  assert(event_handle);
+
+  ets = (struct cerebrod_event_to_send *)x;
+  event_module_destroy(event_handle, ets->index, ets->event);
+  Free(ets);
 }
 
 /*
@@ -510,6 +538,15 @@ cerebrod_event_modules_setup(void)
 
   if (_setup_event_node_timeout_data() < 0)
     goto cleanup;
+
+  /* 
+   * Since the cerebrod listener is started before any of the event
+   * threads (node_timeout, queue_monitor, server), this must be
+   * created in here (which is called by the listener) to avoid a
+   * possible race of modules creating events before the event_queue
+   * is created.
+   */
+  event_queue = List_create((ListDelF)_cerebrod_event_to_send_destroy);
 
   return 1;
   

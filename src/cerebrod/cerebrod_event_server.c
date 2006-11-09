@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_event_server.c,v 1.2 2006-11-08 00:34:04 chu11 Exp $
+ *  $Id: cerebrod_event_server.c,v 1.3 2006-11-09 23:20:08 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -89,18 +89,6 @@ pthread_cond_t event_queue_monitor_init_cond = PTHREAD_COND_INITIALIZER;
 pthread_mutex_t event_queue_monitor_init_lock = PTHREAD_MUTEX_INITIALIZER;
 
 /* 
- * event_queue
- * event_queue_cond
- * event_queue_lock
- *
- * queue of events to send out and the conditional variable and mutex
- * for exclusive access and signaling.
- */
-List event_queue = NULL;
-pthread_cond_t event_queue_cond = PTHREAD_COND_INITIALIZER;
-pthread_mutex_t event_queue_lock = PTHREAD_MUTEX_INITIALIZER;
-
-/* 
  * event_connections
  * event_connections_index
  * event_connections_lock
@@ -114,6 +102,10 @@ pthread_mutex_t event_connections_lock = PTHREAD_MUTEX_INITIALIZER;
 extern event_modules_t event_handle;
 extern hash_t event_index;
 extern List event_names;
+
+extern List event_queue;
+extern pthread_cond_t event_queue_cond;
+extern pthread_mutex_t event_queue_lock;
 
 void
 cerebrod_queue_event(struct cerebro_event *event, unsigned int index)
@@ -136,22 +128,6 @@ cerebrod_queue_event(struct cerebro_event *event, unsigned int index)
   Pthread_mutex_unlock(&event_queue_lock);
 }
 
-/* 
- * _cerebrod_event_to_send_destroy
- */
-static void
-_cerebrod_event_to_send_destroy(void *x)
-{
-  struct cerebrod_event_to_send *ets;
-
-  assert(x);
-  assert(event_handle);
-
-  ets = (struct cerebrod_event_to_send *)x;
-  event_module_destroy(event_handle, ets->index, ets->event);
-  Free(ets);
-}
-
 /*
  * _event_queue_monitor_initialize
  *
@@ -164,7 +140,10 @@ _event_queue_monitor_initialize(void)
   if (event_queue_monitor_init)
     goto out;
 
-  event_queue = List_create((ListDelF)_cerebrod_event_to_send_destroy);
+  /* Note:
+   * See comments in cerebrod_event_update about why the event_queue
+   * is initialized there.
+   */
 
   event_queue_monitor_init++;
   Pthread_cond_signal(&event_queue_monitor_init_cond);
@@ -302,6 +281,10 @@ cerebrod_event_queue_monitor(void *arg)
 {
   _event_queue_monitor_initialize();
 
+  /* Don't bother if there isn't an event queue (i.e. no event modules) */
+  if (!event_queue)
+    return NULL;
+
   /* 
    * achu: The listener and thus event update initialization is
    * started after this thread is started.  So the and event_index may
@@ -408,13 +391,15 @@ _event_server_initialize(void)
    * queue_monitor initialization but before the server
    * initialization).
    */
-  assert(event_names);
-  event_names_count = List_count(event_names);
-  event_connections = List_create((ListDelF)free);
-  event_connections_index = Hash_create(event_names_count,
-                                        (hash_key_f)hash_key_string,
-                                        (hash_cmp_f)strcmp,
-                                        (hash_del_f)list_destroy);
+  if (event_names)
+    {
+      event_names_count = List_count(event_names);
+      event_connections = List_create((ListDelF)free);
+      event_connections_index = Hash_create(event_names_count,
+                                            (hash_key_f)hash_key_string,
+                                            (hash_cmp_f)strcmp,
+                                            (hash_del_f)list_destroy);
+    }
 
   Signal(SIGPIPE, SIG_IGN);
 
@@ -538,25 +523,63 @@ _event_server_response_marshall(struct cerebro_event_server_response *res,
                                 char *buf,
                                 unsigned int buflen)
 {
-  int len = 0;
+  int bufPtrlen, c = 0;
+  char *bufPtr;
   
   assert(res && buf && buflen >= CEREBRO_EVENT_SERVER_RESPONSE_LEN);
   
   memset(buf, '\0', buflen);
-  len += Marshall_int32(res->version, buf + len, buflen - len);
-  len += Marshall_u_int32(res->err_code, buf + len, buflen - len);
-  return len;
+  
+  c += Marshall_int32(res->version, buf + c, buflen - c);
+  c += Marshall_u_int32(res->err_code, buf + c, buflen - c);
+  c += Marshall_u_int8(res->end, buf + c, buflen - c);
+  bufPtr = res->event_name;
+  bufPtrlen = sizeof(res->event_name);
+  c += Marshall_buffer(bufPtr, bufPtrlen, buf + c, buflen - c);
+  return c;
 }
 
 /*
- * _event_server_response
+ * _event_server_response_send
  *
  * respond to the event_server_request with an error
  *
  * Return 0 on success, -1 on error
  */
 static int
-_event_server_response(int fd, int32_t version, u_int32_t err_code)
+_event_server_response_send(int fd, 
+                            struct cerebro_event_server_response *res)
+{
+  char buf[CEREBRO_MAX_PACKET_LEN];
+  int res_len;
+
+  assert(fd >= 0 && res);
+
+  if ((res_len = _event_server_response_marshall(res, 
+                                                 buf, 
+                                                 CEREBRO_MAX_PACKET_LEN)) < 0)
+    return -1;
+
+  if (fd_write_n(fd, buf, res_len) < 0)
+    {
+      CEREBRO_DBG(("fd_write_n: %s", strerror(errno)));
+      return -1;
+    }
+
+  return 0;
+}
+
+/*
+ * _event_server_err_only_response
+ *
+ * respond to the event_server_request with an error
+ *
+ * Return 0 on success, -1 on error
+ */
+static int
+_event_server_err_only_response(int fd, 
+                                int32_t version, 
+                                u_int32_t err_code)
 {
   struct cerebro_event_server_response res;
   char buf[CEREBRO_MAX_PACKET_LEN];
@@ -569,6 +592,7 @@ _event_server_response(int fd, int32_t version, u_int32_t err_code)
   memset(&res, '\0', CEREBRO_EVENT_SERVER_RESPONSE_LEN);
   res.version = version;
   res.err_code = err_code;
+  res.end = CEREBRO_EVENT_SERVER_PROTOCOL_IS_LAST_RESPONSE;
 
   if ((res_len = _event_server_response_marshall(&res, 
                                                  buf, 
@@ -689,6 +713,186 @@ _event_names_compare(void *x, void *key)
 }
 
 /*
+ * _event_names_callback
+ *
+ * Callback function to create event name responses
+ *
+ * Return 0 on success, -1 on error
+ */
+static int
+_event_names_callback(void *data, void *arg)
+{
+  struct cerebrod_event_names_response_data *enr;
+  struct cerebro_event_server_response *res = NULL;
+  char *event_name;
+
+  assert(data && arg);
+
+  event_name = (char *)data;
+  enr = (struct cerebrod_event_names_response_data *)arg;
+
+  if (!(res = malloc(sizeof(struct cerebro_event_server_response))))
+    {
+      CEREBRO_DBG(("malloc: %s", strerror(errno)));
+      goto cleanup;
+    }
+
+  memset(res, '\0', sizeof(struct cerebro_event_server_response));
+  res->version = CEREBRO_EVENT_SERVER_PROTOCOL_VERSION;
+  res->err_code = CEREBRO_EVENT_SERVER_PROTOCOL_ERR_SUCCESS;
+  res->end = CEREBRO_EVENT_SERVER_PROTOCOL_IS_NOT_LAST_RESPONSE;
+  /* strncpy, b/c terminating character not required */
+  strncpy(res->event_name, event_name, CEREBRO_MAX_EVENT_NAME_LEN);
+
+  if (!list_append(enr->responses, res))
+    {
+      CEREBRO_DBG(("list_append: %s", strerror(errno)));
+      goto cleanup;
+    }
+
+  return 0;
+
+ cleanup:
+  if (res)
+    free(res);
+  return -1;
+}
+
+/*
+ * _event_names_send_callback
+ *
+ * Callback function to send all responses
+ */
+static int
+_event_names_send_callback(void *x, void *arg)
+{
+  struct cerebro_event_server_response *res;
+  int fd;
+
+  assert(x && arg);
+
+  res = (struct cerebro_event_server_response *)x;
+  fd = *((int *)arg);
+
+  if (_event_server_response_send(fd, res) < 0)
+    return -1;
+
+  return 0;
+}
+
+/*
+ * _send_event_names
+ *
+ * Send responses
+ *
+ * Returns 0 on success, -1 on error
+ */
+static int
+_send_event_names(int fd, List responses)
+{
+  assert(responses);
+
+  if (List_count(responses))
+    {
+      if (list_for_each(responses,
+                        _event_names_send_callback,
+                        &fd) < 0)
+        return -1;
+    }
+
+  return 0;
+}
+
+/*
+ * _send_event_names_end_response
+ *
+ * Send end event server response
+ *
+ * Returns 0 on success, -1 on error
+ */
+static int
+_send_event_names_end_response(int fd)
+{
+  struct cerebro_event_server_response end_res;
+
+  /* Send end response */
+  memset(&end_res, '\0', sizeof(struct cerebro_event_server_response));
+  end_res.version = CEREBRO_EVENT_SERVER_PROTOCOL_VERSION;
+  end_res.err_code = CEREBRO_EVENT_SERVER_PROTOCOL_ERR_SUCCESS;
+  end_res.end = CEREBRO_EVENT_SERVER_PROTOCOL_IS_LAST_RESPONSE;
+
+  if (_event_server_response_send(fd, &end_res) < 0)
+    return -1;
+
+  return 0;
+}
+
+/*
+ * _respond_with_event_names
+ *
+ * Return 0 on success, -1 on error
+ */
+static int
+_respond_with_event_names(void *arg)
+{
+  struct cerebrod_event_names_response_data enr;
+  List responses = NULL;
+  int fd, rv = -1;
+
+  assert(arg);
+
+  fd = *((int *)arg);
+  
+  if (!event_names)
+    goto end_response;
+
+  if (!List_count(event_names))
+    goto end_response;
+
+  if (!(responses = list_create((ListDelF)free)))
+    {
+      CEREBRO_DBG(("list_create: %s", strerror(errno)));
+      _event_server_err_only_response(fd,
+                                      CEREBRO_EVENT_SERVER_PROTOCOL_VERSION,
+                                      CEREBRO_EVENT_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
+      goto cleanup;
+    }
+
+  enr.fd = fd;
+  enr.responses = responses;
+
+  /* Event names is not changeable - so no need for a lock */
+  if (list_for_each(event_names, _event_names_callback, &enr) < 0)
+    {
+      _event_server_err_only_response(fd,
+                                      CEREBRO_EVENT_SERVER_PROTOCOL_VERSION,
+                                      CEREBRO_EVENT_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
+      goto cleanup;
+    }
+
+  if (_send_event_names(fd, responses) < 0)
+    {
+      _event_server_err_only_response(fd,
+                                      CEREBRO_EVENT_SERVER_PROTOCOL_VERSION,
+                                      CEREBRO_EVENT_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
+      goto cleanup;
+    }
+
+ end_response:
+  if (_send_event_names_end_response(fd) < 0)
+    goto cleanup;
+
+  rv = 0;
+ cleanup:
+  if (responses)
+    list_destroy(responses);
+  Free(arg);
+  close(fd);
+  return rv;
+}
+
+
+/*
  * _event_server_service_connection
  *
  * Service a connection from a client to receive event packets.  Use
@@ -725,25 +929,25 @@ _event_server_service_connection(int fd)
 
   if (_event_server_request_check_version(buf, recv_len, &version) < 0)
     {
-      _event_server_response(fd,
-                             version,
-                             CEREBRO_EVENT_SERVER_PROTOCOL_ERR_VERSION_INVALID);
+      _event_server_err_only_response(fd,
+                                      version,
+                                      CEREBRO_EVENT_SERVER_PROTOCOL_ERR_VERSION_INVALID);
       goto cleanup;
     }
 
   if (recv_len != CEREBRO_EVENT_SERVER_REQUEST_PACKET_LEN)
     {
-      _event_server_response(fd,
-                             version,
-                             CEREBRO_EVENT_SERVER_PROTOCOL_ERR_PACKET_INVALID);
+      _event_server_err_only_response(fd,
+                                      version,
+                                      CEREBRO_EVENT_SERVER_PROTOCOL_ERR_PACKET_INVALID);
       goto cleanup;
     }
 
   if (_event_server_request_unmarshall(&req, buf, recv_len) < 0)
     {
-      _event_server_response(fd,
-                             version,
-                             CEREBRO_EVENT_SERVER_PROTOCOL_ERR_PACKET_INVALID);
+      _event_server_err_only_response(fd,
+                                      version,
+                                      CEREBRO_EVENT_SERVER_PROTOCOL_ERR_PACKET_INVALID);
       goto cleanup;
     }
 
@@ -755,9 +959,37 @@ _event_server_service_connection(int fd)
 
   if (!strlen(event_name_buf))
     {
-      _event_server_response(fd,
-                             req.version,
-                             CEREBRO_EVENT_SERVER_PROTOCOL_ERR_EVENT_INVALID);
+      _event_server_err_only_response(fd,
+                                      req.version,
+                                      CEREBRO_EVENT_SERVER_PROTOCOL_ERR_EVENT_INVALID);
+      goto cleanup;
+    }
+
+  /* Is it the special event-names request */
+  if (!strcmp(event_name_buf, CEREBRO_EVENT_NAMES))
+    {
+      pthread_t thread;
+      pthread_attr_t attr;
+      int *arg;
+
+      Pthread_attr_init(&attr);
+      Pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+      Pthread_attr_setstacksize(&attr, CEREBROD_THREAD_STACKSIZE);
+      arg = Malloc(sizeof(int));
+      *arg = fd;
+      Pthread_create(&thread,
+                     &attr,
+                     _respond_with_event_names,
+                     (void *)arg);
+      Pthread_attr_destroy(&attr);
+      return;
+    }
+
+  if (!event_names)
+    {
+      _event_server_err_only_response(fd,
+                                      req.version,
+                                      CEREBRO_EVENT_SERVER_PROTOCOL_ERR_EVENT_INVALID);
       goto cleanup;
     }
 
@@ -766,18 +998,18 @@ _event_server_service_connection(int fd)
                                          _event_names_compare,
                                          event_name_buf)))
     {
-      _event_server_response(fd,
-                             req.version,
-                             CEREBRO_EVENT_SERVER_PROTOCOL_ERR_EVENT_INVALID);
+      _event_server_err_only_response(fd,
+                                      req.version,
+                                      CEREBRO_EVENT_SERVER_PROTOCOL_ERR_EVENT_INVALID);
       goto cleanup;
     }
   
   if (!(ecd = (struct cerebrod_event_connection_data *)malloc(sizeof(struct cerebrod_event_connection_data))))
     {
       CEREBRO_DBG(("malloc: %s", strerror(errno)));
-      _event_server_response(fd,
-                             req.version,
-                             CEREBRO_EVENT_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
+      _event_server_err_only_response(fd,
+                                      req.version,
+                                      CEREBRO_EVENT_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
       goto cleanup;
     }
   
@@ -787,9 +1019,9 @@ _event_server_service_connection(int fd)
   if (!list_append(event_connections, ecd))
     {
       CEREBRO_DBG(("list_append: %s", strerror(errno)));
-      _event_server_response(fd,
-                             req.version,
-                             CEREBRO_EVENT_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
+      _event_server_err_only_response(fd,
+                                      req.version,
+                                      CEREBRO_EVENT_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
       goto cleanup;
     }
 
@@ -799,18 +1031,18 @@ _event_server_service_connection(int fd)
       if (!(connections = list_create((ListDelF)free)))
         {
           CEREBRO_DBG(("list_create: %s", strerror(errno)));
-          _event_server_response(fd,
-                                 req.version,
-                                 CEREBRO_EVENT_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
+          _event_server_err_only_response(fd,
+                                          req.version,
+                                          CEREBRO_EVENT_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
           goto cleanup;
         }
 
       if (!Hash_insert(event_connections_index, ecd->event_name, connections))
         {
           CEREBRO_DBG(("list_create: %s", strerror(errno)));
-          _event_server_response(fd,
-                                 req.version,
-                                 CEREBRO_EVENT_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
+          _event_server_err_only_response(fd,
+                                          req.version,
+                                          CEREBRO_EVENT_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
           list_destroy(connections);
           goto cleanup;
         }
@@ -819,9 +1051,9 @@ _event_server_service_connection(int fd)
   if (!(fdptr = (int *)malloc(sizeof(int))))
     {
       CEREBRO_DBG(("malloc: %s", strerror(errno)));
-      _event_server_response(fd,
-                             req.version,
-                             CEREBRO_EVENT_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
+      _event_server_err_only_response(fd,
+                                      req.version,
+                                      CEREBRO_EVENT_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
       goto cleanup;
     }
 
@@ -830,9 +1062,9 @@ _event_server_service_connection(int fd)
   if (!list_append(connections, fdptr))
     {
       CEREBRO_DBG(("malloc: %s", strerror(errno)));
-      _event_server_response(fd,
-                             req.version,
-                             CEREBRO_EVENT_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
+      _event_server_err_only_response(fd,
+                                      req.version,
+                                      CEREBRO_EVENT_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
       goto cleanup;
       
     }
@@ -840,9 +1072,9 @@ _event_server_service_connection(int fd)
   /* Clear this pointer so we know it's stored away in a list */
   fdptr = NULL;
 
-  _event_server_response(fd,
-                         req.version,
-                         CEREBRO_EVENT_SERVER_PROTOCOL_ERR_SUCCESS);
+  _event_server_err_only_response(fd,
+                                  req.version,
+                                  CEREBRO_EVENT_SERVER_PROTOCOL_ERR_SUCCESS);
 
   return;
   
@@ -870,15 +1102,16 @@ cerebrod_event_server(void *arg)
       ListIterator eitr;
       struct cerebrod_event_connection_data *ecd;
       struct pollfd *pfds;
-      int pfdslen;
+      int pfdslen = 0;
       int i;
 
-       /* Note that the list_count won't grow larger after the first
-        * mutex block, b/c the cerebrod_event_queue_monitor thread can
-        * never add to the event_connections.  It can only shrink it.
-        */
+      /* Note that the list_count won't grow larger after the first
+       * mutex block, b/c the cerebrod_event_queue_monitor thread can
+       * never add to the event_connections.  It can only shrink it.
+       */
       Pthread_mutex_lock(&event_connections_lock);
-      pfdslen = List_count(event_connections);
+      if (event_connections)
+        pfdslen = List_count(event_connections);
       Pthread_mutex_unlock(&event_connections_lock);
 
       /* The + 1 is b/c of the server_fd. */
@@ -891,18 +1124,22 @@ cerebrod_event_server(void *arg)
       pfds[0].events = POLLIN;
       pfds[0].revents = 0;
 
-      i = 1;
-      Pthread_mutex_lock(&event_connections_lock);
-      eitr = List_iterator_create(event_connections);
-      while ((ecd = list_next(eitr)))
+      /* No 'event_connections' if there are no events */
+      if (event_connections)
         {
-          pfds[i].fd = ecd->fd;
-          pfds[i].events = POLLIN;
-          pfds[i].revents = 0;
-          i++;
+          i = 1;
+          Pthread_mutex_lock(&event_connections_lock);
+          eitr = List_iterator_create(event_connections);
+          while ((ecd = list_next(eitr)))
+            {
+              pfds[i].fd = ecd->fd;
+              pfds[i].events = POLLIN;
+              pfds[i].revents = 0;
+              i++;
+            }
+          List_iterator_destroy(eitr);
+          Pthread_mutex_unlock(&event_connections_lock);
         }
-      List_iterator_destroy(eitr);
-      Pthread_mutex_unlock(&event_connections_lock);
       
       Poll(pfds, pfdslen, -1);
 

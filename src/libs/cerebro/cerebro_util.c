@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_util.c,v 1.6 2005-08-08 21:41:48 achu Exp $
+ *  $Id: cerebro_util.c,v 1.7 2006-11-09 23:20:08 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -44,9 +44,9 @@ _cerebro_handle_check(cerebro_t handle)
   if (!handle || handle->magic != CEREBRO_MAGIC_NUMBER)
     return -1;
 
-  if (!handle->metriclists)
+  if (!handle->namelists)
     {
-      CEREBRO_DBG(("metriclists null"));
+      CEREBRO_DBG(("namelists null"));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }

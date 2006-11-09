@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_nodelist.c,v 1.10 2005-07-26 20:14:19 achu Exp $
+ *  $Id: cerebro_nodelist.c,v 1.11 2006-11-09 23:20:08 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -179,7 +179,7 @@ _cerebro_nodelist_iterator_check(cerebro_nodelist_iterator_t nodelistItr)
 
   if (!nodelistItr->itr || !nodelistItr->nodelist)
     {
-      CEREBRO_DBG(("invalid metriclist iterator data"));
+      CEREBRO_DBG(("invalid namelist iterator data"));
       nodelistItr->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }

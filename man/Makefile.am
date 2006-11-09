@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.33 2006-11-08 00:34:03 chu11 Exp $
+## $Id: Makefile.am,v 1.34 2006-11-09 23:20:08 chu11 Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -9,8 +9,8 @@ man3_MANS  = libcerebro.3 \
 	     cerebro_handle_create.3 \
 	     cerebro_handle_destroy.3 \
 	     cerebro_errnum.3 \
-	     cerebro_metriclist_errnum.3 \
-	     cerebro_metriclist_iterator_errnum.3 \
+	     cerebro_namelist_errnum.3 \
+	     cerebro_namelist_iterator_errnum.3 \
 	     cerebro_nodelist_errnum.3 \
 	     cerebro_nodelist_iterator_errnum.3 \
 	     cerebro_strerror.3 \
@@ -22,6 +22,7 @@ man3_MANS  = libcerebro.3 \
 	     cerebro_set_timeout_len.3 \
 	     cerebro_get_flags.3 \
 	     cerebro_set_flags.3 \
+	     cerebro_get_event_names.3 \
 	     cerebro_event_register.3 \
 	     cerebro_event_unregister.3 \
 	     cerebro_event_parse.3 \
@@ -33,14 +34,14 @@ man3_MANS  = libcerebro.3 \
 	     cerebro_update_metric_value.3 \
 	     cerebro_resend_metric.3 \
 	     cerebro_flush_metric.3 \
-	     cerebro_metriclist_length.3 \
-	     cerebro_metriclist_destroy.3 \
-	     cerebro_metriclist_iterator_create.3 \
-	     cerebro_metriclist_iterator_next.3 \
-	     cerebro_metriclist_iterator_reset.3 \
-	     cerebro_metriclist_iterator_at_end.3 \
-	     cerebro_metriclist_iterator_metric_name.3 \
-	     cerebro_metriclist_iterator_destroy.3 \
+	     cerebro_namelist_length.3 \
+	     cerebro_namelist_destroy.3 \
+	     cerebro_namelist_iterator_create.3 \
+	     cerebro_namelist_iterator_next.3 \
+	     cerebro_namelist_iterator_reset.3 \
+	     cerebro_namelist_iterator_at_end.3 \
+	     cerebro_namelist_iterator_name.3 \
+	     cerebro_namelist_iterator_destroy.3 \
 	     cerebro_nodelist_metric_name.3 \
 	     cerebro_nodelist_length.3 \
 	     cerebro_nodelist_destroy.3 \
@@ -65,8 +66,8 @@ EXTRA_DIST = libcerebro.3 \
 	     cerebro_handle_create.3 \
 	     cerebro_handle_destroy.3 \
 	     cerebro_errnum.3 \
-	     cerebro_metriclist_errnum.3 \
-	     cerebro_metriclist_iterator_errnum.3 \
+	     cerebro_namelist_errnum.3 \
+	     cerebro_namelist_iterator_errnum.3 \
 	     cerebro_nodelist_errnum.3 \
 	     cerebro_nodelist_iterator_errnum.3 \
 	     cerebro_strerror.3 \
@@ -78,6 +79,7 @@ EXTRA_DIST = libcerebro.3 \
 	     cerebro_set_timeout_len.3 \
 	     cerebro_get_flags.3 \
 	     cerebro_set_flags.3 \
+	     cerebro_get_event_names.3 \
 	     cerebro_event_register.3 \
 	     cerebro_event_unregister.3 \
 	     cerebro_event_parse.3 \
@@ -89,14 +91,14 @@ EXTRA_DIST = libcerebro.3 \
 	     cerebro_update_metric_value.3 \
 	     cerebro_resend_metric.3 \
 	     cerebro_flush_metric.3 \
-	     cerebro_metriclist_length.3 \
-	     cerebro_metriclist_destroy.3 \
-	     cerebro_metriclist_iterator_create.3 \
-	     cerebro_metriclist_iterator_next.3 \
-	     cerebro_metriclist_iterator_reset.3 \
-	     cerebro_metriclist_iterator_at_end.3 \
-	     cerebro_metriclist_iterator_metric_name.3 \
-	     cerebro_metriclist_iterator_destroy.3 \
+	     cerebro_namelist_length.3 \
+	     cerebro_namelist_destroy.3 \
+	     cerebro_namelist_iterator_create.3 \
+	     cerebro_namelist_iterator_next.3 \
+	     cerebro_namelist_iterator_reset.3 \
+	     cerebro_namelist_iterator_at_end.3 \
+	     cerebro_namelist_iterator_name.3 \
+	     cerebro_namelist_iterator_destroy.3 \
 	     cerebro_nodelist_metric_name.3 \
 	     cerebro_nodelist_length.3 \
 	     cerebro_nodelist_destroy.3 \

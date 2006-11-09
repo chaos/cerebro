@@ -37,7 +37,7 @@
 
 #include "cerebro.h"
 #include "cerebro_api.h"
-#include "cerebro_metriclist_util.h"
+#include "cerebro_namelist_util.h"
 #include "cerebro_util.h"
 
 #include "cerebro/cerebro_metric_server_protocol.h"
@@ -63,7 +63,7 @@ _receive_metric_name_response(cerebro_t handle,
                               int fd)
 {
   char metric_name_buf[CEREBRO_MAX_METRIC_NAME_LEN+1];
-  struct cerebro_metriclist *metriclist;
+  struct cerebro_namelist *namelist;
 
   if (_cerebro_handle_check(handle) < 0)
     {
@@ -79,8 +79,8 @@ _receive_metric_name_response(cerebro_t handle,
       goto cleanup;
     }
 
-  metriclist = (struct cerebro_metriclist *)list;
-  if (metriclist->magic != CEREBRO_METRICLIST_MAGIC_NUMBER)
+  namelist = (struct cerebro_namelist *)list;
+  if (namelist->magic != CEREBRO_NAMELIST_MAGIC_NUMBER)
     {
       CEREBRO_DBG(("invalid parameters"));
       handle->errnum = CEREBRO_ERR_INTERNAL;
@@ -97,7 +97,7 @@ _receive_metric_name_response(cerebro_t handle,
   memset(metric_name_buf, '\0', CEREBRO_MAX_METRIC_NAME_LEN+1);
   memcpy(metric_name_buf, res->name, CEREBRO_MAX_METRIC_NAME_LEN);
   
-  if (_cerebro_metriclist_append(metriclist, metric_name_buf) < 0)
+  if (_cerebro_namelist_append(namelist, metric_name_buf) < 0)
     goto cleanup;
 
   return 0;
@@ -106,19 +106,19 @@ _receive_metric_name_response(cerebro_t handle,
   return -1;
 }
 
-cerebro_metriclist_t 
+cerebro_namelist_t 
 cerebro_get_metric_names(cerebro_t handle)
 {
-  struct cerebro_metriclist *metriclist = NULL;
+  struct cerebro_namelist *namelist = NULL;
 
   if (_cerebro_handle_check(handle) < 0)
     goto cleanup;
 
-  if (!(metriclist = _cerebro_metriclist_create(handle)))
+  if (!(namelist = _cerebro_namelist_create(handle)))
     goto cleanup;
 
   if (_cerebro_metric_get_data(handle,
-                               metriclist,
+                               namelist,
                                CEREBRO_METRIC_METRIC_NAMES,
                                _receive_metric_name_response) < 0)
     goto cleanup;
@@ -126,10 +126,10 @@ cerebro_get_metric_names(cerebro_t handle)
                                             
   
   handle->errnum = CEREBRO_ERR_SUCCESS;
-  return metriclist;
+  return namelist;
   
  cleanup:
-  if (metriclist)
-    (void)cerebro_metriclist_destroy(metriclist);
+  if (namelist)
+    (void)cerebro_namelist_destroy(namelist);
   return NULL;
 }

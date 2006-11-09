@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro-stat.8.in,v 1.6 2006-11-09 17:36:50 chu11 Exp $
+\."$Id: cerebro-stat.8.in,v 1.7 2006-11-09 23:20:08 chu11 Exp $
 \."#############################################################################
 \."  Copyright (C) 2005 The Regents of the University of California.
 \."  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -65,6 +65,12 @@ Cerebrod server hostname (default=localhost)
 .B \-p \fIINT\fR, \fB\-\-port\fR=\fIINT\fR
 Cerebrod server port (default=8649)
 .TP
+.B -z, --event-list
+List all available events that can be queried
+.TP
+.B -e \fISTRING\fR, \fB\-\-event\fR=\fISTRING\fR
+Register and wait for specified events to occur
+.TP
 .B -l, --metric-list
 List all available metrics that can be queried
 .TP
@@ -91,9 +97,6 @@ Output nodes in hostrange foramt
 .B -t, --metric-received-time
 Output last metric received time along with metric value.  Only
 available when outputting in newline format.
-.TP
-.B -e \fISTRING\fR, \fB\-\-event\fR=\fISTRING\fR
-Register and wait for specified events to occur
 .if @MANPAGE_DEBUG@ \{
 .TP
 .B  -d, --debug

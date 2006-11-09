@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metriclist_util.h,v 1.2 2005-07-22 17:21:07 achu Exp $
+ *  $Id: cerebro_namelist_util.h,v 1.1 2006-11-09 23:20:08 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -25,38 +25,38 @@
  *  59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.
 \*****************************************************************************/
 
-#ifndef _CEREBRO_METRICLIST_UTIL_H
-#define _CEREBRO_METRICLIST_UTIL_H
+#ifndef _CEREBRO_NAMELIST_UTIL_H
+#define _CEREBRO_NAMELIST_UTIL_H
 
 #include "cerebro.h"
 
 /*
- * _cerebro_metriclist_check
+ * _cerebro_namelist_check
  *
- * Checks for a proper cerebro metriclist, setting the errnum
+ * Checks for a proper cerebro namelist, setting the errnum
  * appropriately if an error is found.
  *
  * Returns 0 on success, -1 on error
  */
-int _cerebro_metriclist_check(cerebro_metriclist_t metriclist);
+int _cerebro_namelist_check(cerebro_namelist_t namelist);
 
 /* 
- * _cerebro_metriclist_create
+ * _cerebro_namelist_create
  *
- * Create and initialize a metriclist 
+ * Create and initialize a namelist 
  *
- * Returns metriclist on success, NULL on error
+ * Returns namelist on success, NULL on error
  */
-cerebro_metriclist_t _cerebro_metriclist_create(cerebro_t handle);
+cerebro_namelist_t _cerebro_namelist_create(cerebro_t handle);
 
 /*
- * _cerebro_metriclist_append
+ * _cerebro_namelist_append
  * 
- * Append additional metriclist data
+ * Append additional namelist data
  *
  * Returns 0 on success, -1 on error
  */
-int _cerebro_metriclist_append(cerebro_metriclist_t metriclist,
+int _cerebro_namelist_append(cerebro_namelist_t namelist,
                                const char *metric_name);
 
-#endif /* _CEREBRO_METRICLIST_UTIL_H */
+#endif /* _CEREBRO_NAMELIST_UTIL_H */

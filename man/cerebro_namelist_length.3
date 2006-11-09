@@ -1,0 +1,131 @@
+\."#############################################################################
+\."$Id: cerebro_namelist_length.3,v 1.1 2006-11-09 23:20:08 chu11 Exp $
+\."#############################################################################
+\."  Copyright (C) 2005 The Regents of the University of California.
+\."  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
+\."  Written by Albert Chu <chu11@llnl.gov>.
+\."  UCRL-CODE-155989 All rights reserved.
+\."
+\."  This file is part of Cerebro, a collection of cluster monitoring tools
+\."  and libraries.  For details, see <http://www.llnl.gov/linux/cerebro/>.
+\."
+\."  Cerebro is free software; you can redistribute it and/or modify it under
+\."  the terms of the GNU General Public License as published by the Free
+\."  Software Foundation; either version 2 of the License, or (at your option)
+\."  any later version.
+\."
+\."  Cerebro is distributed in the hope that it will be useful, but WITHOUT ANY
+\."  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+\."  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+\."  details.
+\."
+\."  You should have received a copy of the GNU General Public License along
+\."  with Cerebro; if not, write to the Free Software Foundation, Inc.,
+\."  59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.
+\."#############################################################################
+.TH CEREBRO_NAMELIST_LENGTH 3 "May 2005" "LLNL" "LIBCEREBRO"
+.SH "NAME"
+cerebro_namelist_length,
+cerebro_namelist_destroy, cerebro_namelist_iterator_create,
+cerebro_namelist_iterator_name,
+cerebro_namelist_iterator_next, cerebro_namelist_iterator_reset,
+cerebro_namelist_iterator_at_end,
+cerebro_namelist_iterator_destroy \- cerebro namelist routines
+.SH "SYNOPSIS"
+.B #include <cerebro.h>
+.sp
+.BI "int cerebro_namelist_length(cerebro_namelist_t namelist);
+.sp
+.BI "int cerebro_namelist_destroy(cerebro_namelist_t namelist);"
+.sp
+.BI "cerebro_namelist_iterator_t cerebro_namelist_iterator_create(cerebro_namelist_t namelist);"
+.sp
+.BI "int cerebro_namelist_iterator_name(cerebro_namelist_iterator_t namelistItr, char **name);"
+.sp
+.BI "int cerebro_namelist_iterator_next(cerebro_namelist_iterator_t namelistItr);"
+.sp
+.BI "int cerebro_namelist_iterator_reset(cerebro_namelist_iterator_t namelistItr);"
+.sp
+.BI "int cerebro_namelist_iterator_at_end(cerebro_namelist_iterator_t namelistItr);"
+.sp
+.BI "int cerebro_namelist_iterator_destroy(cerebro_namelist_iterator_t namelistItr);"
+.br
+.SH "DESCRIPTION"
+\fBcerebro_namelist_length\fR retrieves the number of metric names
+stored in the namelist.
+
+\fBcerebro_namelist_destroy\fR destroys the cerebro namelist pointed
+by \fInamelist\fR.  All namelist iterators created using the indicated
+namelist will also be destroyed.
+
+\fBcerebro_namelist_iterator_create\fR creates a cerebro namelist iterator.
+
+\fBcerebro_namelist_iterator_name\fR returns the name
+currently pointed at in the iterator.
+
+\fBcerebro_namelist_iterator_next\fR moves the iterator pointer forward.
+
+\fBcerebro_namelist_iterator_reset\fR resets the iterator pointer back
+to the beginning.
+
+\fBcerebro_namelist_iterator_at_end\fR returns a flag indicating if
+the end of the namelist has been reached.
+
+\fBcerebro_namelist_iterator_destroy\fR destroys the cerebro namelist
+iterator pointed by \fInamelistItr\fR.
+
+.br
+.SH "RETURN VALUES"
+For \fBcerebro_namelist_length\fR, the length of the list is returned
+on success.  On error, -1 is returned.
+
+For \fBcerebro_namelist_iterator_create\fR, a cerebro namelist
+iterator is returned on success.  On error, NULL is returned.
+
+For \fBcerebro_namelist_iterator_next\fR, 1 is returned if more data
+exists, 0 if not, On error, -1 is returned.
+
+For \fBcerebro_namelist_iterator_at_end\fR, 1 is returned if the end
+of the list has been reached, 0 if not.  On error, -1 is returned.
+
+For fBcerebro_namelist_destroy\fR,
+\fBcerebro_namelist_iterator_name\fR,
+\fBcerebro_namelist_iterator_reset\fR, and
+\fBcerebro_namelist_iterator_destroy\fR, 0 is returned on success.  On
+error -1 is returned.
+
+On errors, an error code is returned in \fInamelist\fR or
+\fInamelistItr\fR.  The error code can be retrieved via
+.BR cerebro_namelist_errnum(3) or
+.BR cerebro_namelist_iterator_errnum(3) respectively
+, and a description of the error code can be retrieved via
+.BR cerebro_strerror(3).  
+.br
+.SH "ERRORS"
+.TP
+.B CEREBRO_ERR_NULLNAMELIST
+The \fInamelist\fR parameter is NULL.
+.B CEREBRO_ERR_NULLNAMELIST_ITERATOR
+The \fInamelistItr\fR parameter is NULL.
+.TP
+.B CEREBRO_ERR_MAGIC_NUMBER
+\fInamelist\fR or \fInamelistItr\fR has an incorrect magic number.
+\fInamelist\fR or \fInamelistItr\fR does not point to a an appropriate
+structure or has already been destroyed.
+.TP
+.B CEREBRO_ERR_PARAMETERS
+Invalid parameter passed in.
+.TP
+.B CEREBRO_ERR_END_OF_LIST
+The end of the list has been reached.
+.TP
+.B CEREBRO_ERR_OUTMEM
+Out of memory.
+.TP
+.B CEREBRO_ERR_INTERNAL
+An internal system error occurred.
+.br
+.SH "FILES"
+/usr/include/cerebro.h
+.SH "SEE ALSO"
+cerebro_errnum(3), cerebro_strerror(3)
