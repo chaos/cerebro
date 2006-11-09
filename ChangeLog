@@ -22,7 +22,7 @@
 
 	* man/: Various minor cleanup.
 
-	* src/cerebrod/: Fix various minor bugs.
+	* src/cerebrod/: Fix bug fixes and code cleanup.
 	
 2006-11-08  Albert Chu  <chu11@llnl.gov>
 
