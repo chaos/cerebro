@@ -1,3 +1,7 @@
+2006-11-08  Albert Chu  <chu11@llnl.gov>
+
+	* src/libs/include/Makefile.am: Add cerebro_event_protocol.h.
+	
 2006-11-07  Albert Chu  <chu11@llnl.gov>
 
 	Add Cerebro Event Monitoring Support (from branch
