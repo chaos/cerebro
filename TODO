@@ -29,9 +29,6 @@ Future Features
   - metrics can be per heartbeat or not
     - specified via modules/controller
 
-- event
-  - event_names
-
 Enhancements
 - Should pass config to modules so they can configure/setup 
   based on various conditions.
