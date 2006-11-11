@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_controller.c,v 1.37 2006-11-08 00:34:04 chu11 Exp $
+ *  $Id: cerebrod_metric_controller.c,v 1.37.2.1 2006-11-11 00:46:02 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -52,11 +52,13 @@
 #include "cerebro/cerebro_constants.h"
 
 #include "cerebro/cerebro_metric_control_protocol.h"
+#include "cerebro/cerebrod_heartbeat_protocol.h"
 
 #include "cerebrod.h"
 #include "cerebrod_config.h"
 #include "cerebrod_listener_data.h"
 #include "cerebrod_metric_controller.h"
+#include "cerebrod_speaker.h"
 #include "cerebrod_speaker_data.h"
 #include "cerebrod_util.h"
 
@@ -231,6 +233,7 @@ _metric_control_request_header_unmarshall(struct cerebro_metric_control_request 
   bufPtrlen = sizeof(req->metric_name);
   c += Unmarshall_int32(&(req->version), buf + c, buflen - c);
   c += Unmarshall_int32(&(req->command), buf + c, buflen - c);
+  c += Unmarshall_u_int32(&(req->flags), buf + c, buflen - c);
   c += Unmarshall_buffer(bufPtr, bufPtrlen, buf + c, buflen - c);
   c += Unmarshall_u_int32(&(req->metric_value_type), buf + c, buflen - c);
   c += Unmarshall_u_int32(&(req->metric_value_len), buf + c, buflen - c);
@@ -286,6 +289,7 @@ _metric_control_request_dump(struct cerebro_metric_control_request *req)
   fprintf(stderr, "* ------------------------\n");
   fprintf(stderr, "* Version: %d\n", req->version);
   fprintf(stderr, "* Command: %d\n", req->command);
+  fprintf(stderr, "* Flags: %X\n", req->flags);
   /* Guarantee ending '\0' character */
   memset(metric_name_buf, '\0', CEREBRO_MAX_METRIC_NAME_LEN+1);
   memcpy(metric_name_buf, req->metric_name, CEREBRO_MAX_METRIC_NAME_LEN);
@@ -540,6 +544,104 @@ _receive_metric_value(int fd,
 }
 
 /* 
+ * _send_heartbeat_now
+ *
+ * Send the metric info now rather than waiting for the next heartbeat
+ *
+ * Returns 0 on success, -1 on error
+ */
+static int
+_send_heartbeat_now(int fd, 
+                    int32_t version,
+                    const char *metric_name,
+                    u_int32_t metric_value_type,
+                    u_int32_t metric_value_len,
+                    void *metric_value)
+{
+  struct cerebrod_heartbeat *hb = NULL;
+  struct cerebrod_heartbeat_metric *hd = NULL;
+  char nodename[CEREBRO_MAX_NODENAME_LEN+1];
+  int rv = -1;
+
+  assert(fd >= 0 
+         && metric_name 
+         && conf.speak);
+
+  if (!(hb = (struct cerebrod_heartbeat *)malloc(sizeof(struct cerebrod_heartbeat))))
+    {
+      CEREBRO_DBG(("malloc: %s", strerror(errno)));
+      _send_metric_control_response(fd,
+                                    version,
+                                    CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_INTERNAL_ERROR);
+      goto cleanup;
+    }
+  
+  memset(nodename, '\0', CEREBRO_MAX_NODENAME_LEN+1);
+  if (gethostname(nodename, CEREBRO_MAX_NODENAME_LEN) < 0)
+    {
+      CEREBRO_DBG(("gethostname: %s", strerror(errno)));
+      _send_metric_control_response(fd,
+                                    version,
+                                    CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_INTERNAL_ERROR);
+      goto cleanup;
+    }
+  
+  hb->version = CEREBROD_HEARTBEAT_PROTOCOL_VERSION;
+  memcpy(hb->nodename, nodename, CEREBRO_MAX_NODENAME_LEN);
+
+  hb->metrics_len = 1;
+  if (!(hb->metrics = (struct cerebrod_heartbeat_metric **)malloc(sizeof(struct cerebrod_heartbeat_metric *)*(hb->metrics_len + 1))))
+    {
+      CEREBRO_DBG(("malloc: %s", strerror(errno)));
+      _send_metric_control_response(fd,
+                                    version,
+                                    CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_INTERNAL_ERROR);
+      goto cleanup;
+    }
+  memset(hb->metrics, '\0', sizeof(struct cerebrod_heartbeat_metric *)*(hb->metrics_len + 1));
+
+  if (!(hd = (struct cerebrod_heartbeat_metric *)malloc(sizeof(struct cerebrod_heartbeat_metric))))
+    {
+      CEREBRO_DBG(("malloc: %s", strerror(errno)));
+      _send_metric_control_response(fd,
+                                    version,
+                                    CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_INTERNAL_ERROR);
+      goto cleanup;
+    }
+  memset(hd, '\0', sizeof(struct cerebrod_heartbeat_metric));
+
+  /* need not overflow */
+  strncpy(hd->metric_name, metric_name, CEREBRO_MAX_METRIC_NAME_LEN);
+  
+  hd->metric_value_type = metric_value_type;
+  hd->metric_value_len = metric_value_len;
+  hd->metric_value = metric_value;
+
+  hb->metrics[0] = hd;
+
+  if (cerebrod_send_heartbeat(hb) < 0)
+    {
+      CEREBRO_DBG(("cerebrod_send_heartbeat"));
+      _send_metric_control_response(fd,
+                                    version,
+                                    CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_INTERNAL_ERROR);
+      goto cleanup;
+    }
+
+  rv = 0;
+ cleanup:
+  if (hb)
+    {
+      if (hb->metrics)
+        free(hb->metrics);
+      free(hb);
+    }
+  if (hd)
+    free(hd);
+  return rv;
+}
+
+/* 
  * _update_metric
  *
  * Update the metric type, len, and data for a metric
@@ -605,7 +707,13 @@ _update_metric(int fd,
   if (metric_info->metric_value)
     Free(metric_info->metric_value);
 
-  metric_info->next_call_time = 0;
+  /* If we have to send it now, don't bother waiting for a heartbeat
+   * to come along later by setting next_call_time to UINT_MAX.
+   */
+  if (req->flags & CEREBRO_METRIC_CONTROL_FLAGS_SEND_NOW)
+    metric_info->next_call_time = UINT_MAX;
+  else
+    metric_info->next_call_time = 0;
   metric_info->metric_value_type = req->metric_value_type;
   metric_info->metric_value_len = req->metric_value_len;
   metric_info->metric_value = req->metric_value;
@@ -614,6 +722,18 @@ _update_metric(int fd,
   /* Don't Free() req->metric_value, needs to be pointed at by
    * 'metric_info->metric_value'
    */
+
+  if (req->flags & CEREBRO_METRIC_CONTROL_FLAGS_SEND_NOW)
+    {
+      if (_send_heartbeat_now(fd, 
+                              version,
+                              metric_name,
+                              req->metric_value_type,
+                              req->metric_value_len,
+                              req->metric_value) < 0)
+        goto cleanup;
+    }
+
   return 0;
 
  cleanup:
@@ -629,12 +749,18 @@ _update_metric(int fd,
  * Returns 0 on success, -1 on error
  */
 static int
-_resend_metric(int fd, int32_t version, const char *metric_name)
+_resend_metric(int fd, 
+               int32_t version, 
+               const char *metric_name,
+               struct cerebro_metric_control_request *req)
 {
   struct cerebrod_speaker_metric_info *metric_info;
+  u_int32_t metric_value_type, metric_value_len;
+  void *metric_value_copy = NULL;
+    
   int rv = -1;
 
-  assert(fd >= 0 && metric_name && conf.speak);
+  assert(fd >= 0 && metric_name && req && conf.speak);
 
   Pthread_mutex_lock(&metric_list_lock);
   
@@ -657,12 +783,42 @@ _resend_metric(int fd, int32_t version, const char *metric_name)
       goto cleanup;
     }
   
-  metric_info->next_call_time = 0;
+  /* If we have to send it now, don't bother waiting for a heartbeat
+   * to come along later by setting next_call_time to UINT_MAX.
+   */
+  if (req->flags & CEREBRO_METRIC_CONTROL_FLAGS_SEND_NOW)
+    {
+      metric_info->next_call_time = UINT_MAX;
+
+      /* Copy data so we don't have to send data w/n a mutex section */
+      metric_value_type = metric_info->metric_value_type;
+      metric_value_len = metric_info->metric_value_len;
+      metric_value_copy = (void *)Malloc(metric_info->metric_value_len);
+      memcpy(metric_value_copy, 
+             metric_info->metric_value,
+             metric_info->metric_value_len);
+    }
+  else
+    metric_info->next_call_time = 0;
+
   cerebrod_speaker_data_metric_list_sort();
+  Pthread_mutex_unlock(&metric_list_lock);
+
+  if (req->flags & CEREBRO_METRIC_CONTROL_FLAGS_SEND_NOW)
+    {
+      if (_send_heartbeat_now(fd, 
+                              version,
+                              metric_name,
+                              metric_value_type,
+                              metric_value_len,
+                              metric_value_copy) < 0)
+        goto cleanup;
+    }
 
   rv = 0;
  cleanup:
-  Pthread_mutex_unlock(&metric_list_lock);
+  if (metric_value_copy)
+    Free(metric_value_copy);
   return rv;
 }
 
@@ -902,7 +1058,7 @@ _metric_controller_service_connection(void *arg)
   else if (req.command == CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_RESEND 
            && conf.speak)
     {
-      if (_resend_metric(fd, version, metric_name_buf) < 0)
+      if (_resend_metric(fd, version, metric_name_buf, &req) < 0)
         goto cleanup;
       _speaker_metric_names_dump();
     }

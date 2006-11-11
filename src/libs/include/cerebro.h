@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.24 2006-11-09 23:20:08 chu11 Exp $
+ *  $Id: cerebro.h,v 1.24.2.1 2006-11-11 00:46:02 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -64,10 +64,11 @@
  * Cerebro Flags
  */
 
-#define CEREBRO_METRIC_FLAGS_UP_ONLY               0x00000001
-#define CEREBRO_METRIC_FLAGS_NONE_IF_DOWN          0x00000002
-#define CEREBRO_METRIC_FLAGS_NONE_IF_NOT_MONITORED 0x00000004
-#define CEREBRO_METRIC_FLAGS_MASK                  0x00000007
+#define CEREBRO_METRIC_DATA_FLAGS_UP_ONLY               0x00000001
+#define CEREBRO_METRIC_DATA_FLAGS_NONE_IF_DOWN          0x00000002
+#define CEREBRO_METRIC_DATA_FLAGS_NONE_IF_NOT_MONITORED 0x00000004
+#define CEREBRO_METRIC_CONTROL_FLAGS_SEND_NOW           0x00000008
+#define CEREBRO_METRIC_FLAGS_MASK                       0x0000000F
 
 /* 
  * Cerebro Data Value Types
