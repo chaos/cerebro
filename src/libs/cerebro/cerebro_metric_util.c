@@ -506,7 +506,8 @@ _cerebro_metric_get_data(cerebro_t handle,
             }
           flags = handle->config_data.cerebro_flags;
         }
-      flags = CEREBRO_METRIC_SERVER_FLAGS_DEFAULT;
+      else
+        flags = CEREBRO_METRIC_SERVER_FLAGS_DEFAULT;
     }
   else
     flags = handle->flags;
