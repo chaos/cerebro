@@ -286,13 +286,13 @@ _cmdline_parse(int argc, char **argv)
         metric_name = optarg;
         break;
       case 'U':
-        _cerebro_set_flags(CEREBRO_METRIC_FLAGS_UP_ONLY);
+        _cerebro_set_flags(CEREBRO_METRIC_DATA_FLAGS_UP_ONLY);
         break;
       case 'D':
-        _cerebro_set_flags(CEREBRO_METRIC_FLAGS_NONE_IF_DOWN);
+        _cerebro_set_flags(CEREBRO_METRIC_DATA_FLAGS_NONE_IF_DOWN);
         break;
       case 'N':
-        _cerebro_set_flags(CEREBRO_METRIC_FLAGS_NONE_IF_NOT_MONITORED);
+        _cerebro_set_flags(CEREBRO_METRIC_DATA_FLAGS_NONE_IF_NOT_MONITORED);
         break;
       case 'n':
         output_type = CEREBRO_STAT_NEWLINE;

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro-admin.c,v 1.11 2006-11-08 00:34:04 chu11 Exp $
+ *  $Id: cerebro-admin.c,v 1.12 2006-11-11 05:46:55 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -135,7 +135,8 @@ _usage(void)
           "     %d - string\n"
           "     %d - int64\n"
           "     %d - u_int64\n"
-          "  -l STRING  Specify metric value\n",
+          "  -l STRING  Specify metric value\n"
+          "  -N         Propogate updated data immediately\n",
           CEREBRO_DATA_VALUE_TYPE_NONE,
           CEREBRO_DATA_VALUE_TYPE_INT32,
           CEREBRO_DATA_VALUE_TYPE_U_INT32,
@@ -165,6 +166,32 @@ _version(void)
   exit(1);
 }
 
+/*
+ * _cerebro_set_flags
+ *
+ * Set a cerebro flag
+ */
+static void
+_cerebro_set_flags(unsigned int new_flag)
+{
+  const char *func = __FUNCTION__;
+  int flags;
+
+  if ((flags = cerebro_get_flags(handle)) < 0)
+    {
+      char *msg = cerebro_strerror(cerebro_errnum(handle));
+      err_exit("%s: cerebro_get_flags: %s", func, msg);
+    }
+
+  flags |= new_flag;
+
+  if (cerebro_set_flags(handle, flags) < 0)
+    {
+      char *msg = cerebro_strerror(cerebro_errnum(handle));
+      err_exit("%s: cerebro_set_flags: %s", func, msg);
+    }
+}
+
 /* 
  * _cmdline_parse
  *
@@ -190,6 +217,7 @@ _cmdline_parse(int argc, char **argv)
       {"flush",             0, NULL, 'f'},
       {"metric-value-type", 1, NULL, 't'},
       {"metric-value",      1, NULL, 'l'},
+      {"send-now",          0, NULL, 'N'},
 #if CEREBRO_DEBUG
       {"debug",       0, NULL, 'd'},
 #endif /* CEREBRO_DEBUG */
@@ -199,7 +227,7 @@ _cmdline_parse(int argc, char **argv)
 
   assert(argv);
 
-  strcpy(options, "hvm:rupsft:l:");
+  strcpy(options, "hvm:rupsft:l:N");
 #if CEREBRO_DEBUG
   strcat(options, "d");
 #endif /* CEREBRO_DEBUG */
@@ -246,6 +274,9 @@ _cmdline_parse(int argc, char **argv)
         break;
       case 'l':
         metric_value = optarg;
+        break;
+      case 'N':
+        _cerebro_set_flags(CEREBRO_METRIC_CONTROL_FLAGS_SEND_NOW);
         break;
 #if CEREBRO_DEBUG
       case 'd':

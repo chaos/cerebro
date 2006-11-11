@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_server.c,v 1.39 2006-11-09 23:20:08 chu11 Exp $
+ *  $Id: cerebrod_metric_server.c,v 1.40 2006-11-11 05:46:55 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -547,11 +547,11 @@ _metric_data_evaluate(void *x, const void *key, void *arg)
     }
   else 
     {
-      if (ed->req->flags & CEREBRO_METRIC_FLAGS_UP_ONLY
+      if (ed->req->flags & CEREBRO_METRIC_DATA_FLAGS_UP_ONLY
           && !((ed->time_now - nd->last_received_time) < ed->req->timeout_len))
         goto out;
 
-      if (ed->req->flags & CEREBRO_METRIC_FLAGS_NONE_IF_DOWN
+      if (ed->req->flags & CEREBRO_METRIC_DATA_FLAGS_NONE_IF_DOWN
           && !((ed->time_now - nd->last_received_time) < ed->req->timeout_len))
         {
           if (_metric_server_response_create(nd->nodename,
@@ -582,7 +582,7 @@ _metric_data_evaluate(void *x, const void *key, void *arg)
               return -1;
             }
         }
-      else if (ed->req->flags & CEREBRO_METRIC_FLAGS_NONE_IF_NOT_MONITORED)
+      else if (ed->req->flags & CEREBRO_METRIC_DATA_FLAGS_NONE_IF_NOT_MONITORED)
         {
           if (_metric_server_response_create(nd->nodename,
                                              CEREBRO_MAX_NODENAME_LEN,

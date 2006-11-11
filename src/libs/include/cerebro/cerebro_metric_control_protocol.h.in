@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_control_protocol.h.in,v 1.9 2006-11-08 00:34:04 chu11 Exp $
+ *  $Id: cerebro_metric_control_protocol.h.in,v 1.10 2006-11-11 05:46:55 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -41,7 +41,8 @@
  *
  */
 
-#define CEREBRO_METRIC_CONTROL_PROTOCOL_VERSION               1
+#define CEREBRO_METRIC_CONTROL_PROTOCOL_VERSION               2
+
 /* 
  * Even though the controller protocol is through a local unix domain
  * socket, we'll still need timeouts to ensure the user isn't being an
@@ -54,18 +55,22 @@
 #define CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_SUCCESS           0
 #define CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_VERSION_INVALID   1
 #define CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_COMMAND_INVALID   2
-#define CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_METRIC_INVALID    3
-#define CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_PARAMETER_INVALID 4
-#define CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_PACKET_INVALID    5
+#define CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_FLAGS_INVALID     3
+#define CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_METRIC_INVALID    4
+#define CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_PARAMETER_INVALID 5
+#define CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_PACKET_INVALID    6
 /* CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_METRIC_MAX currently not possible */
-#define CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_METRIC_MAX        6
-#define CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_INTERNAL_ERROR    7
+#define CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_METRIC_MAX        7
+#define CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_INTERNAL_ERROR    8
 
 #define CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_REGISTER          0
 #define CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_UNREGISTER        1
 #define CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_UPDATE            2
 #define CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_RESEND            3
 #define CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_FLUSH             4
+
+#define CEREBRO_METRIC_CONTROL_PROTOCOL_FLAGS_SEND_NOW        0x00000001
+#define CEREBRO_METRIC_CONTROL_PROTOCOL_FLAGS_MASK            0x00000001
 
 #define CEREBRO_METRIC_CONTROL_PATH  @METRIC_CONTROL_PATH@
 
@@ -78,6 +83,7 @@ struct cerebro_metric_control_request
 {
   int32_t version;
   int32_t command;
+  u_int32_t flags;      
   char metric_name[CEREBRO_MAX_METRIC_NAME_LEN];
   u_int32_t metric_value_type;
   u_int32_t metric_value_len;
@@ -86,6 +92,7 @@ struct cerebro_metric_control_request
 
 #define CEREBRO_METRIC_CONTROL_REQUEST_HEADER_LEN  (sizeof(int32_t) \
                                                     + sizeof(int32_t) \
+                                                    + sizeof(u_int32_t) \
                                                     + CEREBRO_MAX_METRIC_NAME_LEN \
                                                     + sizeof(u_int32_t) \
                                                     + sizeof(u_int32_t))

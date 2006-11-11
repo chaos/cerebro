@@ -135,9 +135,9 @@ _metric_control_protocol_err_code_conversion(u_int32_t err_code)
  */
 static int
 _metric_control_request_marshall(cerebro_t handle,
-                                struct cerebro_metric_control_request *req,
-                                char *buf,
-                                unsigned int buflen)
+                                 struct cerebro_metric_control_request *req,
+                                 char *buf,
+                                 unsigned int buflen)
 {
   int n, errnum, bufPtrlen, c = 0;
   char *bufPtr;
@@ -162,6 +162,14 @@ _metric_control_request_marshall(cerebro_t handle,
   if ((n = marshall_int32(req->command, buf + c, buflen - c)) <= 0)
     {
       CEREBRO_DBG(("marshall_int32"));
+      handle->errnum = CEREBRO_ERR_INTERNAL;
+      return -1;
+    }
+  c += n;
+
+  if ((n = marshall_u_int32(req->flags, buf + c, buflen - c)) <= 0)
+    {
+      CEREBRO_DBG(("marshall_u_int32"));
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
@@ -211,6 +219,7 @@ _metric_control_request_send(cerebro_t handle,
   struct cerebro_metric_control_request req;
   char buf[CEREBRO_MAX_PACKET_LEN];
   int req_len;
+  unsigned int flags;
 
   if (!(command >= CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_REGISTER
         && command <= CEREBRO_METRIC_CONTROL_PROTOCOL_CMD_FLUSH)
@@ -239,10 +248,27 @@ _metric_control_request_send(cerebro_t handle,
           metric_value_type = CEREBRO_DATA_VALUE_TYPE_NONE;
         }      
     }
+
+  if (!handle->flags)
+    {
+      if (handle->config_data.cerebro_flags_flag)
+        {
+          if (handle->config_data.cerebro_flags & ~CEREBRO_METRIC_FLAGS_MASK)
+            {
+              handle->errnum = CEREBRO_ERR_CONFIG_INPUT;
+              return -1;
+            }
+          flags = handle->config_data.cerebro_flags;
+        }
+      flags = CEREBRO_METRIC_SERVER_FLAGS_DEFAULT;
+    }
+  else
+    flags = handle->flags;
   
   memset(&req, '\0', sizeof(struct cerebro_metric_control_request));
   req.version = CEREBRO_METRIC_CONTROL_PROTOCOL_VERSION;
   req.command = command;
+  req.flags = flags;
   strncpy(req.metric_name, metric_name, CEREBRO_MAX_METRIC_NAME_LEN);
   req.metric_value_type = metric_value_type;
   req.metric_value_len = metric_value_len;

@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro-admin.8.in,v 1.2 2005-07-22 17:21:07 achu Exp $
+\."$Id: cerebro-admin.8.in,v 1.3 2006-11-11 05:46:55 chu11 Exp $
 \."#############################################################################
 \."  Copyright (C) 2005 The Regents of the University of California.
 \."  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -66,12 +66,17 @@ to see input options.
 .TP
 .B \-l \fISTRING\fR, \fB\-\-metric-value\fR=\fISTRING\fR
 Specify the metric value to be updated.
+.TP
+.B \-N, --send-now
+For update and resend commands, inform cerebrod to propogate new data
+immediately, not to wait for the next
+.B cerebrod
+heartbeat.
 .if @MANPAGE_DEBUG@ \{
 .TP
 .B  -d, --debug
 Turn on debugging
 \}
-
 .SH "ORIGIN"
 Developed by Albert Chu <chu11@llnl.gov> on LLNL's Linux clusters.
 .SH "SEE ALSO"
