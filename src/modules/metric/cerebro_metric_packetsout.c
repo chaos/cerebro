@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_packetsout.c,v 1.3 2006-11-08 00:34:05 chu11 Exp $
+ *  $Id: cerebro_metric_packetsout.c,v 1.4 2006-11-12 07:43:08 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -39,36 +39,12 @@
 #include "cerebro.h"
 #include "cerebro/cerebro_metric_module.h"
 
+#include "cerebro_metric_common.h"
 #include "cerebro_metric_network.h"
 #include "debug.h"
 
 #define PACKETSOUT_METRIC_MODULE_NAME  "packetsout"
 #define PACKETSOUT_METRIC_NAME         "packetsout"
-
-/*
- * packetsout_metric_setup
- *
- * packetsout metric module setup function.  Read and store the packetsout
- * out of /proc.
- */
-static int
-packetsout_metric_setup(void)
-{
-  /* nothing to do */
-  return 0;
-}
-
-/*
- * packetsout_metric_cleanup
- *
- * packetsout metric module cleanup function
- */
-static int
-packetsout_metric_cleanup(void)
-{
-  /* nothing to do */
-  return 0;
-}
 
 /*
  * packetsout_metric_get_metric_name
@@ -79,24 +55,6 @@ static char *
 packetsout_metric_get_metric_name(void)
 {
   return PACKETSOUT_METRIC_NAME;
-}
-
-/*
- * packetsout_metric_get_metric_period
- *
- * packetsout metric module get_metric_period function
- */
-static int
-packetsout_metric_get_metric_period(int *period)
-{
-  if (!period)
-    {
-      CEREBRO_DBG(("invalid parameters"));
-      return -1;
-    }
-  
-  *period = 300;
-  return 0;
 }
 
 /*
@@ -146,46 +104,6 @@ packetsout_metric_get_metric_value(unsigned int *metric_value_type,
   return rv;
 }
 
-/*
- * packetsout_metric_destroy_metric_value
- *
- * packetsout metric module destroy_metric_value function
- */
-static int
-packetsout_metric_destroy_metric_value(void *metric_value)
-{
-  if (!metric_value)
-    {
-      CEREBRO_DBG(("invalid parameters"));
-      return -1;
-    }
-
-  free(metric_value);
-  return 0;
-}
-
-/*
- * packetsout_metric_get_metric_thread
- *
- * packetsout metric module get_metric_thread function
- */
-static Cerebro_metric_thread_pointer
-packetsout_metric_get_metric_thread(void)
-{
-  return NULL;
-}
-
-/*
- * packetsout_metric_send_heartbeat_function_pointer
- *
- * packetsout metric module send_heartbeat_function_pointer function
- */
-static int
-packetsout_metric_send_heartbeat_function_pointer(Cerebro_metric_send_heartbeat function_pointer)
-{
-  return 0;
-}
-
 #if WITH_STATIC_MODULES
 struct cerebro_metric_module_info packetsout_metric_module_info =
 #else  /* !WITH_STATIC_MODULES */
@@ -193,12 +111,12 @@ struct cerebro_metric_module_info metric_module_info =
 #endif /* !WITH_STATIC_MODULES */
   {
     PACKETSOUT_METRIC_MODULE_NAME,
-    &packetsout_metric_setup,
-    &packetsout_metric_cleanup,
+    &common_metric_setup_do_nothing,
+    &common_metric_cleanup_do_nothing,
     &packetsout_metric_get_metric_name,
-    &packetsout_metric_get_metric_period,
+    &common_metric_get_metric_period_300,
     &packetsout_metric_get_metric_value,
-    &packetsout_metric_destroy_metric_value,
-    &packetsout_metric_get_metric_thread,
-    &packetsout_metric_send_heartbeat_function_pointer,
+    &common_metric_destroy_metric_value_free_value,
+    &common_metric_get_metric_thread_null,
+    &common_metric_send_heartbeat_function_pointer_unused,
   };

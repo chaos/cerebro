@@ -1,3 +1,10 @@
+2006-11-11  Albert Chu  <chu11@llnl.gov>
+
+	* src/modules/metric/cerebro_metric_common.h,
+	src/modules/metric/cerebro_metric_common.c: New files.
+
+	* src/modules/metric/: Adjust to use new common functions.
+	
 2006-11-10  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerebrod/, src/libs, src/cerbro-admin/,

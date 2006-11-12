@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_swapfree.c,v 1.4 2006-11-08 00:34:05 chu11 Exp $
+ *  $Id: cerebro_metric_swapfree.c,v 1.5 2006-11-12 07:43:08 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -39,6 +39,7 @@
 #include "cerebro.h"
 #include "cerebro/cerebro_metric_module.h"
 
+#include "cerebro_metric_common.h"
 #include "cerebro_metric_memory.h"
 #include "debug.h"
 
@@ -79,24 +80,6 @@ static char *
 swapfree_metric_get_metric_name(void)
 {
   return SWAPFREE_METRIC_NAME;
-}
-
-/*
- * swapfree_metric_get_metric_period
- *
- * swapfree metric module get_metric_period function
- */
-static int
-swapfree_metric_get_metric_period(int *period)
-{
-  if (!period)
-    {
-      CEREBRO_DBG(("invalid parameters"));
-      return -1;
-    }
-  
-  *period = 300;
-  return 0;
 }
 
 /*
@@ -144,46 +127,6 @@ swapfree_metric_get_metric_value(unsigned int *metric_value_type,
   return rv;
 }
 
-/*
- * swapfree_metric_destroy_metric_value
- *
- * swapfree metric module destroy_metric_value function
- */
-static int
-swapfree_metric_destroy_metric_value(void *metric_value)
-{
-  if (!metric_value)
-    {
-      CEREBRO_DBG(("invalid parameters"));
-      return -1;
-    }
-
-  free(metric_value);
-  return 0;
-}
-
-/*
- * swapfree_metric_get_metric_thread
- *
- * swapfree metric module get_metric_thread function
- */
-static Cerebro_metric_thread_pointer
-swapfree_metric_get_metric_thread(void)
-{
-  return NULL;
-}
-
-/*
- * swapfree_metric_send_heartbeat_function_pointer
- *
- * swapfree metric module send_heartbeat_function_pointer function
- */
-static int
-swapfree_metric_send_heartbeat_function_pointer(Cerebro_metric_send_heartbeat function_pointer)
-{
-  return 0;
-}
-
 #if WITH_STATIC_MODULES
 struct cerebro_metric_module_info swapfree_metric_module_info =
 #else  /* !WITH_STATIC_MODULES */
@@ -191,12 +134,12 @@ struct cerebro_metric_module_info metric_module_info =
 #endif /* !WITH_STATIC_MODULES */
   {
     SWAPFREE_METRIC_MODULE_NAME,
-    &swapfree_metric_setup,
-    &swapfree_metric_cleanup,
+    &common_metric_setup_do_nothing,
+    &common_metric_cleanup_do_nothing,
     &swapfree_metric_get_metric_name,
-    &swapfree_metric_get_metric_period,
+    &common_metric_get_metric_period_300,
     &swapfree_metric_get_metric_value,
-    &swapfree_metric_destroy_metric_value,
-    &swapfree_metric_get_metric_thread,
-    &swapfree_metric_send_heartbeat_function_pointer,
+    &common_metric_destroy_metric_value_free_value,
+    &common_metric_get_metric_thread_null,
+    &common_metric_send_heartbeat_function_pointer_unused,
   };
