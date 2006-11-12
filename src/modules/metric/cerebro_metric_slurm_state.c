@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_slurm_state.c,v 1.19 2006-11-08 00:34:05 chu11 Exp $
+ *  $Id: cerebro_metric_slurm_state.c,v 1.19.2.1 2006-11-12 07:48:47 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -60,6 +60,7 @@
 #include "cerebro/cerebro_constants.h"
 #include "cerebro/cerebro_metric_module.h"
 
+#include "cerebro_metric_common.h"
 #include "debug.h"
 
 #define SLURM_STATE_METRIC_MODULE_NAME      "slurm_state"
@@ -154,18 +155,6 @@ slurm_state_metric_setup(void)
 }
 
 /*
- * slurm_state_metric_cleanup
- *
- * slurm_state metric module cleanup function
- */
-static int
-slurm_state_metric_cleanup(void)
-{
-  /* nothing to do */
-  return 0;
-}
-
-/*
  * slurm_state_metric_get_metric_name
  *
  * slurm_state metric module get_metric_name function
@@ -174,27 +163,6 @@ static char *
 slurm_state_metric_get_metric_name(void)
 {
   return SLURM_STATE_METRIC_NAME;
-}
-
-/*
- * slurm_state_metric_get_metric_period
- *
- * slurm_state metric module get_metric_period function
- */
-static int
-slurm_state_metric_get_metric_period(int *period)
-{
-  if (!period)
-    {
-      CEREBRO_DBG(("invalid parameters"));
-      return -1;
-    }
-
-  /* The slurm_state is propogated every once in awhile.  The
-   * slurm_state metric thread is more responsible for propogation..
-   */
-  *period = 60;
-  return 0;
 }
 
 /*
@@ -217,17 +185,6 @@ slurm_state_metric_get_metric_value(unsigned int *metric_value_type,
   *metric_value_len = sizeof(u_int32_t);
   *metric_value = (void *)&metric_slurm_state;
 
-  return 0;
-}
-
-/*
- * slurm_state_metric_destroy_metric_value
- *
- * slurm_state metric module destroy_metric_value function
- */
-static int
-slurm_state_metric_destroy_metric_value(void *metric_value)
-{
   return 0;
 }
 
@@ -369,17 +326,6 @@ slurm_state_metric_get_metric_thread(void)
   return &slurm_state_metric_thread;
 }
 
-/*
- * slurm_state_metric_send_heartbeat_function_pointer
- *
- * slurm_state metric module send_heartbeat_function_pointer function
- */
-static int
-slurm_state_metric_send_heartbeat_function_pointer(Cerebro_metric_send_heartbeat function_pointer)
-{
-  return 0;
-}
-
 #if WITH_STATIC_MODULES
 struct cerebro_metric_module_info slurm_state_metric_module_info =
 #else  /* !WITH_STATIC_MODULES */
@@ -388,11 +334,11 @@ struct cerebro_metric_module_info metric_module_info =
   {
     SLURM_STATE_METRIC_MODULE_NAME,
     &slurm_state_metric_setup,
-    &slurm_state_metric_cleanup,
+    &common_metric_cleanup_do_nothing,
     &slurm_state_metric_get_metric_name,
-    &slurm_state_metric_get_metric_period,
+    &common_metric_get_metric_period_60,
     &slurm_state_metric_get_metric_value,
-    &slurm_state_metric_destroy_metric_value,
+    &common_metric_destroy_metric_value_do_nothing,
     &slurm_state_metric_get_metric_thread,
-    &slurm_state_metric_send_heartbeat_function_pointer,
+    &common_metric_send_heartbeat_function_pointer_unused,
   };

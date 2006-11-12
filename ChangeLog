@@ -1,9 +1,21 @@
+2006-11-11  Albert Chu  <chu11@llnl.gov>
+
+	* src/modules/metric/cerebro_metric_common.h,
+	src/modules/metric/cerebro_metric_common.c: New files.
+
+	* src/modules/metric/: Adjust to use new common functions.
+	
 2006-11-10  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerebrod/, src/libs, src/cerbro-admin/,
 	man/cerebro-admin.8.in: Support new 'send-now' functionality for
 	updated metrics.  Adjust code appropriately to support new feature
 	and make code cleaner.
+
+2006-11-10  Albert Chu  <chu11@llnl.gov>
+
+	* src/libs/cerebro/cerebro_metric_util.c
+	(_cerebro_metric_get_data): Fix config parse bug.
 
 2006-11-09  Albert Chu  <chu11@llnl.gov>
 

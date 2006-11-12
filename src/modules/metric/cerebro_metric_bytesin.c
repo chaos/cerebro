@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_bytesin.c,v 1.3 2006-11-08 00:34:05 chu11 Exp $
+ *  $Id: cerebro_metric_bytesin.c,v 1.3.2.1 2006-11-12 07:48:47 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -39,36 +39,12 @@
 #include "cerebro.h"
 #include "cerebro/cerebro_metric_module.h"
 
+#include "cerebro_metric_common.h"
 #include "cerebro_metric_network.h"
 #include "debug.h"
 
 #define BYTESIN_METRIC_MODULE_NAME  "bytesin"
 #define BYTESIN_METRIC_NAME         "bytesin"
-
-/*
- * bytesin_metric_setup
- *
- * bytesin metric module setup function.  Read and store the bytesin
- * out of /proc.
- */
-static int
-bytesin_metric_setup(void)
-{
-  /* nothing to do */
-  return 0;
-}
-
-/*
- * bytesin_metric_cleanup
- *
- * bytesin metric module cleanup function
- */
-static int
-bytesin_metric_cleanup(void)
-{
-  /* nothing to do */
-  return 0;
-}
 
 /*
  * bytesin_metric_get_metric_name
@@ -79,24 +55,6 @@ static char *
 bytesin_metric_get_metric_name(void)
 {
   return BYTESIN_METRIC_NAME;
-}
-
-/*
- * bytesin_metric_get_metric_period
- *
- * bytesin metric module get_metric_period function
- */
-static int
-bytesin_metric_get_metric_period(int *period)
-{
-  if (!period)
-    {
-      CEREBRO_DBG(("invalid parameters"));
-      return -1;
-    }
-  
-  *period = 300;
-  return 0;
 }
 
 /*
@@ -146,46 +104,6 @@ bytesin_metric_get_metric_value(unsigned int *metric_value_type,
   return rv;
 }
 
-/*
- * bytesin_metric_destroy_metric_value
- *
- * bytesin metric module destroy_metric_value function
- */
-static int
-bytesin_metric_destroy_metric_value(void *metric_value)
-{
-  if (!metric_value)
-    {
-      CEREBRO_DBG(("invalid parameters"));
-      return -1;
-    }
-
-  free(metric_value);
-  return 0;
-}
-
-/*
- * bytesin_metric_get_metric_thread
- *
- * bytesin metric module get_metric_thread function
- */
-static Cerebro_metric_thread_pointer
-bytesin_metric_get_metric_thread(void)
-{
-  return NULL;
-}
-
-/*
- * bytesin_metric_send_heartbeat_function_pointer
- *
- * bytesin metric module send_heartbeat_function_pointer function
- */
-static int
-bytesin_metric_send_heartbeat_function_pointer(Cerebro_metric_send_heartbeat function_pointer)
-{
-  return 0;
-}
-
 #if WITH_STATIC_MODULES
 struct cerebro_metric_module_info bytesin_metric_module_info =
 #else  /* !WITH_STATIC_MODULES */
@@ -193,12 +111,12 @@ struct cerebro_metric_module_info metric_module_info =
 #endif /* !WITH_STATIC_MODULES */
   {
     BYTESIN_METRIC_MODULE_NAME,
-    &bytesin_metric_setup,
-    &bytesin_metric_cleanup,
+    &common_metric_setup_do_nothing,
+    &common_metric_cleanup_do_nothing,
     &bytesin_metric_get_metric_name,
-    &bytesin_metric_get_metric_period,
+    &common_metric_get_metric_period_300,
     &bytesin_metric_get_metric_value,
-    &bytesin_metric_destroy_metric_value,
-    &bytesin_metric_get_metric_thread,
-    &bytesin_metric_send_heartbeat_function_pointer,
+    &common_metric_destroy_metric_value_free_value,
+    &common_metric_get_metric_thread_null,
+    &common_metric_send_heartbeat_function_pointer_unused,
   };

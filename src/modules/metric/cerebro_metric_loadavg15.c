@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_loadavg15.c,v 1.3 2006-11-08 00:34:05 chu11 Exp $
+ *  $Id: cerebro_metric_loadavg15.c,v 1.3.2.1 2006-11-12 07:48:47 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -39,36 +39,12 @@
 #include "cerebro.h"
 #include "cerebro/cerebro_metric_module.h"
 
+#include "cerebro_metric_common.h"
 #include "cerebro_metric_loadavg.h"
 #include "debug.h"
 
 #define LOADAVG15_METRIC_MODULE_NAME  "loadavg15"
 #define LOADAVG15_METRIC_NAME         "loadavg15"
-
-/*
- * loadavg15_metric_setup
- *
- * loadavg15 metric module setup function.  Read and store the loadavg15
- * out of /proc.
- */
-static int
-loadavg15_metric_setup(void)
-{
-  /* nothing to do */
-  return 0;
-}
-
-/*
- * loadavg15_metric_cleanup
- *
- * loadavg15 metric module cleanup function
- */
-static int
-loadavg15_metric_cleanup(void)
-{
-  /* nothing to do */
-  return 0;
-}
 
 /*
  * loadavg15_metric_get_metric_name
@@ -141,46 +117,6 @@ loadavg15_metric_get_metric_value(unsigned int *metric_value_type,
   return rv;
 }
 
-/*
- * loadavg15_metric_destroy_metric_value
- *
- * loadavg15 metric module destroy_metric_value function
- */
-static int
-loadavg15_metric_destroy_metric_value(void *metric_value)
-{
-  if (!metric_value)
-    {
-      CEREBRO_DBG(("invalid parameters"));
-      return -1;
-    }
-
-  free(metric_value);
-  return 0;
-}
-
-/*
- * loadavg15_metric_get_metric_thread
- *
- * loadavg15 metric module get_metric_thread function
- */
-static Cerebro_metric_thread_pointer
-loadavg15_metric_get_metric_thread(void)
-{
-  return NULL;
-}
-
-/*
- * loadavg15_metric_send_heartbeat_function_pointer
- *
- * loadavg15 metric module send_heartbeat_function_pointer function
- */
-static int
-loadavg15_metric_send_heartbeat_function_pointer(Cerebro_metric_send_heartbeat function_pointer)
-{
-  return 0;
-}
-
 #if WITH_STATIC_MODULES
 struct cerebro_metric_module_info loadavg15_metric_module_info =
 #else  /* !WITH_STATIC_MODULES */
@@ -188,12 +124,12 @@ struct cerebro_metric_module_info metric_module_info =
 #endif /* !WITH_STATIC_MODULES */
   {
     LOADAVG15_METRIC_MODULE_NAME,
-    &loadavg15_metric_setup,
-    &loadavg15_metric_cleanup,
+    &common_metric_setup_do_nothing,
+    &common_metric_cleanup_do_nothing,
     &loadavg15_metric_get_metric_name,
     &loadavg15_metric_get_metric_period,
     &loadavg15_metric_get_metric_value,
-    &loadavg15_metric_destroy_metric_value,
-    &loadavg15_metric_get_metric_thread,
-    &loadavg15_metric_send_heartbeat_function_pointer,
+    &common_metric_destroy_metric_value_free_value,
+    &common_metric_get_metric_thread_null,
+    &common_metric_send_heartbeat_function_pointer_unused,
   };

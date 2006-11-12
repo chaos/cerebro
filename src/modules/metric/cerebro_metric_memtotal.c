@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_memtotal.c,v 1.4 2006-11-08 00:34:05 chu11 Exp $
+ *  $Id: cerebro_metric_memtotal.c,v 1.4.2.1 2006-11-12 07:48:47 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -39,36 +39,12 @@
 #include "cerebro.h"
 #include "cerebro/cerebro_metric_module.h"
 
+#include "cerebro_metric_common.h"
 #include "cerebro_metric_memory.h"
 #include "debug.h"
 
 #define MEMTOTAL_METRIC_MODULE_NAME  "memtotal"
 #define MEMTOTAL_METRIC_NAME         "memtotal"
-
-/*
- * memtotal_metric_setup
- *
- * memtotal metric module setup function.  Read and store the memtotal
- * out of /proc.
- */
-static int
-memtotal_metric_setup(void)
-{
-  /* nothing to do */
-  return 0;
-}
-
-/*
- * memtotal_metric_cleanup
- *
- * memtotal metric module cleanup function
- */
-static int
-memtotal_metric_cleanup(void)
-{
-  /* nothing to do */
-  return 0;
-}
 
 /*
  * memtotal_metric_get_metric_name
@@ -79,24 +55,6 @@ static char *
 memtotal_metric_get_metric_name(void)
 {
   return MEMTOTAL_METRIC_NAME;
-}
-
-/*
- * memtotal_metric_get_metric_period
- *
- * memtotal metric module get_metric_period function
- */
-static int
-memtotal_metric_get_metric_period(int *period)
-{
-  if (!period)
-    {
-      CEREBRO_DBG(("invalid parameters"));
-      return -1;
-    }
-  
-  *period = 300;
-  return 0;
 }
 
 /*
@@ -144,46 +102,6 @@ memtotal_metric_get_metric_value(unsigned int *metric_value_type,
   return rv;
 }
 
-/*
- * memtotal_metric_destroy_metric_value
- *
- * memtotal metric module destroy_metric_value function
- */
-static int
-memtotal_metric_destroy_metric_value(void *metric_value)
-{
-  if (!metric_value)
-    {
-      CEREBRO_DBG(("invalid parameters"));
-      return -1;
-    }
-
-  free(metric_value);
-  return 0;
-}
-
-/*
- * memtotal_metric_get_metric_thread
- *
- * memtotal metric module get_metric_thread function
- */
-static Cerebro_metric_thread_pointer
-memtotal_metric_get_metric_thread(void)
-{
-  return NULL;
-}
-
-/*
- * memtotal_metric_send_heartbeat_function_pointer
- *
- * memtotal metric module send_heartbeat_function_pointer function
- */
-static int
-memtotal_metric_send_heartbeat_function_pointer(Cerebro_metric_send_heartbeat function_pointer)
-{
-  return 0;
-}
-
 #if WITH_STATIC_MODULES
 struct cerebro_metric_module_info memtotal_metric_module_info =
 #else  /* !WITH_STATIC_MODULES */
@@ -191,12 +109,12 @@ struct cerebro_metric_module_info metric_module_info =
 #endif /* !WITH_STATIC_MODULES */
   {
     MEMTOTAL_METRIC_MODULE_NAME,
-    &memtotal_metric_setup,
-    &memtotal_metric_cleanup,
+    &common_metric_setup_do_nothing,
+    &common_metric_cleanup_do_nothing,
     &memtotal_metric_get_metric_name,
-    &memtotal_metric_get_metric_period,
+    &common_metric_get_metric_period_300,
     &memtotal_metric_get_metric_value,
-    &memtotal_metric_destroy_metric_value,
-    &memtotal_metric_get_metric_thread,
-    &memtotal_metric_send_heartbeat_function_pointer,
+    &common_metric_destroy_metric_value_free_value,
+    &common_metric_get_metric_thread_null,
+    &common_metric_send_heartbeat_function_pointer_unused,
   };

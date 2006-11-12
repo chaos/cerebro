@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_boottime.c,v 1.19 2006-11-08 00:34:05 chu11 Exp $
+ *  $Id: cerebro_metric_boottime.c,v 1.19.2.1 2006-11-12 07:48:47 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -48,6 +48,7 @@
 #include "cerebro.h"
 #include "cerebro/cerebro_metric_module.h"
 
+#include "cerebro_metric_common.h"
 #include "debug.h"
 
 #define BOOTTIME_FILE                "/proc/stat"
@@ -113,18 +114,6 @@ boottime_metric_setup(void)
 }
 
 /*
- * boottime_metric_cleanup
- *
- * boottime metric module cleanup function
- */
-static int
-boottime_metric_cleanup(void)
-{
-  /* nothing to do */
-  return 0;
-}
-
-/*
  * boottime_metric_get_metric_name
  *
  * boottime metric module get_metric_name function
@@ -133,28 +122,6 @@ static char *
 boottime_metric_get_metric_name(void)
 {
   return BOOTTIME_METRIC_NAME;
-}
-
-/*
- * boottime_metric_get_metric_period
- *
- * boottime metric module get_metric_period function
- */
-static int
-boottime_metric_get_metric_period(int *period)
-{
-  if (!period)
-    {
-      CEREBRO_DBG(("invalid parameters"));
-      return -1;
-    }
-  
-  /* The boottime is propogated all of the time so that
-   * programs/modules monitoring it will immediately know when a
-   * machine has been rebooted and brought straight back up.
-   */
-  *period = 0;
-  return 0;
 }
 
 /*
@@ -179,39 +146,6 @@ boottime_metric_get_metric_value(unsigned int *metric_value_type,
   return 0;
 }
 
-/*
- * boottime_metric_destroy_metric_value
- *
- * boottime metric module destroy_metric_value function
- */
-static int
-boottime_metric_destroy_metric_value(void *metric_value)
-{
-  return 0;
-}
-
-/*
- * boottime_metric_get_metric_thread
- *
- * boottime metric module get_metric_thread function
- */
-static Cerebro_metric_thread_pointer
-boottime_metric_get_metric_thread(void)
-{
-  return NULL;
-}
-
-/*
- * boottime_metric_send_heartbeat_function_pointer
- *
- * boottime metric module send_heartbeat_function_pointer function
- */
-static int
-boottime_metric_send_heartbeat_function_pointer(Cerebro_metric_send_heartbeat function_pointer)
-{
-  return 0;
-}
-
 #if WITH_STATIC_MODULES
 struct cerebro_metric_module_info boottime_metric_module_info =
 #else  /* !WITH_STATIC_MODULES */
@@ -220,11 +154,11 @@ struct cerebro_metric_module_info metric_module_info =
   {
     BOOTTIME_METRIC_MODULE_NAME,
     &boottime_metric_setup,
-    &boottime_metric_cleanup,
+    &common_metric_cleanup_do_nothing,
     &boottime_metric_get_metric_name,
-    &boottime_metric_get_metric_period,
+    &common_metric_get_metric_period_0,
     &boottime_metric_get_metric_value,
-    &boottime_metric_destroy_metric_value,
-    &boottime_metric_get_metric_thread,
-    &boottime_metric_send_heartbeat_function_pointer,
+    &common_metric_destroy_metric_value_do_nothing,
+    &common_metric_get_metric_thread_null,
+    &common_metric_send_heartbeat_function_pointer_unused,
   };

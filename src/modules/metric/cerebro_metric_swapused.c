@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_swapused.c,v 1.4 2006-11-08 00:34:05 chu11 Exp $
+ *  $Id: cerebro_metric_swapused.c,v 1.4.2.1 2006-11-12 07:48:48 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -39,36 +39,12 @@
 #include "cerebro.h"
 #include "cerebro/cerebro_metric_module.h"
 
+#include "cerebro_metric_common.h"
 #include "cerebro_metric_memory.h"
 #include "debug.h"
 
 #define SWAPUSED_METRIC_MODULE_NAME  "swapused"
 #define SWAPUSED_METRIC_NAME         "swapused"
-
-/*
- * swapused_metric_setup
- *
- * swapused metric module setup function.  Read and store the swapused
- * out of /proc.
- */
-static int
-swapused_metric_setup(void)
-{
-  /* nothing to do */
-  return 0;
-}
-
-/*
- * swapused_metric_cleanup
- *
- * swapused metric module cleanup function
- */
-static int
-swapused_metric_cleanup(void)
-{
-  /* nothing to do */
-  return 0;
-}
 
 /*
  * swapused_metric_get_metric_name
@@ -79,24 +55,6 @@ static char *
 swapused_metric_get_metric_name(void)
 {
   return SWAPUSED_METRIC_NAME;
-}
-
-/*
- * swapused_metric_get_metric_period
- *
- * swapused metric module get_metric_period function
- */
-static int
-swapused_metric_get_metric_period(int *period)
-{
-  if (!period)
-    {
-      CEREBRO_DBG(("invalid parameters"));
-      return -1;
-    }
-  
-  *period = 300;
-  return 0;
 }
 
 /*
@@ -144,46 +102,6 @@ swapused_metric_get_metric_value(unsigned int *metric_value_type,
   return rv;
 }
 
-/*
- * swapused_metric_destroy_metric_value
- *
- * swapused metric module destroy_metric_value function
- */
-static int
-swapused_metric_destroy_metric_value(void *metric_value)
-{
-  if (!metric_value)
-    {
-      CEREBRO_DBG(("invalid parameters"));
-      return -1;
-    }
-
-  free(metric_value);
-  return 0;
-}
-
-/*
- * swapused_metric_get_metric_thread
- *
- * swapused metric module get_metric_thread function
- */
-static Cerebro_metric_thread_pointer
-swapused_metric_get_metric_thread(void)
-{
-  return NULL;
-}
-
-/*
- * swapused_metric_send_heartbeat_function_pointer
- *
- * swapused metric module send_heartbeat_function_pointer function
- */
-static int
-swapused_metric_send_heartbeat_function_pointer(Cerebro_metric_send_heartbeat function_pointer)
-{
-  return 0;
-}
-
 #if WITH_STATIC_MODULES
 struct cerebro_metric_module_info swapused_metric_module_info =
 #else  /* !WITH_STATIC_MODULES */
@@ -191,12 +109,12 @@ struct cerebro_metric_module_info metric_module_info =
 #endif /* !WITH_STATIC_MODULES */
   {
     SWAPUSED_METRIC_MODULE_NAME,
-    &swapused_metric_setup,
-    &swapused_metric_cleanup,
+    &common_metric_setup_do_nothing,
+    &common_metric_cleanup_do_nothing,
     &swapused_metric_get_metric_name,
-    &swapused_metric_get_metric_period,
+    &common_metric_get_metric_period_300,
     &swapused_metric_get_metric_value,
-    &swapused_metric_destroy_metric_value,
-    &swapused_metric_get_metric_thread,
-    &swapused_metric_send_heartbeat_function_pointer,
+    &common_metric_destroy_metric_value_free_value,
+    &common_metric_get_metric_thread_null,
+    &common_metric_send_heartbeat_function_pointer_unused,
   };
