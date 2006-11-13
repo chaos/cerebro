@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_loadavg15.c,v 1.4 2006-11-12 07:43:08 chu11 Exp $
+ *  $Id: cerebro_metric_loadavg15.c,v 1.5 2006-11-13 01:23:58 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -58,24 +58,6 @@ loadavg15_metric_get_metric_name(void)
 }
 
 /*
- * loadavg15_metric_get_metric_period
- *
- * loadavg15 metric module get_metric_period function
- */
-static int
-loadavg15_metric_get_metric_period(int *period)
-{
-  if (!period)
-    {
-      CEREBRO_DBG(("invalid parameters"));
-      return -1;
-    }
-  
-  *period = 60;
-  return 0;
-}
-
-/*
  * loadavg15_metric_get_metric_value
  *
  * loadavg15 metric module get_metric_value function
@@ -127,7 +109,7 @@ struct cerebro_metric_module_info metric_module_info =
     &common_metric_setup_do_nothing,
     &common_metric_cleanup_do_nothing,
     &loadavg15_metric_get_metric_name,
-    &loadavg15_metric_get_metric_period,
+    &common_metric_get_metric_period_60,
     &loadavg15_metric_get_metric_value,
     &common_metric_destroy_metric_value_free_value,
     &common_metric_get_metric_thread_null,
