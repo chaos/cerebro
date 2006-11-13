@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_module.h,v 1.9.4.2 2006-11-13 02:27:49 chu11 Exp $
+ *  $Id: cerebro_metric_module.h,v 1.9.4.3 2006-11-13 17:05:19 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -111,36 +111,17 @@ typedef int (*Cerebro_metric_get_metric_value)(unsigned int *metric_value_type,
 typedef int (*Cerebro_metric_destroy_metric_value)(void *metric_value);
 
 /* 
- * Cerebro_metric_updated
- *
- * function prototype to inform the cerebrod daemon a metric
- * has been updated.
- *
- * Returns 0 on success, -1 on error
- */
-typedef int (*Cerebro_metric_updated)(char *metric_name);
-
-/* 
  * Cerebro_metric_thread_pointer
  *
  * function prototype for a thread which will be passed to
  * pthread_create
  *
- * The function will be passed a pointer to a 'Cerebro_metric_updated'
- * function can be called when the metric value is updated.  This
- * thread can perform any metric monitoring duties it pleases and
- * optionally call the 'Cerebro_metric_updated' function when a metric
- * value is updated.
+ * This thread can perform any metric monitoring duties it pleases and
+ * call the send heartbeat function (see Cerebro_metric_send_heartbeat below) 
+ * to send data when its data has been updated.
  *
  * Typically the thread is used to watch or monitor for some event and
- * locally update data so that cerebrod will propogate the newly
- * received data from a 'get_metric_value' call.
- *
- * If the user wishes to use mutexes within the metric thread to
- * protect against concurrent access, the user is responsible for not
- * putting the locks in situations that can lead to a deadlock.  The
- * 'Cerebro_metric_updated' function call may require locks to
- * function appropriately within the cerebrod daemon.
+ * propogate the information as needed.
  */
 typedef void *(*Cerebro_metric_thread_pointer)(void *arg);
 

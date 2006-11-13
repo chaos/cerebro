@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker_data.c,v 1.41 2006-11-08 00:34:04 chu11 Exp $
+ *  $Id: cerebrod_speaker_data.c,v 1.41.2.1 2006-11-13 17:05:19 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -97,56 +97,6 @@ int metric_list_size = 0;
  */
 pthread_mutex_t metric_list_lock = PTHREAD_MUTEX_INITIALIZER;
 #endif /* !WITH_CEREBROD_NO_THREADS */
-
-/* 
- * _metric_is_updated
- *
- * May be called by a metric module to inform us to 
- * propogate the metric.
- *
- * Returns 0 on success, -1 on error
- */
-static int 
-_metric_is_updated(char *metric_name)
-{
-  struct cerebrod_speaker_metric_info *metric_info = NULL;
-  ListIterator itr = NULL;
-  int found = 0;
-
-  assert(metric_list);
-
-  if (!metric_name)
-    {
-      CEREBRO_DBG(("invalid parameters"));
-      return -1;
-    }
-
-#if !WITH_CEREBROD_NO_THREADS
-  Pthread_mutex_lock(&metric_list_lock);
-#endif /* !WITH_CEREBROD_NO_THREADS */
-  itr = List_iterator_create(metric_list);
-  while ((metric_info = list_next(itr)))
-    {
-      if (!strcmp(metric_info->metric_name, metric_name))
-        {
-          metric_info->next_call_time = 0;
-          found++;
-          break;
-        }
-    }
-  cerebrod_speaker_data_metric_list_sort();
-#if !WITH_CEREBROD_NO_THREADS
-  Pthread_mutex_unlock(&metric_list_lock);
-#endif /* !WITH_CEREBROD_NO_THREADS */
-
-#if CEREBRO_DEBUG  
-  if (!found)
-    CEREBRO_DBG(("metric '%s' not found", metric_name));
-#endif /* CEREBRO_DEBUG */
-
-  List_iterator_destroy(itr);
-  return (found) ? 0 : -1;
-}
 
 /* 
  * _setup_metric_modules
@@ -286,7 +236,7 @@ _setup_metric_modules(void)
           Pthread_attr_init(&attr);
           Pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
           Pthread_attr_setstacksize(&attr, CEREBROD_THREAD_STACKSIZE);
-          Pthread_create(&thread, &attr, threadPtr, &_metric_is_updated);
+          Pthread_create(&thread, &attr, threadPtr, NULL);
           Pthread_attr_destroy(&attr);
         }
 #endif /* !WITH_CEREBROD_NO_THREADS */

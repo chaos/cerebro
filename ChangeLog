@@ -3,6 +3,19 @@
 	* src/libs/include/cerebro/cerebro_metric_module.h,
 	src/libs/modules/, src/modules/metric/: Support new
 	metric module flags.
+
+	* src/cerebrod/cerebrod_speaker_data.c,
+	src/libs/include/cerebro/cerebro_metric_module.h: Alter method by
+	which metric module threads are used.  Metric module threads now
+	send heartbeats when data changes, they don't signal cerebro that
+	data is simply updated.
+
+	* src/modules/metric/cerebro_metric_slurm_state.c
+	(_send_heartbeat,
+	slurm_state_metric_send_heartbeat_function_pointer): New function.
+
+	* src/modules/metric/cerebro_metric_slurm_state.c
+	(slurm_state_metric_thread): Send heartbeat on state change.
 	
 2006-11-11  Albert Chu  <chu11@llnl.gov>
 
