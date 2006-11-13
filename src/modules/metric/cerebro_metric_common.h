@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_common.h,v 1.1.2.1 2006-11-12 07:48:47 chu11 Exp $
+ *  $Id: cerebro_metric_common.h,v 1.1.2.2 2006-11-13 02:27:49 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -67,6 +67,13 @@ int common_metric_get_metric_period_60(int *period);
  * of 300
  */
 int common_metric_get_metric_period_300(int *period);
+
+/* 
+ * common_metric_get_metric_flags_none
+ *
+ * common metric module get_metric_flags function returning no flags.
+ */
+int common_metric_get_metric_flags_none(u_int32_t *flags);
 
 /*
  * common_metric_destroy_metric_value_do_nothing

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: metric_module.c,v 1.19 2006-11-08 00:34:04 chu11 Exp $
+ *  $Id: metric_module.c,v 1.19.2.1 2006-11-13 02:27:49 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -166,6 +166,7 @@ _metric_module_cb(void *handle, void *dl_handle, void *module_info)
       || !metric_module_info->cleanup
       || !metric_module_info->get_metric_name
       || !metric_module_info->get_metric_period
+      || !metric_module_info->get_metric_flags
       || !metric_module_info->get_metric_value
       || !metric_module_info->destroy_metric_value
       || !metric_module_info->get_metric_thread)
@@ -440,6 +441,25 @@ metric_module_get_metric_period(metric_modules_t handle,
     }
 
   return ((*module_info->get_metric_period)(period));
+}
+
+int
+metric_module_get_metric_flags(metric_modules_t handle, 
+                               unsigned int index,
+                               u_int32_t *flags)
+{
+  struct cerebro_metric_module_info *module_info;
+
+  if (_handle_index_check(handle, index) < 0)
+    return -1;
+  
+  if (!(module_info = vector_get(handle->module_infos, index)))
+    {
+      CEREBRO_DBG(("vector_get: %s", strerror(errno)));
+      return -1;
+    }
+
+  return ((*module_info->get_metric_flags)(flags));
 }
 
 int 

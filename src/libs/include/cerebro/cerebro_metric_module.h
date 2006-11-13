@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_module.h,v 1.9.4.1 2006-11-12 07:48:47 chu11 Exp $
+ *  $Id: cerebro_metric_module.h,v 1.9.4.2 2006-11-13 02:27:49 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -28,6 +28,7 @@
 #ifndef _CEREBRO_METRIC_MODULE_H
 #define _CEREBRO_METRIC_MODULE_H
 
+#include <sys/types.h>
 #include <cerebro/cerebrod_heartbeat_protocol.h>
 
 #define CEREBRO_METRIC_MODULE_FLAGS_SEND_ON_PERIOD 0x1
@@ -83,9 +84,9 @@ typedef int (*Cerebro_metric_get_metric_period)(int *period);
  * function prototype for metric module function to indicate the flags
  * it supports.  Required to be defined by each metric module.
  * 
- * Returns flags on success, -1 on error
+ * Returns 0 on success, -1 on error
  */
-typedef int (*Cerebro_metric_get_metric_flags)(void);
+typedef int (*Cerebro_metric_get_metric_flags)(u_int32_t *flags);
 
 /*
  * Cerebro_metric_get_metric_value

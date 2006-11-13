@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_common.c,v 1.1.2.1 2006-11-12 07:48:47 chu11 Exp $
+ *  $Id: cerebro_metric_common.c,v 1.1.2.2 2006-11-13 02:27:49 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -89,6 +89,19 @@ common_metric_get_metric_period_300(int *period)
     }
 
   *period = 300;
+  return 0;
+}
+
+int 
+common_metric_get_metric_flags_none(u_int32_t *flags)
+{
+  if (!flags)
+    {
+      CEREBRO_DBG(("invalid parameters"));
+      return -1;
+    }
+
+  *flags = 0;
   return 0;
 }
 

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_shutdown.c,v 1.3.2.1 2006-11-12 07:48:47 chu11 Exp $
+ *  $Id: cerebro_metric_shutdown.c,v 1.3.2.2 2006-11-13 02:27:49 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -246,6 +246,7 @@ struct cerebro_metric_module_info metric_module_info =
     &common_metric_cleanup_do_nothing,
     &shutdown_metric_get_metric_name,
     &shutdown_metric_get_metric_period,
+    &common_metric_get_metric_flags_none,
     &shutdown_metric_get_metric_value,
     &common_metric_destroy_metric_value_do_nothing,
     &common_metric_get_metric_thread_null,

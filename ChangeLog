@@ -1,3 +1,9 @@
+2006-XX-XX  Albert Chu  <chu11@llnl.gov>
+
+	* src/libs/include/cerebro/cerebro_metric_module.h,
+	src/libs/modules/, src/modules/metric/: Support new
+	metric module flags.
+	
 2006-11-11  Albert Chu  <chu11@llnl.gov>
 
 	* src/modules/metric/cerebro_metric_common.h,

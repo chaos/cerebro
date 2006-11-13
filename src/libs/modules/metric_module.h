@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: metric_module.h,v 1.9 2006-11-08 00:34:04 chu11 Exp $
+ *  $Id: metric_module.h,v 1.9.2.1 2006-11-13 02:27:49 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -91,6 +91,15 @@ char *metric_module_get_metric_name(metric_modules_t handle, unsigned int index)
 int metric_module_get_metric_period(metric_modules_t handle, 
                                     unsigned int index,
                                     int *period);
+
+/*
+ * metric_module_get_metric_flags
+ *
+ * call metric module get_metric_flags function
+ */
+int metric_module_get_metric_flags(metric_modules_t handle, 
+                                   unsigned int index,
+                                   u_int32_t *flags);
 
 /*
  * metric_module_get_metric_value
