@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_event_server.c,v 1.3 2006-11-09 23:20:08 chu11 Exp $
+ *  $Id: cerebrod_event_server.c,v 1.4 2006-11-13 17:04:42 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -142,7 +142,7 @@ _event_queue_monitor_initialize(void)
 
   /* Note:
    * See comments in cerebrod_event_update about why the event_queue
-   * is initialized there.
+   * is initialized there instead of here.
    */
 
   event_queue_monitor_init++;
@@ -383,14 +383,6 @@ _event_server_initialize(void)
   if (event_server_init)
     goto out;
 
-  /* achu:
-   *
-   * This hash must be created in this initialize and not the
-   * queue_monitor initialize, b/c the event names list is generated
-   * during the listener initialization (which is done after the
-   * queue_monitor initialization but before the server
-   * initialization).
-   */
   if (event_names)
     {
       event_names_count = List_count(event_names);
