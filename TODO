@@ -1,13 +1,10 @@
-Before Release
-- up age/lib stuff in configure.ac
-
 Portability
 - IPv6
 - Multicast
 
 Future Features
 - controller
-  - allow access through netowrk
+  - allow access through netowrk?
   - limit host connections based on host list or subnet
   - user/password limited access?
   - munge based access?
@@ -25,15 +22,9 @@ Future Features
   - so can try to avoid dieing on low memory conditions
     (i.e. before the linux oom killer finishes its job)
 
-- speaker
-  - metrics can be per heartbeat or not
-    - specified via modules/controller
-
 Enhancements
 - Should pass config to modules so they can configure/setup 
   based on various conditions.
-- method for metric modules to send heartbeats by themselves when
-  they need to.
 - need way to send functions/pointers/etc. stuff between modules
   without keeping on adding functions.
 - logging/error output/something facility for modules
