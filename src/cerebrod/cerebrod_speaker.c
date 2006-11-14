@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.90.2.1 2006-11-14 04:16:05 chu11 Exp $
+ *  $Id: cerebrod_speaker.c,v 1.90.2.2 2006-11-14 18:09:35 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -263,16 +263,13 @@ _speaker_initialize(void)
             {
               if (metric_info->metric_flags & CEREBRO_METRIC_MODULE_FLAGS_SEND_ON_PERIOD)
                 {
-                  /* XXX need to do something */
-#if 0
                   nst = (struct cerebrod_next_send_time *)Malloc(sizeof(struct cerebrod_next_send_time));
                   nst->next_send_type = CEREBROD_SPEAKER_NEXT_SEND_TYPE_MODULE;
-                  nst->next_send_time = 0;
+                  nst->next_send_time = tv.tv_sec + metric_info->metric_period;
+                  nst->metric_period = metric_info->metric_period;
+                  nst->index = metric_info->index;
                   List_append(next_send_times, nst);
-                  
-                  /* need to store more info, like metric module index or something */
-#endif
-                  ;
+                  nst = NULL;
                 }
             }
         }
@@ -304,8 +301,11 @@ _cerebrod_heartbeat_create(struct cerebrod_next_send_time *nst,
   *heartbeat_len += CEREBROD_HEARTBEAT_HEADER_LEN;
 
   if (nst->next_send_type & CEREBROD_SPEAKER_NEXT_SEND_TYPE_HEARTBEAT)
-    cerebrod_speaker_data_get_metric_data(hb, heartbeat_len);
-  /* XXX - non heartbeat handle */
+    cerebrod_speaker_data_get_heartbeat_metric_data(hb, heartbeat_len);
+  else if (nst->next_send_type & CEREBROD_SPEAKER_NEXT_SEND_TYPE_MODULE)
+    cerebrod_speaker_data_get_module_metric_data(hb, 
+                                                 heartbeat_len, 
+                                                 nst->index);
 
   return hb;
 }
@@ -489,7 +489,8 @@ cerebrod_speaker(void *arg)
 
                   nst->next_send_time = tv.tv_sec + t;
                 }
-              /* XXX - handle modules */
+              if (nst->next_send_type & CEREBROD_SPEAKER_NEXT_SEND_TYPE_MODULE)
+                nst->next_send_time = tv.tv_sec + nst->metric_period;
               if (buf)
                 Free(buf);
             }
