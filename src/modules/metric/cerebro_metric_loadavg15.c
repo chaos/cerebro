@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_loadavg15.c,v 1.6 2006-11-14 18:58:27 chu11 Exp $
+ *  $Id: cerebro_metric_loadavg15.c,v 1.7 2006-11-14 19:02:39 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -109,7 +109,7 @@ struct cerebro_metric_module_info metric_module_info =
     &common_metric_setup_do_nothing,
     &common_metric_cleanup_do_nothing,
     &loadavg15_metric_get_metric_name,
-    &loadavg15_metric_get_metric_period,
+    &common_metric_get_metric_period_60,
     &common_metric_get_metric_flags_none,
     &loadavg15_metric_get_metric_value,
     &common_metric_destroy_metric_value_free_value,
