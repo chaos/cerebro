@@ -1,5 +1,9 @@
 2006-11-14  Albert Chu  <chu11@llnl.gov>
 
+	* configure.ac: Up library version.
+	
+2006-11-14  Albert Chu  <chu11@llnl.gov>
+
 	* src/libs/include/cerebro/cerebro_metric_module.h,
 	src/libs/modules/, src/modules/metric/: Support new
 	metric module flags.
