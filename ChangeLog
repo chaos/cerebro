@@ -16,6 +16,11 @@
 
 	* src/modules/metric/cerebro_metric_slurm_state.c
 	(slurm_state_metric_thread): Send heartbeat on state change.
+
+	* src/cerebrod/cerebrod_speaker_data.c,
+	src/cerebrod/cerebrod_speaker.h, src/cerebrod/cerebrod_speaker.c:
+	Support metric module flags and possibility metric modules may not
+	send data via heartbeats.
 	
 2006-11-11  Albert Chu  <chu11@llnl.gov>
 

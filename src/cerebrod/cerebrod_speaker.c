@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.90 2006-11-08 00:34:04 chu11 Exp $
+ *  $Id: cerebrod_speaker.c,v 1.90.2.1 2006-11-14 04:16:05 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -70,6 +70,20 @@ extern pthread_mutex_t debug_output_mutex;
  * cached system nodename
  */
 static char cerebrod_nodename[CEREBRO_MAX_NODENAME_LEN+1];
+
+/* 
+ * next_send_times
+ *
+ * Stores information on the next time to send information
+ */
+List next_send_times = NULL;
+
+/*
+ * Speaker Data
+ */
+extern List metric_list;
+extern int metric_list_size;
+extern pthread_mutex_t metric_list_lock;
 
 /* 
  * _speaker_socket_create
@@ -162,6 +176,30 @@ _speaker_socket_create(int num)
 }
 
 /* 
+ * _next_send_time_compare
+ *
+ * Compare function for cerebrod_next_send_time structures.
+ */
+static int
+_next_send_time_compare(void *x, void *y)
+{
+  struct cerebrod_next_send_time *a;
+  struct cerebrod_next_send_time *b;
+  
+  assert(x);
+  assert(y);
+
+  a = (struct cerebrod_next_send_time *)x;
+  b = (struct cerebrod_next_send_time *)y;
+
+  if (a->next_send_time < b->next_send_time)
+    return -1;
+  if (b->next_send_time > a->next_send_time)
+    return 1;
+  return 0;
+}
+
+/* 
  * _speaker_initialize
  *
  * perform speaker initialization
@@ -169,6 +207,7 @@ _speaker_socket_create(int num)
 static void
 _speaker_initialize(void)
 {
+  struct cerebrod_next_send_time *nst;
   unsigned int seed;
   struct timeval tv;
   int i, len;
@@ -193,6 +232,54 @@ _speaker_initialize(void)
   srand(seed);
 
   cerebrod_speaker_data_initialize();
+
+  next_send_times = List_create((ListDelF)_Free);
+  /*  
+   * We will always atleast send a heartbeat, so initialize
+   * the next_send_times list with this information.
+   * 
+   * Initialize the next_send_time to send a heartbeat immediately.
+   */
+  nst = (struct cerebrod_next_send_time *)Malloc(sizeof(struct cerebrod_next_send_time));
+  nst->next_send_type = CEREBROD_SPEAKER_NEXT_SEND_TYPE_HEARTBEAT;
+  nst->next_send_time = 0;
+  List_append(next_send_times, nst);
+  nst = NULL;
+
+  if (metric_list)
+    {
+      struct cerebrod_speaker_metric_info *metric_info;
+
+      ListIterator itr;
+      Pthread_mutex_lock(&metric_list_lock);
+      itr = List_iterator_create(metric_list);
+      while ((metric_info = list_next(itr)))
+        {
+          /* Must check for origin, there is a theoretically possible
+           * time slice in which a non-module metric could be added
+           * via the metric controller.
+           */
+          if (metric_info->metric_origin == CEREBROD_METRIC_SPEAKER_ORIGIN_MODULE)
+            {
+              if (metric_info->metric_flags & CEREBRO_METRIC_MODULE_FLAGS_SEND_ON_PERIOD)
+                {
+                  /* XXX need to do something */
+#if 0
+                  nst = (struct cerebrod_next_send_time *)Malloc(sizeof(struct cerebrod_next_send_time));
+                  nst->next_send_type = CEREBROD_SPEAKER_NEXT_SEND_TYPE_MODULE;
+                  nst->next_send_time = 0;
+                  List_append(next_send_times, nst);
+                  
+                  /* need to store more info, like metric module index or something */
+#endif
+                  ;
+                }
+            }
+        }
+      Pthread_mutex_unlock(&metric_list_lock);
+    }
+
+  List_sort(next_send_times, (ListCmpF)_next_send_time_compare);
 }
 
 /*
@@ -201,11 +288,12 @@ _speaker_initialize(void)
  * construct a heartbeat packet
  */
 static struct cerebrod_heartbeat *
-_cerebrod_heartbeat_create(unsigned int *heartbeat_len)
+_cerebrod_heartbeat_create(struct cerebrod_next_send_time *nst,
+                           unsigned int *heartbeat_len)
 {
   struct cerebrod_heartbeat *hb = NULL;
 
-  assert(heartbeat_len);
+  assert(nst && heartbeat_len);
 
   *heartbeat_len = 0;
 
@@ -215,7 +303,9 @@ _cerebrod_heartbeat_create(unsigned int *heartbeat_len)
   memcpy(hb->nodename, cerebrod_nodename, CEREBRO_MAX_NODENAME_LEN);
   *heartbeat_len += CEREBROD_HEARTBEAT_HEADER_LEN;
 
-  cerebrod_speaker_data_get_metric_data(hb, heartbeat_len);
+  if (nst->next_send_type & CEREBROD_SPEAKER_NEXT_SEND_TYPE_HEARTBEAT)
+    cerebrod_speaker_data_get_metric_data(hb, heartbeat_len);
+  /* XXX - non heartbeat handle */
 
   return hb;
 }
@@ -324,63 +414,93 @@ cerebrod_speaker(void *arg)
   int speaker_fd;
 
   _speaker_initialize();
+
   if ((speaker_fd = _speaker_socket_create(conf.heartbeat_source_port)) < 0)
     CEREBRO_EXIT(("speaker fd setup failed"));
 
   while (1)
     {
-      struct cerebrod_heartbeat* hb;
-      struct sockaddr *addr;
-      struct sockaddr_in hbaddr;
-      int rv, hblen, sleep_time;
-      unsigned int buflen, addrlen;
-      char *buf = NULL;
+      struct cerebrod_next_send_time *nst;
+      int sleep_time;
+      ListIterator itr;
+      struct timeval tv;
 
-      /* Algorithm from srand(3) manpage */
-      if (conf.heartbeat_frequency_ranged)
-	sleep_time = conf.heartbeat_frequency_min + ((((double)(conf.heartbeat_frequency_max - conf.heartbeat_frequency_min))*rand())/(RAND_MAX+1.0));
-      else
-	sleep_time = conf.heartbeat_frequency_min;
+      Gettimeofday(&tv, NULL);
 
-      hb = _cerebrod_heartbeat_create(&buflen);
-  
-      if (buflen >= CEREBRO_MAX_PACKET_LEN)
+      itr = List_iterator_create(next_send_times);
+      while ((nst = list_next(itr)))
         {
-          CEREBRO_DBG(("heartbeat exceeds maximum size: packet dropped"));
-          goto end_loop;
-        }
+          if (nst->next_send_time < tv.tv_sec)
+            {
+              struct cerebrod_heartbeat* hb;
+              unsigned int buflen;
+              char *buf = NULL;
+              struct sockaddr *addr;
+              struct sockaddr_in hbaddr;
+              int rv, hblen;
+              unsigned int addrlen;
 
-      buf = Malloc(buflen + 1);
+              hb = _cerebrod_heartbeat_create(nst, &buflen);
 
-      if ((hblen = _heartbeat_marshall(hb, buf, buflen)) < 0)
-        goto end_loop;
+              if (buflen >= CEREBRO_MAX_PACKET_LEN)
+                {
+                  CEREBRO_DBG(("heartbeat exceeds maximum size: packet dropped"));
+                  goto end_loop;
+                }
+              
+              buf = Malloc(buflen + 1);
+              
+              if ((hblen = _heartbeat_marshall(hb, buf, buflen)) < 0)
+                goto end_loop;
 
-      _cerebrod_heartbeat_dump(hb);
+              _cerebrod_heartbeat_dump(hb);
       
-      memset(&hbaddr, '\0', sizeof(struct sockaddr_in));
-      hbaddr.sin_family = AF_INET;
-      hbaddr.sin_port = htons(conf.heartbeat_destination_port);
-      memcpy(&hbaddr.sin_addr, 
-             &conf.heartbeat_destination_ip_in_addr, 
-             sizeof(struct in_addr));
+              memset(&hbaddr, '\0', sizeof(struct sockaddr_in));
+              hbaddr.sin_family = AF_INET;
+              hbaddr.sin_port = htons(conf.heartbeat_destination_port);
+              memcpy(&hbaddr.sin_addr, 
+                     &conf.heartbeat_destination_ip_in_addr, 
+                     sizeof(struct in_addr));
 
-      addr = (struct sockaddr *)&hbaddr;
-      addrlen = sizeof(struct sockaddr_in);
-      if ((rv = sendto(speaker_fd, buf, hblen, 0, addr, addrlen)) != hblen)
-        {
-          if (rv < 0)
-            speaker_fd = cerebrod_reinit_socket(speaker_fd, 
-                                                conf.heartbeat_source_port,
-                                                _speaker_socket_create, 
-                                                "speaker: sendto");
+              addr = (struct sockaddr *)&hbaddr;
+              addrlen = sizeof(struct sockaddr_in);
+              if ((rv = sendto(speaker_fd, buf, hblen, 0, addr, addrlen)) != hblen)
+                {
+                  if (rv < 0)
+                    speaker_fd = cerebrod_reinit_socket(speaker_fd, 
+                                                        conf.heartbeat_source_port,
+                                                        _speaker_socket_create, 
+                                                        "speaker: sendto");
+                  else
+                    CEREBRO_DBG(("sendto: invalid bytes sent"));
+                }
+              
+            end_loop:
+              cerebrod_heartbeat_destroy(hb);
+              if (nst->next_send_type & CEREBROD_SPEAKER_NEXT_SEND_TYPE_HEARTBEAT)
+                {
+                  int t;
+
+                  /* Algorithm from srand(3) manpage */
+                  if (conf.heartbeat_frequency_ranged)
+                    t = conf.heartbeat_frequency_min + ((((double)(conf.heartbeat_frequency_max - conf.heartbeat_frequency_min))*rand())/(RAND_MAX+1.0));
+                  else
+                    t = conf.heartbeat_frequency_min;
+
+                  nst->next_send_time = tv.tv_sec + t;
+                }
+              /* XXX - handle modules */
+              if (buf)
+                Free(buf);
+            }
           else
-            CEREBRO_DBG(("sendto: invalid bytes sent"));
+            break;
         }
+      
+      List_sort(next_send_times, (ListCmpF)_next_send_time_compare);
 
-    end_loop:
-      cerebrod_heartbeat_destroy(hb);
-      if (buf)
-        Free(buf);
+      nst = List_peek(next_send_times);
+      sleep_time = nst->next_send_time - tv.tv_sec;
       sleep(sleep_time);
     }
 

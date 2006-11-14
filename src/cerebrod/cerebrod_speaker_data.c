@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker_data.c,v 1.41.2.1 2006-11-13 17:05:19 chu11 Exp $
+ *  $Id: cerebrod_speaker_data.c,v 1.41.2.2 2006-11-14 04:16:05 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -166,6 +166,7 @@ _setup_metric_modules(void)
 #endif /* !WITH_CEREBROD_NO_THREADS */
       char *module_name, *metric_name;
       int metric_period;
+      u_int32_t metric_flags;
       
       module_name = metric_module_name(metric_handle, i);
 #if CEREBRO_DEBUG
@@ -203,6 +204,13 @@ _setup_metric_modules(void)
           continue;
         }
 
+      if (metric_module_get_metric_flags(metric_handle, i, &metric_flags) < 0)
+        {
+          CEREBRO_DBG(("metric_module_get_metric_flags: %s", module_name));
+          metric_module_cleanup(metric_handle, i);
+          continue;
+        }
+
       if (metric_module_send_heartbeat_function_pointer(metric_handle, i, &cerebrod_send_heartbeat) < 0)
         {
           CEREBRO_DBG(("metric_module_send_heartbeat_function_pointer: %s", module_name));
@@ -216,12 +224,27 @@ _setup_metric_modules(void)
       metric_info->metric_origin = CEREBROD_METRIC_SPEAKER_ORIGIN_MODULE;
 
       metric_info->metric_period = metric_period;
+      metric_info->metric_flags = metric_flags;
       metric_info->index = i;
 
-      if (metric_info->metric_period < 0)
+      /* 
+       * If metric period is < 0, it presumably never will be sent
+       * (metric is likely handled by a metric_thread), so set
+       * next_call_time to UINT_MAX.
+
+       * If this is a metric that will be piggy-backed on heartbeats,
+       * then initialize next_call_time to 0, so the data is sent on
+       * the first heartbeat 
+       *
+       * If this is a metric that will not be piggy-backed on heartbeats,
+       * likewise set the next_call_time to UINT_MAX.  Let the 
+       * speaker logic decide when packets should be sent.
+       */
+
+      if (metric_info->metric_period < 0
+          || metric_info->metric_flags & CEREBRO_METRIC_MODULE_FLAGS_SEND_ON_PERIOD)
         metric_info->next_call_time = UINT_MAX;
       else
-        /* Initialize to 0, so data is sent on the first heartbeat */
         metric_info->next_call_time = 0;
 
       List_append(metric_list, metric_info);
@@ -547,7 +570,8 @@ cerebrod_speaker_data_get_metric_data(struct cerebrod_heartbeat *hb,
       if (tv.tv_sec <= metric_info->next_call_time)
         break;
 
-      if (metric_info->metric_origin & CEREBROD_METRIC_SPEAKER_ORIGIN_MODULE)
+      if (metric_info->metric_origin & CEREBROD_METRIC_SPEAKER_ORIGIN_MODULE
+          && !(metric_info->metric_flags & CEREBRO_METRIC_MODULE_FLAGS_SEND_ON_PERIOD))
 	hd = _get_module_metric_value(metric_info);
 
       if (metric_info->metric_origin & CEREBROD_METRIC_SPEAKER_ORIGIN_USERSPACE)

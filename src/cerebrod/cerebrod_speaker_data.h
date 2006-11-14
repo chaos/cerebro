@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker_data.h,v 1.12 2006-02-22 06:08:28 chu11 Exp $
+ *  $Id: cerebrod_speaker_data.h,v 1.12.4.1 2006-11-14 04:16:05 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -55,6 +55,7 @@ struct cerebrod_speaker_metric_info
 
   /* For Metric Modules */
   int metric_period;
+  u_int32_t metric_flags;
   int index;
 
   /* For Metrics from userspace */
