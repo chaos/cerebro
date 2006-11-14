@@ -1,4 +1,4 @@
-2006-XX-XX  Albert Chu  <chu11@llnl.gov>
+2006-11-14  Albert Chu  <chu11@llnl.gov>
 
 	* src/libs/include/cerebro/cerebro_metric_module.h,
 	src/libs/modules/, src/modules/metric/: Support new
@@ -21,6 +21,8 @@
 	src/cerebrod/cerebrod_speaker.h, src/cerebrod/cerebrod_speaker.c:
 	Support metric module flags and possibility metric modules may not
 	send data via heartbeats.
+
+	* man/cerebro_module_devel.3.in: Updated appropriately.
 	
 2006-11-11  Albert Chu  <chu11@llnl.gov>
 

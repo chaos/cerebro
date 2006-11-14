@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro_module_devel.3.in,v 1.20 2006-11-08 00:34:03 chu11 Exp $
+\."$Id: cerebro_module_devel.3.in,v 1.20.2.1 2006-11-14 18:41:50 chu11 Exp $
 \."#############################################################################
 \."  Copyright (C) 2005 The Regents of the University of California.
 \."  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -388,6 +388,7 @@ struct cerebro_metric_module_info {
   Cerebro_metric_cleanup cleanup;
   Cerebro_metric_get_metric_name get_metric_name;
   Cerebro_metric_get_metric_period get_metric_period;
+  Cerebro_metric_get_metric_flags get_metric_flags;
   Cerebro_metric_get_metric_value get_metric_value;
   Cerebro_metric_destroy_metric_value destroy_metric_value;
   Cerebro_metric_get_metric_thread get_metric_thread;
@@ -428,13 +429,28 @@ The field 'get_metric_period' should point to a function of the following type:
 typedef int (*Cerebro_metric_get_metric_period)(int *period);
 
 The 'get_metric_period' function retrieves the period in seconds that
-the metric value should be read and propogated.  If the period is 0,
-the metric will be read and propogated with every cerebro
-heartbeat. If the period is < 0, the metric will be propogated only
-when instructed to. Note that the period is not precise, and is only
-an approximation.  Data is only propogated in cerebro heartbeats,
-therefore the period time granularity will be related to the cerebro
-heartbeat period.  It returns 0 on success, -1 on error.
+the metric value should be read and propogated.  If the period is < 0,
+the metric will not be propogated and it is the responsibility of the
+module to propogate data via the 'send_heartbeat' function below.  If
+the SEND_ON_PERIOD flag is not set below, the period will not be
+precise.  Data will only be piggy-backed on cerebro heartbeats,
+therefore the granularity of the period will be related to the cerebro
+heartbeat period.  This tradeoff decreases metric time accuracy but
+decreases CPU interruption.  It returns 0 on success, -1 on error.
+
+The field 'get_metric_flags' should point to a function of the following type:
+
+typedef int (*Cerebro_metric_get_metric_flags)(int *flags);
+
+The 'get_metric_flags' function retrieves the flags that indicate slightly
+different behavior that this module may have.  The flags that can be set are:
+
+CEREBRO_METRIC_MODULE_FLAGS_SEND_ON_PERIOD - Do not send the metric
+value with the cerebrod heartbeat.  Send it in its only packet exactly
+on its period.  If this flag is set, the period specified by this module
+must be > 0.
+
+This function returns 0 on success, -1 on error.
 
 The field 'get_metric_value' should point to a function of the following type:
 
@@ -465,23 +481,10 @@ typedef void *(*Cerebro_metric_thread_pointer)(void *arg);
 
 which will be executed as a detached thread.  
 
-The function will be passed a pointer to a function of type:
-
-typedef int (*Cerebro_metric_updated)(char *metric_name);
-
-This thread can perform any metric monitoring duties it pleases and
-optionally call the 'Cerebro_metric_updated' function when a metric
-value is updated.
-
+This thread can perform any metric monitoring duties it pleases.
 Typically the thread is used to watch or monitor for some event and
-locally update data so that cerebrod will propogate the newly received
-data from a 'get_metric_value' call.
- 
-If the user wishes to use mutexes within the metric thread to protect
-against concurrent access, the user is responsible for not putting the
-locks in situations that can lead to a deadlock.  The
-'Cerebro_metric_updated' function call may require locks to function
-appropriately within the cerebrod daemon.
+periodically send cerebrod heartbeats by calling the 'send_heartbeat'
+function below.
 
 If no detached thread is required to be executed by this module, NULL
 should be returned.
@@ -493,7 +496,7 @@ never be called.
 
 The field 'send_heartbeat_function_pointer' should point to a function of the following type:
 
-typedef int (*Cerebro_metric_send_heartbeat_function_pointer)(Cerebro_metric_send_heartbeat function_pointer););
+typedef int (*Cerebro_metric_send_heartbeat_function_pointer)(Cerebro_metric_send_heartbeat function_pointer);
 
 The 'send_heartbeat_function_pointer' receives a pointer of the type:
 

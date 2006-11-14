@@ -1,13 +1,3 @@
-TODO 
-
-documentation
-- flags stuff in metric modules
-- metric module "_is_updated" not in thread anymore
-- data need not be propogated only by heartbeat
-- metric module period > 0 for non-heartbeat
-
-general cleanup of code
-
 Before Release
 - up age/lib stuff in configure.ac
 
