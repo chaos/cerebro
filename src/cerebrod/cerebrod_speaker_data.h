@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker_data.h,v 1.12 2006-02-22 06:08:28 chu11 Exp $
+ *  $Id: cerebrod_speaker_data.h,v 1.13 2006-11-14 18:58:26 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -33,7 +33,7 @@
 #include "cerebro/cerebro_metric_module.h"
 #include "cerebro/cerebrod_heartbeat_protocol.h"
 
-/* 
+/*
  * Flags to define where a metric comes from.  Either it is monitored
  * by default by Cerebro, comes from a metric module, or has come from
  * userspace from a tool or lib.
@@ -51,10 +51,13 @@ struct cerebrod_speaker_metric_info
 {
   char *metric_name;
   u_int32_t metric_origin;
+
+  /* For use on heartbeat sent metrics */
   u_int32_t next_call_time;
 
   /* For Metric Modules */
   int metric_period;
+  u_int32_t metric_flags;
   int index;
 
   /* For Metrics from userspace */
@@ -78,11 +81,20 @@ void cerebrod_speaker_data_initialize(void);
 void cerebrod_speaker_data_metric_list_sort(void);
 
 /*
- * cerebrod_speaker_data_get_metric_data
+ * cerebrod_speaker_data_get_heartbeat_metric_data
  *
  * Store metric data into the heartbeat
  */
-void cerebrod_speaker_data_get_metric_data(struct cerebrod_heartbeat *hb, 
-                                           unsigned int *heartbeat_len);
+void cerebrod_speaker_data_get_heartbeat_metric_data(struct cerebrod_heartbeat *hb, 
+                                                     unsigned int *heartbeat_len);
+
+/*
+ * cerebrod_speaker_data_get_module_metric_data
+ *
+ * Store metric data into the heartbeat
+ */
+void cerebrod_speaker_data_get_module_metric_data(struct cerebrod_heartbeat *hb, 
+                                                  unsigned int *heartbeat_len,
+                                                  unsigned int index);
 
 #endif /* _CEREBROD_SPEAKER_DATA_H */

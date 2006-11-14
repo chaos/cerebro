@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.h,v 1.8 2006-02-22 06:08:28 chu11 Exp $
+ *  $Id: cerebrod_speaker.h,v 1.9 2006-11-14 18:58:26 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -29,6 +29,28 @@
 #define _CEREBROD_SPEAKER_H
 
 #include "cerebro/cerebrod_heartbeat_protocol.h"
+
+/* 
+ * Flags to define if a metric should be sent with cerebrod heartbeats
+ * or by themselves.
+ */
+#define CEREBROD_SPEAKER_NEXT_SEND_TYPE_HEARTBEAT 0x1
+#define CEREBROD_SPEAKER_NEXT_SEND_TYPE_MODULE    0x2
+
+/* 
+ * struct cerebrod_next_send_time
+ *
+ * Store information on when to next send information
+ */
+struct cerebrod_next_send_time
+{
+  u_int32_t next_send_type;
+  u_int32_t next_send_time;
+
+  /* For Metric Modules */
+  int metric_period;
+  int index;
+};
 
 /* 
  * cerebrod_speaker

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_module.h,v 1.9 2006-02-22 06:08:28 chu11 Exp $
+ *  $Id: cerebro_metric_module.h,v 1.10 2006-11-14 18:58:26 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -28,7 +28,10 @@
 #ifndef _CEREBRO_METRIC_MODULE_H
 #define _CEREBRO_METRIC_MODULE_H
 
+#include <sys/types.h>
 #include <cerebro/cerebrod_heartbeat_protocol.h>
+
+#define CEREBRO_METRIC_MODULE_FLAGS_SEND_ON_PERIOD 0x1
 
 /*
  * Cerebro_metric_setup
@@ -75,6 +78,16 @@ typedef char *(*Cerebro_metric_get_metric_name)(void);
  */
 typedef int (*Cerebro_metric_get_metric_period)(int *period);
 
+/* 
+ * Cerebro_metric_get_metric_flags
+ *
+ * function prototype for metric module function to indicate the flags
+ * it supports.  Required to be defined by each metric module.
+ * 
+ * Returns 0 on success, -1 on error
+ */
+typedef int (*Cerebro_metric_get_metric_flags)(u_int32_t *flags);
+
 /*
  * Cerebro_metric_get_metric_value
  *
@@ -98,36 +111,17 @@ typedef int (*Cerebro_metric_get_metric_value)(unsigned int *metric_value_type,
 typedef int (*Cerebro_metric_destroy_metric_value)(void *metric_value);
 
 /* 
- * Cerebro_metric_updated
- *
- * function prototype to inform the cerebrod daemon a metric
- * has been updated.
- *
- * Returns 0 on success, -1 on error
- */
-typedef int (*Cerebro_metric_updated)(char *metric_name);
-
-/* 
  * Cerebro_metric_thread_pointer
  *
  * function prototype for a thread which will be passed to
  * pthread_create
  *
- * The function will be passed a pointer to a 'Cerebro_metric_updated'
- * function can be called when the metric value is updated.  This
- * thread can perform any metric monitoring duties it pleases and
- * optionally call the 'Cerebro_metric_updated' function when a metric
- * value is updated.
+ * This thread can perform any metric monitoring duties it pleases and
+ * call the send heartbeat function (see Cerebro_metric_send_heartbeat below) 
+ * to send data when its data has been updated.
  *
  * Typically the thread is used to watch or monitor for some event and
- * locally update data so that cerebrod will propogate the newly
- * received data from a 'get_metric_value' call.
- *
- * If the user wishes to use mutexes within the metric thread to
- * protect against concurrent access, the user is responsible for not
- * putting the locks in situations that can lead to a deadlock.  The
- * 'Cerebro_metric_updated' function call may require locks to
- * function appropriately within the cerebrod daemon.
+ * propogate the information as needed.
  */
 typedef void *(*Cerebro_metric_thread_pointer)(void *arg);
 
@@ -176,6 +170,7 @@ struct cerebro_metric_module_info
   Cerebro_metric_cleanup cleanup;
   Cerebro_metric_get_metric_name get_metric_name;
   Cerebro_metric_get_metric_period get_metric_period;
+  Cerebro_metric_get_metric_flags get_metric_flags;
   Cerebro_metric_get_metric_value get_metric_value;
   Cerebro_metric_destroy_metric_value destroy_metric_value;
   Cerebro_metric_get_metric_thread get_metric_thread;

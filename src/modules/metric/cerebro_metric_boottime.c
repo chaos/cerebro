@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_boottime.c,v 1.20 2006-11-12 07:43:08 chu11 Exp $
+ *  $Id: cerebro_metric_boottime.c,v 1.21 2006-11-14 18:58:27 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -157,6 +157,7 @@ struct cerebro_metric_module_info metric_module_info =
     &common_metric_cleanup_do_nothing,
     &boottime_metric_get_metric_name,
     &common_metric_get_metric_period_0,
+    &common_metric_get_metric_flags_none,
     &boottime_metric_get_metric_value,
     &common_metric_destroy_metric_value_do_nothing,
     &common_metric_get_metric_thread_null,
