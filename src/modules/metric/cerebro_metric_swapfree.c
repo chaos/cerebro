@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_swapfree.c,v 1.6 2006-11-14 18:58:28 chu11 Exp $
+ *  $Id: cerebro_metric_swapfree.c,v 1.7 2006-11-14 23:05:35 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -45,31 +45,6 @@
 
 #define SWAPFREE_METRIC_MODULE_NAME  "swapfree"
 #define SWAPFREE_METRIC_NAME         "swapfree"
-
-/*
- * swapfree_metric_setup
- *
- * swapfree metric module setup function.  Read and store the swapfree
- * out of /proc.
- */
-static int
-swapfree_metric_setup(void)
-{
-  /* nothing to do */
-  return 0;
-}
-
-/*
- * swapfree_metric_cleanup
- *
- * swapfree metric module cleanup function
- */
-static int
-swapfree_metric_cleanup(void)
-{
-  /* nothing to do */
-  return 0;
-}
 
 /*
  * swapfree_metric_get_metric_name

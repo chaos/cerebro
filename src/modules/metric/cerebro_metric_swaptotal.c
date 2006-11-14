@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_swaptotal.c,v 1.6 2006-11-14 18:58:28 chu11 Exp $
+ *  $Id: cerebro_metric_swaptotal.c,v 1.7 2006-11-14 23:05:35 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -45,31 +45,6 @@
 
 #define SWAPTOTAL_METRIC_MODULE_NAME  "swaptotal"
 #define SWAPTOTAL_METRIC_NAME         "swaptotal"
-
-/*
- * swaptotal_metric_setup
- *
- * swaptotal metric module setup function.  Read and store the swaptotal
- * out of /proc.
- */
-static int
-swaptotal_metric_setup(void)
-{
-  /* nothing to do */
-  return 0;
-}
-
-/*
- * swaptotal_metric_cleanup
- *
- * swaptotal metric module cleanup function
- */
-static int
-swaptotal_metric_cleanup(void)
-{
-  /* nothing to do */
-  return 0;
-}
 
 /*
  * swaptotal_metric_get_metric_name
