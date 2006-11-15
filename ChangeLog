@@ -1,6 +1,10 @@
 2006-11-14  Albert Chu  <chu11@llnl.gov>
 
 	* configure.ac: Up library version.
+
+	* Globally cleanup code so cerebrod "heartbeat" is now a cerebrod
+	"message".  Heartbeats still exist, although they are now one type
+	of cerebrod message, rather than the only possible message.
 	
 2006-11-14  Albert Chu  <chu11@llnl.gov>
 

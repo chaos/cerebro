@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_slurm_state.c,v 1.21 2006-11-14 18:58:28 chu11 Exp $
+ *  $Id: cerebro_metric_slurm_state.c,v 1.22 2006-11-15 00:12:30 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -83,11 +83,11 @@ static u_int32_t metric_slurm_state = 0;
 static int slurm_state_fd = -1;
 
 /*
- * send_heartbeat_function
+ * send_message_function
  *
- * Stores pointer to function to send a heartbeat
+ * Stores pointer to function to send a message
  */
-Cerebro_metric_send_heartbeat send_heartbeat_function = NULL;
+Cerebro_metric_send_message send_message_function = NULL;
 
 /* 
  * _slurm_state_setup_socket
@@ -196,26 +196,26 @@ slurm_state_metric_get_metric_value(unsigned int *metric_value_type,
 }
 
 /*
- * _send_heartbeat
+ * _send_message
  *
  * Will handle the SIGTERM (and SIGINT if we're debugging) signals.
  * After receiving the signal, will create and send the last
- * heartbeat, then kill the program.
+ * message, then kill the program.
  *
  * Although the author took reasonably good steps to make the primary
  * code survive SIGINT signals in system calls, it hasn't been
- * auditted fully.  Sending metrics/heartbeats via signals probably
+ * auditted fully.  Sending metrics/messages via signals probably
  * isn't a good idea.  This is an exception b/c we'll die right away.
  */
 static int
-_send_heartbeat(void)
+_send_message(void)
 {
-  struct cerebrod_heartbeat *hb = NULL;
-  struct cerebrod_heartbeat_metric *hd = NULL;
+  struct cerebrod_message *hb = NULL;
+  struct cerebrod_message_metric *hd = NULL;
   char nodename[CEREBRO_MAX_NODENAME_LEN+1];
   int rv = -1;
 
-  if (!(hb = (struct cerebrod_heartbeat *)malloc(sizeof(struct cerebrod_heartbeat))))
+  if (!(hb = (struct cerebrod_message *)malloc(sizeof(struct cerebrod_message))))
     {
       CEREBRO_DBG(("malloc: %s", strerror(errno)));
       goto cleanup;
@@ -228,17 +228,17 @@ _send_heartbeat(void)
       goto cleanup;
     }
 
-  hb->version = CEREBROD_HEARTBEAT_PROTOCOL_VERSION;
+  hb->version = CEREBROD_MESSAGE_PROTOCOL_VERSION;
   memcpy(hb->nodename, nodename, CEREBRO_MAX_NODENAME_LEN);
   
   hb->metrics_len = 1;
-  if (!(hb->metrics = (struct cerebrod_heartbeat_metric **)malloc(sizeof(struct cerebrod_heartbeat_metric *)*(hb->metrics_len + 1))))
+  if (!(hb->metrics = (struct cerebrod_message_metric **)malloc(sizeof(struct cerebrod_message_metric *)*(hb->metrics_len + 1))))
     goto cleanup;
-  memset(hb->metrics, '\0', sizeof(struct cerebrod_heartbeat_metric *)*(hb->metrics_len + 1));
+  memset(hb->metrics, '\0', sizeof(struct cerebrod_message_metric *)*(hb->metrics_len + 1));
 
-  if (!(hd = (struct cerebrod_heartbeat_metric *)malloc(sizeof(struct cerebrod_heartbeat_metric))))
+  if (!(hd = (struct cerebrod_message_metric *)malloc(sizeof(struct cerebrod_message_metric))))
     goto cleanup;
-  memset(hd, '\0', sizeof(struct cerebrod_heartbeat_metric));
+  memset(hd, '\0', sizeof(struct cerebrod_message_metric));
 
   /* need not overflow */
   strncpy(hd->metric_name, SLURM_STATE_METRIC_NAME, CEREBRO_MAX_METRIC_NAME_LEN);
@@ -250,9 +250,9 @@ _send_heartbeat(void)
 
   hb->metrics[0] = hd;
 
-  if ((*send_heartbeat_function)(hb) < 0)
+  if ((*send_message_function)(hb) < 0)
     {
-      CEREBRO_DBG(("cerebrod_send_heartbeat"));
+      CEREBRO_DBG(("cerebrod_send_message"));
       goto cleanup;
     }
   
@@ -301,8 +301,8 @@ slurm_state_metric_thread(void *arg)
 
       /* No biggie if it fails, we can continue */
       
-      if (_send_heartbeat() < 0)
-        CEREBRO_DBG(("_send_heartbeat failed"));
+      if (_send_message() < 0)
+        CEREBRO_DBG(("_send_message failed"));
       
       while (1)
         {
@@ -363,8 +363,8 @@ slurm_state_metric_thread(void *arg)
                   metric_slurm_state = 0;
                   
                   /* No biggie if it fails, we can continue */
-                  if (_send_heartbeat() < 0)
-                    CEREBRO_DBG(("_send_heartbeat failed"));
+                  if (_send_message() < 0)
+                    CEREBRO_DBG(("_send_message failed"));
 
                   close(fd);
                   break;
@@ -399,12 +399,12 @@ slurm_state_metric_get_metric_thread(void)
 }
 
 /*
- * slurm_state_metric_send_heartbeat_function_pointer
+ * slurm_state_metric_send_message_function_pointer
  *
- * slurm_state metric module send_heartbeat_function_pointer function
+ * slurm_state metric module send_message_function_pointer function
  */
 static int
-slurm_state_metric_send_heartbeat_function_pointer(Cerebro_metric_send_heartbeat function_pointer)
+slurm_state_metric_send_message_function_pointer(Cerebro_metric_send_message function_pointer)
 {
   if (!function_pointer)
     {
@@ -412,7 +412,7 @@ slurm_state_metric_send_heartbeat_function_pointer(Cerebro_metric_send_heartbeat
       return -1;
     }
 
-  send_heartbeat_function = function_pointer;
+  send_message_function = function_pointer;
   return 0;
 }
 
@@ -431,5 +431,5 @@ struct cerebro_metric_module_info metric_module_info =
     &slurm_state_metric_get_metric_value,
     &common_metric_destroy_metric_value_do_nothing,
     &slurm_state_metric_get_metric_thread,
-    &slurm_state_metric_send_heartbeat_function_pointer,
+    &slurm_state_metric_send_message_function_pointer,
   };

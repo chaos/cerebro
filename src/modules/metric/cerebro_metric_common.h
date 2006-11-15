@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_common.h,v 1.2 2006-11-14 19:02:39 chu11 Exp $
+ *  $Id: cerebro_metric_common.h,v 1.3 2006-11-15 00:12:30 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -100,11 +100,11 @@ int common_metric_destroy_metric_value_free_value(void *metric_value);
 Cerebro_metric_thread_pointer common_metric_get_metric_thread_null(void);
 
 /*
- * common_metric_send_heartbeat_function_pointer_unused
+ * common_metric_send_message_function_pointer_unused
  *
- * common metric module send_heartbeat_function_pointer function that
+ * common metric module send_message_function_pointer function that
  * doesn't use the pointer.
  */
-int common_metric_send_heartbeat_function_pointer_unused(Cerebro_metric_send_heartbeat function_pointer);
+int common_metric_send_message_function_pointer_unused(Cerebro_metric_send_message function_pointer);
 
 #endif /* _CEREBRO_METRIC_COMMON */

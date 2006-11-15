@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.h,v 1.12 2006-11-08 00:34:04 chu11 Exp $
+ *  $Id: cerebrod_listener_data.h,v 1.13 2006-11-15 00:12:30 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -38,7 +38,7 @@
 
 #include <sys/types.h>
 
-#include "cerebro/cerebrod_heartbeat_protocol.h"
+#include "cerebro/cerebrod_message_protocol.h"
 
 #include "hash.h"
 
@@ -169,10 +169,10 @@ void cerebrod_listener_data_initialize(void);
 /* 
  * cerebrod_listener_data_update
  *
- * Update listener_data with information from a heartbeat
+ * Update listener_data with information from a cerebrod message
  */
 void cerebrod_listener_data_update(char *nodename,
-                                   struct cerebrod_heartbeat *hb,
+                                   struct cerebrod_message *msg,
                                    u_int32_t received_time);
 
 #endif /* _CEREBROD_LISTENER_DATA_H */

@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro_module_devel.3.in,v 1.21 2006-11-14 18:58:26 chu11 Exp $
+\."$Id: cerebro_module_devel.3.in,v 1.22 2006-11-15 00:12:30 chu11 Exp $
 \."#############################################################################
 \."  Copyright (C) 2005 The Regents of the University of California.
 \."  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -203,16 +203,16 @@ struct cerebro_config {
   unsigned int cerebrod_heartbeat_frequency_min;
   unsigned int cerebrod_heartbeat_frequency_max;
   int cerebrod_heartbeat_frequency_flag;
-  int cerebrod_heartbeat_source_port;
-  int cerebrod_heartbeat_source_port_flag;
-  char cerebrod_heartbeat_source_network_interface[CEREBRO_MAXNETWORKINTERFACELEN+1];
-  int cerebrod_heartbeat_source_network_interface_flag;
-  int cerebrod_heartbeat_destination_port;
-  int cerebrod_heartbeat_destination_port_flag;
-  char cerebrod_heartbeat_destination_ip[CEREBRO_MAXIPADDRLEN+1];
-  int cerebrod_heartbeat_destination_ip_flag;
-  int cerebrod_heartbeat_ttl;
-  int cerebrod_heartbeat_ttl_flag;
+  int cerebrod_message_source_port;
+  int cerebrod_message_source_port_flag;
+  char cerebrod_message_source_network_interface[CEREBRO_MAXNETWORKINTERFACELEN+1];
+  int cerebrod_message_source_network_interface_flag;
+  int cerebrod_message_destination_port;
+  int cerebrod_message_destination_port_flag;
+  char cerebrod_message_destination_ip[CEREBRO_MAXIPADDRLEN+1];
+  int cerebrod_message_destination_ip_flag;
+  int cerebrod_message_ttl;
+  int cerebrod_message_ttl_flag;
   int cerebrod_speak;
   int cerebrod_speak_flag;
   int cerebrod_listen;
@@ -271,38 +271,38 @@ The 'cerebrod_heartbeat_frequency_min' and
 maximum heartbeat frequencey for
 .BR cerebrod(8).
 
-The 'cerebrod_heartbeat_source_port' field stores the heartbeat source
+The 'cerebrod_message_source_port' field stores the message source
 port for
 .BR cerebrod(8).
 
-The 'cerebrod_heartbeat_source_network_interface' field stores the heartbeat
+The 'cerebrod_message_source_network_interface' field stores the message
 network interface for
 .BR cerebrod(8)
-to send heartbeat packets out of.  The network interface can be
+to send message packets out of.  The network interface can be
 specified as a network interface, ip address, or a subnet using CIDR
 notation.
 
-The 'cerebrod_heartbeat_destination_port' field stores the heartbeat
+The 'cerebrod_message_destination_port' field stores the message
 destination port for
 .BR cerebrod(8).
 
-The 'cerebrod_heartbeat_destination_ip' field stores the heartbeat
-destination ip of heartbeat packets sent from
+The 'cerebrod_message_destination_ip' field stores the message
+destination ip of message packets sent from
 .BR cerebrod(8).
 The destination IP address may be a single case or multicast IPv4
 address.
 
-The 'cerebrod_heartbeat_ttl' field stores the heartbeat time to live
-for heartbeat packets multicast from
+The 'cerebrod_message_ttl' field stores the message time to live
+for message packets multicast from
 .BR cerebrod(8).
 
 The 'cerebrod_speak' field is a boolean that turns on the 
 .BR cerebrod(8)
-speaker to send out heartbeat packets.
+speaker to send out message packets.
 
 The 'cerebrod_listen' field is a boolean that turns on the
 .BR cerebrod(8)
-listener to receive heartbeat packets.
+listener to receive message packets.
 
 The 'cerebrod_listen_threads' field stores the number of listener
 threads that should be created in
@@ -392,7 +392,7 @@ struct cerebro_metric_module_info {
   Cerebro_metric_get_metric_value get_metric_value;
   Cerebro_metric_destroy_metric_value destroy_metric_value;
   Cerebro_metric_get_metric_thread get_metric_thread;
-  Cerebro_metric_send_heartbeat_function_pointer send_heartbeat_function_pointer;
+  Cerebro_metric_send_message_function_pointer send_message_function_pointer;
 .in -2
 };
 .fi
@@ -429,14 +429,16 @@ The field 'get_metric_period' should point to a function of the following type:
 typedef int (*Cerebro_metric_get_metric_period)(int *period);
 
 The 'get_metric_period' function retrieves the period in seconds that
-the metric value should be read and propogated.  If the period is < 0,
-the metric will not be propogated and it is the responsibility of the
-module to propogate data via the 'send_heartbeat' function below.  If
-the SEND_ON_PERIOD flag is not set below, the period will not be
-precise.  Data will only be piggy-backed on cerebro heartbeats,
-therefore the granularity of the period will be related to the cerebro
-heartbeat period.  This tradeoff decreases metric time accuracy but
-decreases CPU interruption.  It returns 0 on success, -1 on error.
+the metric value should be read and propogated.  If the period is 0,
+the metric will be read and propogated with every cerebrod heartbeat.
+If the period is < 0, the metric will not be propogated and it is the
+responsibility of the module to propogate data via the
+'send_message' function specified below.  If the SEND_ON_PERIOD flag
+is not set below, the period will not be precise.  Data will only be
+piggy-backed on cerebro heartbeats, therefore the granularity of the
+period will be related to the cerebro heartbeat period.  This tradeoff
+decreases metric time accuracy but decreases CPU interruption.  It
+returns 0 on success, -1 on error.
 
 The field 'get_metric_flags' should point to a function of the following type:
 
@@ -446,7 +448,7 @@ The 'get_metric_flags' function retrieves the flags that indicate slightly
 different behavior that this module may have.  The flags that can be set are:
 
 CEREBRO_METRIC_MODULE_FLAGS_SEND_ON_PERIOD - Do not send the metric
-value with the cerebrod heartbeat.  Send it in its only packet exactly
+value with the cerebrod message.  Send it in its only packet exactly
 on its period.  If this flag is set, the period specified by this module
 must be > 0.
 
@@ -483,7 +485,7 @@ which will be executed as a detached thread.
 
 This thread can perform any metric monitoring duties it pleases.
 Typically the thread is used to watch or monitor for some event and
-periodically send cerebrod heartbeats by calling the 'send_heartbeat'
+periodically send cerebrod messages by calling the 'send_message'
 function below.
 
 If no detached thread is required to be executed by this module, NULL
@@ -494,15 +496,15 @@ If the
 daemon was built without threads, the 'get_metric_thread' function will
 never be called.
 
-The field 'send_heartbeat_function_pointer' should point to a function of the following type:
+The field 'send_message_function_pointer' should point to a function of the following type:
 
-typedef int (*Cerebro_metric_send_heartbeat_function_pointer)(Cerebro_metric_send_heartbeat function_pointer);
+typedef int (*Cerebro_metric_send_message_function_pointer)(Cerebro_metric_send_message function_pointer);
 
-The 'send_heartbeat_function_pointer' receives a pointer of the type:
+The 'send_message_function_pointer' receives a pointer of the type:
 
-typedef int (*Cerebro_metric_send_heartbeat)(struct cerebrod_heartbeat *hb);
+typedef int (*Cerebro_metric_send_message)(struct cerebrod_message *hb);
 
-The pointer will allow the metric module to send a heartbeat message.
+The pointer will allow the metric module to send a cerebrod message.
 
 All of the above functions must be defined in the module and listed in
 the 'metric_module_info' structure.

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker_data.h,v 1.13 2006-11-14 18:58:26 chu11 Exp $
+ *  $Id: cerebrod_speaker_data.h,v 1.14 2006-11-15 00:12:30 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -31,7 +31,7 @@
 #include <sys/types.h>
  
 #include "cerebro/cerebro_metric_module.h"
-#include "cerebro/cerebrod_heartbeat_protocol.h"
+#include "cerebro/cerebrod_message_protocol.h"
 
 /*
  * Flags to define where a metric comes from.  Either it is monitored
@@ -85,16 +85,16 @@ void cerebrod_speaker_data_metric_list_sort(void);
  *
  * Store metric data into the heartbeat
  */
-void cerebrod_speaker_data_get_heartbeat_metric_data(struct cerebrod_heartbeat *hb, 
-                                                     unsigned int *heartbeat_len);
+void cerebrod_speaker_data_get_heartbeat_metric_data(struct cerebrod_message *msg, 
+                                                     unsigned int *message_len);
 
 /*
  * cerebrod_speaker_data_get_module_metric_data
  *
- * Store metric data into the heartbeat
+ * Store metric data into the message
  */
-void cerebrod_speaker_data_get_module_metric_data(struct cerebrod_heartbeat *hb, 
-                                                  unsigned int *heartbeat_len,
+void cerebrod_speaker_data_get_module_metric_data(struct cerebrod_message *msg, 
+                                                  unsigned int *message_len,
                                                   unsigned int index);
 
 #endif /* _CEREBROD_SPEAKER_DATA_H */

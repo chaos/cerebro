@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_heartbeat_protocol.h,v 1.5 2006-02-22 06:08:28 chu11 Exp $
+ *  $Id: cerebrod_message.h,v 1.1 2006-11-15 00:12:30 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -25,47 +25,24 @@
  *  59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.
 \*****************************************************************************/
 
-#ifndef _CEREBROD_HEARTBEAT_PROTOCOL_H
-#define _CEREBROD_HEARTBEAT_PROTOCOL_H
+#ifndef _CEREBROD_MESSAGE_H
+#define _CEREBROD_MESSAGE_H
 
-#include <sys/types.h>
-
-#include <cerebro/cerebro_constants.h>
-
-#define CEREBROD_HEARTBEAT_PROTOCOL_VERSION 2
+#include "cerebro/cerebrod_message_protocol.h"
 
 /*
- * struct cerebrod_heartbeat_metric
+ * cerebrod_message_destroy
  *
- * defines heartbeat metric data
+ * destroy a message packet
  */
-struct cerebrod_heartbeat_metric
-{
-  char metric_name[CEREBRO_MAX_METRIC_NAME_LEN];
-  u_int32_t metric_value_type;
-  u_int32_t metric_value_len;
-  void *metric_value;
-};
-
-#define CEREBROD_HEARTBEAT_METRIC_HEADER_LEN  (CEREBRO_MAX_METRIC_NAME_LEN \
-                                               + sizeof(u_int32_t) \
-                                               + sizeof(u_int32_t))
+void cerebrod_message_destroy(struct cerebrod_message *msg);
 
 /* 
- * struct cerebrod_heartbeat
+ * cerebrod_message_dump
  *
- * defines heartbeat data sent/received from each cerebrod daemon
+ * dump contents of a message packet.  Should be called with
+ * debug_output_mutex held.
  */
-struct cerebrod_heartbeat 
-{
-  int32_t version;
-  char nodename[CEREBRO_MAX_NODENAME_LEN];
-  u_int32_t metrics_len;
-  struct cerebrod_heartbeat_metric **metrics;
-};
+void cerebrod_message_dump(struct cerebrod_message *msg);
 
-#define CEREBROD_HEARTBEAT_HEADER_LEN  (sizeof(int32_t) \
-                                        + CEREBRO_MAX_NODENAME_LEN \
-                                        + sizeof(u_int32_t))
-
-#endif /* _CEREBROD_HEARTBEAT_PROTOCOL_H */
+#endif /* _CEREBROD_MESSAGE_H */

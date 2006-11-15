@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_event_node_timeout_monitor.c,v 1.3 2006-11-09 23:20:08 chu11 Exp $
+ *  $Id: cerebrod_event_node_timeout_monitor.c,v 1.4 2006-11-15 00:12:30 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -254,11 +254,11 @@ cerebrod_event_node_timeout_monitor(void *arg)
          * be a speaker node).
          *
          * So what should the timeout be? Well, the worst thing that
-         * can happen is a heartbeat packet comes the exact
-         * microsecond after we've determined all nodes are down.  So
-         * the packet that just came in has the potential to timeout
-         * after 'event_module_timeout_min' seconds.  So that's the
-         * time we'll sleep for.
+         * can happen is a message packet comes the exact microsecond
+         * after we've determined all nodes are down.  So the packet
+         * that just came in has the potential to timeout after
+         * 'event_module_timeout_min' seconds.  So that's the time
+         * we'll sleep for.
          */
         sleep(event_module_timeout_min);
 

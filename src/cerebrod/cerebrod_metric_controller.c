@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_controller.c,v 1.39 2006-11-14 18:58:26 chu11 Exp $
+ *  $Id: cerebrod_metric_controller.c,v 1.40 2006-11-15 00:12:30 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -52,7 +52,7 @@
 #include "cerebro/cerebro_constants.h"
 
 #include "cerebro/cerebro_metric_control_protocol.h"
-#include "cerebro/cerebrod_heartbeat_protocol.h"
+#include "cerebro/cerebrod_message_protocol.h"
 
 #include "cerebrod.h"
 #include "cerebrod_config.h"
@@ -544,22 +544,22 @@ _receive_metric_value(int fd,
 }
 
 /* 
- * _send_heartbeat_now
+ * _send_message_now
  *
- * Send the metric info now rather than waiting for the next heartbeat
+ * Send the metric info now rather than waiting for the next message
  *
  * Returns 0 on success, -1 on error
  */
 static int
-_send_heartbeat_now(int fd, 
-                    int32_t version,
-                    const char *metric_name,
-                    u_int32_t metric_value_type,
-                    u_int32_t metric_value_len,
-                    void *metric_value)
+_send_message_now(int fd, 
+                  int32_t version,
+                  const char *metric_name,
+                  u_int32_t metric_value_type,
+                  u_int32_t metric_value_len,
+                  void *metric_value)
 {
-  struct cerebrod_heartbeat *hb = NULL;
-  struct cerebrod_heartbeat_metric *hd = NULL;
+  struct cerebrod_message *msg = NULL;
+  struct cerebrod_message_metric *mm = NULL;
   char nodename[CEREBRO_MAX_NODENAME_LEN+1];
   int rv = -1;
 
@@ -567,7 +567,7 @@ _send_heartbeat_now(int fd,
          && metric_name 
          && conf.speak);
 
-  if (!(hb = (struct cerebrod_heartbeat *)malloc(sizeof(struct cerebrod_heartbeat))))
+  if (!(msg = (struct cerebrod_message *)malloc(sizeof(struct cerebrod_message))))
     {
       CEREBRO_DBG(("malloc: %s", strerror(errno)));
       _send_metric_control_response(fd,
@@ -586,11 +586,11 @@ _send_heartbeat_now(int fd,
       goto cleanup;
     }
   
-  hb->version = CEREBROD_HEARTBEAT_PROTOCOL_VERSION;
-  memcpy(hb->nodename, nodename, CEREBRO_MAX_NODENAME_LEN);
+  msg->version = CEREBROD_MESSAGE_PROTOCOL_VERSION;
+  memcpy(msg->nodename, nodename, CEREBRO_MAX_NODENAME_LEN);
 
-  hb->metrics_len = 1;
-  if (!(hb->metrics = (struct cerebrod_heartbeat_metric **)malloc(sizeof(struct cerebrod_heartbeat_metric *)*(hb->metrics_len + 1))))
+  msg->metrics_len = 1;
+  if (!(msg->metrics = (struct cerebrod_message_metric **)malloc(sizeof(struct cerebrod_message_metric *)*(msg->metrics_len + 1))))
     {
       CEREBRO_DBG(("malloc: %s", strerror(errno)));
       _send_metric_control_response(fd,
@@ -598,9 +598,9 @@ _send_heartbeat_now(int fd,
                                     CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_INTERNAL_ERROR);
       goto cleanup;
     }
-  memset(hb->metrics, '\0', sizeof(struct cerebrod_heartbeat_metric *)*(hb->metrics_len + 1));
+  memset(msg->metrics, '\0', sizeof(struct cerebrod_message_metric *)*(msg->metrics_len + 1));
 
-  if (!(hd = (struct cerebrod_heartbeat_metric *)malloc(sizeof(struct cerebrod_heartbeat_metric))))
+  if (!(mm = (struct cerebrod_message_metric *)malloc(sizeof(struct cerebrod_message_metric))))
     {
       CEREBRO_DBG(("malloc: %s", strerror(errno)));
       _send_metric_control_response(fd,
@@ -608,20 +608,20 @@ _send_heartbeat_now(int fd,
                                     CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_INTERNAL_ERROR);
       goto cleanup;
     }
-  memset(hd, '\0', sizeof(struct cerebrod_heartbeat_metric));
+  memset(mm, '\0', sizeof(struct cerebrod_message_metric));
 
   /* need not overflow */
-  strncpy(hd->metric_name, metric_name, CEREBRO_MAX_METRIC_NAME_LEN);
+  strncpy(mm->metric_name, metric_name, CEREBRO_MAX_METRIC_NAME_LEN);
   
-  hd->metric_value_type = metric_value_type;
-  hd->metric_value_len = metric_value_len;
-  hd->metric_value = metric_value;
+  mm->metric_value_type = metric_value_type;
+  mm->metric_value_len = metric_value_len;
+  mm->metric_value = metric_value;
 
-  hb->metrics[0] = hd;
+  msg->metrics[0] = mm;
 
-  if (cerebrod_send_heartbeat(hb) < 0)
+  if (cerebrod_send_message(msg) < 0)
     {
-      CEREBRO_DBG(("cerebrod_send_heartbeat"));
+      CEREBRO_DBG(("cerebrod_send_message"));
       _send_metric_control_response(fd,
                                     version,
                                     CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_INTERNAL_ERROR);
@@ -630,14 +630,14 @@ _send_heartbeat_now(int fd,
 
   rv = 0;
  cleanup:
-  if (hb)
+  if (msg)
     {
-      if (hb->metrics)
-        free(hb->metrics);
-      free(hb);
+      if (msg->metrics)
+        free(msg->metrics);
+      free(msg);
     }
-  if (hd)
-    free(hd);
+  if (mm)
+    free(mm);
   return rv;
 }
 
@@ -707,7 +707,7 @@ _update_metric(int fd,
   if (metric_info->metric_value)
     Free(metric_info->metric_value);
 
-  /* If we have to send it now, don't bother waiting for a heartbeat
+  /* If we have to send it now, don't bother waiting for a message
    * to come along later by setting next_call_time to UINT_MAX.
    */
   if (req->flags & CEREBRO_METRIC_CONTROL_FLAGS_SEND_NOW)
@@ -725,12 +725,12 @@ _update_metric(int fd,
 
   if (req->flags & CEREBRO_METRIC_CONTROL_FLAGS_SEND_NOW)
     {
-      if (_send_heartbeat_now(fd, 
-                              version,
-                              metric_name,
-                              req->metric_value_type,
-                              req->metric_value_len,
-                              req->metric_value) < 0)
+      if (_send_message_now(fd, 
+                            version,
+                            metric_name,
+                            req->metric_value_type,
+                            req->metric_value_len,
+                            req->metric_value) < 0)
         goto cleanup;
     }
 
@@ -783,7 +783,7 @@ _resend_metric(int fd,
       goto cleanup;
     }
   
-  /* If we have to send it now, don't bother waiting for a heartbeat
+  /* If we have to send it now, don't bother waiting for a message
    * to come along later by setting next_call_time to UINT_MAX.
    */
   if (req->flags & CEREBRO_METRIC_CONTROL_FLAGS_SEND_NOW)
@@ -806,12 +806,12 @@ _resend_metric(int fd,
 
   if (req->flags & CEREBRO_METRIC_CONTROL_FLAGS_SEND_NOW)
     {
-      if (_send_heartbeat_now(fd, 
-                              version,
-                              metric_name,
-                              metric_value_type,
-                              metric_value_len,
-                              metric_value_copy) < 0)
+      if (_send_message_now(fd, 
+                            version,
+                            metric_name,
+                            metric_value_type,
+                            metric_value_len,
+                            metric_value_copy) < 0)
         goto cleanup;
     }
 

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_monitor_update.c,v 1.2 2006-11-02 01:22:34 chu11 Exp $
+ *  $Id: cerebrod_monitor_update.c,v 1.3 2006-11-15 00:12:30 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -243,7 +243,7 @@ void
 cerebrod_monitor_modules_update(const char *nodename,
                                 struct cerebrod_node_data *nd,
                                 const char *metric_name,
-                                struct cerebrod_heartbeat_metric *hd)
+                                struct cerebrod_message_metric *mm)
 {
   struct cerebrod_monitor_module_info *monitor_module;
   List monitor_list;
@@ -251,7 +251,7 @@ cerebrod_monitor_modules_update(const char *nodename,
   int rv;
 #endif /* CEREBRO_DEBUG */
   
-  assert(nodename && nd && metric_name && hd);
+  assert(nodename && nd && metric_name && mm);
 
   if (!monitor_index)
     return;
@@ -275,9 +275,9 @@ cerebrod_monitor_modules_update(const char *nodename,
 				       monitor_module->index,
 				       nodename,
 				       metric_name,
-				       hd->metric_value_type,
-				       hd->metric_value_len,
-				       hd->metric_value);
+				       mm->metric_value_type,
+				       mm->metric_value_len,
+				       mm->metric_value);
 	  Pthread_mutex_unlock(&monitor_module->monitor_lock);
 	}
       List_iterator_destroy(itr);

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.91 2006-11-14 18:58:26 chu11 Exp $
+ *  $Id: cerebrod_speaker.c,v 1.92 2006-11-15 00:12:30 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -44,10 +44,10 @@
 #include "cerebro.h"
 #include "cerebro/cerebro_constants.h"
 
-#include "cerebro/cerebrod_heartbeat_protocol.h"
+#include "cerebro/cerebrod_message_protocol.h"
 
 #include "cerebrod_config.h"
-#include "cerebrod_heartbeat.h"
+#include "cerebrod_message.h"
 #include "cerebrod_speaker.h"
 #include "cerebrod_speaker_data.h"
 #include "cerebrod_util.h"
@@ -118,12 +118,12 @@ _speaker_socket_create(int num)
 
       memset(&imr, '\0', sizeof(struct ip_mreqn));
       memcpy(&imr.imr_multiaddr, 
-	     &conf.heartbeat_destination_ip_in_addr,
+	     &conf.message_destination_ip_in_addr,
 	     sizeof(struct in_addr));
       memcpy(&imr.imr_address, 
-	     &conf.heartbeat_source_network_interface_in_addr,
+	     &conf.message_source_network_interface_in_addr,
 	     sizeof(struct in_addr));
-      imr.imr_ifindex = conf.heartbeat_source_network_interface_index;
+      imr.imr_ifindex = conf.message_source_network_interface_index;
       
       optlen = sizeof(struct ip_mreqn);
       if (setsockopt(fd, SOL_IP, IP_MULTICAST_IF, &imr, optlen) < 0)
@@ -140,7 +140,7 @@ _speaker_socket_create(int num)
           goto cleanup;
 	}
 
-      optval = conf.heartbeat_ttl;
+      optval = conf.message_ttl;
       optlen = sizeof(optval);
       if (setsockopt(fd, SOL_IP, IP_MULTICAST_TTL, &optval, optlen) < 0)
 	{
@@ -160,7 +160,7 @@ _speaker_socket_create(int num)
   addr.sin_family = AF_INET;
   addr.sin_port = htons(num);
   memcpy(&addr.sin_addr,
-	 &conf.heartbeat_source_network_interface_in_addr,
+	 &conf.message_source_network_interface_in_addr,
 	 sizeof(struct in_addr));
   if (bind(fd, (struct sockaddr *)&addr, sizeof(struct sockaddr_in)) < 0) 
     {
@@ -280,75 +280,75 @@ _speaker_initialize(void)
 }
 
 /*
- * _cerebrod_heartbeat_create
+ * _cerebrod_message_create
  *
- * construct a heartbeat packet
+ * construct a message packet
  */
-static struct cerebrod_heartbeat *
-_cerebrod_heartbeat_create(struct cerebrod_next_send_time *nst,
-                           unsigned int *heartbeat_len)
+static struct cerebrod_message *
+_cerebrod_message_create(struct cerebrod_next_send_time *nst,
+                         unsigned int *message_len)
 {
-  struct cerebrod_heartbeat *hb = NULL;
+  struct cerebrod_message *msg = NULL;
 
-  assert(nst && heartbeat_len);
+  assert(nst && message_len);
 
-  *heartbeat_len = 0;
+  *message_len = 0;
 
-  hb = Malloc(sizeof(struct cerebrod_heartbeat));
+  msg = Malloc(sizeof(struct cerebrod_message));
 
-  hb->version = CEREBROD_HEARTBEAT_PROTOCOL_VERSION;
-  memcpy(hb->nodename, cerebrod_nodename, CEREBRO_MAX_NODENAME_LEN);
-  *heartbeat_len += CEREBROD_HEARTBEAT_HEADER_LEN;
+  msg->version = CEREBROD_MESSAGE_PROTOCOL_VERSION;
+  memcpy(msg->nodename, cerebrod_nodename, CEREBRO_MAX_NODENAME_LEN);
+  *message_len += CEREBROD_MESSAGE_HEADER_LEN;
 
   if (nst->next_send_type & CEREBROD_SPEAKER_NEXT_SEND_TYPE_HEARTBEAT)
-    cerebrod_speaker_data_get_heartbeat_metric_data(hb, heartbeat_len);
+    cerebrod_speaker_data_get_heartbeat_metric_data(msg, message_len);
   else if (nst->next_send_type & CEREBROD_SPEAKER_NEXT_SEND_TYPE_MODULE)
-    cerebrod_speaker_data_get_module_metric_data(hb, 
-                                                 heartbeat_len, 
+    cerebrod_speaker_data_get_module_metric_data(msg, 
+                                                 message_len, 
                                                  nst->index);
 
-  return hb;
+  return msg;
 }
 
 /*
- * _heartbeat_marshall
+ * _message_marshall
  *
- * marshall contents of a heartbeat packet.
+ * marshall contents of a message packet.
  *
  * Returns length written to buffer on success, -1 on error
  */
 int
-_heartbeat_marshall(struct cerebrod_heartbeat *hb, 
-                    char *buf, 
-                    unsigned int buflen)
+_message_marshall(struct cerebrod_message *msg, 
+                  char *buf, 
+                  unsigned int buflen)
 {
   char *bufPtr;
   int i, bufPtrlen, c = 0;
  
-  assert(hb && buf && buflen >= CEREBROD_HEARTBEAT_HEADER_LEN);
+  assert(msg && buf && buflen >= CEREBROD_MESSAGE_HEADER_LEN);
   
-  bufPtr = hb->nodename;
-  bufPtrlen = sizeof(hb->nodename);
+  bufPtr = msg->nodename;
+  bufPtrlen = sizeof(msg->nodename);
   memset(buf, '\0', buflen);
-  c += Marshall_int32(hb->version, buf + c, buflen - c);
+  c += Marshall_int32(msg->version, buf + c, buflen - c);
   c += Marshall_buffer(bufPtr, bufPtrlen, buf + c, buflen - c);
-  c += Marshall_u_int32(hb->metrics_len, buf + c, buflen - c);
+  c += Marshall_u_int32(msg->metrics_len, buf + c, buflen - c);
   
-  if (!hb->metrics_len)
+  if (!msg->metrics_len)
     return c;
 
-  for (i = 0; i < hb->metrics_len; i++)
+  for (i = 0; i < msg->metrics_len; i++)
     {
       char *mname;
       u_int32_t mtype, mlen;
       void *mvalue;
       int n, mnamelen;
 
-      mname = hb->metrics[i]->metric_name;
-      mnamelen = sizeof(hb->metrics[i]->metric_name);
-      mtype = hb->metrics[i]->metric_value_type;
-      mlen = hb->metrics[i]->metric_value_len;
-      mvalue = hb->metrics[i]->metric_value;
+      mname = msg->metrics[i]->metric_name;
+      mnamelen = sizeof(msg->metrics[i]->metric_name);
+      mtype = msg->metrics[i]->metric_value_type;
+      mlen = msg->metrics[i]->metric_value_len;
+      mvalue = msg->metrics[i]->metric_value;
 
       c += Marshall_buffer(mname, mnamelen, buf + c, buflen - c);
 
@@ -381,15 +381,15 @@ _heartbeat_marshall(struct cerebrod_heartbeat *hb,
 }
 
 /* 
- * _cerebrod_heartbeat_dump
+ * _cerebrod_message_dump
  *
- * Dump contents of heartbeat packet
+ * Dump contents of message packet
  */
 static void
-_cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb)
+_cerebrod_message_dump(struct cerebrod_message *msg)
 {
 #if CEREBRO_DEBUG
-  assert(hb);
+  assert(msg);
 
   if (!(conf.debug && conf.speak_debug))
     return;
@@ -398,9 +398,9 @@ _cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb)
   Pthread_mutex_lock(&debug_output_mutex);
 #endif /* !WITH_CEREBROD_NO_THREADS */
   fprintf(stderr, "**************************************\n");
-  fprintf(stderr, "* Sending Heartbeat\n");     
+  fprintf(stderr, "* Sending Message\n");     
   fprintf(stderr, "* -----------------------\n");
-  cerebrod_heartbeat_dump(hb);
+  cerebrod_message_dump(msg);
   fprintf(stderr, "**************************************\n");
 #if !WITH_CEREBROD_NO_THREADS
   Pthread_mutex_unlock(&debug_output_mutex);
@@ -415,7 +415,7 @@ cerebrod_speaker(void *arg)
 
   _speaker_initialize();
 
-  if ((speaker_fd = _speaker_socket_create(conf.heartbeat_source_port)) < 0)
+  if ((speaker_fd = _speaker_socket_create(conf.message_source_port)) < 0)
     CEREBRO_EXIT(("speaker fd setup failed"));
 
   while (1)
@@ -432,43 +432,43 @@ cerebrod_speaker(void *arg)
         {
           if (nst->next_send_time < tv.tv_sec)
             {
-              struct cerebrod_heartbeat* hb;
+              struct cerebrod_message* msg;
               unsigned int buflen;
               char *buf = NULL;
               struct sockaddr *addr;
-              struct sockaddr_in hbaddr;
-              int rv, hblen;
+              struct sockaddr_in msgaddr;
+              int rv, msglen;
               unsigned int addrlen;
 
-              hb = _cerebrod_heartbeat_create(nst, &buflen);
+              msg = _cerebrod_message_create(nst, &buflen);
 
               if (buflen >= CEREBRO_MAX_PACKET_LEN)
                 {
-                  CEREBRO_DBG(("heartbeat exceeds maximum size: packet dropped"));
+                  CEREBRO_DBG(("message exceeds maximum size: packet dropped"));
                   goto end_loop;
                 }
               
               buf = Malloc(buflen + 1);
               
-              if ((hblen = _heartbeat_marshall(hb, buf, buflen)) < 0)
+              if ((msglen = _message_marshall(msg, buf, buflen)) < 0)
                 goto end_loop;
 
-              _cerebrod_heartbeat_dump(hb);
+              _cerebrod_message_dump(msg);
       
-              memset(&hbaddr, '\0', sizeof(struct sockaddr_in));
-              hbaddr.sin_family = AF_INET;
-              hbaddr.sin_port = htons(conf.heartbeat_destination_port);
-              memcpy(&hbaddr.sin_addr, 
-                     &conf.heartbeat_destination_ip_in_addr, 
+              memset(&msgaddr, '\0', sizeof(struct sockaddr_in));
+              msgaddr.sin_family = AF_INET;
+              msgaddr.sin_port = htons(conf.message_destination_port);
+              memcpy(&msgaddr.sin_addr, 
+                     &conf.message_destination_ip_in_addr, 
                      sizeof(struct in_addr));
 
-              addr = (struct sockaddr *)&hbaddr;
+              addr = (struct sockaddr *)&msgaddr;
               addrlen = sizeof(struct sockaddr_in);
-              if ((rv = sendto(speaker_fd, buf, hblen, 0, addr, addrlen)) != hblen)
+              if ((rv = sendto(speaker_fd, buf, msglen, 0, addr, addrlen)) != msglen)
                 {
                   if (rv < 0)
                     speaker_fd = cerebrod_reinit_socket(speaker_fd, 
-                                                        conf.heartbeat_source_port,
+                                                        conf.message_source_port,
                                                         _speaker_socket_create, 
                                                         "speaker: sendto");
                   else
@@ -476,7 +476,7 @@ cerebrod_speaker(void *arg)
                 }
               
             end_loop:
-              cerebrod_heartbeat_destroy(hb);
+              cerebrod_message_destroy(msg);
               if (nst->next_send_type & CEREBROD_SPEAKER_NEXT_SEND_TYPE_HEARTBEAT)
                 {
                   int t;
@@ -509,15 +509,15 @@ cerebrod_speaker(void *arg)
 }
 
 int
-cerebrod_send_heartbeat(struct cerebrod_heartbeat *hb)
+cerebrod_send_message(struct cerebrod_message *msg)
 {
-  int i, rv, hblen, buflen = 0;
+  int i, rv, msglen, buflen = 0;
   unsigned int addrlen;
   char *buf = NULL;
-  struct sockaddr_in hbaddr;
+  struct sockaddr_in msgaddr;
   int fd = -1;
 
-  if (!hb)
+  if (!msg)
     {
       errno = EINVAL;
       return -1;
@@ -529,49 +529,49 @@ cerebrod_send_heartbeat(struct cerebrod_heartbeat *hb)
 
   fd = _speaker_socket_create(0);
 
-  buflen = CEREBROD_HEARTBEAT_HEADER_LEN;
-  for (i = 0; i < hb->metrics_len; i++)
+  buflen = CEREBROD_MESSAGE_HEADER_LEN;
+  for (i = 0; i < msg->metrics_len; i++)
     {
-      if (!hb->metrics[i])
+      if (!msg->metrics[i])
 	{
 	  CEREBRO_DBG(("null metrics pointer"));
 	  errno = EINVAL;
 	  goto cleanup;
 	}
-      buflen += CEREBROD_HEARTBEAT_METRIC_HEADER_LEN;
-      buflen += hb->metrics[i]->metric_value_len;
+      buflen += CEREBROD_MESSAGE_METRIC_HEADER_LEN;
+      buflen += msg->metrics[i]->metric_value_len;
     }
 
   if (buflen >= CEREBRO_MAX_PACKET_LEN)
     {
-      CEREBRO_DBG(("heartbeat exceeds maximum size: packet dropped"));
+      CEREBRO_DBG(("message exceeds maximum size: packet dropped"));
       goto cleanup;
     }
 
   buf = Malloc(buflen + 1);
 
-  if ((hblen = _heartbeat_marshall(hb, buf, buflen)) < 0)
+  if ((msglen = _message_marshall(msg, buf, buflen)) < 0)
     {
-      CEREBRO_DBG(("_heartbeat_marshall"));
+      CEREBRO_DBG(("_message_marshall"));
       goto cleanup;
     }
 
-  _cerebrod_heartbeat_dump(hb);
+  _cerebrod_message_dump(msg);
       
-  memset(&hbaddr, '\0', sizeof(struct sockaddr_in));
-  hbaddr.sin_family = AF_INET;
-  hbaddr.sin_port = htons(conf.heartbeat_destination_port);
-  memcpy(&hbaddr.sin_addr, 
-	 &conf.heartbeat_destination_ip_in_addr, 
+  memset(&msgaddr, '\0', sizeof(struct sockaddr_in));
+  msgaddr.sin_family = AF_INET;
+  msgaddr.sin_port = htons(conf.message_destination_port);
+  memcpy(&msgaddr.sin_addr, 
+	 &conf.message_destination_ip_in_addr, 
 	 sizeof(struct in_addr));
 
   addrlen = sizeof(struct sockaddr_in);
   if ((rv = sendto(fd, 
                    buf, 
-                   hblen, 
+                   msglen, 
                    0, 
-                   (struct sockaddr *)&hbaddr, 
-                   addrlen)) != hblen)
+                   (struct sockaddr *)&msgaddr, 
+                   addrlen)) != msglen)
     {
       CEREBRO_DBG(("sendto: invalid bytes sent"));
       goto cleanup;

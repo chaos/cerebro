@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_module.h,v 1.10 2006-11-14 18:58:26 chu11 Exp $
+ *  $Id: cerebro_metric_module.h,v 1.11 2006-11-15 00:12:30 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -29,7 +29,7 @@
 #define _CEREBRO_METRIC_MODULE_H
 
 #include <sys/types.h>
-#include <cerebro/cerebrod_heartbeat_protocol.h>
+#include <cerebro/cerebrod_message_protocol.h>
 
 #define CEREBRO_METRIC_MODULE_FLAGS_SEND_ON_PERIOD 0x1
 
@@ -68,11 +68,14 @@ typedef char *(*Cerebro_metric_get_metric_name)(void);
  *
  * Retrieve the period in seconds that the metric value should be read
  * and propogated.  If the period is 0, the metric will be read and
- * propogated with every cerebro heartbeat. If the period is < 0, the
- * metric will be propogated only when instructed to. Note that the
- * period is not precise, and is only an approximation.  Data is only
- * propogated in cerebro heartbeats, therefore the period time
- * granularity will be related to the cerebro heartbeat period.
+ * propogated with every cerebrod heartbeat.  If the period is < 0,
+ * the metric will not be propogated and it is the responsibility of
+ * the module to propogate data via the 'send_message' function
+ * specified below.  If the SEND_ON_PERIOD flag is not set below, the
+ * period will not be precise.  Data will only be piggy-backed on
+ * cerebro heartbeats, therefore the granularity of the period will be
+ * related to the cerebro heartbeat period.  This tradeoff decreases
+ * metric time accuracy but decreases CPU interruption.
  *
  * Returns 0 on success, -1 on error
  */
@@ -117,7 +120,7 @@ typedef int (*Cerebro_metric_destroy_metric_value)(void *metric_value);
  * pthread_create
  *
  * This thread can perform any metric monitoring duties it pleases and
- * call the send heartbeat function (see Cerebro_metric_send_heartbeat below) 
+ * call the send message function (see Cerebro_metric_send_message below) 
  * to send data when its data has been updated.
  *
  * Typically the thread is used to watch or monitor for some event and
@@ -138,24 +141,24 @@ typedef void *(*Cerebro_metric_thread_pointer)(void *arg);
  */
 typedef Cerebro_metric_thread_pointer (*Cerebro_metric_get_metric_thread)(void);
 
-/* Cerebro_metric_send_heartbeat 
+/* Cerebro_metric_send_message 
  *
  * function prototype to inform the cerebrod daemon to send
- * a heartbeat.
+ * a message.
  *
  * Returns 0 on success, -1 on error
  */
-typedef int (*Cerebro_metric_send_heartbeat)(struct cerebrod_heartbeat *hb);
+typedef int (*Cerebro_metric_send_message)(struct cerebrod_message *hb);
 
 /* 
- * Cerebro_metric_send_heartbeat_function_pointer
+ * Cerebro_metric_send_message_function_pointer
  *
- * function prototype to give a Cerebro_metric_send_heartbeat function
+ * function prototype to give a Cerebro_metric_send_message function
  * pointer to the metric module.
  *
  * Returns 0 on success, -1 on error
  */
-typedef int (*Cerebro_metric_send_heartbeat_function_pointer)(Cerebro_metric_send_heartbeat function_pointer);
+typedef int (*Cerebro_metric_send_message_function_pointer)(Cerebro_metric_send_message function_pointer);
 
 /*
  * struct cerebro_metric_module_info 
@@ -174,7 +177,7 @@ struct cerebro_metric_module_info
   Cerebro_metric_get_metric_value get_metric_value;
   Cerebro_metric_destroy_metric_value destroy_metric_value;
   Cerebro_metric_get_metric_thread get_metric_thread;
-  Cerebro_metric_send_heartbeat_function_pointer send_heartbeat_function_pointer; 
+  Cerebro_metric_send_message_function_pointer send_message_function_pointer; 
 };
 
 #endif /* _CEREBRO_METRIC_MODULE_H */

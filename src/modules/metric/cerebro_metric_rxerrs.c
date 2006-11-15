@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_rxerrs.c,v 1.5 2006-11-14 18:58:27 chu11 Exp $
+ *  $Id: cerebro_metric_rxerrs.c,v 1.6 2006-11-15 00:12:30 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -119,5 +119,5 @@ struct cerebro_metric_module_info metric_module_info =
     &rxerrs_metric_get_metric_value,
     &common_metric_destroy_metric_value_free_value,
     &common_metric_get_metric_thread_null,
-    &common_metric_send_heartbeat_function_pointer_unused,
+    &common_metric_send_message_function_pointer_unused,
   };

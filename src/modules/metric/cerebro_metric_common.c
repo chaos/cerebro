@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_common.c,v 1.2 2006-11-14 19:02:39 chu11 Exp $
+ *  $Id: cerebro_metric_common.c,v 1.3 2006-11-15 00:12:30 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -131,7 +131,7 @@ common_metric_get_metric_thread_null(void)
 }
 
 int
-common_metric_send_heartbeat_function_pointer_unused(Cerebro_metric_send_heartbeat function_pointer)
+common_metric_send_message_function_pointer_unused(Cerebro_metric_send_message function_pointer)
 {
   return 0;
 }

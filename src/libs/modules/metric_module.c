@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: metric_module.c,v 1.20 2006-11-14 18:58:26 chu11 Exp $
+ *  $Id: metric_module.c,v 1.21 2006-11-15 00:12:30 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -523,9 +523,9 @@ metric_module_get_metric_thread(metric_modules_t handle,
 }
 
 int 
-metric_module_send_heartbeat_function_pointer(metric_modules_t handle,
-					      unsigned int index,
-					      Cerebro_metric_send_heartbeat function_pointer)
+metric_module_send_message_function_pointer(metric_modules_t handle,
+                                            unsigned int index,
+                                            Cerebro_metric_send_message function_pointer)
 {
   struct cerebro_metric_module_info *module_info;
 
@@ -538,5 +538,5 @@ metric_module_send_heartbeat_function_pointer(metric_modules_t handle,
       return -1;
     }
 
-  return ((*module_info->send_heartbeat_function_pointer)(function_pointer));
+  return ((*module_info->send_message_function_pointer)(function_pointer));
 }

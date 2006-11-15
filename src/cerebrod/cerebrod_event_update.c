@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_event_update.c,v 1.3 2006-11-09 23:20:08 chu11 Exp $
+ *  $Id: cerebrod_event_update.c,v 1.4 2006-11-15 00:12:30 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -641,7 +641,7 @@ void
 cerebrod_event_modules_update(const char *nodename,
                               struct cerebrod_node_data *nd,
                               const char *metric_name,
-                              struct cerebrod_heartbeat_metric *hd)
+                              struct cerebrod_message_metric *mm)
 {
   struct cerebrod_event_module_info *event_module;
   List event_list; 
@@ -649,7 +649,7 @@ cerebrod_event_modules_update(const char *nodename,
   int rv;
 #endif /* CEREBRO_DEBUG */
   
-  assert(nodename && nd && metric_name && hd);
+  assert(nodename && nd && metric_name && mm);
 
   if (!event_index)
     return;
@@ -676,9 +676,9 @@ cerebrod_event_modules_update(const char *nodename,
                                                event_module->index,
                                                nodename,
                                                metric_name,
-                                               hd->metric_value_type,
-                                               hd->metric_value_len,
-                                               hd->metric_value,
+                                               mm->metric_value_type,
+                                               mm->metric_value_len,
+                                               mm->metric_value,
                                                &event)) < 0)
             {
               CEREBRO_DBG(("event_module_metric_update"));

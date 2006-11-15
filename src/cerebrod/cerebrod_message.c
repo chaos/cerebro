@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_heartbeat.c,v 1.49 2006-11-08 00:34:04 chu11 Exp $
+ *  $Id: cerebrod_message.c,v 1.1 2006-11-15 00:12:30 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -37,7 +37,7 @@
 #include "cerebro.h"
 
 #include "cerebrod_config.h"
-#include "cerebrod_heartbeat.h"
+#include "cerebrod_message.h"
 
 #include "wrappers.h"
 
@@ -47,25 +47,25 @@ extern pthread_mutex_t debug_output_mutex;
 #endif /* CEREBRO_DEBUG */
 
 void
-cerebrod_heartbeat_destroy(struct cerebrod_heartbeat *hb)
+cerebrod_message_destroy(struct cerebrod_message *msg)
 {
   int i;
 
-  if (!hb)
+  if (!msg)
     return;
 
-  for (i = 0; i < hb->metrics_len; i++)
+  for (i = 0; i < msg->metrics_len; i++)
     {
-      Free(hb->metrics[i]->metric_value);
-      Free(hb->metrics[i]);
+      Free(msg->metrics[i]->metric_value);
+      Free(msg->metrics[i]);
     }
 
-  Free(hb->metrics);
-  Free(hb);
+  Free(msg->metrics);
+  Free(msg);
 }
 
 void
-cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb)
+cerebrod_message_dump(struct cerebrod_message *msg)
 {
 #if CEREBRO_DEBUG
   int i;
@@ -73,7 +73,7 @@ cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb)
   int rv;
 #endif /* !WITH_CEREBROD_NO_THREADS */
 
-  assert(hb);
+  assert(msg);
 
   if (!conf.debug)
     return;
@@ -89,68 +89,68 @@ cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb)
 #endif /* !WITH_CEREBROD_NO_THREADS */
       
   fprintf(stderr, "**************************************\n");
-  fprintf(stderr, "* Cerebrod Heartbeat:\n");     
+  fprintf(stderr, "* Cerebrod Message:\n");     
   fprintf(stderr, "* -------------------\n");
-  fprintf(stderr, "* version: %d\n", hb->version);
-  fprintf(stderr, "* nodename: \"%s\"\n", hb->nodename);
-  fprintf(stderr, "* metrics_len: %d\n", hb->metrics_len);
+  fprintf(stderr, "* version: %d\n", msg->version);
+  fprintf(stderr, "* nodename: \"%s\"\n", msg->nodename);
+  fprintf(stderr, "* metrics_len: %d\n", msg->metrics_len);
 
-  for (i = 0; i < hb->metrics_len; i++)
+  for (i = 0; i < msg->metrics_len; i++)
     {
       char *buf;
       
       fprintf(stderr, "* %s: metric type = %d, len = %d ",
-              hb->metrics[i]->metric_name, 
-              hb->metrics[i]->metric_value_type,
-              hb->metrics[i]->metric_value_len);
+              msg->metrics[i]->metric_name, 
+              msg->metrics[i]->metric_value_type,
+              msg->metrics[i]->metric_value_len);
       
-      switch(hb->metrics[i]->metric_value_type)
+      switch(msg->metrics[i]->metric_value_type)
         {
         case CEREBRO_DATA_VALUE_TYPE_NONE:
           break;
         case CEREBRO_DATA_VALUE_TYPE_INT32:
           fprintf(stderr, "value = %d", 
-                  *((int32_t *)hb->metrics[i]->metric_value));
+                  *((int32_t *)msg->metrics[i]->metric_value));
           break;
         case CEREBRO_DATA_VALUE_TYPE_U_INT32:
           fprintf(stderr, "value = %u", 
-                  *((u_int32_t *)hb->metrics[i]->metric_value));
+                  *((u_int32_t *)msg->metrics[i]->metric_value));
           break;
         case CEREBRO_DATA_VALUE_TYPE_FLOAT:
           fprintf(stderr, "value = %f", 
-                      *((float *)hb->metrics[i]->metric_value));
+                      *((float *)msg->metrics[i]->metric_value));
           break;
         case CEREBRO_DATA_VALUE_TYPE_DOUBLE:
           fprintf(stderr, "value = %f", 
-                  *((double *)hb->metrics[i]->metric_value));
+                  *((double *)msg->metrics[i]->metric_value));
           break;
         case CEREBRO_DATA_VALUE_TYPE_STRING:
           /* Watch for NUL termination */
-          buf = Malloc(hb->metrics[i]->metric_value_len + 1);
-          memset(buf, '\0', hb->metrics[i]->metric_value_len + 1);
+          buf = Malloc(msg->metrics[i]->metric_value_len + 1);
+          memset(buf, '\0', msg->metrics[i]->metric_value_len + 1);
           memcpy(buf, 
-                 hb->metrics[i]->metric_value, 
-                 hb->metrics[i]->metric_value_len);
+                 msg->metrics[i]->metric_value, 
+                 msg->metrics[i]->metric_value_len);
           fprintf(stderr, "value = %s", buf);
           Free(buf);
           break;
 #if SIZEOF_LONG == 4
         case CEREBRO_DATA_VALUE_TYPE_INT64:
           fprintf(stderr, "value = %lld", 
-                  *((int64_t *)hb->metrics[i]->metric_value));
+                  *((int64_t *)msg->metrics[i]->metric_value));
           break;
         case CEREBRO_DATA_VALUE_TYPE_U_INT64:
           fprintf(stderr, "value = %llu", 
-                  *((u_int64_t *)hb->metrics[i]->metric_value));
+                  *((u_int64_t *)msg->metrics[i]->metric_value));
           break;
 #else  /* SIZEOF_LONG == 8 */
         case CEREBRO_DATA_VALUE_TYPE_INT64:
           fprintf(stderr, "value = %ld", 
-                  *((int64_t *)hb->metrics[i]->metric_value));
+                  *((int64_t *)msg->metrics[i]->metric_value));
           break;
         case CEREBRO_DATA_VALUE_TYPE_U_INT64:
           fprintf(stderr, "value = %lu", 
-                  *((u_int64_t *)hb->metrics[i]->metric_value));
+                  *((u_int64_t *)msg->metrics[i]->metric_value));
           break;
 #endif /* SIZEOF_LONG == 8 */
         default:

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.129 2006-11-08 00:34:04 chu11 Exp $
+ *  $Id: cerebrod_listener.c,v 1.130 2006-11-15 00:12:30 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -46,10 +46,10 @@
 
 #include "cerebro.h"
 #include "cerebro/cerebro_constants.h"
-#include "cerebro/cerebrod_heartbeat_protocol.h"
+#include "cerebro/cerebrod_message_protocol.h"
 
 #include "cerebrod_config.h"
-#include "cerebrod_heartbeat.h"
+#include "cerebrod_message.h"
 #include "cerebrod_listener.h"
 #include "cerebrod_listener_data.h"
 #include "cerebrod_util.h"
@@ -221,113 +221,113 @@ _cerebrod_listener_initialize(void)
 }
 
 /* 
- * _cerebrod_heartbeat_check_version
+ * _cerebrod_message_check_version
  *
  * Check that the version is correct prior to unmarshalling
  *
  * Returns 0 if version is correct, -1 if not
  */
 static int
-_cerebrod_heartbeat_check_version(const char *buf, unsigned int buflen)
+_cerebrod_message_check_version(const char *buf, unsigned int buflen)
 {
   int32_t version;
 
   if (!Unmarshall_int32(&version, buf, buflen))
     return -1;
 
-  if (version != CEREBROD_HEARTBEAT_PROTOCOL_VERSION)
+  if (version != CEREBROD_MESSAGE_PROTOCOL_VERSION)
     return -1;
   
   return 0;
 }
 
 /*
- * _cerebrod_heartbeat_unmarshall
+ * _cerebrod_message_unmarshall
  *
- * unmarshall contents of a heartbeat packet buffer and
- * return in an allocated heartbeat
+ * unmarshall contents of a message packet buffer and
+ * return in an allocated message
  *
- * Returns heartbeat data on success, NULL on error
+ * Returns message data on success, NULL on error
  */
-static struct cerebrod_heartbeat *
-_cerebrod_heartbeat_unmarshall(const char *buf, unsigned int buflen)
+static struct cerebrod_message *
+_cerebrod_message_unmarshall(const char *buf, unsigned int buflen)
 {
-  struct cerebrod_heartbeat *hb = NULL;
-  struct cerebrod_heartbeat_metric *hd = NULL;
+  struct cerebrod_message *msg = NULL;
+  struct cerebrod_message_metric *mm = NULL;
   unsigned int size;
   char *bufPtr;
   int i, n, bufPtrlen, c = 0;
 
   assert(buf);
   
-  hb = Malloc(sizeof(struct cerebrod_heartbeat));
+  msg = Malloc(sizeof(struct cerebrod_message));
 
-  memset(hb, '\0', sizeof(struct cerebrod_heartbeat));
+  memset(msg, '\0', sizeof(struct cerebrod_message));
   
-  if (!(n = Unmarshall_int32(&(hb->version), buf + c, buflen - c)))
+  if (!(n = Unmarshall_int32(&(msg->version), buf + c, buflen - c)))
     goto cleanup;
   c += n;
 
-  bufPtr = hb->nodename;
-  bufPtrlen = sizeof(hb->nodename);
+  bufPtr = msg->nodename;
+  bufPtrlen = sizeof(msg->nodename);
   if (!(n = Unmarshall_buffer(bufPtr, bufPtrlen, buf + c, buflen - c)))
     goto cleanup;
   c += n;
   
-  if (!(n = Unmarshall_u_int32(&(hb->metrics_len), buf + c, buflen - c)))
+  if (!(n = Unmarshall_u_int32(&(msg->metrics_len), buf + c, buflen - c)))
     goto cleanup;
   c += n;
 
   /* If no metrics in this packet, just return with the header */
-  if (!hb->metrics_len)
+  if (!msg->metrics_len)
     {
-      if (buflen != CEREBROD_HEARTBEAT_HEADER_LEN)
+      if (buflen != CEREBROD_MESSAGE_HEADER_LEN)
         {
           CEREBRO_DBG(("invalid packet length for no metrics"));
           goto cleanup;
         }
-      hb->metrics = NULL;
-      return hb;
+      msg->metrics = NULL;
+      return msg;
     }
   
-  size = sizeof(struct cerebrod_heartbeat_metric *)*(hb->metrics_len + 1);
-  hb->metrics = Malloc(size);
-  memset(hb->metrics, '\0', size);
+  size = sizeof(struct cerebrod_message_metric *)*(msg->metrics_len + 1);
+  msg->metrics = Malloc(size);
+  memset(msg->metrics, '\0', size);
       
-  for (i = 0; i < hb->metrics_len; i++)
+  for (i = 0; i < msg->metrics_len; i++)
     {
       char *mname;
       int mnamelen;
 
-      hd = Malloc(sizeof(struct cerebrod_heartbeat_metric));
-      memset(hd, '\0', sizeof(struct cerebrod_heartbeat_metric));
+      mm = Malloc(sizeof(struct cerebrod_message_metric));
+      memset(mm, '\0', sizeof(struct cerebrod_message_metric));
       
-      mname = hd->metric_name;
-      mnamelen = sizeof(hd->metric_name);
+      mname = mm->metric_name;
+      mnamelen = sizeof(mm->metric_name);
       
       if (!(n = Unmarshall_buffer(mname, mnamelen, buf + c, buflen - c)))
         goto cleanup;
       c += n;
       
-      if ((n = unmarshall_data_type_len(&(hd->metric_value_type),
-                                        &(hd->metric_value_len),
+      if ((n = unmarshall_data_type_len(&(mm->metric_value_type),
+                                        &(mm->metric_value_len),
                                         buf + c, 
                                         buflen - c,
                                         NULL)) < 0)
         goto cleanup;
       c += n;
       
-      if (check_data_type_len(hd->metric_value_type, hd->metric_value_len) < 0)
+      if (check_data_type_len(mm->metric_value_type, mm->metric_value_len) < 0)
         goto cleanup;
 
-      hd->metric_value = NULL;
-      if (hd->metric_value_len)
+      mm->metric_value = NULL;
+      if (mm->metric_value_len)
         {
-          hd->metric_value = Malloc(hd->metric_value_len);
-          if ((n = unmarshall_data_value(hd->metric_value_type, 
-                                         hd->metric_value_len,
-                                         hd->metric_value,
-                                         hd->metric_value_len,
+          mm->metric_value = Malloc(mm->metric_value_len);
+          if ((n = unmarshall_data_value(mm->metric_value_type, 
+                                         mm->metric_value_len,
+                                         mm->metric_value,
+                                         mm->metric_value_len,
                                          buf + c,
                                          buflen - c,
                                          NULL)) < 0)
@@ -335,58 +335,58 @@ _cerebrod_heartbeat_unmarshall(const char *buf, unsigned int buflen)
           c += n;
         }
 
-      hb->metrics[i] = hd;
+      msg->metrics[i] = mm;
     }
-  hd = NULL;
+  mm = NULL;
 
-  return hb;
+  return msg;
 
  cleanup:
-  if (hd)
+  if (mm)
     {
-      if (hd->metric_value)
-        Free(hd->metric_value);
-      Free(hd);
+      if (mm->metric_value)
+        Free(mm->metric_value);
+      Free(mm);
     }
 
-  if (hb)
+  if (msg)
     {
-      if (hb->metrics)
+      if (msg->metrics)
         {
           i = 0;
-          while (hb->metrics[i])
+          while (msg->metrics[i])
             {
-              if (hb->metrics[i]->metric_value)
-                Free(hb->metrics[i]->metric_value);
-              Free(hb->metrics[i]);
+              if (msg->metrics[i]->metric_value)
+                Free(msg->metrics[i]->metric_value);
+              Free(msg->metrics[i]);
               i++;
             }
-          Free(hb->metrics);
+          Free(msg->metrics);
         }
-      Free(hb);
+      Free(msg);
     }
   return NULL;
 }
 
 /*
- * _cerebrod_heartbeat_dump
+ * _cerebrod_message_dump
  *
- * Dump contents of heartbeat packet
+ * Dump contents of message packet
  */
 static void
-_cerebrod_heartbeat_dump(struct cerebrod_heartbeat *hb)
+_cerebrod_message_dump(struct cerebrod_message *msg)
 {
 #if CEREBRO_DEBUG
-  assert(hb);
+  assert(msg);
 
   if (!(conf.debug && conf.listen_debug))
     return;
 
   Pthread_mutex_lock(&debug_output_mutex);
   fprintf(stderr, "**************************************\n");
-  fprintf(stderr, "* Received Heartbeat\n");
+  fprintf(stderr, "* Received Message\n");
   fprintf(stderr, "* -----------------------\n");
-  cerebrod_heartbeat_dump(hb);
+  cerebrod_message_dump(msg);
   fprintf(stderr, "**************************************\n");
   Pthread_mutex_unlock(&debug_output_mutex);
 #endif /* CEREBRO_DEBUG */
@@ -401,7 +401,7 @@ cerebrod_listener(void *arg)
 
   for (;;)
     {
-      struct cerebrod_heartbeat *hb;
+      struct cerebrod_message *msg;
       char nodename_buf[CEREBRO_MAX_NODENAME_LEN+1];
       char nodename_key[CEREBRO_MAX_NODENAME_LEN+1];
       struct timeval tv;
@@ -449,28 +449,28 @@ cerebrod_listener(void *arg)
           continue;
         }
 
-      if (_cerebrod_heartbeat_check_version(buf, recv_len) < 0)
+      if (_cerebrod_message_check_version(buf, recv_len) < 0)
         {
 	  CEREBRO_DBG(("received invalid version packet"));
           continue;
         }
 
-      if (!(hb = _cerebrod_heartbeat_unmarshall(buf, recv_len)))
+      if (!(msg = _cerebrod_message_unmarshall(buf, recv_len)))
         {
 	  CEREBRO_DBG(("received unmarshallable packet"));
           continue;
         }
 
-      _cerebrod_heartbeat_dump(hb);
+      _cerebrod_message_dump(msg);
       
       /* Guarantee ending '\0' character */
       memset(nodename_buf, '\0', CEREBRO_MAX_NODENAME_LEN+1);
-      memcpy(nodename_buf, hb->nodename, CEREBRO_MAX_NODENAME_LEN);
+      memcpy(nodename_buf, msg->nodename, CEREBRO_MAX_NODENAME_LEN);
 
       if (!strlen(nodename_buf))
         {
           CEREBRO_DBG(("received null nodename"));
-          cerebrod_heartbeat_destroy(hb);
+          cerebrod_message_destroy(msg);
           continue;
         }
 
@@ -481,7 +481,7 @@ cerebrod_listener(void *arg)
       if (!flag)
 	{
 	  CEREBRO_DBG(("received non-cluster packet: %s", nodename_buf));
-          cerebrod_heartbeat_destroy(hb);
+          cerebrod_message_destroy(msg);
 	  continue;
 	}
       
@@ -493,13 +493,13 @@ cerebrod_listener(void *arg)
 					  CEREBRO_MAX_NODENAME_LEN+1) < 0)
 	{
 	  CEREBRO_DBG(("clusterlist_module_get_nodename: %s", nodename_buf));
-          cerebrod_heartbeat_destroy(hb);
+          cerebrod_message_destroy(msg);
 	  continue;
 	}
 
       Gettimeofday(&tv, NULL);
-      cerebrod_listener_data_update(nodename_key, hb, tv.tv_sec);
-      cerebrod_heartbeat_destroy(hb);
+      cerebrod_listener_data_update(nodename_key, msg, tv.tv_sec);
+      cerebrod_message_destroy(msg);
     }
 
   return NULL;			/* NOT REACHED */

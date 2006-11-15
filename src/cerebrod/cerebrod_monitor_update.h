@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_monitor_update.h,v 1.1 2006-11-02 00:05:09 chu11 Exp $
+ *  $Id: cerebrod_monitor_update.h,v 1.2 2006-11-15 00:12:30 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -36,7 +36,7 @@
 #include <pthread.h>
 #endif /* HAVE_PTHREAD_H */
 
-#include "cerebro/cerebrod_heartbeat_protocol.h"
+#include "cerebro/cerebrod_message_protocol.h"
 #include "cerebrod_listener_data.h"
 
 /*
@@ -68,6 +68,6 @@ int cerebrod_monitor_modules_setup(void);
 void cerebrod_monitor_modules_update(const char *nodename,
                                      struct cerebrod_node_data *nd,
                                      const char *metric_name,
-                                     struct cerebrod_heartbeat_metric *hd);
+                                     struct cerebrod_message_metric *mm);
 
 #endif /* _CEREBROD_MONITOR_UPDATE_H */

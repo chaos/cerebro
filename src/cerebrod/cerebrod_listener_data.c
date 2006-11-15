@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.52 2006-11-08 00:34:04 chu11 Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.53 2006-11-15 00:12:30 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -554,7 +554,7 @@ _metric_names_dump(void)
 static void
 _metric_data_update(struct cerebrod_node_data *nd,
                     const char *metric_name,
-                    struct cerebrod_heartbeat_metric *hd,
+                    struct cerebrod_message_metric *mm,
                     u_int32_t received_time)
 {
   struct cerebrod_metric_data *md;
@@ -562,7 +562,7 @@ _metric_data_update(struct cerebrod_node_data *nd,
   int rv;
 #endif /* CEREBRO_DEBUG */
   
-  assert(nd && metric_name && hd);
+  assert(nd && metric_name && mm);
 
   /* If metric server isn't running, metric_names is NULL */
   if (!metric_names)
@@ -614,38 +614,38 @@ _metric_data_update(struct cerebrod_node_data *nd,
     }
   else
     {
-      if (md->metric_value_type != hd->metric_value_type)
+      if (md->metric_value_type != mm->metric_value_type)
         CEREBRO_DBG(("metric type modified: old=%d new=%d",
-                     md->metric_value_type, hd->metric_value_type));
+                     md->metric_value_type, mm->metric_value_type));
     }
   
   md->metric_value_received_time = received_time;
-  md->metric_value_type = hd->metric_value_type;
+  md->metric_value_type = mm->metric_value_type;
 
   /* Realloc size */
-  if (md->metric_value_len != hd->metric_value_len)
+  if (md->metric_value_len != mm->metric_value_len)
     {
       if (md->metric_value)
         {
           CEREBRO_DBG(("metric length modified: old=%d new=%d",
-                       md->metric_value_len, hd->metric_value_len));
+                       md->metric_value_len, mm->metric_value_len));
           Free(md->metric_value);
         }
-      md->metric_value = Malloc(hd->metric_value_len);
+      md->metric_value = Malloc(mm->metric_value_len);
     }
-  md->metric_value_len = hd->metric_value_len;
-  memcpy(md->metric_value, hd->metric_value, hd->metric_value_len);
+  md->metric_value_len = mm->metric_value_len;
+  memcpy(md->metric_value, mm->metric_value, mm->metric_value_len);
 }
 
 void 
 cerebrod_listener_data_update(char *nodename,
-                              struct cerebrod_heartbeat *hb,
+                              struct cerebrod_message *msg,
                               u_int32_t received_time)
 {
   struct cerebrod_node_data *nd;
   int i, update_output_flag = 0;
 
-  assert(nodename && hb);
+  assert(nodename && msg);
 
   if (!listener_data_init)
     CEREBRO_EXIT(("initialization not complete"));
@@ -685,24 +685,24 @@ cerebrod_listener_data_update(char *nodename,
 
       cerebrod_event_update_node_received_time(nd, received_time);
 
-      for (i = 0; i < hb->metrics_len; i++)
+      for (i = 0; i < msg->metrics_len; i++)
         {
           char metric_name_buf[CEREBRO_MAX_METRIC_NAME_LEN+1];
-          struct cerebrod_heartbeat_metric *hd = hb->metrics[i];
+          struct cerebrod_message_metric *mm = msg->metrics[i];
 
           /* Guarantee ending '\0' character */
           memset(metric_name_buf, '\0', CEREBRO_MAX_METRIC_NAME_LEN+1);
-          memcpy(metric_name_buf, hd->metric_name, CEREBRO_MAX_METRIC_NAME_LEN);
+          memcpy(metric_name_buf, mm->metric_name, CEREBRO_MAX_METRIC_NAME_LEN);
 
           if (!strlen(metric_name_buf))
             {
-              CEREBRO_DBG(("null heartbeat_data metric_name received"));
+              CEREBRO_DBG(("null message_data metric_name received"));
               continue;
             }
 
-          _metric_data_update(nd, metric_name_buf, hd, received_time);
-          cerebrod_monitor_modules_update(nodename, nd, metric_name_buf, hd);
-          cerebrod_event_modules_update(nodename, nd, metric_name_buf, hd);
+          _metric_data_update(nd, metric_name_buf, mm, received_time);
+          cerebrod_monitor_modules_update(nodename, nd, metric_name_buf, mm);
+          cerebrod_event_modules_update(nodename, nd, metric_name_buf, mm);
         }
 
       /* Can't call a debug output function in here, it can cause a

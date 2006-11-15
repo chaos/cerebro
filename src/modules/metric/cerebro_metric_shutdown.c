@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_shutdown.c,v 1.5 2006-11-14 18:58:27 chu11 Exp $
+ *  $Id: cerebro_metric_shutdown.c,v 1.6 2006-11-15 00:12:30 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -47,7 +47,7 @@
 #include "cerebro.h"
 #include "cerebro/cerebro_constants.h"
 #include "cerebro/cerebro_metric_module.h"
-#include "cerebro/cerebrod_heartbeat_protocol.h"
+#include "cerebro/cerebrod_message_protocol.h"
 
 #include "cerebro_metric_common.h"
 #include "debug.h"
@@ -64,32 +64,32 @@
 static u_int32_t metric_shutdown = 0;
 
 /* 
- * send_heartbeat_function
+ * send_message_function
  *
- * Stores pointer to function to send a heartbeat
+ * Stores pointer to function to send a message
  */
-Cerebro_metric_send_heartbeat send_heartbeat_function = NULL;
+Cerebro_metric_send_message send_message_function = NULL;
 
 /* 
  * _metric_shutdown_handler
  *
  * Will handle the SIGTERM (and SIGINT if we're debugging) signals.
  * After receiving the signal, will create and send the last
- * heartbeat, then kill the program.
+ * message, then kill the program.
  *
  * Although the author took reasonably good steps to make the primary
  * code survive SIGINT signals in system calls, it hasn't been
- * auditted fully.  Sending metrics/heartbeats via signals probably
+ * auditted fully.  Sending metrics/messages via signals probably
  * isn't a good idea.  This is an exception b/c we'll die right away.
  */
 static void
 _metric_shutdown_handler(int signum)
 {
-  struct cerebrod_heartbeat *hb = NULL;
-  struct cerebrod_heartbeat_metric *hd = NULL;
+  struct cerebrod_message *hb = NULL;
+  struct cerebrod_message_metric *hd = NULL;
   char nodename[CEREBRO_MAX_NODENAME_LEN+1];
 
-  if (!(hb = (struct cerebrod_heartbeat *)malloc(sizeof(struct cerebrod_heartbeat))))
+  if (!(hb = (struct cerebrod_message *)malloc(sizeof(struct cerebrod_message))))
     {
       CEREBRO_DBG(("malloc: %s", strerror(errno)));
       goto cleanup;
@@ -102,17 +102,17 @@ _metric_shutdown_handler(int signum)
       goto cleanup;
     }
 
-  hb->version = CEREBROD_HEARTBEAT_PROTOCOL_VERSION;
+  hb->version = CEREBROD_MESSAGE_PROTOCOL_VERSION;
   memcpy(hb->nodename, nodename, CEREBRO_MAX_NODENAME_LEN);
   
   hb->metrics_len = 1;
-  if (!(hb->metrics = (struct cerebrod_heartbeat_metric **)malloc(sizeof(struct cerebrod_heartbeat_metric *)*(hb->metrics_len + 1))))
+  if (!(hb->metrics = (struct cerebrod_message_metric **)malloc(sizeof(struct cerebrod_message_metric *)*(hb->metrics_len + 1))))
     goto cleanup;
-  memset(hb->metrics, '\0', sizeof(struct cerebrod_heartbeat_metric *)*(hb->metrics_len + 1));
+  memset(hb->metrics, '\0', sizeof(struct cerebrod_message_metric *)*(hb->metrics_len + 1));
   
-  if (!(hd = (struct cerebrod_heartbeat_metric *)malloc(sizeof(struct cerebrod_heartbeat_metric))))
+  if (!(hd = (struct cerebrod_message_metric *)malloc(sizeof(struct cerebrod_message_metric))))
     goto cleanup;
-  memset(hd, '\0', sizeof(struct cerebrod_heartbeat_metric));
+  memset(hd, '\0', sizeof(struct cerebrod_message_metric));
 
   /* need not overflow */
   strncpy(hd->metric_name, SHUTDOWN_METRIC_NAME, CEREBRO_MAX_METRIC_NAME_LEN);
@@ -124,9 +124,9 @@ _metric_shutdown_handler(int signum)
 
   hb->metrics[0] = hd;
 
-  if ((*send_heartbeat_function)(hb) < 0)
+  if ((*send_message_function)(hb) < 0)
     {
-      CEREBRO_DBG(("cerebrod_send_heartbeat"));
+      CEREBRO_DBG(("cerebrod_send_message"));
       goto cleanup;
     }
 
@@ -218,12 +218,12 @@ shutdown_metric_get_metric_value(unsigned int *metric_value_type,
 }
 
 /*
- * shutdown_metric_send_heartbeat_function_pointer
+ * shutdown_metric_send_message_function_pointer
  *
- * shutdown metric module send_heartbeat_function_pointer function
+ * shutdown metric module send_message_function_pointer function
  */
 static int
-shutdown_metric_send_heartbeat_function_pointer(Cerebro_metric_send_heartbeat function_pointer)
+shutdown_metric_send_message_function_pointer(Cerebro_metric_send_message function_pointer)
 {
   if (!function_pointer)
     {
@@ -231,7 +231,7 @@ shutdown_metric_send_heartbeat_function_pointer(Cerebro_metric_send_heartbeat fu
       return -1;
     }
 
-  send_heartbeat_function = function_pointer;
+  send_message_function = function_pointer;
   return 0;
 }
 
@@ -250,5 +250,5 @@ struct cerebro_metric_module_info metric_module_info =
     &shutdown_metric_get_metric_value,
     &common_metric_destroy_metric_value_do_nothing,
     &common_metric_get_metric_thread_null,
-    &shutdown_metric_send_heartbeat_function_pointer,
+    &shutdown_metric_send_message_function_pointer,
   };

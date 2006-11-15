@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config.h,v 1.9 2006-11-08 00:34:04 chu11 Exp $
+ *  $Id: cerebro_config.h,v 1.10 2006-11-15 00:12:30 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -58,16 +58,16 @@ struct cerebro_config
   unsigned int cerebrod_heartbeat_frequency_min;
   unsigned int cerebrod_heartbeat_frequency_max;
   int cerebrod_heartbeat_frequency_flag;
-  int cerebrod_heartbeat_source_port;
-  int cerebrod_heartbeat_source_port_flag;
-  char cerebrod_heartbeat_source_network_interface[CEREBRO_MAX_NETWORK_INTERFACE_LEN+1];
-  int cerebrod_heartbeat_source_network_interface_flag;
-  int cerebrod_heartbeat_destination_port;
-  int cerebrod_heartbeat_destination_port_flag;
-  char cerebrod_heartbeat_destination_ip[CEREBRO_MAX_IPADDR_LEN+1];
-  int cerebrod_heartbeat_destination_ip_flag;
-  int cerebrod_heartbeat_ttl;
-  int cerebrod_heartbeat_ttl_flag;
+  int cerebrod_message_source_port;
+  int cerebrod_message_source_port_flag;
+  char cerebrod_message_source_network_interface[CEREBRO_MAX_NETWORK_INTERFACE_LEN+1];
+  int cerebrod_message_source_network_interface_flag;
+  int cerebrod_message_destination_port;
+  int cerebrod_message_destination_port_flag;
+  char cerebrod_message_destination_ip[CEREBRO_MAX_IPADDR_LEN+1];
+  int cerebrod_message_destination_ip_flag;
+  int cerebrod_message_ttl;
+  int cerebrod_message_ttl_flag;
   int cerebrod_speak;
   int cerebrod_speak_flag;
   int cerebrod_listen;

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: config_util.c,v 1.18 2006-11-08 00:34:04 chu11 Exp $
+ *  $Id: config_util.c,v 1.19 2006-11-15 00:12:30 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -408,58 +408,58 @@ _load_config_file(struct cerebro_config *conf, unsigned int *errnum)
 	0
       },
       {
-	"cerebrod_heartbeat_source_port",
+	"cerebrod_message_source_port",
 	CONFFILE_OPTION_INT, 
 	-1,
 	conffile_int, 
 	1, 
 	0, 
-	&(conf->cerebrod_heartbeat_source_port_flag),
-	&(conf->cerebrod_heartbeat_source_port), 
+	&(conf->cerebrod_message_source_port_flag),
+	&(conf->cerebrod_message_source_port), 
 	0
       },
       {
-	"cerebrod_heartbeat_source_network_interface", 
+	"cerebrod_message_source_network_interface", 
 	CONFFILE_OPTION_STRING, 
 	-1,
 	conffile_string, 
 	1, 
 	0, 
-	&(conf->cerebrod_heartbeat_source_network_interface_flag),
-	conf->cerebrod_heartbeat_source_network_interface, 
+	&(conf->cerebrod_message_source_network_interface_flag),
+	conf->cerebrod_message_source_network_interface, 
 	CEREBRO_MAX_NETWORK_INTERFACE_LEN
       },
       {
-	"cerebrod_heartbeat_destination_port", 
+	"cerebrod_message_destination_port", 
 	CONFFILE_OPTION_INT, 
 	-1,
 	conffile_int, 
 	1, 
 	0, 
-	&(conf->cerebrod_heartbeat_destination_port_flag),
-	&(conf->cerebrod_heartbeat_destination_port), 
+	&(conf->cerebrod_message_destination_port_flag),
+	&(conf->cerebrod_message_destination_port), 
 	0
       },
       {
-	"cerebrod_heartbeat_destination_ip", 
+	"cerebrod_message_destination_ip", 
 	CONFFILE_OPTION_STRING, 
 	-1,
 	conffile_string, 
 	1, 
 	0, 
-	&(conf->cerebrod_heartbeat_destination_ip_flag),
-	conf->cerebrod_heartbeat_destination_ip, 
+	&(conf->cerebrod_message_destination_ip_flag),
+	conf->cerebrod_message_destination_ip, 
 	CEREBRO_MAX_IPADDR_LEN
       },
       {
-	"cerebrod_heartbeat_ttl", 
+	"cerebrod_message_ttl", 
 	CONFFILE_OPTION_INT, 
 	-1,
 	conffile_int, 
 	1, 
 	0, 
-	&(conf->cerebrod_heartbeat_ttl_flag),
-	&(conf->cerebrod_heartbeat_ttl), 
+	&(conf->cerebrod_message_ttl_flag),
+	&(conf->cerebrod_message_ttl), 
 	0
       },
       {
@@ -748,39 +748,39 @@ _set_cerebro_config(struct cerebro_config *dest,
       dest->cerebrod_heartbeat_frequency_flag++;
     }
 
-  if (!dest->cerebrod_heartbeat_source_port_flag
-      && src->cerebrod_heartbeat_source_port_flag)
+  if (!dest->cerebrod_message_source_port_flag
+      && src->cerebrod_message_source_port_flag)
     {
-      dest->cerebrod_heartbeat_source_port = src->cerebrod_heartbeat_source_port;
-      dest->cerebrod_heartbeat_source_port_flag++;
+      dest->cerebrod_message_source_port = src->cerebrod_message_source_port;
+      dest->cerebrod_message_source_port_flag++;
     }
 
-  if (!dest->cerebrod_heartbeat_source_network_interface_flag
-      && src->cerebrod_heartbeat_source_network_interface_flag)
+  if (!dest->cerebrod_message_source_network_interface_flag
+      && src->cerebrod_message_source_network_interface_flag)
     {
-      strcpy(dest->cerebrod_heartbeat_source_network_interface, 
-             src->cerebrod_heartbeat_source_network_interface);
-      dest->cerebrod_heartbeat_source_network_interface_flag++;
+      strcpy(dest->cerebrod_message_source_network_interface, 
+             src->cerebrod_message_source_network_interface);
+      dest->cerebrod_message_source_network_interface_flag++;
     }
 
-  if (!dest->cerebrod_heartbeat_destination_port_flag
-      && src->cerebrod_heartbeat_destination_port_flag)
+  if (!dest->cerebrod_message_destination_port_flag
+      && src->cerebrod_message_destination_port_flag)
     {
-      dest->cerebrod_heartbeat_destination_port = src->cerebrod_heartbeat_destination_port;
-      dest->cerebrod_heartbeat_destination_port_flag++;
+      dest->cerebrod_message_destination_port = src->cerebrod_message_destination_port;
+      dest->cerebrod_message_destination_port_flag++;
     }
 
-  if (!dest->cerebrod_heartbeat_destination_ip_flag
-      && src->cerebrod_heartbeat_destination_ip_flag)
+  if (!dest->cerebrod_message_destination_ip_flag
+      && src->cerebrod_message_destination_ip_flag)
     {
-      strcpy(dest->cerebrod_heartbeat_destination_ip, src->cerebrod_heartbeat_destination_ip);
-      dest->cerebrod_heartbeat_destination_ip_flag++;
+      strcpy(dest->cerebrod_message_destination_ip, src->cerebrod_message_destination_ip);
+      dest->cerebrod_message_destination_ip_flag++;
     }
 
-  if (!dest->cerebrod_heartbeat_ttl_flag && src->cerebrod_heartbeat_ttl_flag)
+  if (!dest->cerebrod_message_ttl_flag && src->cerebrod_message_ttl_flag)
     {
-      dest->cerebrod_heartbeat_ttl = src->cerebrod_heartbeat_ttl;
-      dest->cerebrod_heartbeat_ttl_flag++;
+      dest->cerebrod_message_ttl = src->cerebrod_message_ttl;
+      dest->cerebrod_message_ttl_flag++;
     }
 
   if (!dest->cerebrod_speak_flag && src->cerebrod_speak_flag)

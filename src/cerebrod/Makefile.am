@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.76 2006-11-08 00:34:04 chu11 Exp $
+## $Id: Makefile.am,v 1.77 2006-11-15 00:12:30 chu11 Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -10,9 +10,9 @@ noinst_HEADERS = cerebrod.h \
 		 cerebrod_event_node_timeout_monitor.h \
 		 cerebrod_event_server.h \
 		 cerebrod_event_update.h \
-		 cerebrod_heartbeat.h \
 		 cerebrod_listener.h \
 		 cerebrod_listener_data.h \
+		 cerebrod_message.h \
 		 cerebrod_metric_controller.h \
 		 cerebrod_metric_server.h \
 		 cerebrod_monitor_update.h \
@@ -86,9 +86,9 @@ cerebrod_SOURCES = cerebrod.c \
 		   cerebrod_event_node_timeout_monitor.c \
 		   cerebrod_event_server.c \
 		   cerebrod_event_update.c \
-		   cerebrod_heartbeat.c \
 		   cerebrod_listener.c \
 		   cerebrod_listener_data.c \
+		   cerebrod_message.c \
 		   cerebrod_metric_controller.c \
 		   cerebrod_metric_server.c \
 		   cerebrod_monitor_update.c \
