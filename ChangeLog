@@ -1,3 +1,7 @@
+2006-11-16  Albert Chu  <chu11@llnl.gov>
+
+	* src/libs/common/vector.c (vector_set): Fix counting bug.
+	
 2006-11-14  Albert Chu  <chu11@llnl.gov>
 
 	* configure.ac: Up library version.

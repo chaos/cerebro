@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: vector.c,v 1.5 2006-10-31 06:27:56 chu11 Exp $
+ *  $Id: vector.c,v 1.6 2006-11-17 00:25:12 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -353,8 +353,10 @@ vector_set (Vector v, void *x, unsigned int index)
               v->f(v->data[index]);
               v->data[index] = NULL;
             }
+          v->count--;
         }
       v->data[index] = x;
+      v->count++;
       rv = x;
     }
   else
