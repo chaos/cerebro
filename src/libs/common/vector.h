@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: vector.h,v 1.1 2006-10-29 17:04:24 chu11 Exp $
+ *  $Id: vector.h,v 1.2 2006-11-17 00:00:55 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -143,7 +143,8 @@ void *vector_append (Vector v, void *x);
 /* 
  * vector_set
  *
- * Set an item to a specific index location.  
+ * Set an item to a specific index location.  To clear one item out of
+ * the vector, set the item to NULL.
  *
  * Returns data pointer on success, calls lsd_nomem_error on error
  */
