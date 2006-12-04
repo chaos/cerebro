@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.92 2006-11-15 00:12:30 chu11 Exp $
+ *  $Id: cerebrod_speaker.c,v 1.93 2006-12-04 18:43:11 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -101,6 +101,7 @@ static int
 _speaker_socket_create(int num)
 {
   struct sockaddr_in addr;
+  unsigned int optlen;
   int fd, optval = 1;
 
   if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
@@ -113,8 +114,6 @@ _speaker_socket_create(int num)
     {
       /* XXX: Probably lots of portability problems here */
       struct ip_mreqn imr;
-      unsigned int optlen;
-      int optval;
 
       memset(&imr, '\0', sizeof(struct ip_mreqn));
       memcpy(&imr.imr_multiaddr, 
@@ -150,7 +149,9 @@ _speaker_socket_create(int num)
     }
 
   /* For quick start/restart */
-  if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(int)) < 0)
+  optval = 1;
+  optlen = sizeof(optval);
+  if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &optval, optlen) < 0)
     {
       CEREBRO_DBG(("setsockopt: %s", strerror(errno)));
       goto cleanup;

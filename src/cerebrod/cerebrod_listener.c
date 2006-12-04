@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.130 2006-11-15 00:12:30 chu11 Exp $
+ *  $Id: cerebrod_listener.c,v 1.131 2006-12-04 18:43:11 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -110,6 +110,7 @@ static int
 _listener_setup_socket(int num)
 {
   struct sockaddr_in addr;
+  unsigned int optlen;
   int fd, optval = 1;
 
   assert(num >= 0 && num < conf.listen_len);
@@ -124,7 +125,6 @@ _listener_setup_socket(int num)
      {
       /* XXX: Probably lots of portability problems here */
       struct ip_mreqn imr;
-      unsigned int optlen;
 
       memset(&imr, '\0', sizeof(struct ip_mreqn));
       memcpy(&imr.imr_multiaddr,
@@ -144,7 +144,9 @@ _listener_setup_socket(int num)
     }
 
   /* For quick start/restart */
-  if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(int)) < 0)
+  optval = 1;
+  optlen = sizeof(optval);
+  if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &optval, optlen) < 0)
     {
       CEREBRO_DBG(("setsockopt: %s", strerror(errno)));
       goto cleanup;

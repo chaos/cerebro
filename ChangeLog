@@ -1,3 +1,9 @@
+2006-12-04  Albert Chu  <chu11@llnl.gov>
+
+	* src/cerebrod/cerebrod_listener.c (_listener_setup_socket),
+	src/cerebrod/cerebrod_speaker.c (_speaker_socket_create): Fix
+	SO_REUSEADDR corner case.
+	
 2006-11-16  Albert Chu  <chu11@llnl.gov>
 
 	* src/libs/common/vector.c (vector_set): Fix counting bug.
