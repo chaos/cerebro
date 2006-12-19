@@ -19,6 +19,7 @@ Cerebro is a collection of cluster monitoring tools and libraries.
 %{!?_with_network: %{!?_without_network: %define _with_network --with-network}}
 %{!?_with_slurm_state: %{!?_without_slurm_state: %define _without_slurm_state --without-slurm-state}}
 %{!?_with_shutdown: %{!?_without_shutdown: %define _without_shutdown --without-shutdown}}
+%{!?_with_updown_event: %{!?_without_updown_event: %define _without_updown_event --without-updown-event}}
 
 %if %{?_with_debug:1}%{!?_with_debug:0}
 %define _enable_debug --enable-debug
@@ -81,6 +82,13 @@ Requires: cerebro
 %description metric-shutdown
 Metric module to monitor graceful shutdowns.
 
+%package event-updown
+Summary: updown module
+Group: System Environment/Base
+Requires: cerebro
+%description event-updown
+Event module to monitor node up/down.
+
 %prep
 %setup  -q -n @PROJECT@-@VERSION@-@RELEASE@
 
@@ -102,6 +110,8 @@ Metric module to monitor graceful shutdowns.
            %{?_without_slurm_state} \
            %{?_with_shutdown} \
            %{?_without_shutdown} \
+           %{?_with_updown_event} \
+           %{?_without_updown_event} \
            %{?_with_cerebrod_speaker_only} \
            %{?_without_cerebrod_speaker_only} \
            %{?_with_cerebrod_no_threads} \
@@ -213,4 +223,10 @@ fi
 %files metric-shutdown
 %defattr(700,root,root)
 %{_libdir}/cerebro/cerebro_metric_shutdown.*
+%endif
+
+%if %{?_with_updown_event:1}%{!?_with_updown_event:0}
+%files event-updown
+%defattr(700,root,root)
+%{_libdir}/cerebro/cerebro_event_updown.*
 %endif

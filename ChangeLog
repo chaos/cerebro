@@ -4,6 +4,14 @@
 
 	* config/ac_updown_event.m4: Fix typo.
 
+	* config/ac_updown.m4: Renamed from ac_updown_event.m4 and
+	modified appropriately for name change.
+
+	* configure.ac, src/modules/event/Makefile.am: Updated
+	appropriately.
+
+	* cerebro.spec.in: Support updown event module.
+
 	* tagged cerebro-1-1-1
 
 2006-12-04  Albert Chu  <chu11@llnl.gov>

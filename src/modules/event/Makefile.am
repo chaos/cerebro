@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.2 2006-11-08 00:34:05 chu11 Exp $
+## $Id: Makefile.am,v 1.3 2006-12-19 23:00:57 chu11 Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -9,21 +9,21 @@ EVENT_VERSION_SCRIPT = $(srcdir)/event.map
 EVENT_OTHER_FLAGS = -Wl,--version-script=$(EVENT_VERSION_SCRIPT)
 endif
 
-if WITH_UPDOWN_EVENT
-UPDOWN_EVENT_MODULE = cerebro_event_updown.la
-UPDOWN_EVENT_STATIC_SOURCES = cerebro_event_updown.c
+if WITH_UPDOWN
+UPDOWN_MODULE = cerebro_event_updown.la
+UPDOWN_STATIC_SOURCES = cerebro_event_updown.c
 endif
 
 if WITH_STATIC_MODULES
 noinst_LTLIBRARIES = libstaticeventmodules.la
 else
 modulelibdir = $(CEREBRO_MODULE_DIR)
-modulelib_LTLIBRARIES = $(UPDOWN_EVENT_MODULE)
+modulelib_LTLIBRARIES = $(UPDOWN_MODULE)
 endif
 
 MODULE_FLAGS = -module -avoid-version
 
-libstaticeventmodules_la_SOURCES = $(UPDOWN_EVENT_STATIC_SOURCES)
+libstaticeventmodules_la_SOURCES = $(UPDOWN_STATIC_SOURCES)
 libstaticeventmodules_la_CFLAGS  = -I$(srcdir)/../../libs/include \
                                    -I$(srcdir)/../../libs/debug
 libstaticeventmodules_la_LDFLAGS = $(EVENT_OTHER_FLAGS)
