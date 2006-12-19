@@ -2,8 +2,21 @@ This file describes changes in recent versions of cerebro. It
 primarily documents those changes that are of interest to users and
 admins.
 
+Changes in cerebro-1.1-1
+===========================
+ -- Allow cerebro to work on multiple subnets.
+ -- Added load average, memory, and network traffic metric modules.
+ -- Support event based monitoring.
+ -- Various bug fixes.
+
+Changes in cerebro-1.0-4
+===========================
+ -- Added graceful shutdown metric module.
+ -- Allow monitor modules to support multiple metrics.
+ -- Various bug fixes.
+
 Changes in cerebro-1.0-1
 ===========================
  -- Initial Release
 
-$Id: NEWS,v 1.5 2005-08-16 21:01:14 achu Exp $
+$Id: NEWS,v 1.6 2006-12-19 22:11:51 chu11 Exp $
