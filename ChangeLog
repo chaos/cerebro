@@ -2,6 +2,8 @@
 
 	* NEWS updated.
 
+	* config/ac_updown_event.m4: Fix typo.
+
 	* tagged cerebro-1-1-1
 
 2006-12-04  Albert Chu  <chu11@llnl.gov>

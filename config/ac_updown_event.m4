@@ -1,12 +1,12 @@
 ##*****************************************************************************
-## $Id: ac_updown_event.m4,v 1.2 2006-11-08 00:34:03 chu11 Exp $
+## $Id: ac_updown_event.m4,v 1.3 2006-12-19 22:54:31 chu11 Exp $
 ##*****************************************************************************
 
 AC_DEFUN([AC_UPDOWN_EVENT],
 [
   AC_MSG_CHECKING([for whether to build updown event module])
-  AC_ARG_WITH([slurm-state],
-    AC_HELP_STRING([--with-slurm-state], [Build updown event module]),
+  AC_ARG_WITH([updown-event],
+    AC_HELP_STRING([--with-updown-event], [Build updown event module]),
     [ case "$withval" in
         no)  ac_updown_event_test=no ;;
         yes) ac_updown_event_test=yes ;;
