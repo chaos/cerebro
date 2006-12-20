@@ -19,7 +19,7 @@ Cerebro is a collection of cluster monitoring tools and libraries.
 %{!?_with_network: %{!?_without_network: %define _with_network --with-network}}
 %{!?_with_slurm_state: %{!?_without_slurm_state: %define _without_slurm_state --without-slurm-state}}
 %{!?_with_shutdown: %{!?_without_shutdown: %define _without_shutdown --without-shutdown}}
-%{!?_with_updown: %{!?_without_updown: %define _without_updown --without-updown}}
+%{!?_with_updown: %{!?_without_updown: %define _without_updown --with-updown}}
 
 %if %{?_with_debug:1}%{!?_with_debug:0}
 %define _enable_debug --enable-debug
