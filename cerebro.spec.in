@@ -19,7 +19,7 @@ Cerebro is a collection of cluster monitoring tools and libraries.
 %{!?_with_network: %{!?_without_network: %define _with_network --with-network}}
 %{!?_with_slurm_state: %{!?_without_slurm_state: %define _without_slurm_state --without-slurm-state}}
 %{!?_with_shutdown: %{!?_without_shutdown: %define _without_shutdown --without-shutdown}}
-%{!?_with_updown_event: %{!?_without_updown_event: %define _without_updown_event --without-updown-event}}
+%{!?_with_updown: %{!?_without_updown: %define _without_updown --without-updown}}
 
 %if %{?_with_debug:1}%{!?_with_debug:0}
 %define _enable_debug --enable-debug
@@ -110,8 +110,8 @@ Event module to monitor node up/down.
            %{?_without_slurm_state} \
            %{?_with_shutdown} \
            %{?_without_shutdown} \
-           %{?_with_updown_event} \
-           %{?_without_updown_event} \
+           %{?_with_updown} \
+           %{?_without_updown} \
            %{?_with_cerebrod_speaker_only} \
            %{?_without_cerebrod_speaker_only} \
            %{?_with_cerebrod_no_threads} \
@@ -225,7 +225,7 @@ fi
 %{_libdir}/cerebro/cerebro_metric_shutdown.*
 %endif
 
-%if %{?_with_updown_event:1}%{!?_with_updown_event:0}
+%if %{?_with_updown:1}%{!?_with_updown:0}
 %files event-updown
 %defattr(700,root,root)
 %{_libdir}/cerebro/cerebro_event_updown.*
