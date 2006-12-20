@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.93 2006-12-04 18:43:11 chu11 Exp $
+ *  $Id: cerebrod_speaker.c,v 1.94 2006-12-20 21:28:53 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -431,7 +431,7 @@ cerebrod_speaker(void *arg)
       itr = List_iterator_create(next_send_times);
       while ((nst = list_next(itr)))
         {
-          if (nst->next_send_time < tv.tv_sec)
+          if (nst->next_send_time <= tv.tv_sec)
             {
               struct cerebrod_message* msg;
               unsigned int buflen;
