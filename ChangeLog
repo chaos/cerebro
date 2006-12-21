@@ -1,4 +1,8 @@
-2006-12-21  Albert Chu  <chu11@llnl.gov>
+2006-12-20  Albert Chu  <chu11@llnl.gov>
+
+	* Fix various compiler warnings.
+	
+2006-12-20  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerebrod/cerebrod_event_server.c
 	(_send_event_names_end_response): Fix compiler warnings.
