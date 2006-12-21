@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_controller.c,v 1.40 2006-11-15 00:12:30 chu11 Exp $
+ *  $Id: cerebrod_metric_controller.c,v 1.41 2006-12-21 01:42:17 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -755,7 +755,7 @@ _resend_metric(int fd,
                struct cerebro_metric_control_request *req)
 {
   struct cerebrod_speaker_metric_info *metric_info;
-  u_int32_t metric_value_type, metric_value_len;
+  u_int32_t metric_value_type = 0, metric_value_len = 0;
   void *metric_value_copy = NULL;
     
   int rv = -1;

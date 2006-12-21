@@ -487,7 +487,10 @@ _metric_value_str(unsigned int mtype,
                   unsigned int buflen)
 {
   const char *func = __FUNCTION__;
-  int mlen_flag, rv = 0;
+#if CEREBRO_DEBUG
+  int mlen_flag;
+#endif /* CEREBRO_DEBUG */
+  int rv = 0;
 
   assert(mvalue && buf && buflen > 0);
 

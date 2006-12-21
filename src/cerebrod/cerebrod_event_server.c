@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_event_server.c,v 1.5 2006-12-21 00:32:34 chu11 Exp $
+ *  $Id: cerebrod_event_server.c,v 1.6 2006-12-21 01:42:17 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -901,7 +901,7 @@ _event_server_service_connection(int fd)
   char event_name_buf[CEREBRO_MAX_EVENT_NAME_LEN+1];
   char *event_name_ptr = NULL;
   int32_t version;
-  int *fdptr;
+  int *fdptr = NULL;
   List connections = NULL;
 
   assert(fd >= 0);

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.131 2006-12-04 18:43:11 chu11 Exp $
+ *  $Id: cerebrod_listener.c,v 1.132 2006-12-21 01:42:17 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -407,8 +407,9 @@ cerebrod_listener(void *arg)
       char nodename_buf[CEREBRO_MAX_NODENAME_LEN+1];
       char nodename_key[CEREBRO_MAX_NODENAME_LEN+1];
       struct timeval tv;
-      int recv_len, flag, i, count;
+      int flag, i, count;
       fd_set readfds;
+      int recv_len = 0;
       int maxfd = 0;
 
       FD_ZERO(&readfds);
