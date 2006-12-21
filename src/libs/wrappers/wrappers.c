@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.c,v 1.15 2005-08-08 17:17:02 achu Exp $
+ *  $Id: wrappers.c,v 1.16 2006-12-21 17:48:44 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -342,7 +342,7 @@ int
 wrap_select(WRAPPERS_ARGS, int n, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout)
 {
   int rv;
-  struct timeval timeout_orig, timeout_current;
+  struct timeval timeout_orig;
   struct timeval start, end, delta;
   
   assert(file && function);
@@ -356,13 +356,12 @@ wrap_select(WRAPPERS_ARGS, int n, fd_set *readfds, fd_set *writefds, fd_set *exc
   if (timeout) 
     {
       timeout_orig = *timeout;
-      timeout_current = *timeout;
       Gettimeofday(&start, NULL);
     }
 
   do 
     {
-      rv = select(n, readfds, writefds, exceptfds, &timeout_current);
+      rv = select(n, readfds, writefds, exceptfds, timeout);
       if (rv < 0 && errno != EINTR)
         WRAPPERS_ERR_ERRNO("select");
       if (rv < 0 && timeout) 
@@ -370,8 +369,8 @@ wrap_select(WRAPPERS_ARGS, int n, fd_set *readfds, fd_set *writefds, fd_set *exc
 	  Gettimeofday(&end, NULL);
 	  /* delta = end-start */
 	  timersub(&end, &start, &delta);     
-	  /* timeout_current = timeout_orig-delta */
-	  timersub(&timeout_orig, &delta, &timeout_current);     
+	  /* timeout = timeout_orig-delta */
+	  timersub(&timeout_orig, &delta, timeout);     
 	}
     } 
   while (rv < 0);
