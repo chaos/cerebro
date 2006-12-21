@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_event_update.c,v 1.4 2006-11-15 00:12:30 chu11 Exp $
+ *  $Id: cerebrod_event_update.c,v 1.5 2006-12-21 03:29:58 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -395,9 +395,9 @@ cerebrod_event_modules_setup(void)
 
   event_module_timeouts = List_create((ListDelF)_cerebrod_event_module_timeout_data_destroy);
   event_module_timeout_index = Hash_create(event_module_count,
-                                         (hash_key_f)hash_key_string,
-                                         (hash_cmp_f)strcmp,
-                                         (hash_del_f)list_destroy);
+					   (hash_key_f)hash_key_string,
+					   (hash_cmp_f)strcmp,
+					   (hash_del_f)list_destroy);
 
   for (i = 0; i < event_module_count; i++)
     {
