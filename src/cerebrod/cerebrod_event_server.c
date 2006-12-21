@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_event_server.c,v 1.4 2006-11-13 17:04:42 chu11 Exp $
+ *  $Id: cerebrod_event_server.c,v 1.5 2006-12-21 00:32:34 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -824,12 +824,12 @@ _send_event_names_end_response(int fd)
  *
  * Return 0 on success, -1 on error
  */
-static int
+static void *
 _respond_with_event_names(void *arg)
 {
   struct cerebrod_event_names_response_data enr;
   List responses = NULL;
-  int fd, rv = -1;
+  int fd;
 
   assert(arg);
 
@@ -874,13 +874,12 @@ _respond_with_event_names(void *arg)
   if (_send_event_names_end_response(fd) < 0)
     goto cleanup;
 
-  rv = 0;
  cleanup:
   if (responses)
     list_destroy(responses);
   Free(arg);
   close(fd);
-  return rv;
+  return NULL;
 }
 
 
