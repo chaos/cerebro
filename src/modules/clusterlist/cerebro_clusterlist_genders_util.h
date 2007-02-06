@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_genders_util.h,v 1.9 2005-07-22 17:21:07 achu Exp $
+ *  $Id: cerebro_clusterlist_genders_util.h,v 1.10 2007-02-06 17:51:07 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -33,7 +33,7 @@
  *
  * common setup function for genders and gendersllnl setup
  */
-int cerebro_clusterlist_genders_setup(genders_t *gh);
+int cerebro_clusterlist_genders_setup(genders_t *gh, char *filename);
 
 /* 
  * cerebro_clusterlist_genders_cleanup

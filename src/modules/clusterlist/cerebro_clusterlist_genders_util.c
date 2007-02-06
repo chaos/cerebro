@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_genders_util.c,v 1.21 2005-07-22 17:21:07 achu Exp $
+ *  $Id: cerebro_clusterlist_genders_util.c,v 1.22 2007-02-06 17:51:07 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -43,7 +43,7 @@
 #include "debug.h"
 
 int 
-cerebro_clusterlist_genders_setup(genders_t *gh)
+cerebro_clusterlist_genders_setup(genders_t *gh, char *filename)
 {
   if (!gh)
     { 
@@ -59,12 +59,13 @@ cerebro_clusterlist_genders_setup(genders_t *gh)
       goto cleanup;
     }
 
-  if (genders_load_data(*gh, NULL) < 0)
+  if (!filename)
+    filename = GENDERS_DEFAULT_FILE;
+  if (genders_load_data(*gh, filename) < 0)
     {
       if (genders_errnum(*gh) == GENDERS_ERR_OPEN)
 	{
-	  cerebro_err_output("genders database '%s' cannot be opened",  
-                             GENDERS_DEFAULT_FILE);
+	  cerebro_err_output("genders database '%s' cannot be opened", filename);
 	  goto cleanup;
 	}
       else

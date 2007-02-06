@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_genders.c,v 1.33 2005-08-23 21:10:15 achu Exp $
+ *  $Id: cerebro_clusterlist_genders.c,v 1.34 2007-02-06 17:51:07 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -69,7 +69,7 @@ genders_clusterlist_setup(void)
       return 0;
     }
 
-  return cerebro_clusterlist_genders_setup(&gh);
+  return cerebro_clusterlist_genders_setup(&gh, NULL);
 }
 
 /*
