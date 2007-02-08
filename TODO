@@ -29,5 +29,8 @@ Enhancements
   without keeping on adding functions.
 - logging/error output/something facility for modules
 
+Specs:
+- cerebro.spec.in - find better way to do restarts
+
 Docs:
 user/admin guide
