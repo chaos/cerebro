@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: event_module.c,v 1.2 2006-11-08 00:34:04 chu11 Exp $
+ *  $Id: event_module.c,v 1.3 2007-02-09 18:44:34 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -161,9 +161,11 @@ _event_module_cb(void *handle, void *dl_handle, void *module_info)
                   event_handle->modules_count))
     {
       CEREBRO_DBG(("vector_set: %s", strerror(errno)));
+#if !WITH_STATIC_MODULES
       vector_set(event_handle->dl_handles,
                  NULL,
                  event_handle->modules_count);
+#endif /* !WITH_STATIC_MODULES */
       return 0;
     }
   event_handle->modules_count++;

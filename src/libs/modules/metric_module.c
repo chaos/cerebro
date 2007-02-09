@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: metric_module.c,v 1.21 2006-11-15 00:12:30 chu11 Exp $
+ *  $Id: metric_module.c,v 1.22 2007-02-09 18:44:34 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -61,15 +61,27 @@ extern struct cerebro_metric_module_info slurm_state_metric_module_info;
 #endif /* WITH_SLURM_STATE */
 
 #if WITH_LOADAVG
-extern struct cerebro_metric_module_info loadavg_metric_module_info;
+extern struct cerebro_metric_module_info loadavg1_metric_module_info;
+extern struct cerebro_metric_module_info loadavg5_metric_module_info;
+extern struct cerebro_metric_module_info loadavg15_metric_module_info;
 #endif /* WITH_LOADAVG */
 
 #if WITH_MEMORY
-extern struct cerebro_metric_module_info memory_metric_module_info;
+extern struct cerebro_metric_module_info memtotal_metric_module_info;
+extern struct cerebro_metric_module_info memused_metric_module_info;
+extern struct cerebro_metric_module_info memfree_metric_module_info;
+extern struct cerebro_metric_module_info swaptotal_metric_module_info;
+extern struct cerebro_metric_module_info swapused_metric_module_info;
+extern struct cerebro_metric_module_info swapfree_metric_module_info;
 #endif /* WITH_MEMORY */
 
 #if WITH_NETWORK
-extern struct cerebro_metric_module_info network_metric_module_info;
+extern struct cerebro_metric_module_info bytesin_metric_module_info;
+extern struct cerebro_metric_module_info bytesout_metric_module_info;
+extern struct cerebro_metric_module_info packetsin_metric_module_info;
+extern struct cerebro_metric_module_info packetsout_metric_module_info;
+extern struct cerebro_metric_module_info rxerrs_metric_module_info;
+extern struct cerebro_metric_module_info txerrs_metric_module_info;
 #endif /* WITH_NETWORK */
 
 /*
@@ -86,13 +98,25 @@ void *metric_modules[] =
     &slurm_state_metric_module_info,
 #endif /* WITH_SLURM_STATE */
 #if WITH_LOADAVG
-    &loadavg_metric_module_info,
+    &loadavg1_metric_module_info,
+    &loadavg5_metric_module_info,
+    &loadavg15_metric_module_info,
 #endif /* WITH_LOADAVG */
 #if WITH_MEMORY
-    &memory_metric_module_info,
+    &memtotal_metric_module_info,
+    &memused_metric_module_info,
+    &memfree_metric_module_info,
+    &swaptotal_metric_module_info,
+    &swapused_metric_module_info,
+    &swapfree_metric_module_info,
 #endif /* WITH_MEMORY */
 #if WITH_NETWORK
-    &network_metric_module_info,
+    &bytesin_metric_module_info,
+    &bytesout_metric_module_info,
+    &packetsin_metric_module_info,
+    &packetsout_metric_module_info,
+    &rxerrs_metric_module_info,
+    &txerrs_metric_module_info,
 #endif /* WITH_NETWORK */
     NULL
   };
@@ -189,9 +213,11 @@ _metric_module_cb(void *handle, void *dl_handle, void *module_info)
                   metric_handle->modules_count))
     {
       CEREBRO_DBG(("vector_set: %s", strerror(errno)));
+#if !WITH_STATIC_MODULES
       vector_set(metric_handle->dl_handles,
                  NULL,
                  metric_handle->modules_count);
+#endif /* !WITH_STATIC_MODULES */
       return 0;
     }
   metric_handle->modules_count++;

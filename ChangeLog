@@ -1,3 +1,18 @@
+2007-02-09  Albert Chu  <chu11@llnl.gov>
+
+	* src/libs/modules/metric_module.c (_metric_module_cb),
+	src/libs/modules/event_module.c (_event_module_cb),
+	src/libs/modules/monitor_module.c (_monitor_module_cb): Fix static
+	compile bug.
+
+	* src/cerebrod/cerebrod_speaker.c: Remove pthread use when
+	--with-cerebrod-no-threads is used.
+
+	* src/libs/modules/metric_module.c: Fix various static module
+	build issues.
+
+	* src/modules/event/Makefile.am: Fix static build bug.
+	
 2007-02-08  Albert Chu  <chu11@llnl.gov>
 
 	* cerebro.spec.in: Add cerebrod restart fix.  Fix ppc64 packaging issue.

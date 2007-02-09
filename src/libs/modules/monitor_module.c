@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: monitor_module.c,v 1.17 2006-11-08 00:34:04 chu11 Exp $
+ *  $Id: monitor_module.c,v 1.18 2007-02-09 18:44:34 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -151,9 +151,11 @@ _monitor_module_cb(void *handle, void *dl_handle, void *module_info)
                   monitor_handle->modules_count))
     {
       CEREBRO_DBG(("vector_set: %s", strerror(errno)));
+#if !WITH_STATIC_MODULES
       vector_set(monitor_handle->dl_handles,
                  NULL,
                  monitor_handle->modules_count);
+#endif /* !WITH_STATIC_MODULES */
       return 0;
     }
   monitor_handle->modules_count++;

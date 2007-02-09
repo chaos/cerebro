@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.94 2006-12-20 21:28:53 chu11 Exp $
+ *  $Id: cerebrod_speaker.c,v 1.95 2007-02-09 18:44:34 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -83,7 +83,9 @@ List next_send_times = NULL;
  */
 extern List metric_list;
 extern int metric_list_size;
+#if !WITH_CEREBROD_NO_THREADS
 extern pthread_mutex_t metric_list_lock;
+#endif /* !WITH_CEREBROD_NO_THREADS */
 
 /* 
  * _speaker_socket_create
@@ -252,7 +254,9 @@ _speaker_initialize(void)
       struct cerebrod_speaker_metric_info *metric_info;
 
       ListIterator itr;
+#if !WITH_CEREBROD_NO_THREADS
       Pthread_mutex_lock(&metric_list_lock);
+#endif /* !WITH_CEREBROD_NO_THREADS */
       itr = List_iterator_create(metric_list);
       while ((metric_info = list_next(itr)))
         {
@@ -274,7 +278,9 @@ _speaker_initialize(void)
                 }
             }
         }
+#if !WITH_CEREBROD_NO_THREADS
       Pthread_mutex_unlock(&metric_list_lock);
+#endif /* !WITH_CEREBROD_NO_THREADS */
     }
 
   List_sort(next_send_times, (ListCmpF)_next_send_time_compare);

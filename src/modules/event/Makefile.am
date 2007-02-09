@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.3 2006-12-19 23:00:57 chu11 Exp $
+## $Id: Makefile.am,v 1.4 2007-02-09 18:44:34 chu11 Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -25,6 +25,7 @@ MODULE_FLAGS = -module -avoid-version
 
 libstaticeventmodules_la_SOURCES = $(UPDOWN_STATIC_SOURCES)
 libstaticeventmodules_la_CFLAGS  = -I$(srcdir)/../../libs/include \
+				   -I$(srcdir)/../../libs/common \
                                    -I$(srcdir)/../../libs/debug
 libstaticeventmodules_la_LDFLAGS = $(EVENT_OTHER_FLAGS)
 
