@@ -188,7 +188,7 @@ fi
 
 %if %{?_with_genders:1}%{!?_with_genders:0}
 %files clusterlist-genders
-%defattr(700,root,root)
+%defattr(-,root,root)
 %{_libdir}/cerebro/*cerebro_clusterlist_genders.*
 %endif
 
@@ -209,7 +209,7 @@ fi
 
 %if %{?_with_hostsfile:1}%{!?_with_hostsfile:0}
 %files clusterlist-hostsfile
-%defattr(700,root,root)
+%defattr(-,root,root)
 %{_libdir}/cerebro/*cerebro_clusterlist_hostsfile.*
 %endif
 
@@ -230,7 +230,7 @@ fi
 
 %if %{?_with_boottime:1}%{!?_with_boottime:0}
 %files metric-boottime
-%defattr(700,root,root)
+%defattr(-,root,root)
 %{_libdir}/cerebro/*cerebro_metric_boottime.*
 %endif
 
@@ -251,7 +251,7 @@ fi
 
 %if %{?_with_loadavg:1}%{!?_with_loadavg:0}
 %files metric-loadavg
-%defattr(700,root,root)
+%defattr(-,root,root)
 %{_libdir}/cerebro/*cerebro_metric_loadavg1.*
 %{_libdir}/cerebro/*cerebro_metric_loadavg5.*
 %{_libdir}/cerebro/*cerebro_metric_loadavg15.*
@@ -274,7 +274,7 @@ fi
 
 %if %{?_with_memory:1}%{!?_with_memory:0}
 %files metric-memory
-%defattr(700,root,root)
+%defattr(-,root,root)
 %{_libdir}/cerebro/*cerebro_metric_memtotal.*
 %{_libdir}/cerebro/*cerebro_metric_memused.*
 %{_libdir}/cerebro/*cerebro_metric_memfree.*
@@ -300,7 +300,7 @@ fi
 
 %if %{?_with_network:1}%{!?_with_network:0}
 %files metric-network
-%defattr(700,root,root)
+%defattr(-,root,root)
 %{_libdir}/cerebro/*cerebro_metric_bytesin.*
 %{_libdir}/cerebro/*cerebro_metric_bytesout.*
 %{_libdir}/cerebro/*cerebro_metric_packetsin.*
@@ -326,7 +326,7 @@ fi
 
 %if %{?_with_slurm_state:1}%{!?_with_slurm_state:0}
 %files metric-slurm-state
-%defattr(700,root,root)
+%defattr(-,root,root)
 %{_libdir}/cerebro/*cerebro_metric_slurm_state.*
 %endif
 
@@ -347,7 +347,7 @@ fi
 
 %if %{?_with_shutdown:1}%{!?_with_shutdown:0}
 %files metric-shutdown
-%defattr(700,root,root)
+%defattr(-,root,root)
 %{_libdir}/cerebro/*cerebro_metric_shutdown.*
 %endif
 
@@ -368,6 +368,6 @@ fi
 
 %if %{?_with_updown:1}%{!?_with_updown:0}
 %files event-updown
-%defattr(700,root,root)
+%defattr(-,root,root)
 %{_libdir}/cerebro/*cerebro_event_updown.*
 %endif
