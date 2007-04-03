@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.53 2006-11-15 00:12:30 chu11 Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.54 2007-04-03 04:23:12 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -577,27 +577,6 @@ _metric_data_update(struct cerebrod_node_data *nd,
     CEREBRO_EXIT(("mutex not locked: rv=%d", rv));
 #endif /* CEREBRO_DEBUG */
   
-  Pthread_mutex_lock(&metric_names_lock);
-  if (!Hash_find(metric_names, metric_name))
-    {
-      struct cerebrod_metric_name_data *mnd;
-      
-      /* Re-hash if our hash is getting too small */
-      if ((metric_names_count + 1) > (metric_names_size*2))
-	cerebrod_rehash(&metric_names,
-			&metric_names_size,
-			LISTENER_DATA_METRIC_NAMES_INCREMENT,
-			metric_names_count,
-			&metric_names_lock);
-      
-      mnd = metric_name_data_create(metric_name,
-                                    CEREBROD_METRIC_LISTENER_ORIGIN_MONITORED);
-      
-      Hash_insert(metric_names, mnd->metric_name, mnd);
-      metric_names_count++;
-    }
-  Pthread_mutex_unlock(&metric_names_lock);             
-  
   if (!(md = Hash_find(nd->metric_data, metric_name)))
     {
       /* Re-hash if our hash is getting too small */
@@ -676,7 +655,61 @@ cerebrod_listener_data_update(char *nodename,
       _output_node_data_insert(nd);
     }
   Pthread_mutex_unlock(&listener_data_lock);
-  
+
+  /* 
+   * The below loop used to be in _metric_data_update().  It was removed
+   * b/c a race was discovered in debug mode.
+   *
+   * If the same host sends 3 cerebro message packets simultaneously
+   * (lets assume due to network congestion), in debug mode we can
+   * get the following deadlock:
+   *
+   * thread 1: enters _metric_names_dump.  Locks metric_names_lock.  Waits
+   * on debug_output_lock.
+   *
+   * thread 2: enters _listener_data_dump.  Locks debug_output_lock
+   * waits on node_data_lock.
+   *
+   * thread 3: locks node_data_lock below in this function.  Call
+   * _metric_update_data() and waits on metric_names_lock.
+   */
+  Pthread_mutex_lock(&metric_names_lock);
+  for (i = 0; i < msg->metrics_len; i++)
+    {
+      char metric_name_buf[CEREBRO_MAX_METRIC_NAME_LEN+1];
+      struct cerebrod_message_metric *mm = msg->metrics[i];
+
+      /* Guarantee ending '\0' character */
+      memset(metric_name_buf, '\0', CEREBRO_MAX_METRIC_NAME_LEN+1);
+      memcpy(metric_name_buf, mm->metric_name, CEREBRO_MAX_METRIC_NAME_LEN);
+
+      if (!strlen(metric_name_buf))
+        {
+          CEREBRO_DBG(("null message_data metric_name received"));
+          continue;
+        }
+
+      if (!Hash_find(metric_names, metric_name_buf))
+        {
+          struct cerebrod_metric_name_data *mnd;
+          
+          /* Re-hash if our hash is getting too small */
+          if ((metric_names_count + 1) > (metric_names_size*2))
+            cerebrod_rehash(&metric_names,
+                            &metric_names_size,
+                            LISTENER_DATA_METRIC_NAMES_INCREMENT,
+                            metric_names_count,
+                            &metric_names_lock);
+          
+          mnd = metric_name_data_create(metric_name_buf,
+                                        CEREBROD_METRIC_LISTENER_ORIGIN_MONITORED);
+          
+          Hash_insert(metric_names, mnd->metric_name, mnd);
+          metric_names_count++;
+        }
+    }
+  Pthread_mutex_unlock(&metric_names_lock);             
+
   Pthread_mutex_lock(&(nd->node_data_lock));
   if (received_time >= nd->last_received_time)
     {
