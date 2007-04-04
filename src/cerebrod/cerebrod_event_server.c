@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_event_server.c,v 1.6 2006-12-21 01:42:17 chu11 Exp $
+ *  $Id: cerebrod_event_server.c,v 1.7 2007-04-04 22:15:55 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -99,8 +99,6 @@ List event_connections = NULL;
 hash_t event_connections_index = NULL;
 pthread_mutex_t event_connections_lock = PTHREAD_MUTEX_INITIALIZER;
  
-extern event_modules_t event_handle;
-extern hash_t event_index;
 extern List event_names;
 
 extern List event_queue;
@@ -1006,7 +1004,18 @@ _event_server_service_connection(int fd)
   
   ecd->event_name = event_name_ptr;
   ecd->fd = fd;
+  
+  if (!(fdptr = (int *)malloc(sizeof(int))))
+    {
+      CEREBRO_DBG(("malloc: %s", strerror(errno)));
+      _event_server_err_only_response(fd,
+                                      req.version,
+                                      CEREBRO_EVENT_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
+      goto cleanup;
+    }
+  *fdptr = fd;
 
+  Pthread_mutex_lock(&event_connections_lock);
   if (!list_append(event_connections, ecd))
     {
       CEREBRO_DBG(("list_append: %s", strerror(errno)));
@@ -1039,7 +1048,7 @@ _event_server_service_connection(int fd)
         }
     }
 
-  if (!(fdptr = (int *)malloc(sizeof(int))))
+  if (!list_append(connections, fdptr))
     {
       CEREBRO_DBG(("malloc: %s", strerror(errno)));
       _event_server_err_only_response(fd,
@@ -1048,17 +1057,6 @@ _event_server_service_connection(int fd)
       goto cleanup;
     }
 
-  *fdptr = fd;
-  Pthread_mutex_lock(&event_connections_lock);
-  if (!list_append(connections, fdptr))
-    {
-      CEREBRO_DBG(("malloc: %s", strerror(errno)));
-      _event_server_err_only_response(fd,
-                                      req.version,
-                                      CEREBRO_EVENT_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
-      goto cleanup;
-      
-    }
   Pthread_mutex_unlock(&event_connections_lock);
   /* Clear this pointer so we know it's stored away in a list */
   fdptr = NULL;

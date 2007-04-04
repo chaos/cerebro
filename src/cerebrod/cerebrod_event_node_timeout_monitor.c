@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_event_node_timeout_monitor.c,v 1.4 2006-11-15 00:12:30 chu11 Exp $
+ *  $Id: cerebrod_event_node_timeout_monitor.c,v 1.5 2007-04-04 22:15:55 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -140,6 +140,9 @@ cerebrod_event_node_timeout_monitor(void *arg)
   if (!event_index)
     return NULL;
 
+  /* Note: After initial setup, we are the only thread that uses this
+   * list/iterator.  So no need for pthread locking.
+   */
   timesitr = List_iterator_create(event_module_timeouts);
 
   while (1)

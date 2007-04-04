@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.96 2007-04-04 17:23:12 chu11 Exp $
+ *  $Id: cerebrod_speaker.c,v 1.97 2007-04-04 22:15:55 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -434,6 +434,9 @@ cerebrod_speaker(void *arg)
 
       Gettimeofday(&tv, NULL);
 
+      /* Note: After initial setup, we are the only thread that uses this
+       * list/iterator.  So no need for pthread locking.
+       */
       itr = List_iterator_create(next_send_times);
       while ((nst = list_next(itr)))
         {

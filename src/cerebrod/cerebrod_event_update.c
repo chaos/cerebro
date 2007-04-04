@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_event_update.c,v 1.5 2006-12-21 03:29:58 chu11 Exp $
+ *  $Id: cerebrod_event_update.c,v 1.6 2007-04-04 22:15:55 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -139,6 +139,23 @@ pthread_cond_t event_queue_cond = PTHREAD_COND_INITIALIZER;
 pthread_mutex_t event_queue_lock = PTHREAD_MUTEX_INITIALIZER;
 
 /*
+ * _cerebrod_event_module_list_destroy
+ *
+ * Destroy a event_module_list struct.
+ */
+static void
+_cerebrod_event_module_list_destroy(void *data)
+{
+  struct cerebrod_event_module_list *el;
+
+  assert(data);
+
+  el = (struct cerebrod_event_module_list *)data;
+  List_destroy(el->event_list);
+  Free(el);
+}
+
+/*
  * _cerebrod_event_module_info_destroy
  *
  * Destroy a event_module_info struct.
@@ -183,6 +200,14 @@ static int
 _event_node_timeout_data_add(const char *nodename, u_int32_t time_now)
 {
   struct cerebrod_event_node_timeout_data *ntd;
+#if CEREBRO_DEBUG
+  int rv;
+
+  /* Should be called with lock already set */
+  rv = Pthread_mutex_trylock(&event_node_timeout_data_lock);
+  if (rv != EBUSY)
+    CEREBRO_EXIT(("mutex not locked: rv=%d", rv));
+#endif /* CEREBRO_DEBUG */
 
   ntd = (struct cerebrod_event_node_timeout_data *)Malloc(sizeof(struct cerebrod_event_node_timeout_data));
   ntd->nodename = (char *)nodename;
@@ -211,7 +236,17 @@ _event_node_timeout_data_callback(void *data, const void *key, void *arg)
 
   nd = (struct cerebrod_node_data *)data;
 
+  /* Note: Lock not really necessary b/c this function is called
+   * during initialization, but it'll make the debug stuff happy 
+   * when you call _event_node_timeout_data_add().
+   */
+#if CEREBRO_DEBUG
+  Pthread_mutex_lock(&event_node_timeout_data_lock);
+#endif /* CEREBRO_DEBUG */
   _event_node_timeout_data_add(nd->nodename, *time_now);
+#if CEREBRO_DEBUG
+  Pthread_mutex_unlock(&event_node_timeout_data_lock);
+#endif /* CEREBRO_DEBUG */
   return 1;
 }
 
@@ -284,7 +319,7 @@ _setup_event_node_timeout_data(void)
   
   Gettimeofday(&tv, NULL);
 
-  num = Hash_for_each(listener_data, 
+  num = Hash_for_each(listener_data,
                       _event_node_timeout_data_callback,
                       &(tv.tv_sec));
   if (num != listener_data_numnodes)
@@ -335,7 +370,7 @@ int
 cerebrod_event_modules_setup(void)
 {
   int i, event_module_count, event_index_len, event_index_count = 0;
-  List event_list = NULL;
+  struct cerebrod_event_modules_list *el = NULL;
 #if CEREBRO_DEBUG
   int rv;
 #endif /* CEREBRO_DEBUG */
@@ -389,7 +424,7 @@ cerebrod_event_modules_setup(void)
   event_index = Hash_create(event_index_len,
                             (hash_key_f)hash_key_string,
                             (hash_cmp_f)strcmp,
-                            (hash_del_f)list_destroy);
+                            (hash_del_f)_cerebrod_event_module_list_destroy);
 
   event_names = List_create((ListDelF)_Free);
 
@@ -458,15 +493,18 @@ cerebrod_event_modules_setup(void)
       metricPtr = strtok_r(event_module->metric_names, ",", &metricbuf);
       while (metricPtr)
         {
-          if (!(event_list = Hash_find(event_index, metricPtr)))
+          if (!(el = Hash_find(event_index, metricPtr)))
             {
-              event_list = List_create((ListDelF)_cerebrod_event_module_info_destroy);
-              List_append(event_list, event_module);
-              Hash_insert(event_index, metricPtr, event_list);
+              el = (struct cerebrod_event_modules_list *)Malloc(sizeof(struct cerebrod_event_modules_list));
+              el->event_list = List_create((ListDelF)_cerebrod_event_module_info_destroy);
+              Pthread_mutex_init(&(el->event_list_lock), NULL);
+
+              List_append(el->event_list, event_module);
+              Hash_insert(event_index, metricPtr, el);
               event_index_count++;
             }
           else
-            List_append(event_list, event_module);
+            List_append(el->event_list, event_module);
           
           metricPtr = strtok_r(NULL, ",", &metricbuf);
         }
@@ -644,7 +682,7 @@ cerebrod_event_modules_update(const char *nodename,
                               struct cerebrod_message_metric *mm)
 {
   struct cerebrod_event_module_info *event_module;
-  List event_list; 
+  struct cerebrod_event_modules_list *el;
 #if CEREBRO_DEBUG
   int rv;
 #endif /* CEREBRO_DEBUG */
@@ -661,14 +699,26 @@ cerebrod_event_modules_update(const char *nodename,
     CEREBRO_EXIT(("mutex not locked: rv=%d", rv));
 #endif /* CEREBRO_DEBUG */
 
-  if ((event_list = Hash_find(event_index, metric_name)))
+  /*
+   * This function may be called by multiple threads by the listener.
+   *
+   * The event_index is setup at the beginning and is only read, not
+   * written to.  However, the lists stored inside the event_index
+   * need to called w/ thread safety (due to the nature of the list
+   * API).
+   *
+   */
+
+  if ((el = Hash_find(event_index, metric_name)))
     {
       struct cerebro_event *event = NULL;
+      ListIterator itr = NULL;
       int rv;
 
-      ListIterator itr = NULL;
+      Pthread_mutex_lock(&(el->event_list_lock));
+      itr = List_iterator_create(el->event_list);
+      Pthread_mutex_unlock(&(el->event_list_lock));
 
-      itr = List_iterator_create(event_list);
       while ((event_module = list_next(itr)))
 	{
 	  Pthread_mutex_lock(&event_module->event_lock);
@@ -691,7 +741,10 @@ cerebrod_event_modules_update(const char *nodename,
         loop_next:
 	  Pthread_mutex_unlock(&event_module->event_lock);
 	}
+
+      Pthread_mutex_lock(&(el->event_list_lock));
       List_iterator_destroy(itr);
+      Pthread_mutex_unlock(&(el->event_list_lock));
     }
 }
 

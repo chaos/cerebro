@@ -2,6 +2,27 @@
 
 	* src/cerebrod/cerebrod_speaker.c (cerebrod_speaker): Fix
 	mem-leak.
+
+	* src/cerebrod/cerebrod_listener_data (metric_data_create): Add
+	assert.
+
+	* src/cerebrod/cerebrod_listener_data
+	(cerebrod_listener_data_update): Fix metric names hash corner
+	case.
+
+	* src/cerebrod/cerebrod_event_update.c
+	(_event_node_timeout_data_add, _event_node_timeout_data_callback):
+	Add pthread lock checks.
+
+	* src/cerebrod/cerebrod_event_server.c
+	(_event_server_service_connection): Fix potential race condition.
+
+	* src/cerebrod/cerebrod_event_server.c: Remove unused globals.
+
+	* src/cerebrod/cerebrod_event_update.h,
+	src/cerebrod/cerebrod_event_update.c
+	(cerebrod_event_modules_setup, cerebrod_event_modules_update): Fix
+	race condition.
 	
 2007-04-02  Albert Chu  <chu11@llnl.gov>
 

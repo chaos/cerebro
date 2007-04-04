@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_event_update.h,v 1.3 2006-11-15 00:12:30 chu11 Exp $
+ *  $Id: cerebrod_event_update.h,v 1.4 2007-04-04 22:15:55 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -40,6 +40,20 @@
 
 #include "cerebro/cerebrod_message_protocol.h"
 #include "cerebrod_listener_data.h"
+
+#include "list.h"
+
+/* 
+ * struct cerebrod_event_modules_list
+ *
+ * Contains list of event module info list and a lock for thread
+ * safety.
+ */
+struct cerebrod_event_modules_list
+{
+  List event_list;
+  pthread_mutex_t event_list_lock;
+};
 
 /*
  * struct cerebrod_event_module_info
