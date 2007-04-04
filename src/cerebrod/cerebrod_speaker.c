@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.95 2007-02-09 18:44:34 chu11 Exp $
+ *  $Id: cerebrod_speaker.c,v 1.96 2007-04-04 17:23:12 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -504,6 +504,7 @@ cerebrod_speaker(void *arg)
           else
             break;
         }
+      List_iterator_destroy(itr);
       
       List_sort(next_send_times, (ListCmpF)_next_send_time_compare);
 

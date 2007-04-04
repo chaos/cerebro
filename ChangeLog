@@ -1,3 +1,8 @@
+2007-04-03  Albert Chu  <chu11@llnl.gov>
+
+	* src/cerebrod/cerebrod_speaker.c (cerebrod_speaker): Fix
+	mem-leak.
+	
 2007-04-02  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerebrod/cerebrod_listener_data.c: Fix race condition.
