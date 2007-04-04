@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_event_update.c,v 1.6 2007-04-04 22:15:55 chu11 Exp $
+ *  $Id: cerebrod_event_update.c,v 1.7 2007-04-04 23:31:20 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -370,7 +370,7 @@ int
 cerebrod_event_modules_setup(void)
 {
   int i, event_module_count, event_index_len, event_index_count = 0;
-  struct cerebrod_event_modules_list *el = NULL;
+  struct cerebrod_event_module_list *el = NULL;
 #if CEREBRO_DEBUG
   int rv;
 #endif /* CEREBRO_DEBUG */
@@ -495,7 +495,7 @@ cerebrod_event_modules_setup(void)
         {
           if (!(el = Hash_find(event_index, metricPtr)))
             {
-              el = (struct cerebrod_event_modules_list *)Malloc(sizeof(struct cerebrod_event_modules_list));
+              el = (struct cerebrod_event_module_list *)Malloc(sizeof(struct cerebrod_event_module_list));
               el->event_list = List_create((ListDelF)_cerebrod_event_module_info_destroy);
               Pthread_mutex_init(&(el->event_list_lock), NULL);
 
@@ -682,7 +682,7 @@ cerebrod_event_modules_update(const char *nodename,
                               struct cerebrod_message_metric *mm)
 {
   struct cerebrod_event_module_info *event_module;
-  struct cerebrod_event_modules_list *el;
+  struct cerebrod_event_module_list *el;
 #if CEREBRO_DEBUG
   int rv;
 #endif /* CEREBRO_DEBUG */
