@@ -23,6 +23,8 @@
 	src/cerebrod/cerebrod_event_update.c
 	(cerebrod_event_modules_setup, cerebrod_event_modules_update): Fix
 	race condition.
+
+	* Makefile.am: Dist out cerebro spec files.
 	
 2007-04-02  Albert Chu  <chu11@llnl.gov>
 
