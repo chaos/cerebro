@@ -90,7 +90,7 @@ Requires: cerebro
 Event module to monitor node up/down.
 
 %prep
-%setup  -q -n @PROJECT@-@VERSION@-@RELEASE@
+%setup  -q -n @PROJECT@-@VERSION@
 
 %build
 %configure --program-prefix=%{?_program_prefix:%{_program_prefix}} \
