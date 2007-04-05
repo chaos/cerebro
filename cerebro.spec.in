@@ -5,7 +5,7 @@ Release: @RELEASE@
 Summary: Cerebro cluster monitoring tools and libraries
 Group: System Environment/Base
 License: GPL
-Source: @PROJECT@-@VERSION@.tgz
+Source: @PROJECT@-@VERSION@.tar.gz
 BuildRoot: %{_tmppath}/@PROJECT@-@VERSION@
 
 %description

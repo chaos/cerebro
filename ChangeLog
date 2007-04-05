@@ -3,6 +3,8 @@
 	* tagged cerebro-1-1-5
 
 	* META: update for release
+
+	* cerebro.spec.in: Update.
 	
 2007-04-03  Albert Chu  <chu11@llnl.gov>
 
