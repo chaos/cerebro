@@ -1,5 +1,11 @@
 2007-04-03  Albert Chu  <chu11@llnl.gov>
 
+	* tagged cerebro-1-1-5
+
+	* META: update for release
+	
+2007-04-03  Albert Chu  <chu11@llnl.gov>
+
 	* src/cerebrod/cerebrod_speaker.c (cerebrod_speaker): Fix
 	mem-leak.
 
