@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_genders_util.h,v 1.10 2007-02-06 17:51:07 chu11 Exp $
+ *  $Id: cerebro_clusterlist_genders_util.h,v 1.11 2007-09-05 18:16:01 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -22,7 +22,7 @@
  *
  *  You should have received a copy of the GNU General Public License along
  *  with Genders; if not, write to the Free Software Foundation, Inc.,
- *  59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.
+ *  51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA.
 \*****************************************************************************/
 
 #ifndef _CEREBRO_CLUSTERLIST_GENDERS_UTIL_H

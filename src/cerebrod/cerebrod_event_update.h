@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_event_update.h,v 1.5 2007-04-04 23:31:20 chu11 Exp $
+ *  $Id: cerebrod_event_update.h,v 1.6 2007-09-05 18:15:55 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -22,7 +22,7 @@
  *
  *  You should have received a copy of the GNU General Public License along
  *  with Genders; if not, write to the Free Software Foundation, Inc.,
- *  59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.
+ *  51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA.
 \*****************************************************************************/
 
 #ifndef _CEREBROD_EVENT_UPDATE_H
