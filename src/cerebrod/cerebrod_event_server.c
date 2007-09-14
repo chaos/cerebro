@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_event_server.c,v 1.8 2007-09-05 18:15:55 chu11 Exp $
+ *  $Id: cerebrod_event_server.c,v 1.9 2007-09-14 23:40:56 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -1137,7 +1137,8 @@ cerebrod_event_server(void *arg)
         CEREBRO_DBG(("server_fd POLLERR"));
       else if (pfds[0].revents & POLLIN)
         {
-          int fd, client_addr_len;
+          unsigned int client_addr_len;
+          int fd;
           struct sockaddr_in client_addr;
 
           client_addr_len = sizeof(struct sockaddr_in);

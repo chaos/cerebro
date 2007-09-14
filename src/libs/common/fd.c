@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: fd.c,v 1.2 2007-09-05 18:16:00 chu11 Exp $
+ *  $Id: fd.c,v 1.3 2007-09-14 23:40:56 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2001-2002 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -89,7 +89,7 @@ fd_write_n (int fd, const void *buf, size_t n)
     ssize_t nwritten;
     unsigned char *p;
 
-    p = (char *)buf;
+    p = (unsigned char *)buf;
     nleft = n;
     while (nleft > 0) {
         if ((nwritten = write (fd, p, nleft)) < 0) {

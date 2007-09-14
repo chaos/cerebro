@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: network_util.c,v 1.8 2007-09-05 18:16:00 chu11 Exp $
+ *  $Id: network_util.c,v 1.9 2007-09-14 23:40:57 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -291,7 +291,8 @@ low_timeout_connect(const char *hostname,
         {
           if (FD_ISSET(fd, &rset) || FD_ISSET(fd, &wset))
             {
-              int len, error;
+              unsigned int len;
+              int error;
               
               len = sizeof(int);
               
