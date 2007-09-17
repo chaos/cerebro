@@ -6,6 +6,8 @@
 	src/cerebro-admin/cerebro-admin.c, man/cerebro-admin.8.in: Re-do
 	usage output and documentation per Py Watson
 	(watson30 at llnl dot gov) suggestions.
+
+	* tagged cerebro-1-1-6
 	
 2007-09-14  Albert Chu  <chu11@llnl.gov>
 
