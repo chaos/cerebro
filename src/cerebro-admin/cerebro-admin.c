@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro-admin.c,v 1.14 2007-09-05 18:15:55 chu11 Exp $
+ *  $Id: cerebro-admin.c,v 1.15 2007-09-17 20:07:58 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -117,7 +117,9 @@ static void
 _usage(void) 
 {
   fprintf(stderr,
-	  "Usage: cerebro_admin [OPTIONS]...\n"
+	  "Usage: cerebro_admin [OPTIONS] -m <metric_name> [-r | -u | -p | -s]\n"
+          "\n"
+          "OPTIONS:\n"
 	  "  -h         Print help and exit\n"
 	  "  -v         Print version and exit\n"
           "  -m STRING  Specify the metric name\n"

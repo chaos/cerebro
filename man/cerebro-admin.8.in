@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro-admin.8.in,v 1.5 2007-09-05 18:15:54 chu11 Exp $
+\."$Id: cerebro-admin.8.in,v 1.6 2007-09-17 20:07:58 chu11 Exp $
 \."#############################################################################
 \."  Copyright (C) 2005 The Regents of the University of California.
 \."  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -27,7 +27,8 @@
 .SH "NAME"
 cerebro-admin \- cerebro metric administration
 .SH "SYNOPSIS"
-.B cerebro-admin [OPTIONS]
+.B cerebro-admin 
+.I "[OPTIONS] -m <metric_name> [-r | -u | -p | -s]"
 .br
 .SH "DESCRIPTION"
 The
@@ -35,7 +36,9 @@ The
 allows administrators to perform metric administration with 
 a 
 .B cerebrod(8)
-metric server.  
+metric server.  New metrics can be registered, unregistered, updated
+or resent.  A number of the options below allow for alternate metric
+values to be specified or alter metric management behavior.
 
 .SH "OPTIONS"
 .TP

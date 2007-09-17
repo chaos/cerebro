@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro_module.3.in,v 1.17 2007-09-05 18:15:54 chu11 Exp $
+\."$Id: cerebro_module.3.in,v 1.18 2007-09-17 20:07:58 chu11 Exp $
 \."#############################################################################
 \."  Copyright (C) 2005 The Regents of the University of California.
 \."  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -59,7 +59,7 @@ located at @CEREBRO_CLUSTERLIST_HOSTSFILE_DEFAULT@.
 
 Clusterlist modules are searched for in the
 .B Cerebro
-package library directory, @CEREBROD_MODULE_DIR@, in the above order.
+package library directory, @CEREBRO_MODULE_DIR@, in the above order.
 If none of the above are found,
 .B cerebrod
 will search for other clusterlist modules.

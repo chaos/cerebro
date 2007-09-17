@@ -1,3 +1,12 @@
+2007-09-17  Albert Chu  <chu11@llnl.gov>
+
+	* man/cerebrod.8.in: Add restart information.
+
+	* src/cerebro-stat/cerebro-stat.c, man/cerebro-stat.8.in,
+	src/cerebro-admin/cerebro-admin.c, man/cerebro-admin.8.in: Re-do
+	usage output and documentation per Py Watson
+	(watson30 at llnl dot gov) suggestions.
+	
 2007-09-14  Albert Chu  <chu11@llnl.gov>
 
 	* Fix compiler warnings.

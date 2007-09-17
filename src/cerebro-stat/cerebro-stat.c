@@ -138,21 +138,26 @@ static void
 _usage(void) 
 {
   fprintf(stderr,
-	  "Usage: cerebro_stat [OPTIONS]...\n"
+	  "Usage: cerebro-stat [OPTIONS] -m <metric_name>\n"
+	  "or     cerebro-stat [OPTIONS] -l\n"
+          "or     cerebro-stat [OPTIONS] -e <event_name>\n"
+          "or     cerebro-stat [OPTIONS] -z\n"
+          "\n"
+          "OPTIONS:\n"
 	  "  -h         Print help and exit\n"
 	  "  -v         Print version and exit\n"
 	  "  -o STRING  Cerebro server hostname\n"
 	  "  -p INT     Cerebro server port\n"
-          "  -z         List all available events that can be monitored\n"
-          "  -e STRING  Monitor the specified event\n"
-          "  -l         List all available metrics that can be queried\n"
           "  -m STRING  Output metric data for the specified metric\n"
+          "  -l         List all available metrics that can be queried\n"
           "  -U         Only output metrics from up nodes\n"
           "  -D         Output '%s' for down nodes\n"
           "  -N         Output '%s' for nodes not monitoring a metric\n"
           "  -n         Output nodes one per line\n"
           "  -q         Output nodes in hostrange format\n"
-          "  -t         Output metric receive times\n",
+          "  -t         Output metric receive times\n"
+          "  -e STRING  Monitor the specified event\n"
+          "  -z         List all available events that can be monitored\n",
           CEREBRO_STAT_NONE_STRING, 
           CEREBRO_STAT_NONE_STRING);
 #if CEREBRO_DEBUG
@@ -222,16 +227,16 @@ _cmdline_parse(int argc, char **argv)
       {"version",               0, NULL, 'v'},
       {"hostname",              1, NULL, 'o'},
       {"port",                  1, NULL, 'p'},
-      {"metric-list",           0, NULL, 'l'},
       {"metric",                1, NULL, 'm'},
+      {"metric-list",           0, NULL, 'l'},
       {"up-only",               0, NULL, 'U'},
       {"none-if-down",          0, NULL, 'D'},
       {"none-if-not-monitored", 0, NULL, 'N'},
       {"newline",               0, NULL, 'n'},
       {"hostrange",             0, NULL, 'q'},
       {"metric-received-time",  0, NULL, 't'},
-      {"event-list",            0, NULL, 'z'},
       {"event",                 1, NULL, 'e'},
+      {"event-list",            0, NULL, 'z'},
 #if CEREBRO_DEBUG
       {"debug",                 0, NULL, 'd'},
 #endif /* CEREBRO_DEBUG */
@@ -279,11 +284,11 @@ _cmdline_parse(int argc, char **argv)
             err_exit("%s: cerebro_set_port: %s", func, msg);
           }
         break;
-      case 'l':
-        metric_list_flag++;
-        break;
       case 'm':
         metric_name = optarg;
+        break;
+      case 'l':
+        metric_list_flag++;
         break;
       case 'U':
         _cerebro_set_flags(CEREBRO_METRIC_DATA_FLAGS_UP_ONLY);

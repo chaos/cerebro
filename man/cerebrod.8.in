@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebrod.8.in,v 1.21 2007-09-05 18:15:55 chu11 Exp $
+\."$Id: cerebrod.8.in,v 1.22 2007-09-17 20:07:58 chu11 Exp $
 \."#############################################################################
 \."  Copyright (C) 2005 The Regents of the University of California.
 \."  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -49,7 +49,16 @@ See the
 .BR cerebro.conf(5)
 and
 .BR cerebro_module(3) 
-manpages for additional information.
+manpages for additional information on configuration.
+
+Depending on the configuration of your cluster, the
+.B cerebrod
+daemon may need to be restarted to recognize a new configuration.
+
+For example, if additional nodes have been added into your cluster,
+.B cerebrod
+may need to be restrated to reload any cluster data files so these
+new nodes will be recognized.  
 
 .SH "OPTIONS"
 .TP

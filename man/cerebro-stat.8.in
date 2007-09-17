@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro-stat.8.in,v 1.8 2007-09-05 18:15:54 chu11 Exp $
+\."$Id: cerebro-stat.8.in,v 1.9 2007-09-17 20:07:58 chu11 Exp $
 \."#############################################################################
 \."  Copyright (C) 2005 The Regents of the University of California.
 \."  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -27,7 +27,17 @@
 .SH "NAME"
 cerebro-stat \- cerebro data gathering
 .SH "SYNOPSIS"
-.B cerebro-stat [OPTIONS]
+.B cerebro-stat
+.I "[OPTIONS] -m <metric_name>"
+.br
+.B cerebro-stat
+.I "[OPTIONS] -l"
+.br
+.B cerebro-stat
+.I "[OPTIONS] -e <event_name>"
+.br
+.B cerebro-stat
+.I "[OPTIONS] -z"
 .br
 .SH "DESCRIPTION"
 The
@@ -36,6 +46,23 @@ tool retrieves the currently available metric names, metric data, and
 event data from a
 .B cerebrod(8)
 daemon.
+
+The user may specify the
+.I  "-m"
+or 
+.I "-e"
+options to retrieve or monitor available metric data and event data.
+
+A number of other options specified below allow for alternate output
+formats for the 
+.I "-m"
+option.
+
+The 
+.I "-l"
+and 
+.I "-z"
+can be specified to list available metrics and events respectively.
 
 The default hostname and port used by 
 .B cerebro-stat
@@ -65,17 +92,11 @@ Cerebrod server hostname (default=localhost)
 .B \-p \fIINT\fR, \fB\-\-port\fR=\fIINT\fR
 Cerebrod server port (default=8649)
 .TP
-.B -z, --event-list
-List all available events that can be queried
-.TP
-.B -e \fISTRING\fR, \fB\-\-event\fR=\fISTRING\fR
-Register and wait for specified events to occur
+.B -m \fISTRING\fR, \fB\-\-metric\fR=\fISTRING\fR
+Output metric data for the specified metric
 .TP
 .B -l, --metric-list
 List all available metrics that can be queried
-.TP
-.B -m \fISTRING\fR, \fB\-\-metric\fR=\fISTRING\fR
-Output metric data for the specified metric
 .TP
 .B -U, --up-only
 Restrict metric output only to those nodes that are determined to be up.
@@ -97,6 +118,12 @@ Output nodes in hostrange foramt
 .B -t, --metric-received-time
 Output last metric received time along with metric value.  Only
 available when outputting in newline format.
+.TP
+.B -e \fISTRING\fR, \fB\-\-event\fR=\fISTRING\fR
+Register and wait for specified events to occur
+.TP
+.B -z, --event-list
+List all available events that can be queried
 .if @MANPAGE_DEBUG@ \{
 .TP
 .B  -d, --debug
