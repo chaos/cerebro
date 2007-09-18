@@ -1,3 +1,11 @@
+2007-09-18  Albert Chu  <chu11@llnl.gov>
+
+	Re-do numbering for release.
+
+	* META, NEWS: update for release
+
+	* tagged cerebro-1-2-1
+	
 2007-09-17  Albert Chu  <chu11@llnl.gov>
 
 	* man/cerebrod.8.in: Add restart information.
