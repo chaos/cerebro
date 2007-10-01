@@ -1,3 +1,7 @@
+2007-10-01  Albert Chu  <chu11@llnl.gov>
+
+	* cerebro.spec.in: Replace /etc/init.d with %{initrddir}.
+	
 2007-09-18  Albert Chu  <chu11@llnl.gov>
 
 	Re-do numbering for release.
