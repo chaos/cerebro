@@ -1,3 +1,10 @@
+2007-10-05  Albert Chu  <chu11@llnl.gov>
+
+	* man/cerebro.conf.5.in:  Update documentation.
+
+	* config/ac_cerebro_metric_control_path.m4: Alter default metric
+	control path to /var.
+	
 2007-10-01  Albert Chu  <chu11@llnl.gov>
 
 	* cerebro.spec.in: Replace /etc/init.d with %{initrddir}.

@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro.conf.5.in,v 1.20 2007-09-05 18:15:54 chu11 Exp $
+\."$Id: cerebro.conf.5.in,v 1.21 2007-10-05 16:44:43 chu11 Exp $
 \."#############################################################################
 \."  Copyright (C) 2005 The Regents of the University of California.
 \."  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -166,7 +166,12 @@ option is turned on.  If the
 option is turned off, the metric_controller will not be started.  The default
 turns this option on as long as the 
 .I cerebrod_speak
-option is turned on.
+option is turned on.  This must be turned on for metric administration tools
+such as
+.B cerebro-admin
+to connect to the
+.B cerebrod
+daemon.
 .TP
 .I cerebrod_metric_server ( on | off )
 Specify if the
@@ -179,7 +184,12 @@ option is turned on.  If the
 option is turned off, the metric_server will not be started.  The default
 turns this option on as long as the 
 .I cerebrod_listen
-option is turned on.
+option is turned on.  This must be turned on for metric reading tools
+such as
+.B cerebro-stat 
+to connect to the
+.B cerebrod
+daemon.
 .TP
 .I cerebrod_metric_server_port num
 Specify the metric server port.  The default server port is 8852.
@@ -234,4 +244,4 @@ option.  This option is turned off by default.
 .SH "FILES"
 @CEREBRO_CONFIG_FILE_DEFAULT@
 .SH "SEE ALSO"
-cerebrod(1), cerebrod(8)
+cerebrod(1), cerebrod(8), cerebro-stat(8), cerebro-admin(8)
