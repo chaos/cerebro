@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_constants.h,v 1.9 2007-09-05 18:16:00 chu11 Exp $
+ *  $Id: cerebro_constants.h,v 1.10 2007-10-05 23:12:28 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -52,7 +52,8 @@
 /* Max of CEREBRO_MAX_NODENAME_LEN & CEREBRO_MAX_METRIC_NAME_LEN */
 #define CEREBRO_MAX_NAME_LEN               CEREBRO_MAX_NODENAME_LEN
 
-#define CEREBRO_MAX_DATA_STRING_LEN         256
+/* Leave atleast 1K for packet header information */
+#define CEREBRO_MAX_DATA_STRING_LEN        (CEREBRO_MAX_PACKET_LEN - 1024)
 
 #define CEREBRO_MAX_LISTENERS              4
 

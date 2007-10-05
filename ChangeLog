@@ -4,6 +4,9 @@
 
 	* config/ac_cerebro_metric_control_path.m4: Alter default metric
 	control path to /var.
+
+	* src/libs/include/cerebro/cerebro_constants.h: Up
+	CEREBRO_MAX_DATA_STRING_LEN to a reasonable size.
 	
 2007-10-01  Albert Chu  <chu11@llnl.gov>
 
