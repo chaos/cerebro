@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: network_util.c,v 1.9 2007-09-14 23:40:57 chu11 Exp $
+ *  $Id: network_util.c,v 1.10 2007-10-08 22:33:15 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -105,7 +105,7 @@ receive_data(int fd,
       
       if ((num = select(fd + 1, &rfds, NULL, NULL, &tv)) < 0)
         {
-          CEREBRO_DBG(("select: %s", strerror(errno)));
+          CEREBRO_ERR(("select: %s", strerror(errno)));
           if (errnum)
             *errnum = CEREBRO_ERR_INTERNAL;
           goto cleanup;
@@ -140,7 +140,7 @@ receive_data(int fd,
            */
           if ((n = read(fd, buf + bytes_read, bytes_to_read - bytes_read)) < 0)
             {
-              CEREBRO_DBG(("read: %s", strerror(errno)));
+              CEREBRO_ERR(("read: %s", strerror(errno)));
               if (errnum)
                 *errnum = CEREBRO_ERR_INTERNAL;
               goto cleanup;
@@ -207,7 +207,7 @@ low_timeout_connect(const char *hostname,
                       &hptr, 
                       &h_errnop) != 0)
     {
-      CEREBRO_DBG(("gethostbyname_r: %s", hstrerror(h_errnop)));
+      CEREBRO_ERR(("gethostbyname_r: %s", hstrerror(h_errnop)));
       if (errnum)
         *errnum = CEREBRO_ERR_HOSTNAME;
       return -1;
@@ -216,7 +216,7 @@ low_timeout_connect(const char *hostname,
   /* valgrind will report a mem-leak in gethostbyname() */
   if (!(hptr = gethostbyname(hostname)))
     {
-      CEREBRO_DBG(("gethostbyname: %s", hstrerror(h_errno)));
+      CEREBRO_ERR(("gethostbyname: %s", hstrerror(h_errno)));
       if (errnum)
         *errnum = CEREBRO_ERR_HOSTNAME;
       return -1;
@@ -227,7 +227,7 @@ low_timeout_connect(const char *hostname,
   
   if ((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
-      CEREBRO_DBG(("socket: %s", strerror(errno)));
+      CEREBRO_ERR(("socket: %s", strerror(errno)));
       if (errnum)
         *errnum = CEREBRO_ERR_INTERNAL;
       goto cleanup;
@@ -240,7 +240,7 @@ low_timeout_connect(const char *hostname,
   
   if ((old_flags = fcntl(fd, F_GETFL, 0)) < 0)
     {
-      CEREBRO_DBG(("fcntl: %s", strerror(errno)));
+      CEREBRO_ERR(("fcntl: %s", strerror(errno)));
       if (errnum)
         *errnum = CEREBRO_ERR_INTERNAL;
       goto cleanup;
@@ -248,7 +248,7 @@ low_timeout_connect(const char *hostname,
   
   if (fcntl(fd, F_SETFL, old_flags | O_NONBLOCK) < 0)
     {
-      CEREBRO_DBG(("fcntl: %s", strerror(errno)));
+      CEREBRO_ERR(("fcntl: %s", strerror(errno)));
       if (errnum)
         *errnum = CEREBRO_ERR_INTERNAL;
       goto cleanup;
@@ -275,7 +275,7 @@ low_timeout_connect(const char *hostname,
       
       if ((rv = select(fd+1, &rset, &wset, NULL, &tval)) < 0)
         {
-          CEREBRO_DBG(("select: %s", strerror(errno)));
+          CEREBRO_ERR(("select: %s", strerror(errno)));
           if (errnum)
             *errnum = CEREBRO_ERR_INTERNAL;
           goto cleanup;
@@ -298,7 +298,7 @@ low_timeout_connect(const char *hostname,
               
               if (getsockopt(fd, SOL_SOCKET, SO_ERROR, &error, &len) < 0)
                 {
-                  CEREBRO_DBG(("getsockopt: %s", strerror(errno)));
+                  CEREBRO_ERR(("getsockopt: %s", strerror(errno)));
                   if (errnum)
                     *errnum = CEREBRO_ERR_INTERNAL;
                   goto cleanup;
@@ -330,7 +330,7 @@ low_timeout_connect(const char *hostname,
   /* reset flags */
   if (fcntl(fd, F_SETFL, old_flags) < 0)
     {
-      CEREBRO_DBG(("fcntl: %s", strerror(errno)));
+      CEREBRO_ERR(("fcntl: %s", strerror(errno)));
       if (errnum)
         *errnum = CEREBRO_ERR_INTERNAL;
       goto cleanup;

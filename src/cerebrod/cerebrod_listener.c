@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.133 2007-09-05 18:15:55 chu11 Exp $
+ *  $Id: cerebrod_listener.c,v 1.134 2007-10-08 22:33:15 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -117,7 +117,7 @@ _listener_setup_socket(int num)
 
   if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {
-      CEREBRO_DBG(("socket: %s", strerror(errno)));
+      CEREBRO_ERR(("socket: %s", strerror(errno)));
       goto cleanup;
     }
 
@@ -138,7 +138,7 @@ _listener_setup_socket(int num)
       optlen = sizeof(struct ip_mreqn);
       if (setsockopt(fd, SOL_IP, IP_ADD_MEMBERSHIP, &imr, optlen) < 0)
 	{
-	  CEREBRO_DBG(("setsockopt: %s", strerror(errno)));
+	  CEREBRO_ERR(("setsockopt: %s", strerror(errno)));
           goto cleanup;
 	}
     }
@@ -148,7 +148,7 @@ _listener_setup_socket(int num)
   optlen = sizeof(optval);
   if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &optval, optlen) < 0)
     {
-      CEREBRO_DBG(("setsockopt: %s", strerror(errno)));
+      CEREBRO_ERR(("setsockopt: %s", strerror(errno)));
       goto cleanup;
     }
 
@@ -163,7 +163,7 @@ _listener_setup_socket(int num)
          sizeof(struct in_addr));
   if (bind(fd, (struct sockaddr *)&addr, sizeof(struct sockaddr_in)) < 0)
     {
-      CEREBRO_DBG(("bind: %s", strerror(errno)));
+      CEREBRO_ERR(("bind: %s", strerror(errno)));
       goto cleanup;
     }
 

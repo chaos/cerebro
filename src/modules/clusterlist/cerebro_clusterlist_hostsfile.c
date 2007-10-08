@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_hostsfile.c,v 1.33 2007-09-05 18:16:01 chu11 Exp $
+ *  $Id: cerebro_clusterlist_hostsfile.c,v 1.34 2007-10-08 22:33:16 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -87,7 +87,7 @@ _readline(int fd, char *buf, unsigned int buflen)
 
   if ((len = fd_read_line(fd, buf, buflen)) < 0)
     {
-      CEREBRO_DBG(("fd_read_line: %s", strerror(errno)));
+      CEREBRO_ERR(("fd_read_line: %s", strerror(errno)));
       return -1;
     }
   
@@ -230,14 +230,14 @@ hostsfile_clusterlist_setup(void)
 
   if (!(hosts = list_create((ListDelF)free)))
     {
-      CEREBRO_DBG(("list_create: %s", strerror(errno)));
+      CEREBRO_ERR(("list_create: %s", strerror(errno)));
       goto cleanup;
     }
 
   if ((fd = open(CEREBRO_CLUSTERLIST_HOSTSFILE_DEFAULT, O_RDONLY)) < 0)
     {
-      cerebro_err_output("hostsfile '%s' cannot be opened: %s", 
-                         CEREBRO_CLUSTERLIST_HOSTSFILE_DEFAULT, strerror(errno));
+      CEREBRO_ERR(("hostsfile '%s' cannot be opened: %s", 
+                   CEREBRO_CLUSTERLIST_HOSTSFILE_DEFAULT, strerror(errno)));
       goto cleanup;
     }
  
@@ -282,13 +282,13 @@ hostsfile_clusterlist_setup(void)
 
       if (!(str = strdup(hostPtr)))
         {
-          CEREBRO_DBG(("strdup: %s", strerror(errno)));
+          CEREBRO_ERR(("strdup: %s", strerror(errno)));
           goto cleanup;
         }
 
       if (!list_append(hosts, str))
         {
-          CEREBRO_DBG(("list_append: %s", strerror(errno)));
+          CEREBRO_ERR(("list_append: %s", strerror(errno)));
           goto cleanup;
         }
     }
@@ -371,13 +371,13 @@ hostsfile_clusterlist_get_all_nodes(char ***nodes)
 
   if (!(itr = list_iterator_create(hosts)))
     {
-      CEREBRO_DBG(("list_iterator_create: %s", strerror(errno)));
+      CEREBRO_ERR(("list_iterator_create: %s", strerror(errno)));
       goto cleanup;
     }
 
   if (!(nodelist = (char **)malloc(sizeof(char *) * (numnodes + 1))))
     {
-      CEREBRO_DBG(("malloc: %s", strerror(errno)));
+      CEREBRO_ERR(("malloc: %s", strerror(errno)));
       goto cleanup;
     }
   memset(nodelist, '\0', sizeof(char *) * (numnodes + 1));
@@ -386,7 +386,7 @@ hostsfile_clusterlist_get_all_nodes(char ***nodes)
     {
       if (!(nodelist[i] = strdup(node)))
         {
-          CEREBRO_DBG(("strdup: %s", strerror(errno)));
+          CEREBRO_ERR(("strdup: %s", strerror(errno)));
           goto cleanup;
         }
       i++;

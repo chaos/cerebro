@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_shutdown.c,v 1.7 2007-09-05 18:16:02 chu11 Exp $
+ *  $Id: cerebro_metric_shutdown.c,v 1.8 2007-10-08 22:33:16 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -91,14 +91,14 @@ _metric_shutdown_handler(int signum)
 
   if (!(hb = (struct cerebrod_message *)malloc(sizeof(struct cerebrod_message))))
     {
-      CEREBRO_DBG(("malloc: %s", strerror(errno)));
+      CEREBRO_ERR(("malloc: %s", strerror(errno)));
       goto cleanup;
     }
 
   memset(nodename, '\0', CEREBRO_MAX_NODENAME_LEN+1);
   if (gethostname(nodename, CEREBRO_MAX_NODENAME_LEN) < 0)
     {
-      CEREBRO_DBG(("gethostname: %s", strerror(errno)));
+      CEREBRO_ERR(("gethostname: %s", strerror(errno)));
       goto cleanup;
     }
 
@@ -145,7 +145,7 @@ shutdown_metric_setup(void)
 {
   if (signal(SIGTERM, _metric_shutdown_handler) == SIG_ERR)
     {
-      CEREBRO_DBG(("signal: %s", strerror(errno)));
+      CEREBRO_ERR(("signal: %s", strerror(errno)));
       return (-1);
     }
 
@@ -153,7 +153,7 @@ shutdown_metric_setup(void)
   /* So we can Ctrl+C for testing */
   if (signal(SIGINT, _metric_shutdown_handler) == SIG_ERR)
     {
-      CEREBRO_DBG(("signal: %s", strerror(errno)));
+      CEREBRO_ERR(("signal: %s", strerror(errno)));
       return (-1);
     }
 #endif /* CEREBRO_DEBUG */

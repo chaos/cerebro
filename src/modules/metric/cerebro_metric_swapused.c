@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_swapused.c,v 1.8 2007-09-05 18:16:02 chu11 Exp $
+ *  $Id: cerebro_metric_swapused.c,v 1.9 2007-10-08 22:33:16 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -85,7 +85,7 @@ swapused_metric_get_metric_value(unsigned int *metric_value_type,
   
   if (!(swapusedptr = (u_int32_t *)malloc(sizeof(u_int32_t))))
     {
-      CEREBRO_DBG(("malloc: %s", strerror(errno)));
+      CEREBRO_ERR(("malloc: %s", strerror(errno)));
       goto cleanup;
     }
   

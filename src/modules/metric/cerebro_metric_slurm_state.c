@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_slurm_state.c,v 1.23 2007-09-05 18:16:02 chu11 Exp $
+ *  $Id: cerebro_metric_slurm_state.c,v 1.24 2007-10-08 22:33:16 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -104,7 +104,7 @@ _slurm_state_setup_socket(void)
 
   if ((fd = socket(AF_LOCAL, SOCK_STREAM, 0)) < 0)
     {      
-      CEREBRO_DBG(("socket: %s", strerror(errno)));
+      CEREBRO_ERR(("socket: %s", strerror(errno)));
       goto cleanup;
     }
   
@@ -119,7 +119,7 @@ _slurm_state_setup_socket(void)
     {
       if (errno != ENOENT)
         {
-          CEREBRO_DBG(("unlink: %s", strerror(errno)));
+          CEREBRO_ERR(("unlink: %s", strerror(errno)));
           goto cleanup;
         }
     }
@@ -130,13 +130,13 @@ _slurm_state_setup_socket(void)
 
   if (bind(fd, (struct sockaddr *)&addr, sizeof(struct sockaddr_un)) < 0)
     {
-      CEREBRO_DBG(("bind: %s", strerror(errno)));
+      CEREBRO_ERR(("bind: %s", strerror(errno)));
       goto cleanup;
     }
   
   if (listen(fd, SLURM_STATE_BACKLOG) < 0)
     {
-      CEREBRO_DBG(("listen: %s", strerror(errno)));
+      CEREBRO_ERR(("listen: %s", strerror(errno)));
       goto cleanup;
     }
   
@@ -217,14 +217,14 @@ _send_message(void)
 
   if (!(hb = (struct cerebrod_message *)malloc(sizeof(struct cerebrod_message))))
     {
-      CEREBRO_DBG(("malloc: %s", strerror(errno)));
+      CEREBRO_ERR(("malloc: %s", strerror(errno)));
       goto cleanup;
     }
 
   memset(nodename, '\0', CEREBRO_MAX_NODENAME_LEN+1);
   if (gethostname(nodename, CEREBRO_MAX_NODENAME_LEN) < 0)
     {
-      CEREBRO_DBG(("gethostname: %s", strerror(errno)));
+      CEREBRO_ERR(("gethostname: %s", strerror(errno)));
       goto cleanup;
     }
 
@@ -286,7 +286,7 @@ slurm_state_metric_thread(void *arg)
       addrlen = sizeof(sizeof(struct sockaddr_un));
       if ((fd = accept(slurm_state_fd, (struct sockaddr *)&addr, &addrlen)) < 0)
         {
-          CEREBRO_DBG(("accept: %s", strerror(errno)));
+          CEREBRO_ERR(("accept: %s", strerror(errno)));
           if (errno == EINTR)
             continue;
           else
@@ -342,7 +342,7 @@ slurm_state_metric_thread(void *arg)
               
               if ((n = read(fd, buf, CEREBRO_MAX_PACKET_LEN)) < 0)
                 {
-                  CEREBRO_DBG(("read: %s", strerror(errno)));
+                  CEREBRO_ERR(("read: %s", strerror(errno)));
                   sleep(SLURM_STATE_REINITIALIZE_WAIT_TIME);
                   close(fd);
                   break;

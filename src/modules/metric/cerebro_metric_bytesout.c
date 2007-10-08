@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_bytesout.c,v 1.7 2007-09-05 18:16:02 chu11 Exp $
+ *  $Id: cerebro_metric_bytesout.c,v 1.8 2007-10-08 22:33:16 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -87,7 +87,7 @@ bytesout_metric_get_metric_value(unsigned int *metric_value_type,
   
   if (!(bytesoutptr = (u_int64_t *)malloc(sizeof(u_int64_t))))
     {
-      CEREBRO_DBG(("malloc: %s", strerror(errno)));
+      CEREBRO_ERR(("malloc: %s", strerror(errno)));
       goto cleanup;
     }
   

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_server.c,v 1.43 2007-09-14 23:40:56 chu11 Exp $
+ *  $Id: cerebrod_metric_server.c,v 1.44 2007-10-08 22:33:15 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -276,7 +276,7 @@ _metric_server_response_send(int fd, struct cerebro_metric_server_response *res)
 
   if (fd_write_n(fd, buf, res_len) < 0)
     {
-      CEREBRO_DBG(("fd_write_n: %s", strerror(errno)));
+      CEREBRO_ERR(("fd_write_n: %s", strerror(errno)));
       goto cleanup;
     }
 
@@ -308,7 +308,7 @@ _metric_server_err_response_send(int fd,
   
   if (fd_write_n(fd, buf, res_len) < 0)
     {
-      CEREBRO_DBG(("fd_write_n: %s", strerror(errno)));
+      CEREBRO_ERR(("fd_write_n: %s", strerror(errno)));
       return -1;
     }
 
@@ -381,7 +381,7 @@ _metric_server_response_create(char *name,
 
   if (!(res = malloc(sizeof(struct cerebro_metric_server_response))))
     {
-      CEREBRO_DBG(("malloc: %s", strerror(errno)));
+      CEREBRO_ERR(("malloc: %s", strerror(errno)));
       return -1;
     }
   memset(res, '\0', sizeof(struct cerebro_metric_server_response));
@@ -406,7 +406,7 @@ _metric_server_response_create(char *name,
     {
       if (!(res->metric_value = (void *)malloc(metric_value_len)))
         {
-          CEREBRO_DBG(("malloc: %s", strerror(errno)));
+          CEREBRO_ERR(("malloc: %s", strerror(errno)));
           goto cleanup;
         }
       memcpy(res->metric_value, metric_value, metric_value_len);
@@ -414,7 +414,7 @@ _metric_server_response_create(char *name,
   
   if (!list_append(responses, res))
     {
-      CEREBRO_DBG(("list_append: %s", strerror(errno)));
+      CEREBRO_ERR(("list_append: %s", strerror(errno)));
       goto cleanup;
     }
 
@@ -700,7 +700,7 @@ _respond_with_metric_names(int fd)
 
   if (!(responses = list_create((ListDelF)free)))
     {
-      CEREBRO_DBG(("list_create: %s", strerror(errno)));
+      CEREBRO_ERR(("list_create: %s", strerror(errno)));
       Pthread_mutex_unlock(&metric_names_lock);
       _metric_server_respond_with_error(fd, 
                                         CEREBRO_METRIC_SERVER_PROTOCOL_VERSION, 
@@ -788,7 +788,7 @@ _respond_with_nodes(int fd,
 
   if (!(responses = list_create((ListDelF)_metric_data_response_destroy)))
     {
-      CEREBRO_DBG(("list_create: %s", strerror(errno)));
+      CEREBRO_ERR(("list_create: %s", strerror(errno)));
       Pthread_mutex_unlock(&listener_data_lock);
       _metric_server_respond_with_error(fd,
                                         req->version,
@@ -957,14 +957,14 @@ _metric_server_setup_socket(int num)
 
   if ((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
-      CEREBRO_DBG(("socket: %s", strerror(errno)));
+      CEREBRO_ERR(("socket: %s", strerror(errno)));
       goto cleanup;
     }
 
   /* For quick start/restart */
   if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(int)) < 0)
     {
-      CEREBRO_DBG(("setsockopt: %s", strerror(errno)));
+      CEREBRO_ERR(("setsockopt: %s", strerror(errno)));
       goto cleanup;
     }
 
@@ -975,13 +975,13 @@ _metric_server_setup_socket(int num)
 
   if (bind(fd, (struct sockaddr *)&addr, sizeof(struct sockaddr_in)) < 0)
     {
-      CEREBRO_DBG(("bind: %s", strerror(errno)));
+      CEREBRO_ERR(("bind: %s", strerror(errno)));
       goto cleanup;
     }
 
   if (listen(fd, CEREBROD_METRIC_SERVER_BACKLOG) < 0)
     {
-      CEREBRO_DBG(("listen: %s", strerror(errno)));
+      CEREBRO_ERR(("listen: %s", strerror(errno)));
       goto cleanup;
     }
 

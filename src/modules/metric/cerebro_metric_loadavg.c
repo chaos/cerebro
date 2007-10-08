@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_loadavg.c,v 1.4 2007-09-05 18:16:02 chu11 Exp $
+ *  $Id: cerebro_metric_loadavg.c,v 1.5 2007-10-08 22:33:16 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -87,7 +87,7 @@ cerebro_metric_get_loadavgs(float *loadavg1,
 
   if (gettimeofday(&now, NULL) < 0)
     {
-      CEREBRO_DBG(("gettimeofday: %s", strerror(errno)));
+      CEREBRO_ERR(("gettimeofday: %s", strerror(errno)));
       goto cleanup;
     }
 
@@ -95,14 +95,14 @@ cerebro_metric_get_loadavgs(float *loadavg1,
     {
       if ((fd = open(LOADAVG_FILE, O_RDONLY, 0)) < 0)
 	{
-	  CEREBRO_DBG(("open: %s", strerror(errno)));
+	  CEREBRO_ERR(("open: %s", strerror(errno)));
 	  goto cleanup;
 	}
       
       memset(buf, '\0', LOADAVG_BUFLEN);
       if ((len = read(fd, buf, LOADAVG_BUFLEN)) < 0)
 	{
-	  CEREBRO_DBG(("read: %s", strerror(errno)));
+	  CEREBRO_ERR(("read: %s", strerror(errno)));
 	  goto cleanup;
 	}
       

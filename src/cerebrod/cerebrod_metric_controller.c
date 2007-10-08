@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_controller.c,v 1.43 2007-09-14 23:40:56 chu11 Exp $
+ *  $Id: cerebrod_metric_controller.c,v 1.44 2007-10-08 22:33:15 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -144,7 +144,7 @@ _metric_controller_setup_socket(int num)
   
   if ((fd = socket(AF_LOCAL, SOCK_STREAM, 0)) < 0)
     {
-      CEREBRO_DBG(("socket: %s", strerror(errno)));
+      CEREBRO_ERR(("socket: %s", strerror(errno)));
       return -1;
     }
 
@@ -169,13 +169,13 @@ _metric_controller_setup_socket(int num)
   
   if (bind(fd, (struct sockaddr *)&addr, sizeof(struct sockaddr_un)) < 0)
     {
-      CEREBRO_DBG(("bind: %s", strerror(errno)));
+      CEREBRO_ERR(("bind: %s", strerror(errno)));
       goto cleanup;
     }
   
   if (listen(fd, CEREBROD_METRIC_CONTROLLER_BACKLOG) < 0)
     {
-      CEREBRO_DBG(("listen: %s", strerror(errno)));
+      CEREBRO_ERR(("listen: %s", strerror(errno)));
       goto cleanup;
     }
   
@@ -329,7 +329,7 @@ _send_metric_control_response(int fd, int32_t version, u_int32_t err_code)
   
   if (fd_write_n(fd, buf, res_len) < 0)
     {
-      CEREBRO_DBG(("fd_write_n: %s", strerror(errno)));
+      CEREBRO_ERR(("fd_write_n: %s", strerror(errno)));
       return -1;
     }
 
@@ -569,7 +569,7 @@ _send_message_now(int fd,
 
   if (!(msg = (struct cerebrod_message *)malloc(sizeof(struct cerebrod_message))))
     {
-      CEREBRO_DBG(("malloc: %s", strerror(errno)));
+      CEREBRO_ERR(("malloc: %s", strerror(errno)));
       _send_metric_control_response(fd,
                                     version,
                                     CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_INTERNAL_ERROR);
@@ -579,7 +579,7 @@ _send_message_now(int fd,
   memset(nodename, '\0', CEREBRO_MAX_NODENAME_LEN+1);
   if (gethostname(nodename, CEREBRO_MAX_NODENAME_LEN) < 0)
     {
-      CEREBRO_DBG(("gethostname: %s", strerror(errno)));
+      CEREBRO_ERR(("gethostname: %s", strerror(errno)));
       _send_metric_control_response(fd,
                                     version,
                                     CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_INTERNAL_ERROR);
@@ -592,7 +592,7 @@ _send_message_now(int fd,
   msg->metrics_len = 1;
   if (!(msg->metrics = (struct cerebrod_message_metric **)malloc(sizeof(struct cerebrod_message_metric *)*(msg->metrics_len + 1))))
     {
-      CEREBRO_DBG(("malloc: %s", strerror(errno)));
+      CEREBRO_ERR(("malloc: %s", strerror(errno)));
       _send_metric_control_response(fd,
                                     version,
                                     CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_INTERNAL_ERROR);
@@ -602,7 +602,7 @@ _send_message_now(int fd,
 
   if (!(mm = (struct cerebrod_message_metric *)malloc(sizeof(struct cerebrod_message_metric))))
     {
-      CEREBRO_DBG(("malloc: %s", strerror(errno)));
+      CEREBRO_ERR(("malloc: %s", strerror(errno)));
       _send_metric_control_response(fd,
                                     version,
                                     CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_INTERNAL_ERROR);

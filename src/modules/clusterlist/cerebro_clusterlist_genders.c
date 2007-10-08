@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_genders.c,v 1.35 2007-09-05 18:16:01 chu11 Exp $
+ *  $Id: cerebro_clusterlist_genders.c,v 1.36 2007-10-08 22:33:16 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -166,7 +166,7 @@ genders_clusterlist_node_in_cluster(const char *node)
 
   if ((flag = genders_isnode(gh, nodePtr)) < 0)
     {
-      CEREBRO_DBG(("genders_isnode: %s", genders_errormsg(gh)));
+      CEREBRO_ERR(("genders_isnode: %s", genders_errormsg(gh)));
       return -1;
     }
 

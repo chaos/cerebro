@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: config_util.c,v 1.20 2007-09-05 18:16:00 chu11 Exp $
+ *  $Id: config_util.c,v 1.21 2007-10-08 22:33:15 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -646,7 +646,7 @@ _load_config_file(struct cerebro_config *conf, unsigned int *errnum)
   
   if (!(cf = conffile_handle_create()))
     {
-      CEREBRO_DBG(("conffile_handle_create"));
+      CEREBRO_ERR(("conffile_handle_create"));
       if (errnum)
         *errnum = CEREBRO_ERR_OUTMEM;
       goto cleanup;

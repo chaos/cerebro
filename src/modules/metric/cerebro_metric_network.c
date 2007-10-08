@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_network.c,v 1.2 2007-09-05 18:16:02 chu11 Exp $
+ *  $Id: cerebro_metric_network.c,v 1.3 2007-10-08 22:33:16 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -100,7 +100,7 @@ cerebro_metric_get_network(u_int64_t *bytesin,
 
   if (gettimeofday(&now, NULL) < 0)
     {
-      CEREBRO_DBG(("gettimeofday: %s", strerror(errno)));
+      CEREBRO_ERR(("gettimeofday: %s", strerror(errno)));
       goto cleanup;
     }
 
@@ -108,14 +108,14 @@ cerebro_metric_get_network(u_int64_t *bytesin,
     {
       if ((fd = open(NETWORK_FILE, O_RDONLY, 0)) < 0)
 	{
-	  CEREBRO_DBG(("open: %s", strerror(errno)));
+	  CEREBRO_ERR(("open: %s", strerror(errno)));
 	  goto cleanup;
 	}
       
       memset(buf, '\0', NETWORK_BUFLEN);
       if ((len = read(fd, buf, NETWORK_BUFLEN)) < 0)
 	{
-	  CEREBRO_DBG(("read: %s", strerror(errno)));
+	  CEREBRO_ERR(("read: %s", strerror(errno)));
 	  goto cleanup;
 	}
 

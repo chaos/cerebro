@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_genders_util.c,v 1.23 2007-09-05 18:16:01 chu11 Exp $
+ *  $Id: cerebro_clusterlist_genders_util.c,v 1.24 2007-10-08 22:33:16 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -55,7 +55,7 @@ cerebro_clusterlist_genders_setup(genders_t *gh, char *filename)
 
   if (!(*gh = genders_handle_create()))
     {
-      CEREBRO_DBG(("genders_handle_create"));
+      CEREBRO_ERR(("genders_handle_create"));
       goto cleanup;
     }
 
@@ -65,12 +65,12 @@ cerebro_clusterlist_genders_setup(genders_t *gh, char *filename)
     {
       if (genders_errnum(*gh) == GENDERS_ERR_OPEN)
 	{
-	  cerebro_err_output("genders database '%s' cannot be opened", filename);
+	  CEREBRO_ERR(("genders database '%s' cannot be opened", filename));
 	  goto cleanup;
 	}
       else
         {
-          CEREBRO_DBG(("genders_load_data: %s", genders_errormsg(*gh)));
+          CEREBRO_ERR(("genders_load_data: %s", genders_errormsg(*gh)));
           goto cleanup;
         }
     }
@@ -117,7 +117,7 @@ cerebro_clusterlist_genders_numnodes(genders_t gh)
 
   if ((num = genders_getnumnodes(gh)) < 0)
     {
-      CEREBRO_DBG(("genders_getnumnodes: %s", genders_errormsg(gh)));
+      CEREBRO_ERR(("genders_getnumnodes: %s", genders_errormsg(gh)));
       return -1;
     }
 
@@ -138,13 +138,13 @@ cerebro_clusterlist_genders_get_all_nodes(genders_t gh, char ***nodes)
 
   if ((nodelistlen = genders_nodelist_create(gh, &nodelist)) < 0)
     {
-      CEREBRO_DBG(("genders_nodelist_create: %s", genders_errormsg(gh)));
+      CEREBRO_ERR(("genders_nodelist_create: %s", genders_errormsg(gh)));
       goto cleanup;
     }
   
   if ((num = genders_getnodes(gh, nodelist, nodelistlen, NULL, NULL)) < 0)
     {
-      CEREBRO_DBG(("genders_getnodes: %s", genders_errormsg(gh)));
+      CEREBRO_ERR(("genders_getnodes: %s", genders_errormsg(gh)));
       goto cleanup;
     }
 

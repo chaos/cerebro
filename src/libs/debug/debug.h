@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: debug.h,v 1.7 2007-09-05 18:16:00 chu11 Exp $
+ *  $Id: debug.h,v 1.8 2007-10-08 22:33:15 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -83,6 +83,12 @@ char *debug_msg_create(const char *fmt, ...);
       cerebro_err_debug(errbuf); \
     } while(0)
 
+#define CEREBRO_ERR(msg) \
+    do { \
+      CEREBRO_MSG_CREATE(msg) \
+      cerebro_err_output(errbuf); \
+    } while(0)
+
 #define CEREBRO_EXIT(msg) \
     do { \
       CEREBRO_MSG_CREATE(msg) \
@@ -92,6 +98,11 @@ char *debug_msg_create(const char *fmt, ...);
 #else /* !CEREBRO_DEBUG */
 
 #define CEREBRO_DBG(msg)
+
+#define CEREBRO_ERR(msg) \
+    do { \
+      cerebro_err_output msg; \
+    } while(0)
 
 #define CEREBRO_EXIT(msg) \
     do { \

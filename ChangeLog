@@ -1,3 +1,10 @@
+2007-10-08  Albert Chu  <chu11@llnl.gov>
+
+	* src/libs/debug/debug.h (CEREBRO_ERR): New macro.
+
+	* src/: Use new macro throughout to provide better debugging when
+	cerebrod is running in non-debug mode.
+	
 2007-10-05  Albert Chu  <chu11@llnl.gov>
 
 	* man/cerebro.conf.5.in:  Update documentation.

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_boottime.c,v 1.23 2007-09-05 18:16:02 chu11 Exp $
+ *  $Id: cerebro_metric_boottime.c,v 1.24 2007-10-08 22:33:16 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -84,13 +84,13 @@ boottime_metric_setup(void)
  
   if ((fd = open(BOOTTIME_FILE, O_RDONLY, 0)) < 0)
     {
-      CEREBRO_DBG(("open: %s", strerror(errno)));
+      CEREBRO_ERR(("open: %s", strerror(errno)));
       goto cleanup;
     }
 
   if ((len = read(fd, buf, BOOTTIME_BUFLEN)) < 0)
     {
-      CEREBRO_DBG(("read: %s", strerror(errno)));
+      CEREBRO_ERR(("read: %s", strerror(errno)));
       goto cleanup;
     }
 

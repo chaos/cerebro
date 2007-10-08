@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_event_server.c,v 1.9 2007-09-14 23:40:56 chu11 Exp $
+ *  $Id: cerebrod_event_server.c,v 1.10 2007-10-08 22:33:15 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -418,14 +418,14 @@ _event_server_setup_socket(int num)
 
   if ((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
-      CEREBRO_DBG(("socket: %s", strerror(errno)));
+      CEREBRO_ERR(("socket: %s", strerror(errno)));
       goto cleanup;
     }
 
   /* For quick start/restart */
   if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(int)) < 0)
     {
-      CEREBRO_DBG(("setsockopt: %s", strerror(errno)));
+      CEREBRO_ERR(("setsockopt: %s", strerror(errno)));
       goto cleanup;
     }
 
@@ -436,13 +436,13 @@ _event_server_setup_socket(int num)
 
   if (bind(fd, (struct sockaddr *)&addr, sizeof(struct sockaddr_in)) < 0)
     {
-      CEREBRO_DBG(("bind: %s", strerror(errno)));
+      CEREBRO_ERR(("bind: %s", strerror(errno)));
       goto cleanup;
     }
 
   if (listen(fd, CEREBROD_EVENT_SERVER_BACKLOG) < 0)
     {
-      CEREBRO_DBG(("listen: %s", strerror(errno)));
+      CEREBRO_ERR(("listen: %s", strerror(errno)));
       goto cleanup;
     }
 
@@ -552,7 +552,7 @@ _event_server_response_send(int fd,
 
   if (fd_write_n(fd, buf, res_len) < 0)
     {
-      CEREBRO_DBG(("fd_write_n: %s", strerror(errno)));
+      CEREBRO_ERR(("fd_write_n: %s", strerror(errno)));
       return -1;
     }
 
@@ -591,7 +591,7 @@ _event_server_err_only_response(int fd,
 
   if (fd_write_n(fd, buf, res_len) < 0)
     {
-      CEREBRO_DBG(("fd_write_n: %s", strerror(errno)));
+      CEREBRO_ERR(("fd_write_n: %s", strerror(errno)));
       return -1;
     }
 
@@ -723,7 +723,7 @@ _event_names_callback(void *data, void *arg)
 
   if (!(res = malloc(sizeof(struct cerebro_event_server_response))))
     {
-      CEREBRO_DBG(("malloc: %s", strerror(errno)));
+      CEREBRO_ERR(("malloc: %s", strerror(errno)));
       goto cleanup;
     }
 
@@ -736,7 +736,7 @@ _event_names_callback(void *data, void *arg)
 
   if (!list_append(enr->responses, res))
     {
-      CEREBRO_DBG(("list_append: %s", strerror(errno)));
+      CEREBRO_ERR(("list_append: %s", strerror(errno)));
       goto cleanup;
     }
 
@@ -841,7 +841,7 @@ _respond_with_event_names(void *arg)
 
   if (!(responses = list_create((ListDelF)free)))
     {
-      CEREBRO_DBG(("list_create: %s", strerror(errno)));
+      CEREBRO_ERR(("list_create: %s", strerror(errno)));
       _event_server_err_only_response(fd,
                                       CEREBRO_EVENT_SERVER_PROTOCOL_VERSION,
                                       CEREBRO_EVENT_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
@@ -995,7 +995,7 @@ _event_server_service_connection(int fd)
   
   if (!(ecd = (struct cerebrod_event_connection_data *)malloc(sizeof(struct cerebrod_event_connection_data))))
     {
-      CEREBRO_DBG(("malloc: %s", strerror(errno)));
+      CEREBRO_ERR(("malloc: %s", strerror(errno)));
       _event_server_err_only_response(fd,
                                       req.version,
                                       CEREBRO_EVENT_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
@@ -1007,7 +1007,7 @@ _event_server_service_connection(int fd)
   
   if (!(fdptr = (int *)malloc(sizeof(int))))
     {
-      CEREBRO_DBG(("malloc: %s", strerror(errno)));
+      CEREBRO_ERR(("malloc: %s", strerror(errno)));
       _event_server_err_only_response(fd,
                                       req.version,
                                       CEREBRO_EVENT_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
@@ -1018,7 +1018,7 @@ _event_server_service_connection(int fd)
   Pthread_mutex_lock(&event_connections_lock);
   if (!list_append(event_connections, ecd))
     {
-      CEREBRO_DBG(("list_append: %s", strerror(errno)));
+      CEREBRO_ERR(("list_append: %s", strerror(errno)));
       _event_server_err_only_response(fd,
                                       req.version,
                                       CEREBRO_EVENT_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
@@ -1030,7 +1030,7 @@ _event_server_service_connection(int fd)
     {
       if (!(connections = list_create((ListDelF)free)))
         {
-          CEREBRO_DBG(("list_create: %s", strerror(errno)));
+          CEREBRO_ERR(("list_create: %s", strerror(errno)));
           _event_server_err_only_response(fd,
                                           req.version,
                                           CEREBRO_EVENT_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
@@ -1039,7 +1039,7 @@ _event_server_service_connection(int fd)
 
       if (!Hash_insert(event_connections_index, ecd->event_name, connections))
         {
-          CEREBRO_DBG(("list_create: %s", strerror(errno)));
+          CEREBRO_ERR(("Hash_insert: %s", strerror(errno)));
           _event_server_err_only_response(fd,
                                           req.version,
                                           CEREBRO_EVENT_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
@@ -1050,7 +1050,7 @@ _event_server_service_connection(int fd)
 
   if (!list_append(connections, fdptr))
     {
-      CEREBRO_DBG(("malloc: %s", strerror(errno)));
+      CEREBRO_ERR(("list_append: %s", strerror(errno)));
       _event_server_err_only_response(fd,
                                       req.version,
                                       CEREBRO_EVENT_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
