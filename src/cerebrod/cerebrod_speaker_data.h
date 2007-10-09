@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker_data.h,v 1.15 2007-09-05 18:15:56 chu11 Exp $
+ *  $Id: cerebrod_speaker_data.h,v 1.16 2007-10-09 00:15:56 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -86,7 +86,8 @@ void cerebrod_speaker_data_metric_list_sort(void);
  * Store metric data into the heartbeat
  */
 void cerebrod_speaker_data_get_heartbeat_metric_data(struct cerebrod_message *msg, 
-                                                     unsigned int *message_len);
+                                                     unsigned int *message_len,
+                                                     int *more_data_to_send);
 
 /*
  * cerebrod_speaker_data_get_module_metric_data
@@ -95,6 +96,7 @@ void cerebrod_speaker_data_get_heartbeat_metric_data(struct cerebrod_message *ms
  */
 void cerebrod_speaker_data_get_module_metric_data(struct cerebrod_message *msg, 
                                                   unsigned int *message_len,
-                                                  unsigned int index);
+                                                  unsigned int index,
+                                                  int *more_data_to_send);
 
 #endif /* _CEREBROD_SPEAKER_DATA_H */

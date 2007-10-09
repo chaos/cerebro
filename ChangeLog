@@ -4,6 +4,13 @@
 
 	* src/: Use new macro throughout to provide better debugging when
 	cerebrod is running in non-debug mode.
+
+	* src/cerebrod/cerebrod_speaker.c (_cerebrod_message_create,
+	cerebrod_speaker), src/cerebrod/cerebrod_speaker_data.c
+	(cerebrod_speaker_data_get_heartbeat_metric_data,
+	cerebrod_speaker_data_get_module_metric_data): Re-work to force
+	multiple UDP packets to be sent immediately if all data cannot be
+	sent in a single packet.
 	
 2007-10-05  Albert Chu  <chu11@llnl.gov>
 
