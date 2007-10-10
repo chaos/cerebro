@@ -1,3 +1,7 @@
+2007-10-09  Albert Chu  <chu11@llnl.gov>
+
+	* tagged pre_config_file_format_change
+	
 2007-10-08  Albert Chu  <chu11@llnl.gov>
 
 	* src/libs/debug/debug.h (CEREBRO_ERR): New macro.
