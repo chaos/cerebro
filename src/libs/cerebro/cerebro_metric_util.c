@@ -444,7 +444,6 @@ _cerebro_metric_get_data(cerebro_t handle,
                          const char *metric_name,
                          Cerebro_metric_receive_response receive_response)
 {
-  unsigned int port;
   unsigned int timeout_len;
   unsigned int flags;
 
@@ -460,23 +459,6 @@ _cerebro_metric_get_data(cerebro_t handle,
 
   if (_cerebro_load_config(handle) < 0)
     return -1;
-
-  if (!handle->port)
-    {
-      if (handle->config_data.cerebro_port_flag)
-        {
-          if (!handle->config_data.cerebro_port)
-            {
-              handle->errnum = CEREBRO_ERR_CONFIG_INPUT;
-              return -1;
-            }
-          port = handle->config_data.cerebro_port;
-        }
-      else
-        port = CEREBRO_METRIC_SERVER_PORT;
-    }
-  else
-    port = handle->port;
 
   if (!handle->timeout_len)
     {
@@ -512,18 +494,42 @@ _cerebro_metric_get_data(cerebro_t handle,
   else
     flags = handle->flags;
 
-  if (!strlen(handle->hostname))
+
+  if (!strlen(handle->hostname) || !handle->port)
     {
-      if (handle->config_data.cerebro_hostnames_flag)
-        {
-          int i, rv = -1;
-          
-          for (i = 0; i < handle->config_data.cerebro_hostnames_len; i++)
+      int i, rv = -1;
+      unsigned int port;
+      char *hostname;
+
+      if (handle->config_data.cerebro_metric_server_flag)
+        {         
+          for (i = 0; i < handle->config_data.cerebro_metric_server_len; i++)
             {
+              if (!strlen(handle->hostname))
+                {
+                  if (!strcmp(handle->config_data.cerebro_metric_server[i].hostname,
+                              CEREBRO_CONFIG_IP_DEFAULT))
+                    hostname = "localhost";
+                  else
+                    hostname = handle->config_data.cerebro_metric_server[i].hostname;
+                }
+              else
+                hostname = handle->hostname;
+
+              if (!handle->port)
+                {
+                  if (handle->config_data.cerebro_metric_server[i].port)
+                    port = handle->config_data.cerebro_metric_server[i].port;
+                  else
+                    port = CEREBRO_METRIC_SERVER_PORT;
+                }
+              else
+                port = handle->port;
+
               if ((rv = _get_metric_data(handle,
                                          list,
                                          metric_name,
-                                         handle->config_data.cerebro_hostnames[i],
+                                         hostname,
                                          port,
                                          timeout_len,
                                          flags,
@@ -532,7 +538,7 @@ _cerebro_metric_get_data(cerebro_t handle,
               break;
             }
           
-          if (i >= handle->config_data.cerebro_hostnames_len)
+          if (i >= handle->config_data.cerebro_metric_server_len)
             {
               handle->errnum = CEREBRO_ERR_CONNECT;
               return -1;
@@ -543,10 +549,20 @@ _cerebro_metric_get_data(cerebro_t handle,
         }
       else
         {
+          if (!strlen(handle->hostname))
+            hostname = "localhost";
+          else
+            hostname = handle->hostname;
+          
+          if (!handle->port)
+            port = CEREBRO_METRIC_SERVER_PORT;
+          else
+            port = handle->port;
+
           if (_get_metric_data(handle,
                                list,
                                metric_name,
-                               "localhost",
+                               hostname,
                                port,
                                timeout_len,
                                flags,
@@ -560,7 +576,7 @@ _cerebro_metric_get_data(cerebro_t handle,
                            list,
                            metric_name,
                            handle->hostname,
-                           port,
+                           handle->port,
                            timeout_len,
                            flags,
                            receive_response) < 0)
