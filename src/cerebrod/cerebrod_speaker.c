@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.100 2007-10-09 00:15:56 chu11 Exp $
+ *  $Id: cerebrod_speaker.c,v 1.101 2007-10-11 23:21:05 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -87,6 +87,15 @@ extern int metric_list_size;
 extern pthread_mutex_t metric_list_lock;
 #endif /* !WITH_CEREBROD_NO_THREADS */
 
+/*
+ * speaker_fds
+ * speaker_fds_lock
+ *
+ * speaker file descriptor and lock to protect concurrent access
+ */
+int speaker_fds[CEREBRO_CONFIG_SPEAK_MESSAGE_CONFIG_MAX];
+pthread_mutex_t speaker_fds_lock = PTHREAD_MUTEX_INITIALIZER;
+
 /* 
  * _speaker_socket_create
  *
@@ -94,8 +103,8 @@ extern pthread_mutex_t metric_list_lock;
  * function.  We want to give the daemon additional chances to
  * "survive" an error condition.
  *
- * In this socket setup function, 'num' is used as the port to setup
- * the socket with.
+ * In this socket setup function, 'num' is used as the message config
+ * and file descriptor index.
  * 
  * Returns file descriptor on success, -1 on error
  */
@@ -112,19 +121,19 @@ _speaker_socket_create(int num)
       goto cleanup;
     }
 
-  if (conf.destination_ip_is_multicast)
+  if (conf.speak_message_config[num].ip_is_multicast)
     {
       /* XXX: Probably lots of portability problems here */
       struct ip_mreqn imr;
 
       memset(&imr, '\0', sizeof(struct ip_mreqn));
       memcpy(&imr.imr_multiaddr, 
-	     &conf.message_destination_ip_in_addr,
+	     &conf.speak_message_config[num].ip_in_addr,
 	     sizeof(struct in_addr));
       memcpy(&imr.imr_address, 
-	     &conf.message_source_network_interface_in_addr,
+	     &conf.speak_message_config[num].network_interface_in_addr,
 	     sizeof(struct in_addr));
-      imr.imr_ifindex = conf.message_source_network_interface_index;
+      imr.imr_ifindex = conf.speak_message_config[num].network_interface_index;
       
       optlen = sizeof(struct ip_mreqn);
       if (setsockopt(fd, SOL_IP, IP_MULTICAST_IF, &imr, optlen) < 0)
@@ -141,7 +150,7 @@ _speaker_socket_create(int num)
           goto cleanup;
 	}
 
-      optval = conf.message_ttl;
+      optval = conf.speak_message_ttl;
       optlen = sizeof(optval);
       if (setsockopt(fd, SOL_IP, IP_MULTICAST_TTL, &optval, optlen) < 0)
 	{
@@ -161,9 +170,9 @@ _speaker_socket_create(int num)
 
   memset(&addr, '\0', sizeof(struct sockaddr_in));
   addr.sin_family = AF_INET;
-  addr.sin_port = htons(num);
+  addr.sin_port = htons(conf.speak_message_config[num].source_port);
   memcpy(&addr.sin_addr,
-	 &conf.message_source_network_interface_in_addr,
+	 &conf.speak_message_config[num].network_interface_in_addr,
 	 sizeof(struct in_addr));
   if (bind(fd, (struct sockaddr *)&addr, sizeof(struct sockaddr_in)) < 0) 
     {
@@ -284,6 +293,14 @@ _speaker_initialize(void)
     }
 
   List_sort(next_send_times, (ListCmpF)_next_send_time_compare);
+
+  Pthread_mutex_lock(&speaker_fds_lock);
+  for (i = 0; i < conf.speak_message_config_len; i++)
+    {
+      if ((speaker_fds[i] = _speaker_socket_create(i)) < 0)
+        CEREBRO_EXIT(("speaker fd setup failed"));
+    }
+  Pthread_mutex_unlock(&speaker_fds_lock);
 }
 
 /*
@@ -419,15 +436,60 @@ _cerebrod_message_dump(struct cerebrod_message *msg)
 #endif /* CEREBRO_DEBUG */
 }
 
+static void
+_cerebrod_message_send(struct cerebrod_message* msg, unsigned int msglen)
+{
+  unsigned int buflen;
+  char *buf = NULL;
+  int i, rv;
+
+  assert(msg);
+  assert(msglen);               /* atleast the header must be there */
+  
+  buf = Malloc(msglen + 1);
+                  
+  if ((buflen = _message_marshall(msg, buf, msglen)) < 0)
+    return;
+  
+  Pthread_mutex_lock(&speaker_fds_lock);
+  for (i = 0; i < conf.speak_message_config_len; i++)
+    {
+      struct sockaddr *addr;
+      struct sockaddr_in msgaddr;
+      unsigned int addrlen;
+      
+      memset(&msgaddr, '\0', sizeof(struct sockaddr_in));
+      msgaddr.sin_family = AF_INET;
+      msgaddr.sin_port = htons(conf.speak_message_config[i].destination_port);
+      memcpy(&msgaddr.sin_addr, 
+             &conf.speak_message_config[i].ip_in_addr, 
+             sizeof(struct in_addr));
+      
+      addr = (struct sockaddr *)&msgaddr;
+      addrlen = sizeof(struct sockaddr_in);
+      if ((rv = sendto(speaker_fds[i],
+                       buf, 
+                       buflen,
+                       0,
+                       addr, 
+                       addrlen)) != msglen)
+        {
+          if (rv < 0)
+            speaker_fds[i] = cerebrod_reinit_socket(speaker_fds[i], 
+                                                    i,
+                                                    _speaker_socket_create, 
+                                                    "speaker: sendto");
+          else
+            CEREBRO_ERR(("sendto: invalid bytes sent"));
+        }
+    }
+  Pthread_mutex_unlock(&speaker_fds_lock);
+}
+
 void *
 cerebrod_speaker(void *arg)
 {
-  int speaker_fd;
-
   _speaker_initialize();
-
-  if ((speaker_fd = _speaker_socket_create(conf.message_source_port)) < 0)
-    CEREBRO_EXIT(("speaker fd setup failed"));
 
   while (1)
     {
@@ -451,12 +513,8 @@ cerebrod_speaker(void *arg)
               while (more_data_to_send)
                 {
                   struct cerebrod_message* msg;
-                  unsigned int buflen;
-                  char *buf = NULL;
-                  struct sockaddr *addr;
-                  struct sockaddr_in msgaddr;
-                  int rv, msglen;
-                  unsigned int addrlen;
+                  unsigned int msglen;
+                  int rv;
                   
                   more_data_to_send = 0;
 
@@ -473,45 +531,20 @@ cerebrod_speaker(void *arg)
                    * would occur.
                    */
 
-                  msg = _cerebrod_message_create(nst, &buflen, &more_data_to_send);
+                  msg = _cerebrod_message_create(nst, &msglen, &more_data_to_send);
                   
-                  if (buflen >= CEREBRO_MAX_PACKET_LEN)
+                  if (msglen >= CEREBRO_MAX_PACKET_LEN)
                     {
                       CEREBRO_DBG(("message exceeds maximum size: packet dropped"));
                       goto end_loop;
                     }
-              
-                  buf = Malloc(buflen + 1);
-                  
-                  if ((msglen = _message_marshall(msg, buf, buflen)) < 0)
-                    goto end_loop;
                   
                   _cerebrod_message_dump(msg);
-                  
-                  memset(&msgaddr, '\0', sizeof(struct sockaddr_in));
-                  msgaddr.sin_family = AF_INET;
-                  msgaddr.sin_port = htons(conf.message_destination_port);
-                  memcpy(&msgaddr.sin_addr, 
-                         &conf.message_destination_ip_in_addr, 
-                         sizeof(struct in_addr));
-                  
-                  addr = (struct sockaddr *)&msgaddr;
-                  addrlen = sizeof(struct sockaddr_in);
-                  if ((rv = sendto(speaker_fd, buf, msglen, 0, addr, addrlen)) != msglen)
-                    {
-                      if (rv < 0)
-                        speaker_fd = cerebrod_reinit_socket(speaker_fd, 
-                                                            conf.message_source_port,
-                                                            _speaker_socket_create, 
-                                                            "speaker: sendto");
-                      else
-                        CEREBRO_ERR(("sendto: invalid bytes sent"));
-                    }
+      
+                  _cerebrod_message_send(msg, msglen);
+
                 end_loop:
                   cerebrod_message_destroy(msg);
-                  if (buf)
-                    Free(buf);
-
                   if (more_data_to_send)
                     CEREBRO_DBG(("extra heartbeat data to send"));
                 }
@@ -549,11 +582,7 @@ cerebrod_speaker(void *arg)
 int
 cerebrod_send_message(struct cerebrod_message *msg)
 {
-  int i, rv, msglen, buflen = 0;
-  unsigned int addrlen;
-  char *buf = NULL;
-  struct sockaddr_in msgaddr;
-  int fd = -1;
+  int i, msglen = 0;
 
   if (!msg)
     {
@@ -565,9 +594,7 @@ cerebrod_send_message(struct cerebrod_message *msg)
    * another fd
    */
 
-  fd = _speaker_socket_create(0);
-
-  buflen = CEREBROD_MESSAGE_HEADER_LEN;
+  msglen = CEREBROD_MESSAGE_HEADER_LEN;
   for (i = 0; i < msg->metrics_len; i++)
     {
       if (!msg->metrics[i])
@@ -576,52 +603,20 @@ cerebrod_send_message(struct cerebrod_message *msg)
 	  errno = EINVAL;
 	  goto cleanup;
 	}
-      buflen += CEREBROD_MESSAGE_METRIC_HEADER_LEN;
-      buflen += msg->metrics[i]->metric_value_len;
+      msglen += CEREBROD_MESSAGE_METRIC_HEADER_LEN;
+      msglen += msg->metrics[i]->metric_value_len;
     }
 
-  if (buflen >= CEREBRO_MAX_PACKET_LEN)
+  if (msglen >= CEREBRO_MAX_PACKET_LEN)
     {
       CEREBRO_DBG(("message exceeds maximum size: packet dropped"));
       goto cleanup;
     }
 
-  buf = Malloc(buflen + 1);
-
-  if ((msglen = _message_marshall(msg, buf, buflen)) < 0)
-    {
-      CEREBRO_DBG(("_message_marshall"));
-      goto cleanup;
-    }
-
   _cerebrod_message_dump(msg);
       
-  memset(&msgaddr, '\0', sizeof(struct sockaddr_in));
-  msgaddr.sin_family = AF_INET;
-  msgaddr.sin_port = htons(conf.message_destination_port);
-  memcpy(&msgaddr.sin_addr, 
-	 &conf.message_destination_ip_in_addr, 
-	 sizeof(struct in_addr));
-
-  addrlen = sizeof(struct sockaddr_in);
-  if ((rv = sendto(fd, 
-                   buf, 
-                   msglen, 
-                   0, 
-                   (struct sockaddr *)&msgaddr, 
-                   addrlen)) != msglen)
-    {
-      
-      if (rv < 0)
-        CEREBRO_ERR(("sendto: %s", strerror(errno)));
-      else
-        CEREBRO_ERR(("sendto: invalid bytes sent"));
-      goto cleanup;
-    }
+  _cerebrod_message_send(msg, msglen);
 
  cleanup:
-  if (buf)
-    Free(buf); 
-  close(fd);
   return 0;
 }

@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro.conf.5.in,v 1.21 2007-10-05 16:44:43 chu11 Exp $
+\."$Id: cerebro.conf.5.in,v 1.22 2007-10-11 23:21:05 chu11 Exp $
 \."#############################################################################
 \."  Copyright (C) 2005 The Regents of the University of California.
 \."  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -50,13 +50,23 @@ backslash ("\\").
 
 .SH "CEREBRO CONFIGURATION OPTIONS"
 .TP
-.I cerebro_hostnames host1 host2 host3 ...
-Specify alternate default hostnames the libcerebro API should attempt
-to connect to.
+.I cerebro_metric_server hostname [port]
+Specify an alternate default metric server host and port the
+libcerebro API should attempt to connect to.  Metric reading tools
+such as
+.B cerebro-stat 
+connect to the metric server to read metric data.  This option can be
+listed multiple times to specify multiple hosts.  If the port is not
+specified, a default is assumed.
+
 .TP
-.I cerebro_port num
-Specify the alternate default port the libcerebro API should attempt
-to connect to.
+.I cerebro_event_server hostname [port]
+Specify an alternate default event server host and port the libcerebro
+API should attempt to connect to.  Event reading tools such as
+.B cerebro-stat 
+connect to the event server to read event data.  This option can be
+listed multiple times to specify multiple hosts.  If the port is not
+specified, a default is assumed.
 .TP
 .I cerebro_timeout_len num
 Specify the alternate default timeout length the libcerebro API should
@@ -79,44 +89,43 @@ within that range is selected for every heartbeat packet sent.  The
 default value is a minimum frequency of 10 seconds and a maximum
 frequency of 20 seconds.
 .TP
-.I cerebrod_message_source_port num 
-Specify the source port that message packets should be sent from.
-This should be different than the destination port specified below.
-The default source port is 8851.
-.TP
-.I cerebrod_message_source_network_interface (network_interface | ip_address | subnet)
-Specify the network interface message packets should be sent out of.
-The network interface can be specified as a network interface (i.e.
-eth0), an ip address (i.e. 192.168.1.1) or a subnet using CIDR
-notation (i.e. 192.168.1.1/16).  By default, when a network interface
-is not specified,
-.B cerebrod
-will search for and select an appropriate network interface. If the
-machine running 
-.B cerebrod
-contains multiple network interfaces, it would be recommended that the
-appropriate network interface be configured.
-.TP
-.I cerebrod_message_destination_port num 
-Specify the destination port that message packets should be sent to.
-This should be different than the source port specified above.  The
-default destination port is 8850.
-.TP
-.I cerebrod_message_destination_ip ip_address
-Specify the destination ip address that message packets should be
-sent to.  The destination ip address may be either a singlecast or
-multicast address. The default destination IP address is 239.2.11.72.
-.TP
-.I cerebrod_message_ttl num
-Specify the message packet time to live parameter.  This parameter
-is only used if the message destination ip address is a multicast ip
-address.  The default ttl is 1.
-.TP
 .I cerebrod_speak ( on | off )
 Specify if the
 .B cerebrod
 daemon should send out packets or not.  Generally speaking, this should
 always be turned on.  The default configuration turns this option on.
+.TP
+.I cerebrod_speak_message_config ip [destination_port source_port network_interface]
+Specify where cerebro messages should be sent to and where they should
+be sent from.  This option can be listed multiple times to specify
+multiple message destinations.  The ip address specifies the destination ip
+address that messages should be sent to.  It may be either a
+singlecast or multicast address.  The default ip address is
+239.2.11.72.  The destination port specifies the port that messages
+should be sent to.  The default destination port is 8850.  The source
+port specifies the port that messages should be sent from.  The
+default source port is 8851.  The network interface specifies the
+network interface messages should be sent out of.  This is typically
+used to specify a network when a multicast ip address is specified as
+the message destination.  The network interface can be specified as a
+network interface (i.e.  eth0), an ip address (i.e. 192.168.1.1) or a
+subnet using CIDR notation (i.e. 192.168.1.1/16).  By default, when a
+network interface is not specified, 
+.B cerebrod 
+will search for and select an appropriate network interface. If the
+machine running 
+.B cerebrod 
+contains multiple network interfaces, it would be recommended that the
+appropriate network interface be configured.  The destination_port,
+source_port, and network_interface may be optionally specified.  
+To use defaults for the ip address or network interface, '0.0.0.0' may
+be specified.  To use defaults for destination_port or source_port a
+'0' may be specified.
+.TP
+.I cerebrod_speak_message_ttl num
+Specify the message packet time to live parameter.  This parameter
+is only used if the message destination ip address is a multicast ip
+address.  The default ttl is 1.
 .TP
 .I cerebrod_listen ( on | off )
 Specify if the
@@ -128,32 +137,34 @@ a few of the machines should be responsible for collecting the
 data so that computational power of the cluster as a whole isn't lost.
 The default configuration turns this option on.
 .TP
+.I cerebrod_listen_message_config ip [port network_interface]
+
+Specify from where cerebro messages should be received.  This option can be listed multiple times to specify
+multiple message destinations.  The ip address specifies the ip
+address that messages should be received on.  It may be either a
+singlecast or multicast address.  The default ip address is
+239.2.11.72.  The port specifies the port that messages
+should be received on.  The default port is 8851.  The network interface specifies the
+network interface messages should be received on.  This is typically
+used to specify a network when a multicast ip address is specified as
+the message receiving ip.  The network interface can be specified as a
+network interface (i.e.  eth0), an ip address (i.e. 192.168.1.1) or a
+subnet using CIDR notation (i.e. 192.168.1.1/16).  By default, when a
+network interface is not specified, 
+.B cerebrod 
+will search for and
+select an appropriate network interface. If the machine running 
+.B cerebrod 
+contains multiple network interfaces, it would be recommended that the
+appropriate network interface be configured.  The port and
+network_interface may be optionally specified.  To use defaults for
+the ip address or network interface, '0.0.0.0' may be specified.  To
+use defaults for the port, a '0' may be specified.
+.TP
 .I cerebrod_listen_threads num
 Specify the number of listening threads the 
 .B cerebrod
 listener server should execute.  The default executes 2 threads.
-.TP
-.I cerebrod_listen_ports port1 port2 port3 port4
-Specify up to four alternate ports that cerebrod should listen for
-packets on.  By default, port 8851 is assumed.
-.TP
-.I cerebrod_listen_ips ip1 ip2 ip3 ip4
-Specify up to four alternate ip addresses that cerebrod should listen
-for packets on.  By default, the multicast address 239.2.11.72 is
-assumed.
-.TP
-.I cerebrod_listen_network_interfaces nic1 nic2 nic3 nic4
-Specify up to four alternate network interfaces that cerebrod should
-listen for packets on.  The network interface can be specified as a
-network interface (i.e.  eth0), an ip address (i.e. 192.168.1.1) or a
-subnet using CIDR notation (i.e. 192.168.1.1/16).  By default, when a
-network interface is not specified,
-.B cerebrod
-will search for and select an appropriate network interface. If the
-machine running
-.B cerebrod
-contains multiple network interfaces, it would be recommended that the
-appropriate network interface be configured.
 .TP
 .I cerebrod_metric_controller ( on | off )
 Specify if the

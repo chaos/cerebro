@@ -381,44 +381,53 @@ _setup_event_connection(cerebro_t handle, const char *event_name)
   if (_cerebro_load_config(handle) < 0)
     return -1;
   
-  if (!handle->port)
-    {
-      if (handle->config_data.cerebro_port_flag)
-        {
-          if (!handle->config_data.cerebro_port)
-            {
-              handle->errnum = CEREBRO_ERR_CONFIG_INPUT;
-              goto cleanup;
-            }
-          port = handle->config_data.cerebro_port;
-        }
-      else
         port = CEREBRO_EVENT_SERVER_PORT;
-    }
-  else
-    port = handle->port;
 
   /* No flags available for events right now, so nothing to handle */
   flags = 0;
 
-  if (!strlen(handle->hostname))
+  if (!strlen(handle->hostname) || !handle->port)
     {
-      if (handle->config_data.cerebro_hostnames_flag)
+      unsigned int port;
+      char *hostname;
+
+      if (handle->config_data.cerebro_event_server_flag)
         {
           int i;
-          
-          for (i = 0; i < handle->config_data.cerebro_hostnames_len; i++)
+
+          for (i = 0; i < handle->config_data.cerebro_event_server_len; i++)
             {
+              if (!strlen(handle->hostname))
+                {
+                  if (!strcmp(handle->config_data.cerebro_event_server[i].hostname,
+                              CEREBRO_CONFIG_IP_DEFAULT))
+                    hostname = "localhost";
+                  else
+                    hostname = handle->config_data.cerebro_event_server[i].hostname;
+                }
+              else
+                hostname = handle->hostname;
+
+              if (!handle->port)
+                {
+                  if (handle->config_data.cerebro_event_server[i].port == CEREBRO_CONFIG_PORT_DEFAULT)
+                    port = CEREBRO_METRIC_SERVER_PORT;
+                  else
+                    port = handle->config_data.cerebro_event_server[i].port;
+                }
+              else
+                port = handle->port;
+
               if ((fd = _event_connection(handle,
                                           event_name,
-                                          handle->config_data.cerebro_hostnames[i],
+                                          hostname,
                                           port,
                                           flags)) < 0)
                 continue;
               break;
             }
           
-          if (i >= handle->config_data.cerebro_hostnames_len)
+          if (i >= handle->config_data.cerebro_event_server_len)
             {
               handle->errnum = CEREBRO_ERR_CONNECT;
               goto cleanup;
@@ -429,9 +438,19 @@ _setup_event_connection(cerebro_t handle, const char *event_name)
         }
       else
         {
+          if (!strlen(handle->hostname))
+            hostname = "localhost";
+          else
+            hostname = handle->hostname;
+
+          if (!handle->port)
+            port = CEREBRO_METRIC_SERVER_PORT;
+          else
+            port = handle->port;
+          
           if ((fd = _event_connection(handle,
                                       event_name,
-                                      "localhost",
+                                      hostname,
                                       port,
                                       flags)) < 0)
             goto cleanup;
@@ -442,7 +461,7 @@ _setup_event_connection(cerebro_t handle, const char *event_name)
       if ((fd = _event_connection(handle,
                                   event_name,
                                   handle->hostname,
-                                  port,
+                                  handle->port,
                                   flags)) < 0)
         goto cleanup;
     }
