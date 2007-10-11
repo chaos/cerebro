@@ -1,3 +1,27 @@
+2007-10-XX  Albert Chu  <chu11@llnl.gov>
+
+	* src/libs/include/cerebro/cerebro_config.h,
+	src/libs/util/config_util.c: Support new config file options
+	cerebro_metric_server, cerebro_event_server,
+	cerebrod_speak_message_config, and cerebrod_listen_message_config.
+	Remove support for cerebro_hostnames, cerebro_port,
+	cerebrod_listen_ips, cerebrod_listen_network_interfaces,
+	cerbrod_listen_ports, cerebrod_message_source_port,
+	cerebrod_message_destination_port,
+	cerebrod_message_destination_ip,
+	cerebrod_message_source_network_interface.  Support multiple
+	speaker destinations.
+
+	* src/libs/cerebro/: Adjust lib for new config changes.
+	
+	* src/cerebrod/cerebrod_config.h, src/cerebrod/cerebrod_config.c,
+	src/cerebrod_listener.c: Adjust appropriately for config changes.
+
+	* src/cerebrod/cerebrod_speaker.c: Support multiple speaker
+	destinations.
+
+	* man/cerebro.conf.5.in: Update appropriately.
+	
 2007-10-09  Albert Chu  <chu11@llnl.gov>
 
 	* tagged pre_config_file_format_change
