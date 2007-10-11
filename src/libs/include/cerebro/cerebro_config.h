@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config.h,v 1.11.2.1 2007-10-10 21:13:09 chu11 Exp $
+ *  $Id: cerebro_config.h,v 1.11.2.2 2007-10-11 22:32:39 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -50,7 +50,7 @@ struct cerebrod_config_listen_message_config {
 
 #define CEREBRO_CONFIG_CEREBRO_METRIC_SERVERS_MAX 128
 
-#define CEREBRO_CONFIG_CEREBRO_EVENT_SERVERS_MAX 128
+#define CEREBRO_CONFIG_CEREBRO_EVENT_SERVERS_MAX  128
 
 #define CEREBRO_CONFIG_SPEAK_MESSAGE_CONFIG_MAX   128
 

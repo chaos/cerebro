@@ -410,7 +410,7 @@ _setup_event_connection(cerebro_t handle, const char *event_name)
 
               if (!handle->port)
                 {
-                  if (handle->config_data.cerebro_event_server[i].port)
+                  if (handle->config_data.cerebro_event_server[i].port != CEREBRO_CONFIG_PORT_DEFAULT)
                     port = handle->config_data.cerebro_event_server[i].port;
                   else
                     port = CEREBRO_METRIC_SERVER_PORT;

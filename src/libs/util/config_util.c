@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: config_util.c,v 1.21.2.1 2007-10-10 21:13:09 chu11 Exp $
+ *  $Id: config_util.c,v 1.21.2.2 2007-10-11 22:32:39 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -371,6 +371,7 @@ _cb_cerebrod_speak_message_config(conffile_t cf, struct conffile_data *data,
         }
       else
         strcpy(conf->cerebrod_speak_message_config[index].network_interface, CEREBRO_CONFIG_IP_DEFAULT);
+      conf->cerebrod_speak_message_config_len++;
     }
 
   return 0;
@@ -449,6 +450,8 @@ _cb_cerebrod_listen_message_config(conffile_t cf, struct conffile_data *data,
         }
       else
         strcpy(conf->cerebrod_listen_message_config[index].network_interface, CEREBRO_CONFIG_IP_DEFAULT);
+
+      conf->cerebrod_listen_message_config_len++;
     }
 
   return 0;
@@ -830,7 +833,9 @@ _set_cerebro_config(struct cerebro_config *dest,
       dest->cerebrod_speak_flag++;
     }
 
-  if (!dest->cerebrod_speak_message_config_flag && src->cerebrod_speak_message_config_flag)
+  if (!dest->cerebrod_speak_message_config_flag 
+      && src->cerebrod_speak_message_config_flag
+      && src->cerebrod_speak_message_config_len)
     {
       for (i = 0; i < src->cerebrod_speak_message_config_len; i++)
         {
@@ -855,7 +860,9 @@ _set_cerebro_config(struct cerebro_config *dest,
       dest->cerebrod_listen_flag++;
     }
 
-  if (!dest->cerebrod_listen_message_config_flag && src->cerebrod_listen_message_config_flag)
+  if (!dest->cerebrod_listen_message_config_flag 
+      && src->cerebrod_listen_message_config_flag
+      && src->cerebrod_listen_message_config_len)
     {
       for (i = 0; i < src->cerebrod_listen_message_config_len; i++)
         {
