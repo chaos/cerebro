@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.134.2.1 2007-10-11 21:14:29 chu11 Exp $
+ *  $Id: cerebrod_listener.c,v 1.134.2.2 2007-10-11 21:57:35 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -101,19 +101,19 @@ clusterlist_module_t clusterlist_handle;
  * function.  We want to give the daemon additional chances to
  * "survive" an error condition.
  *
- * In this socket setup function, 'index' is used as the file descriptor
- * index.
+ * In this socket setup function, 'num' is used as the message config
+ * and file descriptor index.
  * 
  * Returns file descriptor on success, -1 on error
  */
 static int
-_listener_setup_socket(int index)
+_listener_setup_socket(int num)
 {
   struct sockaddr_in addr;
   unsigned int optlen;
   int fd, optval = 1;
 
-  assert(index >= 0 && index < conf.listen_message_config_len);
+  assert(num >= 0 && num < conf.listen_message_config_len);
 
   if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {
@@ -121,19 +121,19 @@ _listener_setup_socket(int index)
       goto cleanup;
     }
 
-  if (conf.listen_message_config[index].ip_is_multicast)
+  if (conf.listen_message_config[num].ip_is_multicast)
      {
       /* XXX: Probably lots of portability problems here */
       struct ip_mreqn imr;
 
       memset(&imr, '\0', sizeof(struct ip_mreqn));
       memcpy(&imr.imr_multiaddr,
-             &conf.listen_message_config[index].ip_in_addr,
+             &conf.listen_message_config[num].ip_in_addr,
              sizeof(struct in_addr));
       memcpy(&imr.imr_address,
-             &conf.listen_message_config[index].network_interface_in_addr,
+             &conf.listen_message_config[num].network_interface_in_addr,
              sizeof(struct in_addr));
-      imr.imr_ifindex = conf.listen_message_config[index].network_interface_index;
+      imr.imr_ifindex = conf.listen_message_config[num].network_interface_index;
 
       optlen = sizeof(struct ip_mreqn);
       if (setsockopt(fd, SOL_IP, IP_ADD_MEMBERSHIP, &imr, optlen) < 0)
@@ -154,9 +154,9 @@ _listener_setup_socket(int index)
 
   memset(&addr, '\0', sizeof(struct sockaddr_in));
   addr.sin_family = AF_INET;
-  addr.sin_port = htons(conf.listen_message_config[index].port);
+  addr.sin_port = htons(conf.listen_message_config[num].port);
   memcpy(&addr.sin_addr, 
-         &conf.listen_message_config[index].ip_in_addr,
+         &conf.listen_message_config[num].ip_in_addr,
          sizeof(struct in_addr));
   if (bind(fd, (struct sockaddr *)&addr, sizeof(struct sockaddr_in)) < 0)
     {
