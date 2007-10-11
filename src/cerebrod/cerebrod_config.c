@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.130.2.1 2007-10-11 21:14:28 chu11 Exp $
+ *  $Id: cerebrod_config.c,v 1.130.2.2 2007-10-11 22:34:40 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -291,7 +291,7 @@ _cerebrod_load_config(void)
             conf.speak_message_config[i].destination_port = tconf.cerebrod_speak_message_config[i].destination_port;
 
           if (tconf.cerebrod_speak_message_config[i].source_port != CEREBRO_CONFIG_PORT_DEFAULT)
-            conf.speak_message_config[i].destination_port = CEREBROD_SPEAK_MESSAGE_CONFIG_SOURCE_PORT_DEFAULT;
+            conf.speak_message_config[i].source_port = CEREBROD_SPEAK_MESSAGE_CONFIG_SOURCE_PORT_DEFAULT;
           else
             conf.speak_message_config[i].source_port = tconf.cerebrod_speak_message_config[i].source_port;
           
