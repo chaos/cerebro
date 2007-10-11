@@ -518,10 +518,10 @@ _cerebro_metric_get_data(cerebro_t handle,
 
               if (!handle->port)
                 {
-                  if (handle->config_data.cerebro_metric_server[i].port != CEREBRO_CONFIG_PORT_DEFAULT)
-                    port = handle->config_data.cerebro_metric_server[i].port;
-                  else
+                  if (handle->config_data.cerebro_metric_server[i].port == CEREBRO_CONFIG_PORT_DEFAULT)
                     port = CEREBRO_METRIC_SERVER_PORT;
+                  else
+                    port = handle->config_data.cerebro_metric_server[i].port;
                 }
               else
                 port = handle->port;

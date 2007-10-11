@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.130.2.2 2007-10-11 22:34:40 chu11 Exp $
+ *  $Id: cerebrod_config.c,v 1.130.2.3 2007-10-11 22:37:09 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -280,25 +280,25 @@ _cerebrod_load_config(void)
     {
       for (i = 0; i < tconf.cerebrod_speak_message_config_len; i++)
         {
-          if (strcmp(tconf.cerebrod_speak_message_config[i].ip, CEREBRO_CONFIG_IP_DEFAULT))
-            conf.speak_message_config[i].ip = Strdup(tconf.cerebrod_speak_message_config[i].ip);
-          else
+          if (!strcmp(tconf.cerebrod_speak_message_config[i].ip, CEREBRO_CONFIG_IP_DEFAULT))
             conf.speak_message_config[i].ip = CEREBROD_SPEAK_MESSAGE_CONFIG_IP_DEFAULT;
+          else
+            conf.speak_message_config[i].ip = Strdup(tconf.cerebrod_speak_message_config[i].ip);
 
-          if (tconf.cerebrod_speak_message_config[i].destination_port != CEREBRO_CONFIG_PORT_DEFAULT)
+          if (tconf.cerebrod_speak_message_config[i].destination_port == CEREBRO_CONFIG_PORT_DEFAULT)
             conf.speak_message_config[i].destination_port = CEREBROD_SPEAK_MESSAGE_CONFIG_DESTINATION_PORT_DEFAULT;
           else
             conf.speak_message_config[i].destination_port = tconf.cerebrod_speak_message_config[i].destination_port;
 
-          if (tconf.cerebrod_speak_message_config[i].source_port != CEREBRO_CONFIG_PORT_DEFAULT)
+          if (tconf.cerebrod_speak_message_config[i].source_port == CEREBRO_CONFIG_PORT_DEFAULT)
             conf.speak_message_config[i].source_port = CEREBROD_SPEAK_MESSAGE_CONFIG_SOURCE_PORT_DEFAULT;
           else
             conf.speak_message_config[i].source_port = tconf.cerebrod_speak_message_config[i].source_port;
           
-          if (strcmp(tconf.cerebrod_speak_message_config[i].network_interface, CEREBRO_CONFIG_IP_DEFAULT))
-            conf.speak_message_config[i].network_interface = Strdup(tconf.cerebrod_speak_message_config[i].network_interface);
-          else
+          if (!strcmp(tconf.cerebrod_speak_message_config[i].network_interface, CEREBRO_CONFIG_IP_DEFAULT))
             conf.speak_message_config[i].network_interface = NULL;
+          else
+            conf.speak_message_config[i].network_interface = Strdup(tconf.cerebrod_speak_message_config[i].network_interface);
         }
       conf.speak_message_config_len = tconf.cerebrod_speak_message_config_len;
     }
@@ -315,20 +315,20 @@ _cerebrod_load_config(void)
     {
       for (i = 0; i < tconf.cerebrod_listen_message_config_len; i++)
         {
-          if (strcmp(tconf.cerebrod_listen_message_config[i].ip, CEREBRO_CONFIG_IP_DEFAULT))
-            conf.listen_message_config[i].ip = Strdup(tconf.cerebrod_listen_message_config[i].ip);
-          else
+          if (!strcmp(tconf.cerebrod_listen_message_config[i].ip, CEREBRO_CONFIG_IP_DEFAULT))
             conf.listen_message_config[i].ip = CEREBROD_LISTEN_MESSAGE_CONFIG_IP_DEFAULT;
+          else
+            conf.listen_message_config[i].ip = Strdup(tconf.cerebrod_listen_message_config[i].ip);
 
-          if (tconf.cerebrod_listen_message_config[i].port != CEREBRO_CONFIG_PORT_DEFAULT)
+          if (tconf.cerebrod_listen_message_config[i].port == CEREBRO_CONFIG_PORT_DEFAULT)
             conf.listen_message_config[i].port = CEREBROD_LISTEN_MESSAGE_CONFIG_PORT_DEFAULT;
           else
             conf.listen_message_config[i].port = tconf.cerebrod_listen_message_config[i].port;
           
-          if (strcmp(tconf.cerebrod_listen_message_config[i].network_interface, CEREBRO_CONFIG_IP_DEFAULT))
-            conf.listen_message_config[i].network_interface = Strdup(tconf.cerebrod_listen_message_config[i].network_interface);
-          else
+          if (!strcmp(tconf.cerebrod_listen_message_config[i].network_interface, CEREBRO_CONFIG_IP_DEFAULT))
             conf.listen_message_config[i].network_interface = NULL;
+          else
+            conf.listen_message_config[i].network_interface = Strdup(tconf.cerebrod_listen_message_config[i].network_interface);
         }
       conf.listen_message_config_len = tconf.cerebrod_listen_message_config_len;
     }
