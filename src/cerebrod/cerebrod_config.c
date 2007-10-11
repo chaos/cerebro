@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.130 2007-09-05 18:15:55 chu11 Exp $
+ *  $Id: cerebrod_config.c,v 1.130.2.1 2007-10-11 21:14:28 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -48,7 +48,6 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 
-#include "cerebro/cerebro_config.h"
 #include "cerebro/cerebro_config_module.h"
 #include "cerebro/cerebro_error.h"
 
@@ -88,40 +87,39 @@ struct cerebrod_config conf;
 static void
 _cerebrod_set_config_default(void)
 {
-  int i;
-
   memset(&conf, '\0', sizeof(struct cerebrod_config));
 
 #if CEREBRO_DEBUG
   conf.debug = CEREBROD_DEBUG_DEFAULT;
   conf.config_file = CEREBRO_CONFIG_FILE_DEFAULT;
 #endif /* CEREBRO_DEBUG */
+
   conf.heartbeat_frequency_min = CEREBROD_HEARTBEAT_FREQUENCY_MIN_DEFAULT;
   conf.heartbeat_frequency_max = CEREBROD_HEARTBEAT_FREQUENCY_MAX_DEFAULT;
-  conf.message_source_port = CEREBROD_MESSAGE_SOURCE_PORT_DEFAULT;
-  conf.message_source_network_interface = CEREBROD_MESSAGE_SOURCE_NETWORK_INTERFACE_DEFAULT;
-  conf.message_destination_port = CEREBROD_MESSAGE_DESTINATION_PORT_DEFAULT;
-  conf.message_destination_ip = CEREBROD_MESSAGE_DESTINATION_IP_DEFAULT;
-  conf.message_ttl = CEREBROD_MESSAGE_TTL_DEFAULT;
+
   conf.speak = CEREBROD_SPEAK_DEFAULT;
+  conf.speak_message_config[0].ip = CEREBROD_SPEAK_MESSAGE_CONFIG_IP_DEFAULT;
+  conf.speak_message_config[0].destination_port = CEREBROD_SPEAK_MESSAGE_CONFIG_DESTINATION_PORT_DEFAULT;
+  conf.speak_message_config[0].source_port = CEREBROD_SPEAK_MESSAGE_CONFIG_SOURCE_PORT_DEFAULT;
+  conf.speak_message_config[0].network_interface = CEREBROD_SPEAK_MESSAGE_CONFIG_NETWORK_INTERFACE_DEFAULT;
+  conf.speak_message_config_len = 1;
+  conf.speak_message_ttl = CEREBROD_SPEAK_MESSAGE_TTL_DEFAULT;
+
   conf.listen = CEREBROD_LISTEN_DEFAULT;
-  conf.listen_threads = CEREBROD_LISTEN_THREADS_DEFAULT;
-  
-  for (i = 0; i < CEREBRO_MAX_LISTENERS; i++)
-    {
-      conf.listen_ports[i] = CEREBROD_LISTEN_PORTS_DEFAULT;
-      conf.listen_ips[i] = CEREBROD_LISTEN_IPS_DEFAULT;
-      conf.listen_network_interfaces[i] = CEREBROD_LISTEN_NETWORK_INTERFACE_DEFAULT;
-    }
-  conf.listen_ports_len = 0;
-  conf.listen_ips_len = 0;
-  conf.listen_network_interfaces_len = 0;
+  conf.listen_message_config[0].ip = CEREBROD_LISTEN_MESSAGE_CONFIG_IP_DEFAULT;
+  conf.listen_message_config[0].port = CEREBROD_LISTEN_MESSAGE_CONFIG_PORT_DEFAULT;
+  conf.listen_message_config[0].network_interface = CEREBROD_LISTEN_MESSAGE_CONFIG_NETWORK_INTERFACE_DEFAULT;
+  conf.listen_message_config_len = 1;
+  conf.listen_threads = CEREBROD_LISTEN_THREADS_DEFAULT; 
 
   conf.metric_controller = CEREBROD_METRIC_CONTROLLER_DEFAULT;
+
   conf.metric_server = CEREBROD_METRIC_SERVER_DEFAULT;
   conf.metric_server_port = CEREBROD_METRIC_SERVER_PORT_DEFAULT;
+
   conf.event_server = CEREBROD_EVENT_SERVER_DEFAULT;
   conf.event_server_port = CEREBROD_EVENT_SERVER_PORT_DEFAULT;
+
 #if CEREBRO_DEBUG
   conf.speak_debug = CEREBROD_SPEAK_DEBUG_DEFAULT;
   conf.listen_debug = CEREBROD_LISTEN_DEBUG_DEFAULT;
@@ -277,39 +275,62 @@ _cerebrod_load_config(void)
       conf.heartbeat_frequency_min = tconf.cerebrod_heartbeat_frequency_min;
       conf.heartbeat_frequency_max = tconf.cerebrod_heartbeat_frequency_max;
     }
-  if (tconf.cerebrod_message_source_port_flag)
-    conf.message_source_port = tconf.cerebrod_message_source_port;
-  if (tconf.cerebrod_message_source_network_interface_flag)
-    conf.message_source_network_interface = Strdup(tconf.cerebrod_message_source_network_interface);
-  if (tconf.cerebrod_message_destination_port_flag)
-    conf.message_destination_port = tconf.cerebrod_message_destination_port;
-  if (tconf.cerebrod_message_destination_ip_flag)
-    conf.message_destination_ip = Strdup(tconf.cerebrod_message_destination_ip);
-  if (tconf.cerebrod_message_ttl_flag)
-    conf.message_ttl = tconf.cerebrod_message_ttl;
+  if (tconf.cerebrod_speak_message_config_flag
+      && tconf.cerebrod_speak_message_config_len)
+    {
+      for (i = 0; i < tconf.cerebrod_speak_message_config_len; i++)
+        {
+          if (strcmp(tconf.cerebrod_speak_message_config[i].ip, CEREBRO_CONFIG_IP_DEFAULT))
+            conf.speak_message_config[i].ip = Strdup(tconf.cerebrod_speak_message_config[i].ip);
+          else
+            conf.speak_message_config[i].ip = CEREBROD_SPEAK_MESSAGE_CONFIG_IP_DEFAULT;
+
+          if (tconf.cerebrod_speak_message_config[i].destination_port != CEREBRO_CONFIG_PORT_DEFAULT)
+            conf.speak_message_config[i].destination_port = CEREBROD_SPEAK_MESSAGE_CONFIG_DESTINATION_PORT_DEFAULT;
+          else
+            conf.speak_message_config[i].destination_port = tconf.cerebrod_speak_message_config[i].destination_port;
+
+          if (tconf.cerebrod_speak_message_config[i].source_port != CEREBRO_CONFIG_PORT_DEFAULT)
+            conf.speak_message_config[i].destination_port = CEREBROD_SPEAK_MESSAGE_CONFIG_SOURCE_PORT_DEFAULT;
+          else
+            conf.speak_message_config[i].source_port = tconf.cerebrod_speak_message_config[i].source_port;
+          
+          if (strcmp(tconf.cerebrod_speak_message_config[i].network_interface, CEREBRO_CONFIG_IP_DEFAULT))
+            conf.speak_message_config[i].network_interface = Strdup(tconf.cerebrod_speak_message_config[i].network_interface);
+          else
+            conf.speak_message_config[i].network_interface = NULL;
+        }
+      conf.speak_message_config_len = tconf.cerebrod_speak_message_config_len;
+    }
+  if (tconf.cerebrod_speak_message_ttl_flag)
+    conf.speak_message_ttl = tconf.cerebrod_speak_message_ttl;
   if (tconf.cerebrod_speak_flag)
     conf.speak = tconf.cerebrod_speak;
   if (tconf.cerebrod_listen_flag)
     conf.listen = tconf.cerebrod_listen;
   if (tconf.cerebrod_listen_threads_flag)
     conf.listen_threads = tconf.cerebrod_listen_threads;
-  if (tconf.cerebrod_listen_ports)
+  if (tconf.cerebrod_listen_message_config_flag
+      && tconf.cerebrod_listen_message_config_len)
     {
-      for (i = 0; i < tconf.cerebrod_listen_ports_len; i++)
-        conf.listen_ports[i] = tconf.cerebrod_listen_ports[i];
-      conf.listen_ports_len = tconf.cerebrod_listen_ports_len;
-    }
-  if (tconf.cerebrod_listen_ips)
-    {
-      for (i = 0; i < tconf.cerebrod_listen_ips_len; i++)
-        conf.listen_ips[i] = Strdup(tconf.cerebrod_listen_ips[i]);
-      conf.listen_ips_len = tconf.cerebrod_listen_ips_len;
-    }
-  if (tconf.cerebrod_listen_network_interfaces)
-    {
-      for (i = 0; i < tconf.cerebrod_listen_network_interfaces_len; i++)
-        conf.listen_network_interfaces[i] = Strdup(tconf.cerebrod_listen_network_interfaces[i]);
-      conf.listen_network_interfaces_len = tconf.cerebrod_listen_network_interfaces_len;
+      for (i = 0; i < tconf.cerebrod_listen_message_config_len; i++)
+        {
+          if (strcmp(tconf.cerebrod_listen_message_config[i].ip, CEREBRO_CONFIG_IP_DEFAULT))
+            conf.listen_message_config[i].ip = Strdup(tconf.cerebrod_listen_message_config[i].ip);
+          else
+            conf.listen_message_config[i].ip = CEREBROD_LISTEN_MESSAGE_CONFIG_IP_DEFAULT;
+
+          if (tconf.cerebrod_listen_message_config[i].port != CEREBRO_CONFIG_PORT_DEFAULT)
+            conf.listen_message_config[i].port = CEREBROD_LISTEN_MESSAGE_CONFIG_PORT_DEFAULT;
+          else
+            conf.listen_message_config[i].port = tconf.cerebrod_listen_message_config[i].port;
+          
+          if (strcmp(tconf.cerebrod_listen_message_config[i].network_interface, CEREBRO_CONFIG_IP_DEFAULT))
+            conf.listen_message_config[i].network_interface = Strdup(tconf.cerebrod_listen_message_config[i].network_interface);
+          else
+            conf.listen_message_config[i].network_interface = NULL;
+        }
+      conf.listen_message_config_len = tconf.cerebrod_listen_message_config_len;
     }
   if (tconf.cerebrod_metric_controller_flag)
     conf.metric_controller = tconf.cerebrod_metric_controller;
@@ -387,55 +408,49 @@ _cerebrod_config_error_check(void)
     cerebro_err_exit("heartbeat frequency max '%d' invalid", 
                      conf.heartbeat_frequency_max);
   
-  if (conf.message_source_port <= 0)
-    cerebro_err_exit("message source port '%d' invalid", 
-                     conf.message_source_port);
+  if (conf.speak_message_config_len)
+    {
+      for (i = 0; i < conf.speak_message_config_len; i++)
+        {
+          if (!Inet_pton(AF_INET, conf.speak_message_config[i].ip, &addr_temp))
+            cerebro_err_exit("speak message IP address '%s' invalid",
+                             conf.speak_message_config[i].ip);
+                             
+          if (conf.speak_message_config[i].destination_port <= 0)
+            cerebro_err_exit("speak message destination port '%d' invalid", 
+                             conf.speak_message_config[i].destination_port);
+          
+          if (conf.speak_message_config[i].source_port <= 0)
+            cerebro_err_exit("speak message source port '%d' invalid", 
+                             conf.speak_message_config[i].source_port);
+          
+          _cerebrod_config_error_check_network_interface(conf.speak_message_config[i].network_interface);
+        }
+    }
 
-  _cerebrod_config_error_check_network_interface(conf.message_source_network_interface);
+  if (conf.speak_message_ttl <= 0)
+    cerebro_err_exit("speak message ttl '%d' invalid", conf.speak_message_ttl);
 
-  if (conf.message_destination_port <= 0)
-    cerebro_err_exit("message destination port '%d' invalid", 
-                     conf.message_destination_port); 
-
-  if (conf.message_destination_port == conf.message_source_port)
-    cerebro_err_exit("message destination and source ports '%d' identical",
-		      conf.message_destination_port);
-
-  if (!Inet_pton(AF_INET, conf.message_destination_ip, &addr_temp))
-    cerebro_err_exit("message destination IP address '%s' invalid",
-                     conf.message_destination_ip);
-
-  if (conf.message_ttl <= 0)
-    cerebro_err_exit("message ttl '%d' invalid", conf.message_ttl);
+  if (conf.listen_message_config_len)
+    {
+      for (i = 0; i < conf.listen_message_config_len; i++)
+        {
+          if (!Inet_pton(AF_INET, conf.listen_message_config[i].ip, &addr_temp))
+            cerebro_err_exit("listen message IP address '%s' invalid",
+                             conf.listen_message_config[i].ip);
+                             
+          if (conf.listen_message_config[i].port <= 0)
+            cerebro_err_exit("listen message port '%d' invalid", 
+                             conf.listen_message_config[i].port);
+          
+          _cerebrod_config_error_check_network_interface(conf.listen_message_config[i].network_interface);
+        }
+    }
 
   if (conf.listen_threads <= 0)
     cerebro_err_exit("listen threads '%d' invalid", conf.listen_threads);
 
-  for (i = 0; i < conf.listen_ports_len; i++)
-    {
-      if (conf.listen_ports[i] <= 0)
-        cerebro_err_exit("listen port '%d' invalid", conf.listen_ports[i]);
-
-      if (conf.message_source_port == conf.listen_ports[i])
-        cerebro_err_exit("message source port and listen port '%d' identical",
-                         conf.message_source_port);
-    }
-
-  if (conf.listen_ips_len)
-    {
-      for (i = 0; i < conf.listen_ips_len; i++)
-        {
-          if (!Inet_pton(AF_INET, conf.listen_ips[i], &addr_temp))
-            cerebro_err_exit("listen IP address '%s' invalid",
-                             conf.message_destination_ip);
-        }
-    }
-
-  if (conf.listen_network_interfaces_len)
-    {
-      for (i = 0; i < conf.listen_network_interfaces_len; i++)
-        _cerebrod_config_error_check_network_interface(conf.listen_network_interfaces[i]);
-    }
+  /* XXX: check if user input identical source/destination ports for speak/listen?? */
 
   if (conf.metric_server_port <= 0)
     cerebro_err_exit("metric server port '%d' invalid", conf.metric_server_port);
@@ -727,8 +742,7 @@ _cerebrod_ip_is_multicast(char *ip)
 static void
 _cerebrod_calculate_configuration_data(void)
 {
-  /* Determine if the message destiation is single or multi casted */
-  conf.destination_ip_is_multicast = _cerebrod_ip_is_multicast(conf.message_destination_ip);
+  int i;
 
   /* Determine if the heartbeat frequencey is ranged or fixed */
   if (conf.heartbeat_frequency_max > 0)
@@ -736,57 +750,51 @@ _cerebrod_calculate_configuration_data(void)
   else
     conf.heartbeat_frequency_ranged = 0;
 
-  /* Determine the appropriate network interface to use based on
-   * the user's message_source_network_interface input.
-   */
-  _calculate_in_addr_and_index(conf.destination_ip_is_multicast,
-                               conf.message_source_network_interface,
-                               &conf.message_source_network_interface_in_addr,
-                               &conf.message_source_network_interface_index);
-
-  /* Calculate the destination ip */
-  if (!Inet_pton(AF_INET, 
-                 conf.message_destination_ip, 
-                 &conf.message_destination_ip_in_addr))
-    cerebro_err_exit("message destination IP address '%s' invalid",
-                     conf.message_destination_ip);
-
-  if (conf.listen)
+  if (conf.speak && conf.speak_message_config_len)
     {
-      int max_len = 0;
-      int i;
-
-      /* Whatever the max index is, we will use */
-      if (conf.listen_ports_len > max_len)
-        max_len = conf.listen_ports_len;
-      if (conf.listen_ips_len > max_len)
-        max_len = conf.listen_ips_len;
-      if (conf.listen_network_interfaces_len > max_len)
-        max_len = conf.listen_network_interfaces_len;
-
-      /* We need atleast one IP/NIC to listen off of. */
-      if (!max_len)
-        max_len = 1;
-      
-      conf.listen_len = max_len;
-
-      for (i = 0; i < conf.listen_len; i++)
+      for (i = 0; i < conf.speak_message_config_len; i++)
         {
-          /* Determine if the list is single or multi casted */
-          conf.listen_ips_is_multicast[i] = _cerebrod_ip_is_multicast(conf.listen_ips[i]);
+          /* Determine if the message destiation is single or multi casted */
+          conf.speak_message_config[i].ip_is_multicast = _cerebrod_ip_is_multicast(conf.speak_message_config[i].ip);
           
-          /* Calculate the ip in_addr */
+          /* Calculate the destination ip */
           if (!Inet_pton(AF_INET, 
-                         conf.listen_ips[i], 
-                         &conf.listen_ips_in_addr[i]))
-            cerebro_err_exit("listen IP address '%s' invalid",
-                             conf.listen_ips[i]);
+                         conf.speak_message_config[i].ip, 
+                         &conf.speak_message_config[i].ip_in_addr))
+            cerebro_err_exit("speak message IP address '%s' invalid",
+                             conf.speak_message_config[i].ip);
 
-          /* Get the network interface and index for this listener*/
-          _calculate_in_addr_and_index(conf.listen_ips_is_multicast[i],
-                                       conf.listen_network_interfaces[i],
-                                       &conf.listen_network_interfaces_in_addr[i],
-                                       &conf.listen_network_interfaces_index[i]);
+          /* Determine the appropriate network interface to use based on
+           * the user's network_interface input.
+           */
+          _calculate_in_addr_and_index(conf.speak_message_config[i].ip_is_multicast,
+                                       conf.speak_message_config[i].network_interface,
+                                       &conf.speak_message_config[i].network_interface_in_addr,
+                                       &conf.speak_message_config[i].network_interface_index);
+        }
+    }
+
+  if (conf.listen && conf.listen_message_config_len)
+    {
+      for (i = 0; i < conf.listen_message_config_len; i++)
+        {
+          /* Determine if the message destiation is single or multi casted */
+          conf.listen_message_config[i].ip_is_multicast = _cerebrod_ip_is_multicast(conf.listen_message_config[i].ip);
+          
+          /* Calculate the destination ip */
+          if (!Inet_pton(AF_INET, 
+                         conf.listen_message_config[i].ip, 
+                         &conf.listen_message_config[i].ip_in_addr))
+            cerebro_err_exit("listen message IP address '%s' invalid",
+                             conf.listen_message_config[i].ip);
+          
+          /* Determine the appropriate network interface to use based on
+           * the user's network_interface input.
+           */
+          _calculate_in_addr_and_index(conf.listen_message_config[i].ip_is_multicast,
+                                       conf.listen_message_config[i].network_interface,
+                                       &conf.listen_message_config[i].network_interface_in_addr,
+                                       &conf.listen_message_config[i].network_interface_index);
         }
     }
 
@@ -814,6 +822,12 @@ _cerebrod_configuration_data_error_check(void)
 {
   int i;
  
+#if 0
+  /* XXX: I don't think this is valid any longer, we could be speaking
+   * to a specific IP address but not listening for it so I'm going to
+   * comment out this check
+   */
+
   /* If the desitnation ip address isn't multicast, and we are
    * listening, the destination ip address better be one of our NICs
    */
@@ -862,27 +876,31 @@ _cerebrod_configuration_data_error_check(void)
       if (!found_interface)
         cerebro_err_exit("message destination address not found");
     }
+#endif
 
   if (conf.metric_server)
     {
-      if (conf.metric_server_port == conf.message_destination_port)
-	cerebro_err_exit("metric server port '%d' cannot be identical "
-                         "to message destination port", conf.metric_server_port);
-
-      if (conf.metric_server_port == conf.message_source_port)
-	cerebro_err_exit("metric server port '%d' cannot be identical "
-                         "to message source port", conf.metric_server_port);
+      for (i = 0; i < conf.speak_message_config_len; i++)
+        {
+          if (conf.metric_server_port == conf.speak_message_config[i].source_port)
+            cerebro_err_exit("metric server port '%d' cannot be identical "
+                             "to a speak message source port", conf.metric_server_port);
+          
+          if (conf.metric_server_port == conf.speak_message_config[i].destination_port)
+            cerebro_err_exit("metric server port '%d' cannot be identical "
+                             "to a speak message destination port", conf.metric_server_port);
+        }
+      
+      for (i = 0; i < conf.listen_message_config_len; i++)
+        {
+          if (conf.metric_server_port == conf.listen_message_config[i].port)
+            cerebro_err_exit("metric server port '%d' cannot be identical "
+                             "to a listen message port", conf.metric_server_port);
+        }
 
       if (conf.metric_server_port == conf.event_server_port)
 	cerebro_err_exit("metric server port '%d' cannot be identical "
                          "to event server port", conf.metric_server_port);
-
-      for (i = 0; i < conf.listen_len; i++)
-        {
-          if (conf.metric_server_port == conf.listen_ports[i])
-            cerebro_err_exit("metric server port '%d' cannot be identical "
-                             "to a listen port", conf.metric_server_port);
-        }
     }
 }
 
@@ -912,20 +930,31 @@ _cerebrod_config_dump(void)
   fprintf(stderr, "* -------------------------------\n");
   fprintf(stderr, "* heartbeat_frequency_min: %d\n", conf.heartbeat_frequency_min);
   fprintf(stderr, "* heartbeat_frequency_max: %d\n", conf.heartbeat_frequency_max);
-  fprintf(stderr, "* message_source_port: %d\n", conf.message_source_port);
-  fprintf(stderr, "* message_source_network_interface: \"%s\"\n", conf.message_source_network_interface);
-  fprintf(stderr, "* message_destination_port: %d\n", conf.message_destination_port);
-  fprintf(stderr, "* message_destination_ip: \"%s\"\n", conf.message_destination_ip);
-  fprintf(stderr, "* message_ttl: %d\n", conf.message_ttl);
   fprintf(stderr, "* speak: %d\n", conf.speak);
-  fprintf(stderr, "* listen: %d\n", conf.listen);
-  fprintf(stderr, "* listen_threads: %d\n", conf.listen_threads);
-  for (i = 0; i < conf.listen_len; i++)
+  for (i = 0; i < conf.speak_message_config_len; i++)
     {
-      fprintf(stderr, "* listen_ports[%d]: %d\n", i, conf.listen_ports[i]);
-      fprintf(stderr, "* listen_ips[%d]: \"%s\"\n", i, conf.listen_ips[i]);
-      fprintf(stderr, "* listen_network_interface[%d]: \"%s\"\n", i, conf.listen_network_interfaces[i]);
+      fprintf(stderr, "* speak[%d]: ip: \"%s\"\n", i, conf.speak_message_config[i].ip);
+      fprintf(stderr, "* speak[%d]: destination_port: %d\n", i, conf.speak_message_config[i].destination_port);
+      fprintf(stderr, "* speak[%d]: source_port: %d\n", i, conf.speak_message_config[i].source_port);
+      fprintf(stderr, "* speak[%d]: network_interface: \"%s\"\n", i, conf.speak_message_config[i].network_interface);
+      fprintf(stderr, "* speak[%d]: ip_is_multicast: %d\n", i, conf.speak_message_config[i].ip_is_multicast);
+      fprintf(stderr, "* speak[%d]: ip_in_addr: %s\n", i, inet_ntoa(conf.speak_message_config[i].ip_in_addr));
+      fprintf(stderr, "* speak[%d]: network_interface_in_addr: %s\n", i, inet_ntoa(conf.speak_message_config[i].network_interface_in_addr));
+      fprintf(stderr, "* speak[%d]: network_interface_index: %d\n", i, conf.speak_message_config[i].network_interface_index);
     }
+  fprintf(stderr, "* speak_message_ttl: %d\n", conf.speak_message_ttl);
+  fprintf(stderr, "* listen: %d\n", conf.listen);
+  for (i = 0; i < conf.listen_message_config_len; i++)
+    {
+      fprintf(stderr, "* listen[%d]: ip: \"%s\"\n", i, conf.listen_message_config[i].ip);
+      fprintf(stderr, "* listen[%d]: port: %d\n", i, conf.listen_message_config[i].port);
+      fprintf(stderr, "* listen[%d]: network_interface: \"%s\"\n", i, conf.listen_message_config[i].network_interface);
+      fprintf(stderr, "* listen[%d]: listen_ips_is_multicast: %d\n", i, conf.listen_message_config[i].ip_is_multicast);
+      fprintf(stderr, "* listen[%d]: listen_ips_in_addr: %s\n", i, inet_ntoa(conf.listen_message_config[i].ip_in_addr));
+      fprintf(stderr, "* listen[%d]: listen_network_interfaces_in_addr: %s\n", i, inet_ntoa(conf.listen_message_config[i].network_interface_in_addr));
+      fprintf(stderr, "* listen[%d]: listen_network_interfaces_index: %d\n", i, conf.listen_message_config[i].network_interface_index);
+    }
+  fprintf(stderr, "* listen_threads: %d\n", conf.listen_threads);
   fprintf(stderr, "* metric_controller: %d\n", conf.metric_controller);
   fprintf(stderr, "* metric_server: %d\n", conf.metric_server);
   fprintf(stderr, "* metric_server_port: %d\n", conf.metric_server_port);
@@ -939,17 +968,8 @@ _cerebrod_config_dump(void)
   fprintf(stderr, "* -------------------------------\n");
   fprintf(stderr, "* Calculated Configuration\n");
   fprintf(stderr, "* -------------------------------\n");
-  fprintf(stderr, "* destination_ip_is_multicast: %d\n", conf.destination_ip_is_multicast);
-  fprintf(stderr, "* message_source_network_interface_in_addr: %s\n", inet_ntoa(conf.message_source_network_interface_in_addr));
-  fprintf(stderr, "* message_destination_ip_in_addr: %s\n", inet_ntoa(conf.message_destination_ip_in_addr));
-  fprintf(stderr, "* message_source_network_interface_index: %d\n", conf.message_source_network_interface_index);
-  for (i = 0; i < conf.listen_len; i++)
-    {
-      fprintf(stderr, "* listen_ips_is_multicast[%d]: %d\n", i, conf.listen_ips_is_multicast[i]);
-      fprintf(stderr, "* listen_ips_in_addr[%d]: %s\n", i, inet_ntoa(conf.listen_ips_in_addr[i]));
-      fprintf(stderr, "* listen_network_interfaces_in_addr[%d]: %s\n", i, inet_ntoa(conf.listen_network_interfaces_in_addr[i]));
-      fprintf(stderr, "* listen_network_interfaces_index[%d]: %d\n", i, conf.listen_network_interfaces_index[i]);
-    }
+  fprintf(stderr, "* heartbeat_frequency_is_ranged: %d\n", conf.heartbeat_frequency_ranged);
+
   fprintf(stderr, "**************************************\n");
 #endif /* CEREBRO_DEBUG */
 }

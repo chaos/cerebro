@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.134 2007-10-08 22:33:15 chu11 Exp $
+ *  $Id: cerebrod_listener.c,v 1.134.2.1 2007-10-11 21:14:29 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -84,7 +84,7 @@ pthread_mutex_t listener_init_lock = PTHREAD_MUTEX_INITIALIZER;
  *
  * listener file descriptor and lock to protect concurrent access
  */
-int listener_fds[CEREBRO_MAX_LISTENERS] = {0, 0, 0, 0};
+int listener_fds[CEREBRO_CONFIG_LISTEN_MESSAGE_CONFIG_MAX];
 pthread_mutex_t listener_fds_lock = PTHREAD_MUTEX_INITIALIZER;
 
 /*
@@ -101,19 +101,19 @@ clusterlist_module_t clusterlist_handle;
  * function.  We want to give the daemon additional chances to
  * "survive" an error condition.
  *
- * In this socket setup function, 'num' is used as the file descriptor
+ * In this socket setup function, 'index' is used as the file descriptor
  * index.
  * 
  * Returns file descriptor on success, -1 on error
  */
 static int
-_listener_setup_socket(int num)
+_listener_setup_socket(int index)
 {
   struct sockaddr_in addr;
   unsigned int optlen;
   int fd, optval = 1;
 
-  assert(num >= 0 && num < conf.listen_len);
+  assert(index >= 0 && index < conf.listen_message_config_len);
 
   if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {
@@ -121,19 +121,19 @@ _listener_setup_socket(int num)
       goto cleanup;
     }
 
-  if (conf.listen_ips_is_multicast[num])
+  if (conf.listen_message_config[index].ip_is_multicast)
      {
       /* XXX: Probably lots of portability problems here */
       struct ip_mreqn imr;
 
       memset(&imr, '\0', sizeof(struct ip_mreqn));
       memcpy(&imr.imr_multiaddr,
-             &conf.listen_ips_in_addr[num],
+             &conf.listen_message_config[index].ip_in_addr,
              sizeof(struct in_addr));
       memcpy(&imr.imr_address,
-             &conf.listen_network_interfaces_in_addr[num],
+             &conf.listen_message_config[index].network_interface_in_addr,
              sizeof(struct in_addr));
-      imr.imr_ifindex = conf.listen_network_interfaces_index[num];
+      imr.imr_ifindex = conf.listen_message_config[index].network_interface_index;
 
       optlen = sizeof(struct ip_mreqn);
       if (setsockopt(fd, SOL_IP, IP_ADD_MEMBERSHIP, &imr, optlen) < 0)
@@ -152,21 +152,18 @@ _listener_setup_socket(int num)
       goto cleanup;
     }
 
-  /* Configuration checks ensure destination ip is on this machine if
-   * it is a non-multicast address.
-   */
   memset(&addr, '\0', sizeof(struct sockaddr_in));
   addr.sin_family = AF_INET;
-  addr.sin_port = htons(conf.listen_ports[num]);
+  addr.sin_port = htons(conf.listen_message_config[index].port);
   memcpy(&addr.sin_addr, 
-         &conf.listen_ips_in_addr[num],
+         &conf.listen_message_config[index].ip_in_addr,
          sizeof(struct in_addr));
   if (bind(fd, (struct sockaddr *)&addr, sizeof(struct sockaddr_in)) < 0)
     {
       CEREBRO_ERR(("bind: %s", strerror(errno)));
       goto cleanup;
     }
-
+  
   return fd;
 
  cleanup:
@@ -189,7 +186,7 @@ _cerebrod_listener_initialize(void)
     goto out;
 
   Pthread_mutex_lock(&listener_fds_lock);
-  for (i = 0; i < conf.listen_len; i++)
+  for (i = 0; i < conf.listen_message_config_len; i++)
     {
       if ((listener_fds[i] = _listener_setup_socket(i)) < 0)
         CEREBRO_EXIT(("listener fd setup failed"));
@@ -414,7 +411,7 @@ cerebrod_listener(void *arg)
 
       FD_ZERO(&readfds);
       Pthread_mutex_lock(&listener_fds_lock);
-      for (i = 0; i < conf.listen_len; i++)
+      for (i = 0; i < conf.listen_message_config_len; i++)
         {
           if (listener_fds[i] > maxfd)
             maxfd = listener_fds[i];
@@ -423,7 +420,7 @@ cerebrod_listener(void *arg)
 
       count = Select(maxfd + 1, &readfds, NULL, NULL, NULL);
 
-      for (i = 0; i < conf.listen_len; i++)
+      for (i = 0; i < conf.listen_message_config_len; i++)
         {
           if (FD_ISSET(listener_fds[i], &readfds))
             {

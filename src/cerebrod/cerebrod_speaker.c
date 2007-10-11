@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.100 2007-10-09 00:15:56 chu11 Exp $
+ *  $Id: cerebrod_speaker.c,v 1.100.2.1 2007-10-11 21:14:29 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -112,19 +112,19 @@ _speaker_socket_create(int num)
       goto cleanup;
     }
 
-  if (conf.destination_ip_is_multicast)
+  if (conf.speak_message_config[0].ip_is_multicast)
     {
       /* XXX: Probably lots of portability problems here */
       struct ip_mreqn imr;
 
       memset(&imr, '\0', sizeof(struct ip_mreqn));
       memcpy(&imr.imr_multiaddr, 
-	     &conf.message_destination_ip_in_addr,
+	     &conf.speak_message_config[0].ip_in_addr,
 	     sizeof(struct in_addr));
       memcpy(&imr.imr_address, 
-	     &conf.message_source_network_interface_in_addr,
+	     &conf.speak_message_config[0].network_interface_in_addr,
 	     sizeof(struct in_addr));
-      imr.imr_ifindex = conf.message_source_network_interface_index;
+      imr.imr_ifindex = conf.speak_message_config[0].network_interface_index;
       
       optlen = sizeof(struct ip_mreqn);
       if (setsockopt(fd, SOL_IP, IP_MULTICAST_IF, &imr, optlen) < 0)
@@ -141,7 +141,7 @@ _speaker_socket_create(int num)
           goto cleanup;
 	}
 
-      optval = conf.message_ttl;
+      optval = conf.speak_message_ttl;
       optlen = sizeof(optval);
       if (setsockopt(fd, SOL_IP, IP_MULTICAST_TTL, &optval, optlen) < 0)
 	{
@@ -163,7 +163,7 @@ _speaker_socket_create(int num)
   addr.sin_family = AF_INET;
   addr.sin_port = htons(num);
   memcpy(&addr.sin_addr,
-	 &conf.message_source_network_interface_in_addr,
+	 &conf.speak_message_config[0].network_interface_in_addr,
 	 sizeof(struct in_addr));
   if (bind(fd, (struct sockaddr *)&addr, sizeof(struct sockaddr_in)) < 0) 
     {
@@ -426,7 +426,7 @@ cerebrod_speaker(void *arg)
 
   _speaker_initialize();
 
-  if ((speaker_fd = _speaker_socket_create(conf.message_source_port)) < 0)
+  if ((speaker_fd = _speaker_socket_create(conf.speak_message_config[0].source_port)) < 0)
     CEREBRO_EXIT(("speaker fd setup failed"));
 
   while (1)
@@ -490,9 +490,9 @@ cerebrod_speaker(void *arg)
                   
                   memset(&msgaddr, '\0', sizeof(struct sockaddr_in));
                   msgaddr.sin_family = AF_INET;
-                  msgaddr.sin_port = htons(conf.message_destination_port);
+                  msgaddr.sin_port = htons(conf.speak_message_config[0].destination_port);
                   memcpy(&msgaddr.sin_addr, 
-                         &conf.message_destination_ip_in_addr, 
+                         &conf.speak_message_config[0].ip_in_addr, 
                          sizeof(struct in_addr));
                   
                   addr = (struct sockaddr *)&msgaddr;
@@ -501,7 +501,7 @@ cerebrod_speaker(void *arg)
                     {
                       if (rv < 0)
                         speaker_fd = cerebrod_reinit_socket(speaker_fd, 
-                                                            conf.message_source_port,
+                                                            conf.speak_message_config[0].source_port,
                                                             _speaker_socket_create, 
                                                             "speaker: sendto");
                       else
@@ -598,9 +598,9 @@ cerebrod_send_message(struct cerebrod_message *msg)
       
   memset(&msgaddr, '\0', sizeof(struct sockaddr_in));
   msgaddr.sin_family = AF_INET;
-  msgaddr.sin_port = htons(conf.message_destination_port);
+  msgaddr.sin_port = htons(conf.speak_message_config[0].destination_port);
   memcpy(&msgaddr.sin_addr, 
-	 &conf.message_destination_ip_in_addr, 
+	 &conf.speak_message_config[0].ip_in_addr, 
 	 sizeof(struct in_addr));
 
   addrlen = sizeof(struct sockaddr_in);
