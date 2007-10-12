@@ -1,4 +1,4 @@
-2007-10-XX  Albert Chu  <chu11@llnl.gov>
+2007-10-11  Albert Chu  <chu11@llnl.gov>
 
 	* src/libs/include/cerebro/cerebro_config.h,
 	src/libs/util/config_util.c: Support new config file options
