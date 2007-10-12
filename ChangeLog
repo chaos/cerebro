@@ -1,6 +1,9 @@
 2007-10-12  Albert Chu  <chu11@llnl.gov>
 
-	* src/libs/include/cerebro/cerebro_config.h,
+	* man/cerebro.conf.5.in, src/cerebrod/cerebrod_config.h,
+	src/cerebrod/cerebrod_config.c, src/cerebrod/cerebrod.c,
+	src/cerebrod/Makefile.am,
+	src/libs/include/cerebro/cerebro_config.h,
 	src/libs/util/config_util.c: Begin work to add cerebro packet
 	forwarding.
 	

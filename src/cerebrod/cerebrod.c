@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.83 2007-09-05 18:15:55 chu11 Exp $
+ *  $Id: cerebrod.c,v 1.84 2007-10-12 23:23:30 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -31,7 +31,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#if STDC_HEADERS
+#include <string.h>
+#endif /* STDC_HEADERS */
 #include <syslog.h>
+#include <errno.h>
 
 #include "cerebro/cerebro_error.h"
 
@@ -93,6 +97,13 @@ extern pthread_mutex_t event_server_init_lock;
 #endif /* !WITH_CEREBROD_SPEAKER_ONLY */
 
 extern struct cerebrod_config conf;
+
+/* for hostlist library */
+void 
+lsd_fatal_error(char *file, int line, char *mesg)
+{
+  cerebro_err_exit("LSD FATAL ERROR(%s:%d) %s: %s", file, line, mesg, strerror(errno));
+}
 
 int 
 main(int argc, char **argv)

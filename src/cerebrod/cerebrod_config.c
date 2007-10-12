@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.132 2007-10-12 17:08:31 chu11 Exp $
+ *  $Id: cerebrod_config.c,v 1.133 2007-10-12 23:23:30 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -72,6 +72,8 @@ extern char *config_debug_config_file;
 extern int config_debug_output;
 #endif /* CEREBRO_DEBUG */
 
+#define CEREBROD_CONFIG_HOSTLIST_BUFLEN 65536
+
 /* 
  * conf
  *
@@ -119,6 +121,9 @@ _cerebrod_set_config_default(void)
 
   conf.event_server = CEREBROD_EVENT_SERVER_DEFAULT;
   conf.event_server_port = CEREBROD_EVENT_SERVER_PORT_DEFAULT;
+
+  /* no forwarding by default */
+  conf.forward_message_config_len = 0;
 
 #if CEREBRO_DEBUG
   conf.speak_debug = CEREBROD_SPEAK_DEBUG_DEFAULT;
@@ -260,7 +265,7 @@ _cerebrod_load_config(void)
 {
   struct cerebro_config tconf;
   unsigned int errnum;
-  int i;
+  int i, j;
 
 #if CEREBRO_DEBUG
   config_debug_config_file = conf.config_file;
@@ -342,6 +347,55 @@ _cerebrod_load_config(void)
     conf.event_server = tconf.cerebrod_event_server;
   if (tconf.cerebrod_event_server_port_flag)
     conf.event_server_port = tconf.cerebrod_event_server_port;
+
+  if (tconf.cerebrod_forward_message_config_flag
+      && tconf.cerebrod_forward_message_config_len)
+    {
+      for (i = 0; i < tconf.cerebrod_forward_message_config_len; i++)
+        {
+          if (!strcmp(tconf.cerebrod_forward_message_config[i].ip, CEREBRO_CONFIG_IP_DEFAULT))
+            conf.forward_message_config[i].ip = CEREBROD_FORWARD_MESSAGE_CONFIG_IP_DEFAULT;
+          else
+            conf.forward_message_config[i].ip = Strdup(tconf.cerebrod_forward_message_config[i].ip);
+
+          if (tconf.cerebrod_forward_message_config[i].destination_port == CEREBRO_CONFIG_PORT_DEFAULT)
+            conf.forward_message_config[i].destination_port = CEREBROD_FORWARD_MESSAGE_CONFIG_DESTINATION_PORT_DEFAULT;
+          else
+            conf.forward_message_config[i].destination_port = tconf.cerebrod_forward_message_config[i].destination_port;
+
+          if (tconf.cerebrod_forward_message_config[i].source_port == CEREBRO_CONFIG_PORT_DEFAULT)
+            conf.forward_message_config[i].source_port = CEREBROD_FORWARD_MESSAGE_CONFIG_SOURCE_PORT_DEFAULT;
+          else
+            conf.forward_message_config[i].source_port = tconf.cerebrod_forward_message_config[i].source_port;
+          
+          if (!strcmp(tconf.cerebrod_forward_message_config[i].network_interface, CEREBRO_CONFIG_IP_DEFAULT))
+            conf.forward_message_config[i].network_interface = NULL;
+          else
+            conf.forward_message_config[i].network_interface = Strdup(tconf.cerebrod_forward_message_config[i].network_interface);
+
+          if (tconf.cerebrod_forward_message_config[i].host_len)
+            {
+              conf.forward_message_config[i].hosts = Hostlist_create(NULL);
+              for (j = 0; j < tconf.cerebrod_forward_message_config[i].host_len; j++)
+                {
+                  char *hostptr = NULL;
+                  char *ptr;
+
+                  hostptr = Strdup(tconf.cerebrod_forward_message_config[i].host[j]);
+                  
+                  /* Shorten hostname if necessary */
+                  if ((ptr = strchr(hostptr, '.')))
+                    *ptr = '\0';
+
+                  Hostlist_push(conf.forward_message_config[i].hosts, hostptr);
+                  
+                  Free(hostptr);
+                }
+            }
+        }
+
+      conf.forward_message_config_len = tconf.cerebrod_forward_message_config_len;
+    }
 #if CEREBRO_DEBUG
   if (tconf.cerebrod_speak_debug_flag)
     conf.speak_debug = tconf.cerebrod_speak_debug;
@@ -473,6 +527,24 @@ _cerebrod_config_error_check(void)
 
   if (conf.event_server_port <= 0)
     cerebro_err_exit("event server port '%d' invalid", conf.event_server_port);
+
+  if (conf.forward_message_config_len)
+    {
+      for (i = 0; i < conf.forward_message_config_len; i++)
+        {
+          _cerebrod_config_error_check_ip(conf.forward_message_config[i].ip);
+          
+          if (conf.forward_message_config[i].destination_port <= 0)
+            cerebro_err_exit("forward message destination port '%d' invalid", 
+                             conf.forward_message_config[i].destination_port);
+          
+          if (conf.forward_message_config[i].source_port <= 0)
+            cerebro_err_exit("forward message source port '%d' invalid", 
+                             conf.forward_message_config[i].source_port);
+          
+          _cerebrod_config_error_check_network_interface(conf.forward_message_config[i].network_interface);
+        }
+    }
 }
 
 /* 
@@ -832,6 +904,36 @@ _cerebrod_calculate_configuration_data(void)
   /* Why would the user want the daemon to do nothing?  Oh well*/
   if (!conf.speak && !conf.listen)
     conf.metric_controller = 0;
+
+  /* if you aren't listening, you can't forward anything */
+  if (!conf.listen && conf.forward_message_config_len)
+    conf.forward_message_config_len = 0;
+
+  if (conf.listen && conf.forward_message_config_len)
+    {
+      for (i = 0; i < conf.forward_message_config_len; i++)
+        {
+          /* Determine if the message destiation is single or multi casted */
+          conf.forward_message_config[i].ip_is_multicast = _cerebrod_ip_is_multicast(conf.forward_message_config[i].ip);
+          
+          /* Calculate the destination ip */
+          if (!Inet_pton(AF_INET, 
+                         conf.forward_message_config[i].ip, 
+                         &conf.forward_message_config[i].ip_in_addr))
+            {
+              hent = Gethostbyname(conf.forward_message_config[i].ip);
+              conf.forward_message_config[i].ip_in_addr = *((struct in_addr *)hent->h_addr);
+            }
+
+          /* Determine the appropriate network interface to use based on
+           * the user's network_interface input.
+           */
+          _calculate_in_addr_and_index(conf.forward_message_config[i].ip_is_multicast,
+                                       conf.forward_message_config[i].network_interface,
+                                       &conf.forward_message_config[i].network_interface_in_addr,
+                                       &conf.forward_message_config[i].network_interface_index);
+        }
+    }
 }
 
 /*
@@ -982,6 +1084,23 @@ _cerebrod_config_dump(void)
   fprintf(stderr, "* metric_server_port: %d\n", conf.metric_server_port);
   fprintf(stderr, "* event_server: %d\n", conf.event_server);
   fprintf(stderr, "* event_server_port: %d\n", conf.event_server_port);
+  for (i = 0; i < conf.forward_message_config_len; i++)
+    {
+      char buf[CEREBROD_CONFIG_HOSTLIST_BUFLEN];
+
+      fprintf(stderr, "* forward[%d]: ip: \"%s\"\n", i, conf.forward_message_config[i].ip);
+      fprintf(stderr, "* forward[%d]: destination_port: %d\n", i, conf.forward_message_config[i].destination_port);
+      fprintf(stderr, "* forward[%d]: source_port: %d\n", i, conf.forward_message_config[i].source_port);
+      fprintf(stderr, "* forward[%d]: network_interface: \"%s\"\n", i, conf.forward_message_config[i].network_interface);
+      Hostlist_ranged_string(conf.forward_message_config[i].hosts, 
+                             CEREBROD_CONFIG_HOSTLIST_BUFLEN,
+                             buf);
+      fprintf(stderr, "* forward[%d]: hosts: \"%s\"\n", i, buf);
+      fprintf(stderr, "* forward[%d]: ip_is_multicast: %d\n", i, conf.forward_message_config[i].ip_is_multicast);
+      fprintf(stderr, "* forward[%d]: ip_in_addr: %s\n", i, inet_ntoa(conf.forward_message_config[i].ip_in_addr));
+      fprintf(stderr, "* forward[%d]: network_interface_in_addr: %s\n", i, inet_ntoa(conf.forward_message_config[i].network_interface_in_addr));
+      fprintf(stderr, "* forward[%d]: network_interface_index: %d\n", i, conf.forward_message_config[i].network_interface_index);
+    }
   fprintf(stderr, "* speak_debug: %d\n", conf.speak_debug);
   fprintf(stderr, "* listen_debug: %d\n", conf.listen_debug);
   fprintf(stderr, "* metric_controller_debug: %d\n", conf.metric_controller_debug);

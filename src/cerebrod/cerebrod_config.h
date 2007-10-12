@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.h,v 1.63 2007-10-11 23:21:05 chu11 Exp $
+ *  $Id: cerebrod_config.h,v 1.64 2007-10-12 23:23:30 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -38,6 +38,8 @@
 #include "cerebro/cerebro_config.h"
 #include "cerebro/cerebro_constants.h"
 
+#include "hostlist.h"
+
 #define CEREBROD_DEBUG_DEFAULT                                    0
 #define CEREBROD_HEARTBEAT_FREQUENCY_MIN_DEFAULT                  10
 #define CEREBROD_HEARTBEAT_FREQUENCY_MAX_DEFAULT                  20
@@ -57,6 +59,11 @@
 #define CEREBROD_METRIC_SERVER_PORT_DEFAULT                       CEREBRO_METRIC_SERVER_PORT
 #define CEREBROD_EVENT_SERVER_DEFAULT                             1
 #define CEREBROD_EVENT_SERVER_PORT_DEFAULT                        CEREBRO_EVENT_SERVER_PORT
+#define CEREBROD_FORWARD_MESSAGE_CONFIG_IP_DEFAULT                  CEREBROD_SPEAK_MESSAGE_CONFIG_IP_DEFAULT
+#define CEREBROD_FORWARD_MESSAGE_CONFIG_DESTINATION_PORT_DEFAULT    CEREBROD_SPEAK_MESSAGE_CONFIG_DESTINATION_PORT_DEFAULT
+#define CEREBROD_FORWARD_MESSAGE_CONFIG_SOURCE_PORT_DEFAULT         8849
+#define CEREBROD_FORWARD_MESSAGE_CONFIG_NETWORK_INTERFACE_DEFAULT   CEREBROD_SPEAK_MESSAGE_CONFIG_NETWORK_INTERFACE_DEFAULT
+
 #define CEREBROD_SPEAK_DEBUG_DEFAULT                              0
 #define CEREBROD_LISTEN_DEBUG_DEFAULT                             0
 #define CEREBROD_METRIC_CONTROLLER_DEBUG_DEFAULT                  0
@@ -82,6 +89,21 @@ struct listen_message_config {
   char *ip;
   int port;
   char *network_interface;
+
+  /* Determined by cerebrod based on configuration */
+  int ip_is_multicast;
+  struct in_addr ip_in_addr;
+  struct in_addr network_interface_in_addr;
+  int network_interface_index;
+};
+
+struct forward_message_config {
+  /* Config */
+  char *ip;
+  int destination_port;
+  int source_port;
+  char *network_interface;
+  hostlist_t hosts;
 
   /* Determined by cerebrod based on configuration */
   int ip_is_multicast;
@@ -119,6 +141,8 @@ struct cerebrod_config
   int metric_server_port;
   int event_server;
   int event_server_port;
+  struct forward_message_config forward_message_config[CEREBRO_CONFIG_FORWARD_MESSAGE_CONFIG_MAX];
+  int forward_message_config_len;
 
 #if CEREBRO_DEBUG
   int speak_debug;

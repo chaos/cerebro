@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.77 2006-11-15 00:12:30 chu11 Exp $
+## $Id: Makefile.am,v 1.78 2007-10-12 23:23:30 chu11 Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -39,10 +39,12 @@ CEREBROD_LDADDS = ../libs/cerebro_error/libcerebro_error.la \
 		  ../libs/util/libutil_data.la \
 		  ../libs/util/libutil_network.la \
 		  ../libs/wrappers/libwrappers.la \
+		  ../libs/wrappers/libwrappers_hostlist.la \
 		  ../libs/wrappers/libwrappers_list.la \
 		  ../libs/wrappers/libwrappers_marshall.la \
 		  ../libs/common/libconffile.la \
 		  ../libs/common/libfd.la \
+		  ../libs/common/libhostlist.la \
 		  ../libs/common/liblist.la \
 		  ../libs/common/libmarshall.la \
 		  ../libs/common/libvector.la
@@ -60,10 +62,12 @@ CEREBROD_LDADDS = ../libs/cerebro_error/libcerebro_error.la \
 		  ../libs/modules/libmodules.la \
 		  ../libs/wrappers/libwrappers.la \
 		  ../libs/wrappers/libwrappers_hash.la \
+		  ../libs/wrappers/libwrappers_hostlist.la \
 		  ../libs/wrappers/libwrappers_list.la \
 		  ../libs/wrappers/libwrappers_marshall.la \
 		  ../libs/common/libconffile.la \
 		  ../libs/common/libfd.la \
+		  ../libs/common/libhostlist.la \
 		  ../libs/common/libhash.la \
 		  ../libs/common/liblist.la \
 		  ../libs/common/libmarshall.la \
@@ -117,6 +121,9 @@ cerebrod_LDADD   = $(CEREBROD_LDADDS) \
 ../libs/common/libhash.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
+../libs/common/libhostlist.la : force-dependency-check
+	@cd `dirname $@` && make `basename $@`
+
 ../libs/common/liblist.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
@@ -163,6 +170,9 @@ cerebrod_LDADD   = $(CEREBROD_LDADDS) \
 	@cd `dirname $@` && make `basename $@`
 
 ../libs/wrappers/libwrappers_hash.la : force-dependency-check
+	@cd `dirname $@` && make `basename $@`
+
+../libs/wrappers/libwrappers_hostlist.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
 ../libs/wrappers/libwrappers_list.la : force-dependency-check
