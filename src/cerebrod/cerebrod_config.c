@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.131 2007-10-11 23:21:05 chu11 Exp $
+ *  $Id: cerebrod_config.c,v 1.132 2007-10-12 17:08:31 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -357,6 +357,27 @@ _cerebrod_load_config(void)
 }
 
 /* 
+ * _cerebrod_config_error_check_ip
+ *
+ * Check for valid ip address or hostname passed in by user
+ */
+static void
+_cerebrod_config_error_check_ip(char *ip)
+{
+  struct in_addr addr_temp;
+
+  assert(ip);
+
+  if (!Inet_pton(AF_INET, ip, &addr_temp))
+    {
+      /* we now assume the user must have passed in a hostname instead of an ip */
+      /* don't use wrappers, this input is allowed to be invalid */
+      if (!gethostbyname(ip))
+        cerebro_err_exit("IP input '%s' cannot be resolved", ip);
+    }
+}
+
+/* 
  * _cerebrod_config_error_check_network_interface
  *
  * Check for valid network interface IP address
@@ -397,7 +418,6 @@ _cerebrod_config_error_check_network_interface(char *network_interface)
 static void
 _cerebrod_config_error_check(void)
 {
-  struct in_addr addr_temp;
   int i;
   
   if (conf.heartbeat_frequency_min <= 0)
@@ -412,10 +432,8 @@ _cerebrod_config_error_check(void)
     {
       for (i = 0; i < conf.speak_message_config_len; i++)
         {
-          if (!Inet_pton(AF_INET, conf.speak_message_config[i].ip, &addr_temp))
-            cerebro_err_exit("speak message IP address '%s' invalid",
-                             conf.speak_message_config[i].ip);
-                             
+          _cerebrod_config_error_check_ip(conf.speak_message_config[i].ip);
+          
           if (conf.speak_message_config[i].destination_port <= 0)
             cerebro_err_exit("speak message destination port '%d' invalid", 
                              conf.speak_message_config[i].destination_port);
@@ -435,10 +453,8 @@ _cerebrod_config_error_check(void)
     {
       for (i = 0; i < conf.listen_message_config_len; i++)
         {
-          if (!Inet_pton(AF_INET, conf.listen_message_config[i].ip, &addr_temp))
-            cerebro_err_exit("listen message IP address '%s' invalid",
-                             conf.listen_message_config[i].ip);
-                             
+          _cerebrod_config_error_check_ip(conf.listen_message_config[i].ip);
+
           if (conf.listen_message_config[i].port <= 0)
             cerebro_err_exit("listen message port '%d' invalid", 
                              conf.listen_message_config[i].port);
@@ -708,30 +724,31 @@ _calculate_in_addr_and_index(int is_multicast,
 static int
 _cerebrod_ip_is_multicast(char *ip)
 {
-  if (strchr(ip, '.'))
-    {
-      char *ipaddr_cpy = Strdup(ip);
-      char *tok, *ptr;
-      int ip_class;
-      int rv;
+  char *ipaddr_cpy;
+  char *tok, *ptr;
+  int ip_class;
+  int rv;
 
-      tok = strtok(ipaddr_cpy, ".");
-      ip_class = strtol(tok, &ptr, 10);
-      if (ptr != (tok + strlen(tok)))
-	cerebro_err_exit("IP address '%s' invalid", ip);
-      
-      if (ip_class >= MULTICAST_CLASS_MIN && ip_class <= MULTICAST_CLASS_MAX)
-	rv = 1;
-      else
-	rv = 0;
-      Free(ipaddr_cpy);
-      return rv;
-    }
-  else
-    cerebro_err_exit("IP address '%s' invalid", ip);
+  assert(ip);
 
-  /* NOT REACHED */
-  return 0;
+ ipaddr_cpy = Strdup(ip);
+ tok = strtok(ipaddr_cpy, ".");
+ ip_class = strtol(tok, &ptr, 10);
+#if 0
+ /* If the user input a hostname instead of an IP address, we
+  * want this to fallthrough and say we didn't input a multicast
+  * address.
+  */
+ if (ptr != (tok + strlen(tok)))
+   cerebro_err_exit("IP address '%s' invalid", ip);
+#endif
+ 
+ if (ip_class >= MULTICAST_CLASS_MIN && ip_class <= MULTICAST_CLASS_MAX)
+   rv = 1;
+ else
+   rv = 0;
+ Free(ipaddr_cpy);
+ return rv;
 }
 
 /*
@@ -742,6 +759,7 @@ _cerebrod_ip_is_multicast(char *ip)
 static void
 _cerebrod_calculate_configuration_data(void)
 {
+  struct hostent *hent;
   int i;
 
   /* Determine if the heartbeat frequencey is ranged or fixed */
@@ -761,8 +779,10 @@ _cerebrod_calculate_configuration_data(void)
           if (!Inet_pton(AF_INET, 
                          conf.speak_message_config[i].ip, 
                          &conf.speak_message_config[i].ip_in_addr))
-            cerebro_err_exit("speak message IP address '%s' invalid",
-                             conf.speak_message_config[i].ip);
+            {
+              hent = Gethostbyname(conf.speak_message_config[i].ip);
+              conf.speak_message_config[i].ip_in_addr = *((struct in_addr *)hent->h_addr);
+            }
 
           /* Determine the appropriate network interface to use based on
            * the user's network_interface input.
@@ -785,9 +805,11 @@ _cerebrod_calculate_configuration_data(void)
           if (!Inet_pton(AF_INET, 
                          conf.listen_message_config[i].ip, 
                          &conf.listen_message_config[i].ip_in_addr))
-            cerebro_err_exit("listen message IP address '%s' invalid",
-                             conf.listen_message_config[i].ip);
-          
+            {
+              hent = Gethostbyname(conf.listen_message_config[i].ip);
+              conf.listen_message_config[i].ip_in_addr = *((struct in_addr *)hent->h_addr);
+            }
+
           /* Determine the appropriate network interface to use based on
            * the user's network_interface input.
            */

@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro.conf.5.in,v 1.22 2007-10-11 23:21:05 chu11 Exp $
+\."$Id: cerebro.conf.5.in,v 1.23 2007-10-12 17:08:31 chu11 Exp $
 \."#############################################################################
 \."  Copyright (C) 2005 The Regents of the University of California.
 \."  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -98,19 +98,20 @@ always be turned on.  The default configuration turns this option on.
 .I cerebrod_speak_message_config ip [destination_port source_port network_interface]
 Specify where cerebro messages should be sent to and where they should
 be sent from.  This option can be listed multiple times to specify
-multiple message destinations.  The ip address specifies the destination ip
-address that messages should be sent to.  It may be either a
-singlecast or multicast address.  The default ip address is
-239.2.11.72.  The destination port specifies the port that messages
-should be sent to.  The default destination port is 8850.  The source
-port specifies the port that messages should be sent from.  The
-default source port is 8851.  The network interface specifies the
-network interface messages should be sent out of.  This is typically
-used to specify a network when a multicast ip address is specified as
-the message destination.  The network interface can be specified as a
-network interface (i.e.  eth0), an ip address (i.e. 192.168.1.1) or a
-subnet using CIDR notation (i.e. 192.168.1.1/16).  By default, when a
-network interface is not specified, 
+multiple message destinations.  The ip address specifies the
+destination ip address that messages should be sent to.  It may be
+specified as a hostname, singlecast ip address, or multicast ip address.
+The default ip address is 239.2.11.72.  The destination port specifies
+the port that messages should be sent to.  The default destination
+port is 8850.  The source port specifies the port that messages should
+be sent from.  The default source port is 8851.  The network interface
+specifies the network interface messages should be sent out of.  This
+is typically used to specify a network when a multicast ip address is
+specified as the message destination.  The network interface can be
+specified as a network interface (i.e.  eth0), an ip address
+(i.e. 192.168.1.1) or a subnet using CIDR notation
+(i.e. 192.168.1.1/16).  By default, when a network interface is not
+specified,
 .B cerebrod 
 will search for and select an appropriate network interface. If the
 machine running 
@@ -138,19 +139,19 @@ data so that computational power of the cluster as a whole isn't lost.
 The default configuration turns this option on.
 .TP
 .I cerebrod_listen_message_config ip [port network_interface]
-
-Specify from where cerebro messages should be received.  This option can be listed multiple times to specify
-multiple message destinations.  The ip address specifies the ip
-address that messages should be received on.  It may be either a
-singlecast or multicast address.  The default ip address is
-239.2.11.72.  The port specifies the port that messages
-should be received on.  The default port is 8851.  The network interface specifies the
-network interface messages should be received on.  This is typically
-used to specify a network when a multicast ip address is specified as
-the message receiving ip.  The network interface can be specified as a
+Specify from where cerebro messages should be received.  This option
+can be listed multiple times to specify multiple message destinations.
+The ip address specifies the ip address that messages should be
+received on.  It may be specified as a hostname, singlecast ip address, or
+multicast ip address.  The default ip address is 239.2.11.72.  The
+port specifies the port that messages should be received on.  The
+default port is 8851.  The network interface specifies the network
+interface messages should be received on.  This is typically used to
+specify a network when a multicast ip address is specified as the
+message receiving ip.  The network interface can be specified as a
 network interface (i.e.  eth0), an ip address (i.e. 192.168.1.1) or a
 subnet using CIDR notation (i.e. 192.168.1.1/16).  By default, when a
-network interface is not specified, 
+network interface is not specified,
 .B cerebrod 
 will search for and
 select an appropriate network interface. If the machine running 
