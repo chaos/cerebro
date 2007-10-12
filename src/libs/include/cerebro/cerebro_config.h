@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config.h,v 1.12 2007-10-11 23:21:05 chu11 Exp $
+ *  $Id: cerebro_config.h,v 1.13 2007-10-12 21:03:14 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -30,24 +30,6 @@
 
 #include <cerebro/cerebro_constants.h>
 
-struct cerebro_config_server {
-  char hostname[CEREBRO_MAX_HOSTNAME_LEN+1];
-  unsigned int port;
-};
-
-struct cerebrod_config_speak_message_config {
-  char ip[CEREBRO_MAX_IPADDR_LEN+1];
-  int destination_port;
-  int source_port;
-  char network_interface[CEREBRO_MAX_NETWORK_INTERFACE_LEN+1];
-};
-
-struct cerebrod_config_listen_message_config {
-  char ip[CEREBRO_MAX_IPADDR_LEN+1];
-  int port;
-  char network_interface[CEREBRO_MAX_NETWORK_INTERFACE_LEN+1];
-};
-
 #define CEREBRO_CONFIG_CEREBRO_METRIC_SERVERS_MAX 128
 
 #define CEREBRO_CONFIG_CEREBRO_EVENT_SERVERS_MAX  128
@@ -56,9 +38,40 @@ struct cerebrod_config_listen_message_config {
 
 #define CEREBRO_CONFIG_LISTEN_MESSAGE_CONFIG_MAX  128
 
+#define CEREBRO_CONFIG_FORWARD_MESSAGE_CONFIG_MAX 128
+
+#define CEREBRO_CONFIG_FORWARD_HOST_MAX           64
+
 #define CEREBRO_CONFIG_PORT_DEFAULT               0
 
 #define CEREBRO_CONFIG_IP_DEFAULT                 "0.0.0.0"
+
+struct cerebro_config_server {
+  char hostname[CEREBRO_MAX_HOSTNAME_LEN+1];
+  unsigned int port;
+};
+
+struct cerebrod_config_speak_message_config {
+  char ip[CEREBRO_MAX_HOSTNAME_LEN+1];
+  int destination_port;
+  int source_port;
+  char network_interface[CEREBRO_MAX_NETWORK_INTERFACE_LEN+1];
+};
+
+struct cerebrod_config_listen_message_config {
+  char ip[CEREBRO_MAX_HOSTNAME_LEN+1];
+  int port;
+  char network_interface[CEREBRO_MAX_NETWORK_INTERFACE_LEN+1];
+};
+
+struct cerebrod_config_forward_message_config {
+  char ip[CEREBRO_MAX_HOSTNAME_LEN+1];
+  int destination_port;
+  int source_port;
+  char network_interface[CEREBRO_MAX_NETWORK_INTERFACE_LEN+1];
+  char host[CEREBRO_CONFIG_FORWARD_HOST_MAX][CEREBRO_MAX_HOSTNAME_LEN+1];
+  unsigned int host_len;
+};
 
 /*  
  * struct cerebro_config
@@ -111,6 +124,9 @@ struct cerebro_config
   int cerebrod_event_server_flag;
   int cerebrod_event_server_port;
   int cerebrod_event_server_port_flag;
+  struct cerebrod_config_forward_message_config cerebrod_forward_message_config[CEREBRO_CONFIG_FORWARD_MESSAGE_CONFIG_MAX];
+  int cerebrod_forward_message_config_len;
+  int cerebrod_forward_message_config_flag;
 #if CEREBRO_DEBUG
   int cerebrod_speak_debug;
   int cerebrod_speak_debug_flag;

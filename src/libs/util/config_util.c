@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: config_util.c,v 1.22 2007-10-11 23:21:05 chu11 Exp $
+ *  $Id: config_util.c,v 1.23 2007-10-12 21:03:14 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -184,7 +184,7 @@ _cb_cerebro_metric_server(conffile_t cf, struct conffile_data *data,
           return -1;
         }
 
-      if (strlen(data->stringlist[0]) > CEREBRO_MAX_NODENAME_LEN)
+      if (strlen(data->stringlist[0]) > CEREBRO_MAX_HOSTNAME_LEN)
         {
           conffile_seterrnum(cf, CONFFILE_ERR_PARSE_OVERFLOW_ARGLEN);
           return -1;
@@ -250,7 +250,7 @@ _cb_cerebro_event_server(conffile_t cf, struct conffile_data *data,
           return -1;
         }
 
-      if (strlen(data->stringlist[0]) > CEREBRO_MAX_NODENAME_LEN)
+      if (strlen(data->stringlist[0]) > CEREBRO_MAX_HOSTNAME_LEN)
         {
           conffile_seterrnum(cf, CONFFILE_ERR_PARSE_OVERFLOW_ARGLEN);
           return -1;
@@ -303,7 +303,7 @@ _cb_cerebrod_speak_message_config(conffile_t cf, struct conffile_data *data,
   
   conf = (struct cerebro_config *)option_ptr;
 
-  /* arg1 - required - desitnation ip - 0.0.0.0 for default
+  /* arg1 - required - destination ip - 0.0.0.0 for default
    * arg2 - optional - destination port - 0 for default
    * arg3 - optional - source port - 0 for default
    * arg4 - optional - source_network_interface - 0.0.0.0 for default
@@ -318,7 +318,7 @@ _cb_cerebrod_speak_message_config(conffile_t cf, struct conffile_data *data,
           return -1;
         }
 
-      if (strlen(data->stringlist[0]) > CEREBRO_MAX_IPADDR_LEN)
+      if (strlen(data->stringlist[0]) > CEREBRO_MAX_HOSTNAME_LEN)
         {
           conffile_seterrnum(cf, CONFFILE_ERR_PARSE_OVERFLOW_ARGLEN);
           return -1;
@@ -362,7 +362,7 @@ _cb_cerebrod_speak_message_config(conffile_t cf, struct conffile_data *data,
       
       if (data->stringlist_len > 3)
         {
-          if (strlen(data->stringlist[3]) > CEREBRO_MAX_NODENAME_LEN)
+          if (strlen(data->stringlist[3]) > CEREBRO_MAX_HOSTNAME_LEN)
             {
               conffile_seterrnum(cf, CONFFILE_ERR_PARSE_OVERFLOW_ARGLEN);
               return -1;
@@ -414,7 +414,7 @@ _cb_cerebrod_listen_message_config(conffile_t cf, struct conffile_data *data,
           return -1;
         }
 
-      if (strlen(data->stringlist[0]) > CEREBRO_MAX_IPADDR_LEN)
+      if (strlen(data->stringlist[0]) > CEREBRO_MAX_HOSTNAME_LEN)
         {
           conffile_seterrnum(cf, CONFFILE_ERR_PARSE_OVERFLOW_ARGLEN);
           return -1;
@@ -441,7 +441,7 @@ _cb_cerebrod_listen_message_config(conffile_t cf, struct conffile_data *data,
 
       if (data->stringlist_len > 2)
         {
-          if (strlen(data->stringlist[2]) > CEREBRO_MAX_NODENAME_LEN)
+          if (strlen(data->stringlist[2]) > CEREBRO_MAX_HOSTNAME_LEN)
             {
               conffile_seterrnum(cf, CONFFILE_ERR_PARSE_OVERFLOW_ARGLEN);
               return -1;
@@ -452,6 +452,124 @@ _cb_cerebrod_listen_message_config(conffile_t cf, struct conffile_data *data,
         strcpy(conf->cerebrod_listen_message_config[index].network_interface, CEREBRO_CONFIG_IP_DEFAULT);
 
       conf->cerebrod_listen_message_config_len++;
+    }
+
+  return 0;
+}
+
+/*
+ * _cb_cerebrod_forward_message_config
+ *
+ * callback function that parses and stores cerebrod forward message
+ * configuration.
+ *
+ * Returns 0 on success, -1 on error
+ */
+static int
+_cb_cerebrod_forward_message_config(conffile_t cf, struct conffile_data *data,
+                                  char *optionname, int option_type, void *option_ptr,
+                                  int option_data, void *app_ptr, int app_data)
+{
+  struct cerebro_config *conf;
+
+  if (!option_ptr)
+    {
+      conffile_seterrnum(cf, CONFFILE_ERR_PARAMETERS);
+      return -1;
+    }
+  
+  conf = (struct cerebro_config *)option_ptr;
+
+  /* arg1 - required - destination ip - 0.0.0.0 for default
+   * arg2 - optional - destination port - 0 for default
+   * arg3 - optional - source port - 0 for default
+   * arg4 - optional - source_network_interface - 0.0.0.0 for default
+   * arg5 - optional - list host specific for forwarding
+   * arg6 ...
+   */
+  if (data->stringlist_len > 0)
+    {
+      int index = conf->cerebrod_forward_message_config_len;
+
+      if (data->stringlist_len > (4 + CEREBRO_CONFIG_FORWARD_HOST_MAX))
+        {
+          conffile_seterrnum(cf, CONFFILE_ERR_PARSE_ARG_TOOMANY);
+          return -1;
+        }
+      
+      if (strlen(data->stringlist[0]) > CEREBRO_MAX_HOSTNAME_LEN)
+        {
+          conffile_seterrnum(cf, CONFFILE_ERR_PARSE_OVERFLOW_ARGLEN);
+          return -1;
+        }
+      
+      strcpy(conf->cerebrod_forward_message_config[index].ip, data->stringlist[0]);
+
+      if (data->stringlist_len > 1)
+        {
+          int port;
+          char *endptr;
+
+          port = strtol(data->stringlist[1], &endptr, 0);
+          if (endptr != (data->stringlist[1] + strlen(data->stringlist[1])))
+            {
+              conffile_seterrnum(cf, CONFFILE_ERR_PARSE_ARG_INVALID);
+              return -1;
+            }
+          
+          conf->cerebrod_forward_message_config[index].destination_port = port;
+        }
+      else
+        conf->cerebrod_forward_message_config[index].destination_port = CEREBRO_CONFIG_PORT_DEFAULT;
+
+      if (data->stringlist_len > 2)
+        {
+          int port;
+          char *endptr;
+
+          port = strtol(data->stringlist[2], &endptr, 0);
+          if (endptr != (data->stringlist[2] + strlen(data->stringlist[2])))
+            {
+              conffile_seterrnum(cf, CONFFILE_ERR_PARSE_ARG_INVALID);
+              return -1;
+            }
+          
+          conf->cerebrod_forward_message_config[index].source_port = port;
+        }
+      else
+        conf->cerebrod_forward_message_config[index].source_port = CEREBRO_CONFIG_PORT_DEFAULT;
+      
+      if (data->stringlist_len > 3)
+        {
+          if (strlen(data->stringlist[3]) > CEREBRO_MAX_HOSTNAME_LEN)
+            {
+              conffile_seterrnum(cf, CONFFILE_ERR_PARSE_OVERFLOW_ARGLEN);
+              return -1;
+            }
+          strcpy(conf->cerebrod_forward_message_config[index].network_interface, data->stringlist[3]);
+        }
+      else
+        strcpy(conf->cerebrod_forward_message_config[index].network_interface, CEREBRO_CONFIG_IP_DEFAULT);
+
+      if (data->stringlist_len > 4)
+        {
+          int i;
+
+          for (i = 4; i < data->stringlist_len; i++)
+            {
+              int host_index = conf->cerebrod_forward_message_config[index].host_len;
+              if (strlen(data->stringlist[i]) > CEREBRO_MAX_HOSTNAME_LEN)
+                {
+                  conffile_seterrnum(cf, CONFFILE_ERR_PARSE_OVERFLOW_ARGLEN);
+                  return -1;
+                }
+              strcpy(conf->cerebrod_forward_message_config[index].host[host_index], 
+                     data->stringlist[i]);
+              conf->cerebrod_forward_message_config[index].host_len++;
+            }
+        }
+
+      conf->cerebrod_forward_message_config_len++;
     }
 
   return 0;
@@ -653,6 +771,17 @@ _load_config_file(struct cerebro_config *conf, unsigned int *errnum)
 	&(conf->cerebrod_event_server_port), 
 	0
       },
+      {
+	"cerebrod_forward_message_config",
+	CONFFILE_OPTION_LIST_STRING, 
+	-1,
+	_cb_cerebrod_forward_message_config, 
+	CEREBRO_CONFIG_FORWARD_MESSAGE_CONFIG_MAX, 
+	0, 
+	&(conf->cerebrod_forward_message_config_flag),
+	conf, 
+	0
+      },
 #if CEREBRO_DEBUG
       {
 	"cerebrod_speak_debug", 
@@ -775,7 +904,7 @@ _set_cerebro_config(struct cerebro_config *dest,
                     struct cerebro_config *src,
                     unsigned int *errnum)
 {
-  int i;
+  int i, j;
 
   if (!dest || !src)
     {
@@ -910,6 +1039,25 @@ _set_cerebro_config(struct cerebro_config *dest,
     {
       dest->cerebrod_event_server_port = src->cerebrod_event_server_port;
       dest->cerebrod_event_server_port_flag++;
+    }
+
+  if (!dest->cerebrod_forward_message_config_flag 
+      && src->cerebrod_forward_message_config_flag
+      && src->cerebrod_forward_message_config_len)
+    {
+      for (i = 0; i < src->cerebrod_forward_message_config_len; i++)
+        {
+          strcpy(dest->cerebrod_forward_message_config[i].ip, src->cerebrod_forward_message_config[i].ip);
+          dest->cerebrod_forward_message_config[i].destination_port = src->cerebrod_forward_message_config[i].destination_port;
+          dest->cerebrod_forward_message_config[i].source_port = src->cerebrod_forward_message_config[i].source_port;
+          strcpy(dest->cerebrod_forward_message_config[i].network_interface, src->cerebrod_forward_message_config[i].network_interface);
+          for (j = 0; j < src->cerebrod_forward_message_config[i].host_len; j++)
+            strcpy(dest->cerebrod_forward_message_config[i].host[j],
+                   src->cerebrod_forward_message_config[i].host[j]);
+          dest->cerebrod_forward_message_config[i].host_len = src->cerebrod_forward_message_config[i].host_len;
+        }
+      dest->cerebrod_forward_message_config_len = src->cerebrod_forward_message_config_len;
+      dest->cerebrod_forward_message_config_flag++;
     }
 
 #if CEREBRO_DEBUG

@@ -1,5 +1,11 @@
 2007-10-12  Albert Chu  <chu11@llnl.gov>
 
+	* src/libs/include/cerebro/cerebro_config.h,
+	src/libs/util/config_util.c: Begin work to add cerebro packet
+	forwarding.
+	
+2007-10-12  Albert Chu  <chu11@llnl.gov>
+
 	* man/cerebro.conf.5.in, src/cerebrod/cerebrod_config.c: Support
 	ability for user to input hostnames for speaker and listen message
 	config instead of just ip addresses.
