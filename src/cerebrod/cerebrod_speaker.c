@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.101 2007-10-11 23:21:05 chu11 Exp $
+ *  $Id: cerebrod_speaker.c,v 1.102 2007-10-12 17:08:06 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -514,7 +514,6 @@ cerebrod_speaker(void *arg)
                 {
                   struct cerebrod_message* msg;
                   unsigned int msglen;
-                  int rv;
                   
                   more_data_to_send = 0;
 
