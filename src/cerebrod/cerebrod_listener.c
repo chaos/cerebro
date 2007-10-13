@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.135 2007-10-11 23:21:05 chu11 Exp $
+ *  $Id: cerebrod_listener.c,v 1.136 2007-10-13 14:08:02 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -86,6 +86,16 @@ pthread_mutex_t listener_init_lock = PTHREAD_MUTEX_INITIALIZER;
  */
 int listener_fds[CEREBRO_CONFIG_LISTEN_MESSAGE_CONFIG_MAX];
 pthread_mutex_t listener_fds_lock = PTHREAD_MUTEX_INITIALIZER;
+
+/* 
+ * forwarding_fds
+ * forwarding_lock
+ *
+ * forwarding information and a lock to protect concurrent access
+ */
+int forwarding_fds[CEREBRO_CONFIG_FORWARD_MESSAGE_CONFIG_MAX];
+hostlist_t forwarding_hosts[CEREBRO_CONFIG_FORWARD_MESSAGE_CONFIG_MAX];
+pthread_mutex_t forwarding_lock = PTHREAD_MUTEX_INITIALIZER;
 
 /*
  * clusterlist_handle
@@ -212,6 +222,18 @@ _cerebrod_listener_initialize(void)
 #endif /* CEREBRO_DEBUG */
 
   cerebrod_listener_data_initialize();
+
+  for (i = 0; i < conf.forward_message_config_len; i++)
+    {
+      /* XXX - do this 
+       *  
+       * forward_all_fds
+       * forward_all_fds_lock
+       *
+       * forward_index
+       * forward_fds_lock
+       */
+    }
 
   listener_init++;
   Pthread_cond_signal(&listener_init_cond);

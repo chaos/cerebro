@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.133 2007-10-12 23:23:30 chu11 Exp $
+ *  $Id: cerebrod_config.c,v 1.134 2007-10-13 14:08:02 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -387,8 +387,8 @@ _cerebrod_load_config(void)
                   if ((ptr = strchr(hostptr, '.')))
                     *ptr = '\0';
 
-                  Hostlist_push(conf.forward_message_config[i].hosts, hostptr);
-                  
+                  if (!hostlist_push(conf.forward_message_config[i].hosts, hostptr))
+                    cerebro_err_exit("host '%s' improperly formatted");
                   Free(hostptr);
                 }
             }
