@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.142 2007-10-15 21:13:59 chu11 Exp $
+ *  $Id: cerebrod_listener.c,v 1.143 2007-10-15 21:23:24 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -672,7 +672,6 @@ cerebrod_listener(void *arg)
 
       Gettimeofday(&tv, NULL);
       cerebrod_listener_data_update(nodename_key, msg, tv.tv_sec);
-      cerebrod_message_destroy(msg);
 
       /* Forward data as necessary.  Note, there is no need to
        * marshall data, it should already be marshalled when we
@@ -726,6 +725,7 @@ cerebrod_listener(void *arg)
             }
         }
 
+      cerebrod_message_destroy(msg);
     }
 
   return NULL;			/* NOT REACHED */
