@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.136 2007-10-13 14:08:02 chu11 Exp $
+ *  $Id: cerebrod_listener.c,v 1.137 2007-10-15 17:24:09 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -89,13 +89,18 @@ pthread_mutex_t listener_fds_lock = PTHREAD_MUTEX_INITIALIZER;
 
 /* 
  * forwarding_fds
+ * forwarding_hosts;
  * forwarding_lock
  *
  * forwarding information and a lock to protect concurrent access
  */
-int forwarding_fds[CEREBRO_CONFIG_FORWARD_MESSAGE_CONFIG_MAX];
-hostlist_t forwarding_hosts[CEREBRO_CONFIG_FORWARD_MESSAGE_CONFIG_MAX];
-pthread_mutex_t forwarding_lock = PTHREAD_MUTEX_INITIALIZER;
+struct forwarding_info
+{
+  int forwarding_fd;
+  hostlist_t forwarding_hosts;
+  pthread_mutex_t forwarding_lock;
+};
+struct forwarding_info forwarding_info[CEREBRO_CONFIG_FORWARD_MESSAGE_CONFIG_MAX];
 
 /*
  * clusterlist_handle
@@ -181,6 +186,155 @@ _listener_setup_socket(int num)
   return -1;
 }
 
+/* 
+ * _forwarding_setup_socket
+ *
+ * Create and setup the forwarding socket.  Do not use wrappers in
+ * this function.  We want to give the daemon additional chances to
+ * "survive" an error condition.
+ *
+ * In this socket setup function, 'num' is used as the message config
+ * and forwarding info index.
+ * 
+ * Returns file descriptor on success, -1 on error
+ */
+static int
+_forwarding_setup_socket(int num)
+{
+  struct sockaddr_in addr;
+  unsigned int optlen;
+  int fd, optval = 1;
+
+  assert(num >= 0 && num < conf.forward_message_config_len);
+
+  if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
+    {
+      CEREBRO_ERR(("socket: %s", strerror(errno)));
+      goto cleanup;
+    }
+
+  if (conf.forward_message_config[num].ip_is_multicast)
+    {
+      /* XXX: Probably lots of portability problems here */
+      struct ip_mreqn imr;
+
+      memset(&imr, '\0', sizeof(struct ip_mreqn));
+      memcpy(&imr.imr_multiaddr,
+             &conf.forward_message_config[num].ip_in_addr,
+             sizeof(struct in_addr));
+      memcpy(&imr.imr_address,
+             &conf.forward_message_config[num].network_interface_in_addr,
+             sizeof(struct in_addr));
+      imr.imr_ifindex = conf.forward_message_config[num].network_interface_index;
+
+      optlen = sizeof(struct ip_mreqn);
+      if (setsockopt(fd, SOL_IP, IP_MULTICAST_IF, &imr, optlen) < 0)
+        {
+          CEREBRO_ERR(("setsockopt: %s", strerror(errno)));
+          goto cleanup;
+        }
+
+      optval = 1;
+      optlen = sizeof(optval);
+      if (setsockopt(fd, SOL_IP, IP_MULTICAST_LOOP, &optval, optlen) < 0)
+        {
+          CEREBRO_ERR(("setsockopt: %s", strerror(errno)));
+          goto cleanup;
+        }
+
+      optval = conf.forward_message_ttl;
+      optlen = sizeof(optval);
+      if (setsockopt(fd, SOL_IP, IP_MULTICAST_TTL, &optval, optlen) < 0)
+        {
+          CEREBRO_ERR(("setsockopt: %s", strerror(errno)));
+          goto cleanup;
+        }
+    }
+
+  /* For quick start/restart */
+  optval = 1;
+  optlen = sizeof(optval);
+  if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &optval, optlen) < 0)
+    {
+      CEREBRO_ERR(("setsockopt: %s", strerror(errno)));
+      goto cleanup;
+    }
+
+  memset(&addr, '\0', sizeof(struct sockaddr_in));
+  addr.sin_family = AF_INET;
+  addr.sin_port = htons(conf.forward_message_config[num].source_port);
+  memcpy(&addr.sin_addr,
+         &conf.forward_message_config[num].network_interface_in_addr,
+         sizeof(struct in_addr));
+  if (bind(fd, (struct sockaddr *)&addr, sizeof(struct sockaddr_in)) < 0)
+    {
+      CEREBRO_ERR(("bind: %s", strerror(errno)));
+      goto cleanup;
+    }
+
+  return fd;
+
+ cleanup:
+  close(fd);
+  return -1;
+}
+
+/* 
+ * _forwarding_setup
+ *
+ * 'index' is the index of the message config and forwarding info.
+ * 
+ * Returns 0 success, -1 on error
+ */
+static int
+_forwarding_setup(int index)
+{
+  hostlist_iterator_t itr;
+  char *node;
+  int rv = -1;
+
+  assert(index >= 0 && index < conf.forward_message_config_len);
+#if 0
+  struct forwarding_info
+  {
+    int forwarding_fd;
+    hostlist_t forwarding_hosts;
+    pthread_mutex_t forwarding_lock;
+  };
+#endif
+  /* We require a separate hostlist here b/c the hosts input by the
+   * user and/or received by the remote hosts need to be mapped to a
+   * single hostname.
+   */
+  if ((forwarding_info[index].forwarding_fd = _forwarding_setup_socket(index)) < 0)
+    goto cleanup;
+  forwarding_info[index].forwarding_hosts = Hostlist_create(NULL);
+  itr = Hostlist_iterator_create(conf.forward_message_config[index].hosts);
+  while ((node = Hostlist_next(itr)))
+    {
+      char nodebuf[CEREBRO_MAX_NODENAME_LEN+1];
+      
+      if (clusterlist_module_get_nodename(clusterlist_handle,
+					  node,
+					  nodebuf, 
+					  CEREBRO_MAX_NODENAME_LEN+1) < 0)
+	{
+	  CEREBRO_DBG(("clusterlist_module_get_nodename: %s", nodebuf));
+          Hostlist_destroy(forwarding_info[index].forwarding_hosts);
+          goto cleanup;
+	}
+      
+      Hostlist_push(forwarding_info[index].forwarding_hosts, nodebuf);
+
+      free(node);
+    }
+  Pthread_mutex_init(&(forwarding_info[index].forwarding_lock), NULL);
+  rv = 0;
+ cleanup:
+  Hostlist_iterator_destroy(itr);
+  return rv;
+}
+
 /*
  * _cerebrod_listener_initialize
  *
@@ -225,14 +379,8 @@ _cerebrod_listener_initialize(void)
 
   for (i = 0; i < conf.forward_message_config_len; i++)
     {
-      /* XXX - do this 
-       *  
-       * forward_all_fds
-       * forward_all_fds_lock
-       *
-       * forward_index
-       * forward_fds_lock
-       */
+      if (_forwarding_setup(i) < 0)
+        CEREBRO_EXIT(("forwarding setup failed"));
     }
 
   listener_init++;

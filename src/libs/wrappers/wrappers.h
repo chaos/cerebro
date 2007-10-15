@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.h,v 1.16 2007-09-05 18:16:00 chu11 Exp $
+ *  $Id: wrappers.h,v 1.17 2007-10-15 17:24:09 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -372,6 +372,12 @@ void wrap_hash_destroy(WRAPPERS_ARGS, hash_t h);
         wrap_hostlist_ranged_string(WRAPPERS_DEBUG_ARGS, hl, n, buf)
 #define Hostlist_deranged_string(hl, n, buf) \
         wrap_hostlist_deranged_string(WRAPPERS_DEBUG_ARGS, hl, n, buf)
+#define Hostlist_iterator_create(hl) \
+        wrap_hostlist_iterator_create(WRAPPERS_DEBUG_ARGS, hl)
+#define Hostlist_iterator_destroy(i) \
+        wrap_hostlist_iterator_destroy(WRAPPERS_DEBUG_ARGS, i)
+#define Hostlist_next(i) \
+        wrap_hostlist_next(WRAPPERS_DEBUG_ARGS, i)
 
 hostlist_t wrap_hostlist_create(WRAPPERS_ARGS, const char *hostlist);
 void wrap_hostlist_destroy(WRAPPERS_ARGS, hostlist_t hl);
@@ -380,6 +386,9 @@ void wrap_hostlist_uniq(WRAPPERS_ARGS, hostlist_t hl);
 int wrap_hostlist_push(WRAPPERS_ARGS, hostlist_t hl, const char *host);
 size_t wrap_hostlist_ranged_string(WRAPPERS_ARGS, hostlist_t hl, size_t n, char *buf);
 size_t wrap_hostlist_deranged_string(WRAPPERS_ARGS, hostlist_t hl, size_t n, char *buf);
+hostlist_iterator_t wrap_hostlist_iterator_create(WRAPPERS_ARGS, hostlist_t hl);
+void wrap_hostlist_iterator_destroy(WRAPPERS_ARGS, hostlist_iterator_t i);
+char *wrap_hostlist_next(WRAPPERS_ARGS, hostlist_iterator_t i);
 
 /* 
  * Marshall wrappers

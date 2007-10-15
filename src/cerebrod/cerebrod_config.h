@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.h,v 1.64 2007-10-12 23:23:30 chu11 Exp $
+ *  $Id: cerebrod_config.h,v 1.65 2007-10-15 17:24:09 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -63,6 +63,7 @@
 #define CEREBROD_FORWARD_MESSAGE_CONFIG_DESTINATION_PORT_DEFAULT    CEREBROD_SPEAK_MESSAGE_CONFIG_DESTINATION_PORT_DEFAULT
 #define CEREBROD_FORWARD_MESSAGE_CONFIG_SOURCE_PORT_DEFAULT         8849
 #define CEREBROD_FORWARD_MESSAGE_CONFIG_NETWORK_INTERFACE_DEFAULT   CEREBROD_SPEAK_MESSAGE_CONFIG_NETWORK_INTERFACE_DEFAULT
+#define CEREBROD_FORWARD_MESSAGE_TTL_DEFAULT                      1
 
 #define CEREBROD_SPEAK_DEBUG_DEFAULT                              0
 #define CEREBROD_LISTEN_DEBUG_DEFAULT                             0
@@ -143,6 +144,7 @@ struct cerebrod_config
   int event_server_port;
   struct forward_message_config forward_message_config[CEREBRO_CONFIG_FORWARD_MESSAGE_CONFIG_MAX];
   int forward_message_config_len;
+  int forward_message_ttl;
 
 #if CEREBRO_DEBUG
   int speak_debug;

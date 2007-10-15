@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers_hostlist.c,v 1.2 2007-09-05 18:16:00 chu11 Exp $
+ *  $Id: wrappers_hostlist.c,v 1.3 2007-10-15 17:24:09 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -128,5 +128,43 @@ wrap_hostlist_deranged_string(WRAPPERS_ARGS, hostlist_t hl, size_t n, char *buf)
   if ((rv = hostlist_deranged_string(hl, n, buf)) < 0)
     WRAPPERS_ERR_ERRNO("hostlist_deranged_string");
 
+  return rv;
+}
+
+hostlist_iterator_t 
+wrap_hostlist_iterator_create(WRAPPERS_ARGS, hostlist_t hl)
+{
+  hostlist_iterator_t rv;
+
+  assert(file && function && hl);
+
+  if (!(rv = hostlist_iterator_create(hl)))
+    WRAPPERS_ERR_ERRNO("hostlist_iterator_create");
+
+  return rv;
+}
+
+void
+wrap_hostlist_iterator_destroy(WRAPPERS_ARGS, hostlist_iterator_t i)
+{
+  assert(file && function);
+
+  if (!i)
+    WRAPPERS_ERR_INVALID_PARAMETERS("hostlist_itreator_destroy");
+
+  hostlist_iterator_destroy(i);
+  return;
+}
+
+char *
+wrap_hostlist_next(WRAPPERS_ARGS, hostlist_iterator_t i)
+{
+  char *rv;
+
+  assert(file && function && i);
+
+  /* Can return NULL value to indicate end of list */
+  rv = hostlist_next(i);
+  
   return rv;
 }

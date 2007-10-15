@@ -1,3 +1,9 @@
+2007-10-15  Albert Chu  <chu11@llnl.gov>
+
+	* src/libs/include/cerebro/cerebro_config.h,
+	src/libs/util/config_util.c, src/cerebrod/cerebrod_listener.c:
+	Continue packet forwarding work.
+	
 2007-10-13  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerebrod/cerebrod_config.c,

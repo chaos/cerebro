@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.134 2007-10-13 14:08:02 chu11 Exp $
+ *  $Id: cerebrod_config.c,v 1.135 2007-10-15 17:24:08 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -124,6 +124,8 @@ _cerebrod_set_config_default(void)
 
   /* no forwarding by default */
   conf.forward_message_config_len = 0;
+
+  conf.forward_message_ttl = CEREBROD_FORWARD_MESSAGE_TTL_DEFAULT;
 
 #if CEREBRO_DEBUG
   conf.speak_debug = CEREBROD_SPEAK_DEBUG_DEFAULT;
@@ -396,6 +398,10 @@ _cerebrod_load_config(void)
 
       conf.forward_message_config_len = tconf.cerebrod_forward_message_config_len;
     }
+
+  if (tconf.cerebrod_forward_message_ttl_flag)
+    conf.forward_message_ttl = tconf.cerebrod_forward_message_ttl;
+
 #if CEREBRO_DEBUG
   if (tconf.cerebrod_speak_debug_flag)
     conf.speak_debug = tconf.cerebrod_speak_debug;
@@ -545,6 +551,10 @@ _cerebrod_config_error_check(void)
           _cerebrod_config_error_check_network_interface(conf.forward_message_config[i].network_interface);
         }
     }
+
+  if (conf.forward_message_ttl <= 0)
+    cerebro_err_exit("forward message ttl '%d' invalid", conf.forward_message_ttl);
+
 }
 
 /* 
@@ -1101,6 +1111,7 @@ _cerebrod_config_dump(void)
       fprintf(stderr, "* forward[%d]: network_interface_in_addr: %s\n", i, inet_ntoa(conf.forward_message_config[i].network_interface_in_addr));
       fprintf(stderr, "* forward[%d]: network_interface_index: %d\n", i, conf.forward_message_config[i].network_interface_index);
     }
+  fprintf(stderr, "* forward_message_ttl: %d\n", conf.forward_message_ttl);
   fprintf(stderr, "* speak_debug: %d\n", conf.speak_debug);
   fprintf(stderr, "* listen_debug: %d\n", conf.listen_debug);
   fprintf(stderr, "* metric_controller_debug: %d\n", conf.metric_controller_debug);

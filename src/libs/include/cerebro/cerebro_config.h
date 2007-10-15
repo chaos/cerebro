@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config.h,v 1.13 2007-10-12 21:03:14 chu11 Exp $
+ *  $Id: cerebro_config.h,v 1.14 2007-10-15 17:24:09 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -127,6 +127,8 @@ struct cerebro_config
   struct cerebrod_config_forward_message_config cerebrod_forward_message_config[CEREBRO_CONFIG_FORWARD_MESSAGE_CONFIG_MAX];
   int cerebrod_forward_message_config_len;
   int cerebrod_forward_message_config_flag;
+  int cerebrod_forward_message_ttl;
+  int cerebrod_forward_message_ttl_flag;
 #if CEREBRO_DEBUG
   int cerebrod_speak_debug;
   int cerebrod_speak_debug_flag;

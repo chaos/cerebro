@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: config_util.c,v 1.23 2007-10-12 21:03:14 chu11 Exp $
+ *  $Id: config_util.c,v 1.24 2007-10-15 17:24:09 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -782,6 +782,17 @@ _load_config_file(struct cerebro_config *conf, unsigned int *errnum)
 	conf, 
 	0
       },
+      {
+	"cerebrod_forward_message_ttl", 
+	CONFFILE_OPTION_INT, 
+	-1,
+	conffile_int, 
+	1, 
+	0, 
+	&(conf->cerebrod_forward_message_ttl_flag),
+	&(conf->cerebrod_forward_message_ttl), 
+	0
+      },
 #if CEREBRO_DEBUG
       {
 	"cerebrod_speak_debug", 
@@ -1058,6 +1069,12 @@ _set_cerebro_config(struct cerebro_config *dest,
         }
       dest->cerebrod_forward_message_config_len = src->cerebrod_forward_message_config_len;
       dest->cerebrod_forward_message_config_flag++;
+    }
+
+  if (!dest->cerebrod_forward_message_ttl_flag && src->cerebrod_forward_message_ttl_flag)
+    {
+      dest->cerebrod_forward_message_ttl = src->cerebrod_forward_message_ttl;
+      dest->cerebrod_forward_message_ttl_flag++;
     }
 
 #if CEREBRO_DEBUG
