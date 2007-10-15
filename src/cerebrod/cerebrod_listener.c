@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.139 2007-10-15 17:51:14 chu11 Exp $
+ *  $Id: cerebrod_listener.c,v 1.140 2007-10-15 20:07:24 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -287,7 +287,7 @@ _forwarding_setup_socket(int num)
 static int
 _forwarding_setup(int index)
 {
-  hostlist_iterator_t itr;
+  hostlist_iterator_t itr = NULL;
   char *node;
   int rv = -1;
 
@@ -300,29 +300,33 @@ _forwarding_setup(int index)
   if ((forwarding_info[index].fd = _forwarding_setup_socket(index)) < 0)
     goto cleanup;
   forwarding_info[index].hosts = Hostlist_create(NULL);
-  itr = Hostlist_iterator_create(conf.forward_message_config[index].hosts);
-  while ((node = Hostlist_next(itr)))
+  if (hostlist_count(conf.forward_message_config[index].hosts) > 0)
     {
-      char nodebuf[CEREBRO_MAX_NODENAME_LEN+1];
-      
-      if (clusterlist_module_get_nodename(clusterlist_handle,
-					  node,
-					  nodebuf, 
-					  CEREBRO_MAX_NODENAME_LEN+1) < 0)
-	{
-	  CEREBRO_DBG(("clusterlist_module_get_nodename: %s", nodebuf));
-          Hostlist_destroy(forwarding_info[index].hosts);
-          goto cleanup;
-	}
-      
-      Hostlist_push(forwarding_info[index].hosts, nodebuf);
-
-      free(node);
+      itr = Hostlist_iterator_create(conf.forward_message_config[index].hosts);
+      while ((node = Hostlist_next(itr)))
+        {
+          char nodebuf[CEREBRO_MAX_NODENAME_LEN+1];
+          
+          if (clusterlist_module_get_nodename(clusterlist_handle,
+                                              node,
+                                              nodebuf, 
+                                              CEREBRO_MAX_NODENAME_LEN+1) < 0)
+            {
+              CEREBRO_DBG(("clusterlist_module_get_nodename: %s", nodebuf));
+              Hostlist_destroy(forwarding_info[index].hosts);
+              goto cleanup;
+            }
+          
+          Hostlist_push(forwarding_info[index].hosts, nodebuf);
+          
+          free(node);
+        }
     }
   Pthread_mutex_init(&(forwarding_info[index].lock), NULL);
   rv = 0;
  cleanup:
-  Hostlist_iterator_destroy(itr);
+  if (itr)
+    Hostlist_iterator_destroy(itr);
   return rv;
 }
 
@@ -668,43 +672,46 @@ cerebrod_listener(void *arg)
        */
       for (i = 0; i < conf.forward_message_config_len; i++)
         {
-          struct sockaddr *addr;
-          struct sockaddr_in msgaddr;
-          unsigned int addrlen;
-          int rv;
-
-          memset(&msgaddr, '\0', sizeof(struct sockaddr_in));
-          msgaddr.sin_family = AF_INET;
-          msgaddr.sin_port = htons(conf.forward_message_config[i].destination_port);
-          memcpy(&msgaddr.sin_addr,
-                 &conf.forward_message_config[i].ip_in_addr,
-                 sizeof(struct in_addr));
-          
-          addr = (struct sockaddr *)&msgaddr;
-          addrlen = sizeof(struct sockaddr_in);
-          
-          Pthread_mutex_lock(&forwarding_info[i].lock);
-          
-          _cerebrod_message_dump(msg, "Forwarding Message");
-
-          if ((rv = sendto(forwarding_info[i].fd,
-                           buf,
-                           recv_len,
-                           0,
-                           addr,
-                           addrlen)) != recv_len)
+          if (!hostlist_count(forwarding_info[i].hosts)
+              || hostlist_find(forwarding_info[i].hosts, nodename_key) >= 0)
             {
-              if (rv < 0)
-                forwarding_info[i].fd = cerebrod_reinit_socket(forwarding_info[i].fd,
-                                                               i,
-                                                               _forwarding_setup_socket,
-                                                               "forwarding: sendto");
-              else
-                CEREBRO_ERR(("sendto: invalid bytes sent"));
-            }
+              struct sockaddr *addr;
+              struct sockaddr_in msgaddr;
+              unsigned int addrlen;
+              int rv;
+              
+              memset(&msgaddr, '\0', sizeof(struct sockaddr_in));
+              msgaddr.sin_family = AF_INET;
+              msgaddr.sin_port = htons(conf.forward_message_config[i].destination_port);
+              memcpy(&msgaddr.sin_addr,
+                     &conf.forward_message_config[i].ip_in_addr,
+                     sizeof(struct in_addr));
+              
+              addr = (struct sockaddr *)&msgaddr;
+              addrlen = sizeof(struct sockaddr_in);
+              
+              _cerebrod_message_dump(msg, "Forwarding Message");
 
-          
-          Pthread_mutex_unlock(&forwarding_info[i].lock);
+              Pthread_mutex_lock(&forwarding_info[i].lock);
+              
+              if ((rv = sendto(forwarding_info[i].fd,
+                               buf,
+                               recv_len,
+                               0,
+                               addr,
+                               addrlen)) != recv_len)
+                {
+                  if (rv < 0)
+                    forwarding_info[i].fd = cerebrod_reinit_socket(forwarding_info[i].fd,
+                                                                   i,
+                                                                   _forwarding_setup_socket,
+                                                                   "forwarding: sendto");
+                  else
+                    CEREBRO_ERR(("sendto: invalid bytes sent"));
+                }
+              
+              Pthread_mutex_unlock(&forwarding_info[i].lock);
+            }
         }
 
     }
