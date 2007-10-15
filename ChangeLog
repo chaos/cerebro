@@ -3,6 +3,9 @@
 	* src/libs/include/cerebro/cerebro_config.h,
 	src/libs/util/config_util.c, src/cerebrod/cerebrod_listener.c:
 	Continue packet forwarding work.
+
+	* src/libs/wrappers/wrappers.h,
+	src/libs/wrappers/wrappers_hostlist.c: Add new hostlist wrappers.
 	
 2007-10-13  Albert Chu  <chu11@llnl.gov>
 
