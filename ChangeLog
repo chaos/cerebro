@@ -6,6 +6,8 @@
 
 	* src/libs/wrappers/wrappers.h,
 	src/libs/wrappers/wrappers_hostlist.c: Add new hostlist wrappers.
+
+	* man/cerebro.conf.5.in: Update appropriately.
 	
 2007-10-13  Albert Chu  <chu11@llnl.gov>
 

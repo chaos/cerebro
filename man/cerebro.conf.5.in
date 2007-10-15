@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro.conf.5.in,v 1.25 2007-10-12 23:54:41 chu11 Exp $
+\."$Id: cerebro.conf.5.in,v 1.26 2007-10-15 17:26:15 chu11 Exp $
 \."#############################################################################
 \."  Copyright (C) 2005 The Regents of the University of California.
 \."  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -124,9 +124,9 @@ be specified.  To use defaults for destination_port or source_port a
 '0' may be specified.
 .TP
 .I cerebrod_speak_message_ttl num
-Specify the message packet time to live parameter.  This parameter
-is only used if the message destination ip address is a multicast ip
-address.  The default ttl is 1.
+Specify the spoken message packet time to live parameter.  This
+parameter is only used if the message destination ip address is a
+multicast ip address.  The default ttl is 1.
 .TP
 .I cerebrod_listen ( on | off )
 Specify if the
@@ -253,6 +253,11 @@ source_port, network_interfacem and hosts may be optionally specified.
 To use defaults for the ip address or network interface, '0.0.0.0' may
 be specified.  To use defaults for destination_port or source_port a
 '0' may be specified.
+.TP
+.I cerebrod_forward_message_ttl num
+Specify the forwarded message packet time to live parameter.  This
+parameter is only used if the message destination ip address is a
+multicast ip address.  The default ttl is 1.
 .if @MANPAGE_DEBUG@ \{
 .TP
 .I cerebrod_speak_debug ( on | off )
