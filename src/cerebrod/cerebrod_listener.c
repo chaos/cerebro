@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.140 2007-10-15 20:07:24 chu11 Exp $
+ *  $Id: cerebrod_listener.c,v 1.141 2007-10-15 20:15:38 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -299,9 +299,9 @@ _forwarding_setup(int index)
    */
   if ((forwarding_info[index].fd = _forwarding_setup_socket(index)) < 0)
     goto cleanup;
-  forwarding_info[index].hosts = Hostlist_create(NULL);
-  if (hostlist_count(conf.forward_message_config[index].hosts) > 0)
+  if (conf.forward_message_config[index].hosts)
     {
+      forwarding_info[index].hosts = Hostlist_create(NULL);
       itr = Hostlist_iterator_create(conf.forward_message_config[index].hosts);
       while ((node = Hostlist_next(itr)))
         {
@@ -322,6 +322,8 @@ _forwarding_setup(int index)
           free(node);
         }
     }
+  else
+    forwarding_info[index].hosts = NULL;
   Pthread_mutex_init(&(forwarding_info[index].lock), NULL);
   rv = 0;
  cleanup:
@@ -672,7 +674,7 @@ cerebrod_listener(void *arg)
        */
       for (i = 0; i < conf.forward_message_config_len; i++)
         {
-          if (!hostlist_count(forwarding_info[i].hosts)
+          if (!forwarding_info[i].hosts
               || hostlist_find(forwarding_info[i].hosts, nodename_key) >= 0)
             {
               struct sockaddr *addr;

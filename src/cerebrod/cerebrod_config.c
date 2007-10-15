@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.135 2007-10-15 17:24:08 chu11 Exp $
+ *  $Id: cerebrod_config.c,v 1.136 2007-10-15 20:15:37 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -394,6 +394,8 @@ _cerebrod_load_config(void)
                   Free(hostptr);
                 }
             }
+          else
+            conf.forward_message_config[i].hosts = NULL;
         }
 
       conf.forward_message_config_len = tconf.cerebrod_forward_message_config_len;
@@ -1102,10 +1104,13 @@ _cerebrod_config_dump(void)
       fprintf(stderr, "* forward[%d]: destination_port: %d\n", i, conf.forward_message_config[i].destination_port);
       fprintf(stderr, "* forward[%d]: source_port: %d\n", i, conf.forward_message_config[i].source_port);
       fprintf(stderr, "* forward[%d]: network_interface: \"%s\"\n", i, conf.forward_message_config[i].network_interface);
-      Hostlist_ranged_string(conf.forward_message_config[i].hosts, 
-                             CEREBROD_CONFIG_HOSTLIST_BUFLEN,
-                             buf);
-      fprintf(stderr, "* forward[%d]: hosts: \"%s\"\n", i, buf);
+      if (conf.forward_message_config[i].hosts)
+        {
+          Hostlist_ranged_string(conf.forward_message_config[i].hosts, 
+                                 CEREBROD_CONFIG_HOSTLIST_BUFLEN,
+                                 buf);
+          fprintf(stderr, "* forward[%d]: hosts: \"%s\"\n", i, buf);
+        }
       fprintf(stderr, "* forward[%d]: ip_is_multicast: %d\n", i, conf.forward_message_config[i].ip_is_multicast);
       fprintf(stderr, "* forward[%d]: ip_in_addr: %s\n", i, inet_ntoa(conf.forward_message_config[i].ip_in_addr));
       fprintf(stderr, "* forward[%d]: network_interface_in_addr: %s\n", i, inet_ntoa(conf.forward_message_config[i].network_interface_in_addr));
