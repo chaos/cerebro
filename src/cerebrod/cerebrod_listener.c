@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.138 2007-10-15 17:47:53 chu11 Exp $
+ *  $Id: cerebrod_listener.c,v 1.139 2007-10-15 17:51:14 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -534,17 +534,17 @@ _cerebrod_message_unmarshall(const char *buf, unsigned int buflen)
  * Dump contents of message packet
  */
 static void
-_cerebrod_message_dump(struct cerebrod_message *msg)
+_cerebrod_message_dump(struct cerebrod_message *msg, char *hdr)
 {
 #if CEREBRO_DEBUG
-  assert(msg);
+  assert(msg && hdr);
 
   if (!(conf.debug && conf.listen_debug))
     return;
 
   Pthread_mutex_lock(&debug_output_mutex);
   fprintf(stderr, "**************************************\n");
-  fprintf(stderr, "* Received Message\n");
+  fprintf(stderr, "* %s\n", hdr);
   fprintf(stderr, "* -----------------------\n");
   cerebrod_message_dump(msg);
   fprintf(stderr, "**************************************\n");
@@ -622,7 +622,7 @@ cerebrod_listener(void *arg)
           continue;
         }
 
-      _cerebrod_message_dump(msg);
+      _cerebrod_message_dump(msg, "Received Message");
       
       /* Guarantee ending '\0' character */
       memset(nodename_buf, '\0', CEREBRO_MAX_NODENAME_LEN+1);
@@ -685,6 +685,8 @@ cerebrod_listener(void *arg)
           
           Pthread_mutex_lock(&forwarding_info[i].lock);
           
+          _cerebrod_message_dump(msg, "Forwarding Message");
+
           if ((rv = sendto(forwarding_info[i].fd,
                            buf,
                            recv_len,

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.102 2007-10-12 17:08:06 chu11 Exp $
+ *  $Id: cerebrod_speaker.c,v 1.103 2007-10-15 17:51:14 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -97,7 +97,7 @@ int speaker_fds[CEREBRO_CONFIG_SPEAK_MESSAGE_CONFIG_MAX];
 pthread_mutex_t speaker_fds_lock = PTHREAD_MUTEX_INITIALIZER;
 
 /* 
- * _speaker_socket_create
+ * _speaker_setup_socket
  *
  * Create and setup a speaker socket.  Do not use wrappers in this
  * function.  We want to give the daemon additional chances to
@@ -109,7 +109,7 @@ pthread_mutex_t speaker_fds_lock = PTHREAD_MUTEX_INITIALIZER;
  * Returns file descriptor on success, -1 on error
  */
 static int
-_speaker_socket_create(int num)
+_speaker_setup_socket(int num)
 {
   struct sockaddr_in addr;
   unsigned int optlen;
@@ -297,7 +297,7 @@ _speaker_initialize(void)
   Pthread_mutex_lock(&speaker_fds_lock);
   for (i = 0; i < conf.speak_message_config_len; i++)
     {
-      if ((speaker_fds[i] = _speaker_socket_create(i)) < 0)
+      if ((speaker_fds[i] = _speaker_setup_socket(i)) < 0)
         CEREBRO_EXIT(("speaker fd setup failed"));
     }
   Pthread_mutex_unlock(&speaker_fds_lock);
@@ -477,7 +477,7 @@ _cerebrod_message_send(struct cerebrod_message* msg, unsigned int msglen)
           if (rv < 0)
             speaker_fds[i] = cerebrod_reinit_socket(speaker_fds[i], 
                                                     i,
-                                                    _speaker_socket_create, 
+                                                    _speaker_setup_socket, 
                                                     "speaker: sendto");
           else
             CEREBRO_ERR(("sendto: invalid bytes sent"));
