@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.h,v 1.65 2007-10-15 17:24:09 chu11 Exp $
+ *  $Id: cerebrod_config.h,v 1.66 2007-10-15 21:13:59 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -107,6 +107,7 @@ struct forward_message_config {
   hostlist_t hosts;
 
   /* Determined by cerebrod based on configuration */
+  int ip_is_local;
   int ip_is_multicast;
   struct in_addr ip_in_addr;
   struct in_addr network_interface_in_addr;

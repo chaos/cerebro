@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.141 2007-10-15 20:15:38 chu11 Exp $
+ *  $Id: cerebrod_listener.c,v 1.142 2007-10-15 21:13:59 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -232,7 +232,10 @@ _forwarding_setup_socket(int num)
           goto cleanup;
         }
 
-      optval = 1;
+      /* Turn off loopback for forwarding, since we already 
+       * have the data.
+       */
+      optval = 0;
       optlen = sizeof(optval);
       if (setsockopt(fd, SOL_IP, IP_MULTICAST_LOOP, &optval, optlen) < 0)
         {
@@ -376,6 +379,9 @@ _cerebrod_listener_initialize(void)
 
   for (i = 0; i < conf.forward_message_config_len; i++)
     {
+      /* if the forward destination is local to the machine, don't forward */
+      if (conf.forward_message_config[i].ip_is_local)
+        continue;
       if (_forwarding_setup(i) < 0)
         CEREBRO_EXIT(("forwarding setup failed"));
     }
@@ -674,6 +680,10 @@ cerebrod_listener(void *arg)
        */
       for (i = 0; i < conf.forward_message_config_len; i++)
         {
+          /* if the forward destination is local to the machine, don't forward */
+          if (conf.forward_message_config[i].ip_is_local)
+            continue;
+
           if (!forwarding_info[i].hosts
               || hostlist_find(forwarding_info[i].hosts, nodename_key) >= 0)
             {

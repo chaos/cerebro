@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.136 2007-10-15 20:15:37 chu11 Exp $
+ *  $Id: cerebrod_config.c,v 1.137 2007-10-15 21:13:59 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -978,7 +978,6 @@ _cerebrod_configuration_data_error_check(void)
       fd = Socket(AF_INET, SOCK_DGRAM, 0);
       _get_if_conf(&buf, &ifc, fd);
      
-      /* If no '/', then just an IP address, mask is all bits */
       if (!Inet_pton(AF_INET, conf.message_destination_ip, &addr_temp))
         cerebro_err_exit("message destination IP address '%s' "
                          "improperly format", conf.message_destination_ip);
@@ -1037,6 +1036,54 @@ _cerebrod_configuration_data_error_check(void)
       if (conf.metric_server_port == conf.event_server_port)
 	cerebro_err_exit("metric server port '%d' cannot be identical "
                          "to event server port", conf.metric_server_port);
+    }
+
+  /* If we are forwarding data, make sure to forward only to hosts that 
+   * aren't the localhost.
+   */
+  if (conf.forward_message_config_len)
+    {
+      int i;
+
+      for (i = 0; i < conf.forward_message_config_len; i++)
+        {
+          struct ifconf ifc;
+          struct ifreq *ifr;
+          void *buf = NULL, *ptr = NULL;
+          int fd, found_interface = 0;
+          
+          fd = Socket(AF_INET, SOCK_DGRAM, 0);
+          _get_if_conf(&buf, &ifc, fd);
+          
+          /* Check all interfaces */
+          for(ptr = buf; ptr < buf + ifc.ifc_len;)
+            { 
+              struct sockaddr_in *sinptr;
+              int len;
+              
+              ifr = (struct ifreq *)ptr;
+              
+              len = _get_ifr_len(ifr);
+              
+              ptr += sizeof(ifr->ifr_name) + len;
+              
+              sinptr = (struct sockaddr_in *)&ifr->ifr_addr;
+              
+              if (!memcmp((void *)&conf.forward_message_config[i].ip_in_addr, 
+                          (void *)&sinptr->sin_addr, 
+                          sizeof(struct in_addr)))
+                {
+                  found_interface++;
+                  break;
+                }
+            }
+          
+          Free(buf);
+          Close(fd);
+          
+          if (found_interface)
+            conf.forward_message_config[i].ip_is_local = 1;
+        }
     }
 }
 
@@ -1111,6 +1158,7 @@ _cerebrod_config_dump(void)
                                  buf);
           fprintf(stderr, "* forward[%d]: hosts: \"%s\"\n", i, buf);
         }
+      fprintf(stderr, "* forward[%d]: ip_is_local: %d\n", i, conf.forward_message_config[i].ip_is_local);
       fprintf(stderr, "* forward[%d]: ip_is_multicast: %d\n", i, conf.forward_message_config[i].ip_is_multicast);
       fprintf(stderr, "* forward[%d]: ip_in_addr: %s\n", i, inet_ntoa(conf.forward_message_config[i].ip_in_addr));
       fprintf(stderr, "* forward[%d]: network_interface_in_addr: %s\n", i, inet_ntoa(conf.forward_message_config[i].network_interface_in_addr));
