@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: module_util.c,v 1.17 2007-09-05 18:16:00 chu11 Exp $
+ *  $Id: module_util.c,v 1.18 2007-10-16 22:43:17 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -21,7 +21,7 @@
  *  details.
  *
  *  You should have received a copy of the GNU General Public License along
- *  with Genders; if not, write to the Free Software Foundation, Inc.,
+ *  with Cerebro; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA.
 \*****************************************************************************/
 

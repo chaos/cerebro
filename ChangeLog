@@ -1,3 +1,7 @@
+2007-10-16  Albert Chu  <chu11@llnl.gov>
+
+	* Fix typos in Copyright headers globally.
+	
 2007-10-15  Albert Chu  <chu11@llnl.gov>
 
 	* src/libs/include/cerebro/cerebro_config.h,

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_daemon.h,v 1.5 2007-09-05 18:15:55 chu11 Exp $
+ *  $Id: cerebrod_daemon.h,v 1.6 2007-10-16 22:43:14 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -21,7 +21,7 @@
  *  details.
  *
  *  You should have received a copy of the GNU General Public License along
- *  with Genders; if not, write to the Free Software Foundation, Inc.,
+ *  with Cerebro; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA.
 \*****************************************************************************/
 
