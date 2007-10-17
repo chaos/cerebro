@@ -1,4 +1,4 @@
-Copyright (C) 2005 The Regents of the University of California.
+Copyright (C) 2005-2007 The Regents of the University of California.
 Produced at Lawrence Livermore National Laboratory.
 Written by Albert Chu <chu11@llnl.gov>.
 UCRL-CODE-155989 All rights reserved.
