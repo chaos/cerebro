@@ -1,7 +1,8 @@
 /*****************************************************************************\
- *  $Id: clusterlist_module.c,v 1.13 2007-10-16 22:43:17 chu11 Exp $
+ *  $Id: clusterlist_module.c,v 1.14 2007-10-17 22:04:49 chu11 Exp $
  *****************************************************************************
- *  Copyright (C) 2005 The Regents of the University of California.
+ *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
+ *  Copyright (C) 2005-2007 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Albert Chu <chu11@llnl.gov>.
  *  UCRL-CODE-155989 All rights reserved.
@@ -21,8 +22,7 @@
  *  details.
  *
  *  You should have received a copy of the GNU General Public License along
- *  with Cerebro; if not, write to the Free Software Foundation, Inc.,
- *  51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA.
+ *  with Cerebro. If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H

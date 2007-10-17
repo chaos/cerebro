@@ -5,6 +5,8 @@
         * DISCALIMER: Updated with new disclaimer.
 
         * Makefile.am, cerebro.spec.in: Add DISCLAIMER.UC.
+
+	* Fixed copyright and FSF address globally.
 	
 2007-10-16  Albert Chu  <chu11@llnl.gov>
 
