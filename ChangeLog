@@ -1,3 +1,11 @@
+2007-10-17  Albert Chu  <chu11@llnl.gov>
+
+        * DISCLAIMER.UC: New file.
+
+        * DISCALIMER: Updated with new disclaimer.
+
+        * Makefile.am, cerebro.spec.in: Add DISCLAIMER.UC.
+	
 2007-10-16  Albert Chu  <chu11@llnl.gov>
 
 	* Fix typos in Copyright headers globally.
