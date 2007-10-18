@@ -43,6 +43,9 @@
 	src/cerebrod/cerebrod_config.h, src/cerebrod/cerebrod_speaker.c:
 	Support cerebrod_alternate_hostname debug option.
 
+	* src/cerebrod/cerebrod_event_node_timeout_monitor.c
+	(cerebrod_event_node_timeout_monitor): Fix segfault corner case.
+
 	* man/cerebro.conf.5.in: Document new cerebrod_alternate_hostname
 	debug option.
 	

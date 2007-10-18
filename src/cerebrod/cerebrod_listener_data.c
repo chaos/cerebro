@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.58 2007-10-17 22:04:49 chu11 Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.59 2007-10-18 22:49:03 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -70,6 +70,7 @@ extern pthread_mutex_t debug_output_mutex;
 #endif /* CEREBRO_DEBUG */
 
 extern clusterlist_module_t clusterlist_handle;
+extern int found_clusterlist_module;
 
 /*
  * listener_data_init
@@ -249,8 +250,11 @@ cerebrod_listener_data_initialize(void)
   if (!clusterlist_handle)
     CEREBRO_EXIT(("clusterlist_handle null"));
 
-  if ((numnodes = clusterlist_module_numnodes(clusterlist_handle)) < 0)
-    CEREBRO_EXIT(("clusterlist_module_numnodes"));
+  if (found_clusterlist_module)
+    {
+      if ((numnodes = clusterlist_module_numnodes(clusterlist_handle)) < 0)
+        CEREBRO_EXIT(("clusterlist_module_numnodes"));
+    }
 
   if (numnodes > 0)
     {

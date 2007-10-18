@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_event_node_timeout_monitor.c,v 1.8 2007-10-17 22:04:49 chu11 Exp $
+ *  $Id: cerebrod_event_node_timeout_monitor.c,v 1.9 2007-10-18 22:49:03 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -241,11 +241,14 @@ cerebrod_event_node_timeout_monitor(void *arg)
 
       List_sort(event_node_timeout_data, _event_node_timeout_data_compare);
 
-      /* When might we timeout again? */
-      ntd = List_peek(event_node_timeout_data);
-      
-      if (!ntd->timeout_occurred)
-        last_received_time = ntd->last_received_time;
+      /* When might we timeout again? It is possible for the list to be
+       * empty, see below.
+       */
+      if ((ntd = List_peek(event_node_timeout_data)))
+        {
+          if (!ntd->timeout_occurred)
+            last_received_time = ntd->last_received_time;
+        }
 
       Pthread_mutex_unlock(&event_node_timeout_data_lock);
 
@@ -254,7 +257,8 @@ cerebrod_event_node_timeout_monitor(void *arg)
       else
         /* If we reach this point, it means all nodes have timed out
          * (this would mean the listening/event_server node wouldn't
-         * be a speaker node).
+         * be a speaker node or perhaps no nodes are known about
+         * b/c no clusterlist module has been configured).
          *
          * So what should the timeout be? Well, the worst thing that
          * can happen is a message packet comes the exact microsecond
