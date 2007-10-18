@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro.conf.5.in,v 1.27 2007-10-17 22:04:48 chu11 Exp $
+\."$Id: cerebro.conf.5.in,v 1.28 2007-10-18 21:56:02 chu11 Exp $
 \."#############################################################################
 \."  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
 \."  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -248,10 +248,11 @@ appropriate network interface be configured.  Multiple hosts can be
 specified to indicate metric data from specific hosts in your cluster
 should be forwarded.  The hosts can be specified space separated,
 comma separated, or hostranged.  If no hosts are specified, all data
-will be forwarded to the destination.  The destination_port,
-source_port, network_interfacem and hosts may be optionally specified.
-To use defaults for the ip address or network interface, '0.0.0.0' may
-be specified.  To use defaults for destination_port or source_port a
+will be forwarded to the destination.  The hosts must be specified in
+their shortened hostname form.  The destination_port, source_port,
+network_interfacem and hosts may be optionally specified.  To use
+defaults for the ip address or network interface, '0.0.0.0' may be
+specified.  To use defaults for destination_port or source_port a
 '0' may be specified.
 .TP
 .I cerebrod_forward_message_ttl num

@@ -34,6 +34,9 @@
 	corner case bug.
 
 	* man/cerebro_module.3.in: Tweak based on changes.
+
+	* man/cerebro.conf.5.in: Add note on shortened hostnames for
+	forwarding config.
 	
 2007-10-17  Albert Chu  <chu11@llnl.gov>
 
