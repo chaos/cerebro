@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro.conf.5.in,v 1.28 2007-10-18 21:56:02 chu11 Exp $
+\."$Id: cerebro.conf.5.in,v 1.29 2007-10-18 22:32:27 chu11 Exp $
 \."#############################################################################
 \."  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
 \."  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -290,6 +290,11 @@ Turn on event server debugging.  Requires that debugging be turned on
 from the command line with the
 .I -d
 option.  This option is turned off by default.
+.TP
+.I cerebrod_alternate_hostname str
+Specify an alternate hostname for the 
+.B cerebrod 
+daemon to use.  Used for various testing and debugging purposes.
 \}
 .SH "FILES"
 @CEREBRO_CONFIG_FILE_DEFAULT@

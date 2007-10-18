@@ -37,6 +37,14 @@
 
 	* man/cerebro.conf.5.in: Add note on shortened hostnames for
 	forwarding config.
+
+	* src/libs/include/cerebro/cerebro_config.h,
+	src/libs/util/config_util.c, src/cerebrod/cerebrod_config.c,
+	src/cerebrod/cerebrod_config.h, src/cerebrod/cerebrod_speaker.c:
+	Support cerebrod_alternate_hostname debug option.
+
+	* man/cerebro.conf.5.in: Document new cerebrod_alternate_hostname
+	debug option.
 	
 2007-10-17  Albert Chu  <chu11@llnl.gov>
 

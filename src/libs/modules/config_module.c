@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: config_module.c,v 1.20 2007-10-18 20:39:12 chu11 Exp $
+ *  $Id: config_module.c,v 1.21 2007-10-18 22:32:27 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -216,21 +216,41 @@ config_module_load(void)
 /*
  * _handle_check
  *
- * Check for proper config module handle with loaded module
+ * Check for proper config module handle
  *
  * Returns 0 on success, -1 on error
  */
 static int
 _handle_check(config_module_t handle)
 {
-  if (!handle 
-      || handle->magic != CONFIG_MODULE_MAGIC_NUMBER 
-      || !handle->module_info)
+  if (!handle || handle->magic != CONFIG_MODULE_MAGIC_NUMBER)
     {
       CEREBRO_DBG(("invalid handle"));
       return -1;
     }
 
+  return 0;
+}
+
+/*
+ * _handle_info_check
+ *
+ * Check for proper config module handle and module_info
+ *
+ * Returns 0 on success, -1 on error
+ */
+static int
+_handle_info_check(config_module_t handle)
+{
+  if (_handle_check(handle) < 0)
+    return -1;
+  
+  if (!handle->module_info)
+    {
+      CEREBRO_DBG(("module not loaded"));
+      return -1;
+    }
+  
   return 0;
 }
 
@@ -240,7 +260,8 @@ config_module_unload(config_module_t handle)
   if (_handle_check(handle) < 0)
     return -1;
   
-  config_module_cleanup(handle);
+  if (handle->module_info)
+    config_module_cleanup(handle);
 
   handle->magic = ~CONFIG_MODULE_MAGIC_NUMBER;
 #if !WITH_STATIC_MODULES
@@ -257,12 +278,8 @@ config_module_unload(config_module_t handle)
 int 
 config_module_found(config_module_t handle)
 {
-  if (!handle 
-      || handle->magic != CONFIG_MODULE_MAGIC_NUMBER)
-    {
-      CEREBRO_DBG(("invalid handle"));
-      return -1;
-    }
+  if (_handle_check(handle) < 0)
+    return -1;
 
   return (handle->module_info) ? 1 : 0;
 }
@@ -270,7 +287,7 @@ config_module_found(config_module_t handle)
 char *
 config_module_name(config_module_t handle)
 {
-  if (_handle_check(handle) < 0)
+  if (_handle_info_check(handle) < 0)
     return NULL;
 
   return (handle->module_info)->config_module_name;
@@ -279,7 +296,7 @@ config_module_name(config_module_t handle)
 int
 config_module_setup(config_module_t handle)
 {
-  if (_handle_check(handle) < 0)
+  if (_handle_info_check(handle) < 0)
     return -1;
   
   return ((*(handle->module_info)->setup)());
@@ -288,7 +305,7 @@ config_module_setup(config_module_t handle)
 int
 config_module_cleanup(config_module_t handle)
 {
-  if (_handle_check(handle) < 0)
+  if (_handle_info_check(handle) < 0)
     return -1;
   
   return ((*(handle->module_info)->cleanup)());
@@ -297,7 +314,7 @@ config_module_cleanup(config_module_t handle)
 int
 config_module_load_config(config_module_t handle, struct cerebro_config *conf)
 {
-  if (_handle_check(handle) < 0)
+  if (_handle_info_check(handle) < 0)
     return -1;
   
   return ((*(handle->module_info)->load_config)(conf));

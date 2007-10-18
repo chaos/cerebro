@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.h,v 1.68 2007-10-17 22:04:49 chu11 Exp $
+ *  $Id: cerebrod_config.h,v 1.69 2007-10-18 22:32:27 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -70,6 +70,7 @@
 #define CEREBROD_METRIC_CONTROLLER_DEBUG_DEFAULT                  0
 #define CEREBROD_METRIC_SERVER_DEBUG_DEFAULT                      0
 #define CEREBROD_EVENT_SERVER_DEBUG_DEFAULT                       0
+#define CEREBROD_ALTERNATE_HOSTNAME                               NULL
 
 struct speak_message_config {
   /* Config */
@@ -153,6 +154,7 @@ struct cerebrod_config
   int metric_controller_debug;
   int metric_server_debug;
   int event_server_debug;
+  char *alternate_hostname;
 #endif /* CEREBRO_DEBUG */
 
   /* Determined by cerebrod based on configuration */

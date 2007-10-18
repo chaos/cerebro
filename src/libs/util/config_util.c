@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: config_util.c,v 1.27 2007-10-18 20:39:12 chu11 Exp $
+ *  $Id: config_util.c,v 1.28 2007-10-18 22:32:27 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -59,7 +59,7 @@ int config_debug_output = 0;
 static int
 _load_config_module(struct cerebro_config *conf, unsigned int *errnum)
 {
-  int ret, rv = -1;
+  int rv = -1, found = 0;
   config_module_t config_handle = NULL;
 
   if (!(config_handle = config_module_load()))
@@ -69,14 +69,14 @@ _load_config_module(struct cerebro_config *conf, unsigned int *errnum)
       goto cleanup;
     }
 
-  if ((ret = config_module_found(config_handle)) < 0)
+  if ((found = config_module_found(config_handle)) < 0)
     {
       if (errnum)
         *errnum = CEREBRO_ERR_CONFIG_MODULE;
       goto cleanup;
     }
 
-  if (!ret)
+  if (!found)
     goto out;
 
   if (config_module_setup(config_handle) < 0)
@@ -108,7 +108,8 @@ _load_config_module(struct cerebro_config *conf, unsigned int *errnum)
  out:
   rv = 0;
  cleanup:
-  config_module_cleanup(config_handle);
+  if (found > 0)
+    config_module_cleanup(config_handle);
   config_module_unload(config_handle);
   return rv;
 }
@@ -586,6 +587,39 @@ _cb_cerebrod_forward_message_config(conffile_t cf, struct conffile_data *data,
   return 0;
 }
 
+/*
+ * _cb_cerebrod_alternate_hostname
+ *
+ * callback function that parses and stores cerebrod alternate hostname
+ *
+ * Returns 0 on success, -1 on error
+ */
+static int
+_cb_cerebrod_alternate_hostname(conffile_t cf, struct conffile_data *data,
+                                char *optionname, int option_type, void *option_ptr,
+                                int option_data, void *app_ptr, int app_data)
+{
+  struct cerebro_config *conf;
+  
+  if (!option_ptr)
+    {
+      conffile_seterrnum(cf, CONFFILE_ERR_PARAMETERS);
+      return -1;
+    }
+  
+  conf = (struct cerebro_config *)option_ptr;
+
+  if (strlen(data->string) > CEREBRO_MAX_HOSTNAME_LEN)
+    {
+      conffile_seterrnum(cf, CONFFILE_ERR_PARSE_OVERFLOW_ARGLEN);
+      return -1;
+    }
+      
+  strcpy(conf->cerebrod_alternate_hostname, data->string);
+  conf->cerebrod_alternate_hostname_flag++;
+  return 0;
+}
+
 /* 
  * _load_config_file
  *
@@ -860,6 +894,17 @@ _load_config_file(struct cerebro_config *conf, unsigned int *errnum)
 	&conf->cerebrod_event_server_debug, 
 	0
       },
+      {
+	"cerebrod_alternate_hostname", 
+	CONFFILE_OPTION_STRING, 
+	-1,
+	_cb_cerebrod_alternate_hostname, 
+	1, 
+	0, 
+	&(conf->cerebrod_alternate_hostname_flag),
+        conf,
+	0
+      },
 #endif /* CEREBRO_DEBUG */
     };
   conffile_t cf = NULL;
@@ -1121,6 +1166,14 @@ _set_cerebro_config(struct cerebro_config *dest,
       dest->cerebrod_event_server_debug = src->cerebrod_event_server_debug;
       dest->cerebrod_event_server_debug_flag++;
     }
+
+  if (!dest->cerebrod_alternate_hostname_flag 
+      && src->cerebrod_alternate_hostname_flag)
+    {
+      strcpy(dest->cerebrod_alternate_hostname, src->cerebrod_alternate_hostname);
+      dest->cerebrod_alternate_hostname_flag++;
+    }
+
 #endif /* CEREBRO_DEBUG */
 
   return 0;

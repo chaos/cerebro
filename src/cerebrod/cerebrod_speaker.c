@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.105 2007-10-17 22:04:49 chu11 Exp $
+ *  $Id: cerebrod_speaker.c,v 1.106 2007-10-18 22:32:27 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -226,7 +226,10 @@ _speaker_initialize(void)
 
   /* Cache Nodename */
   memset(cerebrod_nodename, '\0', CEREBRO_MAX_NODENAME_LEN+1);
-  Gethostname(cerebrod_nodename, CEREBRO_MAX_NODENAME_LEN);
+  if (!conf.alternate_hostname)
+    Gethostname(cerebrod_nodename, CEREBRO_MAX_NODENAME_LEN);
+  else
+    Strncpy(cerebrod_nodename, conf.alternate_hostname, CEREBRO_MAX_NODENAME_LEN+1);
 
   /* Seed random number generator */
   Gettimeofday(&tv, NULL);

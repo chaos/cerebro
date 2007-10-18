@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config.h,v 1.16 2007-10-17 22:04:49 chu11 Exp $
+ *  $Id: cerebro_config.h,v 1.17 2007-10-18 22:32:27 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -140,6 +140,8 @@ struct cerebro_config
   int cerebrod_metric_server_debug_flag;
   int cerebrod_event_server_debug;
   int cerebrod_event_server_debug_flag;
+  char cerebrod_alternate_hostname[CEREBRO_MAX_HOSTNAME_LEN+1];
+  int cerebrod_alternate_hostname_flag;
 #endif /* CEREBRO_DEBUG */
 };
 
