@@ -37,7 +37,6 @@
 
 #include "cerebro.h"
 #include "cerebro_api.h"
-#include "cerebro_clusterlist_util.h"
 #include "cerebro_nodelist_util.h"
 #include "cerebro_util.h"
 
@@ -268,9 +267,6 @@ cerebro_get_metric_data(cerebro_t handle, const char *metric_name)
       handle->errnum = CEREBRO_ERR_PARAMETERS;
       goto cleanup;
     }
-  
-  if (_cerebro_load_clusterlist_module(handle) < 0)
-    goto cleanup;
   
   if (!(nodelist = _cerebro_nodelist_create(handle, metric_name)))
     goto cleanup;

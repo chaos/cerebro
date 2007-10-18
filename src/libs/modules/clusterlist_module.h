@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: clusterlist_module.h,v 1.6 2007-10-17 22:04:49 chu11 Exp $
+ *  $Id: clusterlist_module.h,v 1.7 2007-10-18 21:45:28 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -48,6 +48,13 @@ clusterlist_module_t clusterlist_module_load(void);
  * Returns 0 on success, -1 on error
  */
 int clusterlist_module_unload(clusterlist_module_t handle);
+
+/*
+ * clusterlist_module_found
+ *
+ * Return bool if clusterlist module found or not.
+ */
+int clusterlist_module_found(clusterlist_module_t handle);
 
 /*
  * clusterlist_module_name

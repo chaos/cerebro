@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.c,v 1.14 2007-10-17 22:04:49 chu11 Exp $
+ *  $Id: cerebro.c,v 1.15 2007-10-18 21:45:28 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -37,7 +37,6 @@
 
 #include "cerebro.h"
 #include "cerebro_api.h"
-#include "cerebro_clusterlist_util.h"
 #include "cerebro_config_util.h"
 #include "cerebro_util.h"
 #include "cerebro/cerebro_config.h"
@@ -68,7 +67,6 @@ static char *cerebro_error_messages[] =
     "config file error",
     "config module error",
     "config input error",
-    "clusterlist module error",
     "out of memory",
     "internal error",
     "errnum out of range",
@@ -127,19 +125,6 @@ cerebro_handle_destroy(cerebro_t handle)
 	return -1;
 
       if (handle->loaded_state & CEREBRO_CONFIG_LOADED)
-        {
-          CEREBRO_DBG(("loaded_state invalid"));
-          handle->errnum = CEREBRO_ERR_INTERNAL;
-          return -1;
-        }
-    }
-
-  if (handle->loaded_state & CEREBRO_CLUSTERLIST_MODULE_LOADED)
-    {
-      if (_cerebro_unload_clusterlist_module(handle) < 0)
-        return -1;
-      
-      if (handle->loaded_state & CEREBRO_CLUSTERLIST_MODULE_LOADED)
         {
           CEREBRO_DBG(("loaded_state invalid"));
           handle->errnum = CEREBRO_ERR_INTERNAL;

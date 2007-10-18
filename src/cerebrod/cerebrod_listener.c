@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.145 2007-10-17 22:04:49 chu11 Exp $
+ *  $Id: cerebrod_listener.c,v 1.146 2007-10-18 21:45:28 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -106,6 +106,7 @@ struct forwarding_info forwarding_info[CEREBRO_CONFIG_FORWARD_MESSAGE_CONFIG_MAX
  * Handle for clusterlist module
  */
 clusterlist_module_t clusterlist_handle;
+int found_clusterlist_module = 0;
 
 /* 
  * _listener_setup_socket
@@ -309,18 +310,25 @@ _forwarding_setup(int index)
       while ((node = Hostlist_next(itr)))
         {
           char nodebuf[CEREBRO_MAX_NODENAME_LEN+1];
-          
-          if (clusterlist_module_get_nodename(clusterlist_handle,
-                                              node,
-                                              nodebuf, 
-                                              CEREBRO_MAX_NODENAME_LEN+1) < 0)
+          char *nodeptr;
+
+          if (found_clusterlist_module)
             {
-              CEREBRO_DBG(("clusterlist_module_get_nodename: %s", nodebuf));
-              Hostlist_destroy(forwarding_info[index].hosts);
-              goto cleanup;
+              if (clusterlist_module_get_nodename(clusterlist_handle,
+                                                  node,
+                                                  nodebuf, 
+                                                  CEREBRO_MAX_NODENAME_LEN+1) < 0)
+                {
+                  CEREBRO_DBG(("clusterlist_module_get_nodename: %s", nodebuf));
+                  Hostlist_destroy(forwarding_info[index].hosts);
+                  goto cleanup;
+                }
+              nodeptr = nodebuf;
             }
-          
-          Hostlist_push(forwarding_info[index].hosts, nodebuf);
+          else
+            nodeptr = node;
+              
+          Hostlist_push(forwarding_info[index].hosts, nodeptr);
           
           free(node);
         }
@@ -360,20 +368,26 @@ _cerebrod_listener_initialize(void)
   if (!(clusterlist_handle = clusterlist_module_load()))
     CEREBRO_EXIT(("clusterlist_module_load"));
   
-  if (clusterlist_module_setup(clusterlist_handle) < 0)
-    CEREBRO_EXIT(("clusterlist_module_setup"));
+  if ((found_clusterlist_module = clusterlist_module_found(clusterlist_handle)) < 0)
+    CEREBRO_EXIT(("clusterlist_module_found"));
+
+  if (found_clusterlist_module)
+    {
+      if (clusterlist_module_setup(clusterlist_handle) < 0)
+        CEREBRO_EXIT(("clusterlist_module_setup"));
 
 #if CEREBRO_DEBUG
-  if (conf.debug && conf.listen_debug)
-    {
-      fprintf(stderr, "**************************************\n");
-      fprintf(stderr, "* Cerebro Clusterlist\n");
-      fprintf(stderr, "* -----------------------\n");
-      fprintf(stderr, "* Using Clusterlist: %s\n", 
-              clusterlist_module_name(clusterlist_handle));
-      fprintf(stderr, "**************************************\n");
-    }
+      if (conf.debug && conf.listen_debug)
+        {
+          fprintf(stderr, "**************************************\n");
+          fprintf(stderr, "* Cerebro Clusterlist\n");
+          fprintf(stderr, "* -----------------------\n");
+          fprintf(stderr, "* Using Clusterlist: %s\n", 
+                  clusterlist_module_name(clusterlist_handle));
+          fprintf(stderr, "**************************************\n");
+        }
 #endif /* CEREBRO_DEBUG */
+    }
 
   cerebrod_listener_data_initialize();
 
@@ -647,9 +661,15 @@ cerebrod_listener(void *arg)
           continue;
         }
 
-      if ((flag = clusterlist_module_node_in_cluster(clusterlist_handle,
-						     nodename_buf)) < 0)
-	CEREBRO_EXIT(("clusterlist_module_node_in_cluster: %s", nodename_buf));
+      if (found_clusterlist_module)
+        {
+          if ((flag = clusterlist_module_node_in_cluster(clusterlist_handle,
+                                                         nodename_buf)) < 0)
+            CEREBRO_EXIT(("clusterlist_module_node_in_cluster: %s", nodename_buf));
+        }
+      else
+        /* must assume it is in the cluster */
+        flag = 1;
       
       if (!flag)
 	{
@@ -660,15 +680,20 @@ cerebrod_listener(void *arg)
       
       memset(nodename_key, '\0', CEREBRO_MAX_NODENAME_LEN+1);
 
-      if (clusterlist_module_get_nodename(clusterlist_handle,
-					  nodename_buf,
-					  nodename_key, 
-					  CEREBRO_MAX_NODENAME_LEN+1) < 0)
-	{
-	  CEREBRO_DBG(("clusterlist_module_get_nodename: %s", nodename_buf));
-          cerebrod_message_destroy(msg);
-	  continue;
-	}
+      if (found_clusterlist_module)
+        {
+          if (clusterlist_module_get_nodename(clusterlist_handle,
+                                              nodename_buf,
+                                              nodename_key, 
+                                              CEREBRO_MAX_NODENAME_LEN+1) < 0)
+            {
+              CEREBRO_DBG(("clusterlist_module_get_nodename: %s", nodename_buf));
+              cerebrod_message_destroy(msg);
+              continue;
+            }
+        }
+      else
+        memcpy(nodename_key, nodename_buf, CEREBRO_MAX_NODENAME_LEN+1);
 
       Gettimeofday(&tv, NULL);
       cerebrod_listener_data_update(nodename_key, msg, tv.tv_sec);

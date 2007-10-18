@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.10 2007-10-18 20:39:12 chu11 Exp $
+## $Id: Makefile.am,v 1.11 2007-10-18 21:45:28 chu11 Exp $
 ##*****************************************************************************
 
 noinst_HEADERS	       = clusterlist_module.h \
@@ -46,8 +46,7 @@ libclusterlistmodules_la_CFLAGS = -DCLUSTERLIST_MODULE_BUILDDIR=\"$(clusterlist_
 				  -I$(srcdir)/../common \
 				  -I$(srcdir)/../debug \
 				  -I$(srcdir)/../include
-libclusterlistmodules_la_SOURCES = clusterlist_module.c \
-				   clusterlist_module_default.c
+libclusterlistmodules_la_SOURCES = clusterlist_module.c
 libclusterlistmodules_la_LIBADD = $(CLUSTERLIST_STATIC_LIB)
 
 libconfigmodules_la_CFLAGS = -DCONFIG_MODULE_BUILDDIR=\"$(config_module_builddir)\" \

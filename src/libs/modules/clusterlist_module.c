@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: clusterlist_module.c,v 1.14 2007-10-17 22:04:49 chu11 Exp $
+ *  $Id: clusterlist_module.c,v 1.15 2007-10-18 21:45:28 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -117,8 +117,6 @@ struct clusterlist_module
   struct cerebro_clusterlist_module_info *module_info;
 };
 
-extern struct cerebro_clusterlist_module_info default_clusterlist_module_info;
-
 /* 
  * _clusterlist_module_cb
  *
@@ -220,7 +218,11 @@ clusterlist_module_load(void)
 #if !WITH_STATIC_MODULES
   handle->dl_handle = NULL;
 #endif /* !WITH_STATIC_MODULES */
-  handle->module_info = &default_clusterlist_module_info;
+
+  /* Responsibility of caller to call found to see if a module was
+   * loaded
+   */
+
  out:
   return handle;
 
@@ -276,6 +278,19 @@ clusterlist_module_unload(clusterlist_module_t handle)
 
   module_cleanup();
   return 0;
+}
+
+int
+clusterlist_module_found(clusterlist_module_t handle)
+{
+  if (!handle
+      || handle->magic != CLUSTERLIST_MODULE_MAGIC_NUMBER)
+    {
+      CEREBRO_DBG(("invalid handle"));
+      return -1;
+    }
+
+  return (handle->module_info) ? 1 : 0;
 }
 
 char *

@@ -3,7 +3,8 @@
 	* src/libs/modules/config_module_default.c: Removed file.
 
 	* src/libs/modules/config_module.h,
-	src/libs/modules/config_module.c (config_module_found): New file.
+	src/libs/modules/config_module.c (config_module_found): New
+	function.
 
 	* src/libs/util/config_util.c (_load_config_module): Do not load a
 	config module if one is not found.
@@ -11,7 +12,26 @@
 	* src/libs/modules/config_module.c (config_module_load): Do not
 	use a default config module.
 
-	* src/libs/modules/Makefile.am: Adjust for removed files.
+	* src/libs/modules/clusterlist_module_default.c: Removed file.
+
+	* src/libs/modules/clusterlist_module.h,
+	src/libs/modules/clusterlist_module.c (clusterlist_module_found):
+	New function.
+
+	* src/cerebrod/cerebrod_listener.c: Adjust for non-default
+	clusterlist module not being loaded.
+
+	* src/libs/cerebro/cerebro_clusterlist_util.h,
+	src/libs/cerebro/cerebro_clusterlist_util.c: Remove files.
+
+	* src/libs/cerebro/: Adjust for removal of clusterlist utility
+	files which were unneeded.
+
+	* src/libs/cerebro/Makefile.am, src/libs/modules/Makefile.am:
+	Adjust for removed files.
+
+	* src/cerebro-stat/cerebro-stat.c (_metric_value_str): Fix assert
+	corner case bug.
 	
 2007-10-17  Albert Chu  <chu11@llnl.gov>
 

@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.20 2006-11-09 23:20:08 chu11 Exp $
+## $Id: Makefile.am,v 1.21 2007-10-18 21:45:28 chu11 Exp $
 ##*****************************************************************************
 
 if WITH_GNU_LD
@@ -12,7 +12,6 @@ LTDL_LIBS = ../common/libltdl.la
 endif
 
 noinst_HEADERS	       = cerebro_api.h \
-			 cerebro_clusterlist_util.h \
 			 cerebro_config_util.h \
 			 cerebro_metric_util.h \
 			 cerebro_namelist_util.h \
@@ -27,7 +26,6 @@ libcerebro_la_CFLAGS  = -D_REENTRANT \
 			-I$(srcdir)/../modules \
 			-I$(srcdir)/../util
 libcerebro_la_SOURCES = cerebro.c \
-			cerebro_clusterlist_util.c \
 			cerebro_config_util.c \
 			cerebro_event.c \
 			cerebro_metric_control.c \
@@ -47,7 +45,6 @@ libcerebro_la_LIBADD  = ../cerebro_error/libcerebro_error.la \
 			../common/liblist.la \
 			../common/libmarshall.la \
 			../debug/libdebug.la \
-			../modules/libclusterlistmodules.la \
 			../modules/libconfigmodules.la \
 			../modules/libmodules.la \
 			../util/libutil_config.la \
@@ -74,9 +71,6 @@ libcerebro_la_LIBADD  = ../cerebro_error/libcerebro_error.la \
 	@cd `dirname $@` && make `basename $@`
 
 ../debug/libdebug.la : force-dependency-check
-	@cd `dirname $@` && make `basename $@`
-
-../modules/libclusterlistmodules.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
 ../modules/libconfigmodules.la : force-dependency-check

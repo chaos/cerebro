@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_api.h,v 1.14 2007-10-17 22:04:49 chu11 Exp $
+ *  $Id: cerebro_api.h,v 1.15 2007-10-18 21:45:28 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -33,7 +33,6 @@
 #include "cerebro/cerebro_config.h"
 #include "cerebro/cerebro_constants.h"
 
-#include "clusterlist_module.h"
 #include "list.h"
 
 
@@ -52,7 +51,6 @@
  * Cerebro loaded state flags
  */
 #define CEREBRO_CONFIG_LOADED                  0x00000001
-#define CEREBRO_CLUSTERLIST_MODULE_LOADED      0x00000002
 
 /* 
  * struct cerebro
@@ -68,7 +66,6 @@ struct cerebro {
   unsigned int flags;
   int32_t loaded_state;
   struct cerebro_config config_data;
-  clusterlist_module_t clusterlist_handle;
   List namelists;
   List nodelists;
   List event_fds;

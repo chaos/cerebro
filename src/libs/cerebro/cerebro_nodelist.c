@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_nodelist.c,v 1.14 2007-10-17 22:04:49 chu11 Exp $
+ *  $Id: cerebro_nodelist.c,v 1.15 2007-10-18 21:45:28 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -41,7 +41,6 @@
 #include "cerebro_nodelist_util.h"
 #include "cerebro_util.h"
 
-#include "clusterlist_module.h"
 #include "debug.h"
 #include "list.h"
 

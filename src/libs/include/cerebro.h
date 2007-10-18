@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.h,v 1.29 2007-10-17 22:04:49 chu11 Exp $
+ *  $Id: cerebro.h,v 1.30 2007-10-18 21:45:28 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -55,10 +55,9 @@
 #define CEREBRO_ERR_CONFIG_FILE              21
 #define CEREBRO_ERR_CONFIG_MODULE            22
 #define CEREBRO_ERR_CONFIG_INPUT             23
-#define CEREBRO_ERR_CLUSTERLIST_MODULE       24
-#define CEREBRO_ERR_OUTMEM                   25
-#define CEREBRO_ERR_INTERNAL                 26
-#define CEREBRO_ERR_ERRNUMRANGE              27
+#define CEREBRO_ERR_OUTMEM                   24
+#define CEREBRO_ERR_INTERNAL                 25
+#define CEREBRO_ERR_ERRNUMRANGE              26
 
 /* 
  * Cerebro Flags
