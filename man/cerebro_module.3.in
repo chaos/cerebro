@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro_module.3.in,v 1.19 2007-10-17 22:04:48 chu11 Exp $
+\."$Id: cerebro_module.3.in,v 1.20 2007-10-18 21:52:25 chu11 Exp $
 \."#############################################################################
 \."  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
 \."  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -64,7 +64,10 @@ If none of the above are found,
 .B cerebrod
 will search for other clusterlist modules.
 
-If a clusterlist module cannot be found, a default module is loaded.
+If a clusterlist module cannot be found, a default is assumed in which
+all messages received by the
+.B cerebrod(8)
+daemon make up the cluster.
 
 .SH "CONFIG MODULES"
 
@@ -82,7 +85,7 @@ the options specified in the configuration file.
 
 The following config modules are distributed:
 
-No metric modules are built.
+No config modules are built.
 
 Configuration modules are searched for in the
 .B Cerebro
@@ -91,7 +94,8 @@ If none of the above are found,
 .B cerebrod
 will search for other configuration modules.
 
-If a configuration module cannot be found, a default module is loaded.
+If a configuration module cannot be found, the default configuration
+is assumed.
 
 .SH "METRIC MODULES"
 

@@ -32,6 +32,8 @@
 
 	* src/cerebro-stat/cerebro-stat.c (_metric_value_str): Fix assert
 	corner case bug.
+
+	* man/cerebro_module.3.in: Tweak based on changes.
 	
 2007-10-17  Albert Chu  <chu11@llnl.gov>
 
