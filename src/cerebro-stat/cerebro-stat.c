@@ -497,7 +497,7 @@ _metric_value_str(unsigned int mtype,
 #endif /* CEREBRO_DEBUG */
   int rv = 0;
 
-  assert(mvalue && buf && buflen > 0);
+  assert(buf && buflen > 0);
 
 #if CEREBRO_DEBUG
   if (mtype == CEREBRO_DATA_VALUE_TYPE_NONE)
@@ -521,6 +521,9 @@ _metric_value_str(unsigned int mtype,
 
   if (mlen_flag)
     err_exit("%s: invalid metric length: %d %d", func, mtype, mlen);
+
+  if (mtype != CEREBRO_DATA_VALUE_TYPE_NONE && !mvalue)
+    err_exit("%s: invalid metric type or value: %d %p", func, mtype, mvalue);
 #endif /* CEREBRO_DEBUG */
 
   if (mtype == CEREBRO_DATA_VALUE_TYPE_NONE)
