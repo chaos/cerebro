@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: config_module.h,v 1.7 2007-10-17 22:04:50 chu11 Exp $
+ *  $Id: config_module.h,v 1.8 2007-10-18 20:39:12 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -50,6 +50,13 @@ config_module_t config_module_load(void);
  * Returns 0 on success, -1 on error
  */
 int config_module_unload(config_module_t handle);
+
+/*
+ * config_module_found
+ *
+ * Return bool if config module found or not.
+ */
+int config_module_found(config_module_t handle);
 
 /*
  * config_module_name

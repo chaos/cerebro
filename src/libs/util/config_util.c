@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: config_util.c,v 1.26 2007-10-17 22:04:50 chu11 Exp $
+ *  $Id: config_util.c,v 1.27 2007-10-18 20:39:12 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -59,7 +59,7 @@ int config_debug_output = 0;
 static int
 _load_config_module(struct cerebro_config *conf, unsigned int *errnum)
 {
-  int rv = -1;
+  int ret, rv = -1;
   config_module_t config_handle = NULL;
 
   if (!(config_handle = config_module_load()))
@@ -68,6 +68,16 @@ _load_config_module(struct cerebro_config *conf, unsigned int *errnum)
         *errnum = CEREBRO_ERR_CONFIG_MODULE;
       goto cleanup;
     }
+
+  if ((ret = config_module_found(config_handle)) < 0)
+    {
+      if (errnum)
+        *errnum = CEREBRO_ERR_CONFIG_MODULE;
+      goto cleanup;
+    }
+
+  if (!ret)
+    goto out;
 
   if (config_module_setup(config_handle) < 0)
     {
@@ -95,6 +105,7 @@ _load_config_module(struct cerebro_config *conf, unsigned int *errnum)
       goto cleanup;
     }
 
+ out:
   rv = 0;
  cleanup:
   config_module_cleanup(config_handle);

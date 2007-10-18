@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.9 2006-11-08 00:34:04 chu11 Exp $
+## $Id: Makefile.am,v 1.10 2007-10-18 20:39:12 chu11 Exp $
 ##*****************************************************************************
 
 noinst_HEADERS	       = clusterlist_module.h \
@@ -54,8 +54,7 @@ libconfigmodules_la_CFLAGS = -DCONFIG_MODULE_BUILDDIR=\"$(config_module_builddir
 			     -I$(srcdir)/../common \
 			     -I$(srcdir)/../debug \
 			     -I$(srcdir)/../include
-libconfigmodules_la_SOURCES = config_module.c \
-			      config_module_default.c
+libconfigmodules_la_SOURCES = config_module.c
 libconfigmodules_la_LIBADD = $(CONFIG_STATIC_LIB)
 
 libeventmodules_la_CFLAGS = -DEVENT_MODULE_BUILDDIR=\"$(event_module_builddir)\" \

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: config_module.c,v 1.19 2007-10-17 22:04:50 chu11 Exp $
+ *  $Id: config_module.c,v 1.20 2007-10-18 20:39:12 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -93,8 +93,6 @@ struct config_module
 #endif /* !WITH_STATIC_MODULES */
   struct cerebro_config_module_info *module_info;
 };
-
-extern struct cerebro_config_module_info default_config_module_info;
 
 /*
  * _config_module_cb
@@ -194,7 +192,11 @@ config_module_load(void)
 #if !WITH_STATIC_MODULES
   handle->dl_handle = NULL;
 #endif /* !WITH_STATIC_MODULES */
-  handle->module_info = &default_config_module_info;
+
+  /* Responsibility of caller to call found to see if a module was
+   * loaded
+   */
+
  out:
   return handle;
 
@@ -214,7 +216,7 @@ config_module_load(void)
 /*
  * _handle_check
  *
- * Check for proper config module handle
+ * Check for proper config module handle with loaded module
  *
  * Returns 0 on success, -1 on error
  */
@@ -250,6 +252,19 @@ config_module_unload(config_module_t handle)
 
   module_cleanup();
   return 0;
+}
+
+int 
+config_module_found(config_module_t handle)
+{
+  if (!handle 
+      || handle->magic != CONFIG_MODULE_MAGIC_NUMBER)
+    {
+      CEREBRO_DBG(("invalid handle"));
+      return -1;
+    }
+
+  return (handle->module_info) ? 1 : 0;
 }
 
 char *

@@ -1,3 +1,18 @@
+2007-10-18  Albert Chu  <chu11@llnl.gov>
+
+	* src/libs/modules/config_module_default.c: Removed file.
+
+	* src/libs/modules/config_module.h,
+	src/libs/modules/config_module.c (config_module_found): New file.
+
+	* src/libs/util/config_util.c (_load_config_module): Do not load a
+	config module if one is not found.
+
+	* src/libs/modules/config_module.c (config_module_load): Do not
+	use a default config module.
+
+	* src/libs/modules/Makefile.am: Adjust for removed files.
+	
 2007-10-17  Albert Chu  <chu11@llnl.gov>
 
         * DISCLAIMER.UC: New file.
