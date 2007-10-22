@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config.h,v 1.17 2007-10-18 22:32:27 chu11 Exp $
+ *  $Id: cerebro_config.h,v 1.18 2007-10-22 22:47:41 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -42,9 +42,13 @@
 
 #define CEREBRO_CONFIG_FORWARD_HOST_MAX           64
 
+#define CEREBRO_CONFIG_FORWARD_HOST_ACCEPT_MAX    512
+
 #define CEREBRO_CONFIG_PORT_DEFAULT               0
 
 #define CEREBRO_CONFIG_IP_DEFAULT                 "0.0.0.0"
+
+#define CEREBRO_CONFIG_HOST_INPUT_MAX             128
 
 struct cerebro_config_server {
   char hostname[CEREBRO_MAX_HOSTNAME_LEN+1];
@@ -69,7 +73,7 @@ struct cerebrod_config_forward_message_config {
   int destination_port;
   int source_port;
   char network_interface[CEREBRO_MAX_NETWORK_INTERFACE_LEN+1];
-  char host[CEREBRO_CONFIG_FORWARD_HOST_MAX][CEREBRO_MAX_HOSTNAME_LEN+1];
+  char host[CEREBRO_CONFIG_FORWARD_HOST_MAX][CEREBRO_CONFIG_HOST_INPUT_MAX+1];
   unsigned int host_len;
 };
 
@@ -129,6 +133,9 @@ struct cerebro_config
   int cerebrod_forward_message_config_flag;
   int cerebrod_forward_message_ttl;
   int cerebrod_forward_message_ttl_flag;
+  char cerebrod_forward_host_accept[CEREBRO_CONFIG_FORWARD_HOST_ACCEPT_MAX][CEREBRO_CONFIG_HOST_INPUT_MAX+1];
+  int cerebrod_forward_host_accept_len;
+  int cerebrod_forward_host_accept_flag;
 #if CEREBRO_DEBUG
   int cerebrod_speak_debug;
   int cerebrod_speak_debug_flag;

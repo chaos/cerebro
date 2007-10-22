@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: config_util.c,v 1.29 2007-10-22 20:54:51 chu11 Exp $
+ *  $Id: config_util.c,v 1.30 2007-10-22 22:47:41 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -479,8 +479,8 @@ _cb_cerebrod_listen_message_config(conffile_t cf, struct conffile_data *data,
  */
 static int
 _cb_cerebrod_forward_message_config(conffile_t cf, struct conffile_data *data,
-                                  char *optionname, int option_type, void *option_ptr,
-                                  int option_data, void *app_ptr, int app_data)
+                                    char *optionname, int option_type, void *option_ptr,
+                                    int option_data, void *app_ptr, int app_data)
 {
   struct cerebro_config *conf;
 
@@ -570,7 +570,7 @@ _cb_cerebrod_forward_message_config(conffile_t cf, struct conffile_data *data,
           for (i = 4; i < data->stringlist_len; i++)
             {
               int host_index = conf->cerebrod_forward_message_config[index].host_len;
-              if (strlen(data->stringlist[i]) > CEREBRO_MAX_HOSTNAME_LEN)
+              if (strlen(data->stringlist[i]) > CEREBRO_CONFIG_HOST_INPUT_MAX)
                 {
                   conffile_seterrnum(cf, CONFFILE_ERR_PARSE_OVERFLOW_ARGLEN);
                   return -1;
@@ -584,6 +584,55 @@ _cb_cerebrod_forward_message_config(conffile_t cf, struct conffile_data *data,
       conf->cerebrod_forward_message_config_len++;
     }
 
+  return 0;
+}
+
+/*
+ * _cb_cerebrod_forward_host_accept
+ *
+ * callback function that parses and stores cerebrod forward host
+ * accept configuration.
+ *
+ * Returns 0 on success, -1 on error
+ */
+static int
+_cb_cerebrod_forward_host_accept(conffile_t cf, struct conffile_data *data,
+                                 char *optionname, int option_type, void *option_ptr,
+                                 int option_data, void *app_ptr, int app_data)
+{
+  struct cerebro_config *conf;
+
+  if (!option_ptr)
+    {
+      conffile_seterrnum(cf, CONFFILE_ERR_PARAMETERS);
+      return -1;
+    }
+  
+  conf = (struct cerebro_config *)option_ptr;
+
+  if (data->stringlist_len > 0)
+    {
+      int i;
+
+      for (i = 0; i < data->stringlist_len; i++)
+        {
+          if (conf->cerebrod_forward_host_accept_len >= CEREBRO_CONFIG_FORWARD_HOST_ACCEPT_MAX)
+            {
+              conffile_seterrnum(cf, CONFFILE_ERR_PARSE_ARG_TOOMANY);
+              return -1;
+            }
+
+          if (strlen(data->stringlist[i]) > CEREBRO_CONFIG_HOST_INPUT_MAX)
+            {
+              conffile_seterrnum(cf, CONFFILE_ERR_PARSE_OVERFLOW_ARGLEN);
+              return -1;
+            }
+      
+          strcpy(conf->cerebrod_forward_host_accept[conf->cerebrod_forward_host_accept_len], 
+                 data->stringlist[i]);
+          conf->cerebrod_forward_host_accept_len++;
+        }
+    }
   return 0;
 }
 
@@ -840,6 +889,17 @@ _load_config_file(struct cerebro_config *conf, unsigned int *errnum)
 	0, 
 	&(conf->cerebrod_forward_message_ttl_flag),
 	&(conf->cerebrod_forward_message_ttl), 
+	0
+      },
+      {
+	"cerebrod_forward_host_accept", 
+	CONFFILE_OPTION_LIST_STRING, 
+	-1,
+	_cb_cerebrod_forward_host_accept, 
+	CEREBRO_CONFIG_FORWARD_HOST_ACCEPT_MAX, 
+	0, 
+	&(conf->cerebrod_forward_host_accept_flag),
+	conf, 
 	0
       },
 #if CEREBRO_DEBUG
@@ -1135,6 +1195,17 @@ _set_cerebro_config(struct cerebro_config *dest,
     {
       dest->cerebrod_forward_message_ttl = src->cerebrod_forward_message_ttl;
       dest->cerebrod_forward_message_ttl_flag++;
+    }
+
+  if (!dest->cerebrod_forward_host_accept_flag 
+      && src->cerebrod_forward_host_accept_flag
+      && src->cerebrod_forward_host_accept_len)
+    {
+      for (i = 0; i < src->cerebrod_forward_host_accept_len; i++)
+        strcpy(dest->cerebrod_forward_host_accept[i],
+               src->cerebrod_forward_host_accept[i]);
+      dest->cerebrod_forward_host_accept_len = src->cerebrod_forward_host_accept_len;
+      dest->cerebrod_forward_host_accept_flag++;
     }
 
 #if CEREBRO_DEBUG
