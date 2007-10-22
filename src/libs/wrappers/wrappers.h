@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.h,v 1.19 2007-10-17 22:04:50 chu11 Exp $
+ *  $Id: wrappers.h,v 1.20 2007-10-22 23:24:06 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -368,6 +368,8 @@ void wrap_hash_destroy(WRAPPERS_ARGS, hash_t h);
         wrap_hostlist_uniq(WRAPPERS_DEBUG_ARGS, hl)
 #define Hostlist_push(hl, hosts) \
         wrap_hostlist_push(WRAPPERS_DEBUG_ARGS, hl, hosts)
+#define Hostlist_find(hl, hostname) \
+        wrap_hostlist_find(WRAPPERS_DEBUG_ARGS, hl, hostname)
 #define Hostlist_ranged_string(hl, n, buf) \
         wrap_hostlist_ranged_string(WRAPPERS_DEBUG_ARGS, hl, n, buf)
 #define Hostlist_deranged_string(hl, n, buf) \
@@ -384,6 +386,7 @@ void wrap_hostlist_destroy(WRAPPERS_ARGS, hostlist_t hl);
 void wrap_hostlist_sort(WRAPPERS_ARGS, hostlist_t hl);
 void wrap_hostlist_uniq(WRAPPERS_ARGS, hostlist_t hl);
 int wrap_hostlist_push(WRAPPERS_ARGS, hostlist_t hl, const char *host);
+int wrap_hostlist_find(WRAPPERS_ARGS, hostlist_t hl, const char *hostname);
 size_t wrap_hostlist_ranged_string(WRAPPERS_ARGS, hostlist_t hl, size_t n, char *buf);
 size_t wrap_hostlist_deranged_string(WRAPPERS_ARGS, hostlist_t hl, size_t n, char *buf);
 hostlist_iterator_t wrap_hostlist_iterator_create(WRAPPERS_ARGS, hostlist_t hl);

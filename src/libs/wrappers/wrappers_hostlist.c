@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers_hostlist.c,v 1.5 2007-10-17 22:04:50 chu11 Exp $
+ *  $Id: wrappers_hostlist.c,v 1.6 2007-10-22 23:24:06 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -97,6 +97,20 @@ wrap_hostlist_push(WRAPPERS_ARGS, hostlist_t hl, const char *host)
     WRAPPERS_ERR_ERRNO("hostlist_push");
 
   return rv;
+}
+
+int 
+wrap_hostlist_find(WRAPPERS_ARGS, hostlist_t hl, const char *hostname)
+{
+  int rv;
+
+  assert(file && function);
+
+  if (!hl || !hostname)
+    WRAPPERS_ERR_INVALID_PARAMETERS("hostlist_find");
+
+  /* -1 isn't an error, it indicates the host isn't found */
+  return hostlist_find(hl, hostname);
 }
 
 size_t 

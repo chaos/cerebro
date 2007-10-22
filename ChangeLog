@@ -16,8 +16,9 @@
 	Accept longer strings for potential comma or hostrange inputs.
 
 	* src/libs/include/cerebro/cerebro_config.h,
-	src/libs/util/config_util.c: Begin support of
-	'cerebrod_forward_host_accept' config option.
+	src/libs/util/config_util.c, src/cerebrod/cerebrod_config.h,
+	src/cerebrod/cerebrod_config.c, src/cerebrod/cerebrod_listener.c:
+	Support of 'cerebrod_forward_host_accept' config option.
 	
 2007-10-18  Albert Chu  <chu11@llnl.gov>
 

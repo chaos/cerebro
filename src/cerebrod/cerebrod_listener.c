@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.146 2007-10-18 21:45:28 chu11 Exp $
+ *  $Id: cerebrod_listener.c,v 1.147 2007-10-22 23:24:06 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -591,7 +591,7 @@ cerebrod_listener(void *arg)
       char nodename_buf[CEREBRO_MAX_NODENAME_LEN+1];
       char nodename_key[CEREBRO_MAX_NODENAME_LEN+1];
       struct timeval tv;
-      int flag, i, count;
+      int in_cluster_flag, i, count;
       fd_set readfds;
       int recv_len = 0;
       int maxfd = 0;
@@ -663,15 +663,25 @@ cerebrod_listener(void *arg)
 
       if (found_clusterlist_module)
         {
-          if ((flag = clusterlist_module_node_in_cluster(clusterlist_handle,
-                                                         nodename_buf)) < 0)
+          if ((in_cluster_flag = clusterlist_module_node_in_cluster(clusterlist_handle,
+                                                                    nodename_buf)) < 0)
             CEREBRO_EXIT(("clusterlist_module_node_in_cluster: %s", nodename_buf));
+
+          /* Second chance, is this data being forwarded from another host */
+          if (!in_cluster_flag)
+            {
+              if (Hostlist_find(conf.forward_host_accept, nodename_buf) >= 0)
+                in_cluster_flag++;
+            }
         }
       else
         /* must assume it is in the cluster */
-        flag = 1;
+        /* Note, there is no need to handle 'forward_host_accept' under this case, 
+         * since we don't know if it is in the cluster or not anyways.
+         */
+        in_cluster_flag = 1;
       
-      if (!flag)
+      if (!in_cluster_flag)
 	{
 	  CEREBRO_DBG(("received non-cluster packet: %s", nodename_buf));
           cerebrod_message_destroy(msg);

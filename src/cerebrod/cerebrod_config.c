@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.140 2007-10-18 22:32:27 chu11 Exp $
+ *  $Id: cerebrod_config.c,v 1.141 2007-10-22 23:24:06 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -126,6 +126,8 @@ _cerebrod_set_config_default(void)
   conf.forward_message_config_len = 0;
 
   conf.forward_message_ttl = CEREBROD_FORWARD_MESSAGE_TTL_DEFAULT;
+
+  conf.forward_host_accept = Hostlist_create(NULL);
 
 #if CEREBRO_DEBUG
   conf.speak_debug = CEREBROD_SPEAK_DEBUG_DEFAULT;
@@ -394,6 +396,7 @@ _cerebrod_load_config(void)
                     cerebro_err_exit("host '%s' improperly formatted");
                   Free(hostptr);
                 }
+              Hostlist_sort(conf.forward_message_config[i].hosts);
             }
           else
             conf.forward_message_config[i].hosts = NULL;
@@ -404,6 +407,27 @@ _cerebrod_load_config(void)
 
   if (tconf.cerebrod_forward_message_ttl_flag)
     conf.forward_message_ttl = tconf.cerebrod_forward_message_ttl;
+
+  if (tconf.cerebrod_forward_host_accept_flag
+      && tconf.cerebrod_forward_host_accept_len)
+    {
+      for (i = 0; i < tconf.cerebrod_forward_host_accept_len; i++)
+        {
+          char *hostptr = NULL;
+          char *ptr;
+
+          hostptr = Strdup(tconf.cerebrod_forward_host_accept[i]);
+
+          /* Shorten hostname if necessary */
+          if ((ptr = strchr(hostptr, '.')))
+            *ptr = '\0';
+          
+          if (!hostlist_push(conf.forward_host_accept, hostptr))
+            cerebro_err_exit("host '%s' improperly formatted");
+          Free(hostptr);
+        }
+      Hostlist_sort(conf.forward_host_accept);
+    }
 
 #if CEREBRO_DEBUG
   if (tconf.cerebrod_speak_debug_flag)
@@ -1099,6 +1123,7 @@ static void
 _cerebrod_config_dump(void)
 {
 #if CEREBRO_DEBUG
+  char hbuf[CEREBROD_CONFIG_HOSTLIST_BUFLEN];
   int i;
 
   if (!conf.debug)
@@ -1148,18 +1173,17 @@ _cerebrod_config_dump(void)
   fprintf(stderr, "* event_server_port: %d\n", conf.event_server_port);
   for (i = 0; i < conf.forward_message_config_len; i++)
     {
-      char buf[CEREBROD_CONFIG_HOSTLIST_BUFLEN];
-
       fprintf(stderr, "* forward[%d]: ip: \"%s\"\n", i, conf.forward_message_config[i].ip);
       fprintf(stderr, "* forward[%d]: destination_port: %d\n", i, conf.forward_message_config[i].destination_port);
       fprintf(stderr, "* forward[%d]: source_port: %d\n", i, conf.forward_message_config[i].source_port);
       fprintf(stderr, "* forward[%d]: network_interface: \"%s\"\n", i, conf.forward_message_config[i].network_interface);
       if (conf.forward_message_config[i].hosts)
         {
+          memset(hbuf, '\0', CEREBROD_CONFIG_HOSTLIST_BUFLEN);
           Hostlist_ranged_string(conf.forward_message_config[i].hosts, 
                                  CEREBROD_CONFIG_HOSTLIST_BUFLEN,
-                                 buf);
-          fprintf(stderr, "* forward[%d]: hosts: \"%s\"\n", i, buf);
+                                 hbuf);
+          fprintf(stderr, "* forward[%d]: hosts: \"%s\"\n", i, hbuf);
         }
       fprintf(stderr, "* forward[%d]: ip_is_local: %d\n", i, conf.forward_message_config[i].ip_is_local);
       fprintf(stderr, "* forward[%d]: ip_is_multicast: %d\n", i, conf.forward_message_config[i].ip_is_multicast);
@@ -1168,6 +1192,11 @@ _cerebrod_config_dump(void)
       fprintf(stderr, "* forward[%d]: network_interface_index: %d\n", i, conf.forward_message_config[i].network_interface_index);
     }
   fprintf(stderr, "* forward_message_ttl: %d\n", conf.forward_message_ttl);
+  memset(hbuf, '\0', CEREBROD_CONFIG_HOSTLIST_BUFLEN);
+  Hostlist_ranged_string(conf.forward_host_accept,
+                         CEREBROD_CONFIG_HOSTLIST_BUFLEN,
+                         hbuf);
+  fprintf(stderr, "* forward_host_accept: %s\n", hbuf);
   fprintf(stderr, "* speak_debug: %d\n", conf.speak_debug);
   fprintf(stderr, "* listen_debug: %d\n", conf.listen_debug);
   fprintf(stderr, "* metric_controller_debug: %d\n", conf.metric_controller_debug);
