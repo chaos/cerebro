@@ -1,11 +1,11 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.34 2006-11-09 23:20:08 chu11 Exp $
+## $Id: Makefile.am,v 1.35 2007-10-22 18:13:00 chu11 Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
 
 man3_MANS  = libcerebro.3 \
-	     cerebro.3 \
+	     cerebro.1 \
 	     cerebro_handle_create.3 \
 	     cerebro_handle_destroy.3 \
 	     cerebro_errnum.3 \
@@ -62,7 +62,7 @@ man8_MANS  = cerebro-admin.8 \
 	     cerebrod.8
 
 EXTRA_DIST = libcerebro.3 \
-	     cerebro.3 \
+	     cerebro.1 \
 	     cerebro_handle_create.3 \
 	     cerebro_handle_destroy.3 \
 	     cerebro_errnum.3 \

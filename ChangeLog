@@ -1,3 +1,11 @@
+2007-10-22  Albert Chu  <chu11@llnl.gov>
+
+	* man/cerebro_module.3.in: Add event module information.
+
+	* man/cerebro.1: New manpage.
+
+	* man/Makefile.am: Update for new manpage.
+	
 2007-10-18  Albert Chu  <chu11@llnl.gov>
 
 	* src/libs/modules/config_module_default.c: Removed file.

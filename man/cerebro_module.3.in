@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro_module.3.in,v 1.20 2007-10-18 21:52:25 chu11 Exp $
+\."$Id: cerebro_module.3.in,v 1.21 2007-10-22 18:13:01 chu11 Exp $
 \."#############################################################################
 \."  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
 \."  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -170,6 +170,22 @@ The following monitoring modules are distributed:
 No monitoring modules are built.
 
 Monitor modules are searched for in the
+.B Cerebro
+package library directory, @CEREBRO_MODULE_DIR@.
+
+.SH "EVENT MODULES"
+
+Event modules provide a way for events to be generated when certain
+monitored events occur.  This allows the user to program tools to
+only react when a monitored event occurs.  For example, a tool
+may wish to perform an action only after a node has been confirmed
+to be down.
+
+The following event modules are distributed:
+
+updown - Sends event notifications when cluster nodes go up or down
+
+Event modules are searched for in the
 .B Cerebro
 package library directory, @CEREBRO_MODULE_DIR@.
 

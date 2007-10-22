@@ -1,0 +1,109 @@
+\."#############################################################################
+\."$Id: cerebro.1,v 1.1 2007-10-22 18:13:00 chu11 Exp $
+\."#############################################################################
+\."  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
+\."  Copyright (C) 2005-2007 The Regents of the University of California.
+\."  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
+\."  Written by Albert Chu <chu11@llnl.gov>.
+\."  UCRL-CODE-155989 All rights reserved.
+\."
+\."  This file is part of Cerebro, a collection of cluster monitoring tools
+\."  and libraries.  For details, see <http://www.llnl.gov/linux/cerebro/>.
+\."
+\."  Cerebro is free software; you can redistribute it and/or modify it under
+\."  the terms of the GNU General Public License as published by the Free
+\."  Software Foundation; either version 2 of the License, or (at your option)
+\."  any later version.
+\."
+\."  Cerebro is distributed in the hope that it will be useful, but WITHOUT ANY
+\."  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+\."  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+\."  details.
+\."
+\."  You should have received a copy of the GNU General Public License along
+\."  with Cerebro.  If not, see <http://www.gnu.org/licenses/>.
+\."#############################################################################
+.TH cerebro  "Oct 2007" "cerebro" cerebro
+.SH "NAME"
+cerebro \- cluster monitoring tools and libraries
+.SH "DESCRIPTION"
+.B Cerebro
+is a collection of monitoring tools and libraries.  It is made up of a
+daemon, loadable modules, a library, and several tools.
+
+The daemon, 
+.B cerebrod(8),
+is the core of
+.B Cerebro.
+Typically executed on every node of a cluster, it is responsible for
+sending, receiving, and monitoring various metric data.  
+
+The data that it sends, receives, and monitors is dependent on the 
+data configured to be sent.  Data can be sent via modules
+developed for 
+.B cerebrod,
+(See 
+.B cerebro_modules(3)
+for more information on these modules.), data fed into the daemon
+using 
+.B libcerebro(3),
+or data fed into the daemon via 
+.B cerebro-admin.
+
+.B Libcerebro
+and 
+.B cerebro-admin
+offer the user the ability to monitor data by programming them into tools
+and/or scripts.  Modules developed for 
+.B cerebrod,
+will be automatically loaded by the daemon and those specific metrics
+will automatically be monitored.
+
+Before
+.B cerebro
+can be used as a whole it must be configured.  The configuration file
+options are specified in 
+.B cerebro.conf(5).
+Generally speaking, all cluster nodes should be configured to 'speak' so
+they can send out metric information.  A few cluster nodes, typically
+management nodes, should be configured to 'listen' and gather this metric information.
+The 'metric_controller' should be enabled if data will be fed into 
+.B cerebrod
+via
+.B libcerebro
+and/or 
+.B cerebro-admin.
+The 'metric_server' should be enabled if data will be read
+from
+.B cerebrod
+via
+.B libcerebro
+and/or
+.B cerebro-stat.
+A configuration module is also available for use with
+.B cerebrod.
+If your orgnization already has a database or configuration system for
+clusters, the configuration module may allow your orgnization to 
+configure 
+.B cerebrod
+off that database instead.
+
+Three other module types are available for use in 
+.B cerebrod.
+'clusterlist' modules define what nodes exist within a cluster.
+'monitor' modules allow specific metrics to be passed to the 
+module for handling, perhaps for logging purposes.
+'event' modules allow for the creation of events when certain
+metric information is received.
+See 
+.B cerebro_modules(3)
+for more details.
+
+An event notification API is provided with 
+.B libcerebro
+for programming against these events.
+
+.SH "ORIGIN"
+Developed by Albert Chu <chu11@llnl.gov> on LLNL's Linux clusters.
+.SH "SEE ALSO"
+libcerebro(3), cerebro_modules(3), cerebrod(8)
