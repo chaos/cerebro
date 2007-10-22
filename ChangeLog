@@ -4,6 +4,8 @@
 
 	* man/cerebro.1: New manpage.
 
+	* man/cerebro.3: Removed file.
+
 	* man/Makefile.am: Update for new manpage.
 	
 2007-10-18  Albert Chu  <chu11@llnl.gov>
