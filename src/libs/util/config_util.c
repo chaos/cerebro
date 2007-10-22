@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: config_util.c,v 1.28 2007-10-18 22:32:27 chu11 Exp $
+ *  $Id: config_util.c,v 1.29 2007-10-22 20:54:51 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -600,7 +600,8 @@ _cb_cerebrod_alternate_hostname(conffile_t cf, struct conffile_data *data,
                                 int option_data, void *app_ptr, int app_data)
 {
   struct cerebro_config *conf;
-  
+  char *p;
+
   if (!option_ptr)
     {
       conffile_seterrnum(cf, CONFFILE_ERR_PARAMETERS);
@@ -616,6 +617,9 @@ _cb_cerebrod_alternate_hostname(conffile_t cf, struct conffile_data *data,
     }
       
   strcpy(conf->cerebrod_alternate_hostname, data->string);
+  /* shorten hostname if necessary */
+  if ((p = strchr(conf->cerebrod_alternate_hostname, '.')))
+    *p = '\0';
   conf->cerebrod_alternate_hostname_flag++;
   return 0;
 }
