@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: config_module.c,v 1.21 2007-10-18 22:32:27 chu11 Exp $
+ *  $Id: config_module.c,v 1.22 2007-10-23 22:09:33 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -137,11 +137,18 @@ _config_module_cb(void *handle, void *dl_handle, void *module_info)
     }
 
   if (!config_module_info->config_module_name
+      || !config_module_info->interface_version
       || !config_module_info->setup
       || !config_module_info->cleanup
       || !config_module_info->load_config)
     {
-      CEREBRO_DBG(("invalid module info"));
+      CEREBRO_ERR(("invalid module info, cannot load module"));
+      return 0;
+    }
+
+  if (((*config_module_info->interface_version)()) != CEREBRO_CONFIG_INTERFACE_VERSION)
+    {
+      CEREBRO_ERR(("invalid module interface version, cannot load module"));
       return 0;
     }
 
@@ -291,6 +298,15 @@ config_module_name(config_module_t handle)
     return NULL;
 
   return (handle->module_info)->config_module_name;
+}
+
+int
+config_module_interface_version(config_module_t handle)
+{
+  if (_handle_info_check(handle) < 0)
+    return -1;
+  
+  return ((*(handle->module_info)->interface_version)());
 }
 
 int

@@ -5,6 +5,12 @@
 
 	* configure.ac: Revert lib version change, since interfacea
 	actually didn't change.
+
+	* src/cerebrod/, src/modules/, src/libs/modules/,
+	src/include/cerebro/: Include module interface versioning.
+
+	* man/cerebro_module_devel.3.in: Update with new versioning
+	information.
 	
 2007-10-22  Albert Chu  <chu11@llnl.gov>
 

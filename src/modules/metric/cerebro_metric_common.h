@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_common.h,v 1.6 2007-10-17 22:04:50 chu11 Exp $
+ *  $Id: cerebro_metric_common.h,v 1.7 2007-10-23 22:09:33 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -29,6 +29,13 @@
 #define _CEREBRO_METRIC_COMMON
 
 #include "cerebro/cerebro_metric_module.h"
+
+/*
+ * common_metric_interface_version
+ *
+ * common metric module interface version function 
+ */
+int common_metric_interface_version(void);
 
 /*
  * common_metric_setup_do_nothing

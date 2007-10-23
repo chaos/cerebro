@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_module.h,v 1.5 2007-10-17 22:04:49 chu11 Exp $
+ *  $Id: cerebro_clusterlist_module.h,v 1.6 2007-10-23 22:09:33 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -27,6 +27,19 @@
 
 #ifndef _CEREBRO_CLUSTERLIST_MODULE_H
 #define _CEREBRO_CLUSTERLIST_MODULE_H
+
+#define CEREBRO_CLUSTERLIST_INTERFACE_VERSION 1
+
+/* 
+ * Cerebro_clusterlist_interface_version
+ *
+ * function prototype for clusterlist module function to return the
+ * current clusterlist interface version.  Should always return
+ * current value of macro CEREBRO_CLUSTERLIST_INTERFACE_VERSION.
+ *
+ * Returns version number on success, -1 one error
+ */
+typedef int (*Cerebro_clusterlist_interface_version)(void);
 
 /*
  * Cerebro_clusterlist_setup
@@ -117,6 +130,7 @@ typedef int (*Cerebro_clusterlist_get_nodename)(const char *node,
 struct cerebro_clusterlist_module_info
 {
   char *clusterlist_module_name;
+  Cerebro_clusterlist_interface_version interface_version;
   Cerebro_clusterlist_setup setup;
   Cerebro_clusterlist_cleanup cleanup;
   Cerebro_clusterlist_numnodes numnodes;

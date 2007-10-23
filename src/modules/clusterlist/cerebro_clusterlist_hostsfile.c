@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_hostsfile.c,v 1.36 2007-10-17 22:04:50 chu11 Exp $
+ *  $Id: cerebro_clusterlist_hostsfile.c,v 1.37 2007-10-23 22:09:33 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -61,6 +61,17 @@
  * Store all of the hosts found in the hostsfile
  */
 static List hosts = NULL;
+
+/*
+ * hostsfile_clusterlist_interface_version
+ *
+ * hostsfile clusterlist module interface_version function
+ */
+static int 
+hostsfile_clusterlist_interface_version(void)
+{
+  return CEREBRO_CLUSTERLIST_INTERFACE_VERSION;
+}
 
 /* 
  * _readline
@@ -527,6 +538,7 @@ struct cerebro_clusterlist_module_info clusterlist_module_info =
 #endif /* !WITH_STATIC_MODULES */
   {
     HOSTSFILE_CLUSTERLIST_MODULE_NAME,
+    &hostsfile_clusterlist_interface_version,
     &hostsfile_clusterlist_setup,
     &hostsfile_clusterlist_cleanup,
     &hostsfile_clusterlist_numnodes,

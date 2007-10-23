@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_monitor_module.h,v 1.9 2007-10-17 22:04:49 chu11 Exp $
+ *  $Id: cerebro_monitor_module.h,v 1.10 2007-10-23 22:09:33 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -27,6 +27,19 @@
 
 #ifndef _CEREBRO_MONITOR_MODULE_H
 #define _CEREBRO_MONITOR_MODULE_H
+
+#define CEREBRO_MONITOR_INTERFACE_VERSION 1
+
+/* 
+ * Cerebro_monitor_interface_version
+ *
+ * function prototype for monitor module function to return the
+ * current monitor interface version.  Should always return
+ * current value of macro CEREBRO_MONITOR_INTERFACE_VERSION.
+ *
+ * Returns version number on success, -1 one error
+ */
+typedef int (*Cerebro_monitor_interface_version)(void);
 
 /*
  * Cerebro_monitor_setup
@@ -82,6 +95,7 @@ typedef int (*Cerebro_monitor_metric_update)(const char *nodename,
 struct cerebro_monitor_module_info
 {
   char *monitor_module_name;
+  Cerebro_monitor_interface_version interface_version;
   Cerebro_monitor_setup setup;
   Cerebro_monitor_cleanup cleanup;
   Cerebro_monitor_metric_names metric_names;

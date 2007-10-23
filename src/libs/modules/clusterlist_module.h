@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: clusterlist_module.h,v 1.7 2007-10-18 21:45:28 chu11 Exp $
+ *  $Id: clusterlist_module.h,v 1.8 2007-10-23 22:09:33 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -62,6 +62,13 @@ int clusterlist_module_found(clusterlist_module_t handle);
  * Return clusterlist module name
  */
 char *clusterlist_module_name(clusterlist_module_t handle);
+
+/*
+ * clusterlist_module_interface_version
+ *
+ * Return clusterlist interface version
+ */
+int clusterlist_module_interface_version(clusterlist_module_t handle);
 
 /*
  * clusterlist_module_setup

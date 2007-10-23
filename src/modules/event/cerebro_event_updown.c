@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_event_updown.c,v 1.5 2007-10-17 22:04:50 chu11 Exp $
+ *  $Id: cerebro_event_updown.c,v 1.6 2007-10-23 22:09:33 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -70,6 +70,17 @@ static hash_t node_states = NULL;
  * Cache of nodenames used as keys for the node_states
  */
 static List node_states_nodenames = NULL;
+
+/*
+ * updown_event_interface_version
+ *
+ * updown event module interface_version function
+ */
+static int
+updown_event_interface_version(void)
+{
+  return CEREBRO_EVENT_INTERFACE_VERSION;
+}
 
 /*
  * updown_event_setup
@@ -355,6 +366,7 @@ struct cerebro_event_module_info event_module_info =
 #endif /* !WITH_STATIC_MODULES */
   {
     UPDOWN_EVENT_MODULE_NAME,
+    &updown_event_interface_version,
     &updown_event_setup,
     &updown_event_cleanup,
     &updown_event_event_names,

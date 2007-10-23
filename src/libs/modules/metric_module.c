@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: metric_module.c,v 1.25 2007-10-17 22:04:50 chu11 Exp $
+ *  $Id: metric_module.c,v 1.26 2007-10-23 22:09:33 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -186,6 +186,7 @@ _metric_module_cb(void *handle, void *dl_handle, void *module_info)
     }
   
   if (!metric_module_info->metric_module_name
+      || !metric_module_info->interface_version
       || !metric_module_info->setup
       || !metric_module_info->cleanup
       || !metric_module_info->get_metric_name
@@ -195,7 +196,13 @@ _metric_module_cb(void *handle, void *dl_handle, void *module_info)
       || !metric_module_info->destroy_metric_value
       || !metric_module_info->get_metric_thread)
     {
-      CEREBRO_DBG(("invalid module info"));
+      CEREBRO_ERR(("invalid module info, cannot load module"));
+      return 0;
+    }
+
+  if (((*metric_module_info->interface_version)()) != CEREBRO_METRIC_INTERFACE_VERSION)
+    {
+      CEREBRO_ERR(("invalid module interface version, cannot load module"));
       return 0;
     }
 
@@ -397,6 +404,23 @@ metric_module_name(metric_modules_t handle, unsigned int index)
     }
 
   return module_info->metric_module_name;
+}
+
+int
+metric_module_interface_version(metric_modules_t handle)
+{
+  struct cerebro_metric_module_info *module_info;
+
+  if (_handle_index_check(handle, index) < 0)
+    return -1;
+
+  if (!(module_info = vector_get(handle->module_infos, index)))
+    {
+      CEREBRO_DBG(("vector_get: %s", strerror(errno)));
+      return -1;
+    }
+
+  return ((*module_info->interface_version)());
 }
 
 int 

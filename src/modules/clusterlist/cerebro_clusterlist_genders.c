@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_clusterlist_genders.c,v 1.38 2007-10-17 22:04:50 chu11 Exp $
+ *  $Id: cerebro_clusterlist_genders.c,v 1.39 2007-10-23 22:09:33 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -54,6 +54,17 @@
  * genders handle
  */
 static genders_t gh = NULL;
+
+/*
+ * genders_clusterlist_interface_version
+ *
+ * genders clusterlist module interface_version function
+ */
+static int 
+genders_clusterlist_interface_version(void)
+{
+  return CEREBRO_CLUSTERLIST_INTERFACE_VERSION;
+}
 
 /*
  * genders_clusterlist_setup
@@ -222,6 +233,7 @@ struct cerebro_clusterlist_module_info clusterlist_module_info =
 #endif /* !WITH_STATIC_MODULES */
   {
     GENDERS_CLUSTERLIST_MODULE_NAME,
+    &genders_clusterlist_interface_version,
     &genders_clusterlist_setup,
     &genders_clusterlist_cleanup,
     &genders_clusterlist_numnodes,

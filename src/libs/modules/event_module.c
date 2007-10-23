@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: event_module.c,v 1.6 2007-10-17 22:04:50 chu11 Exp $
+ *  $Id: event_module.c,v 1.7 2007-10-23 22:09:33 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -134,6 +134,7 @@ _event_module_cb(void *handle, void *dl_handle, void *module_info)
     }
 
   if (!event_module_info->event_module_name
+      || !event_module_info->interface_version
       || !event_module_info->setup
       || !event_module_info->cleanup
       || !event_module_info->event_names
@@ -143,7 +144,13 @@ _event_module_cb(void *handle, void *dl_handle, void *module_info)
       || !event_module_info->metric_update
       || !event_module_info->destroy)
     {
-      CEREBRO_DBG(("invalid module info"));
+      CEREBRO_ERR(("invalid module info, cannot load module"));
+      return 0;
+    }
+
+  if (((*event_module_info->interface_version)()) != CEREBRO_EVENT_INTERFACE_VERSION)
+    {
+      CEREBRO_ERR(("invalid module interface version, cannot load module"));
       return 0;
     }
 
@@ -346,6 +353,23 @@ event_module_name(event_modules_t handle, unsigned int index)
     }
 
   return module_info->event_module_name;
+}
+
+int
+event_module_interface_version(event_modules_t handle)
+{
+  struct cerebro_event_module_info *module_info;
+
+  if (_handle_index_check(handle, index) < 0)
+    return -1;
+
+  if (!(module_info = vector_get(handle->module_infos, index)))
+    {
+      CEREBRO_DBG(("vector_get: %s", strerror(errno)));
+      return -1;
+    }
+
+  return ((*module_info->interface_version)());
 }
 
 int 

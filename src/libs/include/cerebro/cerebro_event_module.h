@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_event_module.h,v 1.5 2007-10-17 22:04:49 chu11 Exp $
+ *  $Id: cerebro_event_module.h,v 1.6 2007-10-23 22:09:33 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -29,6 +29,19 @@
 #define _CEREBRO_EVENT_MODULE_H
 
 #include <cerebro/cerebro_event_protocol.h>
+
+#define CEREBRO_EVENT_INTERFACE_VERSION 1
+
+/* 
+ * Cerebro_event_interface_version
+ *
+ * function prototype for event module function to return the
+ * current event interface version.  Should always return
+ * current value of macro CEREBRO_EVENT_INTERFACE_VERSION.
+ *
+ * Returns version number on success, -1 one error
+ */
+typedef int (*Cerebro_event_interface_version)(void);
 
 /*
  * Cerebro_event_setup
@@ -128,6 +141,7 @@ typedef void (*Cerebro_event_destroy)(struct cerebro_event *event);
 struct cerebro_event_module_info
 {
   char *event_module_name;
+  Cerebro_event_interface_version interface_version;
   Cerebro_event_setup setup;
   Cerebro_event_cleanup cleanup;
   Cerebro_event_event_names event_names;

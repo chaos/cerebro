@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_module.h,v 1.14 2007-10-17 22:04:49 chu11 Exp $
+ *  $Id: cerebro_metric_module.h,v 1.15 2007-10-23 22:09:33 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -31,7 +31,20 @@
 #include <sys/types.h>
 #include <cerebro/cerebrod_message_protocol.h>
 
+#define CEREBRO_METRIC_INTERFACE_VERSION 1
+
 #define CEREBRO_METRIC_MODULE_FLAGS_SEND_ON_PERIOD 0x1
+
+/* 
+ * Cerebro_metric_interface_version
+ *
+ * function prototype for metric module function to return the
+ * current metric interface version.  Should always return
+ * current value of macro CEREBRO_METRIC_INTERFACE_VERSION.
+ *
+ * Returns version number on success, -1 one error
+ */
+typedef int (*Cerebro_metric_interface_version)(void);
 
 /*
  * Cerebro_metric_setup
@@ -169,6 +182,7 @@ typedef int (*Cerebro_metric_send_message_function_pointer)(Cerebro_metric_send_
 struct cerebro_metric_module_info
 {
   char *metric_module_name;
+  Cerebro_metric_interface_version interface_version;
   Cerebro_metric_setup setup;
   Cerebro_metric_cleanup cleanup;
   Cerebro_metric_get_metric_name get_metric_name;

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.c,v 1.19 2007-10-17 22:04:50 chu11 Exp $
+ *  $Id: wrappers.c,v 1.20 2007-10-23 22:09:33 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -358,6 +358,12 @@ wrap_select(WRAPPERS_ARGS, int n, fd_set *readfds, fd_set *writefds, fd_set *exc
       timeout_orig = *timeout;
       Gettimeofday(&start, NULL);
     }
+  else
+    {
+      /* unused - necessary to remove compiler warning */
+      timeout_orig.tv_sec = 0;
+      timeout_orig.tv_usec = 0;
+    }
 
   do 
     {
@@ -394,6 +400,12 @@ wrap_poll(WRAPPERS_ARGS, struct pollfd *ufds, unsigned int nfds, int timeout)
       timeout_orig.tv_sec = (long)timeout/1000;
       timeout_orig.tv_usec = (timeout % 1000) * 1000;
       Gettimeofday(&start, NULL);
+    }
+  else
+    {
+      /* unused - necessary to remove compiler warning */
+      timeout_orig.tv_sec = 0;
+      timeout_orig.tv_usec = 0;
     }
 
   do {

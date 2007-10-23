@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_swaptotal.c,v 1.12 2007-10-17 22:04:50 chu11 Exp $
+ *  $Id: cerebro_metric_swaptotal.c,v 1.13 2007-10-23 22:09:34 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -109,6 +109,7 @@ struct cerebro_metric_module_info metric_module_info =
 #endif /* !WITH_STATIC_MODULES */
   {
     SWAPTOTAL_METRIC_MODULE_NAME,
+    &common_metric_interface_version,
     &common_metric_setup_do_nothing,
     &common_metric_cleanup_do_nothing,
     &swaptotal_metric_get_metric_name,

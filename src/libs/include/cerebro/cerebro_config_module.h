@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config_module.h,v 1.6 2007-10-17 22:04:49 chu11 Exp $
+ *  $Id: cerebro_config_module.h,v 1.7 2007-10-23 22:09:33 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -29,6 +29,19 @@
 #define _CEREBRO_CONFIG_MODULE_H
 
 #include <cerebro/cerebro_config.h>
+
+#define CEREBRO_CONFIG_INTERFACE_VERSION 1
+
+/* 
+ * Cerebro_config_interface_version
+ *
+ * function prototype for config module function to return the
+ * current config interface version.  Should always return
+ * current value of macro CEREBRO_CONFIG_INTERFACE_VERSION.
+ *
+ * Returns version number on success, -1 one error
+ */
+typedef int (*Cerebro_config_interface_version)(void);
 
 /*
  * Cerebro_config_setup
@@ -70,6 +83,7 @@ typedef int (*Cerebro_config_load_config)(struct cerebro_config *conf);
 struct cerebro_config_module_info
 {
   char *config_module_name;
+  Cerebro_config_interface_version interface_version;
   Cerebro_config_setup setup;
   Cerebro_config_cleanup cleanup;
   Cerebro_config_load_config load_config;

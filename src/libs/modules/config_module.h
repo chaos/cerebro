@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: config_module.h,v 1.8 2007-10-18 20:39:12 chu11 Exp $
+ *  $Id: config_module.h,v 1.9 2007-10-23 22:09:33 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -64,6 +64,13 @@ int config_module_found(config_module_t handle);
  * Return config module name
  */
 char *config_module_name(config_module_t handle);
+
+/*
+ * config_module_interface_version
+ *
+ * Return config interface version
+ */
+int config_module_interface_version(config_module_t handle);
 
 /*
  * config_module_setup
