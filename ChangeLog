@@ -2,6 +2,9 @@
 
 	* src/cerebrod/cerebrod_speaker.c, src/libs/util/config_util.c:
 	Fix non-debug build compile bugs.
+
+	* configure.ac: Revert lib version change, since interfacea
+	actually didn't change.
 	
 2007-10-22  Albert Chu  <chu11@llnl.gov>
 
