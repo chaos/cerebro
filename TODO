@@ -31,8 +31,3 @@ Enhancements
 
 Specs:
 - cerebro.spec.in - find better way to do restarts
-
-Configging Hosts:
-
-usually checks are for > MAX_HOSTNAME_LEN, but user could go
-over it due to hostranges.

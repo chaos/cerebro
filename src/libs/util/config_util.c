@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: config_util.c,v 1.30 2007-10-22 22:47:41 chu11 Exp $
+ *  $Id: config_util.c,v 1.31 2007-10-23 16:41:41 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -636,6 +636,7 @@ _cb_cerebrod_forward_host_accept(conffile_t cf, struct conffile_data *data,
   return 0;
 }
 
+#if CEREBRO_DEBUG
 /*
  * _cb_cerebrod_alternate_hostname
  *
@@ -672,6 +673,7 @@ _cb_cerebrod_alternate_hostname(conffile_t cf, struct conffile_data *data,
   conf->cerebrod_alternate_hostname_flag++;
   return 0;
 }
+#endif /* CEREBRO_DEBUG */
 
 /* 
  * _load_config_file

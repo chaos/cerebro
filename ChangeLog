@@ -1,3 +1,8 @@
+2007-10-23  Albert Chu  <chu11@llnl.gov>
+
+	* src/cerebrod/cerebrod_speaker.c, src/libs/util/config_util.c:
+	Fix non-debug build compile bugs.
+	
 2007-10-22  Albert Chu  <chu11@llnl.gov>
 
 	* man/cerebro_module.3.in: Add event module information.
