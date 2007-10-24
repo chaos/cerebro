@@ -11,7 +11,11 @@
 
 	* man/cerebro_module_devel.3.in: Update with new versioning
 	information.
-	
+
+	* META, NEWS: update for release
+
+	* tagged cerebro-1-3-1
+
 2007-10-22  Albert Chu  <chu11@llnl.gov>
 
 	* man/cerebro_module.3.in: Add event module information.
