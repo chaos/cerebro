@@ -925,7 +925,7 @@ main(int argc, char *argv[])
       || (metric_name && !strcmp(metric_name, CEREBRO_METRIC_METRIC_NAMES)))
     _metric_list();
 
-  if (metric_name)
+  if (metric_name && strcmp(metric_name, CEREBRO_METRIC_METRIC_NAMES))
     _metric_data();
 
   if (event_name)
