@@ -1,7 +1,3 @@
-2007-10-26  Albert Chu  <chu11@llnl.gov>
-
-	* src/libs/cerebro/cerebro.c: Fix error message corner case.
-	
 2007-10-25  Albert Chu  <chu11@llnl.gov>
 
 	* man/Makefile.am: Install cerebro.1 manpage in man1 instead of
@@ -10,6 +6,8 @@
 	* man/cerebro.conf.5.in: Add forgotten new fields.
 
 	* man/cerebro_module_devel.3.in: Add forgotten module interface changes.
+
+	* src/libs/cerebro/cerebro.c: Fix error message corner case.
 
 2007-10-24  Albert Chu  <chu11@llnl.gov>
 
