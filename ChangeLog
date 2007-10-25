@@ -1,3 +1,8 @@
+2007-10-25  Albert Chu  <chu11@llnl.gov>
+
+	* man/Makefile.am: Install cerebro.1 manpage in man1 instead of
+	man3.
+	
 2007-10-24  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerebro-stat/cerebro-stat.c (main): Fix minor output corner
