@@ -817,7 +817,7 @@ _event_value_unmarshall(cerebro_t handle,
   else
     evalue_len = buflen;
 
-  if (!(evalue = malloc(buflen)))
+  if (!(evalue = malloc(evalue_len)))
     {
       handle->errnum = CEREBRO_ERR_OUTMEM;
       return -1;

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: data_util.c,v 1.5 2007-10-17 22:04:50 chu11 Exp $
+ *  $Id: data_util.c,v 1.6 2007-10-25 21:49:56 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -305,7 +305,7 @@ _unmarshall_data_value(u_int32_t dtype,
 {
   int n = -1;
 
-  if (dlen < dvalue_len || !buf || !caller)
+  if (dlen > dvalue_len || !buf || !caller)
     {
       CEREBRO_DBG(("%s: invalid parameters", caller));
       if (errnum)

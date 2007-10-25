@@ -89,7 +89,7 @@ _metric_value_unmarshall(cerebro_t handle,
   else
     mvalue_len = buflen;
 
-  if (!(mvalue = malloc(buflen)))
+  if (!(mvalue = malloc(mvalue_len)))
     {
       handle->errnum = CEREBRO_ERR_OUTMEM;
       return -1;

@@ -9,6 +9,11 @@
 
 	* src/libs/cerebro/cerebro.c: Fix error message corner case.
 
+	* src/libs/cerebro/cerebro_event.c (_event_value_unmarshall),
+	src/libs/cerebro/cerebro_metric_data.c (_metric_value_unmarshall),
+	src/libs/util/data_util.c (_unmarshall_data_value): Fix parsing
+	corner cases.
+
 2007-10-24  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerebro-stat/cerebro-stat.c (main): Fix minor output corner
