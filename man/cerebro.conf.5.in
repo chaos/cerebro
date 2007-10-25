@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro.conf.5.in,v 1.29 2007-10-18 22:32:27 chu11 Exp $
+\."$Id: cerebro.conf.5.in,v 1.30 2007-10-25 17:04:51 chu11 Exp $
 \."#############################################################################
 \."  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
 \."  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -259,6 +259,16 @@ specified.  To use defaults for destination_port or source_port a
 Specify the forwarded message packet time to live parameter.  This
 parameter is only used if the message destination ip address is a
 multicast ip address.  The default ttl is 1.
+.TP
+.I cerebrod_forward_host_accept host1 host2 host3 ...
+Specify hosts that are not in the cluster that 
+.B cerebrod
+should accept because packets are being forwarded to it.  This option
+is particularly useful for a
+.B cerebrod
+daemon that is running off cluster as a general "data collector".
+Hosts must be specified in their shortened hostname form.  The hosts
+can be specified space separated, comma separated, or hostranged.
 .if @MANPAGE_DEBUG@ \{
 .TP
 .I cerebrod_speak_debug ( on | off )

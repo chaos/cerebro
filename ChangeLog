@@ -2,6 +2,10 @@
 
 	* man/Makefile.am: Install cerebro.1 manpage in man1 instead of
 	man3.
+
+	* man/cerebro.conf.5.in: Add forgotten new fields.
+
+	* man/cerebro_module_devel.3.in: Add forgotten module interface changes.
 	
 2007-10-24  Albert Chu  <chu11@llnl.gov>
 

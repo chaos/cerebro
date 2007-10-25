@@ -1,5 +1,5 @@
 \."#############################################################################
-\."$Id: cerebro_module_devel.3.in,v 1.25 2007-10-23 22:09:33 chu11 Exp $
+\."$Id: cerebro_module_devel.3.in,v 1.26 2007-10-25 17:04:51 chu11 Exp $
 \."#############################################################################
 \."  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
 \."  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -208,44 +208,40 @@ The structure cerebro_config is defined as:
 .nf
 struct cerebro_config {
 .in +2
-  char cerebro_hostnames[CEREBRO_CONFIG_HOSTNAMES_MAX][CEREBRO_MAXNODENAMELEN+1];
-  int cerebro_hostnames_len;
-  int cerebro_hostnames_flag;
-  unsigned int cerebro_port;
-  int cerebro_port_flag;
+  /*
+   * Libcerebro configuration
+   */
+  struct cerebro_config_server cerebro_metric_server[CEREBRO_CONFIG_CEREBRO_METRIC_SERVERS_MAX];
+  int cerebro_metric_server_len;
+  int cerebro_metric_server_flag;
+  struct cerebro_config_server cerebro_event_server[CEREBRO_CONFIG_CEREBRO_EVENT_SERVERS_MAX];
+  int cerebro_event_server_len;
+  int cerebro_event_server_flag;
   unsigned int cerebro_timeout_len;
   int cerebro_timeout_len_flag;
   int cerebro_flags;
   int cerebro_flags_flag;
 
+  /*
+   * Cerebrod configuration
+   */
   unsigned int cerebrod_heartbeat_frequency_min;
   unsigned int cerebrod_heartbeat_frequency_max;
   int cerebrod_heartbeat_frequency_flag;
-  int cerebrod_message_source_port;
-  int cerebrod_message_source_port_flag;
-  char cerebrod_message_source_network_interface[CEREBRO_MAXNETWORKINTERFACELEN+1];
-  int cerebrod_message_source_network_interface_flag;
-  int cerebrod_message_destination_port;
-  int cerebrod_message_destination_port_flag;
-  char cerebrod_message_destination_ip[CEREBRO_MAXIPADDRLEN+1];
-  int cerebrod_message_destination_ip_flag;
-  int cerebrod_message_ttl;
-  int cerebrod_message_ttl_flag;
   int cerebrod_speak;
   int cerebrod_speak_flag;
+  struct cerebrod_config_speak_message_config cerebrod_speak_message_config[CEREBRO_CONFIG_SPEAK_MESSAGE_CONFIG_MAX];
+  int cerebrod_speak_message_config_len;
+  int cerebrod_speak_message_config_flag;
+  int cerebrod_speak_message_ttl;
+  int cerebrod_speak_message_ttl_flag;
   int cerebrod_listen;
   int cerebrod_listen_flag;
   int cerebrod_listen_threads;
   int cerebrod_listen_threads_flag;
-  int cerebrod_listen_ports[CEREBRO_MAX_LISTENERS];
-  int cerebrod_listen_ports_len;
-  int cerebrod_listen_ports_flag;
-  char cerebrod_listen_ips[CEREBRO_MAX_LISTENERS][CEREBRO_MAX_IPADDR_LEN+1];
-  int cerebrod_listen_ips_len;
-  int cerebrod_listen_ips_flag;
-  char cerebrod_listen_network_interfaces[CEREBRO_MAX_LISTENERS][CEREBRO_MAX_NETWORK_INTERFACE_LEN+1];
-  int cerebrod_listen_network_interfaces_len;
-  int cerebrod_listen_network_interfaces_flag;
+  struct cerebrod_config_listen_message_config cerebrod_listen_message_config[CEREBRO_CONFIG_LISTEN_MESSAGE_CONFIG_MAX];
+  int cerebrod_listen_message_config_len;
+  int cerebrod_listen_message_config_flag;
   int cerebrod_metric_controller;
   int cerebrod_metric_controller_flag;
   int cerebrod_metric_server;
@@ -256,6 +252,15 @@ struct cerebro_config {
   int cerebrod_event_server_flag;
   int cerebrod_event_server_port;
   int cerebrod_event_server_port_flag;
+  struct cerebrod_config_forward_message_config cerebrod_forward_message_config[CEREBRO_CONFIG_FORWARD_MESSAGE_CONFIG_MAX];
+  int cerebrod_forward_message_config_len;
+  int cerebrod_forward_message_config_flag;
+  int cerebrod_forward_message_ttl;
+  int cerebrod_forward_message_ttl_flag;
+  char cerebrod_forward_host_accept[CEREBRO_CONFIG_FORWARD_HOST_ACCEPT_MAX][CEREBRO_CONFIG_HOST_INPUT_MAX+1];
+  int cerebrod_forward_host_accept_len;
+  int cerebrod_forward_host_accept_flag;
+
 .if @MANPAGE_DEBUG@ \{
   int cerebrod_speak_debug;
   int cerebrod_speak_debug_flag;
@@ -267,16 +272,18 @@ struct cerebro_config {
   int cerebrod_metric_server_debug_flag;
   int cerebrod_event_server_debug;
   int cerebrod_event_server_debug_flag;
+  char cerebrod_alternate_hostname[CEREBRO_MAX_HOSTNAME_LEN+1];
+  int cerebrod_alternate_hostname_flag;
 \}
 .in -2
 };
 .fi
 
-The 'cerebro_hostnames' field should store an array of default
-hostnames for the libcerebro API should attempt to connect to.
+The 'cerebro_metric_server' field should store an array of default
+metric servers for the libcerebro API should attempt to connect to.
 
-The 'cerebro_port' field should store the default port for the
-libcerebro API should attempt to connect to.
+The 'cerebro_event_server' field should store an array of default
+event servers for the libcerebro API should attempt to connect to.
 
 The 'cerebro_timeout_len' field should store the default timeout
 length the libcerebro API should use to evaluate up vs. down nodes.
@@ -289,34 +296,18 @@ The 'cerebrod_heartbeat_frequency_min' and
 maximum heartbeat frequencey for
 .BR cerebrod(8).
 
-The 'cerebrod_message_source_port' field stores the message source
-port for
-.BR cerebrod(8).
-
-The 'cerebrod_message_source_network_interface' field stores the message
-network interface for
-.BR cerebrod(8)
-to send message packets out of.  The network interface can be
-specified as a network interface, ip address, or a subnet using CIDR
-notation.
-
-The 'cerebrod_message_destination_port' field stores the message
-destination port for
-.BR cerebrod(8).
-
-The 'cerebrod_message_destination_ip' field stores the message
-destination ip of message packets sent from
-.BR cerebrod(8).
-The destination IP address may be a single case or multicast IPv4
-address.
-
-The 'cerebrod_message_ttl' field stores the message time to live
-for message packets multicast from
-.BR cerebrod(8).
-
 The 'cerebrod_speak' field is a boolean that turns on the 
 .BR cerebrod(8)
 speaker to send out message packets.
+
+The 'cerebrod_speak_message_config' field should store an array of
+destinations 
+.BR cerebrod(8)
+messages should be to.
+
+The 'cerebrod_speak_message_ttl' field stores the message time to live
+for message packets multicast from
+.BR cerebrod(8).
 
 The 'cerebrod_listen' field is a boolean that turns on the
 .BR cerebrod(8)
@@ -326,20 +317,10 @@ The 'cerebrod_listen_threads' field stores the number of listener
 threads that should be created in
 .BR cerebrod(8).
 
-The 'cerebrod_listen_ports' field stores the ports
+The 'cerebrod_listen_message_config' field should store an array of
+message destinations 
 .BR cerebrod(8)
-should listen for heratbeat packets on.
-
-The 'cerebrod_listen_ips' field stores the IP addresses
-.BR cerebrod(8)
-should listen for heratbeat packets on.
-
-The 'cerebrod_listen_network_interfaces' field stores the network
-interfaces
-.BR cerebrod(8)
-should listen for heratbeat packets on.  The network interface can be
-specified as a network interface, ip address, or a subnet using CIDR
-notation.
+should be listening on.
 
 The 'cerebrod_metric_controller' field is a boolean that turns on the
 .BR cerebrod(8)
@@ -360,6 +341,19 @@ event server to receive event data requests.
 The 'cerebrod_event_server_port' field stores the event server
 port for 
 .BR cerebrod(8).
+
+The 'cerebrod_forward_message_config' field should store an array of
+message destinations
+.BR cerebrod(8)
+should forward to.
+
+The 'cerebrod_forward_message_ttl' field stores the message time to live
+for forwarded message packets multicast from
+.BR cerebrod(8).
+
+The 'cerebrod_forward_host_accept' field stores the non-cluster hosts
+.BR cerebrod(8)
+should accept.
 
 .if @MANPAGE_DEBUG@ \{
 
@@ -383,12 +377,15 @@ The 'cerebrod_event_server_debug' field is a boolean that turns on
 event server debugging for
 .BR cerebrod.
 
+The 'cerebrod_alternate_hostname' field is a string that specifies
+an alternate hostname 
+.BR cerebrod
+should assume for testing purposes.
 \}
 
 Any parameter that is set in the configuration structure must have its
-respective flag set.  The 'hostnames' field must also have the
-'hostnames_len' field appropriately set to the number of hostnames
-loaded.
+respective flag set.  Any array parameter must also have the appropriately
+array length parameter set.
 
 .SH "METRIC MODULES"
 A cerebro metric module of the name 'foobar' can be written by
