@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.c,v 1.15 2007-10-18 21:45:28 chu11 Exp $
+ *  $Id: cerebro.c,v 1.16 2007-10-25 20:27:20 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -45,31 +45,33 @@
 
 static char *cerebro_error_messages[] =
   {
-    "success",
-    "null cerebro_t handle",
-    "null cerebro_namelist_t namelist",
-    "null cerebro_namelist_iterator_t iterator",
-    "null cerebro_nodelist_t nodelist",
-    "null cerebro_nodelist_iterator_t iterator",
-    "invalid magic number found",
-    "invalid parameters",
-    "invalid hostname",
-    "connection error",
-    "connection timeout",
-    "protocol error",
-    "protocol timeout",
-    "version incompatible",
-    "buffer overflow",
-    "node not found",
-    "metric name invalid",
-    "metric max reached",
-    "end of list reached",
-    "config file error",
-    "config module error",
-    "config input error",
-    "out of memory",
-    "internal error",
-    "errnum out of range",
+    "success",                                   /* 0 */
+    "null cerebro_t handle",                     /* 1 */
+    "null cerebro_namelist_t namelist",          /* 2 */
+    "null cerebro_namelist_iterator_t iterator", /* 3 */
+    "null cerebro_nodelist_t nodelist",          /* 4 */
+    "null cerebro_nodelist_iterator_t iterator", /* 5 */
+    "invalid magic number found",                /* 6 */
+    "invalid parameters",                        /* 7 */
+    "invalid hostname",                          /* 8 */
+    "connection error",                          /* 9 */
+    "connection timeout",                        /* 10 */
+    "protocol error",                            /* 11 */
+    "protocol timeout",                          /* 12 */
+    "version incompatible",                      /* 13 */
+    "buffer overflow",                           /* 14 */
+    "node not found",                            /* 15 */
+    "metric name invalid",                       /* 16 */
+    "event name invalid",                        /* 17 */
+    "metric max reached",                        /* 18 */
+    "end of list reached",                       /* 19 */
+    "event not received",                        /* 20 */
+    "config file error",                         /* 21 */
+    "config module error",                       /* 22 */
+    "config input error",                        /* 23 */
+    "out of memory",                             /* 24 */
+    "internal error",                            /* 25 */
+    "errnum out of range",                       /* 26 */
   };
 
 cerebro_t
