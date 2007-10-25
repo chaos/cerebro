@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.141 2007-10-22 23:24:06 chu11 Exp $
+ *  $Id: cerebrod_config.c,v 1.142 2007-10-25 17:45:24 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -1160,10 +1160,10 @@ _cerebrod_config_dump(void)
       fprintf(stderr, "* listen[%d]: ip: \"%s\"\n", i, conf.listen_message_config[i].ip);
       fprintf(stderr, "* listen[%d]: port: %d\n", i, conf.listen_message_config[i].port);
       fprintf(stderr, "* listen[%d]: network_interface: \"%s\"\n", i, conf.listen_message_config[i].network_interface);
-      fprintf(stderr, "* listen[%d]: listen_ips_is_multicast: %d\n", i, conf.listen_message_config[i].ip_is_multicast);
-      fprintf(stderr, "* listen[%d]: listen_ips_in_addr: %s\n", i, inet_ntoa(conf.listen_message_config[i].ip_in_addr));
-      fprintf(stderr, "* listen[%d]: listen_network_interfaces_in_addr: %s\n", i, inet_ntoa(conf.listen_message_config[i].network_interface_in_addr));
-      fprintf(stderr, "* listen[%d]: listen_network_interfaces_index: %d\n", i, conf.listen_message_config[i].network_interface_index);
+      fprintf(stderr, "* listen[%d]: ip_is_multicast: %d\n", i, conf.listen_message_config[i].ip_is_multicast);
+      fprintf(stderr, "* listen[%d]: ip_in_addr: %s\n", i, inet_ntoa(conf.listen_message_config[i].ip_in_addr));
+      fprintf(stderr, "* listen[%d]: network_interfaces_in_addr: %s\n", i, inet_ntoa(conf.listen_message_config[i].network_interface_in_addr));
+      fprintf(stderr, "* listen[%d]: network_interfaces_index: %d\n", i, conf.listen_message_config[i].network_interface_index);
     }
   fprintf(stderr, "* listen_threads: %d\n", conf.listen_threads);
   fprintf(stderr, "* metric_controller: %d\n", conf.metric_controller);
