@@ -381,8 +381,6 @@ _setup_event_connection(cerebro_t handle, const char *event_name)
   if (_cerebro_load_config(handle) < 0)
     return -1;
   
-        port = CEREBRO_EVENT_SERVER_PORT;
-
   /* No flags available for events right now, so nothing to handle */
   flags = 0;
 
@@ -411,7 +409,7 @@ _setup_event_connection(cerebro_t handle, const char *event_name)
               if (!handle->port)
                 {
                   if (handle->config_data.cerebro_event_server[i].port == CEREBRO_CONFIG_PORT_DEFAULT)
-                    port = CEREBRO_METRIC_SERVER_PORT;
+                    port = CEREBRO_EVENT_SERVER_PORT;
                   else
                     port = handle->config_data.cerebro_event_server[i].port;
                 }
@@ -444,7 +442,7 @@ _setup_event_connection(cerebro_t handle, const char *event_name)
             hostname = handle->hostname;
 
           if (!handle->port)
-            port = CEREBRO_METRIC_SERVER_PORT;
+            port = CEREBRO_EVENT_SERVER_PORT;
           else
             port = handle->port;
           
