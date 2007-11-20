@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.107 2007-10-23 16:41:41 chu11 Exp $
+ *  $Id: cerebrod_speaker.c,v 1.108 2007-11-20 18:19:29 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -250,6 +250,18 @@ _speaker_initialize(void)
 
   srand(seed);
 
+  /* achu: setup speaker fds first, since later initialization could
+   * launch metric modules that want to send data, which require the
+   * fds to be setup first.
+   */
+  Pthread_mutex_lock(&speaker_fds_lock);
+  for (i = 0; i < conf.speak_message_config_len; i++)
+    {
+      if ((speaker_fds[i] = _speaker_setup_socket(i)) < 0)
+        CEREBRO_EXIT(("speaker fd setup failed"));
+    }
+  Pthread_mutex_unlock(&speaker_fds_lock);
+
   cerebrod_speaker_data_initialize();
 
   next_send_times = List_create((ListDelF)_Free);
@@ -300,14 +312,6 @@ _speaker_initialize(void)
     }
 
   List_sort(next_send_times, (ListCmpF)_next_send_time_compare);
-
-  Pthread_mutex_lock(&speaker_fds_lock);
-  for (i = 0; i < conf.speak_message_config_len; i++)
-    {
-      if ((speaker_fds[i] = _speaker_setup_socket(i)) < 0)
-        CEREBRO_EXIT(("speaker fd setup failed"));
-    }
-  Pthread_mutex_unlock(&speaker_fds_lock);
 }
 
 /*
@@ -595,10 +599,6 @@ cerebrod_send_message(struct cerebrod_message *msg)
       errno = EINVAL;
       return -1;
     }
-
-  /* To avoid issues with the primary speaker "thread", we create
-   * another fd
-   */
 
   msglen = CEREBROD_MESSAGE_HEADER_LEN;
   for (i = 0; i < msg->metrics_len; i++)

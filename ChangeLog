@@ -1,3 +1,11 @@
+2007-11-20  Albert Chu  <chu11@llnl.gov>
+
+	* src/cerebrod/cerebrod_speaker.c (cerebrod_send_message): Remove
+	incorrect comment.
+
+	* src/cerebrod/cerebrod_speaker.c (_speaker_initialize): Fix
+	speaker initialization race.
+	
 2007-10-26  Albert Chu  <chu11@llnl.gov>
 
 	* src/libs/cerebro/cerebro_event.c (_setup_event_connection): Fix
