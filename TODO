@@ -22,6 +22,9 @@ Future Features
   - so can try to avoid dieing on low memory conditions
     (i.e. before the linux oom killer finishes its job)
 
+- iterate through all config modules, exit after one succeeds.  If
+  none succeed, use default.
+
 Enhancements
 - Should pass config to modules so they can configure/setup 
   based on various conditions.
