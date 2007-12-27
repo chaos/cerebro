@@ -38,6 +38,8 @@ Module Extra Stuff
   - metric
   - monitoring
   - event
+- don't fail if mysql connection fails in monitoring modules
+
 
 Specs:
 - cerebro.spec.in - find better way to do restarts
