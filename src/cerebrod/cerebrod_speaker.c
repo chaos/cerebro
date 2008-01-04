@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.108 2007-11-20 18:19:29 chu11 Exp $
+ *  $Id: cerebrod_speaker.c,v 1.109 2008-01-04 23:27:04 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -495,6 +495,7 @@ _cerebrod_message_send(struct cerebrod_message* msg, unsigned int msglen)
         }
     }
   Pthread_mutex_unlock(&speaker_fds_lock);
+  Free(buf);
 }
 
 void *
