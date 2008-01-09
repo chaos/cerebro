@@ -40,6 +40,7 @@ Module Extra Stuff
   - event
 - don't fail if mysql connection fails in monitoring modules
 
-
+TCP connections instead of UDP for metric monitoring
+ 
 Specs:
 - cerebro.spec.in - find better way to do restarts
