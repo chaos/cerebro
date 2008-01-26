@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: config_util.c,v 1.31 2007-10-23 16:41:41 chu11 Exp $
+ *  $Id: config_util.c,v 1.32 2008-01-26 06:25:01 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -636,6 +636,55 @@ _cb_cerebrod_forward_host_accept(conffile_t cf, struct conffile_data *data,
   return 0;
 }
 
+/*
+ * _cb_cerebrod_metric_module_exclude
+ *
+ * callback function that parses and stores cerebrod forward host
+ * accept configuration.
+ *
+ * Returns 0 on success, -1 on error
+ */
+static int
+_cb_cerebrod_metric_module_exclude(conffile_t cf, struct conffile_data *data,
+                                 char *optionname, int option_type, void *option_ptr,
+                                 int option_data, void *app_ptr, int app_data)
+{
+  struct cerebro_config *conf;
+
+  if (!option_ptr)
+    {
+      conffile_seterrnum(cf, CONFFILE_ERR_PARAMETERS);
+      return -1;
+    }
+  
+  conf = (struct cerebro_config *)option_ptr;
+
+  if (data->stringlist_len > 0)
+    {
+      int i;
+
+      for (i = 0; i < data->stringlist_len; i++)
+        {
+          if (conf->cerebrod_metric_module_exclude_len >= CEREBRO_CONFIG_METRIC_MODULE_EXCLUDE_MAX)
+            {
+              conffile_seterrnum(cf, CONFFILE_ERR_PARSE_ARG_TOOMANY);
+              return -1;
+            }
+
+          if (strlen(data->stringlist[i]) > CEREBRO_MAX_MODULE_NAME_LEN)
+            {
+              conffile_seterrnum(cf, CONFFILE_ERR_PARSE_OVERFLOW_ARGLEN);
+              return -1;
+            }
+      
+          strcpy(conf->cerebrod_metric_module_exclude[conf->cerebrod_metric_module_exclude_len], 
+                 data->stringlist[i]);
+          conf->cerebrod_metric_module_exclude_len++;
+        }
+    }
+  return 0;
+}
+
 #if CEREBRO_DEBUG
 /*
  * _cb_cerebrod_alternate_hostname
@@ -901,6 +950,17 @@ _load_config_file(struct cerebro_config *conf, unsigned int *errnum)
 	CEREBRO_CONFIG_FORWARD_HOST_ACCEPT_MAX, 
 	0, 
 	&(conf->cerebrod_forward_host_accept_flag),
+	conf, 
+	0
+      },
+      {
+	"cerebrod_metric_module_exclude", 
+	CONFFILE_OPTION_LIST_STRING, 
+	-1,
+	_cb_cerebrod_metric_module_exclude, 
+	CEREBRO_CONFIG_METRIC_MODULE_EXCLUDE_MAX, 
+	0, 
+	&(conf->cerebrod_metric_module_exclude_flag),
 	conf, 
 	0
       },
@@ -1208,6 +1268,17 @@ _set_cerebro_config(struct cerebro_config *dest,
                src->cerebrod_forward_host_accept[i]);
       dest->cerebrod_forward_host_accept_len = src->cerebrod_forward_host_accept_len;
       dest->cerebrod_forward_host_accept_flag++;
+    }
+
+  if (!dest->cerebrod_metric_module_exclude_flag 
+      && src->cerebrod_metric_module_exclude_flag
+      && src->cerebrod_metric_module_exclude_len)
+    {
+      for (i = 0; i < src->cerebrod_metric_module_exclude_len; i++)
+        strcpy(dest->cerebrod_metric_module_exclude[i],
+               src->cerebrod_metric_module_exclude[i]);
+      dest->cerebrod_metric_module_exclude_len = src->cerebrod_metric_module_exclude_len;
+      dest->cerebrod_metric_module_exclude_flag++;
     }
 
 #if CEREBRO_DEBUG

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.142 2007-10-25 17:45:24 chu11 Exp $
+ *  $Id: cerebrod_config.c,v 1.143 2008-01-26 06:25:01 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -128,6 +128,8 @@ _cerebrod_set_config_default(void)
   conf.forward_message_ttl = CEREBROD_FORWARD_MESSAGE_TTL_DEFAULT;
 
   conf.forward_host_accept = Hostlist_create(NULL);
+
+  conf.metric_module_exclude_len = 0;
 
 #if CEREBRO_DEBUG
   conf.speak_debug = CEREBROD_SPEAK_DEBUG_DEFAULT;
@@ -427,6 +429,14 @@ _cerebrod_load_config(void)
           Free(hostptr);
         }
       Hostlist_sort(conf.forward_host_accept);
+    }
+
+  if (tconf.cerebrod_metric_module_exclude_flag
+      && tconf.cerebrod_metric_module_exclude_len)
+    {
+      for (i = 0; i < tconf.cerebrod_metric_module_exclude_len; i++)
+        strcpy(conf.metric_module_exclude[i], tconf.cerebrod_metric_module_exclude[i]);
+      conf.metric_module_exclude_len = tconf.cerebrod_metric_module_exclude_len;
     }
 
 #if CEREBRO_DEBUG

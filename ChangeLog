@@ -1,3 +1,12 @@
+2008-01-25  Albert Chu  <chu11@llnl.gov>
+
+	* man/cerebro.conf.5.in, src/cerebrod/cerebrod_config.c,
+	src/cerebrod/cerebrod_speaker_data.c,
+	src/libs/include/cerebro/cerebro_config.h,
+	src/libs/include/cerebro/cerebro_constants.h,
+	src/libs/util/config_util.c: Support metric module exclude
+	options.
+	
 2008-01-04  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerebrod/cerebrod_speaker.c (_cerebrod_message_send): Fix

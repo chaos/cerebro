@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker_data.c,v 1.47 2007-10-17 22:04:49 chu11 Exp $
+ *  $Id: cerebrod_speaker_data.c,v 1.48 2008-01-26 06:25:01 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -169,6 +169,41 @@ _setup_metric_modules(void)
       u_int32_t metric_flags;
       
       module_name = metric_module_name(metric_handle, i);
+
+      if (conf.metric_module_exclude_len)
+        {
+          int found_exclude = 0;
+          int j;
+
+          for (j = 0; j < conf.metric_module_exclude_len; j++)
+            {
+              if (!strcasecmp(conf.metric_module_exclude[j], module_name))
+                {
+                  found_exclude++;
+                  break;
+                }
+            }
+          
+          if (found_exclude)
+            {
+#if CEREBRO_DEBUG
+              if (conf.debug && conf.speak_debug)
+                {
+#if !WITH_CEREBROD_NO_THREADS
+                  Pthread_mutex_lock(&debug_output_mutex);
+#endif /* !WITH_CEREBROD_NO_THREADS */
+                  fprintf(stderr, "**************************************\n");
+                  fprintf(stderr, "* Skip Metric Module: %s\n", module_name);
+                  fprintf(stderr, "**************************************\n");
+#if !WITH_CEREBROD_NO_THREADS
+                  Pthread_mutex_unlock(&debug_output_mutex);
+#endif /* !WITH_CEREBROD_NO_THREADS */
+                }
+#endif /* CEREBRO_DEBUG */
+              continue;
+            }
+        }
+      
 #if CEREBRO_DEBUG
       if (conf.debug && conf.speak_debug)
         {

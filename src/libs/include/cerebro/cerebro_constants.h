@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_constants.h,v 1.13 2007-10-17 22:04:49 chu11 Exp $
+ *  $Id: cerebro_constants.h,v 1.14 2008-01-26 06:25:01 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -55,8 +55,10 @@
 /* Leave atleast 1K for packet header information */
 #define CEREBRO_MAX_DATA_STRING_LEN        (CEREBRO_MAX_PACKET_LEN - 1024)
 
-#if 0
-#define CEREBRO_MAX_LISTENERS              4
-#endif
+/* achu: all modules don't have a name length, and cerebrod doesn't
+ * check for a name length.  This is a hack to get the
+ * cerebrod_metric_module_exclude option going.
+ */
+#define CEREBRO_MAX_MODULE_NAME_LEN        64
 
 #endif /* _CEREBRO_CONSTANTS_H */

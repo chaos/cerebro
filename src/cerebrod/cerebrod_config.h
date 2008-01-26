@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.h,v 1.70 2007-10-22 23:24:06 chu11 Exp $
+ *  $Id: cerebrod_config.h,v 1.71 2008-01-26 06:25:01 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -148,6 +148,8 @@ struct cerebrod_config
   int forward_message_config_len;
   int forward_message_ttl;
   hostlist_t forward_host_accept;
+  char metric_module_exclude[CEREBRO_CONFIG_METRIC_MODULE_EXCLUDE_MAX][CEREBRO_MAX_MODULE_NAME_LEN+1];
+  int metric_module_exclude_len;
 
 #if CEREBRO_DEBUG
   int speak_debug;

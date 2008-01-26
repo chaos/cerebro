@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_config.h,v 1.18 2007-10-22 22:47:41 chu11 Exp $
+ *  $Id: cerebro_config.h,v 1.19 2008-01-26 06:25:01 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -43,6 +43,8 @@
 #define CEREBRO_CONFIG_FORWARD_HOST_MAX           64
 
 #define CEREBRO_CONFIG_FORWARD_HOST_ACCEPT_MAX    512
+
+#define CEREBRO_CONFIG_METRIC_MODULE_EXCLUDE_MAX  64
 
 #define CEREBRO_CONFIG_PORT_DEFAULT               0
 
@@ -136,6 +138,9 @@ struct cerebro_config
   char cerebrod_forward_host_accept[CEREBRO_CONFIG_FORWARD_HOST_ACCEPT_MAX][CEREBRO_CONFIG_HOST_INPUT_MAX+1];
   int cerebrod_forward_host_accept_len;
   int cerebrod_forward_host_accept_flag;
+  char cerebrod_metric_module_exclude[CEREBRO_CONFIG_METRIC_MODULE_EXCLUDE_MAX][CEREBRO_MAX_MODULE_NAME_LEN+1];
+  int cerebrod_metric_module_exclude_len;
+  int cerebrod_metric_module_exclude_flag;
 #if CEREBRO_DEBUG
   int cerebrod_speak_debug;
   int cerebrod_speak_debug_flag;
