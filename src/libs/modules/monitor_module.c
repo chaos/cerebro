@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: monitor_module.c,v 1.22 2007-10-23 22:09:33 chu11 Exp $
+ *  $Id: monitor_module.c,v 1.23 2008-01-29 19:24:30 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -346,7 +346,7 @@ monitor_module_name(monitor_modules_t handle, unsigned int index)
 }
 
 int
-monitor_module_interface_version(monitor_modules_t handle)
+monitor_module_interface_version(monitor_modules_t handle, unsigned int index)
 {
   struct cerebro_monitor_module_info *module_info;
 

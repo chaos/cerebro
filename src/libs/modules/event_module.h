@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: event_module.h,v 1.6 2007-10-23 22:09:33 chu11 Exp $
+ *  $Id: event_module.h,v 1.7 2008-01-29 19:24:30 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -69,7 +69,7 @@ char *event_module_name(event_modules_t handle, unsigned int index);
  *
  * Return event interface version
  */
-int event_module_interface_version(event_modules_t handle);
+int event_module_interface_version(event_modules_t handle, unsigned int index);
 
 /*
  * event_module_setup

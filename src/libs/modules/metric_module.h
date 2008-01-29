@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: metric_module.h,v 1.15 2007-10-23 22:09:33 chu11 Exp $
+ *  $Id: metric_module.h,v 1.16 2008-01-29 19:24:30 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -67,7 +67,7 @@ char *metric_module_name(metric_modules_t handle, unsigned int index);
  *
  * Return metric interface version
  */
-int metric_module_interface_version(metric_modules_t handle);
+int metric_module_interface_version(metric_modules_t handle, unsigned int index);
 
 /*
  * metric_module_setup

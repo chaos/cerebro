@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: event_module.c,v 1.7 2007-10-23 22:09:33 chu11 Exp $
+ *  $Id: event_module.c,v 1.8 2008-01-29 19:24:30 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -356,7 +356,7 @@ event_module_name(event_modules_t handle, unsigned int index)
 }
 
 int
-event_module_interface_version(event_modules_t handle)
+event_module_interface_version(event_modules_t handle, unsigned int index)
 {
   struct cerebro_event_module_info *module_info;
 
