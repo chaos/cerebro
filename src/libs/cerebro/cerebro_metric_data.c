@@ -197,8 +197,6 @@ _receive_metric_data_response(cerebro_t handle,
   u_int32_t mtype, mlen;
   int rv = -1;
 
-  res->metric_value = NULL;
-
   if (_cerebro_handle_check(handle) < 0)
     {
       CEREBRO_DBG(("handle invalid"));
@@ -212,6 +210,8 @@ _receive_metric_data_response(cerebro_t handle,
       handle->errnum = CEREBRO_ERR_INTERNAL;
       goto cleanup;
     }
+
+  res->metric_value = NULL;
 
   nodelist = (struct cerebro_nodelist *)list;
   if (nodelist->magic != CEREBRO_NODELIST_MAGIC_NUMBER)

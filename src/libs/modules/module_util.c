@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: module_util.c,v 1.19 2007-10-17 22:04:50 chu11 Exp $
+ *  $Id: module_util.c,v 1.20 2008-01-29 19:09:54 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -267,7 +267,7 @@ _find_unknown_modules(char *search_dir,
                       void *handle,
                       unsigned int modules_max)
 {
-  DIR *dir;
+  DIR *dir = NULL;
   struct dirent *dirent;
   int found = 0;
 
@@ -326,6 +326,7 @@ _find_unknown_modules(char *search_dir,
   return (found) ? 1 : 0;
 
  cleanup:
+  closedir(dir);
   return -1;
 }
 

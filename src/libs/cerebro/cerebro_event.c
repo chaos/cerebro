@@ -858,6 +858,8 @@ cerebro_event_parse(cerebro_t handle,
   char *vbuf = NULL;
   void *event_value_ptr = NULL;
       
+  memset(&event, '\0', sizeof(struct cerebro_event));
+
   if (_cerebro_handle_check(handle) < 0)
     goto cleanup;
 
@@ -897,8 +899,6 @@ cerebro_event_parse(cerebro_t handle,
       handle->errnum = CEREBRO_ERR_EVENT_NOT_RECEIVED;
       goto cleanup;
     }
-
-  memset(&event, '\0', sizeof(struct cerebro_event));
 
   if ((bytes_read = receive_data(fd,
                                  CEREBRO_EVENT_HEADER_LEN,

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_controller.c,v 1.46 2007-10-17 22:04:49 chu11 Exp $
+ *  $Id: cerebrod_metric_controller.c,v 1.47 2008-01-29 19:09:53 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -408,7 +408,7 @@ _register_metric(int fd, int32_t version, const char *metric_name)
 
   Pthread_mutex_lock(&metric_list_lock);
 
-  if ((metric_info = _find_speaker_metric_info(metric_name)))
+  if (_find_speaker_metric_info(metric_name))
     {
       _send_metric_control_response(fd,
                                     version,
@@ -1082,6 +1082,8 @@ _metric_controller_service_connection(void *arg)
                                 CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_SUCCESS);
 
  cleanup:
+  if (req.metric_value)
+    Free(req.metric_value);
   Free(arg);
   Close(fd);
   return NULL;

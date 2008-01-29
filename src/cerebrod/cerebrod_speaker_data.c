@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker_data.c,v 1.48 2008-01-26 06:25:01 chu11 Exp $
+ *  $Id: cerebrod_speaker_data.c,v 1.49 2008-01-29 19:09:53 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -79,7 +79,7 @@ pthread_mutex_t speaker_data_init_lock = PTHREAD_MUTEX_INITIALIZER;
  * Handle for metric modules and the count
  */
 metric_modules_t metric_handle = NULL;
-unsigned int metric_handle_count = 0;
+int metric_handle_count = 0;
 
 /*
  * metric_list

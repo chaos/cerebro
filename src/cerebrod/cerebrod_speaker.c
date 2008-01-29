@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.109 2008-01-04 23:27:04 chu11 Exp $
+ *  $Id: cerebrod_speaker.c,v 1.110 2008-01-29 19:09:53 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -450,7 +450,7 @@ _cerebrod_message_dump(struct cerebrod_message *msg)
 static void
 _cerebrod_message_send(struct cerebrod_message* msg, unsigned int msglen)
 {
-  unsigned int buflen;
+  int buflen;
   char *buf = NULL;
   int i, rv;
 

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_boottime.c,v 1.27 2007-10-23 22:09:33 chu11 Exp $
+ *  $Id: cerebro_metric_boottime.c,v 1.28 2008-01-29 19:09:54 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -94,7 +94,11 @@ boottime_metric_setup(void)
       goto cleanup;
     }
 
-  bootvalptr = strstr(buf, BOOTTIME_KEYWORD);
+  if (!(bootvalptr = strstr(buf, BOOTTIME_KEYWORD)))
+    {
+      CEREBRO_ERR(("strstr: boottime can't be found"));
+      goto cleanup;
+    }
   bootvalptr += strlen(BOOTTIME_KEYWORD);
 
   errno = 0;

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers_hostlist.c,v 1.6 2007-10-22 23:24:06 chu11 Exp $
+ *  $Id: wrappers_hostlist.c,v 1.7 2008-01-29 19:09:54 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -113,10 +113,10 @@ wrap_hostlist_find(WRAPPERS_ARGS, hostlist_t hl, const char *hostname)
   return hostlist_find(hl, hostname);
 }
 
-size_t 
+ssize_t 
 wrap_hostlist_ranged_string(WRAPPERS_ARGS, hostlist_t hl, size_t n, char *buf)
 {
-  size_t rv;
+  ssize_t rv;
 
   assert(file && function);
 
@@ -129,10 +129,10 @@ wrap_hostlist_ranged_string(WRAPPERS_ARGS, hostlist_t hl, size_t n, char *buf)
   return rv;
 }
 
-size_t 
+ssize_t 
 wrap_hostlist_deranged_string(WRAPPERS_ARGS, hostlist_t hl, size_t n, char *buf)
 {
-  size_t rv;
+  ssize_t rv;
 
   assert(file && function);
 

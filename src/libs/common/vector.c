@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: vector.c,v 1.9 2007-10-17 22:04:49 chu11 Exp $
+ *  $Id: vector.c,v 1.10 2008-01-29 19:09:54 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -507,7 +507,7 @@ vector_iterator_create (Vector v)
       errno = ENOMEM;
       return lsd_nomem_error(__FILE__, __LINE__, "vector iterator create");
     }
-  memset(i, '\0', sizeof(struct vector));
+  memset(i, '\0', sizeof(struct vectorIterator));
   i->v = v;
   i->current = 0;
   assert(i->magic = VECTOR_ITERATOR_MAGIC); /* set magic via assert abuse */

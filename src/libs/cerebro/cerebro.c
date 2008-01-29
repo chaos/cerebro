@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro.c,v 1.16 2007-10-25 20:27:20 chu11 Exp $
+ *  $Id: cerebro.c,v 1.17 2008-01-29 19:09:53 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -104,14 +104,16 @@ cerebro_handle_create(void)
   return handle;
 
  cleanup:
-  if (handle->namelists)
-    list_destroy(handle->namelists);
-  if (handle->nodelists)
-    list_destroy(handle->nodelists);
-  if (handle->event_fds)
-    list_destroy(handle->event_fds);
   if (handle)
-    free(handle);
+    {
+      if (handle->namelists)
+        list_destroy(handle->namelists);
+      if (handle->nodelists)
+        list_destroy(handle->nodelists);
+      if (handle->event_fds)
+        list_destroy(handle->event_fds);
+      free(handle);
+    }
   return NULL;
 }
 
