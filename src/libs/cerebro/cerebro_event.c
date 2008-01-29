@@ -368,7 +368,6 @@ static int
 _setup_event_connection(cerebro_t handle, const char *event_name)
 {
   int fd = -1;
-  unsigned int port;
   unsigned int flags;
 
   if (!event_name)

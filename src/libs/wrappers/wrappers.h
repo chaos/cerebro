@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.h,v 1.20 2007-10-22 23:24:06 chu11 Exp $
+ *  $Id: wrappers.h,v 1.21 2008-01-29 19:20:20 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -387,8 +387,8 @@ void wrap_hostlist_sort(WRAPPERS_ARGS, hostlist_t hl);
 void wrap_hostlist_uniq(WRAPPERS_ARGS, hostlist_t hl);
 int wrap_hostlist_push(WRAPPERS_ARGS, hostlist_t hl, const char *host);
 int wrap_hostlist_find(WRAPPERS_ARGS, hostlist_t hl, const char *hostname);
-size_t wrap_hostlist_ranged_string(WRAPPERS_ARGS, hostlist_t hl, size_t n, char *buf);
-size_t wrap_hostlist_deranged_string(WRAPPERS_ARGS, hostlist_t hl, size_t n, char *buf);
+ssize_t wrap_hostlist_ranged_string(WRAPPERS_ARGS, hostlist_t hl, size_t n, char *buf);
+ssize_t wrap_hostlist_deranged_string(WRAPPERS_ARGS, hostlist_t hl, size_t n, char *buf);
 hostlist_iterator_t wrap_hostlist_iterator_create(WRAPPERS_ARGS, hostlist_t hl);
 void wrap_hostlist_iterator_destroy(WRAPPERS_ARGS, hostlist_iterator_t i);
 char *wrap_hostlist_next(WRAPPERS_ARGS, hostlist_iterator_t i);

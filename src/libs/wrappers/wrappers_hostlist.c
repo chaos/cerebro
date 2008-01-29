@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers_hostlist.c,v 1.7 2008-01-29 19:09:54 chu11 Exp $
+ *  $Id: wrappers_hostlist.c,v 1.8 2008-01-29 19:20:20 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -102,8 +102,6 @@ wrap_hostlist_push(WRAPPERS_ARGS, hostlist_t hl, const char *host)
 int 
 wrap_hostlist_find(WRAPPERS_ARGS, hostlist_t hl, const char *hostname)
 {
-  int rv;
-
   assert(file && function);
 
   if (!hl || !hostname)
