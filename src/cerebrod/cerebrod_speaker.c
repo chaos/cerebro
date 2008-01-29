@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.110 2008-01-29 19:09:53 chu11 Exp $
+ *  $Id: cerebrod_speaker.c,v 1.111 2008-01-29 19:44:00 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -460,7 +460,10 @@ _cerebrod_message_send(struct cerebrod_message* msg, unsigned int msglen)
   buf = Malloc(msglen + 1);
                   
   if ((buflen = _message_marshall(msg, buf, msglen)) < 0)
-    return;
+    {
+      Free(buf);
+      return;
+    }
   
   Pthread_mutex_lock(&speaker_fds_lock);
   for (i = 0; i < conf.speak_message_config_len; i++)
