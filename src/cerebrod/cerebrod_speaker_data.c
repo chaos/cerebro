@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker_data.c,v 1.49 2008-01-29 19:09:53 chu11 Exp $
+ *  $Id: cerebrod_speaker_data.c,v 1.50 2008-01-30 02:13:13 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -200,6 +200,7 @@ _setup_metric_modules(void)
 #endif /* !WITH_CEREBROD_NO_THREADS */
                 }
 #endif /* CEREBRO_DEBUG */
+              CEREBRO_ERR(("Dropping metric module: %s", module_name));
               continue;
             }
         }

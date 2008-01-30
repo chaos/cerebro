@@ -1,5 +1,10 @@
 2008-01-29  Albert Chu  <chu11@llnl.gov>
 
+	* src/cerebrod/cerebrod_speaker.c (_setup_metric_modules): Add
+	debug statement.
+	
+2008-01-29  Albert Chu  <chu11@llnl.gov>
+
 	* Various minor bug fixes based on code analyzer.
 
 2008-01-25  Albert Chu  <chu11@llnl.gov>
