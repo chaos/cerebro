@@ -39,6 +39,7 @@ Module Extra Stuff
   - monitoring
   - event
 - don't fail if mysql connection fails in monitoring modules
+- support exclude option on all modules
 
 TCP connections instead of UDP for metric monitoring
  
