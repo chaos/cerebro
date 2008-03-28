@@ -1,31 +1,31 @@
-\."#############################################################################
-\."$Id: cerebro_module_devel.3.in,v 1.26 2007-10-25 17:04:51 chu11 Exp $
-\."#############################################################################
-\."  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
-\."  Copyright (C) 2005-2007 The Regents of the University of California.
-\."  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
-\."  Written by Albert Chu <chu11@llnl.gov>.
-\."  UCRL-CODE-155989 All rights reserved.
-\."
-\."  This file is part of Cerebro, a collection of cluster monitoring tools
-\."  and libraries.  For details, see <http://www.llnl.gov/linux/cerebro/>.
-\."
-\."  Cerebro is free software; you can redistribute it and/or modify it under
-\."  the terms of the GNU General Public License as published by the Free
-\."  Software Foundation; either version 2 of the License, or (at your option)
-\."  any later version.
-\."
-\."  Cerebro is distributed in the hope that it will be useful, but WITHOUT ANY
-\."  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-\."  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
-\."  details.
-\."
-\."  You should have received a copy of the GNU General Public License along
-\."  with Cerebro.  If not, see <http://www.gnu.org/licenses/>.
-\."#############################################################################
+.\"#############################################################################
+.\"$Id: cerebro_module_devel.3.in,v 1.27 2008-03-28 15:58:00 chu11 Exp $
+.\"#############################################################################
+.\"  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
+.\"  Copyright (C) 2005-2007 The Regents of the University of California.
+.\"  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
+.\"  Written by Albert Chu <chu11@llnl.gov>.
+.\"  UCRL-CODE-155989 All rights reserved.
+.\"
+.\"  This file is part of Cerebro, a collection of cluster monitoring tools
+.\"  and libraries.  For details, see <http://www.llnl.gov/linux/cerebro/>.
+.\"
+.\"  Cerebro is free software; you can redistribute it and/or modify it under
+.\"  the terms of the GNU General Public License as published by the Free
+.\"  Software Foundation; either version 2 of the License, or (at your option)
+.\"  any later version.
+.\"
+.\"  Cerebro is distributed in the hope that it will be useful, but WITHOUT ANY
+.\"  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+.\"  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+.\"  details.
+.\"
+.\"  You should have received a copy of the GNU General Public License along
+.\"  with Cerebro.  If not, see <http://www.gnu.org/licenses/>.
+.\"#############################################################################
 .TH LIBCEREBRO 3 "May 2005" "LLNL" "LIBCEREBRO"
 .SH "NAME"
-Introduction to writing cerebro modules
+libcerebro \- Introduction to writing cerebro modules
 .SH "SYNOPSIS"
 .B #include <cerebro/cerebro_clusterlist_module.h>
 .sp
@@ -292,7 +292,7 @@ The 'cerebro_flags' field should store the default flags the
 libcerebro API should use.
 
 The 'cerebrod_heartbeat_frequency_min' and
-'cerebrod_heartbeat_frequency_max' fields store the minimum and
+ 'cerebrod_heartbeat_frequency_max' fields store the minimum and
 maximum heartbeat frequencey for
 .BR cerebrod(8).
 
@@ -458,7 +458,7 @@ the metric value should be read and propogated.  If the period is 0,
 the metric will be read and propogated with every cerebrod heartbeat.
 If the period is < 0, the metric will not be propogated and it is the
 responsibility of the module to propogate data via the
-'send_message' function specified below.  If the SEND_ON_PERIOD flag
+ 'send_message' function specified below.  If the SEND_ON_PERIOD flag
 is not set below, the period will not be precise.  Data will only be
 piggy-backed on cerebro heartbeats, therefore the granularity of the
 period will be related to the cerebro heartbeat period.  This tradeoff
@@ -495,7 +495,7 @@ typedef int (*Cerebro_metric_destroy_metric_value)(void *metric_value);
 
 The 'destroy_metric_value' function is passed the metric value pointer
 received from 'get_metric_value'.  If necessary,
-'destroy_metric_value' should free allocated memory.  Returns 0 on
+ 'destroy_metric_value' should free allocated memory.  Returns 0 on
 success, -1 on error.
 
 The field 'get_metric_thread' should point to a function of the following type:

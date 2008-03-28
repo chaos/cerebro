@@ -1,28 +1,28 @@
-\."#############################################################################
-\."$Id: cerebro.conf.5.in,v 1.31 2008-01-26 06:25:01 chu11 Exp $
-\."#############################################################################
-\."  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
-\."  Copyright (C) 2005-2007 The Regents of the University of California.
-\."  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
-\."  Written by Albert Chu <chu11@llnl.gov>.
-\."  UCRL-CODE-155989 All rights reserved.
-\."
-\."  This file is part of Cerebro, a collection of cluster monitoring tools
-\."  and libraries.  For details, see <http://www.llnl.gov/linux/cerebro/>.
-\."
-\."  Cerebro is free software; you can redistribute it and/or modify it under
-\."  the terms of the GNU General Public License as published by the Free
-\."  Software Foundation; either version 2 of the License, or (at your option)
-\."  any later version.
-\."
-\."  Cerebro is distributed in the hope that it will be useful, but WITHOUT ANY
-\."  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-\."  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
-\."  details.
-\."
-\."  You should have received a copy of the GNU General Public License along
-\."  with Cerebro.  If not, see <http://www.gnu.org/licenses/>.
-\."#############################################################################
+.\"#############################################################################
+.\"$Id: cerebro.conf.5.in,v 1.32 2008-03-28 15:58:00 chu11 Exp $
+.\"#############################################################################
+.\"  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
+.\"  Copyright (C) 2005-2007 The Regents of the University of California.
+.\"  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
+.\"  Written by Albert Chu <chu11@llnl.gov>.
+.\"  UCRL-CODE-155989 All rights reserved.
+.\"
+.\"  This file is part of Cerebro, a collection of cluster monitoring tools
+.\"  and libraries.  For details, see <http://www.llnl.gov/linux/cerebro/>.
+.\"
+.\"  Cerebro is free software; you can redistribute it and/or modify it under
+.\"  the terms of the GNU General Public License as published by the Free
+.\"  Software Foundation; either version 2 of the License, or (at your option)
+.\"  any later version.
+.\"
+.\"  Cerebro is distributed in the hope that it will be useful, but WITHOUT ANY
+.\"  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+.\"  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+.\"  details.
+.\"
+.\"  You should have received a copy of the GNU General Public License along
+.\"  with Cerebro.  If not, see <http://www.gnu.org/licenses/>.
+.\"#############################################################################
 .TH cerebro.conf 5 "May 2005" "cerebro.conf @VERSION@" "cerebro.conf"
 .SH "NAME"
 cerebro.conf \- cerebro configuration file
@@ -46,7 +46,7 @@ option must be listed on a separate line.  Arguments for an option are
 separated by any amount of whitespace.  Multiple arguments are also
 separated by whitespace.  Comments can be marked by using the pound
 sign ("#") character, and lines can be continued on the next using
-backslash ("\\").
+backslash (".\").
 
 .SH "CEREBRO CONFIGURATION OPTIONS"
 .TP
@@ -121,7 +121,7 @@ appropriate network interface be configured.  The destination_port,
 source_port, and network_interface may be optionally specified.  
 To use defaults for the ip address or network interface, '0.0.0.0' may
 be specified.  To use defaults for destination_port or source_port a
-'0' may be specified.
+ '0' may be specified.
 .TP
 .I cerebrod_speak_message_ttl num
 Specify the spoken message packet time to live parameter.  This
@@ -253,7 +253,7 @@ their shortened hostname form.  The destination_port, source_port,
 network_interfacem and hosts may be optionally specified.  To use
 defaults for the ip address or network interface, '0.0.0.0' may be
 specified.  To use defaults for destination_port or source_port a
-'0' may be specified.
+ '0' may be specified.
 .TP
 .I cerebrod_forward_message_ttl num
 Specify the forwarded message packet time to live parameter.  This
