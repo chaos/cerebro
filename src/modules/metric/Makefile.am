@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.25 2006-11-14 18:58:26 chu11 Exp $
+## $Id: Makefile.am,v 1.26 2008-03-28 16:18:58 chu11 Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -147,7 +147,8 @@ cerebro_metric_boottime_la_LDFLAGS = $(MODULE_FLAGS) \
 			             $(METRIC_OTHER_FLAGS)
 cerebro_metric_boottime_la_CFLAGS  = -I$(srcdir)/../../libs/include \
 				     -I$(srcdir)/../../libs/debug
-cerebro_metric_boottime_la_LIBADD  = ../../libs/debug/libdebug.la
+cerebro_metric_boottime_la_LIBADD  = ../../libs/debug/libdebug.la \
+				     ../../libs/cerebro_error/libcerebro_error.la
 
 cerebro_metric_loadavg1_la_SOURCES = cerebro_metric_loadavg1.c \
 				     cerebro_metric_loadavg.c \
@@ -156,7 +157,8 @@ cerebro_metric_loadavg1_la_LDFLAGS = $(MODULE_FLAGS) \
 			             $(METRIC_OTHER_FLAGS)
 cerebro_metric_loadavg1_la_CFLAGS  = -I$(srcdir)/../../libs/include \
 				     -I$(srcdir)/../../libs/debug
-cerebro_metric_loadavg1_la_LIBADD  = ../../libs/debug/libdebug.la
+cerebro_metric_loadavg1_la_LIBADD  = ../../libs/debug/libdebug.la \
+				     ../../libs/cerebro_error/libcerebro_error.la
 
 cerebro_metric_loadavg5_la_SOURCES = cerebro_metric_loadavg5.c \
 				     cerebro_metric_loadavg.c \
@@ -165,7 +167,8 @@ cerebro_metric_loadavg5_la_LDFLAGS = $(MODULE_FLAGS) \
 			             $(METRIC_OTHER_FLAGS)
 cerebro_metric_loadavg5_la_CFLAGS  = -I$(srcdir)/../../libs/include \
 				     -I$(srcdir)/../../libs/debug
-cerebro_metric_loadavg5_la_LIBADD  = ../../libs/debug/libdebug.la
+cerebro_metric_loadavg5_la_LIBADD  = ../../libs/debug/libdebug.la \
+				     ../../libs/cerebro_error/libcerebro_error.la
 
 cerebro_metric_loadavg15_la_SOURCES = cerebro_metric_loadavg15.c \
 				      cerebro_metric_loadavg.c \
@@ -174,7 +177,8 @@ cerebro_metric_loadavg15_la_LDFLAGS = $(MODULE_FLAGS) \
 			              $(METRIC_OTHER_FLAGS)
 cerebro_metric_loadavg15_la_CFLAGS  = -I$(srcdir)/../../libs/include \
 				      -I$(srcdir)/../../libs/debug
-cerebro_metric_loadavg15_la_LIBADD  = ../../libs/debug/libdebug.la
+cerebro_metric_loadavg15_la_LIBADD  = ../../libs/debug/libdebug.la \
+				      ../../libs/cerebro_error/libcerebro_error.la
 
 cerebro_metric_memtotal_la_SOURCES = cerebro_metric_memtotal.c \
 				     cerebro_metric_memory.c \
@@ -183,7 +187,8 @@ cerebro_metric_memtotal_la_LDFLAGS = $(MODULE_FLAGS) \
 				     $(METRIC_OTHER_FLAGS)
 cerebro_metric_memtotal_la_CFLAGS  = -I$(srcdir)/../../libs/include \
 				     -I$(srcdir)/../../libs/debug
-cerebro_metric_memtotal_la_LIBADD  = ../../libs/debug/libdebug.la
+cerebro_metric_memtotal_la_LIBADD  = ../../libs/debug/libdebug.la \
+				      ../../libs/cerebro_error/libcerebro_error.la
 
 cerebro_metric_memused_la_SOURCES = cerebro_metric_memused.c \
 				    cerebro_metric_memory.c \
@@ -192,7 +197,8 @@ cerebro_metric_memused_la_LDFLAGS = $(MODULE_FLAGS) \
 				    $(METRIC_OTHER_FLAGS)
 cerebro_metric_memused_la_CFLAGS  = -I$(srcdir)/../../libs/include \
 				    -I$(srcdir)/../../libs/debug
-cerebro_metric_memused_la_LIBADD  = ../../libs/debug/libdebug.la
+cerebro_metric_memused_la_LIBADD  = ../../libs/debug/libdebug.la \
+				    ../../libs/cerebro_error/libcerebro_error.la
 
 cerebro_metric_memfree_la_SOURCES = cerebro_metric_memfree.c \
 				    cerebro_metric_memory.c \
@@ -201,7 +207,8 @@ cerebro_metric_memfree_la_LDFLAGS = $(MODULE_FLAGS) \
 				    $(METRIC_OTHER_FLAGS)
 cerebro_metric_memfree_la_CFLAGS  = -I$(srcdir)/../../libs/include \
 				    -I$(srcdir)/../../libs/debug
-cerebro_metric_memfree_la_LIBADD  = ../../libs/debug/libdebug.la
+cerebro_metric_memfree_la_LIBADD  = ../../libs/debug/libdebug.la \
+				    ../../libs/cerebro_error/libcerebro_error.la
 
 cerebro_metric_swaptotal_la_SOURCES = cerebro_metric_swaptotal.c \
 				      cerebro_metric_memory.c \
@@ -210,7 +217,8 @@ cerebro_metric_swaptotal_la_LDFLAGS = $(MODULE_FLAGS) \
 				      $(METRIC_OTHER_FLAGS)
 cerebro_metric_swaptotal_la_CFLAGS  = -I$(srcdir)/../../libs/include \
 				      -I$(srcdir)/../../libs/debug
-cerebro_metric_swaptotal_la_LIBADD  = ../../libs/debug/libdebug.la
+cerebro_metric_swaptotal_la_LIBADD  = ../../libs/debug/libdebug.la \
+				      ../../libs/cerebro_error/libcerebro_error.la
 
 cerebro_metric_swapused_la_SOURCES = cerebro_metric_swapused.c \
 				     cerebro_metric_memory.c \
@@ -219,7 +227,8 @@ cerebro_metric_swapused_la_LDFLAGS = $(MODULE_FLAGS) \
 				     $(METRIC_OTHER_FLAGS)
 cerebro_metric_swapused_la_CFLAGS  = -I$(srcdir)/../../libs/include \
 				     -I$(srcdir)/../../libs/debug
-cerebro_metric_swapused_la_LIBADD  = ../../libs/debug/libdebug.la
+cerebro_metric_swapused_la_LIBADD  = ../../libs/debug/libdebug.la \
+				     ../../libs/cerebro_error/libcerebro_error.la
 
 cerebro_metric_swapfree_la_SOURCES = cerebro_metric_swapfree.c \
 				     cerebro_metric_memory.c \
@@ -228,7 +237,8 @@ cerebro_metric_swapfree_la_LDFLAGS = $(MODULE_FLAGS) \
 				     $(METRIC_OTHER_FLAGS)
 cerebro_metric_swapfree_la_CFLAGS  = -I$(srcdir)/../../libs/include \
 				     -I$(srcdir)/../../libs/debug
-cerebro_metric_swapfree_la_LIBADD  = ../../libs/debug/libdebug.la
+cerebro_metric_swapfree_la_LIBADD  = ../../libs/debug/libdebug.la \
+				     ../../libs/cerebro_error/libcerebro_error.la
 
 cerebro_metric_bytesin_la_SOURCES = cerebro_metric_bytesin.c \
 				    cerebro_metric_network.c \
@@ -237,7 +247,8 @@ cerebro_metric_bytesin_la_LDFLAGS = $(MODULE_FLAGS) \
 				    $(METRIC_OTHER_FLAGS)
 cerebro_metric_bytesin_la_CFLAGS  = -I$(srcdir)/../../libs/include \
 				    -I$(srcdir)/../../libs/debug
-cerebro_metric_bytesin_la_LIBADD  = ../../libs/debug/libdebug.la
+cerebro_metric_bytesin_la_LIBADD  = ../../libs/debug/libdebug.la \
+				    ../../libs/cerebro_error/libcerebro_error.la
 
 cerebro_metric_bytesout_la_SOURCES = cerebro_metric_bytesout.c \
 				     cerebro_metric_network.c \
@@ -246,7 +257,8 @@ cerebro_metric_bytesout_la_LDFLAGS = $(MODULE_FLAGS) \
 				     $(METRIC_OTHER_FLAGS)
 cerebro_metric_bytesout_la_CFLAGS  = -I$(srcdir)/../../libs/include \
 				     -I$(srcdir)/../../libs/debug
-cerebro_metric_bytesout_la_LIBADD  = ../../libs/debug/libdebug.la
+cerebro_metric_bytesout_la_LIBADD  = ../../libs/debug/libdebug.la \
+				     ../../libs/cerebro_error/libcerebro_error.la
 
 cerebro_metric_packetsin_la_SOURCES = cerebro_metric_packetsin.c \
 				      cerebro_metric_network.c \
@@ -255,7 +267,8 @@ cerebro_metric_packetsin_la_LDFLAGS = $(MODULE_FLAGS) \
 				      $(METRIC_OTHER_FLAGS)
 cerebro_metric_packetsin_la_CFLAGS  = -I$(srcdir)/../../libs/include \
 				      -I$(srcdir)/../../libs/debug
-cerebro_metric_packetsin_la_LIBADD  = ../../libs/debug/libdebug.la
+cerebro_metric_packetsin_la_LIBADD  = ../../libs/debug/libdebug.la \
+				      ../../libs/cerebro_error/libcerebro_error.la
 
 cerebro_metric_packetsout_la_SOURCES = cerebro_metric_packetsout.c \
 				       cerebro_metric_network.c \
@@ -264,7 +277,8 @@ cerebro_metric_packetsout_la_LDFLAGS = $(MODULE_FLAGS) \
 				       $(METRIC_OTHER_FLAGS)
 cerebro_metric_packetsout_la_CFLAGS  = -I$(srcdir)/../../libs/include \
 				       -I$(srcdir)/../../libs/debug
-cerebro_metric_packetsout_la_LIBADD  = ../../libs/debug/libdebug.la
+cerebro_metric_packetsout_la_LIBADD  = ../../libs/debug/libdebug.la \
+				       ../../libs/cerebro_error/libcerebro_error.la
 
 cerebro_metric_rxerrs_la_SOURCES = cerebro_metric_rxerrs.c \
 				   cerebro_metric_network.c \
@@ -273,7 +287,8 @@ cerebro_metric_rxerrs_la_LDFLAGS = $(MODULE_FLAGS) \
 				   $(METRIC_OTHER_FLAGS)
 cerebro_metric_rxerrs_la_CFLAGS  = -I$(srcdir)/../../libs/include \
 				   -I$(srcdir)/../../libs/debug
-cerebro_metric_rxerrs_la_LIBADD  = ../../libs/debug/libdebug.la
+cerebro_metric_rxerrs_la_LIBADD  = ../../libs/debug/libdebug.la \
+				   ../../libs/cerebro_error/libcerebro_error.la
 
 cerebro_metric_txerrs_la_SOURCES = cerebro_metric_txerrs.c \
 				   cerebro_metric_network.c \
@@ -282,7 +297,8 @@ cerebro_metric_txerrs_la_LDFLAGS = $(MODULE_FLAGS) \
 				   $(METRIC_OTHER_FLAGS)
 cerebro_metric_txerrs_la_CFLAGS  = -I$(srcdir)/../../libs/include \
 				   -I$(srcdir)/../../libs/debug
-cerebro_metric_txerrs_la_LIBADD  = ../../libs/debug/libdebug.la
+cerebro_metric_txerrs_la_LIBADD  = ../../libs/debug/libdebug.la \
+				   ../../libs/cerebro_error/libcerebro_error.la
 
 cerebro_metric_slurm_state_la_SOURCES = cerebro_metric_slurm_state.c \
 				        cerebro_metric_common.c
@@ -290,7 +306,8 @@ cerebro_metric_slurm_state_la_LDFLAGS = $(MODULE_FLAGS) \
 					$(METRIC_OTHER_FLAGS)
 cerebro_metric_slurm_state_la_CFLAGS  = -I$(srcdir)/../../libs/include \
 				        -I$(srcdir)/../../libs/debug
-cerebro_metric_slurm_state_la_LIBADD  = ../../libs/debug/libdebug.la
+cerebro_metric_slurm_state_la_LIBADD  = ../../libs/debug/libdebug.la \
+				        ../../libs/cerebro_error/libcerebro_error.la
 
 cerebro_metric_shutdown_la_SOURCES = cerebro_metric_shutdown.c \
 				     cerebro_metric_common.c
@@ -298,12 +315,16 @@ cerebro_metric_shutdown_la_LDFLAGS = $(MODULE_FLAGS) \
 				     $(METRIC_OTHER_FLAGS)
 cerebro_metric_shutdown_la_CFLAGS  = -I$(srcdir)/../../libs/include \
 				     -I$(srcdir)/../../libs/debug
-cerebro_metric_shutdown_la_LIBADD  = ../../libs/debug/libdebug.la
+cerebro_metric_shutdown_la_LIBADD  = ../../libs/debug/libdebug.la \
+				     ../../libs/cerebro_error/libcerebro_error.la
 
 ../../libs/common/libconffile.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
 ../../libs/common/libfd.la : force-dependency-check
+	@cd `dirname $@` && make `basename $@`
+
+../../libs/cerebro_error/libcerebro_error.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
 ../../libs/debug/libdebug.la : force-dependency-check

@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.20 2006-01-18 19:40:43 chu11 Exp $
+## $Id: Makefile.am,v 1.21 2008-03-28 16:18:58 chu11 Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -55,7 +55,8 @@ cerebro_clusterlist_genders_la_LDFLAGS = $(MODULE_FLAGS) \
 				   	 $(CLUSTERLIST_OTHER_FLAGS)
 cerebro_clusterlist_genders_la_CFLAGS  = -I$(srcdir)/../../libs/include \
 				         -I$(srcdir)/../../libs/debug
-cerebro_clusterlist_genders_la_LIBADD  = ../../libs/debug/libdebug.la
+cerebro_clusterlist_genders_la_LIBADD  = ../../libs/debug/libdebug.la \
+					 ../../libs/cerebro_error/libcerebro_error.la
 
 cerebro_clusterlist_hostsfile_la_SOURCES = cerebro_clusterlist_hostsfile.c \
 					   cerebro_clusterlist_util.c
@@ -66,12 +67,16 @@ cerebro_clusterlist_hostsfile_la_CFLAGS  = -I$(srcdir)/../../libs/include \
 					   -I$(srcdir)/../../libs/debug
 cerebro_clusterlist_hostsfile_la_LIBADD  = ../../libs/common/libfd.la \
 					   ../../libs/common/liblist.la \
-					   ../../libs/debug/libdebug.la
+					   ../../libs/debug/libdebug.la \
+					   ../../libs/cerebro_error/libcerebro_error.la
 
 ../../libs/common/libfd.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
 ../../libs/common/liblist.la : force-dependency-check
+	@cd `dirname $@` && make `basename $@`
+
+../../libs/cerebro_error/libcerebro_error.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
 ../../libs/debug/libdebug.la : force-dependency-check
