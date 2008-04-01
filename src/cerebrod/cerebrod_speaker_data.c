@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker_data.c,v 1.51 2008-03-28 17:06:48 chu11 Exp $
+ *  $Id: cerebrod_speaker_data.c,v 1.52 2008-04-01 21:24:45 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007-2008 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -560,7 +560,7 @@ _get_userspace_metric_value(struct cerebrod_speaker_metric_info *metric_info)
     }
   else
     mm->metric_value = NULL;
-      
+
   return mm;
 
  cleanup:

@@ -1,3 +1,12 @@
+2008-04-01  Albert Chu  <chu11@llnl.gov>
+
+	* src/cerebrod/cerebrod_metric_controller.c (_update_metric): Fix
+	mem-corruption corner case.
+
+	* META, NEWS: update for release
+
+	* tagged cerebro-1-4-2
+	
 2008-03-26  Albert Chu  <chu11@llnl.gov>
 
 	* update copyrights in a lot of places

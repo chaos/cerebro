@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_controller.c,v 1.48 2008-03-28 17:06:47 chu11 Exp $
+ *  $Id: cerebrod_metric_controller.c,v 1.49 2008-04-01 21:24:45 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007-2008 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -716,12 +716,12 @@ _update_metric(int fd,
     metric_info->next_call_time = 0;
   metric_info->metric_value_type = req->metric_value_type;
   metric_info->metric_value_len = req->metric_value_len;
-  metric_info->metric_value = req->metric_value;
+  metric_info->metric_value = Malloc(req->metric_value_len);
+  memcpy(metric_info->metric_value,
+         req->metric_value,
+         req->metric_value_len);
   cerebrod_speaker_data_metric_list_sort();
   Pthread_mutex_unlock(&metric_list_lock);
-  /* Don't Free() req->metric_value, needs to be pointed at by
-   * 'metric_info->metric_value'
-   */
 
   if (req->flags & CEREBRO_METRIC_CONTROL_FLAGS_SEND_NOW)
     {
