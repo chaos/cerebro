@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.81 2007-10-23 18:03:49 chu11 Exp $
+## $Id: configure.ac,v 1.82 2008-04-01 22:00:41 chu11 Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -7,7 +7,7 @@
 ##
 # Prologue.
 ##
-AC_INIT([cerebro])
+AC_INIT([cerebro], [1.4-2])
 AC_META
 AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_SRCDIR([README])

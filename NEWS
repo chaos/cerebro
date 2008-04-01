@@ -2,6 +2,10 @@ This file describes changes in recent versions of cerebro. It
 primarily documents those changes that are of interest to users and
 admins.
 
+Changes in cerebro-1.4-2
+===========================
+ -- Fix mem-corruption bug.
+
 Changes in cerebro-1.4-1
 ===========================
  -- Various bug fixes.
@@ -33,4 +37,4 @@ Changes in cerebro-1.0-1
 ===========================
  -- Initial Release
 
-$Id: NEWS,v 1.9 2008-03-26 23:32:31 chu11 Exp $
+$Id: NEWS,v 1.10 2008-04-01 22:00:41 chu11 Exp $
