@@ -3,9 +3,9 @@
 	* src/cerebrod/cerebrod_metric_controller.c (_update_metric): Fix
 	mem-corruption corner case.
 
-	* META, NEWS, configure.ac: update for release
+	* META, NEWS: update for release
 
-	* tagged cerebro-1-4-2
+	* tagged cerebro-1-5-1
 	
 2008-03-26  Albert Chu  <chu11@llnl.gov>
 
