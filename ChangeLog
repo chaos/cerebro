@@ -1,3 +1,14 @@
+2008-04-18  Albert Chu  <chu11@llnl.gov>
+
+	* man/: Fix typos found by Andrew Uselton (acuselton at lbl dot gov).
+	
+2008-04-07  Albert Chu  <chu11@llnl.gov>
+
+	* man/cerebro.1: Rename to cerebro.7 so it is in the proper
+	manpage section.
+
+	* man/Makefile.am: Adjust appropriately.
+	
 2008-04-01  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerebrod/cerebrod_metric_controller.c (_update_metric): Fix
