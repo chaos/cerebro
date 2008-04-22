@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: config_util.c,v 1.33 2008-03-28 17:06:49 chu11 Exp $
+ *  $Id: config_util.c,v 1.34 2008-04-22 23:45:20 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007-2008 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -139,7 +139,7 @@ _cb_cerebrod_heartbeat_freq(conffile_t cf, struct conffile_data *data,
   if (data->intlist_len == 1)
     {
       conf->cerebrod_heartbeat_frequency_min = data->intlist[0];
-      conf->cerebrod_heartbeat_frequency_max = 0;
+      conf->cerebrod_heartbeat_frequency_max = data->intlist[0];
     }
   else if (data->intlist_len == 2)
     {

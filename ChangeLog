@@ -1,3 +1,8 @@
+2008-04-22  Albert Chu  <chu11@llnl.gov>
+
+	* src/libs/util/config_util.c (_cb_cerebrod_heartbeat_freq): Fix
+	parse issue.  Found by Andrew Uselton (acuselton at lbl dot gov).
+	
 2008-04-18  Albert Chu  <chu11@llnl.gov>
 
 	* man/: Fix typos found by Andrew Uselton (acuselton at lbl dot gov).
