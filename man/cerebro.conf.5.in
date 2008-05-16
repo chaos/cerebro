@@ -1,5 +1,5 @@
 .\"#############################################################################
-.\"$Id: cerebro.conf.5.in,v 1.33 2008-03-28 17:06:47 chu11 Exp $
+.\"$Id: cerebro.conf.5.in,v 1.34 2008-05-16 23:09:43 chu11 Exp $
 .\"#############################################################################
 .\"  Copyright (C) 2007-2008 Lawrence Livermore National Security, LLC.
 .\"  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -103,8 +103,8 @@ destination ip address that messages should be sent to.  It may be
 specified as a hostname, singlecast ip address, or multicast ip address.
 The default ip address is 239.2.11.72.  The destination port specifies
 the port that messages should be sent to.  The default destination
-port is 8850.  The source port specifies the port that messages should
-be sent from.  The default source port is 8851.  The network interface
+port is 8851.  The source port specifies the port that messages should
+be sent from.  The default source port is 8850.  The network interface
 specifies the network interface messages should be sent out of.  This
 is typically used to specify a network when a multicast ip address is
 specified as the message destination.  The network interface can be
@@ -230,7 +230,7 @@ destination ip address that messages should be sent to.  It may be
 specified as a hostname, singlecast ip address, or multicast ip address.
 The default ip address is 239.2.11.72.  The destination port specifies
 the port that messages should be sent to.  The default destination
-port is 8850.  The source port specifies the port that messages should
+port is 8851.  The source port specifies the port that messages should
 be sent from.  The default source port is 8849.  The network interface
 specifies the network interface messages should be sent out of.  This
 is typically used to specify a network when a multicast ip address is

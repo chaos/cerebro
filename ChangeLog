@@ -1,3 +1,8 @@
+2008-05-16  Albert Chu  <chu11@llnl.gov>
+
+	* man/cerebro.conf.5.in: Fix port typos found by Py Watson
+	(watson30 at llnl dot gov).
+	
 2008-04-22  Albert Chu  <chu11@llnl.gov>
 
 	* src/libs/util/config_util.c (_cb_cerebrod_heartbeat_freq): Fix
