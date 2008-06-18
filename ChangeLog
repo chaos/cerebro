@@ -1,3 +1,7 @@
+2008-06-18  Albert Chu  <chu11@llnl.gov>
+
+	* etc/cerebrod: Adjust chkconfig start priority.
+	
 2008-05-16  Albert Chu  <chu11@llnl.gov>
 
 	* man/cerebro.conf.5.in: Fix port typos found by Py Watson
