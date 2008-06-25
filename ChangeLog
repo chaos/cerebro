@@ -1,3 +1,8 @@
+2008-06-25  Albert Chu  <chu11@llnl.gov>
+
+	* src/cerebrod/cerebrod_speaker.c (_speaker_initialize): Fix fd
+	race.
+	
 2008-06-24  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerebrod/cerebrod_config.c (_cerebrod_load_config): Make

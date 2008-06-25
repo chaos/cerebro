@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.112 2008-03-28 17:06:48 chu11 Exp $
+ *  $Id: cerebrod_speaker.c,v 1.113 2008-06-25 16:07:02 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007-2008 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -94,6 +94,7 @@ extern pthread_mutex_t metric_list_lock;
  * speaker file descriptor and lock to protect concurrent access
  */
 int speaker_fds[CEREBRO_CONFIG_SPEAK_MESSAGE_CONFIG_MAX];
+unsigned int speaker_fds_len = 0;
 pthread_mutex_t speaker_fds_lock = PTHREAD_MUTEX_INITIALIZER;
 
 /* 
@@ -260,6 +261,7 @@ _speaker_initialize(void)
       if ((speaker_fds[i] = _speaker_setup_socket(i)) < 0)
         CEREBRO_EXIT(("speaker fd setup failed"));
     }
+  speaker_fds_len = conf.speak_message_config_len;
   Pthread_mutex_unlock(&speaker_fds_lock);
 
   cerebrod_speaker_data_initialize();
@@ -466,7 +468,7 @@ _cerebrod_message_send(struct cerebrod_message* msg, unsigned int msglen)
     }
   
   Pthread_mutex_lock(&speaker_fds_lock);
-  for (i = 0; i < conf.speak_message_config_len; i++)
+  for (i = 0; i < speaker_fds_len; i++)
     {
       struct sockaddr *addr;
       struct sockaddr_in msgaddr;
