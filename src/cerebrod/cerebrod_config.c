@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_config.c,v 1.144 2008-03-28 17:06:47 chu11 Exp $
+ *  $Id: cerebrod_config.c,v 1.145 2008-06-25 00:06:29 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007-2008 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -280,7 +280,14 @@ _cerebrod_load_config(void)
 #endif /* CEREBRO_DEBUG */
 
   if (load_config(&tconf, &errnum) < 0)
-    CEREBRO_EXIT(("load_config: %d", errnum));
+    {
+      if (errnum == CEREBRO_ERR_CONFIG_MODULE)
+        CEREBRO_EXIT(("load_config: error loading cerebro config module configuration"));
+      else if (errnum == CEREBRO_ERR_CONFIG_FILE)
+        CEREBRO_EXIT(("load_config: error loading cerebro config file configuration"));
+      else
+        CEREBRO_EXIT(("load_config: error loading cerebro configuration: errnum=%d", errnum));
+    }
   
   if (tconf.cerebrod_heartbeat_frequency_flag)
     {
