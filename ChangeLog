@@ -1,5 +1,7 @@
 2008-06-27  Albert Chu  <chu11@llnl.gov>
 
+	* man/Makefile.am: Fix make dist.
+
 	* META, NEWS: update for release
 
 	* tagged cerebro-1-6-1
