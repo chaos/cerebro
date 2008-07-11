@@ -1,3 +1,7 @@
+2008-07-11  Albert Chu  <chu11@llnl.gov>
+
+	* src/libs/common/hostlist.c: Update to newest lib.
+	
 2008-06-27  Albert Chu  <chu11@llnl.gov>
 
 	* man/Makefile.am: Fix make dist.
