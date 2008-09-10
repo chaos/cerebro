@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_monitor_update.c,v 1.7 2008-03-28 17:06:47 chu11 Exp $
+ *  $Id: cerebrod_monitor_update.c,v 1.8 2008-09-10 23:58:34 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007-2008 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -99,6 +99,23 @@ _cerebrod_monitor_module_info_destroy(void *data)
   Free(monitor_module);
 }
 
+/*
+ * _cerebrod_monitor_module_list_destroy
+ *
+ * Destroy a monitor_module_list struct.
+ */
+static void
+_cerebrod_monitor_module_list_destroy(void *data)
+{
+  struct cerebrod_monitor_module_list *ml;
+
+  assert(data);
+
+  ml = (struct cerebrod_monitor_module_list *)data;
+  List_destroy(ml->monitor_list);
+  Free(ml);
+}
+
 /* 
  * Under almost any circumstance, don't return a -1 error, cerebro can
  * go on without loading monitor modules. The listener_data_init_lock
@@ -108,7 +125,7 @@ int
 cerebrod_monitor_modules_setup(void)
 {
   int i, monitor_module_count, monitor_index_len, monitor_index_count = 0;
-  List monitor_list = NULL;
+  struct cerebrod_monitor_module_list *ml = NULL;
 #if CEREBRO_DEBUG
   int rv;
 #endif /* CEREBRO_DEBUG */
@@ -156,7 +173,7 @@ cerebrod_monitor_modules_setup(void)
   monitor_index = Hash_create(monitor_index_len, 
                               (hash_key_f)hash_key_string, 
                               (hash_cmp_f)strcmp, 
-                              (hash_del_f)list_destroy);
+                              (hash_del_f)_cerebrod_monitor_module_list_destroy);
 
   for (i = 0; i < monitor_module_count; i++)
     {
@@ -200,15 +217,18 @@ cerebrod_monitor_modules_setup(void)
       metricPtr = strtok_r(monitor_module->metric_names, ",", &metricbuf);
       while (metricPtr)
         {
-          if (!(monitor_list = Hash_find(monitor_index, metricPtr)))
+          if (!(ml = Hash_find(monitor_index, metricPtr)))
             {
-              monitor_list = List_create((ListDelF)_cerebrod_monitor_module_info_destroy);
-              List_append(monitor_list, monitor_module);
-              Hash_insert(monitor_index, metricPtr, monitor_list);
+              ml = (struct cerebrod_monitor_module_list *)Malloc(sizeof(struct cerebrod_monitor_module_list));
+              ml->monitor_list = List_create((ListDelF)_cerebrod_monitor_module_info_destroy);
+              Pthread_mutex_init(&(ml->monitor_list_lock), NULL);
+
+              List_append(ml->monitor_list, monitor_module);
+              Hash_insert(monitor_index, metricPtr, ml);
               monitor_index_count++;
             }
           else
-            List_append(monitor_list, monitor_module);
+            List_append(ml->monitor_list, monitor_module);
           
           metricPtr = strtok_r(NULL, ",", &metricbuf);
         }
@@ -246,7 +266,7 @@ cerebrod_monitor_modules_update(const char *nodename,
                                 struct cerebrod_message_metric *mm)
 {
   struct cerebrod_monitor_module_info *monitor_module;
-  List monitor_list;
+  struct cerebrod_monitor_module_list *ml;
 #if CEREBRO_DEBUG
   int rv;
 #endif /* CEREBRO_DEBUG */
@@ -263,11 +283,14 @@ cerebrod_monitor_modules_update(const char *nodename,
     CEREBRO_EXIT(("mutex not locked: rv=%d", rv));
 #endif /* CEREBRO_DEBUG */
 
-  if ((monitor_list = Hash_find(monitor_index, metric_name)))
+  if ((ml = Hash_find(monitor_index, metric_name)))
     {
       ListIterator itr = NULL;
 
-      itr = List_iterator_create(monitor_list);
+      Pthread_mutex_lock(&(ml->monitor_list_lock));
+      itr = List_iterator_create(ml->monitor_list);
+      Pthread_mutex_unlock(&(ml->monitor_list_lock));
+
       while ((monitor_module = list_next(itr)))
 	{
 	  Pthread_mutex_lock(&monitor_module->monitor_lock);
@@ -280,7 +303,10 @@ cerebrod_monitor_modules_update(const char *nodename,
 				       mm->metric_value);
 	  Pthread_mutex_unlock(&monitor_module->monitor_lock);
 	}
+
+      Pthread_mutex_lock(&(ml->monitor_list_lock));
       List_iterator_destroy(itr);
+      Pthread_mutex_unlock(&(ml->monitor_list_lock));
     }
 }
 

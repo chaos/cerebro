@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_monitor_update.h,v 1.6 2008-03-28 17:06:47 chu11 Exp $
+ *  $Id: cerebrod_monitor_update.h,v 1.7 2008-09-10 23:58:34 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007-2008 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -39,6 +39,8 @@
 #include "cerebro/cerebrod_message_protocol.h"
 #include "cerebrod_listener_data.h"
 
+#include "list.h"
+
 /*
  * struct cerebrod_monitor_module_info
  *
@@ -49,6 +51,18 @@ struct cerebrod_monitor_module_info
   char *metric_names;
   int index;
   pthread_mutex_t monitor_lock;
+};
+
+/*
+ * struct cerebrod_monitor_module_list
+ *
+ * Contains list of monitor module info list and a lock for thread
+ * safety.
+ */
+struct cerebrod_monitor_module_list
+{
+  List monitor_list;
+  pthread_mutex_t monitor_list_lock;
 };
 
 /* 

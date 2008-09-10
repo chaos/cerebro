@@ -1,3 +1,8 @@
+2008-09-10  Albert Chu  <chu11@llnl.gov>
+
+	* src/cerebrod/cerebrod_monitor_update.h,
+	src/cerebrod/cerebrod_monitor_update.c: Fix list corruption race.
+	
 2008-07-11  Albert Chu  <chu11@llnl.gov>
 
 	* src/libs/common/hostlist.c: Update to newest lib.
