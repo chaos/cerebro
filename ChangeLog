@@ -1,3 +1,9 @@
+2008-09-15  Albert Chu  <chu11@llnl.gov>
+	
+	* META, NEWS: update for release
+
+	* tagged cerebro-1-7-1
+
 2008-09-10  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerebrod/cerebrod_monitor_update.h,
