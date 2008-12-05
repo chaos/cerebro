@@ -11,7 +11,7 @@ BuildRoot: %{_tmppath}/@PROJECT@-@VERSION@
 %description
 Cerebro is a collection of cluster monitoring tools and libraries.
 
-%{!?_with_genders: %{!?_without_genders: %define _with_genders --with-genders}}
+%{!?_with_genders: %{!?_without_genders: %define _without_genders --without-genders}}
 %{!?_with_hostsfile: %{!?_without_hostsfile: %define _with_hostsfile --with-hostsfile}}
 %{!?_with_boottime: %{!?_without_boottime: %define _with_boottime --with-boottime}}
 %{!?_with_loadavg: %{!?_without_loadavg: %define _with_loadavg --with-loadavg}}
