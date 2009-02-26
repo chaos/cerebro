@@ -1,3 +1,7 @@
+2009-02-26  Albert Chu  <chu11@llnl.gov>
+
+	* etc/cerebrod: By default, do not have cerebrod on.
+	
 2009-01-12  Albert Chu  <chu11@llnl.gov>
 
 	* META, NEWS: update for release
