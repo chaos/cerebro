@@ -2,6 +2,10 @@ This file describes changes in recent versions of cerebro. It
 primarily documents those changes that are of interest to users and
 admins.
 
+Changes in cerebro-1.9-1
+===========================
+ -- Do not enable cerebrod daemon by default.
+
 Changes in cerebro-1.8-1
 ===========================
  -- Fix spec file build issue.
@@ -52,4 +56,4 @@ Changes in cerebro-1.0-1
 ===========================
  -- Initial Release
 
-$Id: NEWS,v 1.14 2009-01-13 01:08:23 chu11 Exp $
+$Id: NEWS,v 1.15 2009-02-26 21:26:25 chu11 Exp $
