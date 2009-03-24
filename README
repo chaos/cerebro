@@ -44,7 +44,7 @@ which allows Cerebro to recognize the hosts in the current cluster.
 The current clusterlist database formats supported are:
 
 Genders - Uses a genders database and the genders library to determine
-all nodes in the cluster.
+all nodes in the cluster. (http://sourceforge.net/projects/genders)
 
 Hostsfile - Uses a file that lists the hostname of every node in the
 cluster on a separate line.
