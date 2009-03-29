@@ -9,7 +9,7 @@ became necessary to develop a slightly different tool.
 
 Several of goals of Cerebro were to develop a monitoring tool that:
 
-- Interrupted the CPU less frequently.
+- Interrupted the CPU less frequently (fixed in newer Ganglias).
 
 - Provide the user with a set of libraries, command-line tools, and a
 dynamic module interface that allow users to monitor new metrics
