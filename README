@@ -24,6 +24,8 @@ tools to have knowledge of every node in the cluster.
 - Provide a dynamic module interface which allows the libraries and
 tools to automatically configure itself across a cluster.
 
+- Define what nodes exist within a cluster.
+
 - Remove XML overhead.
 
 At this point in time, the Cerebro project should not be mistaken for
