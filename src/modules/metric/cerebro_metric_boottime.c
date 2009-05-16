@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_boottime.c,v 1.29 2008-03-28 17:06:49 chu11 Exp $
+ *  $Id: cerebro_metric_boottime.c,v 1.30 2009-05-16 01:36:52 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007-2008 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -109,10 +109,13 @@ boottime_metric_setup(void)
       goto cleanup;
     }
 
+  /* ignore potential error, just return result */
+  close(fd);
   metric_boottime = (u_int32_t)bootval;
   return 0;
 
  cleanup:
+  /* ignore potential error, just return result */
   close(fd);
   return -1;
 }

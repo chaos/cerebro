@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_event_server.c,v 1.13 2008-03-28 17:06:47 chu11 Exp $
+ *  $Id: cerebrod_event_server.c,v 1.14 2009-05-16 01:36:52 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007-2008 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -449,6 +449,7 @@ _event_server_setup_socket(int num)
   return fd;
 
  cleanup:
+  /* ignore potential error, just return error */
   close(fd);
   return -1;
 }
@@ -876,6 +877,7 @@ _respond_with_event_names(void *arg)
   if (responses)
     list_destroy(responses);
   Free(arg);
+  /* ignore potential error, we're done sendin */
   close(fd);
   return NULL;
 }
@@ -1072,6 +1074,7 @@ _event_server_service_connection(int fd)
     free(ecd);
   if (fdptr)
     free(fdptr);
+  /* ignore potential error, we're in the error path already */
   close(fd);
   return;
 }

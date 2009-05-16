@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_speaker.c,v 1.113 2008-06-25 16:07:02 chu11 Exp $
+ *  $Id: cerebrod_speaker.c,v 1.114 2009-05-16 01:36:52 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007-2008 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -184,6 +184,7 @@ _speaker_setup_socket(int num)
   return fd;
 
  cleanup:
+  /* ignore potential error, we're in the error path already */
   close(fd);
   return -1;
 }

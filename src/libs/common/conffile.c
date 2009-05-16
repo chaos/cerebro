@@ -1,32 +1,32 @@
 /*****************************************************************************\
- *  $Id: conffile.c,v 1.2 2007-09-05 18:15:59 chu11 Exp $
+ *  $Id: conffile.c,v 1.3 2009-05-16 01:36:52 chu11 Exp $
  *****************************************************************************
- *  Copyright (C) 2003 The Regents of the University of California.
+ *  Copyright (C) 2007-2008 Lawrence Livermore National Security, LLC.
+ *  Copyright (C) 2003-2007 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
- *  Written by Albert Chu <chu11@llnl.gov>.
+ *  Written by Albert Chu <chu11@llnl.gov>
  *  UCRL-CODE-155699
- *  
+ *
  *  This file is part of Whatsup, tools and libraries for determining up and
  *  down nodes in a cluster. For details, see http://www.llnl.gov/linux/.
- *  
- *  Whatsup is free software; you can redistribute it and/or modify 
- *  it under the terms of the GNU General Public License as published by the 
- *  Free Software Foundation; either version 2 of the License, or (at your 
+ *
+ *  Whatsup is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by the
+ *  Free Software Foundation; either version 2 of the License, or (at your
  *  option) any later version.
- *  
- *  Whatsup is distributed in the hope that it will be useful, but 
- *  WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- *  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License 
+ *
+ *  Whatsup is distributed in the hope that it will be useful, but
+ *  WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ *  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
  *  for more details.
- *  
+ *
  *  You should have received a copy of the GNU General Public License along
- *  with Whatsup; if not, write to the Free Software Foundation, Inc.,
- *  51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA.
+ *  with Whatsup.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
 #if HAVE_CONFIG_H
 #include "config.h"
-#endif
+#endif /* HAVE_CONFIG_H */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -198,6 +198,15 @@ conffile_seterrnum(conffile_t cf, int errnum)
     cf->errnum = errnum;
     return 0;
 }
+
+int
+conffile_line_number(conffile_t cf)
+{
+    if (cf == NULL || cf->magic != CONFFILE_MAGIC)
+        return -1;
+
+    return cf->line_num;
+} 
 
 static int
 _setup(conffile_t cf,
@@ -604,7 +613,7 @@ _parseline(conffile_t cf, char *linebuf, int linebuflen)
             data.boolval = 0;
     }
     else if (option->option_type == CONFFILE_OPTION_INT) {
-        data.intval = strtol(args[0], &ptr, 10);
+        data.intval = strtol(args[0], &ptr, 0);
         if ((args[0] + strlen(args[0])) != ptr) {
             cf->errnum = CONFFILE_ERR_PARSE_ARG_INVALID;
             return -1;
@@ -624,7 +633,7 @@ _parseline(conffile_t cf, char *linebuf, int linebuflen)
     else if (option->option_type == CONFFILE_OPTION_LIST_INT) {
         int i;
         for (i = 0; i < numargs; i++) {
-            data.intlist[i] = strtol(args[i], &ptr, 10);
+            data.intlist[i] = strtol(args[i], &ptr, 0);
             if ((args[i] + strlen(args[i])) != ptr) {
                 cf->errnum = CONFFILE_ERR_PARSE_ARG_INVALID;
                 return -1;
@@ -681,7 +690,7 @@ conffile_parse(conffile_t cf,
                int app_data,
                int flags)
 {
-    int i, j, temp, len = 0, retval = -1;
+    int i, temp, len = 0, retval = -1;
     char linebuf[CONFFILE_MAX_LINELEN];
 
     if (cf == NULL || cf->magic != CONFFILE_MAGIC)
@@ -711,19 +720,6 @@ conffile_parse(conffile_t cf,
                 && options[i].count_ptr == NULL)) {
             cf->errnum = CONFFILE_ERR_PARAMETERS;
             return -1;
-        }
-    }
-
-    /* count_ptr cannot be identical to any other count_ptr */
-    for (i = 0; i < options_len; i++) {
-        for (j = 0; j < options_len; j++) {
-            if (i != j 
-                && options[i].option_type != CONFFILE_OPTION_IGNORE
-                && options[j].option_type != CONFFILE_OPTION_IGNORE
-                && options[i].count_ptr == options[j].count_ptr) {
-                cf->errnum = CONFFILE_ERR_PARAMETERS;
-                return -1;
-            }
         }
     }
 
@@ -765,6 +761,7 @@ conffile_parse(conffile_t cf,
     retval = 0;
 
  cleanup:
+    /* ignore potential error, just return result to user */
     close(cf->fd);
     return retval;
 }

@@ -434,6 +434,7 @@ _get_metric_data(cerebro_t handle,
  
   rv = 0;
  cleanup:
+  /* ignore potential error, just return result */
   close(fd);
   return rv;
 }

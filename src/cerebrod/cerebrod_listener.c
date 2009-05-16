@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener.c,v 1.148 2008-03-28 17:06:47 chu11 Exp $
+ *  $Id: cerebrod_listener.c,v 1.149 2009-05-16 01:36:52 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007-2008 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -181,6 +181,7 @@ _listener_setup_socket(int num)
   return fd;
 
  cleanup:
+  /* ignore potential error, we're in the error path already */
   close(fd);
   return -1;
 }
@@ -277,6 +278,7 @@ _forwarding_setup_socket(int num)
   return fd;
 
  cleanup:
+  /* ignore potential error, we're in the error path already */
   close(fd);
   return -1;
 }

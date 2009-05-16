@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_network.c,v 1.6 2008-03-28 17:06:49 chu11 Exp $
+ *  $Id: cerebro_metric_network.c,v 1.7 2009-05-16 01:36:52 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007-2008 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -266,6 +266,7 @@ cerebro_metric_get_network(u_int64_t *bytesin,
 
   rv = 0;
  cleanup:
+  /* ignore potential error, just return result */
   if (fd >= 0)
     close(fd);
   return rv;

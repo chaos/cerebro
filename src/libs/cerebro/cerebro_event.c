@@ -353,6 +353,7 @@ _event_connection(cerebro_t handle,
   return fd;
 
  cleanup:
+  /* ignore potential error, we're in the error path already */
   close(fd);
   return -1;
 }
@@ -466,6 +467,7 @@ _setup_event_connection(cerebro_t handle, const char *event_name)
   return fd;
 
  cleanup:
+  /* ignore potential error, we're in the error path already */
   if (fd >= 0)
     close(fd);
   return -1;
@@ -539,6 +541,7 @@ _get_event_names(cerebro_t handle,
 
   rv = 0;
  cleanup:
+  /* ignore potential error, just return result */
   close(fd);
   return rv;
 }
@@ -561,6 +564,7 @@ cerebro_get_event_names(cerebro_t handle)
   if (_get_event_names(handle, fd, namelist) < 0)
     goto cleanup;
 
+  /* ignore potential error, just return result */
   close(fd);
   handle->errnum = CEREBRO_ERR_SUCCESS;
   return namelist;
@@ -568,6 +572,7 @@ cerebro_get_event_names(cerebro_t handle)
  cleanup:
   if (namelist)
     (void)cerebro_namelist_destroy(namelist);
+  /* ignore potential error, we're in the error path already */
   if (fd >= 0)
     close(fd);
   return NULL;
@@ -631,6 +636,7 @@ cerebro_event_register(cerebro_t handle, const char *event_name)
   return fd;
   
  cleanup:
+  /* ignore potential error, we're in the error path already */
   if (fd >= 0)
     close(fd);
   if (fdPtr)
@@ -682,6 +688,7 @@ cerebro_event_unregister(cerebro_t handle, int fd)
       return -1;
     }
 
+  /* ignore potential error, just return result */
   close(fd);
 
   handle->errnum = CEREBRO_ERR_SUCCESS;

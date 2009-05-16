@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_memory.c,v 1.11 2008-03-28 17:06:49 chu11 Exp $
+ *  $Id: cerebro_metric_memory.c,v 1.12 2009-05-16 01:36:52 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007-2008 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -196,6 +196,7 @@ cerebro_metric_get_memory(u_int32_t *memtotal,
 
   rv = 0;
  cleanup:
+  /* ignore potential error, just return result */
   if (fd >= 0)
     close(fd);
   return rv;

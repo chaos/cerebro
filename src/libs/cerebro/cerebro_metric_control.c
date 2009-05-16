@@ -87,6 +87,7 @@ _setup_metric_control_fd(cerebro_t handle)
   return fd;
 
  cleanup:
+  /* ignore potential error, we're in the error path already */
   close(fd);
   return -1;
 }
@@ -433,6 +434,7 @@ _cerebro_metric_control(cerebro_t handle,
   handle->errnum = CEREBRO_ERR_SUCCESS;
   rv = 0;
  cleanup:
+  /* ignore potential error, just return result */
   close(fd);
   return rv;
 }

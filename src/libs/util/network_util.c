@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: network_util.c,v 1.13 2008-03-28 17:06:49 chu11 Exp $
+ *  $Id: network_util.c,v 1.14 2009-05-16 01:36:52 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007-2008 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -339,6 +339,7 @@ low_timeout_connect(const char *hostname,
   return fd;
 
  cleanup:
+  /* ignore potential error, just return error */
   close(fd);
   return -1;
 }

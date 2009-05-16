@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_metric_server.c,v 1.47 2008-03-28 17:06:47 chu11 Exp $
+ *  $Id: cerebrod_metric_server.c,v 1.48 2009-05-16 01:36:52 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007-2008 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -934,6 +934,7 @@ _metric_server_service_connection(void *arg)
 
  cleanup:
   Free(arg);
+  /* ignore potential error, we're done sendin */
   close(fd);
   return NULL;
 }
@@ -988,6 +989,7 @@ _metric_server_setup_socket(int num)
   return fd;
 
  cleanup:
+  /* ignore potential error, we're in the error path already */
   close(fd);
   return -1;
 }
