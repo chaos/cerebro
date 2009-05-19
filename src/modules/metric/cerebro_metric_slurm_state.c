@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_slurm_state.c,v 1.28 2008-03-28 17:06:49 chu11 Exp $
+ *  $Id: cerebro_metric_slurm_state.c,v 1.29 2009-05-19 21:02:57 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007-2008 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -143,6 +143,7 @@ _slurm_state_setup_socket(void)
   return fd;
 
  cleanup:
+  /* ignore potential error, just return error */
   close(fd);
   return -1;
 }

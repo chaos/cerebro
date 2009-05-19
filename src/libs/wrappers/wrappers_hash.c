@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers_hash.c,v 1.5 2008-03-28 17:06:49 chu11 Exp $
+ *  $Id: wrappers_hash.c,v 1.6 2009-05-19 21:02:57 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007-2008 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -117,6 +117,22 @@ wrap_hash_remove(WRAPPERS_ARGS, hash_t h, const void *key)
 
   if (!(rv = hash_remove(h, key)))
     WRAPPERS_ERR_ERRNO("hash_remove");
+
+  return rv;
+}
+
+int 
+wrap_hash_remove_if(WRAPPERS_ARGS, hash_t h, hash_arg_f argf, void *arg)
+{
+  int rv;
+
+  assert(file && function);
+    
+  if (!h || !argf)
+    WRAPPERS_ERR_INVALID_PARAMETERS("hash_remove_if");
+
+  if ((rv = hash_remove_if(h, argf, arg)) < 0)
+    WRAPPERS_ERR_ERRNO("hash_remove_if");
 
   return rv;
 }

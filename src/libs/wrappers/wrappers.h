@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.h,v 1.22 2008-03-28 17:06:49 chu11 Exp $
+ *  $Id: wrappers.h,v 1.23 2009-05-19 21:02:57 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007-2008 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -351,6 +351,7 @@ int wrap_hash_count(WRAPPERS_ARGS, hash_t h);
 void *wrap_hash_find(WRAPPERS_ARGS, hash_t h, const void *key);
 void *wrap_hash_insert(WRAPPERS_ARGS, hash_t h, const void *key, void *data);
 void *wrap_hash_remove (WRAPPERS_ARGS, hash_t h, const void *key);
+int wrap_hash_remove_if(WRAPPERS_ARGS, hash_t h, hash_arg_f argf, void *arg);
 int wrap_hash_delete_if(WRAPPERS_ARGS, hash_t h, hash_arg_f argf, void *arg);
 int wrap_hash_for_each(WRAPPERS_ARGS, hash_t h, hash_arg_f argf, void *arg);
 void wrap_hash_destroy(WRAPPERS_ARGS, hash_t h);

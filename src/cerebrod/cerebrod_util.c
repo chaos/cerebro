@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_util.c,v 1.40 2008-03-28 17:06:48 chu11 Exp $
+ *  $Id: cerebrod_util.c,v 1.41 2009-05-19 21:02:57 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007-2008 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -71,7 +71,7 @@ _hash_reinsert(void *data, const void *key, void *arg)
 /* 
  * _hash_removeall
  *
- * callback for hash_delete_if that returns 1, signifying the removal
+ * callback for hash_remove_if that returns 1, signifying the removal
  * of all hashed entries
  */
 static int
@@ -111,7 +111,7 @@ cerebrod_rehash(hash_t *old_hash,
   if (Hash_for_each(*old_hash, _hash_reinsert, &new_hash) != hash_num)
     CEREBRO_EXIT(("invalid reinsert: hash_num=%d", hash_num));
 
-  if (Hash_delete_if(*old_hash, _hash_removeall, NULL) != hash_num)
+  if (Hash_remove_if(*old_hash, _hash_removeall, NULL) != hash_num)
     CEREBRO_EXIT(("invalid removeall: hash_num=%d", hash_num));
 
   Hash_destroy(*old_hash);

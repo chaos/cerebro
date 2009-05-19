@@ -1,3 +1,11 @@
+2009-05-19  Albert Chu  <chu11@llnl.gov>
+
+	* src/libs/common/hash.h, src/libs/common/hash.c (hash_remove_if):
+	New function.
+
+	* src/cerebrod/cerebrod_util.c (cerebrod_rehash): Fix rehash
+	corner case.
+	
 2009-05-15  Albert Chu  <chu11@llnl.gov>
 
         * Add comments for clarification.
