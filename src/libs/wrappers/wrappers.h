@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.h,v 1.23 2009-05-19 21:02:57 chu11 Exp $
+ *  $Id: wrappers.h,v 1.24 2009-08-11 21:43:25 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007-2008 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -339,6 +339,8 @@ int wrap_list_delete(WRAPPERS_ARGS, ListIterator i);
         wrap_hash_insert(WRAPPERS_DEBUG_ARGS, h, key, data)
 #define Hash_remove(h, key) \
         wrap_hash_remove(WRAPPERS_DEBUG_ARGS, h, key)
+#define Hash_remove_if(h, argf, arg) \
+	wrap_hash_remove_if(WRAPPERS_DEBUG_ARGS,h, argf, arg)
 #define Hash_delete_if(h, argf, arg) \
         wrap_hash_delete_if(WRAPPERS_DEBUG_ARGS, h, argf, arg)
 #define Hash_for_each(h, argf, arg) \
