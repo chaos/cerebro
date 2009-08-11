@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod.c,v 1.87 2008-03-28 17:06:47 chu11 Exp $
+ *  $Id: cerebrod.c,v 1.88 2009-08-11 21:21:49 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007-2008 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -35,6 +35,7 @@
 #include <string.h>
 #endif /* STDC_HEADERS */
 #include <syslog.h>
+#include <limits.h>
 #include <errno.h>
 
 #include "cerebro/cerebro_error.h"

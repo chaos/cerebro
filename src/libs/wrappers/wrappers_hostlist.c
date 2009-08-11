@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers_hostlist.c,v 1.9 2008-03-28 17:06:49 chu11 Exp $
+ *  $Id: wrappers_hostlist.c,v 1.10 2009-08-11 21:21:49 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007-2008 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -29,6 +29,7 @@
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include <limits.h>
 #include <assert.h>
 #include <errno.h>
 

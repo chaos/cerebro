@@ -1,3 +1,7 @@
+2009-08-11  Albert Chu  <chu11@llnl.gov>
+
+	* Include headers to fix portability.
+	
 2009-05-19  Albert Chu  <chu11@llnl.gov>
 
 	* src/libs/common/hash.h, src/libs/common/hash.c (hash_remove_if):

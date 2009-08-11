@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_event_update.c,v 1.11 2008-03-28 17:06:47 chu11 Exp $
+ *  $Id: cerebrod_event_update.c,v 1.12 2009-08-11 21:21:49 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007-2008 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -36,6 +36,7 @@
 #if STDC_HEADERS
 #include <string.h>
 #endif /* STDC_HEADERS */
+#include <limits.h>
 #include <errno.h>
 #include <assert.h>
 
