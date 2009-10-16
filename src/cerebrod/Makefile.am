@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.78 2007-10-12 23:23:30 chu11 Exp $
+## $Id: Makefile.am,v 1.79 2009-10-16 23:42:05 chu11 Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -75,7 +75,7 @@ CEREBROD_LDADDS = ../libs/cerebro_error/libcerebro_error.la \
 endif
 
 if !WITH_CEREBROD_NO_THREADS
-# For some reason pthread symbols can't be found when I 
+# On RHEL5, for some reason pthread symbols can't be found when I 
 # add PTHREAD_CFLAGS to cerebrod_CFLAGS below.  Must be
 # due to some linker ordering issue.
 AM_CFLAGS = $(PTHREAD_CFLAGS)
