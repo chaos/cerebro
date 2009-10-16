@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.7 2009-10-16 21:31:42 chu11 Exp $
+## $Id: Makefile.am,v 1.8 2009-10-16 21:50:21 chu11 Exp $
 ##*****************************************************************************
 
 noinst_HEADERS	       = wrappers.h
@@ -40,8 +40,6 @@ libwrappers_marshall_la_CFLAGS  = -I$(srcdir)/../common \
 			          -I$(srcdir)/../include
 libwrappers_marshall_la_SOURCES = wrappers_marshall.c
 
-libwrappers_pthread_la_CFLAGS  = -I$(srcdir)/../common \
-			         -I$(srcdir)/../include
 if !WITH_CEREBROD_NO_THREADS
 libwrappers_pthread_la_CFLAGS = -I$(srcdir)/../common \
 				-I$(srcdir)/../include \
