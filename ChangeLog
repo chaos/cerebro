@@ -1,3 +1,7 @@
+2009-10-16  Albert Chu  <chu11@llnl.gov>
+
+	* Fix RHEL6/FC11 build issues.
+	
 2009-08-11  Albert Chu  <chu11@llnl.gov>
 
 	* Include headers to fix portability.

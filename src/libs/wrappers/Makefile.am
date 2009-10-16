@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.6 2005-08-25 22:04:32 achu Exp $
+## $Id: Makefile.am,v 1.7 2009-10-16 21:31:42 chu11 Exp $
 ##*****************************************************************************
 
 noinst_HEADERS	       = wrappers.h
@@ -42,6 +42,16 @@ libwrappers_marshall_la_SOURCES = wrappers_marshall.c
 
 libwrappers_pthread_la_CFLAGS  = -I$(srcdir)/../common \
 			         -I$(srcdir)/../include
+if !WITH_CEREBROD_NO_THREADS
+libwrappers_pthread_la_CFLAGS = -I$(srcdir)/../common \
+				-I$(srcdir)/../include \
+				$(PTHREAD_CFLAGS)
+libwrappers_pthread_la_LDFLAGS = $(PTHREAD_LIBS)
+else
+libwrappers_pthread_la_CFLAGS = -I$(srcdir)/../common \
+				-I$(srcdir)/../include
+endif
+
 libwrappers_pthread_la_SOURCES = wrappers_pthread.c
 
 force-dependency-check:
