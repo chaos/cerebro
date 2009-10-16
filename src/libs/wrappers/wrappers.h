@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.h,v 1.24 2009-08-11 21:43:25 chu11 Exp $
+ *  $Id: wrappers.h,v 1.25 2009-10-16 23:49:25 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007-2008 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -263,27 +263,6 @@ int wrap_pthread_mutex_unlock(WRAPPERS_ARGS, pthread_mutex_t *mutex);
 int wrap_pthread_mutex_init(WRAPPERS_ARGS, pthread_mutex_t *mutex, const pthread_mutexattr_t *mutexattr);
 int wrap_pthread_cond_signal(WRAPPERS_ARGS, pthread_cond_t *cond);
 int wrap_pthread_cond_wait(WRAPPERS_ARGS, pthread_cond_t *cond, pthread_mutex_t *mutex);
-
-/*
- * ltdl wrappers
- */
-
-#define Lt_dlinit() \
-        wrap_lt_dlinit(WRAPPERS_DEBUG_ARGS)
-#define Lt_dlexit() \
-        wrap_lt_dlexit(WRAPPERS_DEBUG_ARGS)
-#define Lt_dlopen(filename) \
-        wrap_lt_dlopen(WRAPPERS_DEBUG_ARGS, filename)
-#define Lt_dlsym(handle, symbol) \
-        wrap_lt_dlsym(WRAPPERS_DEBUG_ARGS, handle, symbol)
-#define Lt_dlclose(handle) \
-        wrap_lt_dlclose(WRAPPERS_DEBUG_ARGS, handle)
-
-int wrap_lt_dlinit(WRAPPERS_ARGS);
-int wrap_lt_dlexit(WRAPPERS_ARGS);
-lt_dlhandle wrap_lt_dlopen(WRAPPERS_ARGS, const char *filename);
-lt_ptr wrap_lt_dlsym(WRAPPERS_ARGS, void *handle, char *symbol);
-int wrap_lt_dlclose(WRAPPERS_ARGS, void *handle);
 
 /* 
  * List lib wrappers 
