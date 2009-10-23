@@ -32,6 +32,9 @@ Enhancements
   without keeping on adding functions.
 - logging/error output/something facility for modules
 
+Reducements?
+- remove genders config module?  Too much at the end of the day.
+
 Module Extra Stuff
 - signal or polling to see if there are new modules to load
 - retry loading of previously failed modules
@@ -42,6 +45,18 @@ Module Extra Stuff
 - support exclude option on all modules
 
 TCP connections instead of UDP for metric monitoring
+
+extra tag mechanism
+- add extra tag/mark/key mechanism to differentiate same metric name
+  from same node.
+
+preserve stats across cerebro restart
+- to allow more HA like services to exist
+- i.e. trent's idea to have cerebro monitor things so nodes no to
+  auto-config/auto-restart/etc.
+
+synchronize heartbeats
+- perhaps on exact time schedule
  
 Specs:
 - cerebro.spec.in - find better way to do restarts
