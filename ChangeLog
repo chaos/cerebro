@@ -1,3 +1,7 @@
+2009-11-04  Albert Chu  <chu11@llnl.gov>
+
+	* Fix up comments/docs, i.e. != e.g.
+	
 2009-10-16  Albert Chu  <chu11@llnl.gov>
 
 	* src/libs/wrappers/wrappers_ltdl.c, src/libs/wrappers/wrappers.h:

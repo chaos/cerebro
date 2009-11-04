@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebro_metric_server_protocol.h,v 1.12 2008-03-28 17:06:48 chu11 Exp $
+ *  $Id: cerebro_metric_server_protocol.h,v 1.13 2009-11-04 18:59:09 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007-2008 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -38,12 +38,12 @@
  * 
  * Server -> Client
  * - Stream of responses indicating metric_names or nodenames and
- *   metric values.  Respones may depend on the request flags.  Met ric
+ *   metric values.  Respones may depend on the request flags.  Metric
  *   receive times will be 0 for metrics in which a receive time makes no
- *   sense (i.e. cluster node name). After the stream of is complete,
+ *   sense (e.g. cluster node name). After the stream of is complete,
  *   an "end of responses" response will indicate the end of stream
  *   and completion of the request.  This "end of responses" response
- *   will be sent even if no data is returned (i.e. only down nodes
+ *   will be sent even if no data is returned (e.g. only down nodes
  *   are requested, but all nodes are up, or no nodes are monitoring
  *   the indicated metric).
  *

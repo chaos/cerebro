@@ -1,5 +1,5 @@
 .\"#############################################################################
-.\"$Id: cerebro.conf.5.in,v 1.34 2008-05-16 23:09:43 chu11 Exp $
+.\"$Id: cerebro.conf.5.in,v 1.35 2009-11-04 18:59:09 chu11 Exp $
 .\"#############################################################################
 .\"  Copyright (C) 2007-2008 Lawrence Livermore National Security, LLC.
 .\"  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -108,9 +108,9 @@ be sent from.  The default source port is 8850.  The network interface
 specifies the network interface messages should be sent out of.  This
 is typically used to specify a network when a multicast ip address is
 specified as the message destination.  The network interface can be
-specified as a network interface (i.e.  eth0), an ip address
-(i.e. 192.168.1.1) or a subnet using CIDR notation
-(i.e. 192.168.1.1/16).  By default, when a network interface is not
+specified as a network interface (e.g.  eth0), an ip address
+(e.g. 192.168.1.1) or a subnet using CIDR notation
+(e.g. 192.168.1.1/16).  By default, when a network interface is not
 specified,
 .B cerebrod 
 will search for and select an appropriate network interface. If the
@@ -149,8 +149,8 @@ default port is 8851.  The network interface specifies the network
 interface messages should be received on.  This is typically used to
 specify a network when a multicast ip address is specified as the
 message receiving ip.  The network interface can be specified as a
-network interface (i.e.  eth0), an ip address (i.e. 192.168.1.1) or a
-subnet using CIDR notation (i.e. 192.168.1.1/16).  By default, when a
+network interface (e.g.  eth0), an ip address (e.g. 192.168.1.1) or a
+subnet using CIDR notation (e.g. 192.168.1.1/16).  By default, when a
 network interface is not specified,
 .B cerebrod 
 will search for and
@@ -235,9 +235,9 @@ be sent from.  The default source port is 8849.  The network interface
 specifies the network interface messages should be sent out of.  This
 is typically used to specify a network when a multicast ip address is
 specified as the message destination.  The network interface can be
-specified as a network interface (i.e.  eth0), an ip address
-(i.e. 192.168.1.1) or a subnet using CIDR notation
-(i.e. 192.168.1.1/16).  By default, when a network interface is not
+specified as a network interface (e.g.  eth0), an ip address
+(e.g. 192.168.1.1) or a subnet using CIDR notation
+(e.g. 192.168.1.1/16).  By default, when a network interface is not
 specified,
 .B cerebrod 
 will search for and select an appropriate network interface. If the
