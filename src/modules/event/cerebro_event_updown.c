@@ -1,7 +1,7 @@
 /*****************************************************************************\
- *  $Id: cerebro_event_updown.c,v 1.7 2008-03-28 17:06:49 chu11 Exp $
+ *  $Id: cerebro_event_updown.c,v 1.8 2010-02-02 01:01:21 chu11 Exp $
  *****************************************************************************
- *  Copyright (C) 2007-2008 Lawrence Livermore National Security, LLC.
+ *  Copyright (C) 2007-2010 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Albert Chu <chu11@llnl.gov>.

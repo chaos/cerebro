@@ -1,7 +1,7 @@
 /*****************************************************************************\
- *  $Id: cerebrod_util.c,v 1.41 2009-05-19 21:02:57 chu11 Exp $
+ *  $Id: cerebrod_util.c,v 1.42 2010-02-02 01:01:20 chu11 Exp $
  *****************************************************************************
- *  Copyright (C) 2007-2008 Lawrence Livermore National Security, LLC.
+ *  Copyright (C) 2007-2010 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Albert Chu <chu11@llnl.gov>.
