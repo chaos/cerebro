@@ -1,3 +1,7 @@
+2010-02-04  Albert Chu  <chu11@llnl.gov>
+	
+	* man/cerebro_module_devel.3.in: Fix typo.
+	
 2010-02-01  Albert Chu  <chu11@llnl.gov>
 
 	* Update copyrights globally.

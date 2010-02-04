@@ -1,5 +1,5 @@
 .\"#############################################################################
-.\"$Id: cerebro_module_devel.3.in,v 1.30 2010-02-02 01:01:20 chu11 Exp $
+.\"$Id: cerebro_module_devel.3.in,v 1.31 2010-02-04 23:50:50 chu11 Exp $
 .\"#############################################################################
 .\"  Copyright (C) 2007-2010 Lawrence Livermore National Security, LLC.
 .\"  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -661,7 +661,7 @@ The field 'event_names' should point to a function of the following type:
 typedef char *(*Cerebro_event_event_names)(void);
 
 The 'event_names' function returns the name(s) of the event(s) the
-module can generate.  NULL is returned on error.  Multiple metrics are
+module can generate.  NULL is returned on error.  Multiple events are
 comma separated.
 
 The field 'metric_names' should point to a function of the following type:
