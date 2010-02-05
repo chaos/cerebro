@@ -1,4 +1,10 @@
 2010-02-04  Albert Chu  <chu11@llnl.gov>
+
+	* src/cerebrod/cerebrod_event_update.c
+	(cerebrod_event_modules_setup): Fix bug which did not allow
+	multiple events.
+	
+2010-02-04  Albert Chu  <chu11@llnl.gov>
 	
 	* man/cerebro_module_devel.3.in: Fix typo.
 	

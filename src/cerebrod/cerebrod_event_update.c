@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_event_update.c,v 1.13 2010-02-02 01:01:20 chu11 Exp $
+ *  $Id: cerebrod_event_update.c,v 1.14 2010-02-05 00:25:34 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007-2010 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -363,6 +363,20 @@ _cerebrod_event_to_send_destroy(void *x)
 }
 
 /*
+ * _cerebrod_name_strcmp
+ */
+static int
+_cerebrod_name_strcmp(void *x, void *key)
+{
+  assert(x);
+  assert(key);
+
+  if (!strcmp((char *)x, (char *)key))
+    return (1);
+  return (0);
+}
+
+/*
  * Under almost any circumstance, don't return a -1 error, cerebro can
  * go on without loading monitor modules. The listener_data_init_lock
  * should already be set.
@@ -516,7 +530,7 @@ cerebrod_event_modules_setup(void)
       while (eventnamePtr)
         {
           if (!list_find_first(event_names,
-                               (ListFindF)strcmp,
+                               (ListFindF)_cerebrod_name_strcmp,
                                eventnamePtr))
             {
               List_append(event_names, eventnamePtr);
