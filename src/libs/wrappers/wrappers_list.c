@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers_list.c,v 1.7 2010-02-02 01:01:21 chu11 Exp $
+ *  $Id: wrappers_list.c,v 1.8 2010-04-06 22:10:11 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007-2010 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -183,6 +183,22 @@ wrap_list_iterator_destroy(WRAPPERS_ARGS, ListIterator i)
 
   list_iterator_destroy(i);
   return;
+}
+
+void *
+wrap_list_remove(WRAPPERS_ARGS, ListIterator i)
+{
+  int rv;
+
+  assert(file && function);
+
+  if (!i)
+    WRAPPERS_ERR_INVALID_PARAMETERS("list_remove");
+
+  if (!list_remove(i))
+    WRAPPERS_ERR_ERRNO("list_remove");
+
+  return rv;
 }
 
 int 

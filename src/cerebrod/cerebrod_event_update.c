@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_event_update.c,v 1.14 2010-02-05 00:25:34 chu11 Exp $
+ *  $Id: cerebrod_event_update.c,v 1.15 2010-04-06 22:10:11 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007-2010 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -346,11 +346,8 @@ _setup_event_node_timeout_data(void)
   return -1;
 }
 
-/* 
- * _cerebrod_event_to_send_destroy
- */
-static void
-_cerebrod_event_to_send_destroy(void *x)
+void
+cerebrod_event_to_send_destroy(void *x)
 {
   struct cerebrod_event_to_send *ets;
 
@@ -599,7 +596,7 @@ cerebrod_event_modules_setup(void)
    * possible race of modules creating events before the event_queue
    * is created.
    */
-  event_queue = List_create((ListDelF)_cerebrod_event_to_send_destroy);
+  event_queue = List_create((ListDelF)cerebrod_event_to_send_destroy);
 
   return 1;
   

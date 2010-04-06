@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_event_update.h,v 1.10 2010-02-02 01:01:20 chu11 Exp $
+ *  $Id: cerebrod_event_update.h,v 1.11 2010-04-06 22:10:11 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007-2010 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -90,6 +90,14 @@ struct cerebrod_event_module_timeout_data
   unsigned int timeout;
   char *timeout_str;
 };
+
+/*
+ * cerebrod_event_to_send_destroy
+ *
+ * List destroy callback for destroying structs of type
+ * cerebrod_event_to_send.
+ */
+void cerebrod_event_to_send_destroy(void *x);
 
 /*
  * cerebrod_event_modules_setup

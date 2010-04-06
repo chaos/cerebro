@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_event_server.c,v 1.15 2010-02-02 01:01:20 chu11 Exp $
+ *  $Id: cerebrod_event_server.c,v 1.16 2010-04-06 22:10:11 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007-2010 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -45,6 +45,7 @@
 
 #include "cerebrod.h"
 #include "cerebrod_config.h"
+#include "cerebrod_event_update.h"
 #include "cerebrod_event_server.h"
 #include "cerebrod_util.h"
 
@@ -277,11 +278,15 @@ _event_marshall(struct cerebro_event *event,
 void *
 cerebrod_event_queue_monitor(void *arg)
 {
+  List temp_event_queue;
+
   _event_queue_monitor_initialize();
 
   /* Don't bother if there isn't an event queue (i.e. no event modules) */
   if (!event_queue)
     return NULL;
+
+  temp_event_queue = List_create((ListDelF)cerebrod_event_to_send_destroy);
 
   /* 
    * achu: The listener and thus event update initialization is
@@ -298,14 +303,30 @@ cerebrod_event_queue_monitor(void *arg)
     {
       struct cerebrod_event_to_send *ets;
       ListIterator eitr;
+      ListIterator titr;
 
       Pthread_mutex_lock(&event_queue_lock);
       assert(event_queue);
       while (list_count(event_queue) == 0)
         Pthread_cond_wait(&event_queue_cond, &event_queue_lock);
 
+      /* Debug dumping in the below loop can race with the debug
+       * dumping from the listener, b/c of racing on the
+       * event_queue_lock.  To avoid this race, we copy the data off
+       * the event_queue, so the event_queue_lock can be freed up.
+       */
+
       eitr = List_iterator_create(event_queue);
       while ((ets = list_next(eitr)))
+        {
+          List_append(temp_event_queue, ets);
+          List_remove(eitr);
+        }
+      List_iterator_destroy(eitr);
+      Pthread_mutex_unlock(&event_queue_lock);
+
+      titr = List_iterator_create(temp_event_queue);
+      while ((ets = list_next(titr)))
         {
           List connections;
 
@@ -357,12 +378,13 @@ cerebrod_event_queue_monitor(void *arg)
             }
           Pthread_mutex_unlock(&event_connections_lock);
 
-          List_delete(eitr);
+          List_delete(titr);
         }
-      List_iterator_destroy(eitr);
-
-      Pthread_mutex_unlock(&event_queue_lock);
+      
+      List_iterator_destroy(titr);
     }
+
+  List_destroy(temp_event_queue);
 
   return NULL;			/* NOT REACHED */
 }

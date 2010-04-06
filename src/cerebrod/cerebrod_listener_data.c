@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: cerebrod_listener_data.c,v 1.61 2010-02-02 01:01:20 chu11 Exp $
+ *  $Id: cerebrod_listener_data.c,v 1.62 2010-04-06 22:10:11 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007-2010 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -444,8 +444,10 @@ _node_data_dump(void *x, const void *key, void *arg)
   assert(x);
  
   nd = (struct cerebrod_node_data *)x;
- 
+
+printf("LOCKING NODE: %s\n", nd->nodename); 
   Pthread_mutex_lock(&(nd->node_data_lock));
+printf("GOT LOCK NODE: %s\n", nd->nodename);
   if (nd->discovered && conf.metric_server_debug)
     {
       int num;

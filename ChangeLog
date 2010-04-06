@@ -1,3 +1,8 @@
+2010-04-06  Albert Chu  <chu11@llnl.gov>
+
+	* src/cerebrod/: Fix debug output race condition between event
+	server and listener threads.
+	
 2010-02-04  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerebrod/cerebrod_event_update.c

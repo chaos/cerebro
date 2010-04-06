@@ -1,5 +1,5 @@
 /*****************************************************************************\
- *  $Id: wrappers.h,v 1.26 2010-02-02 01:01:21 chu11 Exp $
+ *  $Id: wrappers.h,v 1.27 2010-04-06 22:10:11 chu11 Exp $
  *****************************************************************************
  *  Copyright (C) 2007-2010 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -289,6 +289,8 @@ int wrap_pthread_cond_wait(WRAPPERS_ARGS, pthread_cond_t *cond, pthread_mutex_t 
         wrap_list_iterator_create(WRAPPERS_DEBUG_ARGS, l)
 #define List_iterator_destroy(i) \
         wrap_list_iterator_destroy(WRAPPERS_DEBUG_ARGS, i)
+#define List_remove(i) \
+        wrap_list_remove(WRAPPERS_DEBUG_ARGS, i)
 #define List_delete(i) \
         wrap_list_delete(WRAPPERS_DEBUG_ARGS, i)
 
@@ -303,6 +305,7 @@ void wrap_list_sort(WRAPPERS_ARGS, List l, ListCmpF f);
 void *wrap_list_peek(WRAPPERS_ARGS, List l);
 ListIterator wrap_list_iterator_create(WRAPPERS_ARGS, List l);
 void wrap_list_iterator_destroy(WRAPPERS_ARGS, ListIterator i);
+void *wrap_list_remove(WRAPPERS_ARGS, ListIterator i);
 int wrap_list_delete(WRAPPERS_ARGS, ListIterator i);
 
 /* 
