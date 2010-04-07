@@ -1,3 +1,9 @@
+2010-04-07  Albert Chu  <chu11@llnl.gov>
+
+	* META, NEWS: update for release
+
+	* tagged cerebro-1-10-1
+
 2010-04-06  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerebrod/: Fix debug output race condition between event
