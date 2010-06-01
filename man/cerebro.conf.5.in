@@ -1,5 +1,5 @@
 .\"#############################################################################
-.\"$Id: cerebro.conf.5.in,v 1.36 2010-02-02 01:01:20 chu11 Exp $
+.\"$Id: cerebro.conf.5.in,v 1.37 2010-06-01 21:01:40 chu11 Exp $
 .\"#############################################################################
 .\"  Copyright (C) 2007-2010 Lawrence Livermore National Security, LLC.
 .\"  Copyright (C) 2005-2007 The Regents of the University of California.
@@ -70,7 +70,7 @@ specified, a default is assumed.
 .TP
 .I cerebro_timeout_len num
 Specify the alternate default timeout length the libcerebro API should
-use to evaluate up vs. down nodes.
+use to evaluate up vs. down nodes.  Defaults to 60 seconds.
 .TP
 .I cerebro_flags num
 Specify the alternate default flags the libcerebro API should use by
@@ -277,31 +277,31 @@ should not load.
 .if @MANPAGE_DEBUG@ \{
 .TP
 .I cerebrod_speak_debug ( on | off )
-Turn on speak debugging.  Requires that debugging be turned on from
+Turn on/off speak debugging.  Requires that debugging be turned on from
 the command line with the
 .I -d
 option.  This option is turned off by default.
 .TP
 .I cerebrod_listen_debug ( on | off )
-Turn on listen debugging.  Requires that debugging be turned on from
+Turn on/off listen debugging.  Requires that debugging be turned on from
 the command line with the
 .I -d
 option.  This option is turned off by default.
 .TP
 .I cerebrod_metric_controller_debug ( on | off )
-Turn on metric controller debugging.  Requires that debugging be turned on
+Turn on/off metric controller debugging.  Requires that debugging be turned on
 from the command line with the
 .I -d
 option.  This option is turned off by default.
 .TP
 .I cerebrod_metric_server_debug ( on | off )
-Turn on metric server debugging.  Requires that debugging be turned on
+Turn on/off metric server debugging.  Requires that debugging be turned on
 from the command line with the
 .I -d
 option.  This option is turned off by default.
 .TP
 .I cerebrod_event_server_debug ( on | off )
-Turn on event server debugging.  Requires that debugging be turned on
+Turn on/off event server debugging.  Requires that debugging be turned on
 from the command line with the
 .I -d
 option.  This option is turned off by default.

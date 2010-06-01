@@ -157,6 +157,7 @@ fi
 %defattr(-,root,root)
 %doc README NEWS ChangeLog DISCLAIMER DISCLAIMER.UC COPYING
 %config(noreplace) %{_sysconfdir}/init.d/cerebrod
+%attr(0600,root,root) %config(noreplace) %{_sysconfdir}/cerebro.conf
 %{_includedir}/*
 %dir %{_libdir}/cerebro
 %{_libdir}/libcerebro*
