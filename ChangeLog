@@ -1,3 +1,7 @@
+2010-08-17  Albert Chu  <chu11@llnl.gov>
+
+	* man/cerebro.7: Fix typo.
+	
 2010-07-01  Albert Chu  <chu11@llnl.gov>
 
 	* META, NEWS: update for release
