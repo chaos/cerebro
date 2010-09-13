@@ -445,9 +445,7 @@ _node_data_dump(void *x, const void *key, void *arg)
  
   nd = (struct cerebrod_node_data *)x;
 
-printf("LOCKING NODE: %s\n", nd->nodename); 
   Pthread_mutex_lock(&(nd->node_data_lock));
-printf("GOT LOCK NODE: %s\n", nd->nodename);
   if (nd->discovered && conf.metric_server_debug)
     {
       int num;
