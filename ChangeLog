@@ -1,5 +1,11 @@
 2010-12-03  Albert Chu  <chu11@llnl.gov>
 
+	* META, NEWS: update for release
+
+	* tagged cerebro-1-11-1
+
+2010-12-03  Albert Chu  <chu11@llnl.gov>
+
 	* Update various CEREBRO_DBG error messages to CEREBRO_ERR.
 	
 2010-08-17  Albert Chu  <chu11@llnl.gov>
