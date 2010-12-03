@@ -2,6 +2,10 @@ This file describes changes in recent versions of cerebro. It
 primarily documents those changes that are of interest to users and
 admins.
 
+Changes in cerebro-1.12-1
+===========================
+ -- Increase verbosity of error logging to aid in debugging.
+
 Changes in cerebro-1.11-1
 ===========================
  -- Include cerebro.conf template by default.
