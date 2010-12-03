@@ -242,7 +242,7 @@ metric_modules_load(void)
 
   if (!(handle = (struct metric_module *)malloc(sizeof(struct metric_module))))
     {
-      CEREBRO_DBG(("malloc: %s", strerror(errno)));
+      CEREBRO_ERR(("malloc: %s", strerror(errno)));
       return NULL;
     }
   memset(handle, '\0', sizeof(struct metric_module));
@@ -252,14 +252,14 @@ metric_modules_load(void)
 #if !WITH_STATIC_MODULES
   if (!(handle->dl_handles = vector_create((VectorDelF)lt_dlclose)))
     {
-      CEREBRO_DBG(("vector_create: %s", strerror(errno)));
+      CEREBRO_ERR(("vector_create: %s", strerror(errno)));
       goto cleanup;
     }
 #endif /* !WITH_STATIC_MODULES */
   
   if (!(handle->module_infos = vector_create(NULL)))
     {
-      CEREBRO_DBG(("vector_create: %s", strerror(errno)));
+      CEREBRO_ERR(("vector_create: %s", strerror(errno)));
       goto cleanup;
     }
 

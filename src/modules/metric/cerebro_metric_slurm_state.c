@@ -110,7 +110,7 @@ _slurm_state_setup_socket(void)
   
   if (strlen(SLURM_STATE_CONTROL_PATH) >= sizeof(addr.sun_path))
     {
-      CEREBRO_DBG(("path '%s' too long", SLURM_STATE_CONTROL_PATH));
+      CEREBRO_ERR(("path '%s' too long", SLURM_STATE_CONTROL_PATH));
       goto cleanup;
     }
 

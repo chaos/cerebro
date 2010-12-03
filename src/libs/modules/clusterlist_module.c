@@ -196,7 +196,7 @@ clusterlist_module_load(void)
 
   if (!(handle = (struct clusterlist_module *)malloc(sizeof(struct clusterlist_module))))
     {
-      CEREBRO_DBG(("malloc: %s", strerror(errno)));
+      CEREBRO_ERR(("malloc: %s", strerror(errno)));
       return NULL;
     }
   memset(handle, '\0', sizeof(struct clusterlist_module));

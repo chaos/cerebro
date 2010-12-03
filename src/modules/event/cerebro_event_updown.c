@@ -95,13 +95,13 @@ updown_event_setup(void)
                                   (hash_cmp_f)strcmp,
                                   (hash_del_f)free)))
     {
-      CEREBRO_DBG(("hash_create: %s", strerror(errno)));
+      CEREBRO_ERR(("hash_create: %s", strerror(errno)));
       goto cleanup;
     }
   
   if (!(node_states_nodenames = list_create((ListDelF)free)))
     {
-      CEREBRO_DBG(("list_create: %s", strerror(errno)));
+      CEREBRO_ERR(("list_create: %s", strerror(errno)));
       goto cleanup;
     }
 
@@ -178,13 +178,13 @@ _create_entry(const char *nodename)
 
   if (!(state = (int *)malloc(sizeof(int))))
     {
-      CEREBRO_DBG(("malloc: %s", strerror(errno)));
+      CEREBRO_ERR(("malloc: %s", strerror(errno)));
       goto cleanup;
     }
   
   if (!(nodePtr = (char *)malloc(CEREBRO_MAX_NODENAME_LEN + 1)))
     {
-      CEREBRO_DBG(("malloc: %s", strerror(errno)));
+      CEREBRO_ERR(("malloc: %s", strerror(errno)));
       goto cleanup;
     }
 
@@ -223,7 +223,7 @@ _create_event(const char *nodename, int state)
 
   if (!(event = (struct cerebro_event *)malloc(sizeof(struct cerebro_event))))
     {
-      CEREBRO_DBG(("malloc: %s", strerror(errno)));
+      CEREBRO_ERR(("malloc: %s", strerror(errno)));
       goto cleanup;
     }
 
@@ -235,7 +235,7 @@ _create_event(const char *nodename, int state)
   event->event_value_len = sizeof(int32_t);
   if (!(event->event_value = malloc(sizeof(int32_t))))
     {
-      CEREBRO_DBG(("malloc: %s", strerror(errno)));
+      CEREBRO_ERR(("malloc: %s", strerror(errno)));
       goto cleanup;
     }
   

@@ -170,7 +170,7 @@ config_module_load(void)
 
   if (!(handle = (struct config_module *)malloc(sizeof(struct config_module))))
     {
-      CEREBRO_DBG(("malloc: %s", strerror(errno)));
+      CEREBRO_ERR(("malloc: %s", strerror(errno)));
       return NULL;
     }
   memset(handle, '\0', sizeof(struct config_module));

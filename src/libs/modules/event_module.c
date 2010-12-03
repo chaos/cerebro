@@ -190,7 +190,7 @@ event_modules_load(void)
                                                                                     
   if (!(handle = (struct event_module *)malloc(sizeof(struct event_module))))
     {
-      CEREBRO_DBG(("malloc: %s", strerror(errno)));
+      CEREBRO_ERR(("malloc: %s", strerror(errno)));
       return NULL;
     }
   memset(handle, '\0', sizeof(struct event_module));
@@ -200,14 +200,14 @@ event_modules_load(void)
 #if !WITH_STATIC_MODULES
   if (!(handle->dl_handles = vector_create((VectorDelF)lt_dlclose)))
     {
-      CEREBRO_DBG(("vector_create: %s", strerror(errno)));
+      CEREBRO_ERR(("vector_create: %s", strerror(errno)));
       goto cleanup;
     }
 #endif /* !WITH_STATIC_MODULES */
   
   if (!(handle->module_infos = vector_create(NULL)))
     {
-      CEREBRO_DBG(("vector_create: %s", strerror(errno)));
+      CEREBRO_ERR(("vector_create: %s", strerror(errno)));
       goto cleanup;
     }
 

@@ -138,7 +138,7 @@ _load_module(char *search_dir,
 
   if (!(dl_handle = lt_dlopen(filebuf)))
     {
-      CEREBRO_DBG(("lt_dlopen: %s, %s", filebuf, lt_dlerror()));
+      CEREBRO_ERR(("lt_dlopen: %s, %s", filebuf, lt_dlerror()));
       goto cleanup;
     }
               
@@ -202,7 +202,7 @@ _find_known_module(char *search_dir,
     {
       if (errno != ENOENT)
         {
-          CEREBRO_DBG(("opendir: %s: %s", search_dir, strerror(errno)));
+          CEREBRO_ERR(("opendir: %s: %s", search_dir, strerror(errno)));
           return -1;
         }
       return 0;
@@ -286,7 +286,7 @@ _find_unknown_modules(char *search_dir,
     {
       if (errno != ENOENT)
         {
-          CEREBRO_DBG(("opendir: %s: %s", search_dir, strerror(errno)));
+          CEREBRO_ERR(("opendir: %s: %s", search_dir, strerror(errno)));
           return -1;
         }
       return 0;
@@ -378,6 +378,7 @@ find_and_load_modules(char *module_dir,
         return 1;
     }
 
+#if 0
 #if CEREBRO_DEBUG
   if ((rv = _find_unknown_modules(module_dir,
                                   signature,
@@ -390,8 +391,11 @@ find_and_load_modules(char *module_dir,
   if (rv)
     return 1;
 #endif /* CEREBRO_DEBUG */
+#endif
 
-  if ((rv = _find_unknown_modules(CEREBRO_MODULE_DIR,
+  printf("MODULE DIR = %s\n", CEREBRO_MODULE_DIR);
+
+  if ((rv = _find_unknown_modules("/usr/lib64/cerebro",
                                   signature,
                                   module_cb,
                                   module_info_sym,
@@ -415,7 +419,7 @@ module_setup(void)
 #if !WITH_STATIC_MODULES
   if (lt_dlinit() != 0)
     {
-      CEREBRO_DBG(("lt_dlinit: %s", lt_dlerror()));
+      CEREBRO_ERR(("lt_dlinit: %s", lt_dlerror()));
       return -1;
     }
 #endif /* !WITH_STATIC_MODULES */

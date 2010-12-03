@@ -1,3 +1,7 @@
+2010-12-03  Albert Chu  <chu11@llnl.gov>
+
+	* Update various CEREBRO_DBG error messages to CEREBRO_ERR.
+	
 2010-08-17  Albert Chu  <chu11@llnl.gov>
 
 	* man/cerebro.7: Fix typo.
