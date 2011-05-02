@@ -378,7 +378,6 @@ find_and_load_modules(char *module_dir,
         return 1;
     }
 
-#if 0
 #if CEREBRO_DEBUG
   if ((rv = _find_unknown_modules(module_dir,
                                   signature,
@@ -391,9 +390,6 @@ find_and_load_modules(char *module_dir,
   if (rv)
     return 1;
 #endif /* CEREBRO_DEBUG */
-#endif
-
-  printf("MODULE DIR = %s\n", CEREBRO_MODULE_DIR);
 
   if ((rv = _find_unknown_modules("/usr/lib64/cerebro",
                                   signature,
