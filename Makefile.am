@@ -4,6 +4,10 @@
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
 
-SUBDIRS = etc man src
+if !WITH_STATIC_MODULES
+LTDL_DIRS = libltdl
+endif
+
+SUBDIRS = $(LTDL_DIRS) etc man src
 
 EXTRA_DIST = autogen.sh DISCLAIMER DISCLAIMER.UC META cerebro.spec.in cerebro.spec

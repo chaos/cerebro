@@ -8,7 +8,8 @@ sbin_PROGRAMS = cerebro-stat
 cerebro_stat_SOURCES = cerebro-stat.c
 cerebro_stat_CFLAGS  = -I $(srcdir)/../libs/include \
 		       -I $(srcdir)/../libs/common \
-		       -I $(srcdir)/../libs/wrappers
+		       -I $(srcdir)/../libs/wrappers \
+		       -I $(srcdir)/../../libltdl
 
 # Wierd linker issues, ordering here matters
 cerebro_stat_LDADD = ../libs/cerebro/libcerebro.la \

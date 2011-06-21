@@ -10,14 +10,9 @@ noinst_HEADERS = conffile.h \
 		 hash.h \
 		 hostlist.h \
 		 list.h \
-		 ltdl.h \
 		 marshall.h \
 		 thread.h \
 		 vector.h 
-
-if !WITH_STATIC_MODULES
-LTDL_LIB = libltdl.la
-endif
 
 noinst_LTLIBRARIES = libconffile.la \
                      liberror.la \
@@ -25,7 +20,6 @@ noinst_LTLIBRARIES = libconffile.la \
 		     libhash.la \
 		     libhostlist.la \
 		     liblist.la \
-		     $(LTDL_LIB) \
 		     libmarshall.la \
 		     libvector.la
 
@@ -40,9 +34,6 @@ libhash_la_SOURCES = hash.c thread.c
 libhostlist_la_SOURCES = hostlist.c
 
 liblist_la_SOURCES = list.c
-
-libltdl_la_SOURCES = ltdl.c
-libltdl_la_LIBADD = $(LIBADD_DL)
 
 libmarshall_la_SOURCES = marshall.c
 

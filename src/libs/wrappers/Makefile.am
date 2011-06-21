@@ -12,33 +12,40 @@ noinst_LTLIBRARIES     = libwrappers.la \
 			 libwrappers_pthread.la
 
 libwrappers_la_CFLAGS  = -I$(srcdir)/../common \
-			 -I$(srcdir)/../include
+			 -I$(srcdir)/../include \
+			 -I$(srcdir)/../../../libltdl
 libwrappers_la_SOURCES = wrappers.c
 
 libwrappers_hash_la_CFLAGS  = -I$(srcdir)/../common \
-			      -I$(srcdir)/../include
+			      -I$(srcdir)/../include \
+			      -I$(srcdir)/../../../libltdl
 libwrappers_hash_la_SOURCES = wrappers_hash.c
 
 libwrappers_hostlist_la_CFLAGS  = -I$(srcdir)/../common \
-			          -I$(srcdir)/../include
+			          -I$(srcdir)/../include \
+				  -I$(srcdir)/../../../libltdl
 libwrappers_hostlist_la_SOURCES = wrappers_hostlist.c
 
 libwrappers_list_la_CFLAGS  = -I$(srcdir)/../common \
-			      -I$(srcdir)/../include
+			      -I$(srcdir)/../include \
+			      -I$(srcdir)/../../../libltdl
 libwrappers_list_la_SOURCES = wrappers_list.c
 
 libwrappers_marshall_la_CFLAGS  = -I$(srcdir)/../common \
-			          -I$(srcdir)/../include
+			          -I$(srcdir)/../include \
+				  -I$(srcdir)/../../../libltdl
 libwrappers_marshall_la_SOURCES = wrappers_marshall.c
 
 if !WITH_CEREBROD_NO_THREADS
 libwrappers_pthread_la_CFLAGS = -I$(srcdir)/../common \
 				-I$(srcdir)/../include \
+				-I$(srcdir)/../../../libltdl \
 				$(PTHREAD_CFLAGS)
 libwrappers_pthread_la_LDFLAGS = $(PTHREAD_LIBS)
 else
 libwrappers_pthread_la_CFLAGS = -I$(srcdir)/../common \
-				-I$(srcdir)/../include
+				-I$(srcdir)/../include \
+				-I$(srcdir)/../../../libltdl
 endif
 
 libwrappers_pthread_la_SOURCES = wrappers_pthread.c

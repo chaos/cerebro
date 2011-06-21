@@ -25,7 +25,7 @@ noinst_HEADERS = cerebrod.h \
 #
 
 if !WITH_STATIC_MODULES
-LTDL_LIBS = ../libs/common/libltdl.la
+LTDL_LIBS = ../../libltdl/libltdlc.la
 endif
 
 # Wierd linker issues here, ordering matters
@@ -104,10 +104,14 @@ cerebrod_CFLAGS  = -I$(srcdir)/../libs/common \
 		   -I$(srcdir)/../libs/include \
 		   -I$(srcdir)/../libs/modules \
 		   -I$(srcdir)/../libs/util \
-		   -I$(srcdir)/../libs/wrappers
+		   -I$(srcdir)/../libs/wrappers \
+		   -I$(srcdir)/../../libltdl
 cerebrod_LDADD   = $(CEREBROD_LDADDS) \
 		   $(LTDL_LIBS) \
 		   $(PTHREAD_WRAPPERS)
+
+../../libltdl/libltdlc.la : force-dependency-check
+	@cd `dirname $@` && make `basename $@`
 
 ../libs/cerebro_error/libcerebro_error.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
@@ -125,9 +129,6 @@ cerebrod_LDADD   = $(CEREBROD_LDADDS) \
 	@cd `dirname $@` && make `basename $@`
 
 ../libs/common/liblist.la : force-dependency-check
-	@cd `dirname $@` && make `basename $@`
-
-../libs/common/libltdl.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
 ../libs/common/libmarshall.la : force-dependency-check

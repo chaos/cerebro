@@ -1,3 +1,8 @@
+2011-06-21  Albert Chu  <chu11@llnl.gov>
+
+	* Update for building on RHEL6.  Add Makefile.in, configure,
+	config/, libltdl/, etc. for building straight out of the tree.
+	
 2011-05-02  Albert Chu  <chu11@llnl.gov>
 
 	* src/libs/modules/module_util.c: Remove accidental debug left in.

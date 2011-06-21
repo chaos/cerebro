@@ -8,7 +8,7 @@ CEREBRO_OTHER_FLAGS = -Wl,--version-script=$(CEREBRO_VERSION_SCRIPT)
 endif
 
 if !WITH_STATIC_MODULES
-LTDL_LIBS = ../common/libltdl.la
+LTDL_LIBS = ../../../libltdl/libltdlc.la
 endif
 
 noinst_HEADERS	       = cerebro_api.h \
@@ -52,6 +52,9 @@ libcerebro_la_LIBADD  = ../cerebro_error/libcerebro_error.la \
 			../util/libutil_network.la \
 			$(LTDL_LIBS)
 
+../../../libltdl/libltdlc.la : force-dependency-check
+	@cd `dirname $@` && make `basename $@`
+
 ../cerebro_error/libcerebro_error.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
@@ -62,9 +65,6 @@ libcerebro_la_LIBADD  = ../cerebro_error/libcerebro_error.la \
 	@cd `dirname $@` && make `basename $@`
 
 ../common/liblist.la : force-dependency-check
-	@cd `dirname $@` && make `basename $@`
-
-../common/libltdl.la : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
 ../common/libmarshall.la : force-dependency-check

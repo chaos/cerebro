@@ -45,41 +45,47 @@ noinst_LTLIBRARIES    = libclusterlistmodules.la \
 libclusterlistmodules_la_CFLAGS = -DCLUSTERLIST_MODULE_BUILDDIR=\"$(clusterlist_module_builddir)\" \
 				  -I$(srcdir)/../common \
 				  -I$(srcdir)/../debug \
-				  -I$(srcdir)/../include
+				  -I$(srcdir)/../include \
+				  -I$(srcdir)/../../../libltdl
 libclusterlistmodules_la_SOURCES = clusterlist_module.c
 libclusterlistmodules_la_LIBADD = $(CLUSTERLIST_STATIC_LIB)
 
 libconfigmodules_la_CFLAGS = -DCONFIG_MODULE_BUILDDIR=\"$(config_module_builddir)\" \
 			     -I$(srcdir)/../common \
 			     -I$(srcdir)/../debug \
-			     -I$(srcdir)/../include
+			     -I$(srcdir)/../include \
+			     -I$(srcdir)/../../../libltdl
 libconfigmodules_la_SOURCES = config_module.c
 libconfigmodules_la_LIBADD = $(CONFIG_STATIC_LIB)
 
 libeventmodules_la_CFLAGS = -DEVENT_MODULE_BUILDDIR=\"$(event_module_builddir)\" \
 			    -I$(srcdir)/../common \
 			    -I$(srcdir)/../debug \
-			    -I$(srcdir)/../include
+			    -I$(srcdir)/../include \
+			    -I$(srcdir)/../../../libltdl
 libeventmodules_la_SOURCES = event_module.c
 libeventmodules_la_LIBADD = $(EVENT_STATIC_LIB)
 
 libmetricmodules_la_CFLAGS = -DMETRIC_MODULE_BUILDDIR=\"$(metric_module_builddir)\" \
 			     -I$(srcdir)/../common \
 			     -I$(srcdir)/../debug \
-			     -I$(srcdir)/../include
+			     -I$(srcdir)/../include \
+			     -I$(srcdir)/../../../libltdl
 libmetricmodules_la_SOURCES = metric_module.c
 libmetricmodules_la_LIBADD = $(METRIC_STATIC_LIB)
 
 libmonitormodules_la_CFLAGS = -DMONITOR_MODULE_BUILDDIR=\"$(monitor_module_builddir)\" \
 			      -I$(srcdir)/../common \
 			      -I$(srcdir)/../debug \
-			      -I$(srcdir)/../include
+			      -I$(srcdir)/../include \
+			      -I$(srcdir)/../../../libltdl
 libmonitormodules_la_SOURCES = monitor_module.c
 libmonitormodules_la_LIBADD = $(MONITOR_STATIC_LIB)
 
 libmodules_la_CFLAGS  = -I$(srcdir)/../common \
 			-I$(srcdir)/../debug \
-			-I$(srcdir)/../include
+			-I$(srcdir)/../include \
+			-I$(srcdir)/../../../libltdl
 libmodules_la_SOURCES = module_util.c
 
 ../../modules/clusterlist/libstaticclusterlistmodules.la : force-dependency-check
