@@ -1,3 +1,8 @@
+2011-07-08 Frederik Ferner <frederik.ferner@diamond.ac.uk>
+
+	* Replace literal string '/usr/lib64/cerebro' with
+	CEREBRO_MODULES_DIR.
+	
 2011-06-21  Albert Chu  <chu11@llnl.gov>
 
 	* Update for building on RHEL6.  Add Makefile.in, configure,
