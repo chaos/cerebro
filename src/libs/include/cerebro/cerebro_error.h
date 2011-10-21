@@ -1,7 +1,7 @@
 /*****************************************************************************\
  *  $Id: cerebro_error.h,v 1.7 2010-02-02 01:01:20 chu11 Exp $
  *****************************************************************************
- *  Copyright (C) 2007-2010 Lawrence Livermore National Security, LLC.
+ *  Copyright (C) 2007-2011 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Albert Chu <chu11@llnl.gov>.

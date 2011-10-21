@@ -1,7 +1,7 @@
 /*****************************************************************************\
  *  $id: cerebro_metric.c,v 1.17 2005/06/07 16:18:58 achu Exp $
  *****************************************************************************
- *  Copyright (C) 2007-2010 Lawrence Livermore National Security, LLC.
+ *  Copyright (C) 2007-2011 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2005-2007 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Albert Chu <chu11@llnl.gov>.
