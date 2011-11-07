@@ -45,7 +45,11 @@ The
 tool retrieves the currently available metric names, metric data, and
 event data from a
 .B cerebrod(8)
-daemon.
+daemon.  Please see
+.BR cerebro(7)
+for an overview of the
+.B Cerebro
+system.
 
 The user may specify the
 .I  "-m"
@@ -137,4 +141,4 @@ Turn on debugging
 .SH "ORIGIN"
 Developed by Albert Chu <chu11@llnl.gov> on LLNL's Linux clusters.
 .SH "SEE ALSO"
-cerebro_module(3), cerebro.conf(5), cerebrod(8)
+cerebro_module(3), cerebro.conf(5), cerebro(7), cerebrod(8)

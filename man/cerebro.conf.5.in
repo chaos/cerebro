@@ -36,7 +36,11 @@ library and the
 daemon.  The configuration ultimately affects the utility and behavior
 of the
 .B Cerebro
-suite of tools and libraries.
+suite of tools and libraries.  Please see
+.BR cerebro(7)
+for an overview of the
+.B Cerebro
+system.
 
 The default configuration file loaded is @CEREBRO_CONFIG_FILE_DEFAULT@. 
 
@@ -47,6 +51,60 @@ separated by any amount of whitespace.  Multiple arguments are also
 separated by whitespace.  Comments can be marked by using the pound
 sign ("#") character, and lines can be continued on the next using
 backslash (".\").
+
+.SH "COMMON CONFIGURATION"
+
+For most users, cluster nodes should be configured with
+.I cerebrod_speak
+enabled so they can send out metric information.
+
+A few cluster nodes, typically management nodes
+or head nodes, should be configured with
+.I cerebrod_listen
+enabled so they can receive/gather metric information.  It does not
+cause any harm if 'listen' is enabled on all nodes, however it would
+be an unnecessary thread/process running on many cluster nodes.
+
+The
+.I cerebrod_metric_controller
+should be enabled if metric data will be fed into
+.B cerebrod
+via
+.B libcerebro
+and/or 
+.B cerebro-admin.
+
+The
+.I cerebrod_metric_server
+should be enabled if metric data will be read from
+.B cerebrod
+via
+.B libcerebro
+and/or
+.B cerebro-stat.
+
+By default,
+.B cerebrod
+will communicate using multicast.  It will pick the first network
+interface it can find that is capable of using multicast.  To pick an alternate
+network interface, please see the
+.I cerebrod_speak_message_config
+and
+.I cerebrod_listen_message_config
+configuration options below.  If so desired, a non-multicast address
+can also be configured.
+
+Tools such as
+.B cerebro-admin
+and 
+.B cerebro-stat
+must commonly access a listening
+.B cerebrod
+daemon.  They default to communicating to the localhost, but that can
+be modified by configuring alternate defaults into
+.I cerebro_metric_server
+and
+.I cerebro_event_server.
 
 .SH "CEREBRO CONFIGURATION OPTIONS"
 .TP

@@ -35,7 +35,11 @@ The
 daemon is responsible for receiving and distributing cluster node data
 from each node in the cluster for use within the
 .B Cerebro
-suite of tools and libraries.
+suite of tools and libraries.  Please see
+.BR cerebro(7)
+for an overview of the
+.B Cerebro
+system.
 
 The 
 .B cerebrod
@@ -83,4 +87,4 @@ Turn on debugging and run daemon in foreground
 .SH "ORIGIN"
 Developed by Albert Chu <chu11@llnl.gov> on LLNL's Linux clusters.
 .SH "SEE ALSO"
-cerebro_module(3), cerebro.conf(5)
+cerebro_module(3), cerebro.conf(5), cerebro(7)

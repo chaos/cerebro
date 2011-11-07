@@ -38,7 +38,11 @@ a
 .B cerebrod(8)
 metric server.  New metrics can be registered, unregistered, updated
 or resent.  A number of the options below allow for alternate metric
-values to be specified or alter metric management behavior.
+values to be specified or alter metric management behavior.  Please see
+.BR cerebro(7)
+for an overview of the
+.B Cerebro
+system.
 
 .SH "OPTIONS"
 .TP
@@ -83,4 +87,4 @@ Turn on debugging
 .SH "ORIGIN"
 Developed by Albert Chu <chu11@llnl.gov> on LLNL's Linux clusters.
 .SH "SEE ALSO"
-cerebro_module(3), cerebro.conf(5), cerebrod(8)
+cerebro_module(3), cerebro.conf(5), cerebro(7), cerebrod(8)
