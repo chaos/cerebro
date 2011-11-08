@@ -40,7 +40,7 @@ suite of tools and libraries.  Please see
 .BR cerebro(7)
 for an overview of the
 .B Cerebro
-system and a common configuration that can be used.
+system and common configuration/setup information.
 
 The default configuration file loaded is @CEREBRO_CONFIG_FILE_DEFAULT@. 
 
