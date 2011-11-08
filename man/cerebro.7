@@ -35,71 +35,210 @@ The daemon,
 .B cerebrod(8),
 is the core of
 .B Cerebro.
-Typically executed on every node of a cluster, it is responsible for
-sending, receiving, and monitoring various metric data.  The
+The daemon should be run on every node of a cluster.  It is
+responsible for sending, receiving, and monitoring various metric
+data.
+
+.B Cerebrod(8)
+may be configured to gather/send data (be a \fIspeaker\fR),
+collect/receive data (be a \fIlistener\fR), or both.  Typically, it is
+configured to be a \fBspeaker\fR on all the nodes of a cluster, and is
+a \fBlistener\fR on only a few nodes of a cluster.  However, Cerebro
+may be setup a multitude of ways depending on the situation.
+
+By default,
 .B cerebrod(8)
-daemon should be running on every node of a cluster you wish to be
-involved in monitoring.
+sends and receives data via a multicast address on a set of defined
+ports.  However, it can be reconfigured to use non-multicast addresses
+and other alternate default ports.
 
 The metric data that 
 .B cerebrod(8)
-sends and receives is dependent on the data configured for monitoring.
-Data can be sent via modules developed for
-.B cerebrod,
-(See 
-.B cerebro_modules(3)
-for more information on these modules.), data fed into the daemon
-using 
+gathers and sends is dependent on the what data is configured for
+monitoring.
+Data can be fed into the daemon using
+.B cerebro
+metric modules,
 .B libcerebro(3),
-or data fed into the daemon via 
-.B cerebro-admin.
+or
+.B cerebro-admin(8).
+Data gathered or fed into
+.B cerebrod(8)
+\fIspeakers\fR are ultimately sent to \fIlisteners\fR.
 
-.B Libcerebro
-and 
-.B cerebro-admin
-offer the user the ability to send data by programming them into tools
-and/or scripts.  Modules developed for 
-.B cerebrod,
-will be automatically loaded by the daemon and those specific metrics
-will automatically be monitored.
-
-.B Libcerebro
+.B Cerebro
+monitoring modules,
+.B libcerebro(3)
 and
-.B cerebro-stat
-offer the user the ability to receive data and program them into tools
-and/or scripts.
+.B cerebro-stat(8)
+offer the user the ability to collect/receive monitored data on
+\fIlisteners\fR.
 
 Before
 .B cerebro
 can be used as a whole it must be configured.  
 See
 .B cerebro.conf(5)
-for a complete list and description of configuration file options and
-general configuration information.  A configuration module is also
-available for use with
-.B cerebrod.
-If your orgnization already has a database or configuration system for
-clusters, the configuration module may allow your orgnization to 
-configure 
-.B cerebrod
-off that database instead.
+for a complete list and description of configuration file options.  A
+general overview of configuration and setup can be found below.
 
-Three other module types are available for use in 
-.B cerebrod.
- 'clusterlist' modules define what nodes exist within a cluster.
- 'monitor' modules allow specific metrics to be passed to the 
-module for handling, perhaps for logging purposes.
- 'event' modules allow for the creation of events when certain
-metric information is received.
-See 
+.SH "CEREBRO MODULES"
+
+Dynamically loadable modules can be developed for
+.B cerebrod
+for a variety of purposes, including configuration, data
+gathering/sending, data collection/receiving, or data logging.  
+
+Most
+users will likely want to use the
+.B libcerebro(3)
+library or script against the
+.B cerebro-stat(8)
+or
+.B cerebro-admin(8)
+tools.
+
+However for those users interested, a summary of the types of modules
+available for
+.B Cerebro
+can be found in the
+.B cerebro_module(3)
+manpage.  Detailed programming information for the modules can be
+found in the
 .B cerebro_modules(3)
+manpage.
+
+.SH "CEREBRO EVENTS"
+
+.B Cerebro
+also has the ability to generate events when certain types of data
+event occur.  For example, an event could be generated when a node
+goes down in the cluster.  An event notification API is provided with
+.B libcerebro(3)
+for programming against these events or they can be watched via
+.B cerebro-stat(8).
+
+For more information, see
+.B libcerebro(3)
+and 
+.B cerebro_module(3).
+
+.SH "COMMON CONFIGURATION AND SETUP"
+
+The default
+.B cerebro
+configuration file is @CEREBRO_CONFIG_FILE_DEFAULT@.  Detailed
+configuration information can be found in
+.B cerebro.conf(5).
+However, the following should be a suitable start for configuration
+for most users.
+
+For most users, users will wish to gather/send (\fIspeak\fR) data on
+all cluster nodes, but only receive data (\fIlisten\fR) on a few
+nodes.  Therefore all cluster nodes should be configured with
+.I cerebrod_speak
+enabled on all nodes so they can send out metric data.
+The management, collection, or head nodes should be configured with
+.I cerebrod_listen
+enabled so they can receive/gather metric information.  It should be
+disabled on all remaining nodes.
+
+The
+.I cerebrod_metric_controller
+should be enabled if metric data will be fed into
+.B cerebrod
+via
+.B libcerebro
+and/or 
+.B cerebro-admin.
+Typically, this means it should be enabled wherever
+.I cerebrod_speak
+is enabled.
+
+The
+.I cerebrod_metric_server
+should be enabled if metric data will be read from
+.B cerebrod
+via
+.B libcerebro
+and/or
+.B cerebro-stat.
+Typically, this means it should be enabled wherever
+.I cerebrod_listen
+is enabled.
+
+By default,
+.B cerebrod
+will communicate using multicast.  It will pick the first network
+interface it can find that is capable of using multicast.  To pick an alternate
+network interface, please use the
+.I cerebrod_speak_message_config
+and
+.I cerebrod_listen_message_config
+configuration options to configure alternate network interfaces to
+use.  If so desired, a non-multicast addresses can also be configured
+with these options.
+
+If event monitoring is desired, the
+.I cerebrod_event_server
+should be enabled.  Typically, it is enabled wherever
+.I cerebrod_listen
+is enabled.
+
+Tools such as
+.B cerebro-admin
+and 
+.B cerebro-stat
+must commonly access a listening
+.B cerebrod
+daemon.  They default to communicating to the \fIlocalhost\fR, but
+that can be modified by configuring alternate defaults into
+.I cerebro_metric_server
+and
+.I cerebro_event_server.
+
+If the default ports chosen by any services of
+.B cerebro
+conflict with existing services, they can be reconfigured 
+and alternate default ports via a variety of options.  Please see
+.B cerebro.conf(5)
 for more details.
 
-An event notification API is provided with 
-.B libcerebro
-for programming against these events.
+After configuring
+.B cerebro
+on all cluster hosts, please start the daemon on all nodes.
+
+If things are setup correctly, you should be able to run
+
+.B # /usr/sbin/cerebro-stat -m updown_state
+
+and see a list of nodes currently sending/receiving
+.B cerebrod
+heartbeats.
+
+To see if metric data can be sent and collected, on a \fIspeaker\fR node, register a metric and feed some data to
+.B cerebrod 
+via:
+
+.B # /usr/sbin/cerebro-admin -r -m foobar
+
+.B # /usr/sbin/cerebro-admin -p -m foobar -t 5 -l 'avalue'
+
+In the above example, I have registered a metric called "foobar" and updated its value to "avalue".
+
+On a \fIlistener\fR node, see that the value of "foobar" has bee propogated to it by running:
+
+.B # /usr/sbin/cerebro-stat -l
+
+and hopefully you should see the value "avalue" when you run
+
+.B # /usr/sbin/cerebro-stat -m foobar
+
+Finally, when you are done, you should unregister the metric on the original \fIspeaker\fR node via:
+
+.B # /usr/sbin/cerebro-admin -u -m foobar
 
 .SH "ORIGIN"
 Developed by Albert Chu <chu11@llnl.gov> on LLNL's Linux clusters.
 .SH "SEE ALSO"
-libcerebro(3), cerebro_module(3), cerebro.conf(5), cerebrod(8)
+libcerebro(3), cerebro_module(3), cerebro_modules(3), cerebro.conf(5), cerebrod(8)
