@@ -106,6 +106,14 @@ be modified by configuring alternate defaults into
 and
 .I cerebro_event_server.
 
+If things are setup correctly, you should be able to run
+
+.B # /usr/sbin/cerebro-stat -m updown_state
+
+and see a list of nodes currently sending/receiving
+.B cerebrod
+heartbeats.
+
 .SH "CEREBRO CONFIGURATION OPTIONS"
 .TP
 .I cerebro_metric_server hostname [port]
