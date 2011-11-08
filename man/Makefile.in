@@ -37,7 +37,8 @@ target_triplet = @target@
 subdir = man
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(srcdir)/cerebro-admin.8.in $(srcdir)/cerebro-stat.8.in \
-	$(srcdir)/cerebro.conf.5.in $(srcdir)/cerebro_module.3.in \
+	$(srcdir)/cerebro.7.in $(srcdir)/cerebro.conf.5.in \
+	$(srcdir)/cerebro_module.3.in \
 	$(srcdir)/cerebro_module_devel.3.in $(srcdir)/cerebrod.8.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/config/ac_boottime.m4 \
@@ -65,7 +66,8 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config/config.h
 CONFIG_CLEAN_FILES = cerebro-admin.8 cerebro-stat.8 cerebrod.8 \
-	cerebro_module.3 cerebro_module_devel.3 cerebro.conf.5
+	cerebro_module.3 cerebro_module_devel.3 cerebro.conf.5 \
+	cerebro.7
 CONFIG_CLEAN_VPATH_FILES =
 SOURCES =
 DIST_SOURCES =
@@ -411,6 +413,8 @@ cerebro_module.3: $(top_builddir)/config.status $(srcdir)/cerebro_module.3.in
 cerebro_module_devel.3: $(top_builddir)/config.status $(srcdir)/cerebro_module_devel.3.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 cerebro.conf.5: $(top_builddir)/config.status $(srcdir)/cerebro.conf.5.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+cerebro.7: $(top_builddir)/config.status $(srcdir)/cerebro.7.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 
 mostlyclean-libtool:

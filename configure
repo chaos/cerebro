@@ -16747,7 +16747,7 @@ _ACEOF
 ##
 # Epilogue.
 ##
-ac_config_files="$ac_config_files cerebro.spec Makefile etc/Makefile man/Makefile man/cerebro-admin.8 man/cerebro-stat.8 man/cerebrod.8 man/cerebro_module.3 man/cerebro_module_devel.3 man/cerebro.conf.5 src/Makefile src/cerebro-admin/Makefile src/cerebro-stat/Makefile src/cerebrod/Makefile src/libs/Makefile src/libs/cerebro/Makefile src/libs/cerebro_error/Makefile src/libs/common/Makefile src/libs/debug/Makefile src/libs/include/Makefile src/libs/include/cerebro/cerebro_metric_control_protocol.h src/libs/modules/Makefile src/libs/util/Makefile src/libs/wrappers/Makefile src/modules/Makefile src/modules/clusterlist/Makefile src/modules/config/Makefile src/modules/event/Makefile src/modules/metric/Makefile src/modules/monitor/Makefile"
+ac_config_files="$ac_config_files cerebro.spec Makefile etc/Makefile man/Makefile man/cerebro-admin.8 man/cerebro-stat.8 man/cerebrod.8 man/cerebro_module.3 man/cerebro_module_devel.3 man/cerebro.conf.5 man/cerebro.7 src/Makefile src/cerebro-admin/Makefile src/cerebro-stat/Makefile src/cerebrod/Makefile src/libs/Makefile src/libs/cerebro/Makefile src/libs/cerebro_error/Makefile src/libs/common/Makefile src/libs/debug/Makefile src/libs/include/Makefile src/libs/include/cerebro/cerebro_metric_control_protocol.h src/libs/modules/Makefile src/libs/util/Makefile src/libs/wrappers/Makefile src/modules/Makefile src/modules/clusterlist/Makefile src/modules/config/Makefile src/modules/event/Makefile src/modules/metric/Makefile src/modules/monitor/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -17809,6 +17809,7 @@ do
     "man/cerebro_module.3") CONFIG_FILES="$CONFIG_FILES man/cerebro_module.3" ;;
     "man/cerebro_module_devel.3") CONFIG_FILES="$CONFIG_FILES man/cerebro_module_devel.3" ;;
     "man/cerebro.conf.5") CONFIG_FILES="$CONFIG_FILES man/cerebro.conf.5" ;;
+    "man/cerebro.7") CONFIG_FILES="$CONFIG_FILES man/cerebro.7" ;;
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
     "src/cerebro-admin/Makefile") CONFIG_FILES="$CONFIG_FILES src/cerebro-admin/Makefile" ;;
     "src/cerebro-stat/Makefile") CONFIG_FILES="$CONFIG_FILES src/cerebro-stat/Makefile" ;;
