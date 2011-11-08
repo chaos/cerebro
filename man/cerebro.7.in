@@ -130,8 +130,7 @@ The default
 configuration file is @CEREBRO_CONFIG_FILE_DEFAULT@.  Detailed
 configuration information can be found in
 .B cerebro.conf(5).
-However, the following should be a suitable start for configuration
-for most users.
+However, the following should be a suitable for most users.
 
 For most users, users will wish to gather/send (\fIspeak\fR) data on
 all cluster nodes, but only receive data (\fIlisten\fR) on a few
