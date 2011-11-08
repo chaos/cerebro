@@ -39,7 +39,7 @@ DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/cerebro.spec.in \
 	$(top_srcdir)/config/config.h.in $(top_srcdir)/configure \
 	$(top_srcdir)/src/libs/include/cerebro/cerebro_metric_control_protocol.h.in \
-	AUTHORS COPYING ChangeLog INSTALL NEWS TODO config/compile \
+	AUTHORS COPYING ChangeLog INSTALL NEWS TODO \
 	config/config.guess config/config.sub config/depcomp \
 	config/install-sh config/ltmain.sh config/missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
