@@ -1,6 +1,10 @@
 2010-11-07  Albert Chu  <chu11@llnl.gov>
 
 	* Additional doc updates.
+
+	* man/cerebro.7: Removed and replaced with cerebro.7.in.
+
+	* configure.ac: Update appropriately for generated manpage.
 	
 2010-11-07  Albert Chu  <chu11@llnl.gov>
 

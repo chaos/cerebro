@@ -242,6 +242,7 @@ AC_CONFIG_FILES( \
   man/cerebro_module.3 \
   man/cerebro_module_devel.3 \
   man/cerebro.conf.5 \
+  man/cerebro.7 \
   src/Makefile \
   src/cerebro-admin/Makefile \
   src/cerebro-stat/Makefile \
