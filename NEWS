@@ -2,6 +2,10 @@ This file describes changes in recent versions of cerebro. It
 primarily documents those changes that are of interest to users and
 admins.
 
+Changes in cerebro-1.14-1
+===========================
+ -- Various documentation updates.
+
 Changes in cerebro-1.13-1
 ===========================
  -- Fix portability bug for 32 bit vs 64 bit machines.
