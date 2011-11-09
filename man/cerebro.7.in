@@ -42,8 +42,8 @@ data.
 .B Cerebrod(8)
 may be configured to gather/send data (be a \fIspeaker\fR),
 collect/receive data (be a \fIlistener\fR), or both.  Typically, it is
-configured to be a \fBspeaker\fR on all the nodes of a cluster, and is
-a \fBlistener\fR on only a few nodes of a cluster.  However, Cerebro
+configured to be a \fIspeaker\fR on all the nodes of a cluster, and is
+a \fIlistener\fR on only a few nodes of a cluster.  However, Cerebro
 may be setup a multitude of ways depending on the situation.
 
 By default,
