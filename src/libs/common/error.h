@@ -51,6 +51,14 @@
  */
 void err_init(char *prog);
 
+/*
+ * err_init_exit_value
+ *
+ * By default, err_exit() exits with 1.  Give an alternate value to
+ * exit with.
+ */
+void err_init_exit_value(int val);
+
 /* 
  * err_get_flags
  *
