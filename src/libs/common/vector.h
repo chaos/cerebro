@@ -46,8 +46,8 @@
  *****************************************************************************/
 
 
-#ifndef VECTOR_H
-#define VECTOR_H
+#ifndef LSD_VECTOR_H
+#define LSD_VECTOR_H
 
 /* Notes:
  * 
@@ -255,4 +255,4 @@ void vector_iterator_destroy (VectorIterator i);
  */
 void *vector_next (VectorIterator i);
 
-#endif /* !VECTOR_H */
+#endif /* !LSD_VECTOR_H */
