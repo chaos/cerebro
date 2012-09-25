@@ -53,9 +53,7 @@
 #include "wrappers.h"
 
 extern struct cerebrod_config conf;
-#if CEREBRO_DEBUG
 extern pthread_mutex_t debug_output_mutex;
-#endif /* CEREBRO_DEBUG */
 
 /* 
  * event_node_timeout_monitor_init
@@ -173,7 +171,6 @@ cerebrod_event_node_timeout_monitor(void *arg)
                     {
                       List modules_list;
 
-#if CEREBRO_DEBUG
                       if (conf.event_server_debug)
                         {
                           Pthread_mutex_lock(&debug_output_mutex);
@@ -182,7 +179,6 @@ cerebrod_event_node_timeout_monitor(void *arg)
                           fprintf(stderr, "**************************************\n");
                           Pthread_mutex_unlock(&debug_output_mutex);
                         }
-#endif /* CEREBRO_DEBUG */
 
                       if ((modules_list = Hash_find(event_module_timeout_index, 
                                                     mtd->timeout_str)))

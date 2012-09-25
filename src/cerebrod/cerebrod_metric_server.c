@@ -58,9 +58,7 @@
 #include "wrappers.h"
 
 extern struct cerebrod_config conf;
-#if CEREBRO_DEBUG
 extern pthread_mutex_t debug_output_mutex;
-#endif /* CEREBRO_DEBUG */
 
 extern hash_t listener_data;
 extern hash_t metric_names;
@@ -139,7 +137,6 @@ _metric_server_request_unmarshall(struct cerebro_metric_server_request *req,
 static void
 _metric_server_request_dump(struct cerebro_metric_server_request *req)
 {
-#if CEREBRO_DEBUG
   char metric_name_buf[CEREBRO_MAX_METRIC_NAME_LEN+1];
 
   assert(req);
@@ -160,7 +157,6 @@ _metric_server_request_dump(struct cerebro_metric_server_request *req)
   fprintf(stderr, "* Timeout_len: %d\n", req->timeout_len);
   fprintf(stderr, "**************************************\n");
   Pthread_mutex_unlock(&debug_output_mutex);
-#endif /* CEREBRO_DEBUG */
 }
 
 /* 

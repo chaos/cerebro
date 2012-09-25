@@ -71,9 +71,7 @@
 #include "wrappers.h"
 
 extern struct cerebrod_config conf;
-#if CEREBRO_DEBUG
 extern pthread_mutex_t debug_output_mutex;
-#endif /* CEREBRO_DEBUG */
 
 /* 
  * Speaker Data
@@ -277,7 +275,6 @@ _metric_control_response_marshall(struct cerebro_metric_control_response *res,
 static void
 _metric_control_request_dump(struct cerebro_metric_control_request *req)
 {
-#if CEREBRO_DEBUG
   char metric_name_buf[CEREBRO_MAX_METRIC_NAME_LEN+1];
 
   assert(req);
@@ -300,7 +297,6 @@ _metric_control_request_dump(struct cerebro_metric_control_request *req)
   fprintf(stderr, "* metric_value_len: %d\n", req->metric_value_len);
   fprintf(stderr, "**************************************\n");
   Pthread_mutex_unlock(&debug_output_mutex);
-#endif /* CEREBRO_DEBUG */
 }
 
 /* 
@@ -940,7 +936,6 @@ _flush_metric(int fd, int32_t version, const char *metric_name)
 static void
 _speaker_metric_names_dump(void)
 {
-#if CEREBRO_DEBUG
   struct cerebrod_speaker_metric_info *metric_info = NULL;
   ListIterator itr = NULL;
 
@@ -960,7 +955,6 @@ _speaker_metric_names_dump(void)
   List_iterator_destroy(itr);
   Pthread_mutex_unlock(&debug_output_mutex);
   Pthread_mutex_unlock(&metric_list_lock);
-#endif /* CEREBRO_DEBUG */
 }
 
 /*

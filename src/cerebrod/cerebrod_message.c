@@ -41,10 +41,8 @@
 
 #include "wrappers.h"
 
-#if CEREBRO_DEBUG
 extern struct cerebrod_config conf;
 extern pthread_mutex_t debug_output_mutex;
-#endif /* CEREBRO_DEBUG */
 
 void
 cerebrod_message_destroy(struct cerebrod_message *msg)
@@ -67,7 +65,6 @@ cerebrod_message_destroy(struct cerebrod_message *msg)
 void
 cerebrod_message_dump(struct cerebrod_message *msg)
 {
-#if CEREBRO_DEBUG
   int i;
 #if !WITH_CEREBROD_NO_THREADS
   int rv;
@@ -159,5 +156,4 @@ cerebrod_message_dump(struct cerebrod_message *msg)
       fprintf(stderr, "\n");
     }
   fprintf(stderr, "**************************************\n");
-#endif /* CEREBRO_DEBUG */
 }

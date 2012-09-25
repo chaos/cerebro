@@ -1,3 +1,8 @@
+2012-09-25  Albert Chu  <chu11@llnl.gov>
+	
+	* cerebrod/: Support -d and -c in production builds of cerebrod,
+	including useful debug flags in cerebro.conf.
+	
 2012-03-02  Albert Chu  <chu11@llnl.gov>
 
 	* src/libs/common/error.h, src/libs/common/error.c

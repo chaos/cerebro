@@ -123,10 +123,8 @@ struct forward_message_config {
 struct cerebrod_config
 {
   /* Set by the user on the command line */
-#if CEREBRO_DEBUG
   int debug;
   char *config_file;
-#endif /* CEREBRO_DEBUG */
 
   /* Set by the user in the configuration file */
   int heartbeat_frequency_min;
@@ -151,12 +149,12 @@ struct cerebrod_config
   char metric_module_exclude[CEREBRO_CONFIG_METRIC_MODULE_EXCLUDE_MAX][CEREBRO_MAX_MODULE_NAME_LEN+1];
   int metric_module_exclude_len;
 
-#if CEREBRO_DEBUG
   int speak_debug;
   int listen_debug;
   int metric_controller_debug;
   int metric_server_debug;
   int event_server_debug;
+#if CEREBRO_DEBUG
   char *alternate_hostname;
 #endif /* CEREBRO_DEBUG */
 

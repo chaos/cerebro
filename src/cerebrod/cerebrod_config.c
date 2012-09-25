@@ -91,10 +91,8 @@ _cerebrod_set_config_default(void)
 {
   memset(&conf, '\0', sizeof(struct cerebrod_config));
 
-#if CEREBRO_DEBUG
   conf.debug = CEREBROD_DEBUG_DEFAULT;
   conf.config_file = CEREBRO_CONFIG_FILE_DEFAULT;
-#endif /* CEREBRO_DEBUG */
 
   conf.heartbeat_frequency_min = CEREBROD_HEARTBEAT_FREQUENCY_MIN_DEFAULT;
   conf.heartbeat_frequency_max = CEREBROD_HEARTBEAT_FREQUENCY_MAX_DEFAULT;
@@ -131,12 +129,12 @@ _cerebrod_set_config_default(void)
 
   conf.metric_module_exclude_len = 0;
 
-#if CEREBRO_DEBUG
   conf.speak_debug = CEREBROD_SPEAK_DEBUG_DEFAULT;
   conf.listen_debug = CEREBROD_LISTEN_DEBUG_DEFAULT;
   conf.metric_controller_debug = CEREBROD_METRIC_CONTROLLER_DEBUG_DEFAULT;
   conf.metric_server_debug = CEREBROD_METRIC_SERVER_DEBUG_DEFAULT;
   conf.event_server_debug = CEREBROD_EVENT_SERVER_DEBUG_DEFAULT;
+#if CEREBRO_DEBUG
   conf.alternate_hostname = CEREBROD_ALTERNATE_HOSTNAME;
 #endif /* CEREBRO_DEBUG */
 }
@@ -151,13 +149,10 @@ _usage(void)
 {
   fprintf(stderr, "Usage: cerebrod [OPTIONS]\n"
           "-h    --help          Output Help\n"
-          "-v    --version       Output Version\n");
-#if CEREBRO_DEBUG
-  fprintf(stderr, 
+          "-v    --version       Output Version\n",
           "-c    --config_file   Specify alternate config file\n"
           "-d    --debug         Turn on debugging and run daemon\n"
 	  "                      in foreground\n");
-#endif /* CEREBRO_DEBUG */
   exit(0);
 }
 
@@ -189,20 +184,15 @@ _cerebrod_cmdline_arguments_parse(int argc, char **argv)
     {
       {"help",                0, NULL, 'h'},
       {"version",             0, NULL, 'v'},
-#if CEREBRO_DEBUG
       {"config-file",         1, NULL, 'c'},
       {"debug",               0, NULL, 'd'},
-#endif /* CEREBRO_DEBUG */
     };
 #endif /* HAVE_GETOPT_LONG */
 
   assert(argv);
 
   memset(options, '\0', sizeof(options));
-  strcat(options, "hv");
-#if CEREBRO_DEBUG
-  strcat(options, "c:d");
-#endif /* CEREBRO_DEBUG */
+  strcat(options, "hvc:d");
 
   /* turn off output messages */
   opterr = 0;
@@ -221,14 +211,12 @@ _cerebrod_cmdline_arguments_parse(int argc, char **argv)
         case 'v':       /* --version */
           _version();
           break;
-#if CEREBRO_DEBUG
         case 'c':       /* --config-file */
           conf.config_file = Strdup(optarg);
           break;
         case 'd':       /* --debug */
           conf.debug++;
           break;
-#endif /* CEREBRO_DEBUG */
         case '?':
         default:
           cerebro_err_exit("unknown command line option '%c'", optopt);
@@ -244,7 +232,6 @@ _cerebrod_cmdline_arguments_parse(int argc, char **argv)
 static void
 _cerebrod_cmdline_arguments_error_check(void)
 {
-#if CEREBRO_DEBUG
   /* Check if the configuration file exists */
   if (conf.config_file)
     {
@@ -259,7 +246,6 @@ _cerebrod_cmdline_arguments_error_check(void)
             cerebro_err_exit("config file '%s' not found", conf.config_file);
         }
     }
-#endif /* CEREBRO_DEBUG */
 }
 
 /*
@@ -274,10 +260,8 @@ _cerebrod_load_config(void)
   unsigned int errnum;
   int i, j;
 
-#if CEREBRO_DEBUG
   config_debug_config_file = conf.config_file;
   config_debug_output = conf.debug;
-#endif /* CEREBRO_DEBUG */
 
   if (load_config(&tconf, &errnum) < 0)
     {
@@ -446,7 +430,6 @@ _cerebrod_load_config(void)
       conf.metric_module_exclude_len = tconf.cerebrod_metric_module_exclude_len;
     }
 
-#if CEREBRO_DEBUG
   if (tconf.cerebrod_speak_debug_flag)
     conf.speak_debug = tconf.cerebrod_speak_debug;
   if (tconf.cerebrod_listen_debug_flag)
@@ -457,6 +440,7 @@ _cerebrod_load_config(void)
     conf.metric_server_debug = tconf.cerebrod_metric_server_debug;
   if (tconf.cerebrod_event_server_debug_flag)
     conf.event_server_debug = tconf.cerebrod_event_server_debug;
+#if CEREBRO_DEBUG
   if (tconf.cerebrod_alternate_hostname_flag)
     conf.alternate_hostname = Strdup(tconf.cerebrod_alternate_hostname);
 #endif /* CEREBRO_DEBUG */
@@ -1139,7 +1123,6 @@ _cerebrod_configuration_data_error_check(void)
 static void 
 _cerebrod_config_dump(void)
 {
-#if CEREBRO_DEBUG
   char hbuf[CEREBROD_CONFIG_HOSTLIST_BUFLEN];
   int i;
 
@@ -1226,7 +1209,6 @@ _cerebrod_config_dump(void)
   fprintf(stderr, "* heartbeat_frequency_is_ranged: %d\n", conf.heartbeat_frequency_ranged);
 
   fprintf(stderr, "**************************************\n");
-#endif /* CEREBRO_DEBUG */
 }
 
 void

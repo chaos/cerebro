@@ -56,11 +56,9 @@
 #include "wrappers.h"
 
 extern struct cerebrod_config conf;
-#if CEREBRO_DEBUG
 #if !WITH_CEREBROD_NO_THREADS
 extern pthread_mutex_t debug_output_mutex;
 #endif /* !WITH_CEREBROD_NO_THREADS */
-#endif /* CEREBRO_DEBUG */
 
 /*
  * speaker_data_init
@@ -142,7 +140,6 @@ _setup_metric_modules(void)
   
   if (!metric_handle_count)
     {
-#if CEREBRO_DEBUG
       if (conf.debug && conf.speak_debug)
         {
 #if !WITH_CEREBROD_NO_THREADS
@@ -155,7 +152,6 @@ _setup_metric_modules(void)
           Pthread_mutex_unlock(&debug_output_mutex);
 #endif /* !WITH_CEREBROD_NO_THREADS */
         }
-#endif /* CEREBRO_DEBUG */
       goto cleanup;
     }
 
@@ -187,7 +183,6 @@ _setup_metric_modules(void)
           
           if (found_exclude)
             {
-#if CEREBRO_DEBUG
               if (conf.debug && conf.speak_debug)
                 {
 #if !WITH_CEREBROD_NO_THREADS
@@ -200,13 +195,11 @@ _setup_metric_modules(void)
                   Pthread_mutex_unlock(&debug_output_mutex);
 #endif /* !WITH_CEREBROD_NO_THREADS */
                 }
-#endif /* CEREBRO_DEBUG */
               CEREBRO_ERR(("Dropping metric module: %s", module_name));
               continue;
             }
         }
       
-#if CEREBRO_DEBUG
       if (conf.debug && conf.speak_debug)
         {
 #if !WITH_CEREBROD_NO_THREADS
@@ -219,7 +212,6 @@ _setup_metric_modules(void)
           Pthread_mutex_unlock(&debug_output_mutex);
 #endif /* !WITH_CEREBROD_NO_THREADS */
         }
-#endif /* CEREBRO_DEBUG */
 
       if (metric_module_setup(metric_handle, i) < 0)
         {

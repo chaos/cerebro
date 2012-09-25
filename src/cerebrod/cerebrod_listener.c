@@ -60,9 +60,7 @@
 #include "wrappers.h"
 
 extern struct cerebrod_config conf;
-#if CEREBRO_DEBUG
 extern pthread_mutex_t debug_output_mutex;
-#endif /* CEREBRO_DEBUG */
 
 extern clusterlist_module_t clusterlist_handle;
 
@@ -378,7 +376,6 @@ _cerebrod_listener_initialize(void)
       if (clusterlist_module_setup(clusterlist_handle) < 0)
         CEREBRO_EXIT(("clusterlist_module_setup"));
 
-#if CEREBRO_DEBUG
       if (conf.debug && conf.listen_debug)
         {
           fprintf(stderr, "**************************************\n");
@@ -388,7 +385,6 @@ _cerebrod_listener_initialize(void)
                   clusterlist_module_name(clusterlist_handle));
           fprintf(stderr, "**************************************\n");
         }
-#endif /* CEREBRO_DEBUG */
     }
 
   cerebrod_listener_data_initialize();
@@ -564,7 +560,6 @@ _cerebrod_message_unmarshall(const char *buf, unsigned int buflen)
 static void
 _cerebrod_message_dump(struct cerebrod_message *msg, char *hdr)
 {
-#if CEREBRO_DEBUG
   assert(msg && hdr);
 
   if (!(conf.debug && conf.listen_debug))
@@ -577,7 +572,6 @@ _cerebrod_message_dump(struct cerebrod_message *msg, char *hdr)
   cerebrod_message_dump(msg);
   fprintf(stderr, "**************************************\n");
   Pthread_mutex_unlock(&debug_output_mutex);
-#endif /* CEREBRO_DEBUG */
 }
 
 void *
