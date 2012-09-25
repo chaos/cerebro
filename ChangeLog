@@ -2,6 +2,9 @@
 	
 	* cerebrod/: Support -d and -c in production builds of cerebrod,
 	including useful debug flags in cerebro.conf.
+
+	* src/libs/debug/debug.h: Output more debugging information in
+	production builds.
 	
 2012-03-02  Albert Chu  <chu11@llnl.gov>
 

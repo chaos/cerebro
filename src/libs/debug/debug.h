@@ -97,7 +97,10 @@ char *debug_msg_create(const char *fmt, ...);
    
 #else /* !CEREBRO_DEBUG */
 
-#define CEREBRO_DBG(msg)
+#define CEREBRO_DBG(msg) \
+    do { \
+      cerebro_err_debug msg; \
+    } while(0)
 
 #define CEREBRO_ERR(msg) \
     do { \
