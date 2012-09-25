@@ -2,6 +2,11 @@ This file describes changes in recent versions of cerebro. It
 primarily documents those changes that are of interest to users and
 admins.
 
+Changes in cerebro-1.15-1
+===========================
+ -- Allow -d and -c in production builds of cerebrod.
+ -- Allow debug flags in cerebro.conf in production builds of cerebro.
+
 Changes in cerebro-1.14-1
 ===========================
  -- Various documentation updates.
