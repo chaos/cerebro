@@ -52,7 +52,6 @@
 
 #include "wrappers.h"
 
-#if CEREBRO_DEBUG
 #if !WITH_CEREBROD_NO_THREADS
 /*  
  * debug_output_mutex
@@ -67,7 +66,6 @@
  */
 pthread_mutex_t debug_output_mutex = PTHREAD_MUTEX_INITIALIZER;
 #endif /* !WITH_CEREBROD_NO_THREADS */
-#endif /* CEREBRO_DEBUG */
 
 #if !WITH_CEREBROD_SPEAKER_ONLY
 
@@ -114,7 +112,6 @@ main(int argc, char **argv)
 
   cerebrod_config_setup(argc, argv);
 
-#if CEREBRO_DEBUG
   if (!conf.debug)
     {
       cerebrod_daemon_init();
@@ -122,10 +119,6 @@ main(int argc, char **argv)
     }
   else
     cerebro_err_set_flags(CEREBRO_ERROR_STDERR);
-#else  /* !CEREBRO_DEBUG */
-  cerebrod_daemon_init();
-  cerebro_err_set_flags(CEREBRO_ERROR_SYSLOG);
-#endif /* !CEREBRO_DEBUG */
 
   /* Call after daemonization, since daemonization closes currently
    * open fds 

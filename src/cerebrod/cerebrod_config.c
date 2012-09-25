@@ -67,10 +67,8 @@
 #define INTF_IP               1 
 #define INTF_NAME             2
 
-#if CEREBRO_DEBUG
 extern char *config_debug_config_file;
 extern int config_debug_output;
-#endif /* CEREBRO_DEBUG */
 
 #define CEREBROD_CONFIG_HOSTLIST_BUFLEN 65536
 
@@ -149,7 +147,7 @@ _usage(void)
 {
   fprintf(stderr, "Usage: cerebrod [OPTIONS]\n"
           "-h    --help          Output Help\n"
-          "-v    --version       Output Version\n",
+          "-v    --version       Output Version\n"
           "-c    --config_file   Specify alternate config file\n"
           "-d    --debug         Turn on debugging and run daemon\n"
 	  "                      in foreground\n");
@@ -1202,7 +1200,9 @@ _cerebrod_config_dump(void)
   fprintf(stderr, "* metric_controller_debug: %d\n", conf.metric_controller_debug);
   fprintf(stderr, "* metric_server_debug: %d\n", conf.metric_server_debug);
   fprintf(stderr, "* event_server_debug: %d\n", conf.event_server_debug);
+#if CEREBRO_DEBUG
   fprintf(stderr, "* alternate_hostname: %s\n", conf.alternate_hostname);
+#endif /* CEREBRO_DEBUG */
   fprintf(stderr, "* -------------------------------\n");
   fprintf(stderr, "* Calculated Configuration\n");
   fprintf(stderr, "* -------------------------------\n");
