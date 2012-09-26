@@ -65,9 +65,7 @@
 #define LISTENER_DATA_METRIC_DATA_INCREMENT     32
 
 extern struct cerebrod_config conf;
-#if CEREBRO_DEBUG
 extern pthread_mutex_t debug_output_mutex;
-#endif /* CEREBRO_DEBUG */
 
 extern clusterlist_module_t clusterlist_handle;
 extern int found_clusterlist_module;
@@ -340,7 +338,6 @@ cerebrod_listener_data_initialize(void)
 static void
 _output_node_data_insert(struct cerebrod_node_data *nd)
 {
-#if CEREBRO_DEBUG
   assert(nd);
  
   if (!(conf.debug && conf.listen_debug))
@@ -351,7 +348,6 @@ _output_node_data_insert(struct cerebrod_node_data *nd)
   fprintf(stderr, "* Insert: Node=%s\n", nd->nodename);
   fprintf(stderr, "**************************************\n");
   Pthread_mutex_unlock(&debug_output_mutex);
-#endif /* CEREBRO_DEBUG */
 }
 
 /*  
@@ -362,7 +358,6 @@ _output_node_data_insert(struct cerebrod_node_data *nd)
 static void
 _output_node_data_update(struct cerebrod_node_data *nd)
 {
-#if CEREBRO_DEBUG
   assert(nd);
  
   if (!(conf.debug && conf.listen_debug))
@@ -373,10 +368,8 @@ _output_node_data_update(struct cerebrod_node_data *nd)
   fprintf(stderr, "* Update: Node=%s\n", nd->nodename);
   fprintf(stderr, "**************************************\n");
   Pthread_mutex_unlock(&debug_output_mutex);
-#endif /* CEREBRO_DEBUG */
 }
 
-#if CEREBRO_DEBUG
 /*
  * _metric_data_dump
  *
@@ -469,7 +462,6 @@ _node_data_dump(void *x, const void *key, void *arg)
 
   return 1;
 }
-#endif /* CEREBRO_DEBUG */
 
 /*
  * _listener_data_dump
@@ -479,7 +471,6 @@ _node_data_dump(void *x, const void *key, void *arg)
 static void
 _listener_data_dump(void)
 {
-#if CEREBRO_DEBUG
   if (!(conf.debug && conf.listen_debug))
     return;
 
@@ -504,7 +495,6 @@ _listener_data_dump(void)
   fprintf(stderr, "**************************************\n");
   Pthread_mutex_unlock(&debug_output_mutex);
   Pthread_mutex_unlock(&listener_data_lock);
-#endif /* CEREBRO_DEBUG */
 }
 
 /*
@@ -512,7 +502,6 @@ _listener_data_dump(void)
  *
  * callback function from hash_for_each to dump metric names
  */
-#if CEREBRO_DEBUG
 static int
 _metric_name_output(void *data, const void *key, void *arg)
 {
@@ -525,7 +514,6 @@ _metric_name_output(void *data, const void *key, void *arg)
   fprintf(stderr, "* %s\n", mnd->metric_name);
   return 1;
 }
-#endif /* CEREBRO_DEBUG */
 
 /*
  * _metric_names_dump
@@ -535,7 +523,6 @@ _metric_name_output(void *data, const void *key, void *arg)
 static void
 _metric_names_dump(void)
 {
-#if CEREBRO_DEBUG
   if (!(conf.debug && conf.listen_debug && metric_names))
     return;
 
@@ -548,7 +535,6 @@ _metric_names_dump(void)
   fprintf(stderr, "**************************************\n");
   Pthread_mutex_unlock(&debug_output_mutex);
   Pthread_mutex_unlock(&metric_names_lock);
-#endif /* CEREBRO_DEBUG */
 }
 
 /* 

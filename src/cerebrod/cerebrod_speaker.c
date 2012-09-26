@@ -58,11 +58,9 @@
 #include "wrappers.h"
 
 extern struct cerebrod_config conf;
-#if CEREBRO_DEBUG
 #if !WITH_CEREBROD_NO_THREADS
 extern pthread_mutex_t debug_output_mutex;
 #endif /* !WITH_CEREBROD_NO_THREADS */
-#endif /* CEREBRO_DEBUG */
 
 /*
  * cerebrod_nodename
@@ -430,7 +428,6 @@ _message_marshall(struct cerebrod_message *msg,
 static void
 _cerebrod_message_dump(struct cerebrod_message *msg)
 {
-#if CEREBRO_DEBUG
   assert(msg);
 
   if (!(conf.debug && conf.speak_debug))
@@ -447,7 +444,6 @@ _cerebrod_message_dump(struct cerebrod_message *msg)
 #if !WITH_CEREBROD_NO_THREADS
   Pthread_mutex_unlock(&debug_output_mutex);
 #endif /* !WITH_CEREBROD_NO_THREADS */
-#endif /* CEREBRO_DEBUG */
 }
 
 static void

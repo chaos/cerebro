@@ -61,9 +61,7 @@
 #define LISTENER_DATA_METRIC_DATA_INCREMENT     32
 
 extern struct cerebrod_config conf;
-#if CEREBRO_DEBUG
 extern pthread_mutex_t debug_output_mutex;
-#endif /* CEREBRO_DEBUG */
 
 extern pthread_mutex_t listener_data_init_lock;
 
@@ -151,7 +149,6 @@ cerebrod_monitor_modules_setup(void)
 
   if (!monitor_module_count)
     {
-#if CEREBRO_DEBUG
       if (conf.debug && conf.listen_debug)
         {
           Pthread_mutex_lock(&debug_output_mutex);
@@ -160,7 +157,6 @@ cerebrod_monitor_modules_setup(void)
           fprintf(stderr, "**************************************\n");
           Pthread_mutex_unlock(&debug_output_mutex);
         }
-#endif /* CEREBRO_DEBUG */
       goto cleanup;
     }
   
@@ -183,7 +179,6 @@ cerebrod_monitor_modules_setup(void)
 
       module_name = monitor_module_name(monitor_handle, i);
 
-#if CEREBRO_DEBUG
       if (conf.debug && conf.listen_debug)
         {
           Pthread_mutex_lock(&debug_output_mutex);
@@ -192,7 +187,6 @@ cerebrod_monitor_modules_setup(void)
           fprintf(stderr, "**************************************\n");
           Pthread_mutex_unlock(&debug_output_mutex);
         }
-#endif /* CEREBRO_DEBUG */
 
       if (monitor_module_setup(monitor_handle, i) < 0)
         {

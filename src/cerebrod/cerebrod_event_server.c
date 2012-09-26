@@ -59,9 +59,7 @@
 #include "wrappers.h"
 
 extern struct cerebrod_config conf;
-#if CEREBRO_DEBUG
 extern pthread_mutex_t debug_output_mutex;
-#endif /* CEREBRO_DEBUG */
 
 #define CEREBROD_EVENT_SERVER_BACKLOG 10
 
@@ -158,7 +156,6 @@ _event_queue_monitor_initialize(void)
 static void
 _event_dump(struct cerebro_event *event)
 {
-#if CEREBRO_DEBUG
   if (conf.event_server_debug)
     {
       char *buf;
@@ -229,7 +226,6 @@ _event_dump(struct cerebro_event *event)
       fprintf(stderr, "**************************************\n");
       Pthread_mutex_unlock(&debug_output_mutex);
     }
-#endif /* CEREBRO_DEBUG */
 }
 
 /* 
@@ -358,7 +354,6 @@ cerebrod_event_queue_monitor(void *arg)
                               || errno == ENETDOWN
                               || errno == ENETUNREACH)
                             {
-#if CEREBRO_DEBUG
                               if (conf.event_server_debug)
                                 {
                                   Pthread_mutex_lock(&debug_output_mutex);
@@ -367,7 +362,6 @@ cerebrod_event_queue_monitor(void *arg)
                                   fprintf(stderr, "**************************************\n");
                                   Pthread_mutex_unlock(&debug_output_mutex);
                                 }
-#endif /* CEREBRO_DEBUG */
                               List_delete(citr);
                             }
                           continue;
@@ -684,7 +678,6 @@ _event_server_request_unmarshall(struct cerebro_event_server_request *req,
 static void
 _event_server_request_dump(struct cerebro_event_server_request *req)
 {
-#if CEREBRO_DEBUG
   char event_name_buf[CEREBRO_MAX_EVENT_NAME_LEN+1];
 
   assert(req);
@@ -704,7 +697,6 @@ _event_server_request_dump(struct cerebro_event_server_request *req)
   fprintf(stderr, "* Flags: %x\n", req->flags);
   fprintf(stderr, "**************************************\n");
   Pthread_mutex_unlock(&debug_output_mutex);
-#endif /* CEREBRO_DEBUG */
 }
 
 /* 
@@ -1211,7 +1203,6 @@ cerebrod_event_server(void *arg)
 
               if (n <= 0)
                 {
-#if CEREBRO_DEBUG
                   if (conf.debug && conf.event_server_debug)
                     {
                       Pthread_mutex_lock(&debug_output_mutex);
@@ -1220,7 +1211,6 @@ cerebrod_event_server(void *arg)
                       fprintf(stderr, "**************************************\n");
                       Pthread_mutex_unlock(&debug_output_mutex);
                     }
-#endif /* CEREBRO_DEBUG */
                   Pthread_mutex_lock(&event_connections_lock);
                   _delete_event_connection_fd(pfds[i].fd);
                   Pthread_mutex_unlock(&event_connections_lock);

@@ -44,10 +44,8 @@
 #include "config_module.h"
 #include "debug.h"
 
-#if CEREBRO_DEBUG
 char *config_debug_config_file = NULL;
 int config_debug_output = 0;
-#endif /* CEREBRO_DEBUG */
 
 /* 
  * _load_config_module
@@ -86,7 +84,6 @@ _load_config_module(struct cerebro_config *conf, unsigned int *errnum)
       goto cleanup;
     }
 
-#if CEREBRO_DEBUG  
   if (config_debug_output)
     {
       fprintf(stderr, "**************************************\n");
@@ -96,7 +93,6 @@ _load_config_module(struct cerebro_config *conf, unsigned int *errnum)
               config_module_name(config_handle));
       fprintf(stderr, "**************************************\n");
     }
-#endif /* CEREBRO_DEBUG */
 
   if (config_module_load_config(config_handle, conf) < 0)
     {
@@ -964,7 +960,6 @@ _load_config_file(struct cerebro_config *conf, unsigned int *errnum)
 	conf, 
 	0
       },
-#if CEREBRO_DEBUG
       {
 	"cerebrod_speak_debug", 
 	CONFFILE_OPTION_BOOL, 
@@ -1020,6 +1015,7 @@ _load_config_file(struct cerebro_config *conf, unsigned int *errnum)
 	&conf->cerebrod_event_server_debug, 
 	0
       },
+#if CEREBRO_DEBUG
       {
 	"cerebrod_alternate_hostname", 
 	CONFFILE_OPTION_STRING, 
@@ -1044,14 +1040,10 @@ _load_config_file(struct cerebro_config *conf, unsigned int *errnum)
       goto cleanup;
     }
   
-#if CEREBRO_DEBUG
   if (!config_debug_config_file)
     config_file = CEREBRO_CONFIG_FILE_DEFAULT;
   else
     config_file = config_debug_config_file;
-#else  /* !NDEBUG */
-  config_file = CEREBRO_CONFIG_FILE_DEFAULT;
-#endif /* !NDEBUG */
 
   memset(conf, '\0', sizeof(struct cerebro_config));
   num = sizeof(options)/sizeof(struct conffile_option);
@@ -1281,7 +1273,6 @@ _set_cerebro_config(struct cerebro_config *dest,
       dest->cerebrod_metric_module_exclude_flag++;
     }
 
-#if CEREBRO_DEBUG
   if (!dest->cerebrod_speak_debug_flag && src->cerebrod_speak_debug_flag)
     {
       dest->cerebrod_speak_debug = src->cerebrod_speak_debug;
@@ -1315,6 +1306,7 @@ _set_cerebro_config(struct cerebro_config *dest,
       dest->cerebrod_event_server_debug_flag++;
     }
 
+#if CEREBRO_DEBUG
   if (!dest->cerebrod_alternate_hostname_flag 
       && src->cerebrod_alternate_hostname_flag)
     {

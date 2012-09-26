@@ -71,14 +71,12 @@ Output help
 .TP
 .B  -v, --version
 Output version
-.if @MANPAGE_DEBUG@ \{
 .TP
 .B  -c, --config-file
 Specify alternate configuration file
 .TP
 .B  -d, --debug
 Turn on debugging and run daemon in foreground
-\}
 
 .SH "FILES"
 @CEREBRO_CONFIG_FILE_DEFAULT@

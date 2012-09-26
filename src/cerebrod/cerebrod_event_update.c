@@ -59,9 +59,7 @@
 #define EVENT_NODE_TIMEOUT_SIZE_INCREMENT       1024
 
 extern struct cerebrod_config conf;
-#if CEREBRO_DEBUG
 extern pthread_mutex_t debug_output_mutex;
-#endif /* CEREBRO_DEBUG */
 
 extern pthread_mutex_t listener_data_init_lock;
 
@@ -413,7 +411,6 @@ cerebrod_event_modules_setup(void)
 
   if (!event_module_count)
     {
-#if CEREBRO_DEBUG
       if (conf.debug && conf.event_server_debug)
         {
           Pthread_mutex_lock(&debug_output_mutex);
@@ -422,7 +419,6 @@ cerebrod_event_modules_setup(void)
           fprintf(stderr, "**************************************\n");
           Pthread_mutex_unlock(&debug_output_mutex);
         }
-#endif /* CEREBRO_DEBUG */
       goto cleanup;
     }
 
@@ -456,7 +452,6 @@ cerebrod_event_modules_setup(void)
 
       module_name = event_module_name(event_handle, i);
 
-#if CEREBRO_DEBUG
       if (conf.debug && conf.event_server_debug)
         {
           Pthread_mutex_lock(&debug_output_mutex);
@@ -465,7 +460,6 @@ cerebrod_event_modules_setup(void)
           fprintf(stderr, "**************************************\n");
           Pthread_mutex_unlock(&debug_output_mutex);
         }
-#endif /* CEREBRO_DEBUG */
 
       if (event_module_setup(event_handle, i) < 0)
         {
@@ -531,7 +525,6 @@ cerebrod_event_modules_setup(void)
                                eventnamePtr))
             {
               List_append(event_names, eventnamePtr);
-#if CEREBRO_DEBUG
               if (conf.debug && conf.event_server_debug)
                 {
                   Pthread_mutex_lock(&debug_output_mutex);
@@ -540,7 +533,6 @@ cerebrod_event_modules_setup(void)
                   fprintf(stderr, "**************************************\n");
                   Pthread_mutex_unlock(&debug_output_mutex);
                 }
-#endif /* CEREBRO_DEBUG */
             }
           eventnamePtr = strtok_r(NULL, ",", &eventbuf);
         }

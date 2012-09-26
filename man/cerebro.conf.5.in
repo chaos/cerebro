@@ -285,7 +285,6 @@ can be specified space separated, comma separated, or hostranged.
 Specify metric module names that 
 .B cerebrod
 should not load.
-.if @MANPAGE_DEBUG@ \{
 .TP
 .I cerebrod_speak_debug ( on | off )
 Turn on/off speak debugging.  Requires that debugging be turned on from
@@ -316,6 +315,7 @@ Turn on/off event server debugging.  Requires that debugging be turned on
 from the command line with the
 .I -d
 option.  This option is turned off by default.
+.if @MANPAGE_DEBUG@ \{
 .TP
 .I cerebrod_alternate_hostname str
 Specify an alternate hostname for the 
