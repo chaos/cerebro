@@ -49,6 +49,7 @@
 #include "cerebro/cerebrod_message_protocol.h"
 
 #include "cerebrod_config.h"
+#include "cerebrod_debug.h"
 #include "cerebrod_message.h"
 #include "cerebrod_listener.h"
 #include "cerebrod_listener_data.h"
@@ -129,7 +130,7 @@ _listener_setup_socket(int num)
 
   if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {
-      CEREBRO_ERR(("socket: %s", strerror(errno)));
+      CEREBROD_ERR(("socket: %s", strerror(errno)));
       goto cleanup;
     }
 
@@ -150,7 +151,7 @@ _listener_setup_socket(int num)
       optlen = sizeof(struct ip_mreqn);
       if (setsockopt(fd, SOL_IP, IP_ADD_MEMBERSHIP, &imr, optlen) < 0)
 	{
-	  CEREBRO_ERR(("setsockopt: %s", strerror(errno)));
+	  CEREBROD_ERR(("setsockopt: %s", strerror(errno)));
           goto cleanup;
 	}
     }
@@ -160,7 +161,7 @@ _listener_setup_socket(int num)
   optlen = sizeof(optval);
   if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &optval, optlen) < 0)
     {
-      CEREBRO_ERR(("setsockopt: %s", strerror(errno)));
+      CEREBROD_ERR(("setsockopt: %s", strerror(errno)));
       goto cleanup;
     }
 
@@ -172,7 +173,7 @@ _listener_setup_socket(int num)
          sizeof(struct in_addr));
   if (bind(fd, (struct sockaddr *)&addr, sizeof(struct sockaddr_in)) < 0)
     {
-      CEREBRO_ERR(("bind: %s", strerror(errno)));
+      CEREBROD_ERR(("bind: %s", strerror(errno)));
       goto cleanup;
     }
   
@@ -207,7 +208,7 @@ _forwarding_setup_socket(int num)
 
   if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {
-      CEREBRO_ERR(("socket: %s", strerror(errno)));
+      CEREBROD_ERR(("socket: %s", strerror(errno)));
       goto cleanup;
     }
 
@@ -228,7 +229,7 @@ _forwarding_setup_socket(int num)
       optlen = sizeof(struct ip_mreqn);
       if (setsockopt(fd, SOL_IP, IP_MULTICAST_IF, &imr, optlen) < 0)
         {
-          CEREBRO_ERR(("setsockopt: %s", strerror(errno)));
+          CEREBROD_ERR(("setsockopt: %s", strerror(errno)));
           goto cleanup;
         }
 
@@ -239,7 +240,7 @@ _forwarding_setup_socket(int num)
       optlen = sizeof(optval);
       if (setsockopt(fd, SOL_IP, IP_MULTICAST_LOOP, &optval, optlen) < 0)
         {
-          CEREBRO_ERR(("setsockopt: %s", strerror(errno)));
+          CEREBROD_ERR(("setsockopt: %s", strerror(errno)));
           goto cleanup;
         }
 
@@ -247,7 +248,7 @@ _forwarding_setup_socket(int num)
       optlen = sizeof(optval);
       if (setsockopt(fd, SOL_IP, IP_MULTICAST_TTL, &optval, optlen) < 0)
         {
-          CEREBRO_ERR(("setsockopt: %s", strerror(errno)));
+          CEREBROD_ERR(("setsockopt: %s", strerror(errno)));
           goto cleanup;
         }
     }
@@ -257,7 +258,7 @@ _forwarding_setup_socket(int num)
   optlen = sizeof(optval);
   if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &optval, optlen) < 0)
     {
-      CEREBRO_ERR(("setsockopt: %s", strerror(errno)));
+      CEREBROD_ERR(("setsockopt: %s", strerror(errno)));
       goto cleanup;
     }
 
@@ -269,7 +270,7 @@ _forwarding_setup_socket(int num)
          sizeof(struct in_addr));
   if (bind(fd, (struct sockaddr *)&addr, sizeof(struct sockaddr_in)) < 0)
     {
-      CEREBRO_ERR(("bind: %s", strerror(errno)));
+      CEREBROD_ERR(("bind: %s", strerror(errno)));
       goto cleanup;
     }
 
@@ -319,7 +320,7 @@ _forwarding_setup(int index)
                                                   nodebuf, 
                                                   CEREBRO_MAX_NODENAME_LEN+1) < 0)
                 {
-                  CEREBRO_DBG(("clusterlist_module_get_nodename: %s", nodebuf));
+                  CEREBROD_DBG(("clusterlist_module_get_nodename: %s", nodebuf));
                   Hostlist_destroy(forwarding_info[index].hosts);
                   goto cleanup;
                 }
@@ -361,20 +362,20 @@ _cerebrod_listener_initialize(void)
   for (i = 0; i < conf.listen_message_config_len; i++)
     {
       if ((listener_fds[i] = _listener_setup_socket(i)) < 0)
-        CEREBRO_EXIT(("listener fd setup failed"));
+        CEREBROD_EXIT(("listener fd setup failed"));
     }
   Pthread_mutex_unlock(&listener_fds_lock);
 
   if (!(clusterlist_handle = clusterlist_module_load()))
-    CEREBRO_EXIT(("clusterlist_module_load"));
+    CEREBROD_EXIT(("clusterlist_module_load"));
   
   if ((found_clusterlist_module = clusterlist_module_found(clusterlist_handle)) < 0)
-    CEREBRO_EXIT(("clusterlist_module_found"));
+    CEREBROD_EXIT(("clusterlist_module_found"));
 
   if (found_clusterlist_module)
     {
       if (clusterlist_module_setup(clusterlist_handle) < 0)
-        CEREBRO_EXIT(("clusterlist_module_setup"));
+        CEREBROD_EXIT(("clusterlist_module_setup"));
 
       if (conf.debug && conf.listen_debug)
         {
@@ -395,7 +396,7 @@ _cerebrod_listener_initialize(void)
       if (conf.forward_message_config[i].ip_is_local)
         continue;
       if (_forwarding_setup(i) < 0)
-        CEREBRO_EXIT(("forwarding setup failed"));
+        CEREBROD_EXIT(("forwarding setup failed"));
     }
 
   listener_init++;
@@ -467,7 +468,7 @@ _cerebrod_message_unmarshall(const char *buf, unsigned int buflen)
     {
       if (buflen != CEREBROD_MESSAGE_HEADER_LEN)
         {
-          CEREBRO_DBG(("invalid packet length for no metrics"));
+          CEREBROD_DBG(("invalid packet length for no metrics"));
           goto cleanup;
         }
       msg->metrics = NULL;
@@ -628,19 +629,19 @@ cerebrod_listener(void *arg)
 
       if (recv_len >= CEREBRO_MAX_PACKET_LEN)
         {
-	  CEREBRO_DBG(("received truncated packet"));
+	  CEREBROD_DBG(("received truncated packet"));
           continue;
         }
 
       if (_cerebrod_message_check_version(buf, recv_len) < 0)
         {
-	  CEREBRO_DBG(("received invalid version packet"));
+	  CEREBROD_DBG(("received invalid version packet"));
           continue;
         }
 
       if (!(msg = _cerebrod_message_unmarshall(buf, recv_len)))
         {
-	  CEREBRO_DBG(("received unmarshallable packet"));
+	  CEREBROD_DBG(("received unmarshallable packet"));
           continue;
         }
 
@@ -652,7 +653,7 @@ cerebrod_listener(void *arg)
 
       if (!strlen(nodename_buf))
         {
-          CEREBRO_DBG(("received null nodename"));
+          CEREBROD_DBG(("received null nodename"));
           cerebrod_message_destroy(msg);
           continue;
         }
@@ -661,7 +662,7 @@ cerebrod_listener(void *arg)
         {
           if ((in_cluster_flag = clusterlist_module_node_in_cluster(clusterlist_handle,
                                                                     nodename_buf)) < 0)
-            CEREBRO_EXIT(("clusterlist_module_node_in_cluster: %s", nodename_buf));
+            CEREBROD_EXIT(("clusterlist_module_node_in_cluster: %s", nodename_buf));
 
           /* Second chance, is this data being forwarded from another host */
           if (!in_cluster_flag)
@@ -679,7 +680,7 @@ cerebrod_listener(void *arg)
       
       if (!in_cluster_flag)
 	{
-	  CEREBRO_DBG(("received non-cluster packet: %s", nodename_buf));
+	  CEREBROD_DBG(("received non-cluster packet: %s", nodename_buf));
           cerebrod_message_destroy(msg);
 	  continue;
 	}
@@ -693,7 +694,7 @@ cerebrod_listener(void *arg)
                                               nodename_key, 
                                               CEREBRO_MAX_NODENAME_LEN+1) < 0)
             {
-              CEREBRO_DBG(("clusterlist_module_get_nodename: %s", nodename_buf));
+              CEREBROD_DBG(("clusterlist_module_get_nodename: %s", nodename_buf));
               cerebrod_message_destroy(msg);
               continue;
             }
@@ -749,7 +750,7 @@ cerebrod_listener(void *arg)
                                                                    _forwarding_setup_socket,
                                                                    "forwarding: sendto");
                   else
-                    CEREBRO_ERR(("sendto: invalid bytes sent"));
+                    CEREBROD_ERR(("sendto: invalid bytes sent"));
                 }
               
               Pthread_mutex_unlock(&forwarding_info[i].lock);

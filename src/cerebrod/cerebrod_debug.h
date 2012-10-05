@@ -25,90 +25,31 @@
  *  with Cerebro. If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
-#ifndef _DEBUG_H
-#define _DEBUG_H
+#ifndef _CEREBROD_DEBUG_H
+#define _CEREBROD_DEBUG_H
 
 #if HAVE_CONFIG_H
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
 
-#include <stdio.h>
-#include <stdlib.h>
-#if STDC_HEADERS
-#include <string.h>
-#endif /* STDC_HEADERS */
-
-#include "cerebro/cerebro_error.h"
-
-#define DEBUG_BUFFER_LEN 8192
-
-#define CEREBRO_MSG_CREATE(msg) \
-    char errbuf[DEBUG_BUFFER_LEN]; \
-    int len; \
-    \
-    memset(errbuf, '\0', DEBUG_BUFFER_LEN); \
-    \
-    len = snprintf(errbuf, \
-                   DEBUG_BUFFER_LEN, \
-                   "(%s, %s, %d): ", \
-                   __FILE__, \
-                   __FUNCTION__, \
-                   __LINE__); \
-    \
-    if (len < DEBUG_BUFFER_LEN) \
-      { \
-        char *msgbuf; \
-        if ((msgbuf = debug_msg_create msg)) \
-          { \
-            strncat(errbuf, msgbuf, DEBUG_BUFFER_LEN - len - 1); \
-            len += strlen(msgbuf); \
-            free(msgbuf); \
-          } \
-      }
-
-/*
- * debug_msg_create
- *
- * create a buffer and put the a mesage inside it
- *
- * Returns message buffer or NULL on error
- */
-char *debug_msg_create(const char *fmt, ...);
+#include "debug.h"
 
 #if CEREBRO_DEBUG
 
-#define CEREBRO_DBG(msg) \
-    do { \
-      CEREBRO_MSG_CREATE(msg) \
-      cerebro_err_debug(errbuf); \
-    } while(0)
-
-#define CEREBRO_ERR(msg) \
-    do { \
-      CEREBRO_MSG_CREATE(msg) \
-      cerebro_err_output(errbuf); \
-    } while(0)
-
-#define CEREBRO_EXIT(msg) \
-    do { \
-      CEREBRO_MSG_CREATE(msg) \
-      cerebro_err_exit(errbuf); \
-    } while(0)
+#define CEREBROD_DBG(msg) CEREBRO_DBG(msg)
    
 #else /* !CEREBRO_DEBUG */
 
-#define CEREBRO_DBG(msg)
-
-#define CEREBRO_ERR(msg) \
+#define CEREBROD_DBG(msg) \
     do { \
-      cerebro_err_output msg; \
-    } while(0)
-
-#define CEREBRO_EXIT(msg) \
-    do { \
-      cerebro_err_exit msg; \
+      if (conf.debug) \
+	cerebro_err_debug msg; \
     } while(0)
 
 #endif /* !CEREBRO_DEBUG */
 
-#endif /* _DEBUG_H */
+#define CEREBROD_ERR(msg) CEREBRO_ERR(msg)
+
+#define CEREBROD_EXIT(msg) CEREBRO_EXIT(msg)
+
+#endif /* _CEREBROD_DEBUG_H */

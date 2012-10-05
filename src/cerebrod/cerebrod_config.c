@@ -52,6 +52,7 @@
 #include "cerebro/cerebro_error.h"
 
 #include "cerebrod_config.h"
+#include "cerebrod_debug.h"
 #include "cerebrod_util.h"
 
 #include "config_util.h"
@@ -264,11 +265,11 @@ _cerebrod_load_config(void)
   if (load_config(&tconf, &errnum) < 0)
     {
       if (errnum == CEREBRO_ERR_CONFIG_MODULE)
-        CEREBRO_EXIT(("load_config: error loading cerebro config module configuration"));
+        CEREBROD_EXIT(("load_config: error loading cerebro config module configuration"));
       else if (errnum == CEREBRO_ERR_CONFIG_FILE)
-        CEREBRO_EXIT(("load_config: error loading cerebro config file configuration"));
+        CEREBROD_EXIT(("load_config: error loading cerebro config file configuration"));
       else
-        CEREBRO_EXIT(("load_config: error loading cerebro configuration: errnum=%d", errnum));
+        CEREBROD_EXIT(("load_config: error loading cerebro configuration: errnum=%d", errnum));
     }
   
   if (tconf.cerebrod_heartbeat_frequency_flag)
@@ -611,7 +612,7 @@ _get_if_conf(void **buf, struct ifconf *ifc, int fd)
       ifc->ifc_buf = *buf;
 
       if (ioctl(fd, SIOCGIFCONF, ifc) < 0)
-        CEREBRO_EXIT(("ioctl: %s", strerror(errno)));
+        CEREBROD_EXIT(("ioctl: %s", strerror(errno)));
 
       if (ifc->ifc_len == lastlen)
         break;
@@ -788,7 +789,7 @@ _calculate_in_addr_and_index(int is_multicast,
       strncpy(ifr_tmp.ifr_name, ifr->ifr_name, IFNAMSIZ);
 
       if (ioctl(fd, SIOCGIFFLAGS, &ifr_tmp) < 0)
-        CEREBRO_EXIT(("ioctl: %s", strerror(errno)));
+        CEREBROD_EXIT(("ioctl: %s", strerror(errno)));
 
       if (!(ifr_tmp.ifr_flags & IFF_UP))
         continue;
@@ -801,7 +802,7 @@ _calculate_in_addr_and_index(int is_multicast,
       strncpy(ifr_tmp.ifr_name, ifr->ifr_name, IFNAMSIZ);
       
       if(ioctl(fd, SIOCGIFINDEX, &ifr_tmp) < 0)
-        CEREBRO_EXIT(("ioctl: %s", strerror(errno)));
+        CEREBROD_EXIT(("ioctl: %s", strerror(errno)));
           
       sinptr = (struct sockaddr_in *)&ifr->ifr_addr;
       in_addr->s_addr = sinptr->sin_addr.s_addr;

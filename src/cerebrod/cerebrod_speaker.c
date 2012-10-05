@@ -47,6 +47,7 @@
 #include "cerebro/cerebrod_message_protocol.h"
 
 #include "cerebrod_config.h"
+#include "cerebrod_debug.h"
 #include "cerebrod_message.h"
 #include "cerebrod_speaker.h"
 #include "cerebrod_speaker_data.h"
@@ -116,7 +117,7 @@ _speaker_setup_socket(int num)
 
   if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {
-      CEREBRO_ERR(("socket: %s", strerror(errno)));
+      CEREBROD_ERR(("socket: %s", strerror(errno)));
       goto cleanup;
     }
 
@@ -137,7 +138,7 @@ _speaker_setup_socket(int num)
       optlen = sizeof(struct ip_mreqn);
       if (setsockopt(fd, SOL_IP, IP_MULTICAST_IF, &imr, optlen) < 0)
 	{
-	  CEREBRO_ERR(("setsockopt: %s", strerror(errno)));
+	  CEREBROD_ERR(("setsockopt: %s", strerror(errno)));
           goto cleanup;
 	}
 
@@ -145,7 +146,7 @@ _speaker_setup_socket(int num)
       optlen = sizeof(optval);
       if (setsockopt(fd, SOL_IP, IP_MULTICAST_LOOP, &optval, optlen) < 0)
 	{
-	  CEREBRO_ERR(("setsockopt: %s", strerror(errno)));
+	  CEREBROD_ERR(("setsockopt: %s", strerror(errno)));
           goto cleanup;
 	}
 
@@ -153,7 +154,7 @@ _speaker_setup_socket(int num)
       optlen = sizeof(optval);
       if (setsockopt(fd, SOL_IP, IP_MULTICAST_TTL, &optval, optlen) < 0)
 	{
-	  CEREBRO_ERR(("setsockopt: %s", strerror(errno)));
+	  CEREBROD_ERR(("setsockopt: %s", strerror(errno)));
           goto cleanup;
 	}
     }
@@ -163,7 +164,7 @@ _speaker_setup_socket(int num)
   optlen = sizeof(optval);
   if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &optval, optlen) < 0)
     {
-      CEREBRO_ERR(("setsockopt: %s", strerror(errno)));
+      CEREBROD_ERR(("setsockopt: %s", strerror(errno)));
       goto cleanup;
     }
 
@@ -175,7 +176,7 @@ _speaker_setup_socket(int num)
 	 sizeof(struct in_addr));
   if (bind(fd, (struct sockaddr *)&addr, sizeof(struct sockaddr_in)) < 0) 
     {
-      CEREBRO_ERR(("bind: %s", strerror(errno)));
+      CEREBROD_ERR(("bind: %s", strerror(errno)));
       goto cleanup;
     }
 
@@ -258,7 +259,7 @@ _speaker_initialize(void)
   for (i = 0; i < conf.speak_message_config_len; i++)
     {
       if ((speaker_fds[i] = _speaker_setup_socket(i)) < 0)
-        CEREBRO_EXIT(("speaker fd setup failed"));
+        CEREBROD_EXIT(("speaker fd setup failed"));
     }
   speaker_fds_len = conf.speak_message_config_len;
   Pthread_mutex_unlock(&speaker_fds_lock);
@@ -394,13 +395,13 @@ _message_marshall(struct cerebrod_message *msg,
 
       if (mtype == CEREBRO_DATA_VALUE_TYPE_NONE && mlen)
         {
-          CEREBRO_DBG(("adjusting metric len to 0"));
+          CEREBROD_DBG(("adjusting metric len to 0"));
           mlen = 0;
         }
 
       if (mtype == CEREBRO_DATA_VALUE_TYPE_STRING && !mlen)
         {
-          CEREBRO_DBG(("adjusting metric type to none"));
+          CEREBROD_DBG(("adjusting metric type to none"));
           mtype = CEREBRO_DATA_VALUE_TYPE_NONE;
         }
 
@@ -493,7 +494,7 @@ _cerebrod_message_send(struct cerebrod_message* msg, unsigned int msglen)
                                                     _speaker_setup_socket, 
                                                     "speaker: sendto");
           else
-            CEREBRO_ERR(("sendto: invalid bytes sent"));
+            CEREBROD_ERR(("sendto: invalid bytes sent"));
         }
     }
   Pthread_mutex_unlock(&speaker_fds_lock);
@@ -548,7 +549,7 @@ cerebrod_speaker(void *arg)
                   
                   if (msglen >= CEREBRO_MAX_PACKET_LEN)
                     {
-                      CEREBRO_DBG(("message exceeds maximum size: packet dropped"));
+                      CEREBROD_DBG(("message exceeds maximum size: packet dropped"));
                       goto end_loop;
                     }
                   
@@ -559,7 +560,7 @@ cerebrod_speaker(void *arg)
                 end_loop:
                   cerebrod_message_destroy(msg);
                   if (more_data_to_send)
-                    CEREBRO_DBG(("extra heartbeat data to send"));
+                    CEREBROD_DBG(("extra heartbeat data to send"));
                 }
               
               if (nst->next_send_type & CEREBROD_SPEAKER_NEXT_SEND_TYPE_HEARTBEAT)
@@ -608,7 +609,7 @@ cerebrod_send_message(struct cerebrod_message *msg)
     {
       if (!msg->metrics[i])
 	{
-	  CEREBRO_DBG(("null metrics pointer"));
+	  CEREBROD_DBG(("null metrics pointer"));
 	  errno = EINVAL;
 	  goto cleanup;
 	}
@@ -618,7 +619,7 @@ cerebrod_send_message(struct cerebrod_message *msg)
 
   if (msglen >= CEREBRO_MAX_PACKET_LEN)
     {
-      CEREBRO_DBG(("message exceeds maximum size: packet dropped"));
+      CEREBROD_DBG(("message exceeds maximum size: packet dropped"));
       goto cleanup;
     }
 

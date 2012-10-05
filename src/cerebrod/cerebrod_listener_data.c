@@ -43,6 +43,7 @@
 #include "cerebro/cerebro_constants.h"
 
 #include "cerebrod_config.h"
+#include "cerebrod_debug.h"
 #include "cerebrod_listener_data.h"
 #include "cerebrod_event_update.h"
 #include "cerebrod_monitor_update.h"
@@ -207,7 +208,7 @@ metric_name_data_create(const char *metric_name, u_int32_t metric_origin)
   memset(mnd, '\0', sizeof(struct cerebrod_metric_name_data));
 
   if (strlen(metric_name) > CEREBRO_MAX_METRIC_NAME_LEN)
-    CEREBRO_DBG(("metric name length invalid"));
+    CEREBROD_DBG(("metric name length invalid"));
 
   if (metric_origin & CEREBROD_METRIC_LISTENER_ORIGIN_DEFAULT)
     mnd->metric_name = (char *)metric_name;
@@ -243,15 +244,15 @@ cerebrod_listener_data_initialize(void)
     goto out;
   
   if (!conf.listen)
-    CEREBRO_EXIT(("listen server not setup"));
+    CEREBROD_EXIT(("listen server not setup"));
 
   if (!clusterlist_handle)
-    CEREBRO_EXIT(("clusterlist_handle null"));
+    CEREBROD_EXIT(("clusterlist_handle null"));
 
   if (found_clusterlist_module)
     {
       if ((numnodes = clusterlist_module_numnodes(clusterlist_handle)) < 0)
-        CEREBRO_EXIT(("clusterlist_module_numnodes"));
+        CEREBROD_EXIT(("clusterlist_module_numnodes"));
     }
 
   if (numnodes > 0)
@@ -280,7 +281,7 @@ cerebrod_listener_data_initialize(void)
       char **nodes;
 
       if (clusterlist_module_get_all_nodes(clusterlist_handle, &nodes) < 0)
-        CEREBRO_EXIT(("clusterlist_module_get_all_nodes"));
+        CEREBROD_EXIT(("clusterlist_module_get_all_nodes"));
 
       for (i = 0; i < numnodes; i++)
         {
@@ -320,10 +321,10 @@ cerebrod_listener_data_initialize(void)
     }
 
   if (cerebrod_event_modules_setup() < 0)
-    CEREBRO_EXIT(("cerebrod_event_modules_setup"));
+    CEREBROD_EXIT(("cerebrod_event_modules_setup"));
 
   if (cerebrod_monitor_modules_setup() < 0)
-    CEREBRO_EXIT(("cerebrod_monitor_modules_setup"));
+    CEREBROD_EXIT(("cerebrod_monitor_modules_setup"));
 
   listener_data_init++;
  out:
@@ -566,7 +567,7 @@ _metric_data_update(struct cerebrod_node_data *nd,
   /* Should be called with lock already set */
   rv = Pthread_mutex_trylock(&nd->node_data_lock);
   if (rv != EBUSY)
-    CEREBRO_EXIT(("mutex not locked: rv=%d", rv));
+    CEREBROD_EXIT(("mutex not locked: rv=%d", rv));
 #endif /* CEREBRO_DEBUG */
   
   if (!(md = Hash_find(nd->metric_data, metric_name)))
@@ -586,7 +587,7 @@ _metric_data_update(struct cerebrod_node_data *nd,
   else
     {
       if (md->metric_value_type != mm->metric_value_type)
-        CEREBRO_DBG(("metric type modified: old=%d new=%d",
+        CEREBROD_DBG(("metric type modified: old=%d new=%d",
                      md->metric_value_type, mm->metric_value_type));
     }
   
@@ -598,7 +599,7 @@ _metric_data_update(struct cerebrod_node_data *nd,
     {
       if (md->metric_value)
         {
-          CEREBRO_DBG(("metric length modified: old=%d new=%d",
+          CEREBROD_DBG(("metric length modified: old=%d new=%d",
                        md->metric_value_len, mm->metric_value_len));
           Free(md->metric_value);
         }
@@ -619,10 +620,10 @@ cerebrod_listener_data_update(char *nodename,
   assert(nodename && msg);
 
   if (!listener_data_init)
-    CEREBRO_EXIT(("initialization not complete"));
+    CEREBROD_EXIT(("initialization not complete"));
 
   if (!listener_data)
-    CEREBRO_EXIT(("initialization not complete"));
+    CEREBROD_EXIT(("initialization not complete"));
 
   Pthread_mutex_lock(&listener_data_lock);
   if (!(nd = Hash_find(listener_data, nodename)))
@@ -679,7 +680,7 @@ cerebrod_listener_data_update(char *nodename,
           
           if (!strlen(metric_name_buf))
             {
-              CEREBRO_DBG(("null message_data metric_name received"));
+              CEREBROD_DBG(("null message_data metric_name received"));
               continue;
             }
           
@@ -724,7 +725,7 @@ cerebrod_listener_data_update(char *nodename,
 
           if (!strlen(metric_name_buf))
             {
-              CEREBRO_DBG(("null message_data metric_name received"));
+              CEREBROD_DBG(("null message_data metric_name received"));
               continue;
             }
 

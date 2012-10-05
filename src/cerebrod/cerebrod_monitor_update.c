@@ -43,6 +43,7 @@
 #include "cerebro/cerebro_constants.h"
 
 #include "cerebrod_config.h"
+#include "cerebrod_debug.h"
 #include "cerebrod_monitor_update.h"
 #include "cerebrod_util.h"
 
@@ -132,18 +133,18 @@ cerebrod_monitor_modules_setup(void)
   /* Should be called with lock already set */
   rv = Pthread_mutex_trylock(&listener_data_init_lock);
   if (rv != EBUSY)
-    CEREBRO_EXIT(("mutex not locked: rv=%d", rv));
+    CEREBROD_EXIT(("mutex not locked: rv=%d", rv));
 #endif /* CEREBRO_DEBUG */
 
   if (!(monitor_handle = monitor_modules_load()))
     {
-      CEREBRO_DBG(("monitor_modules_load"));
+      CEREBROD_DBG(("monitor_modules_load"));
       goto cleanup;
     }
 
   if ((monitor_module_count = monitor_modules_count(monitor_handle)) < 0)
     {
-      CEREBRO_DBG(("monitor_modules_count"));
+      CEREBROD_DBG(("monitor_modules_count"));
       goto cleanup;
     }
 
@@ -190,13 +191,13 @@ cerebrod_monitor_modules_setup(void)
 
       if (monitor_module_setup(monitor_handle, i) < 0)
         {
-          CEREBRO_DBG(("monitor_module_setup failed: %s", module_name));
+          CEREBROD_DBG(("monitor_module_setup failed: %s", module_name));
           continue;
         }
 
       if (!(metric_names = monitor_module_metric_names(monitor_handle, i)) < 0)
         {
-          CEREBRO_DBG(("monitor_module_metric_names failed: %s", module_name));
+          CEREBROD_DBG(("monitor_module_metric_names failed: %s", module_name));
           monitor_module_cleanup(monitor_handle, i);
           continue;
         }
@@ -274,7 +275,7 @@ cerebrod_monitor_modules_update(const char *nodename,
   /* Should be called with lock already set */
   rv = Pthread_mutex_trylock(&nd->node_data_lock);
   if (rv != EBUSY)
-    CEREBRO_EXIT(("mutex not locked: rv=%d", rv));
+    CEREBROD_EXIT(("mutex not locked: rv=%d", rv));
 #endif /* CEREBRO_DEBUG */
 
   if ((ml = Hash_find(monitor_index, metric_name)))

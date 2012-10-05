@@ -38,6 +38,7 @@
 #include <errno.h>
 
 #include "cerebrod_config.h"
+#include "cerebrod_debug.h"
 #include "cerebrod_util.h"
 
 #include "debug.h"
@@ -97,7 +98,7 @@ cerebrod_rehash(hash_t *old_hash,
     {
       int rv = Pthread_mutex_trylock(hash_mutex);
       if (rv != EBUSY)
-        CEREBRO_EXIT(("mutex not locked: rv=%d", rv));
+        CEREBROD_EXIT(("mutex not locked: rv=%d", rv));
     }
 #endif /* CEREBRO_DEBUG */
 
@@ -109,10 +110,10 @@ cerebrod_rehash(hash_t *old_hash,
 			 (hash_del_f)_Free);
   
   if (Hash_for_each(*old_hash, _hash_reinsert, &new_hash) != hash_num)
-    CEREBRO_EXIT(("invalid reinsert: hash_num=%d", hash_num));
+    CEREBROD_EXIT(("invalid reinsert: hash_num=%d", hash_num));
 
   if (Hash_remove_if(*old_hash, _hash_removeall, NULL) != hash_num)
-    CEREBRO_EXIT(("invalid removeall: hash_num=%d", hash_num));
+    CEREBROD_EXIT(("invalid removeall: hash_num=%d", hash_num));
 
   Hash_destroy(*old_hash);
 
@@ -143,18 +144,18 @@ cerebrod_reinit_socket(int old_fd,
 
       if ((fd = socket_setup(num)) < 0)
         {
-          CEREBRO_DBG(("%s: error re-initializing socket", msg));
+          CEREBROD_DBG(("%s: error re-initializing socket", msg));
 
           /* Wait a bit, so we don't spin */
           sleep(CEREBROD_REINITIALIZE_TIME);
         }
       else
-        CEREBRO_DBG(("success re-initializing socket"));
+        CEREBROD_DBG(("success re-initializing socket"));
     }
   else if (errno == EINTR)
-    CEREBRO_DBG(("%s: %s", msg, strerror(errno)));
+    CEREBROD_DBG(("%s: %s", msg, strerror(errno)));
   else
-    CEREBRO_EXIT(("%s: %s", msg, strerror(errno)));
+    CEREBROD_EXIT(("%s: %s", msg, strerror(errno)));
 
   return fd;
 }

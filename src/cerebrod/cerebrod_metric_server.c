@@ -46,6 +46,7 @@
 
 #include "cerebrod.h"
 #include "cerebrod_config.h"
+#include "cerebrod_debug.h"
 #include "cerebrod_listener_data.h"
 #include "cerebrod_metric_server.h"
 #include "cerebrod_util.h"
@@ -175,7 +176,7 @@ _metric_server_request_check_version(const char *buf,
                                        
   if (!Unmarshall_int32(version, buf, buflen))
     {
-      CEREBRO_DBG(("version could not be unmarshalled"));
+      CEREBROD_DBG(("version could not be unmarshalled"));
       return -1;
     }
 
@@ -272,7 +273,7 @@ _metric_server_response_send(int fd, struct cerebro_metric_server_response *res)
 
   if (fd_write_n(fd, buf, res_len) < 0)
     {
-      CEREBRO_ERR(("fd_write_n: %s", strerror(errno)));
+      CEREBROD_ERR(("fd_write_n: %s", strerror(errno)));
       goto cleanup;
     }
 
@@ -304,7 +305,7 @@ _metric_server_err_response_send(int fd,
   
   if (fd_write_n(fd, buf, res_len) < 0)
     {
-      CEREBRO_ERR(("fd_write_n: %s", strerror(errno)));
+      CEREBROD_ERR(("fd_write_n: %s", strerror(errno)));
       return -1;
     }
 
@@ -363,21 +364,21 @@ _metric_server_response_create(char *name,
       || (metric_value_type != CEREBRO_DATA_VALUE_TYPE_NONE 
           && !metric_value_len))
     {
-      CEREBRO_DBG(("bogus metric: type=%d len=%d", 
+      CEREBROD_DBG(("bogus metric: type=%d len=%d", 
                    metric_value_type, metric_value_len));
       return -1;
     }
 
   if ((metric_value_len && !metric_value) || (!metric_value_len && metric_value))
     {
-      CEREBRO_DBG(("bogus metric: len=%d value=%p", 
+      CEREBROD_DBG(("bogus metric: len=%d value=%p", 
                    metric_value_len, metric_value));
       return -1;
     }
 
   if (!(res = malloc(sizeof(struct cerebro_metric_server_response))))
     {
-      CEREBRO_ERR(("malloc: %s", strerror(errno)));
+      CEREBROD_ERR(("malloc: %s", strerror(errno)));
       return -1;
     }
   memset(res, '\0', sizeof(struct cerebro_metric_server_response));
@@ -388,7 +389,7 @@ _metric_server_response_create(char *name,
 #if CEREBRO_DEBUG
   if (sizeof(res->name) < max_name_len)
     {
-      CEREBRO_DBG(("bad name size: %d", sizeof(res->name)));
+      CEREBROD_DBG(("bad name size: %d", sizeof(res->name)));
       goto cleanup;
     }
 #endif /* CEREBRO_DEBUG */
@@ -402,7 +403,7 @@ _metric_server_response_create(char *name,
     {
       if (!(res->metric_value = (void *)malloc(metric_value_len)))
         {
-          CEREBRO_ERR(("malloc: %s", strerror(errno)));
+          CEREBROD_ERR(("malloc: %s", strerror(errno)));
           goto cleanup;
         }
       memcpy(res->metric_value, metric_value, metric_value_len);
@@ -410,7 +411,7 @@ _metric_server_response_create(char *name,
   
   if (!list_append(responses, res))
     {
-      CEREBRO_ERR(("list_append: %s", strerror(errno)));
+      CEREBROD_ERR(("list_append: %s", strerror(errno)));
       goto cleanup;
     }
 
@@ -451,7 +452,7 @@ _metric_names_callback(void *data, const void *key, void *arg)
   /* Should be called with lock already set */
   rv = Pthread_mutex_trylock(&metric_names_lock);
   if (rv != EBUSY)
-    CEREBRO_EXIT(("mutex not locked: rv=%d", rv));
+    CEREBROD_EXIT(("mutex not locked: rv=%d", rv));
 #endif /* CEREBRO_DEBUG */
 
   if (_metric_server_response_create(mnd->metric_name, 
@@ -493,7 +494,7 @@ _metric_data_evaluate(void *x, const void *key, void *arg)
   /* Should be called with lock already set */
   rv = Pthread_mutex_trylock(&listener_data_lock);
   if (rv != EBUSY)
-    CEREBRO_EXIT(("mutex not locked: rv=%d", rv));
+    CEREBROD_EXIT(("mutex not locked: rv=%d", rv));
 #endif /* CEREBRO_DEBUG */
 
   Pthread_mutex_lock(&(nd->node_data_lock));
@@ -503,7 +504,7 @@ _metric_data_evaluate(void *x, const void *key, void *arg)
    * greater than the time stored in any last_received time.
    */
   if (ed->time_now < nd->last_received_time)
-    CEREBRO_DBG(("last_received time later than time_now time"));
+    CEREBROD_DBG(("last_received time later than time_now time"));
 #endif /* CEREBRO_DEBUG */
 
   if (!strcmp(ed->metric_name, CEREBRO_METRIC_CLUSTER_NODES))
@@ -696,7 +697,7 @@ _respond_with_metric_names(int fd)
 
   if (!(responses = list_create((ListDelF)free)))
     {
-      CEREBRO_ERR(("list_create: %s", strerror(errno)));
+      CEREBROD_ERR(("list_create: %s", strerror(errno)));
       Pthread_mutex_unlock(&metric_names_lock);
       _metric_server_respond_with_error(fd, 
                                         CEREBRO_METRIC_SERVER_PROTOCOL_VERSION, 
@@ -784,7 +785,7 @@ _respond_with_nodes(int fd,
 
   if (!(responses = list_create((ListDelF)_metric_data_response_destroy)))
     {
-      CEREBRO_ERR(("list_create: %s", strerror(errno)));
+      CEREBROD_ERR(("list_create: %s", strerror(errno)));
       Pthread_mutex_unlock(&listener_data_lock);
       _metric_server_respond_with_error(fd,
                                         req->version,
@@ -954,14 +955,14 @@ _metric_server_setup_socket(int num)
 
   if ((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
-      CEREBRO_ERR(("socket: %s", strerror(errno)));
+      CEREBROD_ERR(("socket: %s", strerror(errno)));
       goto cleanup;
     }
 
   /* For quick start/restart */
   if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(int)) < 0)
     {
-      CEREBRO_ERR(("setsockopt: %s", strerror(errno)));
+      CEREBROD_ERR(("setsockopt: %s", strerror(errno)));
       goto cleanup;
     }
 
@@ -972,13 +973,13 @@ _metric_server_setup_socket(int num)
 
   if (bind(fd, (struct sockaddr *)&addr, sizeof(struct sockaddr_in)) < 0)
     {
-      CEREBRO_ERR(("bind: %s", strerror(errno)));
+      CEREBROD_ERR(("bind: %s", strerror(errno)));
       goto cleanup;
     }
 
   if (listen(fd, CEREBROD_METRIC_SERVER_BACKLOG) < 0)
     {
-      CEREBRO_ERR(("listen: %s", strerror(errno)));
+      CEREBROD_ERR(("listen: %s", strerror(errno)));
       goto cleanup;
     }
 
@@ -998,7 +999,7 @@ cerebrod_metric_server(void *arg)
   _metric_server_initialize();
 
   if ((server_fd = _metric_server_setup_socket(0)) < 0)
-    CEREBRO_EXIT(("metric server fd setup failed"));
+    CEREBROD_EXIT(("metric server fd setup failed"));
 
   for (;;)
     {

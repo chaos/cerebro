@@ -43,6 +43,7 @@
 #include "cerebro/cerebro_constants.h"
 
 #include "cerebrod_config.h"
+#include "cerebrod_debug.h"
 #include "cerebrod_event_node_timeout_monitor.h"
 #include "cerebrod_event_server.h"
 #include "cerebrod_event_update.h"
@@ -199,7 +200,7 @@ cerebrod_event_node_timeout_monitor(void *arg)
                                                                   ntd->nodename, 
                                                                   &event)) < 0)
                                 {
-                                  CEREBRO_DBG(("event_module_node_timeout"));
+                                  CEREBROD_DBG(("event_module_node_timeout"));
                                   goto loop_next;
                                 }
 

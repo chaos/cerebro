@@ -1,3 +1,10 @@
+2012-10-04  Albert Chu  <chu11@llnl.gov>
+
+	* src/cerebrod/cerebrod_debug.h: New file.
+
+	* src/cerebrod/: Do not allow debug messages to output unless
+	running in foreground.
+	
 2012-09-26  Albert Chu  <chu11@llnl.gov>
 	
 	* META, NEWS: update for release

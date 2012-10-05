@@ -44,6 +44,7 @@
 #include "cerebro/cerebro_constants.h"
 
 #include "cerebrod_config.h"
+#include "cerebrod_debug.h"
 #include "cerebrod_listener_data.h"
 #include "cerebrod_event_update.h"
 #include "cerebrod_event_server.h"
@@ -205,7 +206,7 @@ _event_node_timeout_data_add(const char *nodename, u_int32_t time_now)
   /* Should be called with lock already set */
   rv = Pthread_mutex_trylock(&event_node_timeout_data_lock);
   if (rv != EBUSY)
-    CEREBRO_EXIT(("mutex not locked: rv=%d", rv));
+    CEREBROD_EXIT(("mutex not locked: rv=%d", rv));
 #endif /* CEREBRO_DEBUG */
 
   ntd = (struct cerebrod_event_node_timeout_data *)Malloc(sizeof(struct cerebrod_event_node_timeout_data));
@@ -391,7 +392,7 @@ cerebrod_event_modules_setup(void)
   /* Should be called with lock already set */
   rv = Pthread_mutex_trylock(&listener_data_init_lock);
   if (rv != EBUSY)
-    CEREBRO_EXIT(("mutex not locked: rv=%d", rv));
+    CEREBROD_EXIT(("mutex not locked: rv=%d", rv));
 #endif /* CEREBRO_DEBUG */
 
   if (!conf.event_server)
@@ -399,13 +400,13 @@ cerebrod_event_modules_setup(void)
 
   if (!(event_handle = event_modules_load()))
     {
-      CEREBRO_DBG(("event_modules_load"));
+      CEREBROD_DBG(("event_modules_load"));
       goto cleanup;
     }
 
   if ((event_module_count = event_modules_count(event_handle)) < 0)
     {
-      CEREBRO_DBG(("event_modules_count"));
+      CEREBROD_DBG(("event_modules_count"));
       goto cleanup;
     }
 
@@ -463,27 +464,27 @@ cerebrod_event_modules_setup(void)
 
       if (event_module_setup(event_handle, i) < 0)
         {
-          CEREBRO_DBG(("event_module_setup failed: %s", module_name));
+          CEREBROD_DBG(("event_module_setup failed: %s", module_name));
           continue;
         }
 
       if (!(module_metric_names = event_module_metric_names(event_handle, i)) < 0)
         {
-          CEREBRO_DBG(("event_module_metric_names failed: %s", module_name));
+          CEREBROD_DBG(("event_module_metric_names failed: %s", module_name));
           event_module_cleanup(event_handle, i);
           continue;
         }
 
       if (!(module_event_names = event_module_event_names(event_handle, i)) < 0)
         {
-          CEREBRO_DBG(("event_module_event_names failed: %s", module_name));
+          CEREBROD_DBG(("event_module_event_names failed: %s", module_name));
           event_module_cleanup(event_handle, i);
           continue;
         }
       
       if ((timeout = event_module_timeout_length(event_handle, i)) < 0)
         {
-          CEREBRO_DBG(("event_module_timeout_length failed: %s", module_name));
+          CEREBROD_DBG(("event_module_timeout_length failed: %s", module_name));
           event_module_cleanup(event_handle, i);
           continue;
         }
@@ -631,7 +632,7 @@ cerebrod_event_add_node_timeout_data(struct cerebrod_node_data *nd,
   /* Should be called with lock already set */
   rv = Pthread_mutex_trylock(&listener_data_lock);
   if (rv != EBUSY)
-    CEREBRO_EXIT(("mutex not locked: rv=%d", rv));
+    CEREBROD_EXIT(("mutex not locked: rv=%d", rv));
 #endif /* CEREBRO_DEBUG */
 
   Pthread_mutex_lock(&event_node_timeout_data_lock);
@@ -667,7 +668,7 @@ cerebrod_event_update_node_received_time(struct cerebrod_node_data *nd,
   /* Should be called with lock already set */
   rv = Pthread_mutex_trylock(&nd->node_data_lock);
   if (rv != EBUSY)
-    CEREBRO_EXIT(("mutex not locked: rv=%d", rv));
+    CEREBROD_EXIT(("mutex not locked: rv=%d", rv));
 #endif /* CEREBRO_DEBUG */
 
   Pthread_mutex_lock(&event_node_timeout_data_lock);
@@ -700,7 +701,7 @@ cerebrod_event_modules_update(const char *nodename,
   /* Should be called with lock already set */
   rv = Pthread_mutex_trylock(&nd->node_data_lock);
   if (rv != EBUSY)
-    CEREBRO_EXIT(("mutex not locked: rv=%d", rv));
+    CEREBROD_EXIT(("mutex not locked: rv=%d", rv));
 #endif /* CEREBRO_DEBUG */
 
   /*
@@ -735,7 +736,7 @@ cerebrod_event_modules_update(const char *nodename,
                                                mm->metric_value,
                                                &event)) < 0)
             {
-              CEREBRO_DBG(("event_module_metric_update"));
+              CEREBROD_DBG(("event_module_metric_update"));
               goto loop_next;
             }
 

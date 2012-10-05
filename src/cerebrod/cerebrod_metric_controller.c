@@ -57,6 +57,7 @@
 
 #include "cerebrod.h"
 #include "cerebrod_config.h"
+#include "cerebrod_debug.h"
 #include "cerebrod_listener_data.h"
 #include "cerebrod_metric_controller.h"
 #include "cerebrod_speaker.h"
@@ -143,13 +144,13 @@ _metric_controller_setup_socket(int num)
   
   if ((fd = socket(AF_LOCAL, SOCK_STREAM, 0)) < 0)
     {
-      CEREBRO_ERR(("socket: %s", strerror(errno)));
+      CEREBROD_ERR(("socket: %s", strerror(errno)));
       return -1;
     }
 
   if (strlen(CEREBRO_METRIC_CONTROL_PATH) >= sizeof(addr.sun_path))
     {
-      CEREBRO_DBG(("path '%s' too long", CEREBRO_METRIC_CONTROL_PATH));
+      CEREBROD_DBG(("path '%s' too long", CEREBRO_METRIC_CONTROL_PATH));
       goto cleanup;
     }
 
@@ -157,7 +158,7 @@ _metric_controller_setup_socket(int num)
   if (unlink(CEREBRO_METRIC_CONTROL_PATH) < 0)
     {
       if (errno != ENOENT)
-        CEREBRO_EXIT(("unlink: %s", strerror(errno)));
+        CEREBROD_EXIT(("unlink: %s", strerror(errno)));
     }
   
   memset(&addr, '\0', sizeof(struct sockaddr_un));
@@ -168,13 +169,13 @@ _metric_controller_setup_socket(int num)
   
   if (bind(fd, (struct sockaddr *)&addr, sizeof(struct sockaddr_un)) < 0)
     {
-      CEREBRO_ERR(("bind: %s", strerror(errno)));
+      CEREBROD_ERR(("bind: %s", strerror(errno)));
       goto cleanup;
     }
   
   if (listen(fd, CEREBROD_METRIC_CONTROLLER_BACKLOG) < 0)
     {
-      CEREBRO_ERR(("listen: %s", strerror(errno)));
+      CEREBROD_ERR(("listen: %s", strerror(errno)));
       goto cleanup;
     }
   
@@ -202,7 +203,7 @@ _metric_control_request_check_version(const char *buf,
 
   if (!Unmarshall_int32(version, buf, buflen))
     {
-      CEREBRO_DBG(("version could not be unmarshalled"));
+      CEREBROD_DBG(("version could not be unmarshalled"));
       return -1;
     }
 
@@ -327,7 +328,7 @@ _send_metric_control_response(int fd, int32_t version, u_int32_t err_code)
   
   if (fd_write_n(fd, buf, res_len) < 0)
     {
-      CEREBRO_ERR(("fd_write_n: %s", strerror(errno)));
+      CEREBROD_ERR(("fd_write_n: %s", strerror(errno)));
       return -1;
     }
 
@@ -356,7 +357,7 @@ _find_speaker_metric_info(const char *metric_name)
   /* Should be called with lock already set */
   rv = Pthread_mutex_trylock(&metric_list_lock);
   if (rv != EBUSY)
-    CEREBRO_EXIT(("mutex not locked: rv=%d", rv));
+    CEREBROD_EXIT(("mutex not locked: rv=%d", rv));
 #endif /* CEREBRO_DEBUG */
 
   itr = List_iterator_create(metric_list);
@@ -468,7 +469,7 @@ _unregister_metric(int fd, int32_t version, const char *metric_name)
     }
 
   if (List_delete_all(metric_list, _find_metric_name, (void *)metric_name) != 1)
-    CEREBRO_DBG(("invalid list_delete_all"));
+    CEREBROD_DBG(("invalid list_delete_all"));
 
   metric_list_size--;
 
@@ -567,7 +568,7 @@ _send_message_now(int fd,
 
   if (!(msg = (struct cerebrod_message *)malloc(sizeof(struct cerebrod_message))))
     {
-      CEREBRO_ERR(("malloc: %s", strerror(errno)));
+      CEREBROD_ERR(("malloc: %s", strerror(errno)));
       _send_metric_control_response(fd,
                                     version,
                                     CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_INTERNAL_ERROR);
@@ -577,7 +578,7 @@ _send_message_now(int fd,
   memset(nodename, '\0', CEREBRO_MAX_NODENAME_LEN+1);
   if (gethostname(nodename, CEREBRO_MAX_NODENAME_LEN) < 0)
     {
-      CEREBRO_ERR(("gethostname: %s", strerror(errno)));
+      CEREBROD_ERR(("gethostname: %s", strerror(errno)));
       _send_metric_control_response(fd,
                                     version,
                                     CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_INTERNAL_ERROR);
@@ -590,7 +591,7 @@ _send_message_now(int fd,
   msg->metrics_len = 1;
   if (!(msg->metrics = (struct cerebrod_message_metric **)malloc(sizeof(struct cerebrod_message_metric *)*(msg->metrics_len + 1))))
     {
-      CEREBRO_ERR(("malloc: %s", strerror(errno)));
+      CEREBROD_ERR(("malloc: %s", strerror(errno)));
       _send_metric_control_response(fd,
                                     version,
                                     CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_INTERNAL_ERROR);
@@ -600,7 +601,7 @@ _send_message_now(int fd,
 
   if (!(mm = (struct cerebrod_message_metric *)malloc(sizeof(struct cerebrod_message_metric))))
     {
-      CEREBRO_ERR(("malloc: %s", strerror(errno)));
+      CEREBROD_ERR(("malloc: %s", strerror(errno)));
       _send_metric_control_response(fd,
                                     version,
                                     CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_INTERNAL_ERROR);
@@ -619,7 +620,7 @@ _send_message_now(int fd,
 
   if (cerebrod_send_message(msg) < 0)
     {
-      CEREBRO_DBG(("cerebrod_send_message"));
+      CEREBROD_DBG(("cerebrod_send_message"));
       _send_metric_control_response(fd,
                                     version,
                                     CEREBRO_METRIC_CONTROL_PROTOCOL_ERR_INTERNAL_ERROR);
@@ -662,7 +663,7 @@ _update_metric(int fd,
   if (req->metric_value_type == CEREBRO_DATA_VALUE_TYPE_STRING &&
       !req->metric_value_len)
     {
-      CEREBRO_DBG(("adjusting metric type to none"));
+      CEREBROD_DBG(("adjusting metric type to none"));
       req->metric_value_type = CEREBRO_DATA_VALUE_TYPE_NONE;
     }
 
@@ -845,7 +846,7 @@ _flush_metric_data(void *x, const void *key, void *arg)
   /* Should be called with lock already set */
   rv = Pthread_mutex_trylock(&listener_data_lock);
   if (rv != EBUSY)
-    CEREBRO_EXIT(("mutex not locked: rv=%d", rv));
+    CEREBROD_EXIT(("mutex not locked: rv=%d", rv));
 #endif /* CEREBRO_DEBUG */
   
   Pthread_mutex_lock(&(nd->node_data_lock));
@@ -859,7 +860,7 @@ _flush_metric_data(void *x, const void *key, void *arg)
           nd->metric_data_count--;
         }
       else
-        CEREBRO_DBG(("illogical delete"));
+        CEREBROD_DBG(("illogical delete"));
     }
   Pthread_mutex_unlock(&(nd->node_data_lock));
 
@@ -910,7 +911,7 @@ _flush_metric(int fd, int32_t version, const char *metric_name)
   if ((mnd = Hash_remove(metric_names, metric_name)))
     metric_name_data_destroy(mnd);
   else
-    CEREBRO_DBG(("illogical delete"));
+    CEREBROD_DBG(("illogical delete"));
 
   Pthread_mutex_unlock(&metric_names_lock);
 
@@ -1094,7 +1095,7 @@ cerebrod_metric_controller(void *arg)
   _metric_controller_initialize();
 
   if ((controller_fd = _metric_controller_setup_socket(0)) < 0)
-    CEREBRO_EXIT(("metric controller fd setup failed"));
+    CEREBROD_EXIT(("metric controller fd setup failed"));
 
   for (;;)
     {

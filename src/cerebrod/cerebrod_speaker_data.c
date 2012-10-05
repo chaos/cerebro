@@ -47,6 +47,7 @@
 
 #include "cerebrod.h"
 #include "cerebrod_config.h"
+#include "cerebrod_debug.h"
 #include "cerebrod_speaker.h"
 #include "cerebrod_speaker_data.h"
 
@@ -122,19 +123,19 @@ _setup_metric_modules(void)
   /* Should be called with lock already set */
   rv = Pthread_mutex_trylock(&metric_list_lock);
   if (rv != EBUSY)
-    CEREBRO_EXIT(("mutex not locked: rv=%d", rv));
+    CEREBROD_EXIT(("mutex not locked: rv=%d", rv));
 #endif /* !WITH_CEREBROD_NO_THREADS */
 #endif /* CEREBRO_DEBUG */
 
   if (!(metric_handle = metric_modules_load()))
     {
-      CEREBRO_DBG(("metric_modules_load"));
+      CEREBROD_DBG(("metric_modules_load"));
       goto cleanup;
     }
   
   if ((metric_handle_count = metric_modules_count(metric_handle)) < 0)
     {
-      CEREBRO_DBG(("metric_module_count failed"));
+      CEREBROD_DBG(("metric_module_count failed"));
       goto cleanup;
     }
   
@@ -195,7 +196,7 @@ _setup_metric_modules(void)
                   Pthread_mutex_unlock(&debug_output_mutex);
 #endif /* !WITH_CEREBROD_NO_THREADS */
                 }
-              CEREBRO_ERR(("Dropping metric module: %s", module_name));
+              CEREBROD_ERR(("Dropping metric module: %s", module_name));
               continue;
             }
         }
@@ -215,27 +216,27 @@ _setup_metric_modules(void)
 
       if (metric_module_setup(metric_handle, i) < 0)
         {
-          CEREBRO_DBG(("metric_module_setup: %s", module_name));
+          CEREBROD_DBG(("metric_module_setup: %s", module_name));
           continue;
         }
 
       if (!(metric_name = metric_module_get_metric_name(metric_handle, i)))
         {
-          CEREBRO_DBG(("metric_module_get_metric_name: %s", module_name));
+          CEREBROD_DBG(("metric_module_get_metric_name: %s", module_name));
           metric_module_cleanup(metric_handle, i);
           continue;
         }
 
       if (metric_module_get_metric_period(metric_handle, i, &metric_period) < 0)
         {
-          CEREBRO_DBG(("metric_module_get_metric_period: %s", module_name));
+          CEREBROD_DBG(("metric_module_get_metric_period: %s", module_name));
           metric_module_cleanup(metric_handle, i);
           continue;
         }
 
       if (metric_module_get_metric_flags(metric_handle, i, &metric_flags) < 0)
         {
-          CEREBRO_DBG(("metric_module_get_metric_flags: %s", module_name));
+          CEREBROD_DBG(("metric_module_get_metric_flags: %s", module_name));
           metric_module_cleanup(metric_handle, i);
           continue;
         }
@@ -243,14 +244,14 @@ _setup_metric_modules(void)
       if (metric_flags & CEREBRO_METRIC_MODULE_FLAGS_SEND_ON_PERIOD
           && metric_period <= 0)
         {
-          CEREBRO_DBG(("metric module period invalid: %s", module_name));
+          CEREBROD_DBG(("metric module period invalid: %s", module_name));
           metric_module_cleanup(metric_handle, i);
           continue;
         }
 
       if (metric_module_send_message_function_pointer(metric_handle, i, &cerebrod_send_message) < 0)
         {
-          CEREBRO_DBG(("metric_module_send_message_function_pointer: %s", module_name));
+          CEREBROD_DBG(("metric_module_send_message_function_pointer: %s", module_name));
           metric_module_cleanup(metric_handle, i);
           continue;
         }
@@ -363,7 +364,7 @@ cerebrod_speaker_data_initialize(void)
   metric_list = List_create((ListDelF)_destroy_speaker_metric_info);
 
   if (_setup_metric_modules() < 0)
-    CEREBRO_EXIT(("_setup_metric_modules"));
+    CEREBROD_EXIT(("_setup_metric_modules"));
 
 #if !WITH_CEREBROD_NO_THREADS
   Pthread_mutex_unlock(&metric_list_lock);
@@ -417,7 +418,7 @@ cerebrod_speaker_data_metric_list_sort(void)
   /* Should be called with lock already set */
   rv = Pthread_mutex_trylock(&metric_list_lock);
   if (rv != EBUSY)
-    CEREBRO_EXIT(("mutex not locked: rv=%d", rv));
+    CEREBROD_EXIT(("mutex not locked: rv=%d", rv));
 #endif /* !WITH_CEREBROD_NO_THREADS */
 #endif /* CEREBRO_DEBUG */
 
@@ -446,7 +447,7 @@ _get_module_metric_value(unsigned int index)
 
   if (!(metric_name = metric_module_get_metric_name(metric_handle, index)))
     {
-      CEREBRO_DBG(("metric_module_get_metric_name: %d", index));
+      CEREBROD_DBG(("metric_module_get_metric_name: %d", index));
       goto cleanup;
     }
 
@@ -459,20 +460,20 @@ _get_module_metric_value(unsigned int index)
                                      &mlen,
                                      &mvalue) < 0)
     {
-      CEREBRO_DBG(("metric_module_get_metric_value: %d", index));
+      CEREBROD_DBG(("metric_module_get_metric_value: %d", index));
       goto cleanup;
     }
 
   if (mtype == CEREBRO_DATA_VALUE_TYPE_STRING 
       && mlen > CEREBRO_MAX_DATA_STRING_LEN)
     {
-      CEREBRO_DBG(("truncate metric string: %d", mlen));
+      CEREBROD_DBG(("truncate metric string: %d", mlen));
       mlen = CEREBRO_MAX_DATA_STRING_LEN;
     }
  
   if (mtype == CEREBRO_DATA_VALUE_TYPE_STRING && !mlen)
     {
-      CEREBRO_DBG(("adjusting metric type to none"));
+      CEREBROD_DBG(("adjusting metric type to none"));
       mtype = CEREBRO_DATA_VALUE_TYPE_NONE;
     }
 
@@ -525,7 +526,7 @@ _get_userspace_metric_value(struct cerebrod_speaker_metric_info *metric_info)
 
 #if CEREBRO_DEBUG
   if (metric_info->next_call_time)
-    CEREBRO_DBG(("Unexpected next_call_time"));
+    CEREBROD_DBG(("Unexpected next_call_time"));
 #endif /* CEREBRO_DEBUG */
 
   mtype = metric_info->metric_value_type;
@@ -578,7 +579,7 @@ cerebrod_speaker_data_get_heartbeat_metric_data(struct cerebrod_message *msg,
   assert(msg && message_len && more_data_to_send);
 
   if (!speaker_data_init)
-    CEREBRO_EXIT(("initialization not complete"));
+    CEREBROD_EXIT(("initialization not complete"));
 
   *more_data_to_send = 0;
 
@@ -673,7 +674,7 @@ cerebrod_speaker_data_get_module_metric_data(struct cerebrod_message *msg,
   assert(metric_handle && metric_list && metric_list_size);
 
   if (!speaker_data_init)
-    CEREBRO_EXIT(("initialization not complete"));
+    CEREBROD_EXIT(("initialization not complete"));
 
   *more_data_to_send = 0;
 
