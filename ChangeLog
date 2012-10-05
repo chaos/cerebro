@@ -1,4 +1,10 @@
 2012-10-04  Albert Chu  <chu11@llnl.gov>
+	
+	* META, NEWS: update for release
+
+	* tagged cerebro-1-16-1
+
+2012-10-04  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerebrod/cerebrod_debug.h: New file.
 
