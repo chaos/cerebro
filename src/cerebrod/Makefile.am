@@ -6,6 +6,7 @@
 
 noinst_HEADERS = cerebrod.h \
 		 cerebrod_config.h \
+		 cerebrod_debug.h \
                  cerebrod_daemon.h \
 		 cerebrod_event_node_timeout_monitor.h \
 		 cerebrod_event_server.h \
