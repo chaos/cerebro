@@ -1,3 +1,13 @@
+2012-11-09  Albert Chu  <chu11@llnl.gov>
+
+	Support gettimeofday retry configuration option to work around
+	issue on a number of Intel motherboards.
+
+	* config/ac_gettimeofday_retry.m4: New file
+
+	* src/libs/wrappers/wrappers.c (wrap_gettimeofday): Support
+	workaround.
+	
 2012-10-04  Albert Chu  <chu11@llnl.gov>
 	
 	* META, NEWS: update for release

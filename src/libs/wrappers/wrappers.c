@@ -547,8 +547,46 @@ wrap_gettimeofday(WRAPPERS_ARGS, struct timeval *tv, struct timezone *tz)
   if (!tv)
     WRAPPERS_ERR_INVALID_PARAMETERS("gettimeofday");
 
+#ifndef WITH_GETTIMEOFDAY_RETRY
   if ((rv = gettimeofday(tv, tz)) < 0)
     WRAPPERS_ERR_ERRNO("gettimeofday");
+#else
+  /* On a number of Intel systems, it has been observed that
+   * gettimeofday can occassionally return erroneous values.  For
+   * example, values 40 years into the future.  Then it goes back to
+   * returning valid values.  This can wreck havok on a number of the
+   * scheduling mechanisms inside Cerebro.
+   *
+   * The hack workaround is to spin calling gettimeofday().  If any
+   * two consecutive calls to gettimeofday are greater than 60 seconds
+   * off from each other, we assume we've got an erroneous call, then
+   * we retry again.  It's unknown why these systems are like this,
+   * but the return of an erroneous value is very rare.  This is just
+   * a hack, it's not great, but it works.
+   */
+  {
+    struct timeval tv1, tv2;
+    int ret1, ret2;
+
+    while (1)
+      {
+	if ((ret1 = gettimeofday(&tv1, tz)))
+	  WRAPPERS_ERR_ERRNO("gettimeofday");
+	if ((ret2 = gettimeofday(&tv2, tz)))
+	  WRAPPERS_ERR_ERRNO("gettimeofday");
+	
+	if (abs(tv1.tv_sec - tv2.tv_sec) < 60)
+	  {
+	    tv->tv_sec = tv2.tv_sec;
+	    tv->tv_usec = tv2.tv_usec;
+	    rv = ret2;
+	    break;
+	  }
+	else
+	  cerebro_err_output("gettimeofday bad time read - retrying"); 
+      }
+  }
+#endif
 
   return rv;
 }
