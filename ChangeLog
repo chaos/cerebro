@@ -1,3 +1,8 @@
+2012-11-12  Albert Chu  <chu11@llnl.gov>
+	
+	* src/libs/wrappers/wrappers.c (wrap_gettimeofday): Update log
+	message with more detail.
+
 2012-11-09  Albert Chu  <chu11@llnl.gov>
 
 	Support gettimeofday retry configuration option to work around

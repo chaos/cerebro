@@ -537,6 +537,8 @@ wrap_localtime_r(WRAPPERS_ARGS, const time_t *timep, struct tm *result)
   return tmptr;
 }
 
+#define GETTIMEOFDAY_RANGE 60
+
 int
 wrap_gettimeofday(WRAPPERS_ARGS, struct timeval *tv, struct timezone *tz)
 {
@@ -575,7 +577,7 @@ wrap_gettimeofday(WRAPPERS_ARGS, struct timeval *tv, struct timezone *tz)
 	if ((ret2 = gettimeofday(&tv2, tz)))
 	  WRAPPERS_ERR_ERRNO("gettimeofday");
 	
-	if (abs(tv1.tv_sec - tv2.tv_sec) < 60)
+	if (abs(tv1.tv_sec - tv2.tv_sec) < GETTIMEOFDAY_RANGE)
 	  {
 	    tv->tv_sec = tv2.tv_sec;
 	    tv->tv_usec = tv2.tv_usec;
@@ -583,7 +585,11 @@ wrap_gettimeofday(WRAPPERS_ARGS, struct timeval *tv, struct timezone *tz)
 	    break;
 	  }
 	else
-	  cerebro_err_output("gettimeofday bad time read - retrying"); 
+	  cerebro_err_output("gettimeofday bad time read "
+			     "(abs(%u - %u) >= %u) - retrying",
+			     tv1.tv_sec,
+			     tv2.tv_sec,
+			     GETTIMEOFDAY_RANGE);
       }
   }
 #endif
