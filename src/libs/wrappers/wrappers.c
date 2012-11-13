@@ -586,7 +586,7 @@ wrap_gettimeofday(WRAPPERS_ARGS, struct timeval *tv, struct timezone *tz)
 	  }
 	else
 	  cerebro_err_output("gettimeofday bad time read "
-			     "(abs(%u - %u) >= %u) - retrying",
+			     "(abs(%lu - %lu) >= %u) - retrying",
 			     tv1.tv_sec,
 			     tv2.tv_sec,
 			     GETTIMEOFDAY_RANGE);
