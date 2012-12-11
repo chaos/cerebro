@@ -278,8 +278,8 @@
 /* Define if you have genders. */
 #undef WITH_GENDERS
 
-/* Define if you want gettimeofday retry mechanism. */
-#undef WITH_GETTIMEOFDAY_RETRY
+/* Define if you want gettimeofday workaround mechanism. */
+#undef WITH_GETTIMEOFDAY_WORKAROUND
 
 /* Define if you want the loadavg module. */
 #undef WITH_LOADAVG

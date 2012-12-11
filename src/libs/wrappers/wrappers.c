@@ -549,7 +549,7 @@ wrap_gettimeofday(WRAPPERS_ARGS, struct timeval *tv, struct timezone *tz)
   if (!tv)
     WRAPPERS_ERR_INVALID_PARAMETERS("gettimeofday");
 
-#ifndef WITH_GETTIMEOFDAY_RETRY
+#ifndef WITH_GETTIMEOFDAY_WORKAROUND
   if ((rv = gettimeofday(tv, tz)) < 0)
     WRAPPERS_ERR_ERRNO("gettimeofday");
 #else

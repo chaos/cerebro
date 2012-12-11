@@ -20,7 +20,7 @@ Cerebro is a collection of cluster monitoring tools and libraries.
 %{!?_with_slurm_state: %{!?_without_slurm_state: %define _without_slurm_state --without-slurm-state}}
 %{!?_with_shutdown: %{!?_without_shutdown: %define _without_shutdown --without-shutdown}}
 %{!?_with_updown: %{!?_without_updown: %define _with_updown --with-updown}}
-%{!?_with_gettimeofday_retry: %{!?_without_gettimeofday_retry: %define _without_gettimeofday_retry --without-gettimeofday-retry}}
+%{!?_with_gettimeofday_workaround: %{!?_without_gettimeofday_workaround: %define _without_gettimeofday_workaround --without-gettimeofday-workaround}}
 
 %if %{?_with_debug:1}%{!?_with_debug:0}
 %define _enable_debug --enable-debug
@@ -113,8 +113,8 @@ Event module to monitor node up/down.
            %{?_without_shutdown} \
            %{?_with_updown} \
            %{?_without_updown} \
-           %{?_with_gettimeofday_retry} \
-           %{?_without_gettimeofday_retry} \
+           %{?_with_gettimeofday_workaround} \
+           %{?_without_gettimeofday_workaround} \
            %{?_with_cerebrod_speaker_only} \
            %{?_without_cerebrod_speaker_only} \
            %{?_with_cerebrod_no_threads} \

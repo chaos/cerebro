@@ -573,7 +573,29 @@ cerebrod_speaker(void *arg)
                   else
                     t = conf.heartbeat_frequency_min;
 
-                  nst->next_send_time = tv.tv_sec + t;
+#ifdef WITH_GETTIMEOFDAY_WORKAROUND
+		  /* On a number of Intel systems, it has been
+		   * observed that gettimeofday can occassionally
+		   * return erroneous values.  For example, values 40
+		   * years into the future.  Then it goes back to
+		   * returning valid values.
+		   *
+		   * Even the present workaround in Gettimeofday() was
+		   * not found to be sufficient, so this additional
+		   * workaround has been put in place.
+		   *
+		   * The following code should work around this
+		   * situation.  
+		   */
+                  if (conf.heartbeat_frequency_ranged
+		      && (((tv.tv_sec + t) - nst->next_send_time) > (2 * conf.heartbeat_frequency_max)))
+		    {
+		      CEREBROD_ERR (("Forcing maximum heartbeat frequency due to out of range time: %lu", tv.tv_sec));
+		      nst->next_send_time += conf.heartbeat_frequency_max;
+		    }
+		  else
+#endif /* WITH_GETTIMEOFDAY_WORKAROUND */
+		    nst->next_send_time = tv.tv_sec + t;
                 }
               if (nst->next_send_type & CEREBROD_SPEAKER_NEXT_SEND_TYPE_MODULE)
                 nst->next_send_time = tv.tv_sec + nst->metric_period;

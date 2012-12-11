@@ -847,8 +847,8 @@ WITH_STATIC_MODULES_FALSE
 WITH_STATIC_MODULES_TRUE
 MANPAGE_STATIC_MODULES
 WITH_STATIC_MODULES
-WITH_GETTIMEOFDAY_RETRY_FALSE
-WITH_GETTIMEOFDAY_RETRY_TRUE
+WITH_GETTIMEOFDAY_WORKAROUND_FALSE
+WITH_GETTIMEOFDAY_WORKAROUND_TRUE
 METRIC_CONTROL_PATH
 CEREBRO_CONFIG_FILE_DEFAULT
 CEREBRO_MODULE_DIR
@@ -1007,7 +1007,7 @@ enable_ltdl_install
 enable_debug
 with_cerebro_config_file
 with_metric_control_path
-with_gettimeofday_retry
+with_gettimeofday_workaround
 enable_static_modules
 with_cerebrod_speaker_only
 with_cerebrod_no_threads
@@ -1687,8 +1687,8 @@ Optional Packages:
                           Specify default cerebro config file path
   --with-metric-control-path
                           Define metric control path
-  --with-gettimeofday-retry
-                          Build w/ gettimeofday retry mechanism
+  --with-gettimeofday-workaround
+                          Build w/ gettimeofday workaround mechanism
   --with-cerebrod-speaker-only
                           Build only speaker functionality into cerebrod
   --with-cerebrod-no-threads
@@ -14130,42 +14130,42 @@ $as_echo "$METRIC_CONTROL_PATH" >&6; }
 # Check for special build conditions
 #
 
-  { $as_echo "$as_me:$LINENO: checking for whether to build w/ gettimeofday retry mechanism" >&5
-$as_echo_n "checking for whether to build w/ gettimeofday retry mechanism... " >&6; }
+  { $as_echo "$as_me:$LINENO: checking for whether to build w/ gettimeofday workaround mechanism" >&5
+$as_echo_n "checking for whether to build w/ gettimeofday workaround mechanism... " >&6; }
 
-# Check whether --with-gettimeofday-retry was given.
-if test "${with_gettimeofday_retry+set}" = set; then
-  withval=$with_gettimeofday_retry;  case "$withval" in
-        no)  ac_gettimeofday_retry_test=no ;;
-        yes) ac_gettimeofday_retry_test=yes ;;
-        *)   { { $as_echo "$as_me:$LINENO: error: bad value \"$withval\" for --with-gettimeofday-retry" >&5
-$as_echo "$as_me: error: bad value \"$withval\" for --with-gettimeofday-retry" >&2;}
+# Check whether --with-gettimeofday-workaround was given.
+if test "${with_gettimeofday_workaround+set}" = set; then
+  withval=$with_gettimeofday_workaround;  case "$withval" in
+        no)  ac_gettimeofday_workaround_test=no ;;
+        yes) ac_gettimeofday_workaround_test=yes ;;
+        *)   { { $as_echo "$as_me:$LINENO: error: bad value \"$withval\" for --with-gettimeofday-workaround" >&5
+$as_echo "$as_me: error: bad value \"$withval\" for --with-gettimeofday-workaround" >&2;}
    { (exit 1); exit 1; }; } ;;
       esac
 
 
 fi
 
-  { $as_echo "$as_me:$LINENO: result: ${ac_gettimeofday_retry_test=no}" >&5
-$as_echo "${ac_gettimeofday_retry_test=no}" >&6; }
+  { $as_echo "$as_me:$LINENO: result: ${ac_gettimeofday_workaround_test=no}" >&5
+$as_echo "${ac_gettimeofday_workaround_test=no}" >&6; }
 
-  if test "$ac_gettimeofday_retry_test" = "yes"; then
+  if test "$ac_gettimeofday_workaround_test" = "yes"; then
 
 cat >>confdefs.h <<\_ACEOF
-#define WITH_GETTIMEOFDAY_RETRY 1
+#define WITH_GETTIMEOFDAY_WORKAROUND 1
 _ACEOF
 
-     ac_with_gettimeofday_retry=yes
+     ac_with_gettimeofday_workaround=yes
   else
-     ac_with_gettimeofday_retry=no
+     ac_with_gettimeofday_workaround=no
   fi
 
- if test "$ac_with_gettimeofday_retry" = "yes"; then
-  WITH_GETTIMEOFDAY_RETRY_TRUE=
-  WITH_GETTIMEOFDAY_RETRY_FALSE='#'
+ if test "$ac_with_gettimeofday_workaround" = "yes"; then
+  WITH_GETTIMEOFDAY_WORKAROUND_TRUE=
+  WITH_GETTIMEOFDAY_WORKAROUND_FALSE='#'
 else
-  WITH_GETTIMEOFDAY_RETRY_TRUE='#'
-  WITH_GETTIMEOFDAY_RETRY_FALSE=
+  WITH_GETTIMEOFDAY_WORKAROUND_TRUE='#'
+  WITH_GETTIMEOFDAY_WORKAROUND_FALSE=
 fi
 
 
@@ -16962,10 +16962,10 @@ $as_echo "$as_me: error: conditional \"WITH_GNU_LD\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
-if test -z "${WITH_GETTIMEOFDAY_RETRY_TRUE}" && test -z "${WITH_GETTIMEOFDAY_RETRY_FALSE}"; then
-  { { $as_echo "$as_me:$LINENO: error: conditional \"WITH_GETTIMEOFDAY_RETRY\" was never defined.
+if test -z "${WITH_GETTIMEOFDAY_WORKAROUND_TRUE}" && test -z "${WITH_GETTIMEOFDAY_WORKAROUND_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"WITH_GETTIMEOFDAY_WORKAROUND\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
-$as_echo "$as_me: error: conditional \"WITH_GETTIMEOFDAY_RETRY\" was never defined.
+$as_echo "$as_me: error: conditional \"WITH_GETTIMEOFDAY_WORKAROUND\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
