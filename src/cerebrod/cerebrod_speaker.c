@@ -588,6 +588,7 @@ cerebrod_speaker(void *arg)
 		   * situation.  
 		   */
                   if (conf.heartbeat_frequency_ranged
+		      && nst->next_send_time
 		      && (((tv.tv_sec + t) - nst->next_send_time) > (2 * conf.heartbeat_frequency_max)))
 		    {
 		      CEREBROD_ERR (("Forcing maximum heartbeat frequency due to out of range time: %lu", tv.tv_sec));
