@@ -591,7 +591,7 @@ cerebrod_speaker(void *arg)
 		      && nst->next_send_time
 		      && (((tv.tv_sec + t) - nst->next_send_time) > (2 * conf.heartbeat_frequency_max)))
 		    {
-		      if (((tv.tv_sec + t) - nst->next_send_time)) < (10 * conf.heartbeat_frequency_max))
+		      if (((tv.tv_sec + t) - nst->next_send_time) < (10 * conf.heartbeat_frequency_max))
 			{
 			  /* If the tv_sec is only moderately off, assume it's due to drift and it's ok */
 			  nst->next_send_time = tv.tv_sec + t;
