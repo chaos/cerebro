@@ -1,3 +1,8 @@
+2012-01-10  Albert Chu  <chu11@llnl.gov>
+
+	* src/cerebrod_speaker.c (cerebrod_speaker): Re-work prior
+	gettimeofday workaround to deal with corner cases.
+	
 2012-12-11  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerebrod_speaker.c (cerebrod_speaker): Add additional
