@@ -70,6 +70,7 @@
 #define CEREBROD_METRIC_CONTROLLER_DEBUG_DEFAULT                  0
 #define CEREBROD_METRIC_SERVER_DEBUG_DEFAULT                      0
 #define CEREBROD_EVENT_SERVER_DEBUG_DEFAULT                       0
+#define CEREBROD_GETTIMEOFDAY_WORKAROUND_DEFAULT                  0
 #define CEREBROD_ALTERNATE_HOSTNAME                               NULL
 
 struct speak_message_config {
@@ -154,6 +155,7 @@ struct cerebrod_config
   int metric_controller_debug;
   int metric_server_debug;
   int event_server_debug;
+  int gettimeofday_workaround;
 #if CEREBRO_DEBUG
   char *alternate_hostname;
 #endif /* CEREBRO_DEBUG */

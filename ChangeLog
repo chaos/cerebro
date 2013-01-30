@@ -1,3 +1,22 @@
+2012-01-30  Albert Chu  <chu11@llnl.gov>
+
+	* src/cerebrod/cerebrod_speaker.c: Re-work gettimeofday workaround
+	into configuration option.
+
+	* src/libs/util/config_util.c,
+	src/libs/include/cerebro/cerebro_config.h,
+	src/cerebrod/cerebrod_config.c: Support new
+	cerebrod_gettimeofday_workaround configuration option.
+
+	* src/libs/wrappers/wrappers.h,
+	src/libs/wrappers/wrappers.c (Gettimeofday_workaround,
+	wrap_gettimeofday_workaround): Add new macro and function.
+
+	* man/cerebro.conf.5.in: Add cerebrod_gettimeofday_workaround
+	information.
+
+	* config/ac_gettimeofday_workaround.m4: Remove file.
+
 2012-01-10  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerebrod_speaker.c (cerebrod_speaker): Re-work prior

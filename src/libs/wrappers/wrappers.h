@@ -205,10 +205,13 @@ int wrap_inet_pton(WRAPPERS_ARGS, int af, const char *src, void *dst);
         wrap_localtime_r(__FILE__, __FUNCTION__, __LINE__, timep, result)
 #define Gettimeofday(tv, tz) \
         wrap_gettimeofday(WRAPPERS_DEBUG_ARGS, tv, tz)
+#define Gettimeofday_workaround(tv, tz) \
+        wrap_gettimeofday_workaround(WRAPPERS_DEBUG_ARGS, tv, tz)
 
 struct tm *wrap_localtime(WRAPPERS_ARGS, const time_t *timep);
 struct tm *wrap_localtime_r(WRAPPERS_ARGS, const time_t *timep, struct tm *result);
 int wrap_gettimeofday(WRAPPERS_ARGS, struct timeval *tv, struct timezone *tz);
+int wrap_gettimeofday_workaround(WRAPPERS_ARGS, struct timeval *tv, struct timezone *tz);
 
 /* 
  * Misc System Call Wrappers 

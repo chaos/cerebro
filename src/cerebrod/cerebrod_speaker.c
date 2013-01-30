@@ -513,7 +513,10 @@ cerebrod_speaker(void *arg)
       ListIterator itr;
       struct timeval tv;
 
-      Gettimeofday(&tv, NULL);
+      if (conf.gettimeofday_workaround)
+	Gettimeofday_workaround(&tv, NULL);
+      else
+	Gettimeofday(&tv, NULL);
 
       /* Note: After initial setup, we are the only thread that uses this
        * list/iterator.  So no need for pthread locking.
@@ -573,37 +576,40 @@ cerebrod_speaker(void *arg)
                   else
                     t = conf.heartbeat_frequency_min;
 
-#ifdef WITH_GETTIMEOFDAY_WORKAROUND
-		  /* On a number of Intel systems, it has been
-		   * observed that gettimeofday can occassionally
-		   * return erroneous values.  For example, values 40
-		   * years into the future.  Then it goes back to
-		   * returning valid values.
-		   *
-		   * Even the present workaround in Gettimeofday() was
-		   * not found to be sufficient, so this additional
-		   * workaround has been put in place.
-		   *
-		   * The following code should work around this
-		   * situation.  
-		   */
-                  if (conf.heartbeat_frequency_ranged
-		      && nst->next_send_time
-		      && (((tv.tv_sec + t) - nst->next_send_time) > (2 * conf.heartbeat_frequency_max)))
+		  if (conf.gettimeofday_workaround)
 		    {
-		      if (((tv.tv_sec + t) - nst->next_send_time) < (10 * conf.heartbeat_frequency_max))
+		      /* On a number of Intel systems, it has been
+		       * observed that gettimeofday can occassionally
+		       * return erroneous values.  For example, values 40
+		       * years into the future.  Then it goes back to
+		       * returning valid values.
+		       *
+		       * Even the present workaround in Gettimeofday() was
+		       * not found to be sufficient, so this additional
+		       * workaround has been put in place.
+		       *
+		       * The following code should work around this
+		       * situation.  
+		       */
+		      if (conf.heartbeat_frequency_ranged
+			  && nst->next_send_time
+			  && (((tv.tv_sec + t) - nst->next_send_time) > (2 * conf.heartbeat_frequency_max)))
 			{
-			  /* If the tv_sec is only moderately off, assume it's due to drift and it's ok */
-			  nst->next_send_time = tv.tv_sec + t;
+			  if (((tv.tv_sec + t) - nst->next_send_time) < (10 * conf.heartbeat_frequency_max))
+			    {
+			      /* If the tv_sec is only moderately off, assume it's due to drift and it's ok */
+			      nst->next_send_time = tv.tv_sec + t;
+			    }
+			  else
+			    {
+			      CEREBROD_ERR (("Forcing maximum heartbeat frequency due to out of range time: %lu", tv.tv_sec));
+			      nst->next_send_time += conf.heartbeat_frequency_max;
+			    }
 			}
 		      else
-			{
-			  CEREBROD_ERR (("Forcing maximum heartbeat frequency due to out of range time: %lu", tv.tv_sec));
-			  nst->next_send_time += conf.heartbeat_frequency_max;
-			}
+			nst->next_send_time = tv.tv_sec + t;
 		    }
 		  else
-#endif /* WITH_GETTIMEOFDAY_WORKAROUND */
 		    nst->next_send_time = tv.tv_sec + t;
                 }
               if (nst->next_send_type & CEREBROD_SPEAKER_NEXT_SEND_TYPE_MODULE)
@@ -617,17 +623,18 @@ cerebrod_speaker(void *arg)
       List_sort(next_send_times, (ListCmpF)_next_send_time_compare);
 
       nst = List_peek(next_send_times);
-#ifdef WITH_GETTIMEOFDAY_WORKAROUND
-      if ((nst->next_send_type & CEREBROD_SPEAKER_NEXT_SEND_TYPE_HEARTBEAT)
-	  && (((nst->next_send_time - tv.tv_sec) < 0)
-	      || (conf.heartbeat_frequency_ranged
-		  && ((nst->next_send_time - tv.tv_sec) > conf.heartbeat_frequency_max))))
-	sleep_time = conf.heartbeat_frequency_max;
+      if (conf.gettimeofday_workaround)
+	{
+	  if ((nst->next_send_type & CEREBROD_SPEAKER_NEXT_SEND_TYPE_HEARTBEAT)
+	      && (((nst->next_send_time - tv.tv_sec) < 0)
+		  || (conf.heartbeat_frequency_ranged
+		      && ((nst->next_send_time - tv.tv_sec) > conf.heartbeat_frequency_max))))
+	    sleep_time = conf.heartbeat_frequency_max;
+	  else
+	    sleep_time = nst->next_send_time - tv.tv_sec;
+	}
       else
 	sleep_time = nst->next_send_time - tv.tv_sec;
-#else /* !WITH_GETTIMEOFDAY_WORKAROUND */
-      sleep_time = nst->next_send_time - tv.tv_sec;
-#endif /* WITH_GETTIMEOFDAY_WORKAROUND */
       sleep(sleep_time);
     }
 

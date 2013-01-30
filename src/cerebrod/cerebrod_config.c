@@ -133,6 +133,7 @@ _cerebrod_set_config_default(void)
   conf.metric_controller_debug = CEREBROD_METRIC_CONTROLLER_DEBUG_DEFAULT;
   conf.metric_server_debug = CEREBROD_METRIC_SERVER_DEBUG_DEFAULT;
   conf.event_server_debug = CEREBROD_EVENT_SERVER_DEBUG_DEFAULT;
+  conf.gettimeofday_workaround = CEREBROD_GETTIMEOFDAY_WORKAROUND_DEFAULT;
 #if CEREBRO_DEBUG
   conf.alternate_hostname = CEREBROD_ALTERNATE_HOSTNAME;
 #endif /* CEREBRO_DEBUG */
@@ -439,6 +440,8 @@ _cerebrod_load_config(void)
     conf.metric_server_debug = tconf.cerebrod_metric_server_debug;
   if (tconf.cerebrod_event_server_debug_flag)
     conf.event_server_debug = tconf.cerebrod_event_server_debug;
+  if (tconf.cerebrod_gettimeofday_workaround_flag)
+    conf.gettimeofday_workaround = tconf.cerebrod_gettimeofday_workaround;
 #if CEREBRO_DEBUG
   if (tconf.cerebrod_alternate_hostname_flag)
     conf.alternate_hostname = Strdup(tconf.cerebrod_alternate_hostname);
@@ -1201,6 +1204,7 @@ _cerebrod_config_dump(void)
   fprintf(stderr, "* metric_controller_debug: %d\n", conf.metric_controller_debug);
   fprintf(stderr, "* metric_server_debug: %d\n", conf.metric_server_debug);
   fprintf(stderr, "* event_server_debug: %d\n", conf.event_server_debug);
+  fprintf(stderr, "* gettimeofday_workaround: %d\n", conf.gettimeofday_workaround);
 #if CEREBRO_DEBUG
   fprintf(stderr, "* alternate_hostname: %s\n", conf.alternate_hostname);
 #endif /* CEREBRO_DEBUG */

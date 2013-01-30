@@ -46,7 +46,6 @@ am__aclocal_m4_deps = $(top_srcdir)/config/ac_boottime.m4 \
 	$(top_srcdir)/config/ac_debug.m4 \
 	$(top_srcdir)/config/ac_genders.m4 \
 	$(top_srcdir)/config/ac_gethostbyname_r.m4 \
-	$(top_srcdir)/config/ac_gettimeofday_workaround.m4 \
 	$(top_srcdir)/config/ac_hostsfile.m4 \
 	$(top_srcdir)/config/ac_ipv6.m4 \
 	$(top_srcdir)/config/ac_loadavg.m4 \

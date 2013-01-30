@@ -151,6 +151,8 @@ struct cerebro_config
   int cerebrod_metric_server_debug_flag;
   int cerebrod_event_server_debug;
   int cerebrod_event_server_debug_flag;
+  int cerebrod_gettimeofday_workaround;
+  int cerebrod_gettimeofday_workaround_flag;
 #if CEREBRO_DEBUG
   char cerebrod_alternate_hostname[CEREBRO_MAX_HOSTNAME_LEN+1];
   int cerebrod_alternate_hostname_flag;

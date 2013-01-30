@@ -847,8 +847,6 @@ WITH_STATIC_MODULES_FALSE
 WITH_STATIC_MODULES_TRUE
 MANPAGE_STATIC_MODULES
 WITH_STATIC_MODULES
-WITH_GETTIMEOFDAY_WORKAROUND_FALSE
-WITH_GETTIMEOFDAY_WORKAROUND_TRUE
 METRIC_CONTROL_PATH
 CEREBRO_CONFIG_FILE_DEFAULT
 CEREBRO_MODULE_DIR
@@ -1007,7 +1005,6 @@ enable_ltdl_install
 enable_debug
 with_cerebro_config_file
 with_metric_control_path
-with_gettimeofday_workaround
 enable_static_modules
 with_cerebrod_speaker_only
 with_cerebrod_no_threads
@@ -1687,8 +1684,6 @@ Optional Packages:
                           Specify default cerebro config file path
   --with-metric-control-path
                           Define metric control path
-  --with-gettimeofday-workaround
-                          Build w/ gettimeofday workaround mechanism
   --with-cerebrod-speaker-only
                           Build only speaker functionality into cerebrod
   --with-cerebrod-no-threads
@@ -4669,13 +4664,13 @@ if test "${lt_cv_nm_interface+set}" = set; then
 else
   lt_cv_nm_interface="BSD nm"
   echo "int some_variable = 0;" > conftest.$ac_ext
-  (eval echo "\"\$as_me:4672: $ac_compile\"" >&5)
+  (eval echo "\"\$as_me:4667: $ac_compile\"" >&5)
   (eval "$ac_compile" 2>conftest.err)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:4675: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
+  (eval echo "\"\$as_me:4670: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
   (eval "$NM \"conftest.$ac_objext\"" 2>conftest.err > conftest.out)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:4678: output\"" >&5)
+  (eval echo "\"\$as_me:4673: output\"" >&5)
   cat conftest.out >&5
   if $GREP 'External.*some_variable' conftest.out > /dev/null; then
     lt_cv_nm_interface="MS dumpbin"
@@ -5881,7 +5876,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 5884 "configure"' > conftest.$ac_ext
+  echo '#line 5879 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -7734,11 +7729,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7737: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7732: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:7741: \$? = $ac_status" >&5
+   echo "$as_me:7736: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -8073,11 +8068,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8076: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8071: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8080: \$? = $ac_status" >&5
+   echo "$as_me:8075: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -8178,11 +8173,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8181: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8176: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:8185: \$? = $ac_status" >&5
+   echo "$as_me:8180: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -8233,11 +8228,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8236: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8231: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:8240: \$? = $ac_status" >&5
+   echo "$as_me:8235: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -11036,7 +11031,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11039 "configure"
+#line 11034 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11132,7 +11127,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11135 "configure"
+#line 11130 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12283,7 +12278,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 12286 "configure"
+#line 12281 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -14124,49 +14119,6 @@ fi
 $as_echo "$METRIC_CONTROL_PATH" >&6; }
 
 
-
-
-#
-# Check for special build conditions
-#
-
-  { $as_echo "$as_me:$LINENO: checking for whether to build w/ gettimeofday workaround mechanism" >&5
-$as_echo_n "checking for whether to build w/ gettimeofday workaround mechanism... " >&6; }
-
-# Check whether --with-gettimeofday-workaround was given.
-if test "${with_gettimeofday_workaround+set}" = set; then
-  withval=$with_gettimeofday_workaround;  case "$withval" in
-        no)  ac_gettimeofday_workaround_test=no ;;
-        yes) ac_gettimeofday_workaround_test=yes ;;
-        *)   { { $as_echo "$as_me:$LINENO: error: bad value \"$withval\" for --with-gettimeofday-workaround" >&5
-$as_echo "$as_me: error: bad value \"$withval\" for --with-gettimeofday-workaround" >&2;}
-   { (exit 1); exit 1; }; } ;;
-      esac
-
-
-fi
-
-  { $as_echo "$as_me:$LINENO: result: ${ac_gettimeofday_workaround_test=no}" >&5
-$as_echo "${ac_gettimeofday_workaround_test=no}" >&6; }
-
-  if test "$ac_gettimeofday_workaround_test" = "yes"; then
-
-cat >>confdefs.h <<\_ACEOF
-#define WITH_GETTIMEOFDAY_WORKAROUND 1
-_ACEOF
-
-     ac_with_gettimeofday_workaround=yes
-  else
-     ac_with_gettimeofday_workaround=no
-  fi
-
- if test "$ac_with_gettimeofday_workaround" = "yes"; then
-  WITH_GETTIMEOFDAY_WORKAROUND_TRUE=
-  WITH_GETTIMEOFDAY_WORKAROUND_FALSE='#'
-else
-  WITH_GETTIMEOFDAY_WORKAROUND_TRUE='#'
-  WITH_GETTIMEOFDAY_WORKAROUND_FALSE=
-fi
 
 
 #
@@ -16959,13 +16911,6 @@ if test -z "${WITH_GNU_LD_TRUE}" && test -z "${WITH_GNU_LD_FALSE}"; then
   { { $as_echo "$as_me:$LINENO: error: conditional \"WITH_GNU_LD\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 $as_echo "$as_me: error: conditional \"WITH_GNU_LD\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
-if test -z "${WITH_GETTIMEOFDAY_WORKAROUND_TRUE}" && test -z "${WITH_GETTIMEOFDAY_WORKAROUND_FALSE}"; then
-  { { $as_echo "$as_me:$LINENO: error: conditional \"WITH_GETTIMEOFDAY_WORKAROUND\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-$as_echo "$as_me: error: conditional \"WITH_GETTIMEOFDAY_WORKAROUND\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi

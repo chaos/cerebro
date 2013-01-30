@@ -1015,6 +1015,17 @@ _load_config_file(struct cerebro_config *conf, unsigned int *errnum)
 	&conf->cerebrod_event_server_debug, 
 	0
       },
+      {
+	"cerebrod_gettimeofday_workaround", 
+	CONFFILE_OPTION_BOOL, 
+	-1,
+	conffile_bool, 
+	1, 
+	0, 
+	&(conf->cerebrod_gettimeofday_workaround_flag),
+	&conf->cerebrod_gettimeofday_workaround, 
+	0
+      },
 #if CEREBRO_DEBUG
       {
 	"cerebrod_alternate_hostname", 
@@ -1304,6 +1315,13 @@ _set_cerebro_config(struct cerebro_config *dest,
     {
       dest->cerebrod_event_server_debug = src->cerebrod_event_server_debug;
       dest->cerebrod_event_server_debug_flag++;
+    }
+
+  if (!dest->cerebrod_gettimeofday_workaround_flag
+      && src->cerebrod_gettimeofday_workaround_flag)
+    {
+      dest->cerebrod_gettimeofday_workaround = src->cerebrod_gettimeofday_workaround;
+      dest->cerebrod_gettimeofday_workaround_flag++;
     }
 
 #if CEREBRO_DEBUG

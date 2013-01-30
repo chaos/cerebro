@@ -549,10 +549,22 @@ wrap_gettimeofday(WRAPPERS_ARGS, struct timeval *tv, struct timezone *tz)
   if (!tv)
     WRAPPERS_ERR_INVALID_PARAMETERS("gettimeofday");
 
-#ifndef WITH_GETTIMEOFDAY_WORKAROUND
   if ((rv = gettimeofday(tv, tz)) < 0)
     WRAPPERS_ERR_ERRNO("gettimeofday");
-#else
+
+  return rv;
+}
+
+int
+wrap_gettimeofday_workaround(WRAPPERS_ARGS, struct timeval *tv, struct timezone *tz)
+{
+  int rv;
+
+  assert(file && function);
+
+  if (!tv)
+    WRAPPERS_ERR_INVALID_PARAMETERS("gettimeofday");
+
   /* On a number of Intel systems, it has been observed that
    * gettimeofday can occassionally return erroneous values.  For
    * example, values 40 years into the future.  Then it goes back to
@@ -592,7 +604,6 @@ wrap_gettimeofday(WRAPPERS_ARGS, struct timeval *tv, struct timezone *tz)
 			     GETTIMEOFDAY_RANGE);
       }
   }
-#endif
 
   return rv;
 }

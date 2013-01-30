@@ -315,6 +315,10 @@ Turn on/off event server debugging.  Requires that debugging be turned on
 from the command line with the
 .I -d
 option.  This option is turned off by default.
+.TP
+.I cerebrod_gettimeofday_workaround ( on | off )
+Turn on/off workarounds to get around systems with bugs with
+gettimeofday().  This option is turned off by default.
 .if @MANPAGE_DEBUG@ \{
 .TP
 .I cerebrod_alternate_hostname str

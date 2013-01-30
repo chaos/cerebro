@@ -89,12 +89,6 @@ AC_CEREBRO_CONFIG_FILE
 AC_CEREBRO_METRIC_CONTROL_PATH
 
 #
-# Check for special build conditions
-#
-AC_GETTIMEOFDAY_WORKAROUND
-AM_CONDITIONAL(WITH_GETTIMEOFDAY_WORKAROUND, [test "$ac_with_gettimeofday_workaround" = "yes"])
-
-#
 # Check for static module compilation
 #
 AC_STATIC_MODULES
