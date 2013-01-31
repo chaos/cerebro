@@ -17,6 +17,10 @@
 
 	* config/ac_gettimeofday_workaround.m4: Remove file.
 
+	* configure.ac, cerebro.spec.in: Update accordingly.
+
+	* Re autogen.
+
 2012-01-10  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerebrod_speaker.c (cerebrod_speaker): Re-work prior
