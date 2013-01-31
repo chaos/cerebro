@@ -1,3 +1,8 @@
+2012-01-31  Albert Chu  <chu11@llnl.gov>
+
+	* /etc/cerebro.conf: Add cerebrod_gettimeofday_workaround.  Remove
+	cerebrod_alternate_hostname, latter which is only for debugging.
+	
 2012-01-30  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerebrod/cerebrod_speaker.c: Re-work gettimeofday workaround
