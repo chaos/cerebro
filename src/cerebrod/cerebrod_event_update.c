@@ -453,6 +453,35 @@ cerebrod_event_modules_setup(void)
 
       module_name = event_module_name(event_handle, i);
 
+      if (conf.event_module_exclude_len)
+        {
+          int found_exclude = 0;
+          int j;
+
+          for (j = 0; j < conf.event_module_exclude_len; j++)
+            {
+              if (!strcasecmp(conf.event_module_exclude[j], module_name))
+                {
+                  found_exclude++;
+                  break;
+                }
+            }
+
+          if (found_exclude)
+            {
+              if (conf.debug && conf.event_server_debug)
+                {
+                  Pthread_mutex_lock(&debug_output_mutex);
+                  fprintf(stderr, "**************************************\n");
+                  fprintf(stderr, "* Skip Event Module: %s\n", module_name);
+                  fprintf(stderr, "**************************************\n");
+                  Pthread_mutex_unlock(&debug_output_mutex);
+                }
+              CEREBROD_ERR(("Dropping event module: %s", module_name));
+              continue;
+            }
+        }
+
       if (conf.debug && conf.event_server_debug)
         {
           Pthread_mutex_lock(&debug_output_mutex);

@@ -2,6 +2,12 @@ This file describes changes in recent versions of cerebro. It
 primarily documents those changes that are of interest to users and
 admins.
 
+Changes in cerebro-1.17-1
+===========================
+ -- Support cerebrod_monitor_module_exclude,
+    cerebrod_event_module_exclude, and
+    cerebrod_gettimeofday_workaround options.
+
 Changes in cerebro-1.16-1
 ===========================
  -- Limit debug output in cerebrod only when running in the

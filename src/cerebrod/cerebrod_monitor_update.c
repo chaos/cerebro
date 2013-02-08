@@ -180,6 +180,35 @@ cerebrod_monitor_modules_setup(void)
 
       module_name = monitor_module_name(monitor_handle, i);
 
+      if (conf.monitor_module_exclude_len)
+        {
+          int found_exclude = 0;
+          int j;
+
+          for (j = 0; j < conf.monitor_module_exclude_len; j++)
+            {
+              if (!strcasecmp(conf.monitor_module_exclude[j], module_name))
+                {
+                  found_exclude++;
+                  break;
+                }
+            }
+
+          if (found_exclude)
+            {
+              if (conf.debug && conf.listen_debug)
+                {
+                  Pthread_mutex_lock(&debug_output_mutex);
+                  fprintf(stderr, "**************************************\n");
+                  fprintf(stderr, "* Skip Monitor Module: %s\n", module_name);
+                  fprintf(stderr, "**************************************\n");
+                  Pthread_mutex_unlock(&debug_output_mutex);
+                }
+              CEREBROD_ERR(("Dropping monitor module: %s", module_name));
+              continue;
+            }
+        }
+
       if (conf.debug && conf.listen_debug)
         {
           Pthread_mutex_lock(&debug_output_mutex);

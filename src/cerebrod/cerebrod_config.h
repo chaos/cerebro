@@ -149,6 +149,10 @@ struct cerebrod_config
   hostlist_t forward_host_accept;
   char metric_module_exclude[CEREBRO_CONFIG_METRIC_MODULE_EXCLUDE_MAX][CEREBRO_MAX_MODULE_NAME_LEN+1];
   int metric_module_exclude_len;
+  char monitor_module_exclude[CEREBRO_CONFIG_MONITOR_MODULE_EXCLUDE_MAX][CEREBRO_MAX_MODULE_NAME_LEN+1];
+  int monitor_module_exclude_len;
+  char event_module_exclude[CEREBRO_CONFIG_EVENT_MODULE_EXCLUDE_MAX][CEREBRO_MAX_MODULE_NAME_LEN+1];
+  int event_module_exclude_len;
 
   int speak_debug;
   int listen_debug;

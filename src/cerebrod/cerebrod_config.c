@@ -127,6 +127,8 @@ _cerebrod_set_config_default(void)
   conf.forward_host_accept = Hostlist_create(NULL);
 
   conf.metric_module_exclude_len = 0;
+  conf.monitor_module_exclude_len = 0;
+  conf.event_module_exclude_len = 0;
 
   conf.speak_debug = CEREBROD_SPEAK_DEBUG_DEFAULT;
   conf.listen_debug = CEREBROD_LISTEN_DEBUG_DEFAULT;
@@ -428,6 +430,22 @@ _cerebrod_load_config(void)
       for (i = 0; i < tconf.cerebrod_metric_module_exclude_len; i++)
         strcpy(conf.metric_module_exclude[i], tconf.cerebrod_metric_module_exclude[i]);
       conf.metric_module_exclude_len = tconf.cerebrod_metric_module_exclude_len;
+    }
+
+  if (tconf.cerebrod_monitor_module_exclude_flag
+      && tconf.cerebrod_monitor_module_exclude_len)
+    {
+      for (i = 0; i < tconf.cerebrod_monitor_module_exclude_len; i++)
+        strcpy(conf.monitor_module_exclude[i], tconf.cerebrod_monitor_module_exclude[i]);
+      conf.monitor_module_exclude_len = tconf.cerebrod_monitor_module_exclude_len;
+    }
+
+  if (tconf.cerebrod_event_module_exclude_flag
+      && tconf.cerebrod_event_module_exclude_len)
+    {
+      for (i = 0; i < tconf.cerebrod_event_module_exclude_len; i++)
+        strcpy(conf.event_module_exclude[i], tconf.cerebrod_event_module_exclude[i]);
+      conf.event_module_exclude_len = tconf.cerebrod_event_module_exclude_len;
     }
 
   if (tconf.cerebrod_speak_debug_flag)

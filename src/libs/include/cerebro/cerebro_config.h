@@ -46,6 +46,10 @@
 
 #define CEREBRO_CONFIG_METRIC_MODULE_EXCLUDE_MAX  64
 
+#define CEREBRO_CONFIG_MONITOR_MODULE_EXCLUDE_MAX 64
+
+#define CEREBRO_CONFIG_EVENT_MODULE_EXCLUDE_MAX   64
+
 #define CEREBRO_CONFIG_PORT_DEFAULT               0
 
 #define CEREBRO_CONFIG_IP_DEFAULT                 "0.0.0.0"
@@ -141,6 +145,12 @@ struct cerebro_config
   char cerebrod_metric_module_exclude[CEREBRO_CONFIG_METRIC_MODULE_EXCLUDE_MAX][CEREBRO_MAX_MODULE_NAME_LEN+1];
   int cerebrod_metric_module_exclude_len;
   int cerebrod_metric_module_exclude_flag;
+  char cerebrod_monitor_module_exclude[CEREBRO_CONFIG_MONITOR_MODULE_EXCLUDE_MAX][CEREBRO_MAX_MODULE_NAME_LEN+1];
+  int cerebrod_monitor_module_exclude_len;
+  int cerebrod_monitor_module_exclude_flag;
+  char cerebrod_event_module_exclude[CEREBRO_CONFIG_EVENT_MODULE_EXCLUDE_MAX][CEREBRO_MAX_MODULE_NAME_LEN+1];
+  int cerebrod_event_module_exclude_len;
+  int cerebrod_event_module_exclude_flag;
   int cerebrod_speak_debug;
   int cerebrod_speak_debug_flag;
   int cerebrod_listen_debug;

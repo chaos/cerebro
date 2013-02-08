@@ -633,17 +633,17 @@ _cb_cerebrod_forward_host_accept(conffile_t cf, struct conffile_data *data,
 }
 
 /*
- * _cb_cerebrod_metric_module_exclude
+ * _cb_cerebrod_module_exclude
  *
- * callback function that parses and stores cerebrod forward host
- * accept configuration.
+ * callback function that parses and stores cerebrod module exclude
+ * configuration.
  *
  * Returns 0 on success, -1 on error
  */
 static int
-_cb_cerebrod_metric_module_exclude(conffile_t cf, struct conffile_data *data,
-                                 char *optionname, int option_type, void *option_ptr,
-                                 int option_data, void *app_ptr, int app_data)
+_cb_cerebrod_module_exclude(conffile_t cf, struct conffile_data *data,
+			    char *optionname, int option_type, void *option_ptr,
+			    int option_data, void *app_ptr, int app_data)
 {
   struct cerebro_config *conf;
 
@@ -661,21 +661,49 @@ _cb_cerebrod_metric_module_exclude(conffile_t cf, struct conffile_data *data,
 
       for (i = 0; i < data->stringlist_len; i++)
         {
-          if (conf->cerebrod_metric_module_exclude_len >= CEREBRO_CONFIG_METRIC_MODULE_EXCLUDE_MAX)
-            {
-              conffile_seterrnum(cf, CONFFILE_ERR_PARSE_ARG_TOOMANY);
-              return -1;
-            }
-
           if (strlen(data->stringlist[i]) > CEREBRO_MAX_MODULE_NAME_LEN)
             {
               conffile_seterrnum(cf, CONFFILE_ERR_PARSE_OVERFLOW_ARGLEN);
               return -1;
             }
+
+	  /* achu: passing char[][] as pointer is badness, play it safe */
+	  if (!strcasecmp(optionname,  "cerebrod_metric_module_exclude"))
+	    {
+	      if (conf->cerebrod_metric_module_exclude_len >= CEREBRO_CONFIG_METRIC_MODULE_EXCLUDE_MAX)
+		{
+		  conffile_seterrnum(cf, CONFFILE_ERR_PARSE_ARG_TOOMANY);
+		  return -1;
+		}
       
-          strcpy(conf->cerebrod_metric_module_exclude[conf->cerebrod_metric_module_exclude_len], 
-                 data->stringlist[i]);
-          conf->cerebrod_metric_module_exclude_len++;
+	      strcpy(conf->cerebrod_metric_module_exclude[conf->cerebrod_metric_module_exclude_len], 
+		     data->stringlist[i]);
+	      conf->cerebrod_metric_module_exclude_len++;
+	    }
+	  else if (!strcasecmp(optionname,  "cerebrod_monitor_module_exclude"))
+	    {
+	      if (conf->cerebrod_monitor_module_exclude_len >= CEREBRO_CONFIG_MONITOR_MODULE_EXCLUDE_MAX)
+		{
+		  conffile_seterrnum(cf, CONFFILE_ERR_PARSE_ARG_TOOMANY);
+		  return -1;
+		}
+      
+	      strcpy(conf->cerebrod_monitor_module_exclude[conf->cerebrod_monitor_module_exclude_len], 
+		     data->stringlist[i]);
+	      conf->cerebrod_monitor_module_exclude_len++;
+	    }
+	  else if (!strcasecmp(optionname,  "cerebrod_event_module_exclude"))
+	    {
+	      if (conf->cerebrod_event_module_exclude_len >= CEREBRO_CONFIG_EVENT_MODULE_EXCLUDE_MAX)
+		{
+		  conffile_seterrnum(cf, CONFFILE_ERR_PARSE_ARG_TOOMANY);
+		  return -1;
+		}
+      
+	      strcpy(conf->cerebrod_event_module_exclude[conf->cerebrod_event_module_exclude_len], 
+		     data->stringlist[i]);
+	      conf->cerebrod_event_module_exclude_len++;
+	    }
         }
     }
   return 0;
@@ -953,10 +981,32 @@ _load_config_file(struct cerebro_config *conf, unsigned int *errnum)
 	"cerebrod_metric_module_exclude", 
 	CONFFILE_OPTION_LIST_STRING, 
 	-1,
-	_cb_cerebrod_metric_module_exclude, 
+	_cb_cerebrod_module_exclude, 
 	CEREBRO_CONFIG_METRIC_MODULE_EXCLUDE_MAX, 
 	0, 
 	&(conf->cerebrod_metric_module_exclude_flag),
+	conf, 
+	0
+      },
+      {
+	"cerebrod_monitor_module_exclude", 
+	CONFFILE_OPTION_LIST_STRING, 
+	-1,
+	_cb_cerebrod_module_exclude, 
+	CEREBRO_CONFIG_MONITOR_MODULE_EXCLUDE_MAX, 
+	0, 
+	&(conf->cerebrod_monitor_module_exclude_flag),
+	conf, 
+	0
+      },
+      {
+	"cerebrod_event_module_exclude", 
+	CONFFILE_OPTION_LIST_STRING, 
+	-1,
+	_cb_cerebrod_module_exclude, 
+	CEREBRO_CONFIG_EVENT_MODULE_EXCLUDE_MAX, 
+	0, 
+	&(conf->cerebrod_event_module_exclude_flag),
 	conf, 
 	0
       },
@@ -1282,6 +1332,28 @@ _set_cerebro_config(struct cerebro_config *dest,
                src->cerebrod_metric_module_exclude[i]);
       dest->cerebrod_metric_module_exclude_len = src->cerebrod_metric_module_exclude_len;
       dest->cerebrod_metric_module_exclude_flag++;
+    }
+
+  if (!dest->cerebrod_monitor_module_exclude_flag 
+      && src->cerebrod_monitor_module_exclude_flag
+      && src->cerebrod_monitor_module_exclude_len)
+    {
+      for (i = 0; i < src->cerebrod_monitor_module_exclude_len; i++)
+        strcpy(dest->cerebrod_monitor_module_exclude[i],
+               src->cerebrod_monitor_module_exclude[i]);
+      dest->cerebrod_monitor_module_exclude_len = src->cerebrod_monitor_module_exclude_len;
+      dest->cerebrod_monitor_module_exclude_flag++;
+    }
+
+  if (!dest->cerebrod_event_module_exclude_flag 
+      && src->cerebrod_event_module_exclude_flag
+      && src->cerebrod_event_module_exclude_len)
+    {
+      for (i = 0; i < src->cerebrod_event_module_exclude_len; i++)
+        strcpy(dest->cerebrod_event_module_exclude[i],
+               src->cerebrod_event_module_exclude[i]);
+      dest->cerebrod_event_module_exclude_len = src->cerebrod_event_module_exclude_len;
+      dest->cerebrod_event_module_exclude_flag++;
     }
 
   if (!dest->cerebrod_speak_debug_flag && src->cerebrod_speak_debug_flag)
