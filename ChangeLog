@@ -1,9 +1,15 @@
+2012-02-08  Albert Chu  <chu11@llnl.gov>
+
+	* tagged cerebro-1-17-1
+	
 2012-02-07  Albert Chu  <chu11@llnl.gov>
 
 	* Support new cerebrod_monitor_module_exclude and
 	cerebrod_event_module_exclude options to limit loading of specific
 	modules.
 	
+	* META, NEWS: update for release
+
 2012-01-31  Albert Chu  <chu11@llnl.gov>
 
 	* /etc/cerebro.conf: Add cerebrod_gettimeofday_workaround.  Remove
