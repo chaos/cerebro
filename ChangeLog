@@ -1,3 +1,8 @@
+2013-06-07  Albert Chu  <chu11@llnl.gov>
+
+	* src/libs/util/network_util.c (low_timeout_connect): Fix segfault
+	corner case.
+	
 2012-02-08  Albert Chu  <chu11@llnl.gov>
 
 	* tagged cerebro-1-17-1

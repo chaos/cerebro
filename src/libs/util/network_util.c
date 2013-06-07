@@ -212,6 +212,13 @@ low_timeout_connect(const char *hostname,
         *errnum = CEREBRO_ERR_HOSTNAME;
       return -1;
     }
+  if (!hptr)
+    {
+      CEREBRO_ERR(("gethostbyname_r hptr: %s", hstrerror(h_errnop)));
+      if (errnum)
+        *errnum = CEREBRO_ERR_HOSTNAME;
+      return -1;
+    }
 #else  /* !HAVE_FUNC_GETHOSTBYNAME_R */
   /* valgrind will report a mem-leak in gethostbyname() */
   if (!(hptr = gethostbyname(hostname)))
