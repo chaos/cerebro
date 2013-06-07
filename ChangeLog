@@ -1,13 +1,19 @@
+2012-06-07  Albert Chu  <chu11@llnl.gov>
+
+	* tagged cerebro-1-18-1
+
+	* META, NEWS: update for release
+
 2013-06-07  Albert Chu  <chu11@llnl.gov>
 
 	* src/libs/util/network_util.c (low_timeout_connect): Fix segfault
 	corner case.
 	
-2012-02-08  Albert Chu  <chu11@llnl.gov>
+2013-02-08  Albert Chu  <chu11@llnl.gov>
 
 	* tagged cerebro-1-17-1
 	
-2012-02-07  Albert Chu  <chu11@llnl.gov>
+2013-02-07  Albert Chu  <chu11@llnl.gov>
 
 	* Support new cerebrod_monitor_module_exclude and
 	cerebrod_event_module_exclude options to limit loading of specific
@@ -15,12 +21,12 @@
 	
 	* META, NEWS: update for release
 
-2012-01-31  Albert Chu  <chu11@llnl.gov>
+2013-01-31  Albert Chu  <chu11@llnl.gov>
 
 	* /etc/cerebro.conf: Add cerebrod_gettimeofday_workaround.  Remove
 	cerebrod_alternate_hostname, latter which is only for debugging.
 	
-2012-01-30  Albert Chu  <chu11@llnl.gov>
+2013-01-30  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerebrod/cerebrod_speaker.c: Re-work gettimeofday workaround
 	into configuration option.
@@ -43,7 +49,7 @@
 
 	* Re autogen.
 
-2012-01-10  Albert Chu  <chu11@llnl.gov>
+2013-01-10  Albert Chu  <chu11@llnl.gov>
 
 	* src/cerebrod_speaker.c (cerebrod_speaker): Re-work prior
 	gettimeofday workaround to deal with corner cases.
