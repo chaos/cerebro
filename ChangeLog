@@ -1,3 +1,13 @@
+2014-05-20 Ryan Haasken <haasken@cray.com>
+
+	* src/modules/metric/cerebro_metric_boottime.c (boottime_metric_setup):
+	Read entire /proc/stat when searching for btime.  When searching
+	in /proc/stat for btime, read one line at a time, and continue
+	reading until the end of the file.  This ensures that we will find
+	the line which contains the boot time of the machine.  The buffer
+	size was left the same because some lines in /proc/stat can be
+	quite long.
+	
 2013-06-07  Albert Chu  <chu11@llnl.gov>
 
 	* tagged cerebro-1-18-1

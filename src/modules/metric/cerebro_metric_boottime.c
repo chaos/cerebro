@@ -77,29 +77,34 @@ static u_int32_t metric_boottime = 0;
 static int
 boottime_metric_setup(void)
 {
-  int fd, len;
+  FILE *fp = NULL;
   char *bootvalptr;
   char buf[BOOTTIME_BUFLEN];
   unsigned long int bootval;
- 
-  if ((fd = open(BOOTTIME_FILE, O_RDONLY, 0)) < 0)
+
+  if (!(fp = fopen(BOOTTIME_FILE, "r")))
     {
       CEREBRO_ERR(("open: %s", strerror(errno)));
       goto cleanup;
     }
 
-  if ((len = read(fd, buf, BOOTTIME_BUFLEN)) < 0)
+  /* Read lines until EOF or error */
+  while (fgets(buf, BOOTTIME_BUFLEN, fp))
     {
-      CEREBRO_ERR(("read: %s", strerror(errno)));
-      goto cleanup;
+      bootvalptr = strstr(buf, BOOTTIME_KEYWORD);
+      if (bootvalptr)
+        {
+          bootvalptr += strlen(BOOTTIME_KEYWORD);
+          break;
+        }
     }
-
-  if (!(bootvalptr = strstr(buf, BOOTTIME_KEYWORD)))
+  if (!bootvalptr)
     {
       CEREBRO_ERR(("strstr: boottime can't be found"));
       goto cleanup;
     }
-  bootvalptr += strlen(BOOTTIME_KEYWORD);
+
+
 
   errno = 0;
   bootval = (u_int32_t)strtoul(bootvalptr, NULL, 10);
@@ -110,14 +115,14 @@ boottime_metric_setup(void)
     }
 
   /* ignore potential error, just return result */
-  close(fd);
+  fclose(fp);
   metric_boottime = (u_int32_t)bootval;
   return 0;
 
  cleanup:
   /* ignore potential error, just return result */
-  close(fd);
-  return -1;
+  fclose(fp);
+  return 1;
 }
 
 /*
