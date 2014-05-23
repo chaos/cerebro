@@ -122,7 +122,7 @@ boottime_metric_setup(void)
  cleanup:
   /* ignore potential error, just return result */
   fclose(fp);
-  return 1;
+  return -1;
 }
 
 /*
