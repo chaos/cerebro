@@ -1,3 +1,7 @@
+2014-08-07 Ryan Haasken <haasken@cray.com>
+
+	* etc/cerebrod: Call Xexit at the end of the script
+	
 2014-05-23 Ryan Haasken <haasken@cray.com>
 
 	* src/modules/metric/cerebro_metric_boottime.c (boottime_metric_setup):
