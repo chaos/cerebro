@@ -34,17 +34,21 @@ if [ -f /etc/rc.d/init.d/functions ] ; then
     }
     Xstatus() {
         status cerebrod
-	RETVAL=$?
+        RETVAL=$?
+    }
+    Xrestart() {
+        $0 stop
+        $0 start
+        RETVAL=$?
     }
     Xcondrestart() {
         if test -e /var/lock/subsys/cerebrod; then
-	    $0 stop
-	    $0 start
-   	    RETVAL=$?
+            $0 restart
+            RETVAL=$?
         fi
     }
     Xexit() {
-	exit $RETVAL
+        exit $RETVAL
     }
 elif [ -f /etc/rc.status ] ; then
     . /etc/rc.status
@@ -61,6 +65,11 @@ elif [ -f /etc/rc.status ] ; then
         checkproc $CEREBROD
         rc_status -v
     }
+    Xrestart() {
+        $0 stop
+        $0 start
+        rc_status
+    }
     Xcondrestart() {
         $0 status
         if test $? = 0; then
@@ -71,7 +80,7 @@ elif [ -f /etc/rc.status ] ; then
         rc_status
     }
     Xexit() {
-	rc_exit
+        rc_exit
     }
 else
     echo "Unknown distribution type"
@@ -81,28 +90,26 @@ fi
 RETVAL=0
 
 case "$1" in
-   start)
-   	echo -n "Starting cerebrod: "
+    start)
+        echo -n "Starting cerebrod: "
         Xstart
         ;;
-  stop)
-   	echo -n "Shutting down cerebrod: "
-	Xstop
-   	;;
-  restart|reload)
-   	$0 stop
-   	$0 start
-   	RETVAL=$?
-   	;;
-  status)
+    stop)
+        echo -n "Shutting down cerebrod: "
+        Xstop
+        ;;
+    restart|reload)
+        Xrestart
+        ;;
+    status)
         Xstatus
-   	;;
-  condrestart)
+        ;;
+    condrestart)
         Xcondrestart
-   	;;
-  *)
-	echo "Usage: $0 {start|stop|restart|status|condrestart}"
-	exit 1
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart|status|condrestart}"
+        exit 1
 esac
 
 Xexit

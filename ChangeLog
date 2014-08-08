@@ -1,5 +1,23 @@
 2014-08-07 Ryan Haasken <haasken@cray.com>
 
+	cerebrod init script: add Xrestart function and re-indent file
+
+	The cerebrod init script does not return the correct exit status
+	for the restart command on SLES systems.  This is because the
+	restart case only sets RETVAL and doesn't call rc_status.  This
+	patch fixes this issue by creating an Xrestart function which is
+	defined differently for RHEL vs.  SLES, just like the other 'X'
+	functions.
+
+	Also made the two Xcondrestart functions consistent in that they
+	now both call "$0 restart" instead of the RHEL one calling "$0
+	stop; $0 start" and the SLES one calling "$0 restart".
+
+	Also updated the indentation in the file so that it consistently
+	uses 4 spaces instead of tab characters.
+
+2014-08-07 Ryan Haasken <haasken@cray.com>
+
 	* etc/cerebrod: Call Xexit at the end of the script
 	
 2014-05-23 Ryan Haasken <haasken@cray.com>
