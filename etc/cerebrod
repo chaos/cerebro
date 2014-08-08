@@ -98,17 +98,21 @@ case "$1" in
         echo -n "Shutting down cerebrod: "
         Xstop
         ;;
-    restart|reload)
+    restart|force-reload)
         Xrestart
+        ;;
+    reload)
+        echo "Operation unsupported: $1"
+        exit 3
         ;;
     status)
         Xstatus
         ;;
-    condrestart)
+    condrestart|try-restart)
         Xcondrestart
         ;;
     *)
-        echo "Usage: $0 {start|stop|restart|status|condrestart}"
+        echo "Usage: $0 {start|stop|restart|force-reload|status|condrestart|try-restart}"
         exit 1
 esac
 

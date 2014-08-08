@@ -1,4 +1,23 @@
-2014-08-07 Ryan Haasken <haasken@cray.com>
+2014-08-08 Ryan Haasken <haasken@cray.com>
+
+	init script: Replace reload w/ force-reload for LSB compliance
+
+	The LSB says that reload should reload configuration if it's
+	possible to do so without restarting the service, and support for
+	the reload operation is optional.  Previously, the init script
+	just restarted the service if given the "reload" argument.  This
+	patch changes "reload" to an unsupported operation.
+
+	The LSB says that the force-reload operation must be supported,
+	and this operation can restart the service in order to reload
+	configuration.  This patch adds the "force-reload" operation and
+	just calls Xrestart when that operation is requested.
+
+	Also added try-restart, which is the SLES equivalent of
+	condrestart (Red Hat).  Updated the usage information to reflect
+	these changes.
+	
+2014-08-08 Ryan Haasken <haasken@cray.com>
 
 	cerebrod init script: add Xrestart function and re-indent file
 
