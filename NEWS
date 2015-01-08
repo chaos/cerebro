@@ -5,6 +5,7 @@ admins.
 Changes in cerebro-1.19-1
 ===========================
  -- Fix LSB compliance with cerebrod init script.
+ -- Fix chkconfig end priority.
 
 Changes in cerebro-1.18-1
 ===========================
