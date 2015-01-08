@@ -1,7 +1,7 @@
 #!/bin/sh
 # $Id: cerebrod,v 1.8 2009-02-26 18:18:58 chu11 Exp $
 #
-# chkconfig: - 95 95
+# chkconfig: - 95 5
 # description: cerebrod startup script
 #
 ### BEGIN INIT INFO

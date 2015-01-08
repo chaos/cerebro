@@ -1,3 +1,25 @@
+2015-01-08 Ryan Haasken <haasken@cray.com>
+
+	* etc/cerebrod: Change end_priority to 100 - start_priority.
+
+	On a CentOS 6.5 system, the mysqld service is shut down before the
+	cerebrod service. However, cerebrod uses mysqld, so it should shut
+	down before mysqld.
+
+	This problem is due to an incorrect end_priority in the chkconfig
+	header in the cerebrod init script. According to
+
+	http://fedoraproject.org/wiki/Packaging:SysVInitScript#.23_chkconfig:_line
+
+	the chkconfig header in an init script should have the end_priority
+	equal to (100 - start_priority). The format of the chkconfig line is:
+
+	 # chkconfig: <startlevellist> <startpriority> <endpriority>
+
+	The current start_priority of 95 is good because it means cerebrod
+	will start late. However, it should then be stopped early, so it's
+	end_priority should be (100 - 95) = 5.
+	
 2014-08-08 Ryan Haasken <haasken@cray.com>
 
 	init script: Replace reload w/ force-reload for LSB compliance
