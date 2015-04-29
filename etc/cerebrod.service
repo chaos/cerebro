@@ -1,0 +1,10 @@
+[Unit]
+Description=Cerebro Monitoring Daemon
+After=network.target remote-fs.target syslog.target
+
+[Service]
+Type=forking
+ExecStart=/usr/sbin/cerebrod
+
+[Install]
+WantedBy=multi-user.target
