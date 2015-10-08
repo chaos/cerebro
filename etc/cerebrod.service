@@ -1,10 +1,16 @@
-[Unit]
-Description=Cerebro Monitoring Daemon
-After=network.target remote-fs.target syslog.target
-
-[Service]
-Type=forking
-ExecStart=/usr/sbin/cerebrod
-
-[Install]
-WantedBy=multi-user.target
+[Unit]                               
+Description=Cerebrod daemon          
+After=syslog.target network.target   
+                                      
+[Service]                            
+Type=forking                         
+ExecStart=/usr/sbin/cerebrod         
+ExecReload=/bin/kill -HUP $MAINPID   
+KillMode=process                     
+User=root
+Group=root
+Restart=on-failure                   
+RestartSec=5s                        
+                                      
+[Install]                            
+WantedBy=multi-user.target           

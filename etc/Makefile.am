@@ -4,14 +4,13 @@
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
 
-EXTRA_DIST = cerebrod cerebro.conf
- 
-install-data-local:
-	$(INSTALL) -m 755 -d $(DESTDIR)$(sysconfdir)
-	$(INSTALL) -m 755 -d $(DESTDIR)$(sysconfdir)/init.d
-	$(INSTALL) -m 755 $(srcdir)/cerebro.conf $(DESTDIR)$(sysconfdir)
-	$(INSTALL) -m 755 $(srcdir)/cerebrod $(DESTDIR)$(sysconfdir)/init.d/cerebrod
+EXTRA_DIST = cerebrod cerebro.conf cerebrod.service
 
-uninstall-local:
-	$(RM) -f $(DESTDIR)/$(sysconfdir)/init.d/cerebrod
-	$(RM) -f $(DESTDIR)/$(sysconfdir)/cerebro.conf
+if HAVE_SYSTEMD
+systemdsystemunit_SCRIPTS=cerebrod.service
+else
+initconfdir=$(sysconfdir)/init.d
+initconf_SCRIPTS=cerebrod
+endif
+
+sysconf_DATA=cerebro.conf
