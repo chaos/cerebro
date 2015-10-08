@@ -57,6 +57,11 @@ LT_INIT
 AC_LIB_LTDL
 AM_CONDITIONAL(WITH_GNU_LD, test "$with_gnu_ld" = "yes")
 
+##
+# Check for systemd
+##
+RRA_WITH_SYSTEMD_UNITDIR
+
 #
 # Check for debugging
 #

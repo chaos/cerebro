@@ -8,6 +8,8 @@ License: GPL
 Source: @PROJECT@-@VERSION@.tar.gz
 BuildRoot: %{_tmppath}/@PROJECT@-@VERSION@
 
+BuildRequires: systemd
+
 %description
 Cerebro is a collection of cluster monitoring tools and libraries.
 
@@ -118,7 +120,8 @@ Event module to monitor node up/down.
            %{?_without_cerebrod_no_threads} \
            %{?_with_cerebro_config_file} \
            %{?_enable_static_modules} \
-           %{?_enable_debug}
+           %{?_enable_debug} \
+           --with-systemdsystemunitdir=%{_unitdir}
 make 
 
 %install
@@ -165,6 +168,7 @@ fi
 %{_sbindir}/cerebrod
 %{_sbindir}/cerebro-stat
 %{_sbindir}/cerebro-admin
+%{_unitdir}/cerebro.service
 
 #
 # achu: This looks terrible w/ all these %posts.  There
