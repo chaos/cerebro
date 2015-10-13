@@ -4,10 +4,10 @@
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
 
-EXTRA_DIST = cerebrod cerebro.conf cerebro.service
+EXTRA_DIST = cerebrod cerebro.conf cerebrod.service
 
 if HAVE_SYSTEMD
-systemdsystemunit_SCRIPTS=cerebro.service
+systemdsystemunit_SCRIPTS=cerebrod.service
 else
 initconfdir=$(sysconfdir)/init.d
 initconf_SCRIPTS=cerebrod

@@ -168,7 +168,7 @@ fi
 %{_sbindir}/cerebrod
 %{_sbindir}/cerebro-stat
 %{_sbindir}/cerebro-admin
-%{_unitdir}/cerebro.service
+%{_unitdir}/cerebrod.service
 
 #
 # achu: This looks terrible w/ all these %posts.  There
