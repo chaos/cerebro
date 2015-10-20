@@ -7,6 +7,8 @@ Type=forking
 ExecStart=/usr/sbin/cerebrod         
 ExecReload=/bin/kill -HUP $MAINPID   
 KillMode=process                     
+User=root
+Group=root
 Restart=on-failure                   
 RestartSec=5s                        
                                       

@@ -128,38 +128,9 @@ make
 rm -rf $RPM_BUILD_ROOT
 DESTDIR="$RPM_BUILD_ROOT" make install
 
-%post
-#
-# Restart cerebrod if already running
-#
-if [ "$1" = 1 ]; then
-   if [ -x %{_initrddir}/cerebrod ]; then
-      [ -x /sbin/chkconfig ] && /sbin/chkconfig --add cerebrod
-   fi
-fi
-if [ $1 -ge 1 ]; then
-   if [ -x %{_initrddir}/cerebrod ]; then
-      %{_initrddir}/cerebrod condrestart
-   fi
-fi
-
-%preun
-#
-# Stop cerebrod if it is running
-#
-if [ "$1" = 0 ]; then
-    if [ -x %{_initrddir}/cerebrod ]; then
-       if %{_initrddir}/cerebrod status | grep -q running; then
-          %{_initrddir}/cerebrod stop
-       fi
-       [ -x /sbin/chkconfig ] && /sbin/chkconfig --del cerebrod
-    fi
-fi
-
 %files
 %defattr(-,root,root)
 %doc README NEWS ChangeLog DISCLAIMER DISCLAIMER.UC COPYING
-%config(noreplace) %{_sysconfdir}/init.d/cerebrod
 %attr(0600,root,root) %config(noreplace) %{_sysconfdir}/cerebro.conf
 %{_includedir}/*
 %dir %{_libdir}/cerebro
@@ -177,20 +148,6 @@ fi
 # I'm currently unaware of.
 #
 
-%post clusterlist-genders
-#
-# Restart cerebrod if already running
-#
-if [ "$1" = 1 ]; then
-   if [ -x %{_initrddir}/cerebrod ]; then
-      [ -x /sbin/chkconfig ] && /sbin/chkconfig --add cerebrod
-   fi
-fi
-if [ $1 -ge 1 ]; then
-   if [ -x %{_initrddir}/cerebrod ]; then
-      %{_initrddir}/cerebrod condrestart
-   fi
-fi
 
 %if %{?_with_genders:1}%{!?_with_genders:0}
 %files clusterlist-genders
@@ -198,20 +155,6 @@ fi
 %{_libdir}/cerebro/*cerebro_clusterlist_genders.*
 %endif
 
-%post clusterlist-hostsfile
-#
-# Restart cerebrod if already running
-#
-if [ "$1" = 1 ]; then
-   if [ -x %{_initrddir}/cerebrod ]; then
-      [ -x /sbin/chkconfig ] && /sbin/chkconfig --add cerebrod
-   fi
-fi
-if [ $1 -ge 1 ]; then
-   if [ -x %{_initrddir}/cerebrod ]; then
-      %{_initrddir}/cerebrod condrestart
-   fi
-fi
 
 %if %{?_with_hostsfile:1}%{!?_with_hostsfile:0}
 %files clusterlist-hostsfile
@@ -219,41 +162,11 @@ fi
 %{_libdir}/cerebro/*cerebro_clusterlist_hostsfile.*
 %endif
 
-%post metric-boottime
-#
-# Restart cerebrod if already running
-#
-if [ "$1" = 1 ]; then
-   if [ -x %{_initrddir}/cerebrod ]; then
-      [ -x /sbin/chkconfig ] && /sbin/chkconfig --add cerebrod
-   fi
-fi
-if [ $1 -ge 1 ]; then
-   if [ -x %{_initrddir}/cerebrod ]; then
-      %{_initrddir}/cerebrod condrestart
-   fi
-fi
-
 %if %{?_with_boottime:1}%{!?_with_boottime:0}
 %files metric-boottime
 %defattr(700,root,root)
 %{_libdir}/cerebro/*cerebro_metric_boottime.*
 %endif
-
-%post metric-loadavg
-#
-# Restart cerebrod if already running
-#
-if [ "$1" = 1 ]; then
-   if [ -x %{_initrddir}/cerebrod ]; then
-      [ -x /sbin/chkconfig ] && /sbin/chkconfig --add cerebrod
-   fi
-fi
-if [ $1 -ge 1 ]; then
-   if [ -x %{_initrddir}/cerebrod ]; then
-      %{_initrddir}/cerebrod condrestart
-   fi
-fi
 
 %if %{?_with_loadavg:1}%{!?_with_loadavg:0}
 %files metric-loadavg
@@ -262,21 +175,6 @@ fi
 %{_libdir}/cerebro/*cerebro_metric_loadavg5.*
 %{_libdir}/cerebro/*cerebro_metric_loadavg15.*
 %endif
-
-%post metric-memory
-#
-# Restart cerebrod if already running
-#
-if [ "$1" = 1 ]; then
-   if [ -x %{_initrddir}/cerebrod ]; then
-      [ -x /sbin/chkconfig ] && /sbin/chkconfig --add cerebrod
-   fi
-fi
-if [ $1 -ge 1 ]; then
-   if [ -x %{_initrddir}/cerebrod ]; then
-      %{_initrddir}/cerebrod condrestart
-   fi
-fi
 
 %if %{?_with_memory:1}%{!?_with_memory:0}
 %files metric-memory
@@ -289,21 +187,6 @@ fi
 %{_libdir}/cerebro/*cerebro_metric_swapfree.*
 %endif
 
-%post metric-network
-#
-# Restart cerebrod if already running
-#
-if [ "$1" = 1 ]; then
-   if [ -x %{_initrddir}/cerebrod ]; then
-      [ -x /sbin/chkconfig ] && /sbin/chkconfig --add cerebrod
-   fi
-fi
-if [ $1 -ge 1 ]; then
-   if [ -x %{_initrddir}/cerebrod ]; then
-      %{_initrddir}/cerebrod condrestart
-   fi
-fi
-
 %if %{?_with_network:1}%{!?_with_network:0}
 %files metric-network
 %defattr(700,root,root)
@@ -315,62 +198,17 @@ fi
 %{_libdir}/cerebro/*cerebro_metric_txerrs.*
 %endif
 
-%post metric-slurm-state
-#
-# Restart cerebrod if already running
-#
-if [ "$1" = 1 ]; then
-   if [ -x %{_initrddir}/cerebrod ]; then
-      [ -x /sbin/chkconfig ] && /sbin/chkconfig --add cerebrod
-   fi
-fi
-if [ $1 -ge 1 ]; then
-   if [ -x %{_initrddir}/cerebrod ]; then
-      %{_initrddir}/cerebrod condrestart
-   fi
-fi
-
 %if %{?_with_slurm_state:1}%{!?_with_slurm_state:0}
 %files metric-slurm-state
 %defattr(700,root,root)
 %{_libdir}/cerebro/*cerebro_metric_slurm_state.*
 %endif
 
-%post metric-shutdown
-#
-# Restart cerebrod if already running
-#
-if [ "$1" = 1 ]; then
-   if [ -x %{_initrddir}/cerebrod ]; then
-      [ -x /sbin/chkconfig ] && /sbin/chkconfig --add cerebrod
-   fi
-fi
-if [ $1 -ge 1 ]; then
-   if [ -x %{_initrddir}/cerebrod ]; then
-      %{_initrddir}/cerebrod condrestart
-   fi
-fi
-
 %if %{?_with_shutdown:1}%{!?_with_shutdown:0}
 %files metric-shutdown
 %defattr(700,root,root)
 %{_libdir}/cerebro/*cerebro_metric_shutdown.*
 %endif
-
-%post event-updown
-#
-# Restart cerebrod if already running
-#
-if [ "$1" = 1 ]; then
-   if [ -x %{_initrddir}/cerebrod ]; then
-      [ -x /sbin/chkconfig ] && /sbin/chkconfig --add cerebrod
-   fi
-fi
-if [ $1 -ge 1 ]; then
-   if [ -x %{_initrddir}/cerebrod ]; then
-      %{_initrddir}/cerebrod condrestart
-   fi
-fi
 
 %if %{?_with_updown:1}%{!?_with_updown:0}
 %files event-updown

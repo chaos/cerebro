@@ -8,6 +8,12 @@ if !WITH_STATIC_MODULES
 LTDL_DIRS = libltdl
 endif
 
+install-data-local:
+	$(top_srcdir)/config/install-sh -m 755 -d \
+		$(DESTDIR)$(localstatedir)/run
+	$(top_srcdir)/config/install-sh -m 755 -d \
+		$(DESTDIR)$(localstatedir)/run/cerebro
+
 SUBDIRS = $(LTDL_DIRS) etc man src
 
 EXTRA_DIST = autogen.sh DISCLAIMER DISCLAIMER.UC META cerebro.spec.in cerebro.spec
