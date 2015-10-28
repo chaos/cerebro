@@ -124,6 +124,13 @@ Event module to monitor node up/down.
            --with-systemdsystemunitdir=%{_unitdir}
 make 
 
+%pre
+# stop cerebro before modification, remember if it was running
+if systemctl status cerebrod | grep running; then
+        touch %{_tmppath}/cerebrod_restart_sentinel_file
+        systemctl stop cerebrod
+fi
+
 %install
 rm -rf $RPM_BUILD_ROOT
 DESTDIR="$RPM_BUILD_ROOT" make install
@@ -141,13 +148,6 @@ DESTDIR="$RPM_BUILD_ROOT" make install
 %{_sbindir}/cerebro-admin
 %{_unitdir}/cerebrod.service
 %dir %attr(0755,root,root) %config %{_localstatedir}/run/cerebro
-
-#
-# achu: This looks terrible w/ all these %posts.  There
-# is probably a better way to do this in spec files that
-# I'm currently unaware of.
-#
-
 
 %if %{?_with_genders:1}%{!?_with_genders:0}
 %files clusterlist-genders
@@ -215,3 +215,13 @@ DESTDIR="$RPM_BUILD_ROOT" make install
 %defattr(700,root,root)
 %{_libdir}/cerebro/*cerebro_event_updown.*
 %endif
+
+%post
+# do we need to restart it?
+if [ -f %{_tmppath}/cerebrod_restart_sentinel_file ]; then
+        systemctl daemon-reload
+        systemctl enable cerebrod
+        systemctl start cerebrod
+        rm %{_tmppath}/cerebrod_restart_sentinel_file
+fi
+
