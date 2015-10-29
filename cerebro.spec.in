@@ -124,7 +124,7 @@ Event module to monitor node up/down.
            --with-systemdsystemunitdir=%{_unitdir}
 make 
 
-%pre
+%pretrans
 # stop cerebro before modification, remember if it was running
 if systemctl status cerebrod | grep running; then
         touch %{_tmppath}/cerebrod_restart_sentinel_file
@@ -216,7 +216,7 @@ DESTDIR="$RPM_BUILD_ROOT" make install
 %{_libdir}/cerebro/*cerebro_event_updown.*
 %endif
 
-%post
+%posttrans
 # do we need to restart it?
 if [ -f %{_tmppath}/cerebrod_restart_sentinel_file ]; then
         systemctl daemon-reload
@@ -224,4 +224,3 @@ if [ -f %{_tmppath}/cerebrod_restart_sentinel_file ]; then
         systemctl start cerebrod
         rm %{_tmppath}/cerebrod_restart_sentinel_file
 fi
-
