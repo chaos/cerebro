@@ -9,6 +9,8 @@ Source: @PROJECT@-@VERSION@.tar.gz
 BuildRoot: %{_tmppath}/@PROJECT@-@VERSION@
 
 BuildRequires: systemd
+Requires: systemd
+Requires: /bin/sh 
 
 %description
 Cerebro is a collection of cluster monitoring tools and libraries.
