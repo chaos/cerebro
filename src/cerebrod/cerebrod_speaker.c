@@ -512,11 +512,13 @@ cerebrod_speaker(void *arg)
       int sleep_time;
       ListIterator itr;
       struct timeval tv;
+      time_t now;
 
       if (conf.gettimeofday_workaround)
 	Gettimeofday_workaround(&tv, NULL);
       else
 	Gettimeofday(&tv, NULL);
+      now = tv.tv_sec;
 
       /* Note: After initial setup, we are the only thread that uses this
        * list/iterator.  So no need for pthread locking.
@@ -524,7 +526,7 @@ cerebrod_speaker(void *arg)
       itr = List_iterator_create(next_send_times);
       while ((nst = list_next(itr)))
         {
-          if (nst->next_send_time <= tv.tv_sec)
+          if (nst->next_send_time <= now)
             {
               int more_data_to_send = 1; /* initialize to 1 for first time through */
 
@@ -593,29 +595,29 @@ cerebrod_speaker(void *arg)
 		       */
 		      if (conf.heartbeat_frequency_ranged
 			  && nst->next_send_time
-			  && (((tv.tv_sec + t) - nst->next_send_time) > (2 * conf.heartbeat_frequency_max)))
+			  && (((now + t) - nst->next_send_time) > (2 * conf.heartbeat_frequency_max)))
 			{
-			  if (((tv.tv_sec + t) - nst->next_send_time) < (10 * conf.heartbeat_frequency_max))
+			  if (((now + t) - nst->next_send_time) < (10 * conf.heartbeat_frequency_max))
 			    {
 			      /* If the tv_sec is only moderately off, assume it's due to drift and it's ok */
-			      nst->next_send_time = tv.tv_sec + t;
+			      nst->next_send_time = now + t;
 			    }
 			  else
 			    {
 			      CEREBROD_ERR (("Forcing maximum heartbeat frequency due to out of range time. "
                                              "tv_sec:%lu, t:%d, next_send_time:%u",
-                                             tv.tv_sec, t, (unsigned)nst->next_send_time));
+                                             now, t, (unsigned)nst->next_send_time));
 			      nst->next_send_time += conf.heartbeat_frequency_max;
 			    }
 			}
 		      else
-			nst->next_send_time = tv.tv_sec + t;
+			nst->next_send_time = now + t;
 		    }
 		  else
-		    nst->next_send_time = tv.tv_sec + t;
+		    nst->next_send_time = now + t;
                 }
               if (nst->next_send_type & CEREBROD_SPEAKER_NEXT_SEND_TYPE_MODULE)
-                nst->next_send_time = tv.tv_sec + nst->metric_period;
+                nst->next_send_time = now + nst->metric_period;
             }
           else
             break;
@@ -628,15 +630,15 @@ cerebrod_speaker(void *arg)
       if (conf.gettimeofday_workaround)
 	{
 	  if ((nst->next_send_type & CEREBROD_SPEAKER_NEXT_SEND_TYPE_HEARTBEAT)
-	      && (((nst->next_send_time - tv.tv_sec) < 0)
+	      && (((nst->next_send_time - now) < 0)
 		  || (conf.heartbeat_frequency_ranged
-		      && ((nst->next_send_time - tv.tv_sec) > conf.heartbeat_frequency_max))))
+		      && ((nst->next_send_time - now) > conf.heartbeat_frequency_max))))
 	    sleep_time = conf.heartbeat_frequency_max;
 	  else
-	    sleep_time = nst->next_send_time - tv.tv_sec;
+	    sleep_time = nst->next_send_time - now;
 	}
       else
-	sleep_time = nst->next_send_time - tv.tv_sec;
+	sleep_time = nst->next_send_time - now;
       sleep(sleep_time);
     }
 
