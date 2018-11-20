@@ -6,28 +6,38 @@ Summary: Cerebro cluster monitoring tools and libraries
 Group: System Environment/Base
 License: GPL
 Source: @PROJECT@-@VERSION@.tar.gz
-BuildRoot: %{_tmppath}/@PROJECT@-@VERSION@
 
 BuildRequires: systemd
 Requires: systemd
 Requires: /bin/sh 
 
+%define _with_gendersllnl                  --with-gendersllnl
+%define _without_gendersllnl_ion           --without-gendersllnl-ion
+%define _without_genders                   --without-genders
+%define _without_hostsfile                 --without-hostsfile
+%define _with_boottime                     --with-boottime
+%define _without_loadavg                   --without-loadavg
+%define _without_memory                    --without-memory
+%define _without_network                   --without-network
+%define _without_slurm_state               --without-slurm-state
+%define _with_shutdown                     --with-shutdown
+%define _with_updown                       --with-updown
+%define _without_bgl_ciod                  --without-bgl-ciod
+
 %description
 Cerebro is a collection of cluster monitoring tools and libraries.
-
-%{!?_with_genders: %{!?_without_genders: %define _without_genders --without-genders}}
-%{!?_with_hostsfile: %{!?_without_hostsfile: %define _with_hostsfile --with-hostsfile}}
-%{!?_with_boottime: %{!?_without_boottime: %define _with_boottime --with-boottime}}
-%{!?_with_loadavg: %{!?_without_loadavg: %define _with_loadavg --with-loadavg}}
-%{!?_with_memory: %{!?_without_memory: %define _with_memory --with-memory}}
-%{!?_with_network: %{!?_without_network: %define _with_network --with-network}}
-%{!?_with_slurm_state: %{!?_without_slurm_state: %define _without_slurm_state --without-slurm-state}}
-%{!?_with_shutdown: %{!?_without_shutdown: %define _without_shutdown --without-shutdown}}
-%{!?_with_updown: %{!?_without_updown: %define _with_updown --with-updown}}
 
 %if %{?_with_debug:1}%{!?_with_debug:0}
 %define _enable_debug --enable-debug
 %endif
+
+%package clusterlist-gendersllnl
+Summary: clusterlist gendersllnl module
+Group: System Environment/Base
+Requires: cerebro
+Requires: gendersllnl
+%description clusterlist-gendersllnl
+Gendersllnl module
 
 %package clusterlist-genders
 Summary: clusterlist genders module
@@ -98,6 +108,10 @@ Event module to monitor node up/down.
 
 %build
 %configure --program-prefix=%{?_program_prefix:%{_program_prefix}} \
+           %{?_with_gendersllnl} \
+           %{?_without_gendersllnl} \
+           %{?_with_gendersllnl_ion} \
+           %{?_without_gendersllnl_ion} \
            %{?_with_genders} \
            %{?_without_genders} \
            %{?_with_hostsfile} \
