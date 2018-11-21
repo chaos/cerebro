@@ -140,6 +140,12 @@ Event module to monitor node up/down.
            --with-systemdsystemunitdir=%{_unitdir}
 make 
 
+%post
+# are we upgrading? restart it if running
+if [[ "$1" -gt 1 ]]; then
+	systemctl try-restart cerebrod
+fi
+
 %install
 rm -rf $RPM_BUILD_ROOT
 DESTDIR="$RPM_BUILD_ROOT" make install
