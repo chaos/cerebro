@@ -87,7 +87,7 @@ following type:
 
 typedef int (*Cerebro_clusterlist_interface_version)(void);
 
-The 'interface_version' function should return the interface verison
+The 'interface_version' function should return the interface version
 number in the macro CEREBRO_CLUSTERLIST_INTERFACE_VERSION.
 
 The field 'setup' should point to a function of the following type:
@@ -175,7 +175,7 @@ following type:
 
 typedef int (*Cerebro_config_interface_version)(void);
 
-The 'interface_version' function should return the interface verison
+The 'interface_version' function should return the interface version
 number in the macro CEREBRO_CONFIG_INTERFACE_VERSION.
 
 The field 'setup' should point to a function of the following type:
@@ -425,7 +425,7 @@ following type:
 
 typedef int (*Cerebro_metric_interface_version)(void);
 
-The 'interface_version' function should return the interface verison
+The 'interface_version' function should return the interface version
 number in the macro CEREBRO_METRIC_INTERFACE_VERSION.
 
 The field 'setup' should point to a function of the following type:
@@ -567,7 +567,7 @@ following type:
 
 typedef int (*Cerebro_monitor_interface_version)(void);
 
-The 'interface_version' function should return the interface verison
+The 'interface_version' function should return the interface version
 number in the macro CEREBRO_MONITOR_INTERFACE_VERSION.
 
 The field 'setup' should point to a function of the following type:
@@ -639,7 +639,7 @@ following type:
 
 typedef int (*Cerebro_event_interface_version)(void);
 
-The 'interface_version' function should return the interface verison
+The 'interface_version' function should return the interface version
 number in the macro CEREBRO_EVENT_INTERFACE_VERSION.
 
 The field 'setup' should point to a function of the following type:
