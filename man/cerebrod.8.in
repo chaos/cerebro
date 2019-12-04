@@ -61,7 +61,7 @@ daemon may need to be restarted to recognize a new configuration.
 
 For example, if additional nodes have been added into your cluster,
 .B cerebrod
-may need to be restrated to reload any cluster data files so these
+may need to be restarted to reload any cluster data files so these
 new nodes will be recognized.  
 
 .SH "OPTIONS"
