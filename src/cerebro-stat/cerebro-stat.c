@@ -636,7 +636,7 @@ _newline_output(List l)
               strftime(tbuf, CEREBRO_STAT_BUFLEN, "%F %I:%M:%S%P", tm);
             }
           else
-            snprintf(tbuf, CEREBRO_STAT_BUFLEN, CEREBRO_STAT_UNKNOWN_STRING);
+            snprintf(tbuf, CEREBRO_STAT_BUFLEN, "%s", CEREBRO_STAT_UNKNOWN_STRING);
 
           fprintf(stdout, "%s(%s): %s\n", data->nodename, tbuf, vbuf);
         }
