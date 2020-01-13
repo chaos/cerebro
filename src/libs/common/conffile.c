@@ -148,34 +148,34 @@ conffile_errmsg(conffile_t cf, char *buf, int buflen)
 
     if (cf == NULL) 
         rv = snprintf(errbuf, CONFFILE_MAX_ERRMSGLEN, 
-                      _errmsg[CONFFILE_ERR_NULLHANDLE]);
+                      "%s", _errmsg[CONFFILE_ERR_NULLHANDLE]);
     else if (cf->magic != CONFFILE_MAGIC)
         rv = snprintf(errbuf, CONFFILE_MAX_ERRMSGLEN, 
-                      _errmsg[CONFFILE_ERR_MAGIC]);
+                      "%s", _errmsg[CONFFILE_ERR_MAGIC]);
     else if (cf->errnum < CONFFILE_ERR_SUCCESS 
              || cf->errnum > CONFFILE_ERR_ERRNUMRANGE)
         rv = snprintf(errbuf, CONFFILE_MAX_ERRMSGLEN, 
-                      _errmsg[CONFFILE_ERR_ERRNUMRANGE]);
+                      "%s", _errmsg[CONFFILE_ERR_ERRNUMRANGE]);
     else if (cf->errnum == CONFFILE_ERR_PARSE_OPTION_UNKNOWN
              || cf->errnum == CONFFILE_ERR_PARSE_ARG_MISSING
              || cf->errnum == CONFFILE_ERR_PARSE_ARG_TOOMANY
              || cf->errnum == CONFFILE_ERR_PARSE_ARG_INVALID)
         rv = snprintf(errbuf, CONFFILE_MAX_ERRMSGLEN, 
-                      _errmsg[cf->errnum], cf->optionname, cf->line_num);
+                      "%s", _errmsg[cf->errnum], cf->optionname, cf->line_num);
     else if (cf->errnum == CONFFILE_ERR_PARSE_OPTION_TOOMANY
              || cf->errnum == CONFFILE_ERR_PARSE_OPTION_TOOFEW)
         rv = snprintf(errbuf, CONFFILE_MAX_ERRMSGLEN, 
-                      _errmsg[cf->errnum], cf->optionname);
+                      "%s", _errmsg[cf->errnum], cf->optionname);
     else if (cf->errnum == CONFFILE_ERR_PARSE_OVERFLOW_LINELEN
              || cf->errnum == CONFFILE_ERR_PARSE_OVERFLOW_OPTIONLEN
              || cf->errnum == CONFFILE_ERR_PARSE_OVERFLOW_ARGLEN
              || cf->errnum == CONFFILE_ERR_PARSE_QUOTE
              || cf->errnum == CONFFILE_ERR_PARSE_CONTINUATION)
         rv = snprintf(errbuf, CONFFILE_MAX_ERRMSGLEN, 
-                      _errmsg[cf->errnum], cf->line_num);
+                      "%s", _errmsg[cf->errnum], cf->line_num);
     else
         rv = snprintf(errbuf, CONFFILE_MAX_ERRMSGLEN, 
-                      _errmsg[cf->errnum]);
+                      "%s", _errmsg[cf->errnum]);
 
     if (rv >= buflen)
         return -1;
