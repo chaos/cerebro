@@ -148,35 +148,61 @@ conffile_errmsg(conffile_t cf, char *buf, int buflen)
 
     if (cf == NULL) 
         rv = snprintf(errbuf, CONFFILE_MAX_ERRMSGLEN, 
-                      _errmsg[CONFFILE_ERR_NULLHANDLE]);
+                      "%s", _errmsg[CONFFILE_ERR_NULLHANDLE]);
     else if (cf->magic != CONFFILE_MAGIC)
         rv = snprintf(errbuf, CONFFILE_MAX_ERRMSGLEN, 
-                      _errmsg[CONFFILE_ERR_MAGIC]);
+                      "%s", _errmsg[CONFFILE_ERR_MAGIC]);
     else if (cf->errnum < CONFFILE_ERR_SUCCESS 
              || cf->errnum > CONFFILE_ERR_ERRNUMRANGE)
         rv = snprintf(errbuf, CONFFILE_MAX_ERRMSGLEN, 
-                      _errmsg[CONFFILE_ERR_ERRNUMRANGE]);
-    else if (cf->errnum == CONFFILE_ERR_PARSE_OPTION_UNKNOWN
-             || cf->errnum == CONFFILE_ERR_PARSE_ARG_MISSING
-             || cf->errnum == CONFFILE_ERR_PARSE_ARG_TOOMANY
-             || cf->errnum == CONFFILE_ERR_PARSE_ARG_INVALID)
+                      "%s", _errmsg[CONFFILE_ERR_ERRNUMRANGE]);
+    else if (cf->errnum == CONFFILE_ERR_PARSE_OPTION_UNKNOWN)
         rv = snprintf(errbuf, CONFFILE_MAX_ERRMSGLEN, 
-                      _errmsg[cf->errnum], cf->optionname, cf->line_num);
-    else if (cf->errnum == CONFFILE_ERR_PARSE_OPTION_TOOMANY
-             || cf->errnum == CONFFILE_ERR_PARSE_OPTION_TOOFEW)
+                      "unknown configuration option \"%s\" on line %d",
+                      cf->optionname, cf->line_num);
+    else if (cf->errnum == CONFFILE_ERR_PARSE_ARG_MISSING)
         rv = snprintf(errbuf, CONFFILE_MAX_ERRMSGLEN, 
-                      _errmsg[cf->errnum], cf->optionname);
-    else if (cf->errnum == CONFFILE_ERR_PARSE_OVERFLOW_LINELEN
-             || cf->errnum == CONFFILE_ERR_PARSE_OVERFLOW_OPTIONLEN
-             || cf->errnum == CONFFILE_ERR_PARSE_OVERFLOW_ARGLEN
-             || cf->errnum == CONFFILE_ERR_PARSE_QUOTE
-             || cf->errnum == CONFFILE_ERR_PARSE_CONTINUATION)
+                      "missing argument for option \"%s\" on line %d",
+                      cf->optionname, cf->line_num);
+    else if (cf->errnum == CONFFILE_ERR_PARSE_ARG_TOOMANY)
         rv = snprintf(errbuf, CONFFILE_MAX_ERRMSGLEN, 
-                      _errmsg[cf->errnum], cf->line_num);
+                      "too many arguments listed for option \"%s\" on line %d",
+                      cf->optionname, cf->line_num);
+    else if (cf->errnum == CONFFILE_ERR_PARSE_ARG_INVALID)
+        rv = snprintf(errbuf, CONFFILE_MAX_ERRMSGLEN, 
+                      "invalid argument listed for option \"%s\" on line %d",
+                      cf->optionname, cf->line_num);
+    else if (cf->errnum == CONFFILE_ERR_PARSE_OPTION_TOOMANY)
+        rv = snprintf(errbuf, CONFFILE_MAX_ERRMSGLEN, 
+                      "configuration option \"%s\" listed too many times",
+                      cf->optionname);
+    else if (cf->errnum == CONFFILE_ERR_PARSE_OPTION_TOOFEW)
+        rv = snprintf(errbuf, CONFFILE_MAX_ERRMSGLEN, 
+                      "configuration option \"%s\" listed too few times",
+                      cf->optionname);
+    else if (cf->errnum == CONFFILE_ERR_PARSE_OVERFLOW_LINELEN)
+        rv = snprintf(errbuf, CONFFILE_MAX_ERRMSGLEN, 
+                      "overflow line length on line %d",
+                      cf->line_num);
+    else if (cf->errnum == CONFFILE_ERR_PARSE_OVERFLOW_OPTIONLEN)
+        rv = snprintf(errbuf, CONFFILE_MAX_ERRMSGLEN, 
+                      "overflow option name length on line %d",
+                      cf->line_num);
+    else if (cf->errnum == CONFFILE_ERR_PARSE_OVERFLOW_ARGLEN)
+        rv = snprintf(errbuf, CONFFILE_MAX_ERRMSGLEN, 
+                      "overflow arg length on line %d",
+                      cf->line_num);
+    else if (cf->errnum == CONFFILE_ERR_PARSE_QUOTE)
+        rv = snprintf(errbuf, CONFFILE_MAX_ERRMSGLEN, 
+                      "quotation marks used improperly on line %d",
+                      cf->line_num);
+    else if (cf->errnum == CONFFILE_ERR_PARSE_CONTINUATION)
+        rv = snprintf(errbuf, CONFFILE_MAX_ERRMSGLEN, 
+                      "continuation character '\\' used improperly on line %d",
+                      cf->line_num);
     else
         rv = snprintf(errbuf, CONFFILE_MAX_ERRMSGLEN, 
-                      _errmsg[cf->errnum]);
-
+                      "%s", _errmsg[cf->errnum]);
     if (rv >= buflen)
         return -1;
              
