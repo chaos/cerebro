@@ -41,6 +41,7 @@
 #include "hostlist.h"
 
 #define CEREBROD_DEBUG_DEFAULT                                    0
+#define CEREBROD_FOREGROUND_DEFAULT                               0
 #define CEREBROD_HEARTBEAT_FREQUENCY_MIN_DEFAULT                  10
 #define CEREBROD_HEARTBEAT_FREQUENCY_MAX_DEFAULT                  20
 #define CEREBROD_SPEAK_DEFAULT                                    1
@@ -125,6 +126,7 @@ struct cerebrod_config
 {
   /* Set by the user on the command line */
   int debug;
+  int foreground;
   char *config_file;
 
   /* Set by the user in the configuration file */
