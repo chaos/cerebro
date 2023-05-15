@@ -275,7 +275,7 @@ _event_module_timeout_data_find_callback(void *x, void *key)
 /*
  * _event_module_timeout_data_compare
  *
- * Callback from list_sort for comparsion of data in
+ * Callback from list_sort for comparison of data in
  * cerebrod_event_module_timeout_data.
  */
 static int

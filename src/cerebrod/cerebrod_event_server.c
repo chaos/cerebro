@@ -903,7 +903,7 @@ _respond_with_event_names(void *arg)
  *
  * Service a connection from a client to receive event packets.  Use
  * wrapper functions minimally, b/c we want to return errors to the
- * user instead of exitting with errors.
+ * user instead of exiting with errors.
  *
  */
 static void

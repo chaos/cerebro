@@ -92,7 +92,7 @@ typedef int (*Cerebro_clusterlist_get_all_nodes)(char ***nodes);
  * Cerebro_clusterlist_node_in_cluster
  *
  * function prototype for clusterlist module function to determine if
- * a node is in the cluser. Required to be defined by each clusterlist
+ * a node is in the cluster. Required to be defined by each clusterlist
  * module.
  *
  * - node - node string

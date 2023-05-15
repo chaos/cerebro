@@ -135,7 +135,7 @@ receive_data(int fd,
           int n;
 
           /* Don't use fd_read_n b/c it loops until exactly
-           * bytes_to_read is read.  Due to version incompatability or
+           * bytes_to_read is read.  Due to version incompatibility or
            * error packets, we may want to read a smaller packet.
            */
           if ((n = read(fd, buf + bytes_read, bytes_to_read - bytes_read)) < 0)

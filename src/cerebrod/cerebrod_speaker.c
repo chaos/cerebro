@@ -581,7 +581,7 @@ cerebrod_speaker(void *arg)
 		  if (conf.gettimeofday_workaround)
 		    {
 		      /* On a number of Intel systems, it has been
-		       * observed that gettimeofday can occassionally
+		       * observed that gettimeofday can occasionally
 		       * return erroneous values.  For example, values 40
 		       * years into the future.  Then it goes back to
 		       * returning valid values.

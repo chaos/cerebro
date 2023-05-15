@@ -38,7 +38,7 @@
  * 
  * Server -> Client
  * - Stream of responses indicating metric_names or nodenames and
- *   metric values.  Respones may depend on the request flags.  Metric
+ *   metric values.  Responses may depend on the request flags.  Metric
  *   receive times will be 0 for metrics in which a receive time makes no
  *   sense (e.g. cluster node name). After the stream of is complete,
  *   an "end of responses" response will indicate the end of stream

@@ -705,7 +705,7 @@ _calculate_in_addr_and_index(int is_multicast,
   int intf_type;
 
   /* 
-   * There are three possibile formats for the interface input:
+   * There are three possible formats for the interface input:
    *
    * - No interface specified (i.e. null)
    * - IP address or subnet specified 
@@ -894,7 +894,7 @@ _cerebrod_calculate_configuration_data(void)
   struct hostent *hent;
   int i;
 
-  /* Determine if the heartbeat frequencey is ranged or fixed */
+  /* Determine if the heartbeat frequency is ranged or fixed */
   if (conf.heartbeat_frequency_max > 0)
     conf.heartbeat_frequency_ranged = 1;
   else
@@ -904,7 +904,7 @@ _cerebrod_calculate_configuration_data(void)
     {
       for (i = 0; i < conf.speak_message_config_len; i++)
         {
-          /* Determine if the message destiation is single or multi casted */
+          /* Determine if the message destination is single or multi casted */
           conf.speak_message_config[i].ip_is_multicast = _cerebrod_ip_is_multicast(conf.speak_message_config[i].ip);
           
           /* Calculate the destination ip */
@@ -930,7 +930,7 @@ _cerebrod_calculate_configuration_data(void)
     {
       for (i = 0; i < conf.listen_message_config_len; i++)
         {
-          /* Determine if the message destiation is single or multi casted */
+          /* Determine if the message destination is single or multi casted */
           conf.listen_message_config[i].ip_is_multicast = _cerebrod_ip_is_multicast(conf.listen_message_config[i].ip);
           
           /* Calculate the destination ip */
@@ -973,7 +973,7 @@ _cerebrod_calculate_configuration_data(void)
     {
       for (i = 0; i < conf.forward_message_config_len; i++)
         {
-          /* Determine if the message destiation is single or multi casted */
+          /* Determine if the message destination is single or multi casted */
           conf.forward_message_config[i].ip_is_multicast = _cerebrod_ip_is_multicast(conf.forward_message_config[i].ip);
           
           /* Calculate the destination ip */
@@ -1012,7 +1012,7 @@ _cerebrod_configuration_data_error_check(void)
    * comment out this check
    */
 
-  /* If the desitnation ip address isn't multicast, and we are
+  /* If the designation ip address isn't multicast, and we are
    * listening, the destination ip address better be one of our NICs
    */
   if (!conf.destination_ip_is_multicast && conf.listen)

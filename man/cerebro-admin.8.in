@@ -75,7 +75,7 @@ to see input options.
 Specify the metric value to be updated.
 .TP
 .B \-N, --send-now
-For update and resend commands, inform cerebrod to propogate new data
+For update and resend commands, inform cerebrod to propagate new data
 immediately, not to wait for the next
 .B cerebrod
 heartbeat.

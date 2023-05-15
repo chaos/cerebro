@@ -566,7 +566,7 @@ wrap_gettimeofday_workaround(WRAPPERS_ARGS, struct timeval *tv, struct timezone 
     WRAPPERS_ERR_INVALID_PARAMETERS("gettimeofday");
 
   /* On a number of Intel systems, it has been observed that
-   * gettimeofday can occassionally return erroneous values.  For
+   * gettimeofday can occasionally return erroneous values.  For
    * example, values 40 years into the future.  Then it goes back to
    * returning valid values.  This can wreck havok on a number of the
    * scheduling mechanisms inside Cerebro.

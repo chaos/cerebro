@@ -349,7 +349,7 @@ _metric_server_respond_with_error(int fd, int32_t version, u_int32_t err_code)
 static int
 _metric_server_response_create(char *name,
                                unsigned int max_name_len,
-                               u_int32_t metric_value_recevied_time,
+                               u_int32_t metric_value_received_time,
                                u_int32_t metric_value_type,
                                u_int32_t metric_value_len,
                                void *metric_value,
@@ -395,7 +395,7 @@ _metric_server_response_create(char *name,
 #endif /* CEREBRO_DEBUG */
   /* strncpy, b/c terminating character not required */
   strncpy(res->name, name, max_name_len);
-  res->metric_value_received_time = metric_value_recevied_time;
+  res->metric_value_received_time = metric_value_received_time;
   res->metric_value_type = metric_value_type;
   res->metric_value_len = metric_value_len;
   
@@ -836,7 +836,7 @@ _respond_with_nodes(int fd,
  *
  * Thread to service a connection from a client to retrieve metric
  * data.  Use wrapper functions minimally, b/c we want to return
- * errors to the user instead of exitting with errors.
+ * errors to the user instead of exiting with errors.
  *
  * Passed int * pointer to client TCP socket file descriptor
  *

@@ -138,7 +138,7 @@ _usage(void)
           "     %d - int64\n"
           "     %d - u_int64\n"
           "  -l STRING  Specify metric value\n"
-          "  -N         Propogate updated data immediately\n",
+          "  -N         Propagate updated data immediately\n",
           CEREBRO_DATA_VALUE_TYPE_NONE,
           CEREBRO_DATA_VALUE_TYPE_INT32,
           CEREBRO_DATA_VALUE_TYPE_U_INT32,

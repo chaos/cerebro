@@ -39,7 +39,7 @@
  * - Event request.
  *
  * Server -> Client (If event requested)
- * - When events occur, respones with event data will be returned.
+ * - When events occur, response with event data will be returned.
  *   Client is responsible for polling appropriately.  A single response
  *   packet will be returned once at the beginning to signal if things
  *   were setup properly or if an error occurred.  After this the server
