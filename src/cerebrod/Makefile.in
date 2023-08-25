@@ -413,7 +413,7 @@ noinst_HEADERS = cerebrod.h \
 @WITH_CEREBROD_SPEAKER_ONLY_FALSE@		  ../libs/common/libvector.la
 
 
-# Wierd linker issues here, ordering matters
+# Weird linker issues here, ordering matters
 @WITH_CEREBROD_SPEAKER_ONLY_TRUE@CEREBROD_LDADDS = ../libs/cerebro_error/libcerebro_error.la \
 @WITH_CEREBROD_SPEAKER_ONLY_TRUE@		  ../libs/debug/libdebug.la \
 @WITH_CEREBROD_SPEAKER_ONLY_TRUE@		  ../libs/modules/libmetricmodules.la \

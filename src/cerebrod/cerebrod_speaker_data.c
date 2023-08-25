@@ -642,7 +642,7 @@ cerebrod_speaker_data_get_heartbeat_metric_data(struct cerebrod_message *msg,
 
           /* 
            * Metric period stays at 0 for metrics that need to be
-           * propogated every time
+           * propagated every time
            */
           if (metric_info->metric_period > 0)
             metric_info->next_call_time = tv.tv_sec + metric_info->metric_period;

@@ -244,7 +244,7 @@ main(int argc, char **argv)
   /* Start speaker  
    *
    * It may make more logical sense to start the metric controller
-   * after the speaker since metric data cannot be propogated until
+   * after the speaker since metric data cannot be propagated until
    * after the speaker has finished being setup.  We run the speaker
    * last b/c it is the common case.  Most machines (particularly
    * compute nodes in a cluster) will only speak, and do nothing else.

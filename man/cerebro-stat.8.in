@@ -117,7 +117,7 @@ specified metric rather than not outputting anything at all.
 Output nodes one per line
 .TP
 .B -q, --hostrange
-Output nodes in hostrange foramt
+Output nodes in hostrange format
 .TP
 .B -t, --metric-received-time
 Output last metric received time along with metric value.  Only

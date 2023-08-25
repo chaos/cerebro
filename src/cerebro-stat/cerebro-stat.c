@@ -416,7 +416,7 @@ _event_list(void)
   while ((str = list_next(litr)))
     fprintf(stdout, "%s\n", str);
 
-  /* List_destroy() and cerebro_namelist_destory() destroy iterators too */
+  /* List_destroy() and cerebro_namelist_destroy() destroy iterators too */
   List_destroy(l);
   (void)cerebro_namelist_destroy(m);
 }
@@ -474,7 +474,7 @@ _metric_list(void)
   while ((str = list_next(litr)))
     fprintf(stdout, "%s\n", str);
 
-  /* List_destroy() and cerebro_namelist_destory() destroy iterators too */
+  /* List_destroy() and cerebro_namelist_destroy() destroy iterators too */
   List_destroy(l);
   (void)cerebro_namelist_destroy(m);
 }
@@ -897,7 +897,7 @@ _metric_data(void)
   else if (output_type == CEREBRO_STAT_HOSTRANGE)
     _hostrange_output(l);
 
-  /* List_destroy() and cerebro_nodelist_destory() destroy iterators too */
+  /* List_destroy() and cerebro_nodelist_destroy() destroy iterators too */
   List_destroy(l);
   (void)cerebro_nodelist_destroy(n);
 }

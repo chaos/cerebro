@@ -80,10 +80,10 @@ typedef char *(*Cerebro_metric_get_metric_name)(void);
  * Cerebro_metric_get_metric_period
  *
  * Retrieve the period in seconds that the metric value should be read
- * and propogated.  If the period is 0, the metric will be read and
- * propogated with every cerebrod heartbeat.  If the period is < 0,
- * the metric will not be propogated and it is the responsibility of
- * the module to propogate data via the 'send_message' function
+ * and propagated.  If the period is 0, the metric will be read and
+ * propagated with every cerebrod heartbeat.  If the period is < 0,
+ * the metric will not be propagated and it is the responsibility of
+ * the module to propagate data via the 'send_message' function
  * specified below.  If the SEND_ON_PERIOD flag is not set below, the
  * period will not be precise.  Data will only be piggy-backed on
  * cerebro heartbeats, therefore the granularity of the period will be
@@ -137,7 +137,7 @@ typedef int (*Cerebro_metric_destroy_metric_value)(void *metric_value);
  * to send data when its data has been updated.
  *
  * Typically the thread is used to watch or monitor for some event and
- * propogate the information as needed.
+ * propagate the information as needed.
  */
 typedef void *(*Cerebro_metric_thread_pointer)(void *arg);
 

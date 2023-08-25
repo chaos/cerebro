@@ -62,7 +62,7 @@
  * optionname2   arg1 \ # my comment
  *               arg2
  *
- * A continuation character at the end of a line takes precendence
+ * A continuation character at the end of a line takes precedence
  * over escape characters.  For example, the following results in a
  * parse error:
  *
@@ -287,7 +287,7 @@ typedef int (*conffile_option_func)(conffile_t cf,
  * An array of this structure specifies the options to be searched for
  * in the configuration file.
  *
- * 'optionname' is the option name that should be serached for.
+ * 'optionname' is the option name that should be searched for.
  * 'option_type' is the option type specified in conffile.  See 
  *      OPTION TYPES above.
  * 'option_type_arg' argument for the option type.  See OPTION TYPES above.

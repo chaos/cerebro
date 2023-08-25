@@ -80,7 +80,7 @@ example, if the cluster contains a cluster configuration database, a
 configuration module could be written to read from the cluster
 configuration database, and configure each node accordingly.
 
-The configuration loaded by a configuration module can be overrided by
+The configuration loaded by a configuration module can be overridden by
 the options specified in the configuration file.
 
 The following config modules are distributed:
@@ -102,7 +102,7 @@ is assumed.
 Metric modules provide a way for the
 .B cerebrod
 daemon to retrieve system data so that other additional
-system data can be propogated.  Multiple metric modules can be
+system data can be propagated.  Multiple metric modules can be
 opened by a speaking
 .B cerebrod
 daemon.

@@ -29,7 +29,7 @@ if !WITH_STATIC_MODULES
 LTDL_LIBS = ../../libltdl/libltdlc.la
 endif
 
-# Wierd linker issues here, ordering matters
+# Weird linker issues here, ordering matters
 if WITH_CEREBROD_SPEAKER_ONLY
 CEREBROD_LDADDS = ../libs/cerebro_error/libcerebro_error.la \
 		  ../libs/debug/libdebug.la \

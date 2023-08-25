@@ -246,7 +246,7 @@ _setup(conffile_t cf,
     int i;
     
     /* If it doesn't exist for real or can't be read, we consider it
-     * non-existant 
+     * non-existent 
      */
     if (access(filename, R_OK) < 0) {
         cf->errnum = CONFFILE_ERR_EXIST;

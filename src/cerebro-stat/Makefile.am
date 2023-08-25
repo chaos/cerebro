@@ -11,7 +11,7 @@ cerebro_stat_CFLAGS  = -I $(srcdir)/../libs/include \
 		       -I $(srcdir)/../libs/wrappers \
 		       -I $(srcdir)/../../libltdl
 
-# Wierd linker issues, ordering here matters
+# Weird linker issues, ordering here matters
 cerebro_stat_LDADD = ../libs/cerebro/libcerebro.la \
 		     ../libs/wrappers/libwrappers.la \
 		     ../libs/wrappers/libwrappers_hash.la \

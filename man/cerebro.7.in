@@ -225,7 +225,7 @@ via:
 
 In the above example, I have registered a metric called "foobar" and updated its value to "avalue".
 
-On a \fIlistener\fR node, see that the value of "foobar" has bee propogated to it by running:
+On a \fIlistener\fR node, see that the value of "foobar" has bee propagated to it by running:
 
 .B # /usr/sbin/cerebro-stat -l
 

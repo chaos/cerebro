@@ -83,7 +83,7 @@ typedef int (*Cerebrod_socket_setup)(int num);
  * The num is passed to the socket_setup function.  For some socket
  * setup functions, they num will be a dummy value that is never used.
  * 
- * Returns new (or possibley old) fd on success, -1 on error
+ * Returns new (or possibly old) fd on success, -1 on error
  */
 int
 cerebrod_reinit_socket(int old_fd, 
