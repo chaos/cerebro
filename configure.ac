@@ -10,7 +10,7 @@
 AC_INIT([cerebro], [1.21.8])
 AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_SRCDIR([README])
-AC_CANONICAL_SYSTEM
+AC_CANONICAL_TARGET
 
 ##
 # Automake support.
