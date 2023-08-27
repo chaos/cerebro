@@ -1,9 +1,0 @@
-##
-# $Id: META,v 1.32 2010-07-01 22:53:04 chu11 Exp $
-##
-# Metadata for RPM/TAR makefile targets
-##
-  Meta:		1
-  Name:		cerebro
-  Version:	1.21
-  Release:	8
