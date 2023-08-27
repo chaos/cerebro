@@ -6,7 +6,7 @@ AC_DEFUN([AC_HOSTSFILE],
 [
   AC_MSG_CHECKING([for whether to build hostsfile module])
   AC_ARG_WITH([hostsfile],
-    AC_HELP_STRING([--with-hostsfile], [Build hostsfile modules]),
+    AS_HELP_STRING([--with-hostsfile], [Build hostsfile modules]),
     [ case "$withval" in
         no)  ac_hostsfile_test=no ;;
         yes) ac_hostsfile_test=yes ;;
@@ -33,7 +33,7 @@ AC_DEFUN([AC_HOSTSFILE_PATH],
 
   AC_MSG_CHECKING([for default hostsfile path])
   AC_ARG_WITH([hostsfile-path],
-    AC_HELP_STRING([--with-hostsfile-path=PATH], 
+    AS_HELP_STRING([--with-hostsfile-path=PATH], 
                    [Specify default hostsfile clusterlist path]),
     [ case "$withval" in
         no)  ;;

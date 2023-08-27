@@ -7,17 +7,16 @@
 ##
 # Prologue.
 ##
-AC_INIT([cerebro])
-AC_META
+AC_INIT([cerebro], [1.21.8])
 AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_SRCDIR([README])
-AC_CANONICAL_SYSTEM
+AC_CANONICAL_TARGET
 
 ##
 # Automake support.
 ##
-AM_INIT_AUTOMAKE($PROJECT, $VERSION)
-AM_CONFIG_HEADER([config/config.h])
+AM_INIT_AUTOMAKE([tar-ustar subdir-objects])
+AC_CONFIG_HEADERS([config/config.h])
 AM_MAINTAINER_MODE
 
 # Update this information before a public release only!

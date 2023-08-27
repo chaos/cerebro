@@ -16,7 +16,7 @@ AC_DEFUN([AC_CEREBRO_METRIC_CONTROL_PATH],
 
   AC_MSG_CHECKING([for the metric control path])
   AC_ARG_WITH([metric-control-path],
-    AC_HELP_STRING([--with-metric-control-path], 
+    AS_HELP_STRING([--with-metric-control-path], 
                    [Define metric control path]),
     [ case "$withval" in
         no)  ;;

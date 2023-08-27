@@ -6,7 +6,7 @@ AC_DEFUN([AC_UPDOWN],
 [
   AC_MSG_CHECKING([for whether to build updown event module])
   AC_ARG_WITH([updown],
-    AC_HELP_STRING([--with-updown], [Build updown event module]),
+    AS_HELP_STRING([--with-updown], [Build updown event module]),
     [ case "$withval" in
         no)  ac_updown_test=no ;;
         yes) ac_updown_test=yes ;;

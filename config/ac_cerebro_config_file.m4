@@ -8,7 +8,7 @@ AC_DEFUN([AC_CEREBRO_CONFIG_FILE],
 
   AC_MSG_CHECKING([for cerebro config file default path])
   AC_ARG_WITH([cerebro-config-file],
-    AC_HELP_STRING([--with-cerebro-config-file=PATH], 
+    AS_HELP_STRING([--with-cerebro-config-file=PATH], 
                    [Specify default cerebro config file path]),
     [ case "$withval" in
         no)  ;;

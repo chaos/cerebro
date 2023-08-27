@@ -6,7 +6,7 @@ AC_DEFUN([AC_BOOTTIME],
 [
   AC_MSG_CHECKING([for whether to build boottime module])
   AC_ARG_WITH([boottime],
-    AC_HELP_STRING([--with-boottime], [Build boottime modules]),
+    AS_HELP_STRING([--with-boottime], [Build boottime modules]),
     [ case "$withval" in
         no)  ac_boottime_test=no ;;
         yes) ac_boottime_test=yes ;;

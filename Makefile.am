@@ -16,4 +16,4 @@ install-data-local:
 
 SUBDIRS = $(LTDL_DIRS) etc man src
 
-EXTRA_DIST = autogen.sh DISCLAIMER DISCLAIMER.UC META cerebro.spec.in cerebro.spec
+EXTRA_DIST = autogen.sh DISCLAIMER DISCLAIMER.UC cerebro.spec.in cerebro.spec

@@ -6,7 +6,7 @@ AC_DEFUN([AC_MEMORY],
 [
   AC_MSG_CHECKING([for whether to build memory modules])
   AC_ARG_WITH([memory],
-    AC_HELP_STRING([--with-memory], [Build memory modules]),
+    AS_HELP_STRING([--with-memory], [Build memory modules]),
     [ case "$withval" in
         no)  ac_memory_test=no ;;
         yes) ac_memory_test=yes ;;

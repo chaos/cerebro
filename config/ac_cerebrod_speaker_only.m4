@@ -6,7 +6,7 @@ AC_DEFUN([AC_CEREBROD_SPEAKER_ONLY],
 [
   AC_MSG_CHECKING([for whether to build cerebrod with only speaker functionality])
   AC_ARG_WITH([cerebrod-speaker-only],
-    AC_HELP_STRING([--with-cerebrod-speaker-only], [Build only speaker functionality into cerebrod]),
+    AS_HELP_STRING([--with-cerebrod-speaker-only], [Build only speaker functionality into cerebrod]),
     [ case "$withval" in
         no)  ac_cerebrod_speaker_only_test=no ;;
         yes) ac_cerebrod_speaker_only_test=yes ;;
@@ -28,7 +28,7 @@ AC_DEFUN([AC_CEREBROD_NO_THREADS],
 [
   AC_MSG_CHECKING([for whether to build cerebrod with no threads (requires --with-cerebrod-speaker-only])
   AC_ARG_WITH([cerebrod-no-threads],
-    AC_HELP_STRING([--with-cerebrod-no-threads], [Build no threads into cerebrod (requires --with-cerebrod-speaker-only]),
+    AS_HELP_STRING([--with-cerebrod-no-threads], [Build no threads into cerebrod (requires --with-cerebrod-speaker-only]),
     [ case "$withval" in
         no)  ac_cerebrod_no_threads_test=no ;;
         yes) ac_cerebrod_no_threads_test=yes ;;

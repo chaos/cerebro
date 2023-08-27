@@ -6,7 +6,7 @@ AC_DEFUN([AC_LOADAVG],
 [
   AC_MSG_CHECKING([for whether to build loadavg modules])
   AC_ARG_WITH([loadavg],
-    AC_HELP_STRING([--with-loadavg], [Build loadavg modules]),
+    AS_HELP_STRING([--with-loadavg], [Build loadavg modules]),
     [ case "$withval" in
         no)  ac_loadavg_test=no ;;
         yes) ac_loadavg_test=yes ;;
