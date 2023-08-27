@@ -16,7 +16,7 @@ AC_CANONICAL_TARGET
 # Automake support.
 ##
 AM_INIT_AUTOMAKE([tar-ustar subdir-objects])
-AM_CONFIG_HEADER([config/config.h])
+AC_CONFIG_HEADERS([config/config.h])
 AM_MAINTAINER_MODE
 
 # Update this information before a public release only!
