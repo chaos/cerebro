@@ -6,7 +6,7 @@ AC_DEFUN([AC_SHUTDOWN],
 [
   AC_MSG_CHECKING([for whether to build shutdown module])
   AC_ARG_WITH([shutdown],
-    AC_HELP_STRING([--with-shutdown], [Build shutdown module]),
+    AS_HELP_STRING([--with-shutdown], [Build shutdown module]),
     [ case "$withval" in
         no)  ac_shutdown_test=no ;;
         yes) ac_shutdown_test=yes ;;

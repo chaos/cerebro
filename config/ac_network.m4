@@ -6,7 +6,7 @@ AC_DEFUN([AC_NETWORK],
 [
   AC_MSG_CHECKING([for whether to build network modules])
   AC_ARG_WITH([network],
-    AC_HELP_STRING([--with-network], [Build network modules]),
+    AS_HELP_STRING([--with-network], [Build network modules]),
     [ case "$withval" in
         no)  ac_network_test=no ;;
         yes) ac_network_test=yes ;;

@@ -6,7 +6,7 @@ AC_DEFUN([AC_STATIC_MODULES],
 [
   AC_MSG_CHECKING([for static module compilation])
   AC_ARG_ENABLE([static-modules],
-    AC_HELP_STRING([--enable-static-modules], [enable build with static modules]),
+    AS_HELP_STRING([--enable-static-modules], [enable build with static modules]),
     [ case "$enableval" in
         yes) ac_with_static_modules=yes ;;
         no)  ac_with_static_modules=no ;;
