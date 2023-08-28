@@ -45,30 +45,30 @@
 #define unmarshall_data_value(t,l,v,vl,b,bl,e) \
         _unmarshall_data_value(t,l,v,vl,b,bl,e,__FUNCTION__)
 
-/* 
+/*
  * _check_data_type_len
  *
  * Check if data type and len are reasonable
  *
  * Returns 0 if data is sane, -1 if not
  */
-int _check_data_type_len(u_int32_t dtype, 
-                           u_int32_t dlen, 
+int _check_data_type_len(u_int32_t dtype,
+                           u_int32_t dlen,
                            const char *caller);
 
-/* 
+/*
  * _check_data_type_len_value
  *
  * Check if data type, len, and value are reasonable
  *
  * Returns 0 if data is sane, -1 if not
  */
-int _check_data_type_len_value(u_int32_t dtype, 
-                               u_int32_t dlen, 
+int _check_data_type_len_value(u_int32_t dtype,
+                               u_int32_t dlen,
                                void *dvalue,
                                const char *caller);
 
-/* 
+/*
  * _marshall_data
  *
  * Marshall data type, len, and if appropriate the value
@@ -83,12 +83,12 @@ int _marshall_data(u_int32_t dtype,
                    int *errnum,
                    const char *caller);
 
-/* 
+/*
  * _unmarshall_data_type_len
  *
  * Unmarshall a data type and len
  *
- * Returns length of data unmarshalled from buffer, 0 if buffer 
+ * Returns length of data unmarshalled from buffer, 0 if buffer
  * does not contain enough data, -1 on error
  */
 int _unmarshall_data_type_len(u_int32_t *dtype,
@@ -98,12 +98,12 @@ int _unmarshall_data_type_len(u_int32_t *dtype,
                               int *errnum,
                               const char *caller);
 
-/* 
+/*
  * _unmarshall_data_value
  *
  * Unmarshall a data value
  *
- * Returns length of data unmarshalled from buffer, 0 if buffer 
+ * Returns length of data unmarshalled from buffer, 0 if buffer
  * does not contain enough data, -1 on error
  */
 int _unmarshall_data_value(u_int32_t dtype,

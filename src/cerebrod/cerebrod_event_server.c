@@ -64,7 +64,7 @@ extern pthread_mutex_t debug_output_mutex;
 
 #define CEREBROD_EVENT_SERVER_BACKLOG 10
 
-/* 
+/*
  * event_server_init
  * event_server_init_cond
  * event_server_init_lock
@@ -76,7 +76,7 @@ int event_server_init = 0;
 pthread_cond_t event_server_init_cond = PTHREAD_COND_INITIALIZER;
 pthread_mutex_t event_server_init_lock = PTHREAD_MUTEX_INITIALIZER;
 
-/* 
+/*
  * event_queue_monitor_init
  * event_queue_monitor_init_cond
  * event_queue_monitor_init_lock
@@ -88,7 +88,7 @@ int event_queue_monitor_init = 0;
 pthread_cond_t event_queue_monitor_init_cond = PTHREAD_COND_INITIALIZER;
 pthread_mutex_t event_queue_monitor_init_lock = PTHREAD_MUTEX_INITIALIZER;
 
-/* 
+/*
  * event_connections
  * event_connections_index
  * event_connections_lock
@@ -98,7 +98,7 @@ pthread_mutex_t event_queue_monitor_init_lock = PTHREAD_MUTEX_INITIALIZER;
 List event_connections = NULL;
 hash_t event_connections_index = NULL;
 pthread_mutex_t event_connections_lock = PTHREAD_MUTEX_INITIALIZER;
- 
+
 extern List event_names;
 
 extern List event_queue;
@@ -119,7 +119,7 @@ cerebrod_queue_event(struct cerebro_event *event, unsigned int index)
   ets->event_name = event->event_name;
   ets->index = index;
   ets->event = event;
-  
+
   List_append(event_queue, ets);
 
   Pthread_cond_signal(&event_queue_cond);
@@ -149,7 +149,7 @@ _event_queue_monitor_initialize(void)
   Pthread_mutex_unlock(&event_queue_monitor_init_lock);
 }
 
-/* 
+/*
  * _event_dump
  *
  * Output event debugging info
@@ -229,7 +229,7 @@ _event_dump(struct cerebro_event *event)
     }
 }
 
-/* 
+/*
  * _event_marshall
  *
  * marshall event packet
@@ -243,7 +243,7 @@ _event_marshall(struct cerebro_event *event,
 {
   int bufPtrlen, n, c = 0;
   char *bufPtr;
-  
+
   assert(event && buf && buflen >= CEREBRO_EVENT_HEADER_LEN);
 
   memset(buf, '\0', buflen);
@@ -285,10 +285,10 @@ cerebrod_event_queue_monitor(void *arg)
 
   temp_event_queue = List_create((ListDelF)cerebrod_event_to_send_destroy);
 
-  /* 
+  /*
    * achu: The listener and thus event update initialization is
    * started after this thread is started.  So the and event_index may
-   * not be set up the first time this loop is reached.  
+   * not be set up the first time this loop is reached.
    *
    * However, it must be set after the condition is signaled, b/c the
    * listener (and thus event update code) and event node timeout
@@ -328,15 +328,15 @@ cerebrod_event_queue_monitor(void *arg)
           List connections;
 
           _event_dump(ets->event);
-          
+
           Pthread_mutex_lock(&event_connections_lock);
           if ((connections = Hash_find(event_connections_index, ets->event_name)))
             {
               char buf[CEREBRO_MAX_PACKET_LEN];
               int elen;
 
-              if ((elen = _event_marshall(ets->event, 
-                                          buf, 
+              if ((elen = _event_marshall(ets->event,
+                                          buf,
                                           CEREBRO_MAX_PACKET_LEN)) > 0)
                 {
                   ListIterator citr;
@@ -375,7 +375,7 @@ cerebrod_event_queue_monitor(void *arg)
 
           List_delete(titr);
         }
-      
+
       List_iterator_destroy(titr);
     }
 
@@ -488,14 +488,14 @@ _delete_event_connection_fd(int fd)
   if (rv != EBUSY)
     CEREBROD_EXIT(("mutex not locked: rv=%d", rv));
 #endif /* CEREBRO_DEBUG */
-  
+
   eitr = List_iterator_create(event_connections);
   while ((ecd = list_next(eitr)))
     {
       if (ecd->fd == fd)
         {
           List connections;
-          if ((connections = Hash_find(event_connections_index, 
+          if ((connections = Hash_find(event_connections_index,
                                        ecd->event_name)))
             {
               ListIterator citr;
@@ -504,7 +504,7 @@ _delete_event_connection_fd(int fd)
               citr = List_iterator_create(connections);
               while ((fdPtr = list_next(citr)))
                 {
-                  if (*fdPtr == fd) 
+                  if (*fdPtr == fd)
                     {
                       List_delete(citr);
                       break;
@@ -533,11 +533,11 @@ _event_server_response_marshall(struct cerebro_event_server_response *res,
 {
   int bufPtrlen, c = 0;
   char *bufPtr;
-  
+
   assert(res && buf && buflen >= CEREBRO_EVENT_SERVER_RESPONSE_LEN);
-  
+
   memset(buf, '\0', buflen);
-  
+
   c += Marshall_int32(res->version, buf + c, buflen - c);
   c += Marshall_u_int32(res->err_code, buf + c, buflen - c);
   c += Marshall_u_int8(res->end, buf + c, buflen - c);
@@ -555,7 +555,7 @@ _event_server_response_marshall(struct cerebro_event_server_response *res,
  * Return 0 on success, -1 on error
  */
 static int
-_event_server_response_send(int fd, 
+_event_server_response_send(int fd,
                             struct cerebro_event_server_response *res)
 {
   char buf[CEREBRO_MAX_PACKET_LEN];
@@ -563,8 +563,8 @@ _event_server_response_send(int fd,
 
   assert(fd >= 0 && res);
 
-  if ((res_len = _event_server_response_marshall(res, 
-                                                 buf, 
+  if ((res_len = _event_server_response_marshall(res,
+                                                 buf,
                                                  CEREBRO_MAX_PACKET_LEN)) < 0)
     return -1;
 
@@ -585,8 +585,8 @@ _event_server_response_send(int fd,
  * Return 0 on success, -1 on error
  */
 static int
-_event_server_err_only_response(int fd, 
-                                int32_t version, 
+_event_server_err_only_response(int fd,
+                                int32_t version,
                                 u_int32_t err_code)
 {
   struct cerebro_event_server_response res;
@@ -602,8 +602,8 @@ _event_server_err_only_response(int fd,
   res.err_code = err_code;
   res.end = CEREBRO_EVENT_SERVER_PROTOCOL_IS_LAST_RESPONSE;
 
-  if ((res_len = _event_server_response_marshall(&res, 
-                                                 buf, 
+  if ((res_len = _event_server_response_marshall(&res,
+                                                 buf,
                                                  CEREBRO_MAX_PACKET_LEN)) < 0)
     return -1;
 
@@ -638,7 +638,7 @@ _event_server_request_check_version(const char *buf,
 
   if (*version != CEREBRO_EVENT_SERVER_PROTOCOL_VERSION)
     return -1;
-  
+
   return 0;
 }
 
@@ -656,7 +656,7 @@ _event_server_request_unmarshall(struct cerebro_event_server_request *req,
 {
   int bufPtrlen, c = 0;
   char *bufPtr;
-  
+
   assert(req && buf);
 
   bufPtr = req->event_name;
@@ -700,7 +700,7 @@ _event_server_request_dump(struct cerebro_event_server_request *req)
   Pthread_mutex_unlock(&debug_output_mutex);
 }
 
-/* 
+/*
  * _event_names_compare
  *
  * Comparison for list_find
@@ -848,7 +848,7 @@ _respond_with_event_names(void *arg)
   assert(arg);
 
   fd = *((int *)arg);
-  
+
   if (!event_names)
     goto end_response;
 
@@ -1000,7 +1000,7 @@ _event_server_service_connection(int fd)
     }
 
   /* Event names is not changeable - so no need for a lock */
-  if (!(event_name_ptr = list_find_first(event_names, 
+  if (!(event_name_ptr = list_find_first(event_names,
                                          _event_names_compare,
                                          event_name_buf)))
     {
@@ -1009,7 +1009,7 @@ _event_server_service_connection(int fd)
                                       CEREBRO_EVENT_SERVER_PROTOCOL_ERR_EVENT_INVALID);
       goto cleanup;
     }
-  
+
   if (!(ecd = (struct cerebrod_event_connection_data *)malloc(sizeof(struct cerebrod_event_connection_data))))
     {
       CEREBROD_ERR(("malloc: %s", strerror(errno)));
@@ -1018,10 +1018,10 @@ _event_server_service_connection(int fd)
                                       CEREBRO_EVENT_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
       goto cleanup;
     }
-  
+
   ecd->event_name = event_name_ptr;
   ecd->fd = fd;
-  
+
   if (!(fdptr = (int *)malloc(sizeof(int))))
     {
       CEREBROD_ERR(("malloc: %s", strerror(errno)));
@@ -1042,7 +1042,7 @@ _event_server_service_connection(int fd)
       goto cleanup;
     }
 
-  if (!(connections = Hash_find(event_connections_index, 
+  if (!(connections = Hash_find(event_connections_index,
                                 ecd->event_name)))
     {
       if (!(connections = list_create((ListDelF)free)))
@@ -1083,7 +1083,7 @@ _event_server_service_connection(int fd)
                                   CEREBRO_EVENT_SERVER_PROTOCOL_ERR_SUCCESS);
 
   return;
-  
+
  cleanup:
   if (ecd)
     free(ecd);
@@ -1147,7 +1147,7 @@ cerebrod_event_server(void *arg)
           List_iterator_destroy(eitr);
           Pthread_mutex_unlock(&event_connections_lock);
         }
-      
+
       Poll(pfds, pfdslen, -1);
 
       /* Deal with the server fd first */
@@ -1196,7 +1196,7 @@ cerebrod_event_server(void *arg)
                * our fd.
                */
 
-              n = fd_read_n(pfds[i].fd, 
+              n = fd_read_n(pfds[i].fd,
                             buf,
                             CEREBRO_MAX_PACKET_LEN);
               if (n < 0)
@@ -1218,7 +1218,7 @@ cerebrod_event_server(void *arg)
                 }
             }
         }
-      
+
       Free(pfds);
     }
 

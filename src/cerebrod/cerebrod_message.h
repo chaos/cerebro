@@ -37,7 +37,7 @@
  */
 void cerebrod_message_destroy(struct cerebrod_message *msg);
 
-/* 
+/*
  * cerebrod_message_dump
  *
  * dump contents of a message packet.  Should be called with

@@ -28,7 +28,7 @@
 #ifndef _CEREBROD_DAEMON_H
 #define _CEREBROD_DAEMON_H
 
-/* 
+/*
  * cerebrod_daemon_init
  *
  * daemonize the cerebrod process

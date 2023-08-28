@@ -24,6 +24,6 @@ AC_DEFUN([AC_SHUTDOWN],
      MANPAGE_SHUTDOWN=0
      ac_with_shutdown=no
   fi
- 
+
   AC_SUBST(MANPAGE_SHUTDOWN)
 ])

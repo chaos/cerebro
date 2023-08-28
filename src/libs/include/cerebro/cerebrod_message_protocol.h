@@ -51,12 +51,12 @@ struct cerebrod_message_metric
                                              + sizeof(u_int32_t) \
                                              + sizeof(u_int32_t))
 
-/* 
+/*
  * struct cerebrod_message
  *
  * defines message data sent/received from each cerebrod daemon
  */
-struct cerebrod_message 
+struct cerebrod_message
 {
   int32_t version;
   char nodename[CEREBRO_MAX_NODENAME_LEN];

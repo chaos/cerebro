@@ -39,16 +39,16 @@ Any cerebro nodelists created using the handle will also be destroyed.
 .SH "RETURN VALUES"
 On success, 0 is returned.  On error, -1 is returned, and an error
 code is returned in \fIhandle\fR.  The error code can be retrieved via
-.BR cerebro_errnum(3), 
-and a description of the error code can be retrieved via 
-.BR cerebro_strerror(3).  
+.BR cerebro_errnum(3),
+and a description of the error code can be retrieved via
+.BR cerebro_strerror(3).
 .br
 .SH "ERRORS"
 .TP
 .B CEREBRO_ERR_NULLHANDLE
 The \fIhandle\fR parameter is NULL.
 .TP
-.B CEREBRO_ERR_MAGIC_NUMBER 
+.B CEREBRO_ERR_MAGIC_NUMBER
 \fIhandle\fR has an incorrect magic number.  \fIhandle\fR does not
 point to a cerebro_t handle or \fIhandle\fR has already been
 destroyed.

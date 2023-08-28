@@ -38,7 +38,7 @@
 
 #include "debug.h"
 
-int 
+int
 _cerebro_handle_check(cerebro_t handle)
 {
   if (!handle || handle->magic != CEREBRO_MAGIC_NUMBER)
@@ -57,7 +57,7 @@ _cerebro_handle_check(cerebro_t handle)
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
-  
+
   return 0;
 }
 

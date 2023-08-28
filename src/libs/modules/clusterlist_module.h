@@ -35,7 +35,7 @@ typedef struct clusterlist_module *clusterlist_module_t;
  *
  * Find and load the clusterlist module.  If none is found, will
  * assume a default clusterlist module.
- * 
+ *
  * Returns clusterlist module handle on success, NULL on error
  */
 clusterlist_module_t clusterlist_module_load(void);
@@ -103,7 +103,7 @@ int clusterlist_module_get_all_nodes(clusterlist_module_t handle, char ***nodes)
  *
  * call clusterlist module node in cluster function
  */
-int clusterlist_module_node_in_cluster(clusterlist_module_t handle, 
+int clusterlist_module_node_in_cluster(clusterlist_module_t handle,
                                        const char *node);
 
 /*
@@ -112,8 +112,8 @@ int clusterlist_module_node_in_cluster(clusterlist_module_t handle,
  * call clusterlist module get nodename function
  */
 int clusterlist_module_get_nodename(clusterlist_module_t handle,
-				    const char *node, 
-				    char *buf, 
+				    const char *node,
+				    char *buf,
 				    unsigned int buflen);
 
 #endif /* _CLUSTERLIST_MODULE_H */

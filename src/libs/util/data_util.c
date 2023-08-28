@@ -40,7 +40,7 @@
 #include "debug.h"
 #include "marshall.h"
 
-int 
+int
 _check_data_type_len(u_int32_t dtype, u_int32_t dlen, const char *caller)
 {
   if (!caller)
@@ -72,7 +72,7 @@ _check_data_type_len(u_int32_t dtype, u_int32_t dlen, const char *caller)
       return -1;
     }
 
-  if (dtype == CEREBRO_DATA_VALUE_TYPE_STRING 
+  if (dtype == CEREBRO_DATA_VALUE_TYPE_STRING
       && dlen > CEREBRO_MAX_DATA_STRING_LEN)
     {
       CEREBRO_DBG(("%s: string len too long", caller));
@@ -83,9 +83,9 @@ _check_data_type_len(u_int32_t dtype, u_int32_t dlen, const char *caller)
 
 }
 
-int 
-_check_data_type_len_value(u_int32_t dtype, 
-                           u_int32_t dlen, 
+int
+_check_data_type_len_value(u_int32_t dtype,
+                           u_int32_t dlen,
                            void *dvalue,
                            const char *caller)
 {
@@ -117,7 +117,7 @@ _marshall_data(u_int32_t dtype,
                const char *caller)
 {
   int n, c = 0;
-  
+
   if (!buf || !caller)
     {
       CEREBRO_DBG(("%s: invalid parameters", caller));
@@ -141,7 +141,7 @@ _marshall_data(u_int32_t dtype,
       return -1;
     }
   c += n;
-                                                                                     
+
   if ((n = marshall_u_int32(dlen, buf + c, buflen - c)) <= 0)
     {
       CEREBRO_DBG(("%s: marshall_u_int32", caller));
@@ -237,7 +237,7 @@ _marshall_data(u_int32_t dtype,
   return c;
 }
 
-int 
+int
 _unmarshall_data_type_len(u_int32_t *dtype,
                           u_int32_t *dlen,
                           const char *buf,
@@ -271,7 +271,7 @@ _unmarshall_data_type_len(u_int32_t *dtype,
       return -1;
     }
   c += n;
-                                                                                     
+
   if ((n = unmarshall_u_int32(dlen, buf + c, buflen - c)) < 0)
     {
       CEREBRO_DBG(("unmarshall_u_int32"));
@@ -293,7 +293,7 @@ _unmarshall_data_type_len(u_int32_t *dtype,
   return c;
 }
 
-int 
+int
 _unmarshall_data_value(u_int32_t dtype,
                        u_int32_t dlen,
                        void *dvalue,
@@ -319,7 +319,7 @@ _unmarshall_data_value(u_int32_t dtype,
         *errnum = CEREBRO_ERR_PROTOCOL;
       return -1;
     }
-  
+
   if (!dlen)
     return 0;
 
@@ -369,7 +369,7 @@ _unmarshall_data_value(u_int32_t dtype,
   else
     /* If an invalid param, should have been caught before here */
     CEREBRO_DBG(("%s: invalid type %d", caller, dtype));
-  
+
   if (n < 0)
     {
       if (errnum)
@@ -385,6 +385,6 @@ _unmarshall_data_value(u_int32_t dtype,
         *errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
-  
+
   return n;
 }

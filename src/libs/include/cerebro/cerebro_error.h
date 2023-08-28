@@ -32,7 +32,7 @@
 #define CEREBRO_ERROR_STDERR  0x0002
 #define CEREBRO_ERROR_SYSLOG  0x0004
 
-/*  
+/*
  * cerebro_err_init
  *
  * Initializes cerebro error lib
@@ -46,28 +46,28 @@ void cerebro_err_init(char *prog);
  */
 int cerebro_err_get_flags(void);
 
-/*  
+/*
  * cerebro_err_set_flags
  *
  * Sets the error lib flags to 'flags'.
  */
 void cerebro_err_set_flags(int flags);
 
-/* 
+/*
  * cerebro_err_debug
  *
- * Outputs error debugging.  
+ * Outputs error debugging.
  */
 void cerebro_err_debug(const char *fmt, ...);
 
-/* 
+/*
  * cerebro_err_output
  *
- * Calls error output.  
+ * Calls error output.
  */
 void cerebro_err_output(const char *fmt, ...);
 
-/* 
+/*
  * cerebro_err_exit
  *
  * Outputs error and exits

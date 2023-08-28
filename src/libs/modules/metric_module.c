@@ -128,7 +128,7 @@ void *metric_modules[] =
 #define METRIC_MODULE_DIR          METRIC_MODULE_BUILDDIR "/.libs"
 #define METRIC_MODULE_MAGIC_NUMBER 0x33882222
 
-/* 
+/*
  * struct metric_module
  *
  * metric module handle
@@ -150,7 +150,7 @@ struct metric_module
  *
  * Return 1 is module is stored, 0 if not, -1 on fatal error
  */
-static int 
+static int
 #if WITH_STATIC_MODULES
 _metric_module_cb(void *handle, void *module_info)
 #else  /* !WITH_STATIC_MODULES */
@@ -162,7 +162,7 @@ _metric_module_cb(void *handle, void *dl_handle, void *module_info)
 #if !WITH_STATIC_MODULES
   lt_dlhandle metric_dl_handle;
 #endif /* !WITH_STATIC_MODULES */
-                                                                                      
+
 #if WITH_STATIC_MODULES
   if (!handle || !module_info)
 #else /* !WITH_STATIC_MODULES */
@@ -172,19 +172,19 @@ _metric_module_cb(void *handle, void *dl_handle, void *module_info)
       CEREBRO_DBG(("invalid parameters"));
       return -1;
     }
-  
+
   metric_handle = handle;
 #if !WITH_STATIC_MODULES
   metric_dl_handle = dl_handle;
 #endif /* !WITH_STATIC_MODULES */
   metric_module_info = module_info;
-  
+
   if (metric_handle->magic != METRIC_MODULE_MAGIC_NUMBER)
     {
       CEREBRO_DBG(("invalid handle"));
       return -1;
     }
-  
+
   if (!metric_module_info->metric_module_name
       || !metric_module_info->interface_version
       || !metric_module_info->setup
@@ -207,7 +207,7 @@ _metric_module_cb(void *handle, void *dl_handle, void *module_info)
     }
 
 #if !WITH_STATIC_MODULES
-  if (!vector_set(metric_handle->dl_handles, 
+  if (!vector_set(metric_handle->dl_handles,
                   metric_dl_handle,
                   metric_handle->modules_count))
     {
@@ -216,7 +216,7 @@ _metric_module_cb(void *handle, void *dl_handle, void *module_info)
     }
 #endif /* !WITH_STATIC_MODULES */
   if (!vector_set(metric_handle->module_infos,
-                  metric_module_info, 
+                  metric_module_info,
                   metric_handle->modules_count))
     {
       CEREBRO_DBG(("vector_set: %s", strerror(errno)));
@@ -231,7 +231,7 @@ _metric_module_cb(void *handle, void *dl_handle, void *module_info)
   return 1;
 }
 
-metric_modules_t 
+metric_modules_t
 metric_modules_load(void)
 {
   struct metric_module *handle = NULL;
@@ -256,7 +256,7 @@ metric_modules_load(void)
       goto cleanup;
     }
 #endif /* !WITH_STATIC_MODULES */
-  
+
   if (!(handle->module_infos = vector_create(NULL)))
     {
       CEREBRO_ERR(("vector_create: %s", strerror(errno)));
@@ -283,7 +283,7 @@ metric_modules_load(void)
     goto out;
 
   /* Responsibility of caller to call count to see if no modules were
-   * loaded 
+   * loaded
    */
 
  out:
@@ -335,17 +335,17 @@ _handle_index_check(metric_modules_t handle, unsigned int index)
 {
   if (_handle_check(handle) < 0)
     return -1;
-  
+
   if (!(index < handle->modules_count))
     {
       CEREBRO_DBG(("invalid index"));
       return -1;
     }
-  
+
   return 0;
 }
 
-int 
+int
 metric_modules_unload(metric_modules_t handle)
 {
   int i;
@@ -377,10 +377,10 @@ metric_modules_unload(metric_modules_t handle)
 
   module_cleanup();
   return 0;
-  
+
 }
 
-int 
+int
 metric_modules_count(metric_modules_t handle)
 {
   if (_handle_check(handle) < 0)
@@ -423,14 +423,14 @@ metric_module_interface_version(metric_modules_t handle, unsigned int index)
   return ((*module_info->interface_version)());
 }
 
-int 
+int
 metric_module_setup(metric_modules_t handle, unsigned int index)
 {
   struct cerebro_metric_module_info *module_info;
 
   if (_handle_index_check(handle, index) < 0)
     return -1;
-  
+
   if (!(module_info = vector_get(handle->module_infos, index)))
     {
       CEREBRO_DBG(("vector_get: %s", strerror(errno)));
@@ -440,14 +440,14 @@ metric_module_setup(metric_modules_t handle, unsigned int index)
   return ((*module_info->setup)());
 }
 
-int 
+int
 metric_module_cleanup(metric_modules_t handle, unsigned int index)
 {
   struct cerebro_metric_module_info *module_info;
 
   if (_handle_index_check(handle, index) < 0)
     return -1;
-  
+
   if (!(module_info = vector_get(handle->module_infos, index)))
     {
       CEREBRO_DBG(("vector_get: %s", strerror(errno)));
@@ -464,7 +464,7 @@ metric_module_get_metric_name(metric_modules_t handle, unsigned int index)
 
   if (_handle_index_check(handle, index) < 0)
     return NULL;
-  
+
   if (!(module_info = vector_get(handle->module_infos, index)))
     {
       CEREBRO_DBG(("vector_get: %s", strerror(errno)));
@@ -475,7 +475,7 @@ metric_module_get_metric_name(metric_modules_t handle, unsigned int index)
 }
 
 int
-metric_module_get_metric_period(metric_modules_t handle, 
+metric_module_get_metric_period(metric_modules_t handle,
                                 unsigned int index,
                                 int *period)
 {
@@ -483,7 +483,7 @@ metric_module_get_metric_period(metric_modules_t handle,
 
   if (_handle_index_check(handle, index) < 0)
     return -1;
-  
+
   if (!(module_info = vector_get(handle->module_infos, index)))
     {
       CEREBRO_DBG(("vector_get: %s", strerror(errno)));
@@ -494,7 +494,7 @@ metric_module_get_metric_period(metric_modules_t handle,
 }
 
 int
-metric_module_get_metric_flags(metric_modules_t handle, 
+metric_module_get_metric_flags(metric_modules_t handle,
                                unsigned int index,
                                u_int32_t *flags)
 {
@@ -502,7 +502,7 @@ metric_module_get_metric_flags(metric_modules_t handle,
 
   if (_handle_index_check(handle, index) < 0)
     return -1;
-  
+
   if (!(module_info = vector_get(handle->module_infos, index)))
     {
       CEREBRO_DBG(("vector_get: %s", strerror(errno)));
@@ -512,7 +512,7 @@ metric_module_get_metric_flags(metric_modules_t handle,
   return ((*module_info->get_metric_flags)(flags));
 }
 
-int 
+int
 metric_module_get_metric_value(metric_modules_t handle,
 			       unsigned int index,
 			       unsigned int *metric_value_type,
@@ -523,7 +523,7 @@ metric_module_get_metric_value(metric_modules_t handle,
 
   if (_handle_index_check(handle, index) < 0)
     return -1;
-  
+
   if (!(module_info = vector_get(handle->module_infos, index)))
     {
       CEREBRO_DBG(("vector_get: %s", strerror(errno)));
@@ -535,7 +535,7 @@ metric_module_get_metric_value(metric_modules_t handle,
                                            metric_value));
 }
 
-int 
+int
 metric_module_destroy_metric_value(metric_modules_t handle,
 				   unsigned int index,
 				   void *metric_value)
@@ -544,7 +544,7 @@ metric_module_destroy_metric_value(metric_modules_t handle,
 
   if (_handle_index_check(handle, index) < 0)
     return -1;
-  
+
   if (!(module_info = vector_get(handle->module_infos, index)))
     {
       CEREBRO_DBG(("vector_get: %s", strerror(errno)));
@@ -554,7 +554,7 @@ metric_module_destroy_metric_value(metric_modules_t handle,
   return ((*module_info->destroy_metric_value)(metric_value));
 }
 
-Cerebro_metric_thread_pointer 
+Cerebro_metric_thread_pointer
 metric_module_get_metric_thread(metric_modules_t handle,
                                 unsigned int index)
 {
@@ -562,7 +562,7 @@ metric_module_get_metric_thread(metric_modules_t handle,
 
   if (_handle_index_check(handle, index) < 0)
     return NULL;
-  
+
   if (!(module_info = vector_get(handle->module_infos, index)))
     {
       CEREBRO_DBG(("vector_get: %s", strerror(errno)));
@@ -572,7 +572,7 @@ metric_module_get_metric_thread(metric_modules_t handle,
   return ((*module_info->get_metric_thread)());
 }
 
-int 
+int
 metric_module_send_message_function_pointer(metric_modules_t handle,
                                             unsigned int index,
                                             Cerebro_metric_send_message function_pointer)
@@ -581,7 +581,7 @@ metric_module_send_message_function_pointer(metric_modules_t handle,
 
   if (_handle_index_check(handle, index) < 0)
     return -1;
-  
+
   if (!(module_info = vector_get(handle->module_infos, index)))
     {
       CEREBRO_DBG(("vector_get: %s", strerror(errno)));

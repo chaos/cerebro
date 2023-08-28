@@ -34,7 +34,7 @@
 
 #include "wrappers.h"
 
-List 
+List
 wrap_list_create(WRAPPERS_ARGS, ListDelF f)
 {
   List rv;
@@ -83,11 +83,11 @@ wrap_list_append (WRAPPERS_ARGS, List l, void *x)
 
   if (!(rv = list_append(l, x)))
     WRAPPERS_ERR_ERRNO("list_append");
-  
+
   return rv;
 }
 
-void * 
+void *
 wrap_list_find_first (WRAPPERS_ARGS, List l, ListFindF f, void *key)
 {
   assert(file && function);
@@ -98,7 +98,7 @@ wrap_list_find_first (WRAPPERS_ARGS, List l, ListFindF f, void *key)
   return list_find_first(l, f, key);
 }
 
-int 
+int
 wrap_list_delete_all(WRAPPERS_ARGS, List l, ListFindF f, void *key)
 {
   int rv;
@@ -110,7 +110,7 @@ wrap_list_delete_all(WRAPPERS_ARGS, List l, ListFindF f, void *key)
 
   if ((rv = list_delete_all(l, f, key)) < 0)
     WRAPPERS_ERR_ERRNO("list_delete_all");
-  
+
   return rv;
 }
 
@@ -126,7 +126,7 @@ wrap_list_for_each(WRAPPERS_ARGS, List l, ListForF f, void *arg)
 
   if ((rv = list_for_each(l, f, arg)) < 0)
     WRAPPERS_ERR_ERRNO("list_for_each");
-  
+
   return rv;
 }
 
@@ -151,7 +151,7 @@ wrap_list_peek(WRAPPERS_ARGS, List l)
 
   if (!l)
     WRAPPERS_ERR_INVALID_PARAMETERS("list_peek");
-  
+
   rv = list_peek(l);
 
   return rv;
@@ -201,7 +201,7 @@ wrap_list_remove(WRAPPERS_ARGS, ListIterator i)
   return rv;
 }
 
-int 
+int
 wrap_list_delete(WRAPPERS_ARGS, ListIterator i)
 {
   int rv;

@@ -24,6 +24,6 @@ AC_DEFUN([AC_BOOTTIME],
      MANPAGE_BOOTTIME=0
      ac_with_boottime=no
   fi
- 
+
   AC_SUBST(MANPAGE_BOOTTIME)
 ])

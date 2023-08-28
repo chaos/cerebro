@@ -24,7 +24,7 @@
  *  You should have received a copy of the GNU General Public License along
  *  with Cerebro. If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
- 
+
 #ifndef _CEREBRO_CONSTANTS_H
 #define _CEREBRO_CONSTANTS_H
 
@@ -33,7 +33,7 @@
  * definition for MAXHOSTNAMELEN.  We define our own maximum nodename
  * length.
  */
-#define CEREBRO_MAX_NODENAME_LEN           64 
+#define CEREBRO_MAX_NODENAME_LEN           64
 #define CEREBRO_MAX_HOSTNAME_LEN           CEREBRO_MAX_NODENAME_LEN
 
 #define CEREBRO_MAX_PATH_LEN               512

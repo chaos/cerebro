@@ -43,7 +43,7 @@
 
 #include "list.h"
 
-/* 
+/*
  * struct cerebrod_event_module_list
  *
  * Contains list of event module info list and a lock for thread
@@ -68,7 +68,7 @@ struct cerebrod_event_module_info
   pthread_mutex_t event_lock;
 };
 
-/* 
+/*
  * struct cerebrod_event_node_timeout_data
  *
  * contains information needed for timeout calculations
@@ -80,7 +80,7 @@ struct cerebrod_event_node_timeout_data
   int timeout_occurred;
 };
 
-/* 
+/*
  * struct cerebrod_event_module_timeout_data
  *
  * Store a timeout and it's string
@@ -108,7 +108,7 @@ void cerebrod_event_to_send_destroy(void *x);
  */
 int cerebrod_event_modules_setup(void);
 
-/* 
+/*
  * cerebrod_event_add_node_timeout_data
  *
  * Called to add another node timeout data element to appropriate
@@ -117,7 +117,7 @@ int cerebrod_event_modules_setup(void);
 void cerebrod_event_add_node_timeout_data(struct cerebrod_node_data *nd,
                                           u_int32_t received_time);
 
-/* 
+/*
  * cerebrod_event_update_node_received_time
  *
  * Called to update node timeout data is a cerebrod message was

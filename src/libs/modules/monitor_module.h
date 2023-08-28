@@ -28,13 +28,13 @@
 #ifndef _MONITOR_MODULE_H
 #define _MONITOR_MODULE_H
 
-typedef struct monitor_module *monitor_modules_t; 
+typedef struct monitor_module *monitor_modules_t;
 
 /*
  * monitor_modules_load
  *
  * Find and load the monitor modules.
- * 
+ *
  * Returns monitor module handle on success, NULL on error
  */
 monitor_modules_t monitor_modules_load(void);
@@ -95,7 +95,7 @@ char *monitor_module_metric_names(monitor_modules_t handle, unsigned int index);
  *
  * call monitor module metric_update function
  */
-int monitor_module_metric_update(monitor_modules_t handle, 
+int monitor_module_metric_update(monitor_modules_t handle,
 				 unsigned int index,
 				 const char *nodename,
                                  const char *metric_name,

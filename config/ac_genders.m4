@@ -15,7 +15,7 @@ AC_DEFUN([AC_GENDERS],
     ]
   )
   AC_MSG_RESULT([${ac_genders_test=yes}])
-  
+
   if test "$ac_genders_test" = "yes"; then
      AC_CHECK_LIB([genders], [genders_handle_create], [ac_have_genders=yes], [])
   fi
@@ -25,7 +25,7 @@ AC_DEFUN([AC_GENDERS],
      GENDERS_LIBS="-lgenders"
      MANPAGE_GENDERS=1
      ac_with_genders=yes
-  else 
+  else
      MANPAGE_GENDERS=0
      ac_with_genders=no
   fi

@@ -53,7 +53,7 @@ timeout length will be used.
 should use.  By default, no flags are set.  The following flags
 are available to be set:
 
-CEREBRO_METRIC_FLAGS_UP_ONLY - By default 
+CEREBRO_METRIC_FLAGS_UP_ONLY - By default
 .BR cerebro_get_metric_data(3)
 will return data for every node in the cluster currently
 monitoring the specified metric.  This flag alters this behavior
@@ -63,7 +63,7 @@ metric server return only nodes that are currently up.  This flag does
 not apply to any of the default metrics supplied by
 .BR cerebrod(8).
 
-CEREBRO_METRIC_FLAGS_NONE_IF_DOWN - By default, 
+CEREBRO_METRIC_FLAGS_NONE_IF_DOWN - By default,
 .BR cerebro_get_metric_data(3)
 will return a cluster node even if the data has not been recently updated.
 This flag alters this behavior to have the
@@ -72,7 +72,7 @@ metric server return the node to the user without a metric_value.
 This flag does not apply to any of the default metrics supplied by
 .BR cerebrod(8).
 
-CEREBRO_METRIC_FLAGS_NONE_IF_NOT_MONITORED - By default, 
+CEREBRO_METRIC_FLAGS_NONE_IF_NOT_MONITORED - By default,
 .BR cerebro_get_metric_data(3)
 will not return a cluster node if the cluster node is not currently
 monitoring the specified metric.  This flag alters this behavior to

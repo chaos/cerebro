@@ -24,21 +24,21 @@ AC_DEFUN([AC_SLURM_STATE],
      MANPAGE_SLURM_STATE=0
      ac_with_slurm_state=no
   fi
- 
+
   AC_SUBST(MANPAGE_SLURM_STATE)
 ])
 
 AC_DEFUN([AC_SLURM_STATE_CONTROL_PATH],
 [
   if test "$ac_debug" = "yes"; then
-     SLURM_STATE_CONTROL_PATH="/tmp/cerebro_metric_slurm_state"     
+     SLURM_STATE_CONTROL_PATH="/tmp/cerebro_metric_slurm_state"
   else
      SLURM_STATE_CONTROL_PATH="$CEREBRO_MODULE_DIR/cerebro_metric_slurm_state"
   fi
 
   AC_MSG_CHECKING([for the slurm state control path])
   AC_ARG_WITH([slurm-state-control-path],
-    AS_HELP_STRING([--with-slurm-state-control-path], 
+    AS_HELP_STRING([--with-slurm-state-control-path],
                    [Define slurm state control path]),
     [ case "$withval" in
         no)  ;;

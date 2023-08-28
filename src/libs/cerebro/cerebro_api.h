@@ -24,7 +24,7 @@
  *  You should have received a copy of the GNU General Public License along
  *  with Cerebro.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
- 
+
 #ifndef _CEREBRO_API_H
 #define _CEREBRO_API_H
 
@@ -36,7 +36,7 @@
 #include "list.h"
 
 
-/* 
+/*
  * CEREBRO_MAGIC_NUMBER
  *
  * Magic number for cerebro handle
@@ -47,12 +47,12 @@
 #define CEREBRO_NODELIST_MAGIC_NUMBER            0xF00F4567
 #define CEREBRO_NODELIST_ITERATOR_MAGIC_NUMBER   0xF00F5678
 
-/* 
+/*
  * Cerebro loaded state flags
  */
 #define CEREBRO_CONFIG_LOADED                  0x00000001
 
-/* 
+/*
  * struct cerebro
  *
  * Used globally as cerebro handle
@@ -71,7 +71,7 @@ struct cerebro {
   List event_fds;
 };
 
-/* 
+/*
  * struct cerebro_namelist
  *
  * Used for nodelist interface
@@ -84,7 +84,7 @@ struct cerebro_namelist {
   struct cerebro *handle;
 };
 
-/* 
+/*
  * struct cerebro_namelist_iterator
  *
  * Used for nodelist iterator interface
@@ -97,7 +97,7 @@ struct cerebro_namelist_iterator {
   struct cerebro_namelist *namelist;
 };
 
-/* 
+/*
  * struct cerebro_nodelist_data
  *
  * Stores a nodename and a value
@@ -110,7 +110,7 @@ struct cerebro_nodelist_data {
   void *metric_value;
 };
 
-/* 
+/*
  * struct cerebro_nodelist
  *
  * Used for nodelist interface
@@ -124,7 +124,7 @@ struct cerebro_nodelist {
   struct cerebro *handle;
 };
 
-/* 
+/*
  * struct cerebro_nodelist_iterator
  *
  * Used for nodelist iterator interface

@@ -42,14 +42,14 @@
 
 #include "hash.h"
 
-/* 
+/*
  * Flags to define if a metric is a default metric, or something
  * the listener received.
  */
 #define CEREBROD_METRIC_LISTENER_ORIGIN_DEFAULT   0x00000001
 #define CEREBROD_METRIC_LISTENER_ORIGIN_MONITORED 0x00000002
 
-/* 
+/*
  * struct cerebrod_metric_data
  *
  * Contains metric data for a node
@@ -92,7 +92,7 @@ struct cerebrod_event_module
   pthread_mutex_t event_lock;
 };
 
-/* 
+/*
  * struct cerebrod_metric_name_data
  *
  * contains metric name and origin
@@ -103,7 +103,7 @@ struct cerebrod_metric_name_data
   u_int32_t metric_origin;
 };
 
-/* 
+/*
  * struct cerebrod_event_node_timeout
  *
  * contains information needed for timeout calculations
@@ -115,7 +115,7 @@ struct cerebrod_event_node_timeout
   unsigned int timeout_occurred;
 };
 
-/* 
+/*
  * struct cerebrod_timeout_data
  *
  * Store a timeout and it's string
@@ -126,7 +126,7 @@ struct cerebrod_timeout_data
   char *timeout_str;
 };
 
-/* 
+/*
  * metric_data_create
  *
  * create metric name data
@@ -135,14 +135,14 @@ struct cerebrod_timeout_data
  */
 struct cerebrod_metric_data *metric_data_create(const char *metric_name);
 
-/* 
+/*
  * metric_data_destroy
  *
  * destroy metric name data
  */
 void metric_data_destroy(void *data);
 
-/* 
+/*
  * metric_name_data_create
  *
  * create metric name data
@@ -152,21 +152,21 @@ void metric_data_destroy(void *data);
 struct cerebrod_metric_name_data *metric_name_data_create(const char *metric_name,
                                                           u_int32_t metric_origin);
 
-/* 
+/*
  * metric_name_data_destroy
  *
  * destroy metric name data
  */
 void metric_name_data_destroy(void *data);
 
-/* 
+/*
  * cerebrod_listener_data_initialize
  *
  * Initialize listener_data structures
  */
 void cerebrod_listener_data_initialize(void);
 
-/* 
+/*
  * cerebrod_listener_data_update
  *
  * Update listener_data with information from a cerebrod message

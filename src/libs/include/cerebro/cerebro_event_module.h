@@ -32,7 +32,7 @@
 
 #define CEREBRO_EVENT_INTERFACE_VERSION 1
 
-/* 
+/*
  * Cerebro_event_interface_version
  *
  * function prototype for event module function to return the
@@ -123,7 +123,7 @@ typedef int (*Cerebro_event_metric_update)(const char *nodename,
                                            void *metric_value,
                                            struct cerebro_event **event);
 
-/* 
+/*
  * Cerebro_event_destroy
  *
  * function prototype for event module to destroy an event generated
@@ -133,8 +133,8 @@ typedef int (*Cerebro_event_metric_update)(const char *nodename,
 typedef void (*Cerebro_event_destroy)(struct cerebro_event *event);
 
 /*
- * struct cerebro_event_module_info 
- * 
+ * struct cerebro_event_module_info
+ *
  * contains event module information and operations.  Required to be
  * defined in each event module.
  */

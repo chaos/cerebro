@@ -48,11 +48,11 @@
 #include "debug.h"
 #include "marshall.h"
 
-/* 
+/*
  * _receive_metric_name_response
  *
  * Receive a metric server name response
- * 
+ *
  * Returns 0 on success, -1 on error
  */
 static int
@@ -92,11 +92,11 @@ _receive_metric_name_response(cerebro_t handle,
       handle->errnum = CEREBRO_ERR_PROTOCOL;
       goto cleanup;
     }
-      
+
   /* Guarantee ending '\0' character */
   memset(metric_name_buf, '\0', CEREBRO_MAX_METRIC_NAME_LEN+1);
   memcpy(metric_name_buf, res->name, CEREBRO_MAX_METRIC_NAME_LEN);
-  
+
   if (_cerebro_namelist_append(namelist, metric_name_buf) < 0)
     goto cleanup;
 
@@ -106,7 +106,7 @@ _receive_metric_name_response(cerebro_t handle,
   return -1;
 }
 
-cerebro_namelist_t 
+cerebro_namelist_t
 cerebro_get_metric_names(cerebro_t handle)
 {
   struct cerebro_namelist *namelist = NULL;
@@ -122,12 +122,12 @@ cerebro_get_metric_names(cerebro_t handle)
                                CEREBRO_METRIC_METRIC_NAMES,
                                _receive_metric_name_response) < 0)
     goto cleanup;
-  
-                                            
-  
+
+
+
   handle->errnum = CEREBRO_ERR_SUCCESS;
   return namelist;
-  
+
  cleanup:
   if (namelist)
     (void)cerebro_namelist_destroy(namelist);

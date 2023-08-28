@@ -30,13 +30,13 @@
 
 #include "cerebro/cerebro_event_protocol.h"
 
-typedef struct event_module *event_modules_t; 
+typedef struct event_module *event_modules_t;
 
 /*
  * event_modules_load
  *
  * Find and load the event modules.
- * 
+ *
  * Returns event module handle on success, NULL on error
  */
 event_modules_t event_modules_load(void);
@@ -121,7 +121,7 @@ int event_module_node_timeout(event_modules_t handle,
  *
  * call event module metric_update function
  */
-int event_module_metric_update(event_modules_t handle, 
+int event_module_metric_update(event_modules_t handle,
                                unsigned int index,
                                const char *nodename,
                                const char *metric_name,

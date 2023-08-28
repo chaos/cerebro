@@ -75,9 +75,9 @@
  */
 static u_int32_t metric_slurm_state = 0;
 
-/* 
+/*
  * slurm_state_fd
- * 
+ *
  * Unix Domain socket in which slurm will connect to
  */
 static int slurm_state_fd = -1;
@@ -89,7 +89,7 @@ static int slurm_state_fd = -1;
  */
 Cerebro_metric_send_message send_message_function = NULL;
 
-/* 
+/*
  * _slurm_state_setup_socket
  *
  * Create and setup the server socket
@@ -103,11 +103,11 @@ _slurm_state_setup_socket(void)
   int fd;
 
   if ((fd = socket(AF_LOCAL, SOCK_STREAM, 0)) < 0)
-    {      
+    {
       CEREBRO_ERR(("socket: %s", strerror(errno)));
       goto cleanup;
     }
-  
+
   if (strlen(SLURM_STATE_CONTROL_PATH) >= sizeof(addr.sun_path))
     {
       CEREBRO_ERR(("path '%s' too long", SLURM_STATE_CONTROL_PATH));
@@ -133,13 +133,13 @@ _slurm_state_setup_socket(void)
       CEREBRO_ERR(("bind: %s", strerror(errno)));
       goto cleanup;
     }
-  
+
   if (listen(fd, SLURM_STATE_BACKLOG) < 0)
     {
       CEREBRO_ERR(("listen: %s", strerror(errno)));
       goto cleanup;
     }
-  
+
   return fd;
 
  cleanup:
@@ -231,7 +231,7 @@ _send_message(void)
 
   hb->version = CEREBROD_MESSAGE_PROTOCOL_VERSION;
   memcpy(hb->nodename, nodename, CEREBRO_MAX_NODENAME_LEN);
-  
+
   hb->metrics_len = 1;
   if (!(hb->metrics = (struct cerebrod_message_metric **)malloc(sizeof(struct cerebrod_message_metric *)*(hb->metrics_len + 1))))
     goto cleanup;
@@ -256,7 +256,7 @@ _send_message(void)
       CEREBRO_DBG(("cerebrod_send_message"));
       goto cleanup;
     }
-  
+
   rv = 0;
  cleanup:
   if (hb)
@@ -270,7 +270,7 @@ _send_message(void)
   return rv;
 }
 
-/* 
+/*
  * slurm_state_metric_thread
  *
  * Thread that will continually monitor the state of slurm
@@ -283,7 +283,7 @@ slurm_state_metric_thread(void *arg)
       struct sockaddr_un addr;
       socklen_t addrlen;
       int fd, num;
-      
+
       addrlen = sizeof(sizeof(struct sockaddr_un));
       if ((fd = accept(slurm_state_fd, (struct sockaddr *)&addr, &addrlen)) < 0)
         {
@@ -301,10 +301,10 @@ slurm_state_metric_thread(void *arg)
       metric_slurm_state = 1;
 
       /* No biggie if it fails, we can continue */
-      
+
       if (_send_message() < 0)
         CEREBRO_DBG(("_send_message failed"));
-      
+
       while (1)
         {
           char buf[CEREBRO_MAX_PACKET_LEN];
@@ -312,7 +312,7 @@ slurm_state_metric_thread(void *arg)
 
           FD_ZERO(&rfds);
           FD_SET(fd, &rfds);
-          
+
           if ((num = select(fd + 1, &rfds, NULL, NULL, NULL)) < 0)
             {
               CEREBRO_DBG(("select: %s", strerror(errno)));
@@ -340,7 +340,7 @@ slurm_state_metric_thread(void *arg)
           if (FD_ISSET(fd, &rfds))
             {
               int n;
-              
+
               if ((n = read(fd, buf, CEREBRO_MAX_PACKET_LEN)) < 0)
                 {
                   CEREBRO_ERR(("read: %s", strerror(errno)));
@@ -362,7 +362,7 @@ slurm_state_metric_thread(void *arg)
               if (!n)
                 {
                   metric_slurm_state = 0;
-                  
+
                   /* No biggie if it fails, we can continue */
                   if (_send_message() < 0)
                     CEREBRO_DBG(("_send_message failed"));
@@ -380,7 +380,7 @@ slurm_state_metric_thread(void *arg)
               close(fd);
               break;
             }
-          
+
         }
     }
 

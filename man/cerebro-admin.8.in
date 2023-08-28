@@ -27,14 +27,14 @@
 .SH "NAME"
 cerebro-admin \- cerebro metric administration
 .SH "SYNOPSIS"
-.B cerebro-admin 
+.B cerebro-admin
 .I "[OPTIONS] -m <metric_name> [-r | -u | -p | -s]"
 .br
 .SH "DESCRIPTION"
 The
 .B cerebro-admin
-allows administrators to perform metric administration with 
-a 
+allows administrators to perform metric administration with
+a
 .B cerebrod(8)
 metric server.  New metrics can be registered, unregistered, updated
 or resent.  A number of the options below allow for alternate metric

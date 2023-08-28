@@ -91,14 +91,14 @@ hash_t listener_data = NULL;
 int listener_data_numnodes;
 int listener_data_size;
 
-/*  
+/*
  * listener_data_lock
  *
  * lock to protect pthread access to listener_data
  */
 pthread_mutex_t listener_data_lock = PTHREAD_MUTEX_INITIALIZER;
 
-/* 
+/*
  * metric_names
  * metric_names_size
  *
@@ -108,7 +108,7 @@ hash_t metric_names = NULL;
 int metric_names_size;
 int metric_names_count;
 
-/* 
+/*
  * metric_name_defaults
  * metric_name_defaults_count
  *
@@ -122,7 +122,7 @@ char *metric_name_defaults[] = {
 };
 int metric_name_defaults_count = 3;
 
-/*  
+/*
  * metric_names_lock
  *
  * lock to protect pthread access to the metric_name index
@@ -146,23 +146,23 @@ metric_data_create(const char *metric_name)
   return md;
 }
 
-void 
+void
 metric_data_destroy(void *data)
 {
   struct cerebrod_metric_data *md;
 
   assert(data);
-  
+
   md = (struct cerebrod_metric_data *)data;
   Free(md->metric_name);
   Free(md->metric_value);
   Free(md);
 }
 
-/* 
+/*
  * _cerebrod_node_data_create_and_init
  *
- * Create and initialize a cerebrod_node_data 
+ * Create and initialize a cerebrod_node_data
  *
  */
 static struct cerebrod_node_data *
@@ -180,9 +180,9 @@ _cerebrod_node_data_create_and_init(const char *nodename)
   Pthread_mutex_init(&(nd->node_data_lock), NULL);
   if (conf.metric_server)
     {
-      nd->metric_data = Hash_create(LISTENER_DATA_METRIC_DATA_SIZE_DEFAULT, 
+      nd->metric_data = Hash_create(LISTENER_DATA_METRIC_DATA_SIZE_DEFAULT,
                                     (hash_key_f)hash_key_string,
-                                    (hash_cmp_f)strcmp, 
+                                    (hash_cmp_f)strcmp,
                                     (hash_del_f)metric_data_destroy);
       nd->metric_data_size = LISTENER_DATA_METRIC_DATA_SIZE_DEFAULT;
     }
@@ -200,7 +200,7 @@ metric_name_data_create(const char *metric_name, u_int32_t metric_origin)
 {
   struct cerebrod_metric_name_data *mnd;
 
-  assert(metric_name 
+  assert(metric_name
          && (metric_origin >= CEREBROD_METRIC_LISTENER_ORIGIN_DEFAULT
              && metric_origin <= CEREBROD_METRIC_LISTENER_ORIGIN_MONITORED));
 
@@ -226,7 +226,7 @@ metric_name_data_destroy(void *data)
   struct cerebrod_metric_name_data *mnd;
 
   assert(data);
-  
+
   mnd = (struct cerebrod_metric_name_data *)data;
 
   if (mnd->metric_origin & CEREBROD_METRIC_LISTENER_ORIGIN_MONITORED)
@@ -234,7 +234,7 @@ metric_name_data_destroy(void *data)
   Free(mnd);
 }
 
-void 
+void
 cerebrod_listener_data_initialize(void)
 {
   int numnodes = 0;
@@ -242,7 +242,7 @@ cerebrod_listener_data_initialize(void)
   pthread_mutex_lock(&listener_data_init_lock);
   if (listener_data_init)
     goto out;
-  
+
   if (!conf.listen)
     CEREBROD_EXIT(("listen server not setup"));
 
@@ -270,7 +270,7 @@ cerebrod_listener_data_initialize(void)
                               (hash_key_f)hash_key_string,
                               (hash_cmp_f)strcmp,
                               (hash_del_f)NULL);
-  
+
   /* If the clusterlist module contains nodes, retrieve all of these
    * nodes and put them into the cerebrod_listener_data list.  All updates
    * will involve updating data rather than involve insertion.
@@ -286,7 +286,7 @@ cerebrod_listener_data_initialize(void)
       for (i = 0; i < numnodes; i++)
         {
           struct cerebrod_node_data *nd;
-          
+
           nd = _cerebrod_node_data_create_and_init(nodes[i]);
 
           Hash_insert(listener_data, nd->nodename, nd);
@@ -300,11 +300,11 @@ cerebrod_listener_data_initialize(void)
   if (conf.metric_server)
     {
       int i;
-      
+
       metric_names_size = metric_name_defaults_count + LISTENER_DATA_METRIC_NAMES_SIZE_DEFAULT;
-      metric_names = Hash_create(metric_names_size, 
-                                 (hash_key_f)hash_key_string, 
-                                 (hash_cmp_f)strcmp, 
+      metric_names = Hash_create(metric_names_size,
+                                 (hash_key_f)hash_key_string,
+                                 (hash_cmp_f)strcmp,
                                  (hash_del_f)metric_name_data_destroy);
 
       metric_names_count = 0;
@@ -331,7 +331,7 @@ cerebrod_listener_data_initialize(void)
   Pthread_mutex_unlock(&listener_data_init_lock);
 }
 
-/*  
+/*
  * _output_node_data_insert
  *
  * Output debugging info about a recently inserted node
@@ -340,7 +340,7 @@ static void
 _output_node_data_insert(struct cerebrod_node_data *nd)
 {
   assert(nd);
- 
+
   if (!(conf.debug && conf.listen_debug))
     return;
 
@@ -351,7 +351,7 @@ _output_node_data_insert(struct cerebrod_node_data *nd)
   Pthread_mutex_unlock(&debug_output_mutex);
 }
 
-/*  
+/*
  * _output_node_data_update
  *
  * Output debugging info about a recently updated node
@@ -360,7 +360,7 @@ static void
 _output_node_data_update(struct cerebrod_node_data *nd)
 {
   assert(nd);
- 
+
   if (!(conf.debug && conf.listen_debug))
     return;
 
@@ -381,14 +381,14 @@ _metric_data_dump(void *data, const void *key, void *arg)
 {
   struct cerebrod_metric_data *md;
   char *nodename, *buf;
- 
+
   assert(data && key && arg);
- 
+
   md = (struct cerebrod_metric_data *)data;
   nodename = (char *)arg;
- 
+
   fprintf(stderr, "* %s: metric name=%s type=%d len=%d ",
-          nodename, md->metric_name, md->metric_value_type, 
+          nodename, md->metric_name, md->metric_value_type,
           md->metric_value_len);
 
   if (md->metric_value_type == CEREBRO_DATA_VALUE_TYPE_INT32)
@@ -436,16 +436,16 @@ _node_data_dump(void *x, const void *key, void *arg)
   struct cerebrod_node_data *nd;
 
   assert(x);
- 
+
   nd = (struct cerebrod_node_data *)x;
 
   Pthread_mutex_lock(&(nd->node_data_lock));
   if (nd->discovered && conf.metric_server_debug)
     {
       int num;
-      
+
       fprintf(stderr, "* %s: discovered=%d\n", nd->nodename, nd->discovered);
-      fprintf(stderr, "* %s: last_received_time=%u\n", 
+      fprintf(stderr, "* %s: last_received_time=%u\n",
               nd->nodename, nd->last_received_time);
 
       if (nd->metric_data)
@@ -455,7 +455,7 @@ _node_data_dump(void *x, const void *key, void *arg)
             fprintf(stderr, "* invalid dump count: num=%d data count=%d\n",
                     num, nd->metric_data_count);
           else
-            fprintf(stderr, "* %s: metric_data_count=%d\n", 
+            fprintf(stderr, "* %s: metric_data_count=%d\n",
                     nd->nodename, nd->metric_data_count);
         }
     }
@@ -485,7 +485,7 @@ _listener_data_dump(void)
   if (listener_data_numnodes > 0)
     {
       int num;
-      
+
       num = Hash_for_each(listener_data, _node_data_dump, NULL);
       if (num != listener_data_numnodes)
         fprintf(stderr, "* invalid dump count: num=%d numnodes=%d\n",
@@ -538,7 +538,7 @@ _metric_names_dump(void)
   Pthread_mutex_unlock(&metric_names_lock);
 }
 
-/* 
+/*
  * _metric_data_update
  *
  * Update the data of a particular metric.  The struct
@@ -554,7 +554,7 @@ _metric_data_update(struct cerebrod_node_data *nd,
 #if CEREBRO_DEBUG
   int rv;
 #endif /* CEREBRO_DEBUG */
-  
+
   assert(nd && metric_name && mm);
 
   /* If metric server isn't running, metric_names is NULL */
@@ -569,7 +569,7 @@ _metric_data_update(struct cerebrod_node_data *nd,
   if (rv != EBUSY)
     CEREBROD_EXIT(("mutex not locked: rv=%d", rv));
 #endif /* CEREBRO_DEBUG */
-  
+
   if (!(md = Hash_find(nd->metric_data, metric_name)))
     {
       /* Re-hash if our hash is getting too small */
@@ -590,7 +590,7 @@ _metric_data_update(struct cerebrod_node_data *nd,
         CEREBROD_DBG(("metric type modified: old=%d new=%d",
                      md->metric_value_type, mm->metric_value_type));
     }
-  
+
   md->metric_value_received_time = received_time;
   md->metric_value_type = mm->metric_value_type;
 
@@ -609,7 +609,7 @@ _metric_data_update(struct cerebrod_node_data *nd,
   memcpy(md->metric_value, mm->metric_value, mm->metric_value_len);
 }
 
-void 
+void
 cerebrod_listener_data_update(char *nodename,
                               struct cerebrod_message *msg,
                               u_int32_t received_time)
@@ -641,7 +641,7 @@ cerebrod_listener_data_update(char *nodename,
       listener_data_numnodes++;
 
       cerebrod_event_add_node_timeout_data(nd, received_time);
-      
+
       /* Ok to call debug output function, since
        * listener_data_lock is locked.
        */
@@ -649,7 +649,7 @@ cerebrod_listener_data_update(char *nodename,
     }
   Pthread_mutex_unlock(&listener_data_lock);
 
-  /* 
+  /*
    * The below loop used to be in _metric_data_update().  It was removed
    * b/c a race was discovered in debug mode.
    *
@@ -673,21 +673,21 @@ cerebrod_listener_data_update(char *nodename,
         {
           char metric_name_buf[CEREBRO_MAX_METRIC_NAME_LEN+1];
           struct cerebrod_message_metric *mm = msg->metrics[i];
-          
+
           /* Guarantee ending '\0' character */
           memset(metric_name_buf, '\0', CEREBRO_MAX_METRIC_NAME_LEN+1);
           memcpy(metric_name_buf, mm->metric_name, CEREBRO_MAX_METRIC_NAME_LEN);
-          
+
           if (!strlen(metric_name_buf))
             {
               CEREBROD_DBG(("null message_data metric_name received"));
               continue;
             }
-          
+
           if (!Hash_find(metric_names, metric_name_buf))
             {
               struct cerebrod_metric_name_data *mnd;
-              
+
               /* Re-hash if our hash is getting too small */
               if ((metric_names_count + 1) > (metric_names_size*2))
                 cerebrod_rehash(&metric_names,
@@ -695,10 +695,10 @@ cerebrod_listener_data_update(char *nodename,
                                 LISTENER_DATA_METRIC_NAMES_INCREMENT,
                                 metric_names_count,
                                 &metric_names_lock);
-              
+
               mnd = metric_name_data_create(metric_name_buf,
                                             CEREBROD_METRIC_LISTENER_ORIGIN_MONITORED);
-              
+
               Hash_insert(metric_names, mnd->metric_name, mnd);
               metric_names_count++;
             }

@@ -44,17 +44,17 @@
 #include "debug.h"
 #include "list.h"
 
-int 
+int
 cerebro_namelist_length(cerebro_namelist_t namelist)
 {
   if (_cerebro_namelist_check(namelist) < 0)
     return -1;
-  
+
   namelist->errnum = CEREBRO_ERR_SUCCESS;
   return list_count(namelist->metric_names);
 }
 
-int 
+int
 cerebro_namelist_destroy(cerebro_namelist_t namelist)
 {
   cerebro_namelist_t tempnamelist;
@@ -75,10 +75,10 @@ cerebro_namelist_destroy(cerebro_namelist_t namelist)
       if (tempnamelist == namelist)
         {
           list_remove(itr);
-          
+
           namelist->magic = ~CEREBRO_NAMELIST_MAGIC_NUMBER;
           namelist->errnum = CEREBRO_ERR_SUCCESS;
-          /* 
+          /*
            * destroy metric_names first, since it will destroy iterators
            */
           list_destroy(namelist->metric_names);
@@ -107,8 +107,8 @@ cerebro_namelist_destroy(cerebro_namelist_t namelist)
     list_iterator_destroy(itr);
   return rv;
 }
- 
-cerebro_namelist_iterator_t 
+
+cerebro_namelist_iterator_t
 cerebro_namelist_iterator_create(cerebro_namelist_t namelist)
 {
   cerebro_namelist_iterator_t namelistItr = NULL;
@@ -123,13 +123,13 @@ cerebro_namelist_iterator_create(cerebro_namelist_t namelist)
     }
   memset(namelistItr, '\0', sizeof(struct cerebro_namelist_iterator));
   namelistItr->magic = CEREBRO_NAMELIST_ITERATOR_MAGIC_NUMBER;
-  
+
   if (!(namelistItr->itr = list_iterator_create(namelist->metric_names)))
     {
       namelist->errnum = CEREBRO_ERR_OUTMEM;
       goto cleanup;
     }
-  
+
   if (!list_append(namelist->iterators, namelistItr))
     {
       CEREBRO_DBG(("list_append: %s", strerror(errno)));
@@ -151,8 +151,8 @@ cerebro_namelist_iterator_create(cerebro_namelist_t namelist)
     }
   return NULL;
 }
- 
-/* 
+
+/*
  * _cerebro_namelist_iterator_check
  *
  * Checks for a proper cerebro namelist
@@ -162,7 +162,7 @@ cerebro_namelist_iterator_create(cerebro_namelist_t namelist)
 int
 _cerebro_namelist_iterator_check(cerebro_namelist_iterator_t namelistItr)
 {
-  if (!namelistItr 
+  if (!namelistItr
       || namelistItr->magic != CEREBRO_NAMELIST_ITERATOR_MAGIC_NUMBER)
     return -1;
 
@@ -172,7 +172,7 @@ _cerebro_namelist_iterator_check(cerebro_namelist_iterator_t namelistItr)
       namelistItr->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
-  
+
   if (namelistItr->namelist->magic != CEREBRO_NAMELIST_MAGIC_NUMBER)
     {
       CEREBRO_DBG(("namelist destroyed"));
@@ -184,19 +184,19 @@ _cerebro_namelist_iterator_check(cerebro_namelist_iterator_t namelistItr)
 }
 
 
-int 
+int
 cerebro_namelist_iterator_name(cerebro_namelist_iterator_t namelistItr,
                                char **name)
 {
   if (_cerebro_namelist_iterator_check(namelistItr) < 0)
     return -1;
-  
+
   if (!namelistItr->current)
     {
       namelistItr->errnum = CEREBRO_ERR_END_OF_LIST;
       return -1;
     }
-  
+
   if (name)
     *name = namelistItr->current;
   return 0;
@@ -213,8 +213,8 @@ cerebro_namelist_iterator_next(cerebro_namelist_iterator_t namelistItr)
   namelistItr->errnum = CEREBRO_ERR_SUCCESS;
   return (namelistItr->current) ? 1 : 0;
 }
- 
-int 
+
+int
 cerebro_namelist_iterator_reset(cerebro_namelist_iterator_t namelistItr)
 {
   if (_cerebro_namelist_iterator_check(namelistItr) < 0)
@@ -235,7 +235,7 @@ cerebro_namelist_iterator_at_end(cerebro_namelist_iterator_t namelistItr)
   return (namelistItr->current) ? 0 : 1;
 }
 
-int 
+int
 cerebro_namelist_iterator_destroy(cerebro_namelist_iterator_t namelistItr)
 {
   cerebro_namelist_t namelist;
@@ -245,7 +245,7 @@ cerebro_namelist_iterator_destroy(cerebro_namelist_iterator_t namelistItr)
 
   if (_cerebro_namelist_iterator_check(namelistItr) < 0)
     return -1;
-  
+
   namelist = namelistItr->namelist;
 
   if (!(itr = list_iterator_create(namelist->iterators)))
@@ -253,7 +253,7 @@ cerebro_namelist_iterator_destroy(cerebro_namelist_iterator_t namelistItr)
       namelistItr->errnum = CEREBRO_ERR_OUTMEM;
       goto cleanup;
     }
-  
+
   while ((tempItr = list_next(itr)))
     {
       if (tempItr == namelistItr)
@@ -267,7 +267,7 @@ cerebro_namelist_iterator_destroy(cerebro_namelist_iterator_t namelistItr)
           break;
         }
     }
-  
+
   if (!found)
     {
       namelistItr->errnum = CEREBRO_ERR_PARAMETERS;

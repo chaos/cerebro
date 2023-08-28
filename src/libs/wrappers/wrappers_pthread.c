@@ -34,11 +34,11 @@
 
 #include "wrappers.h"
 
-int 
+int
 wrap_pthread_create(WRAPPERS_ARGS, pthread_t *thread, pthread_attr_t *attr, void *(*start_routine)(void *), void *arg)
 {
   int rv;
-  
+
   assert(file && function);
 
   if (!thread || !start_routine)
@@ -50,11 +50,11 @@ wrap_pthread_create(WRAPPERS_ARGS, pthread_t *thread, pthread_attr_t *attr, void
   return rv;
 }
 
-int 
+int
 wrap_pthread_attr_init(WRAPPERS_ARGS, pthread_attr_t *attr)
 {
   int rv;
-  
+
   assert(file && function);
 
   if (!attr)
@@ -66,11 +66,11 @@ wrap_pthread_attr_init(WRAPPERS_ARGS, pthread_attr_t *attr)
   return rv;
 }
 
-int 
+int
 wrap_pthread_attr_destroy(WRAPPERS_ARGS, pthread_attr_t *attr)
 {
   int rv;
-  
+
   assert(file && function);
 
   if (!attr)
@@ -82,11 +82,11 @@ wrap_pthread_attr_destroy(WRAPPERS_ARGS, pthread_attr_t *attr)
   return rv;
 }
 
-int 
+int
 wrap_pthread_attr_setdetachstate(WRAPPERS_ARGS, pthread_attr_t *attr, int detachstate)
 {
   int rv;
-  
+
   assert(file && function);
 
   if (!attr)
@@ -98,11 +98,11 @@ wrap_pthread_attr_setdetachstate(WRAPPERS_ARGS, pthread_attr_t *attr, int detach
   return rv;
 }
 
-int 
+int
 wrap_pthread_attr_setstacksize(WRAPPERS_ARGS, pthread_attr_t *attr, size_t stacksize)
 {
   int rv;
-  
+
   assert(file && function);
 
   if (!attr || stacksize < PTHREAD_STACK_MIN)
@@ -118,7 +118,7 @@ int
 wrap_pthread_mutex_lock(WRAPPERS_ARGS, pthread_mutex_t *mutex)
 {
   int rv;
-  
+
   assert(file && function);
 
   if (!mutex)
@@ -130,11 +130,11 @@ wrap_pthread_mutex_lock(WRAPPERS_ARGS, pthread_mutex_t *mutex)
   return rv;
 }
 
-int 
+int
 wrap_pthread_mutex_trylock(WRAPPERS_ARGS, pthread_mutex_t *mutex)
 {
   int rv;
-  
+
   assert(file && function);
 
   if (!mutex)
@@ -147,11 +147,11 @@ wrap_pthread_mutex_trylock(WRAPPERS_ARGS, pthread_mutex_t *mutex)
   return rv;
 }
 
-int 
+int
 wrap_pthread_mutex_unlock(WRAPPERS_ARGS, pthread_mutex_t *mutex)
 {
   int rv;
-  
+
   assert(file && function);
 
   if (!mutex)
@@ -167,7 +167,7 @@ int
 wrap_pthread_mutex_init(WRAPPERS_ARGS, pthread_mutex_t *mutex, const pthread_mutexattr_t *mutexattr)
 {
   int rv;
-  
+
   assert(file && function);
 
   if (!mutex)
@@ -179,7 +179,7 @@ wrap_pthread_mutex_init(WRAPPERS_ARGS, pthread_mutex_t *mutex, const pthread_mut
   return rv;
 }
 
-int 
+int
 wrap_pthread_cond_signal(WRAPPERS_ARGS, pthread_cond_t *cond)
 {
   int rv;
@@ -195,7 +195,7 @@ wrap_pthread_cond_signal(WRAPPERS_ARGS, pthread_cond_t *cond)
   return rv;
 }
 
-int 
+int
 wrap_pthread_cond_wait(WRAPPERS_ARGS, pthread_cond_t *cond, pthread_mutex_t *mutex)
 {
   int rv;

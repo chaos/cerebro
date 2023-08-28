@@ -83,14 +83,14 @@ struct cerebrod_config_forward_message_config {
   unsigned int host_len;
 };
 
-/*  
+/*
  * struct cerebro_config
  *
  * Stores configuration info from config file.
  */
 struct cerebro_config
 {
-  /* 
+  /*
    * Libcerebro configuration
    */
   struct cerebro_config_server cerebro_metric_server[CEREBRO_CONFIG_CEREBRO_METRIC_SERVERS_MAX];
@@ -104,7 +104,7 @@ struct cerebro_config
   int cerebro_flags;
   int cerebro_flags_flag;
 
-  /* 
+  /*
    * Cerebrod configuration
    */
   unsigned int cerebrod_heartbeat_frequency_min;

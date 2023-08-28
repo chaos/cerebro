@@ -23,7 +23,7 @@ AC_DEFUN([AC_HOSTSFILE],
      MANPAGE_HOSTSFILE=0
      ac_with_hostsfile=no
   fi
- 
+
   AC_SUBST(MANPAGE_HOSTSFILE)
 ])
 
@@ -33,7 +33,7 @@ AC_DEFUN([AC_HOSTSFILE_PATH],
 
   AC_MSG_CHECKING([for default hostsfile path])
   AC_ARG_WITH([hostsfile-path],
-    AS_HELP_STRING([--with-hostsfile-path=PATH], 
+    AS_HELP_STRING([--with-hostsfile-path=PATH],
                    [Specify default hostsfile clusterlist path]),
     [ case "$withval" in
         no)  ;;
@@ -44,8 +44,8 @@ AC_DEFUN([AC_HOSTSFILE_PATH],
   )
   AC_MSG_RESULT($CEREBRO_CLUSTERLIST_HOSTSFILE_DEFAULT)
 
-  AC_DEFINE_UNQUOTED([CEREBRO_CLUSTERLIST_HOSTSFILE_DEFAULT], 
-                     ["$CEREBRO_CLUSTERLIST_HOSTSFILE_DEFAULT"], 
+  AC_DEFINE_UNQUOTED([CEREBRO_CLUSTERLIST_HOSTSFILE_DEFAULT],
+                     ["$CEREBRO_CLUSTERLIST_HOSTSFILE_DEFAULT"],
                      [Define default hostsfile clusterlist.])
   AC_SUBST(CEREBRO_CLUSTERLIST_HOSTSFILE_DEFAULT)
 ])

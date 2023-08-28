@@ -19,7 +19,7 @@ AC_DEFUN([AC_STATIC_MODULES],
   if test "$ac_with_static_modules" = "yes"; then
      AC_DEFINE([WITH_STATIC_MODULES], [1], [Define if builing with static modules])
      MANPAGE_STATIC_MODULES=1
-  else 
+  else
      MANPAGE_STATIC_MODULES=0
   fi
 

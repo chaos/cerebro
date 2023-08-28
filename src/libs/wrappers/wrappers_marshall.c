@@ -34,7 +34,7 @@
 
 #include "wrappers.h"
 
-int 
+int
 wrap_marshall_int8(WRAPPERS_ARGS, int8_t val, char *buf, unsigned int buflen)
 {
   int rv;
@@ -50,7 +50,7 @@ wrap_marshall_int8(WRAPPERS_ARGS, int8_t val, char *buf, unsigned int buflen)
   return rv;
 }
 
-int 
+int
 wrap_marshall_int32(WRAPPERS_ARGS, int32_t val, char *buf, unsigned int buflen)
 {
   int rv;
@@ -66,7 +66,7 @@ wrap_marshall_int32(WRAPPERS_ARGS, int32_t val, char *buf, unsigned int buflen)
   return rv;
 }
 
-int 
+int
 wrap_marshall_u_int8(WRAPPERS_ARGS, u_int8_t val, char *buf, unsigned int buflen)
 {
   int rv;
@@ -82,7 +82,7 @@ wrap_marshall_u_int8(WRAPPERS_ARGS, u_int8_t val, char *buf, unsigned int buflen
   return rv;
 }
 
-int 
+int
 wrap_marshall_u_int32(WRAPPERS_ARGS, u_int32_t val, char *buf, unsigned int buflen)
 {
   int rv;
@@ -98,7 +98,7 @@ wrap_marshall_u_int32(WRAPPERS_ARGS, u_int32_t val, char *buf, unsigned int bufl
   return rv;
 }
 
-int 
+int
 wrap_marshall_float(WRAPPERS_ARGS, float val, char *buf, unsigned int buflen)
 {
   int rv;
@@ -114,7 +114,7 @@ wrap_marshall_float(WRAPPERS_ARGS, float val, char *buf, unsigned int buflen)
   return rv;
 }
 
-int 
+int
 wrap_marshall_double(WRAPPERS_ARGS, double val, char *buf, unsigned int buflen)
 {
   int rv;
@@ -130,7 +130,7 @@ wrap_marshall_double(WRAPPERS_ARGS, double val, char *buf, unsigned int buflen)
   return rv;
 }
 
-int 
+int
 wrap_marshall_buffer(WRAPPERS_ARGS, const char *val, unsigned int vallen, char *buf, unsigned int buflen)
 {
   int rv;
@@ -146,7 +146,7 @@ wrap_marshall_buffer(WRAPPERS_ARGS, const char *val, unsigned int vallen, char *
   return rv;
 }
 
-int 
+int
 wrap_unmarshall_int8(WRAPPERS_ARGS, int8_t *val, const char *buf, unsigned int buflen)
 {
   int rv;
@@ -162,7 +162,7 @@ wrap_unmarshall_int8(WRAPPERS_ARGS, int8_t *val, const char *buf, unsigned int b
   return rv;
 }
 
-int 
+int
 wrap_unmarshall_int32(WRAPPERS_ARGS, int32_t *val, const char *buf, unsigned int buflen)
 {
   int rv;
@@ -178,7 +178,7 @@ wrap_unmarshall_int32(WRAPPERS_ARGS, int32_t *val, const char *buf, unsigned int
   return rv;
 }
 
-int 
+int
 wrap_unmarshall_u_int8(WRAPPERS_ARGS, u_int8_t *val, const char *buf, unsigned int buflen)
 {
   int rv;
@@ -194,7 +194,7 @@ wrap_unmarshall_u_int8(WRAPPERS_ARGS, u_int8_t *val, const char *buf, unsigned i
   return rv;
 }
 
-int 
+int
 wrap_unmarshall_u_int32(WRAPPERS_ARGS, u_int32_t *val, const char *buf, unsigned int buflen)
 {
   int rv;
@@ -226,7 +226,7 @@ wrap_unmarshall_float(WRAPPERS_ARGS, float *val, const char *buf, unsigned int b
   return rv;
 }
 
-int 
+int
 wrap_unmarshall_double(WRAPPERS_ARGS, double *val, const char *buf, unsigned int buflen)
 {
   int rv;
@@ -242,7 +242,7 @@ wrap_unmarshall_double(WRAPPERS_ARGS, double *val, const char *buf, unsigned int
   return rv;
 }
 
-int 
+int
 wrap_unmarshall_buffer(WRAPPERS_ARGS, char *val, unsigned int vallen, const char *buf, unsigned int buflen)
 {
   int rv;

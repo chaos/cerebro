@@ -59,7 +59,7 @@ common_metric_cleanup_do_nothing(void)
   return 0;
 }
 
-int 
+int
 common_metric_get_metric_period_0(int *period)
 {
   if (!period)
@@ -72,7 +72,7 @@ common_metric_get_metric_period_0(int *period)
   return 0;
 }
 
-int 
+int
 common_metric_get_metric_period_60(int *period)
 {
   if (!period)
@@ -85,7 +85,7 @@ common_metric_get_metric_period_60(int *period)
   return 0;
 }
 
-int 
+int
 common_metric_get_metric_period_300(int *period)
 {
   if (!period)

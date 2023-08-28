@@ -28,7 +28,7 @@
 #ifndef _CEREBRO_UTIL_H
 #define _CEREBRO_UTIL_H
 
-/* 
+/*
  * _cerebro_handle_check
  *
  * Checks for a proper cerebro handle, setting the errnum

@@ -76,19 +76,19 @@ swapfree_metric_get_metric_value(unsigned int *metric_value_type,
       CEREBRO_DBG(("invalid parameters"));
       return -1;
     }
-  
+
   if (cerebro_metric_get_memory(NULL,
 				NULL,
 				NULL,
 				&swapfreeval) < 0)
     goto cleanup;
-  
+
   if (!(swapfreeptr = (u_int32_t *)malloc(sizeof(u_int32_t))))
     {
       CEREBRO_ERR(("malloc: %s", strerror(errno)));
       goto cleanup;
     }
-  
+
   *swapfreeptr = swapfreeval;
 
   *metric_value_type = CEREBRO_DATA_VALUE_TYPE_U_INT32;

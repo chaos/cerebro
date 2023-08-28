@@ -1,4 +1,4 @@
-Name:    @PACKAGE@ 
+Name:    @PACKAGE@
 Version: @VERSION@
 Release: 1
 
@@ -9,7 +9,7 @@ Source: @PACKAGE@-@VERSION@.tar.gz
 
 BuildRequires: systemd
 Requires: systemd
-Requires: /bin/sh 
+Requires: /bin/sh
 
 %description
 Cerebro is a collection of cluster monitoring tools and libraries.
@@ -123,7 +123,7 @@ Event module to monitor node up/down.
            %{?_enable_static_modules} \
            %{?_enable_debug} \
            --with-systemdsystemunitdir=%{_unitdir}
-make 
+make
 
 %post
 # are we upgrading? restart it if running

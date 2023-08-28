@@ -40,10 +40,10 @@
  */
 int _cerebro_namelist_check(cerebro_namelist_t namelist);
 
-/* 
+/*
  * _cerebro_namelist_create
  *
- * Create and initialize a namelist 
+ * Create and initialize a namelist
  *
  * Returns namelist on success, NULL on error
  */
@@ -51,7 +51,7 @@ cerebro_namelist_t _cerebro_namelist_create(cerebro_t handle);
 
 /*
  * _cerebro_namelist_append
- * 
+ *
  * Append additional namelist data
  *
  * Returns 0 on success, -1 on error

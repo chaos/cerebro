@@ -52,7 +52,7 @@
  *   response will be sent even if no event names exist.
  *
  * Client -> Server
- * - Client can close the connection at any time by closing the 
+ * - Client can close the connection at any time by closing the
  *   TCP connection.
  *
  * Notes:
@@ -110,12 +110,12 @@ struct cerebro_event_server_response
                                             + sizeof(u_int8_t) \
                                             + CEREBRO_MAX_EVENT_NAME_LEN)
 
-/* 
+/*
  * struct cerebro_event
  *
  * defines an event that can be returned to listeners
  */
-struct cerebro_event 
+struct cerebro_event
 {
   int32_t version;
   u_int32_t err_code;

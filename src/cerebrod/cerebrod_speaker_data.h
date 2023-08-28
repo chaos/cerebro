@@ -29,7 +29,7 @@
 #define _CEREBROD_SPEAKER_DATA_H
 
 #include <sys/types.h>
- 
+
 #include "cerebro/cerebro_metric_module.h"
 #include "cerebro/cerebrod_message_protocol.h"
 
@@ -73,7 +73,7 @@ struct cerebrod_speaker_metric_info
  */
 void cerebrod_speaker_data_initialize(void);
 
-/* 
+/*
  * cerebrod_speaker_data_metric_list_sort
  *
  * Sort the metric list
@@ -85,7 +85,7 @@ void cerebrod_speaker_data_metric_list_sort(void);
  *
  * Store metric data into the heartbeat
  */
-void cerebrod_speaker_data_get_heartbeat_metric_data(struct cerebrod_message *msg, 
+void cerebrod_speaker_data_get_heartbeat_metric_data(struct cerebrod_message *msg,
                                                      unsigned int *message_len,
                                                      int *more_data_to_send);
 
@@ -94,7 +94,7 @@ void cerebrod_speaker_data_get_heartbeat_metric_data(struct cerebrod_message *ms
  *
  * Store metric data into the message
  */
-void cerebrod_speaker_data_get_module_metric_data(struct cerebrod_message *msg, 
+void cerebrod_speaker_data_get_module_metric_data(struct cerebrod_message *msg,
                                                   unsigned int *message_len,
                                                   unsigned int index,
                                                   int *more_data_to_send);

@@ -28,7 +28,7 @@
 #ifndef _CEREBROD_EVENT_NODE_TIMEOUT_H
 #define _CEREBROD_EVENT_NODE_TIMEOUT_H
 
-/* 
+/*
  * cerebrod_event_node_timeout_monitor
  *
  * Runs the cerebrod event node timeout monitor.  This thread will
@@ -36,7 +36,7 @@
  * must be notified.
  *
  * Passed no argument
- * 
+ *
  * Executed in detached state, no return value.
  */
 void *cerebrod_event_node_timeout_monitor(void *);

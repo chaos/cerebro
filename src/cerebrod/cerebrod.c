@@ -53,7 +53,7 @@
 #include "wrappers.h"
 
 #if !WITH_CEREBROD_NO_THREADS
-/*  
+/*
  * debug_output_mutex
  *
  * To coordinate output of debugging info to stderr.
@@ -98,13 +98,13 @@ extern pthread_mutex_t event_server_init_lock;
 extern struct cerebrod_config conf;
 
 /* for hostlist library */
-void 
+void
 lsd_fatal_error(char *file, int line, char *mesg)
 {
   cerebro_err_exit("LSD FATAL ERROR(%s:%d) %s: %s", file, line, mesg, strerror(errno));
 }
 
-int 
+int
 main(int argc, char **argv)
 {
   cerebro_err_init(argv[0]);
@@ -121,7 +121,7 @@ main(int argc, char **argv)
     cerebro_err_set_flags(CEREBRO_ERROR_STDERR);
 
   /* Call after daemonization, since daemonization closes currently
-   * open fds 
+   * open fds
    */
   openlog(argv[0], LOG_ODELAY | LOG_PID, LOG_DAEMON);
 
@@ -214,12 +214,12 @@ main(int argc, char **argv)
       /* Wait for initialization to complete */
       Pthread_mutex_lock(&event_node_timeout_monitor_init_lock);
       while (!event_node_timeout_monitor_init)
-        Pthread_cond_wait(&event_node_timeout_monitor_init_cond, 
+        Pthread_cond_wait(&event_node_timeout_monitor_init_cond,
                           &event_node_timeout_monitor_init_lock);
       Pthread_mutex_unlock(&event_node_timeout_monitor_init_lock);
     }
 
-  /* Start metric controller - see comments at speaker below */ 
+  /* Start metric controller - see comments at speaker below */
   if (conf.metric_controller)
     {
       pthread_t thread;
@@ -234,14 +234,14 @@ main(int argc, char **argv)
       /* Wait for initialization to complete */
       Pthread_mutex_lock(&metric_controller_init_lock);
       while (!metric_controller_init)
-        Pthread_cond_wait(&metric_controller_init_cond, 
+        Pthread_cond_wait(&metric_controller_init_cond,
                           &metric_controller_init_lock);
       Pthread_mutex_unlock(&metric_controller_init_lock);
     }
 
 #endif /* !WITH_CEREBROD_SPEAKER_ONLY */
 
-  /* Start speaker  
+  /* Start speaker
    *
    * It may make more logical sense to start the metric controller
    * after the speaker since metric data cannot be propagated until
@@ -257,7 +257,7 @@ main(int argc, char **argv)
 
   /* If speak is set, we do not reach this point */
 
-  for (;;) 
+  for (;;)
     sleep(INT_MAX);
 
   return 0;			/* NOT REACHED */

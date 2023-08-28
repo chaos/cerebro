@@ -5,7 +5,7 @@
 AC_DEFUN([AC_CEREBRO_METRIC_CONTROL_PATH],
 [
   if test "$ac_debug" = "yes"; then
-     METRIC_CONTROL_PATH="\"/tmp/cerebro_metric_control\""     
+     METRIC_CONTROL_PATH="\"/tmp/cerebro_metric_control\""
   else
      # Must expand nested unquoting
      METRIC_CONTROL_PATH_TMP1="`eval echo ${localstatedir}/run/cerebro_metric_control`"
@@ -16,7 +16,7 @@ AC_DEFUN([AC_CEREBRO_METRIC_CONTROL_PATH],
 
   AC_MSG_CHECKING([for the metric control path])
   AC_ARG_WITH([metric-control-path],
-    AS_HELP_STRING([--with-metric-control-path], 
+    AS_HELP_STRING([--with-metric-control-path],
                    [Define metric control path]),
     [ case "$withval" in
         no)  ;;

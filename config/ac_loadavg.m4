@@ -24,6 +24,6 @@ AC_DEFUN([AC_LOADAVG],
      MANPAGE_LOADAVG=0
      ac_with_loadavg=no
   fi
- 
+
   AC_SUBST(MANPAGE_LOADAVG)
 ])

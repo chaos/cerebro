@@ -68,7 +68,7 @@ _cerebro_nodelist_check(cerebro_nodelist_t nodelist)
   return 0;
 }
 
-/* 
+/*
  * _cerebro_nodelist_data_destroy
  *
  * Free contents of a nodelist data item
@@ -77,7 +77,7 @@ static void
 _cerebro_nodelist_data_destroy(void *x)
 {
   struct cerebro_nodelist_data *nd;
-  
+
   nd = (struct cerebro_nodelist_data *)x;
 
   if (nd->metric_value)
@@ -85,7 +85,7 @@ _cerebro_nodelist_data_destroy(void *x)
   free(nd);
 }
 
-cerebro_nodelist_t 
+cerebro_nodelist_t
 _cerebro_nodelist_create(cerebro_t handle, const char *metric_name)
 {
   cerebro_nodelist_t nodelist = NULL;
@@ -121,11 +121,11 @@ _cerebro_nodelist_create(cerebro_t handle, const char *metric_name)
       handle->errnum = CEREBRO_ERR_INTERNAL;
       goto cleanup;
     }
-  
+
   nodelist->handle = handle;
 
   return nodelist;
-      
+
  cleanup:
   if (nodelist)
     {
@@ -138,7 +138,7 @@ _cerebro_nodelist_create(cerebro_t handle, const char *metric_name)
   return NULL;
 }
 
-int 
+int
 _cerebro_nodelist_append(cerebro_nodelist_t nodelist,
 			 const char *nodename,
                          u_int32_t metric_value_received_time,
@@ -195,7 +195,7 @@ _cerebro_nodelist_append(cerebro_nodelist_t nodelist,
       nodelist->errnum = CEREBRO_ERR_INTERNAL;
       goto cleanup;
     }
-  
+
   return 0;
 
  cleanup:

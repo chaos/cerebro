@@ -46,7 +46,7 @@ static int cerebro_err_initialized = 0;
 
 static int cerebro_flags = 0;
 
-void 
+void
 cerebro_err_init(char *prog)
 {
   if (!prog)
@@ -57,13 +57,13 @@ cerebro_err_init(char *prog)
   cerebro_err_initialized++;
 }
 
-int 
+int
 cerebro_err_get_flags(void)
 {
   return cerebro_flags;
 }
 
-void 
+void
 cerebro_err_set_flags(int flags)
 {
   int err_flags = 0;
@@ -80,14 +80,14 @@ cerebro_err_set_flags(int flags)
   err_set_flags(err_flags);
 }
 
-void 
+void
 cerebro_err_debug(const char *fmt, ...)
 {
   char buffer[CEREBRO_ERROR_STRING_BUFLEN];
   va_list ap;
 
   if (!cerebro_err_initialized)
-    return; 
+    return;
 
   if (!fmt)
     return;
@@ -99,14 +99,14 @@ cerebro_err_debug(const char *fmt, ...)
   err_debug(buffer);
 }
 
-void 
+void
 cerebro_err_output(const char *fmt, ...)
 {
   char buffer[CEREBRO_ERROR_STRING_BUFLEN];
   va_list ap;
 
   if (!cerebro_err_initialized)
-    return; 
+    return;
 
   if (!fmt)
     return;
@@ -118,14 +118,14 @@ cerebro_err_output(const char *fmt, ...)
   err_output(buffer);
 }
 
-void 
+void
 cerebro_err_exit(const char *fmt, ...)
 {
   char buffer[CEREBRO_ERROR_STRING_BUFLEN];
   va_list ap;
 
   if (!cerebro_err_initialized)
-    return; 
+    return;
 
   if (!fmt)
     return;

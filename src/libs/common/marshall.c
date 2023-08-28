@@ -24,11 +24,11 @@
  *  You should have received a copy of the GNU General Public License along
  *  with Cerebro.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
- 
+
 #if HAVE_CONFIG_H
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
- 
+
 #include <stdio.h>
 #include <stdlib.h>
 #if STDC_HEADERS
@@ -167,7 +167,7 @@ marshall_u_int64(u_int64_t val, char *buf, unsigned int buflen)
   return 0;
 }
 
-int 
+int
 marshall_float(float val, char *buf, unsigned int buflen)
 {
   if (!buf || sizeof(float) != sizeof(u_int32_t))
@@ -186,11 +186,11 @@ marshall_float(float val, char *buf, unsigned int buflen)
     }
   return 0;
 }
-                                                                                    
-int 
+
+int
 marshall_double(double val, char *buf, unsigned int buflen)
 {
-  
+
   if (!buf || sizeof(double) != (2*sizeof(u_int32_t)))
     {
       errno = EINVAL;
@@ -217,9 +217,9 @@ marshall_double(double val, char *buf, unsigned int buflen)
 
 
 int
-marshall_buffer(const char *val, 
-                unsigned int vallen, 
-                char *buf, 
+marshall_buffer(const char *val,
+                unsigned int vallen,
+                char *buf,
                 unsigned int buflen)
 {
   if (!val || !buf)
@@ -364,7 +364,7 @@ unmarshall_u_int64(u_int64_t *val, const char *buf, unsigned int buflen)
   return 0;
 }
 
-int 
+int
 unmarshall_float(float *val, const char *buf, unsigned int buflen)
 {
   if (!val || !buf || sizeof(float) != sizeof(u_int32_t))
@@ -385,7 +385,7 @@ unmarshall_float(float *val, const char *buf, unsigned int buflen)
   return 0;
 }
 
-int 
+int
 unmarshall_double(double *val, const char *buf, unsigned int buflen)
 {
   if (!val || !buf || sizeof(double) != (2*sizeof(u_int32_t)))
@@ -414,9 +414,9 @@ unmarshall_double(double *val, const char *buf, unsigned int buflen)
 }
 
 int
-unmarshall_buffer(char *val, 
-                  unsigned int vallen, 
-                  const char *buf, 
+unmarshall_buffer(char *val,
+                  unsigned int vallen,
+                  const char *buf,
                   unsigned int buflen)
 {
   if (!val || !buf)

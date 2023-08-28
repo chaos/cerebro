@@ -24,6 +24,6 @@ AC_DEFUN([AC_MEMORY],
      MANPAGE_MEMORY=0
      ac_with_memory=no
   fi
- 
+
   AC_SUBST(MANPAGE_MEMORY)
 ])

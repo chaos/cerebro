@@ -30,14 +30,14 @@
 
 #include "cerebro/cerebrod_message_protocol.h"
 
-/* 
+/*
  * Flags to define if a metric should be sent with cerebrod heartbeat
  * or by themselves.
  */
 #define CEREBROD_SPEAKER_NEXT_SEND_TYPE_HEARTBEAT 0x1
 #define CEREBROD_SPEAKER_NEXT_SEND_TYPE_MODULE    0x2
 
-/* 
+/*
  * struct cerebrod_next_send_time
  *
  * Store information on when to next send information
@@ -52,18 +52,18 @@ struct cerebrod_next_send_time
   int index;
 };
 
-/* 
+/*
  * cerebrod_speaker
  *
  * Runs the cerebrod speaker thread
  *
  * Passed no argument
- * 
+ *
  * Executed in detached state, no return value.
  */
 void *cerebrod_speaker(void *);
 
-/* 
+/*
  * cerebrod_send_message
  *
  * Sends a message.  Called by metric modules when necessary.

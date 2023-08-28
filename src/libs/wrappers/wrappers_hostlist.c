@@ -35,7 +35,7 @@
 
 #include "wrappers.h"
 
-hostlist_t 
+hostlist_t
 wrap_hostlist_create(WRAPPERS_ARGS, const char *hostlist)
 {
   hostlist_t rv;
@@ -60,7 +60,7 @@ wrap_hostlist_destroy(WRAPPERS_ARGS, hostlist_t hl)
   return;
 }
 
-void 
+void
 wrap_hostlist_sort(WRAPPERS_ARGS, hostlist_t hl)
 {
   assert(file && function);
@@ -72,7 +72,7 @@ wrap_hostlist_sort(WRAPPERS_ARGS, hostlist_t hl)
   return;
 }
 
-void 
+void
 wrap_hostlist_uniq(WRAPPERS_ARGS, hostlist_t hl)
 {
  assert(file && function);
@@ -84,7 +84,7 @@ wrap_hostlist_uniq(WRAPPERS_ARGS, hostlist_t hl)
   return;
 }
 
-int 
+int
 wrap_hostlist_push(WRAPPERS_ARGS, hostlist_t hl, const char *host)
 {
   int rv;
@@ -100,7 +100,7 @@ wrap_hostlist_push(WRAPPERS_ARGS, hostlist_t hl, const char *host)
   return rv;
 }
 
-int 
+int
 wrap_hostlist_find(WRAPPERS_ARGS, hostlist_t hl, const char *hostname)
 {
   assert(file && function);
@@ -112,7 +112,7 @@ wrap_hostlist_find(WRAPPERS_ARGS, hostlist_t hl, const char *hostname)
   return hostlist_find(hl, hostname);
 }
 
-ssize_t 
+ssize_t
 wrap_hostlist_ranged_string(WRAPPERS_ARGS, hostlist_t hl, size_t n, char *buf)
 {
   ssize_t rv;
@@ -128,7 +128,7 @@ wrap_hostlist_ranged_string(WRAPPERS_ARGS, hostlist_t hl, size_t n, char *buf)
   return rv;
 }
 
-ssize_t 
+ssize_t
 wrap_hostlist_deranged_string(WRAPPERS_ARGS, hostlist_t hl, size_t n, char *buf)
 {
   ssize_t rv;
@@ -144,7 +144,7 @@ wrap_hostlist_deranged_string(WRAPPERS_ARGS, hostlist_t hl, size_t n, char *buf)
   return rv;
 }
 
-hostlist_iterator_t 
+hostlist_iterator_t
 wrap_hostlist_iterator_create(WRAPPERS_ARGS, hostlist_t hl)
 {
   hostlist_iterator_t rv;
@@ -178,6 +178,6 @@ wrap_hostlist_next(WRAPPERS_ARGS, hostlist_iterator_t i)
 
   /* Can return NULL value to indicate end of list */
   rv = hostlist_next(i);
-  
+
   return rv;
 }

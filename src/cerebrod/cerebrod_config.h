@@ -117,7 +117,7 @@ struct forward_message_config {
 };
 
 /*
- * struct cerebrod_config 
+ * struct cerebrod_config
  *
  * configuration structure and data used by all of cerebrod.
  */
@@ -130,7 +130,7 @@ struct cerebrod_config
   /* Set by the user in the configuration file */
   int heartbeat_frequency_min;
   int heartbeat_frequency_max;
-  int speak; 
+  int speak;
   struct speak_message_config speak_message_config[CEREBRO_CONFIG_SPEAK_MESSAGE_CONFIG_MAX];
   int speak_message_config_len;
   int speak_message_ttl;
@@ -170,7 +170,7 @@ struct cerebrod_config
 
 /*
  * cerebrod_config_setup
- * 
+ *
  * perform all cerebrod configuration.  Includes command line parsing,
  * config module loading, and configuration file parsing
  */

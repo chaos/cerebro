@@ -39,7 +39,7 @@
 
 #include "debug.h"
 
-int 
+int
 cerebro_copy_nodename(const char *node, char *buf, unsigned int buflen)
 {
   int len;

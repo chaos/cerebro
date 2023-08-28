@@ -48,7 +48,7 @@ _cerebro_namelist_check(cerebro_namelist_t namelist)
 {
   if (!namelist || namelist->magic != CEREBRO_NAMELIST_MAGIC_NUMBER)
     return -1;
-                                                                                      
+
   if (!namelist->metric_names
       || !namelist->iterators
       || !namelist->handle)
@@ -57,18 +57,18 @@ _cerebro_namelist_check(cerebro_namelist_t namelist)
       namelist->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
-                                                                                      
+
   if (namelist->handle->magic != CEREBRO_MAGIC_NUMBER)
     {
       CEREBRO_DBG(("handle destroyed"));
       namelist->errnum = CEREBRO_ERR_MAGIC_NUMBER;
       return -1;
     }
-                                                                                      
+
   return 0;
 }
 
-cerebro_namelist_t 
+cerebro_namelist_t
 _cerebro_namelist_create(cerebro_t handle)
 {
   cerebro_namelist_t namelist = NULL;
@@ -103,11 +103,11 @@ _cerebro_namelist_create(cerebro_t handle)
       handle->errnum = CEREBRO_ERR_INTERNAL;
       goto cleanup;
     }
-  
+
   namelist->handle = handle;
 
   return namelist;
-      
+
  cleanup:
   if (namelist)
     {
@@ -120,8 +120,8 @@ _cerebro_namelist_create(cerebro_t handle)
   return NULL;
 }
 
-int 
-_cerebro_namelist_append(cerebro_namelist_t namelist, 
+int
+_cerebro_namelist_append(cerebro_namelist_t namelist,
                            const char *metric_name)
 {
   char *str = NULL;
@@ -148,7 +148,7 @@ _cerebro_namelist_append(cerebro_namelist_t namelist,
       namelist->errnum = CEREBRO_ERR_INTERNAL;
       goto cleanup;
     }
-  
+
   return 0;
 
  cleanup:

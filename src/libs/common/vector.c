@@ -27,7 +27,7 @@
  *  Copyright (C) 2001-2002 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
- *  
+ *
  *  This file is from LSD-Tools, the LLNL Software Development Toolbox.
  *
  *  LSD-Tools is free software; you can redistribute it and/or modify it under
@@ -116,7 +116,7 @@ struct vector {
   unsigned int length;          /* length of current data array */
   void **data;                  /* data array */
 #ifdef WITH_PTHREADS
-  pthread_mutex_t mutex;        
+  pthread_mutex_t mutex;
 #endif /* WITH_PTHREADS */
 #ifndef NDEBUG
   int32_t magic;                /* magic number */
@@ -217,10 +217,10 @@ _alloc_data (Vector v, unsigned int length_increase)
       errno = ENOMEM;
       return lsd_nomem_error(__FILE__, __LINE__, "data create");
     }
-  
+
   for (i = v->length; i < (v->length + length_increase); i++)
     ptr[i] = NULL;
-  
+
   v->data = ptr;
   v->length += length_increase;
 
@@ -274,7 +274,7 @@ vector_create (VectorDelF f)
   v->data = NULL;
   vector_mutex_init(&(v->mutex));
   assert(v->magic = VECTOR_MAGIC); /* set magic via assert abuse */
- 
+
   return v;
 }
 
@@ -284,7 +284,7 @@ vector_destroy (Vector v)
   assert(v);
   vector_mutex_lock(&v->mutex);
   assert(v->magic == VECTOR_MAGIC);
-  
+
   (void)_clear_data(v);
 
   assert(v->magic = ~VECTOR_MAGIC); /* clear magic via assert abuse */
@@ -364,7 +364,7 @@ vector_set (Vector v, void *x, unsigned int index)
   vector_mutex_lock(&v->mutex);
   assert(v->magic == VECTOR_MAGIC);
 
-  if (index < v->length) 
+  if (index < v->length)
     {
       if (v->data[index])
         {
@@ -471,7 +471,7 @@ vector_for_each (Vector v, VectorForF f, void *arg)
     {
       if (v->data[i])
         {
-          if (f(v->data[i], arg, i) < 0) 
+          if (f(v->data[i], arg, i) < 0)
             {
               rv = -1;
               break;
@@ -507,7 +507,7 @@ vector_to_array (Vector v, void *p[], unsigned int len)
       p[i] = v->data[i];
       rv++;
     }
-  
+
  cleanup:
   vector_mutex_unlock(&v->mutex);
   return(rv);
@@ -571,7 +571,7 @@ vector_next (VectorIterator i)
   if (i->current < i->v->length)
     {
       /* Skip any elements that are NULL */
-      while ((!(i->v->data[i->current])) 
+      while ((!(i->v->data[i->current]))
              && i->current < i->v->length)
         i->current++;
 

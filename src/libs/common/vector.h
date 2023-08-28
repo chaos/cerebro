@@ -27,7 +27,7 @@
  *  Copyright (C) 2001-2002 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
- *  
+ *
  *  This file is from LSD-Tools, the LLNL Software Development Toolbox.
  *
  *  LSD-Tools is free software; you can redistribute it and/or modify it under
@@ -50,10 +50,10 @@
 #define LSD_VECTOR_H
 
 /* Notes:
- * 
+ *
  * API emulates Chris Dunlap's (dunlap6 at llnl dot gov) List library.
  * Lots of code was copied.
- * 
+ *
  *  If NDEBUG is not defined, internal debug code will be enabled.  This is
  *  intended for development use only and production code should define NDEBUG.
  *
@@ -150,7 +150,7 @@ int vector_count (Vector v);
  * Vector Manipulation     *
  ***************************/
 
-/* 
+/*
  * vector_append
  *
  * Append an item to the end of the vector, growing the vector
@@ -160,7 +160,7 @@ int vector_count (Vector v);
  */
 void *vector_append (Vector v, void *x);
 
-/* 
+/*
  * vector_set
  *
  * Set an item to a specific index location.  To clear one item out of
@@ -170,7 +170,7 @@ void *vector_append (Vector v, void *x);
  */
 void *vector_set(Vector v, void *x, unsigned int index);
 
-/* 
+/*
  * vector_clear
  *
  * Remove all data in the vector.
@@ -183,14 +183,14 @@ int vector_clear(Vector v);
  * Vector Access           *
  ***************************/
 
-/* 
+/*
  * vector_get
  *
  * Return data stored at an index, NULL if item not set
  */
 void *vector_get(Vector v, unsigned int index);
 
-/* 
+/*
  * vector_find_first
  *
  * Returns the index to the first item that the specified
@@ -198,7 +198,7 @@ void *vector_get(Vector v, unsigned int index);
  */
 int vector_find_first (Vector v, VectorFindF f, void *key);
 
-/* 
+/*
  * vector_for_each
  *
  * Operate on each data element of the vector that is set.
@@ -207,7 +207,7 @@ int vector_find_first (Vector v, VectorFindF f, void *key);
  */
 int vector_for_each (Vector v, VectorForF f, void *arg);
 
-/* 
+/*
  * vector_to_array
  *
  * Copy vector pointers to the supplied array.
@@ -220,7 +220,7 @@ int vector_to_array (Vector v, void *p[], unsigned int len);
  * Vector Iterator Functions *
  *****************************/
 
-/* 
+/*
  * vector_iterator_create
  *
  * Create a vector iterator
@@ -229,21 +229,21 @@ int vector_to_array (Vector v, void *p[], unsigned int len);
  */
 VectorIterator vector_iterator_create (Vector v);
 
-/* 
+/*
  * vector_iterator_reset
  *
  * Resets the iterator
  */
 void vector_iterator_reset (VectorIterator i);
 
-/* 
+/*
  * vector_iterator_destroy
  *
  * Destroy the vector iteratory
  */
 void vector_iterator_destroy (VectorIterator i);
 
-/* 
+/*
  * vector_next
  *
  * Returns a pointer to the next item's data, NULL at the end of the

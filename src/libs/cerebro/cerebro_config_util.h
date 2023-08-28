@@ -30,7 +30,7 @@
 
 #include "cerebro.h"
 
-/* 
+/*
  * _cerebro_load_config
  *
  * Read and load config file data
@@ -39,7 +39,7 @@
  */
 int _cerebro_load_config(cerebro_t handle);
 
-/* 
+/*
  * _cerebro_unload_config
  *
  * Unload config file info

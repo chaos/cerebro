@@ -56,7 +56,7 @@
 extern struct cerebrod_config conf;
 extern pthread_mutex_t debug_output_mutex;
 
-/* 
+/*
  * event_node_timeout_monitor_init
  * event_node_timeout_monitor_init_cond
  * event_node_timeout_monitor_init_lock
@@ -157,7 +157,7 @@ cerebrod_event_node_timeout_monitor(void *arg)
       List_sort(event_node_timeout_data, _event_node_timeout_data_compare);
 
       nodesitr = List_iterator_create(event_node_timeout_data);
-      
+
       while ((ntd = list_next(nodesitr)))
         {
           struct cerebrod_event_module_timeout_data *mtd;
@@ -181,14 +181,14 @@ cerebrod_event_node_timeout_monitor(void *arg)
                           Pthread_mutex_unlock(&debug_output_mutex);
                         }
 
-                      if ((modules_list = Hash_find(event_module_timeout_index, 
+                      if ((modules_list = Hash_find(event_module_timeout_index,
                                                     mtd->timeout_str)))
                         {
                           struct cerebrod_event_module *event_module;
                           ListIterator modulesitr;
 
                           modulesitr = List_iterator_create(modules_list);
-                          
+
                           while ((event_module = list_next(modulesitr)))
                             {
                               struct cerebro_event *event = NULL;
@@ -197,7 +197,7 @@ cerebrod_event_node_timeout_monitor(void *arg)
                               Pthread_mutex_lock(&event_module->event_lock);
                               if ((rv = event_module_node_timeout(event_handle,
                                                                   event_module->index,
-                                                                  ntd->nodename, 
+                                                                  ntd->nodename,
                                                                   &event)) < 0)
                                 {
                                   CEREBROD_DBG(("event_module_node_timeout"));

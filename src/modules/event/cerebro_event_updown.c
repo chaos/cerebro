@@ -98,7 +98,7 @@ updown_event_setup(void)
       CEREBRO_ERR(("hash_create: %s", strerror(errno)));
       goto cleanup;
     }
-  
+
   if (!(node_states_nodenames = list_create((ListDelF)free)))
     {
       CEREBRO_ERR(("list_create: %s", strerror(errno)));
@@ -165,7 +165,7 @@ updown_event_timeout_length(void)
   return UPDOWN_EVENT_TIMEOUT_LENGTH;
 }
 
-/* 
+/*
  * _create_entry
  *
  * Create an entry in the node_states hash
@@ -181,7 +181,7 @@ _create_entry(const char *nodename)
       CEREBRO_ERR(("malloc: %s", strerror(errno)));
       goto cleanup;
     }
-  
+
   if (!(nodePtr = (char *)malloc(CEREBRO_MAX_NODENAME_LEN + 1)))
     {
       CEREBRO_ERR(("malloc: %s", strerror(errno)));
@@ -189,7 +189,7 @@ _create_entry(const char *nodename)
     }
 
   strncpy(nodePtr, nodename, CEREBRO_MAX_NODENAME_LEN);
-  
+
   if (!list_append(node_states_nodenames, nodePtr))
     {
       CEREBRO_DBG(("list_append: %s", strerror(errno)));
@@ -211,7 +211,7 @@ _create_entry(const char *nodename)
   return NULL;
 }
 
-/* 
+/*
  * _create_event
  *
  * Create an event
@@ -238,7 +238,7 @@ _create_event(const char *nodename, int state)
       CEREBRO_ERR(("malloc: %s", strerror(errno)));
       goto cleanup;
     }
-  
+
   *((int *)event->event_value) = state;
 
   return event;
@@ -296,7 +296,7 @@ updown_event_node_timeout(const char *nodename,
           rv = 1;
         }
     }
-  
+
   *state = UPDOWN_EVENT_STATE_DOWN;
   return rv;
 }
@@ -307,7 +307,7 @@ updown_event_node_timeout(const char *nodename,
  * updown event module metric_update function.  Store results the
  * updown cache appropriately.
  */
-static int 
+static int
 updown_event_metric_update(const char *nodename,
                            const char *metric_name,
                            unsigned int metric_value_type,
@@ -336,7 +336,7 @@ updown_event_metric_update(const char *nodename,
           rv = 1;
         }
     }
-  
+
   *state = UPDOWN_EVENT_STATE_UP;
   return rv;
 }

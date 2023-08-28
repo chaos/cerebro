@@ -32,7 +32,7 @@
 
 #include "list.h"
 
-/* 
+/*
  * struct cerebrod_event_to_send
  *
  * Store information necessary to send out an event
@@ -45,7 +45,7 @@ struct cerebrod_event_to_send
   struct cerebro_event *event;
 };
 
-/* 
+/*
  * struct cerebrod_event_connection_data
  *
  * Store data about current event connections.
@@ -74,25 +74,25 @@ struct cerebrod_event_names_response_data
  */
 void cerebrod_queue_event(struct cerebro_event *event, unsigned int index);
 
-/* 
+/*
  * cerebrod_event_queue_monitor
  *
  * Runs the cerebrod event queue monitor which will send out events
  * when signaled.
  *
  * Passed no argument
- * 
+ *
  * Executed in detached state, no return value.
  */
 void *cerebrod_event_queue_monitor(void *);
 
-/* 
+/*
  * cerebrod_event_server
  *
  * Runs the cerebrod event server thread
  *
  * Passed no argument
- * 
+ *
  * Executed in detached state, no return value.
  */
 void *cerebrod_event_server(void *);

@@ -103,8 +103,8 @@
                       file, function, line, msg); \
    } while(0);
 
-/* 
- * Memory/String Wrappers 
+/*
+ * Memory/String Wrappers
  */
 #define Malloc(size) \
         wrap_malloc(WRAPPERS_DEBUG_ARGS, size)
@@ -123,17 +123,17 @@ char * wrap_strncpy(WRAPPERS_ARGS, char *dest, const char *src, size_t n);
 /* Special wrapper for List/Hash libraries */
 void _Free(void *ptr);
 
-/* 
- * File System Wrappers 
+/*
+ * File System Wrappers
  */
 #define Open(pathname, flags, mode) \
         wrap_open(WRAPPERS_DEBUG_ARGS, pathname, flags, mode)
 #define Close(fd) \
         wrap_close(WRAPPERS_DEBUG_ARGS, fd)
 #define Read(fd, buf, count) \
-        wrap_read(WRAPPERS_DEBUG_ARGS, fd, buf, count) 
+        wrap_read(WRAPPERS_DEBUG_ARGS, fd, buf, count)
 #define Write(fd, buf, count) \
-        wrap_write(WRAPPERS_DEBUG_ARGS, fd, buf, count) 
+        wrap_write(WRAPPERS_DEBUG_ARGS, fd, buf, count)
 #define Chdir(path) \
         wrap_chdir(WRAPPERS_DEBUG_ARGS, path)
 #define Stat(path, buf) \
@@ -155,8 +155,8 @@ mode_t wrap_umask(WRAPPERS_ARGS, mode_t mask);
 DIR *wrap_opendir(WRAPPERS_ARGS, const char *name);
 int wrap_closedir(WRAPPERS_ARGS, DIR *dir);
 
-/* 
- * Networking Wrappers 
+/*
+ * Networking Wrappers
  */
 #define Socket(domain, type, protocol) \
         wrap_socket(WRAPPERS_DEBUG_ARGS, domain, type, protocol)
@@ -196,8 +196,8 @@ struct hostent *wrap_gethostbyname(WRAPPERS_ARGS, const char *name);
 const char *wrap_inet_ntop(WRAPPERS_ARGS, int af, const void *src, char *dst, socklen_t cnt);
 int wrap_inet_pton(WRAPPERS_ARGS, int af, const char *src, void *dst);
 
-/* 
- * Time Wrappers 
+/*
+ * Time Wrappers
  */
 #define Localtime(timep) \
         wrap_localtime(__FILE__, __FUNCTION__, __LINE__, timep)
@@ -213,8 +213,8 @@ struct tm *wrap_localtime_r(WRAPPERS_ARGS, const time_t *timep, struct tm *resul
 int wrap_gettimeofday(WRAPPERS_ARGS, struct timeval *tv, struct timezone *tz);
 int wrap_gettimeofday_workaround(WRAPPERS_ARGS, struct timeval *tv, struct timezone *tz);
 
-/* 
- * Misc System Call Wrappers 
+/*
+ * Misc System Call Wrappers
  */
 #define Fork() \
         wrap_fork(WRAPPERS_DEBUG_ARGS);
@@ -229,8 +229,8 @@ pid_t wrap_fork(WRAPPERS_ARGS);
 Sighandler_t wrap_signal(WRAPPERS_ARGS, int signum, Sighandler_t handler);
 int wrap_gethostname(WRAPPERS_ARGS, char *name, size_t len);
 
-/* 
- * Pthread Wrappers 
+/*
+ * Pthread Wrappers
  */
 #define Pthread_create(thread, attr, start_routine, arg) \
         wrap_pthread_create(WRAPPERS_DEBUG_ARGS, thread, attr, start_routine, arg)
@@ -267,8 +267,8 @@ int wrap_pthread_mutex_init(WRAPPERS_ARGS, pthread_mutex_t *mutex, const pthread
 int wrap_pthread_cond_signal(WRAPPERS_ARGS, pthread_cond_t *cond);
 int wrap_pthread_cond_wait(WRAPPERS_ARGS, pthread_cond_t *cond, pthread_mutex_t *mutex);
 
-/* 
- * List lib wrappers 
+/*
+ * List lib wrappers
  */
 #define List_create(f) \
         wrap_list_create(WRAPPERS_DEBUG_ARGS, f)
@@ -311,8 +311,8 @@ void wrap_list_iterator_destroy(WRAPPERS_ARGS, ListIterator i);
 void *wrap_list_remove(WRAPPERS_ARGS, ListIterator i);
 int wrap_list_delete(WRAPPERS_ARGS, ListIterator i);
 
-/* 
- * Hash lib wrappers 
+/*
+ * Hash lib wrappers
  */
 #define Hash_create(size, key_f, cmp_f, del_f) \
         wrap_hash_create(WRAPPERS_DEBUG_ARGS, size, key_f, cmp_f, del_f)
@@ -343,8 +343,8 @@ int wrap_hash_delete_if(WRAPPERS_ARGS, hash_t h, hash_arg_f argf, void *arg);
 int wrap_hash_for_each(WRAPPERS_ARGS, hash_t h, hash_arg_f argf, void *arg);
 void wrap_hash_destroy(WRAPPERS_ARGS, hash_t h);
 
-/* 
- * Hostlist lib wrappers 
+/*
+ * Hostlist lib wrappers
  */
 #define Hostlist_create(hostlist) \
         wrap_hostlist_create(WRAPPERS_DEBUG_ARGS, hostlist)
@@ -381,7 +381,7 @@ hostlist_iterator_t wrap_hostlist_iterator_create(WRAPPERS_ARGS, hostlist_t hl);
 void wrap_hostlist_iterator_destroy(WRAPPERS_ARGS, hostlist_iterator_t i);
 char *wrap_hostlist_next(WRAPPERS_ARGS, hostlist_iterator_t i);
 
-/* 
+/*
  * Marshall wrappers
  */
 
@@ -429,5 +429,5 @@ int wrap_unmarshall_float(WRAPPERS_ARGS, float *val, const char *buf, unsigned i
 int wrap_unmarshall_double(WRAPPERS_ARGS, double *val, const char *buf, unsigned int buflen);
 int wrap_unmarshall_buffer(WRAPPERS_ARGS, char *val, unsigned int vallen, const char *buf, unsigned int buflen);
 
-   
+
 #endif /* _WRAPPERS_H */

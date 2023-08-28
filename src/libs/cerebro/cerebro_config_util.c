@@ -44,7 +44,7 @@
 #include "config_util.h"
 #include "debug.h"
 
-int 
+int
 _cerebro_load_config(cerebro_t handle)
 {
   unsigned int errnum;
@@ -54,7 +54,7 @@ _cerebro_load_config(cerebro_t handle)
 
   if (handle->loaded_state & CEREBRO_CONFIG_LOADED)
     return 0;
-  
+
   memset(&(handle->config_data), '\0', sizeof(struct cerebro_config));
   if (load_config(&(handle->config_data), &errnum) < 0)
     {
@@ -62,19 +62,19 @@ _cerebro_load_config(cerebro_t handle)
       handle->errnum = errnum;
       return -1;
     }
-  
+
   handle->loaded_state |= CEREBRO_CONFIG_LOADED;
   return 0;
 }
 
-int 
+int
 _cerebro_unload_config(cerebro_t handle)
 {
   if (_cerebro_handle_check(handle) < 0)
     return -1;
 
   memset(&(handle->config_data), '\0', sizeof(struct cerebro_config));
-  
+
   handle->loaded_state &= ~CEREBRO_CONFIG_LOADED;
   return 0;
 }

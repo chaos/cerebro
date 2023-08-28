@@ -75,7 +75,7 @@ static u_int32_t cache_swapfree;
 
 static unsigned long int last_read = 0;
 
-/* 
+/*
  * _read_memory
  *
  * Returns 0 on success, -1 on error
@@ -115,7 +115,7 @@ _read_memory(int fd,
     }
   parseptr += strlen(keyword);
   parseptr += 1;                /* for the ':' character */
-  
+
   errno = 0;
   memval = (u_int32_t)strtoul(parseptr, NULL, 10);
   if ((memval == LONG_MIN || memval == LONG_MAX) && errno == ERANGE)
@@ -123,7 +123,7 @@ _read_memory(int fd,
       CEREBRO_DBG(("memtotal out of range"));
       goto cleanup;
     }
-  
+
   *memvalptr = memval;
   rv = 0;
  cleanup:
@@ -159,7 +159,7 @@ cerebro_metric_get_memory(u_int32_t *memtotal,
 	  CEREBRO_ERR(("open: %s", strerror(errno)));
 	  goto cleanup;
 	}
-      
+
       memset(buf, '\0', MEMORY_BUFLEN);
       if ((len = read(fd, buf, MEMORY_BUFLEN)) < 0)
 	{

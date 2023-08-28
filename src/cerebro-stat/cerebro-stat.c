@@ -58,13 +58,13 @@
 #define CEREBRO_STAT_NEWLINE         0
 #define CEREBRO_STAT_HOSTRANGE       1
 
-/* 
- * External variables for getopt 
+/*
+ * External variables for getopt
  */
 extern char *optarg;
 extern int optind, opterr, optopt;
 
-/* 
+/*
  * Cerebro-Stat Data
  *
  * hostname - hostname to connect to
@@ -81,7 +81,7 @@ static int metric_list_flag = 0;
 static char *metric_name = NULL;
 static int metric_received_time_flag = 0;
 
-/*  
+/*
  * node_metric_data
  *
  * Contains node and metric data
@@ -94,7 +94,7 @@ struct node_metric_data {
   void *metric_value;
 };
 
-/* 
+/*
  * hostrange_data
  *
  * Contains hostlist and key data
@@ -104,7 +104,7 @@ struct hostrange_data {
   char *key;
 };
 
-/* 
+/*
  * _init_cerebro_stat
  *
  * initialize globals
@@ -118,7 +118,7 @@ _init_cerebro_stat(void)
     err_exit("%s: cerebro_handle_create()", func);
 }
 
-/* 
+/*
  * _cleanup_cerebro_stat
  *
  * cleanup globals
@@ -129,13 +129,13 @@ _cleanup_cerebro_stat(void)
   (void)cerebro_handle_destroy(handle);
 }
 
-/* 
+/*
  * _usage
  *
  * output usage and exit
  */
-static void 
-_usage(void) 
+static void
+_usage(void)
 {
   fprintf(stderr,
 	  "Usage: cerebro-stat [OPTIONS] -m <metric_name>\n"
@@ -158,7 +158,7 @@ _usage(void)
           "  -t         Output metric receive times\n"
           "  -e STRING  Monitor the specified event\n"
           "  -z         List all available events that can be monitored\n",
-          CEREBRO_STAT_NONE_STRING, 
+          CEREBRO_STAT_NONE_STRING,
           CEREBRO_STAT_NONE_STRING);
 #if CEREBRO_DEBUG
   fprintf(stderr,
@@ -169,19 +169,19 @@ _usage(void)
   exit(1);
 }
 
-/*  
+/*
  * _version
  *
  * output version and exit
  */
-static void 
-_version(void) 
+static void
+_version(void)
 {
   fprintf(stderr, "%s %s\n", PACKAGE, VERSION);
   exit(1);
 }
 
-/* 
+/*
  * _cerebro_set_flags
  *
  * Set a cerebro flag
@@ -207,13 +207,13 @@ _cerebro_set_flags(unsigned int new_flag)
     }
 }
 
-/* 
+/*
  * _cmdline_parse
  *
  * parse all cmdline input
  */
 static void
-_cmdline_parse(int argc, char **argv) 
+_cmdline_parse(int argc, char **argv)
 {
   const char *func = __FUNCTION__;
   char options[1024];
@@ -221,7 +221,7 @@ _cmdline_parse(int argc, char **argv)
   int c;
 
 #if HAVE_GETOPT_LONG
-  struct option loptions[] = 
+  struct option loptions[] =
     {
       {"help",                  0, NULL, 'h'},
       {"version",               0, NULL, 'v'},
@@ -250,17 +250,17 @@ _cmdline_parse(int argc, char **argv)
 #if CEREBRO_DEBUG
   strcat(options, "d");
 #endif /* CEREBRO_DEBUG */
-  
+
   /* turn off output messages printed by getopt_long */
   opterr = 0;
-  
+
 #if HAVE_GETOPT_LONG
   while ((c = getopt_long(argc, argv, options, loptions, NULL)) != -1)
 #else
   while ((c = getopt(argc, argv, options)) != -1)
 #endif
     {
-    switch(c) 
+    switch(c)
       {
       case 'h':
         _usage();
@@ -331,12 +331,12 @@ _cmdline_parse(int argc, char **argv)
        + (event_name ? 1 : 0)
        + (event_list_flag ? 1 : 0)) > 1)
     err_exit("Specify one of --event-list, --event, --metric-list, and --metric options");
-  
+
   if (!event_name && !event_list_flag && !metric_list_flag && !metric_name)
     _usage();
 }
 
-/* 
+/*
  * _clean_err_exit
  *
  * Check for and output "nice" error messages for certain errnums.  If
@@ -385,7 +385,7 @@ _event_list(void)
       _clean_err_exit(cerebro_errnum(handle));
       err_exit("%s: cerebro_get_event_names: %s", func, msg);
     }
-  
+
   if (!(mitr = cerebro_namelist_iterator_create(m)))
     {
       char *msg = cerebro_strerror(cerebro_namelist_errnum(m));
@@ -410,7 +410,7 @@ _event_list(void)
           err_exit("%s: cerebro_namelist_iterator_next: %s", func, msg);
         }
     }
-  
+
   litr = List_iterator_create(l);
 
   while ((str = list_next(litr)))
@@ -443,7 +443,7 @@ _metric_list(void)
       _clean_err_exit(cerebro_errnum(handle));
       err_exit("%s: cerebro_get_metric_names: %s", func, msg);
     }
-  
+
   if (!(mitr = cerebro_namelist_iterator_create(m)))
     {
       char *msg = cerebro_strerror(cerebro_namelist_errnum(m));
@@ -468,7 +468,7 @@ _metric_list(void)
           err_exit("%s: cerebro_namelist_iterator_next: %s", func, msg);
         }
     }
-  
+
   litr = List_iterator_create(l);
 
   while ((str = list_next(litr)))
@@ -479,7 +479,7 @@ _metric_list(void)
   (void)cerebro_namelist_destroy(m);
 }
 
-/* 
+/*
  * _metric_value_str
  *
  * Get the metric value string
@@ -488,7 +488,7 @@ static void
 _metric_value_str(unsigned int mtype,
                   unsigned int mlen,
                   void *mvalue,
-                  char *buf, 
+                  char *buf,
                   unsigned int buflen)
 {
   const char *func = __FUNCTION__;
@@ -549,12 +549,12 @@ _metric_value_str(unsigned int mtype,
   else if (mtype == CEREBRO_DATA_VALUE_TYPE_U_INT64)
     rv = snprintf(buf, buflen, "%lu", *((u_int64_t *)mvalue));
 #endif /* SIZEOF_LONG == 8 */
-  
+
   if (rv >= buflen)
     err_exit("%s: truncated output: %d", func, mlen);
 }
 
-/* 
+/*
  * _cluster_nodes_output
  *
  * Output cluster nodes
@@ -587,10 +587,10 @@ _cluster_nodes_output(List l)
 
       Hostlist_sort(hl);
       Hostlist_uniq(hl);
-      
+
       memset(hstr, '\0', CEREBRO_STAT_BUFLEN);
       Hostlist_ranged_string(hl, CEREBRO_STAT_BUFLEN, hstr);
-      
+
       fprintf(stdout, "%s\n", hstr);
     }
 
@@ -599,7 +599,7 @@ _cluster_nodes_output(List l)
     Hostlist_destroy(hl);
 }
 
-/* 
+/*
  * _newline_output
  *
  * Output metric data, one node per line
@@ -627,7 +627,7 @@ _newline_output(List l)
       if (metric_received_time_flag)
         {
           char tbuf[CEREBRO_STAT_BUFLEN];
-          
+
           memset(tbuf, '\0', CEREBRO_STAT_BUFLEN);
           if (data->metric_value_received_time)
             {
@@ -648,7 +648,7 @@ _newline_output(List l)
   /* No need to destroy list iterator, caller will destroy List */
 }
 
-/* 
+/*
  * _hostrange_data_destroy
  *
  * Free hostrange_data structures
@@ -666,9 +666,9 @@ _hostrange_data_destroy(void *data)
   Free(hd);
 }
 
-/* 
+/*
  * _hostrange_output_data
- * 
+ *
  * Callback for hash_for_each to output a hostrange for a metric data
  */
 static int
@@ -680,7 +680,7 @@ _hostrange_output_data(void *data, const void *key, void *arg)
   assert(data && key);
 
   hd = (struct hostrange_data *)data;
-  
+
   memset(hstr, '\0', CEREBRO_STAT_BUFLEN);
   Hostlist_sort(hd->hl);
   Hostlist_ranged_string(hd->hl, CEREBRO_STAT_BUFLEN, hstr);
@@ -689,7 +689,7 @@ _hostrange_output_data(void *data, const void *key, void *arg)
   return 1;
 }
 
-/* 
+/*
  * _hostrange_output
  *
  * Output metric data in hostrange format.  The algorithm involves
@@ -716,7 +716,7 @@ _hostrange_output(List l)
     err_exit("%s: invalid count", func);
 #endif /* CEREBRO_DEBUG */
 
-  h = Hash_create(count, 
+  h = Hash_create(count,
                   (hash_key_f)hash_key_string,
                   (hash_cmp_f)strcmp,
                   (hash_del_f)_hostrange_data_destroy);
@@ -730,8 +730,8 @@ _hostrange_output(List l)
 
       _metric_value_str(data->metric_value_type,
                         data->metric_value_len,
-                        data->metric_value, 
-                        buf, 
+                        data->metric_value,
+                        buf,
                         CEREBRO_STAT_BUFLEN);
 
       if (!(hd = Hash_find(h, buf)))
@@ -770,7 +770,7 @@ _event_data(void)
       _clean_err_exit(cerebro_errnum(handle));
       err_exit("%s: cerebro_event_register: %s", func, msg);
     }
-  
+
   while (1)
     {
       struct pollfd pfd;
@@ -779,7 +779,7 @@ _event_data(void)
       pfd.fd = fd;
       pfd.events = POLLIN;
       pfd.revents = 0;
-  
+
       n = Poll(&pfd, 1, -1);
 
       if (n && pfd.revents & POLLIN)
@@ -801,29 +801,29 @@ _event_data(void)
                                   &event_value) < 0)
             {
               char *msg = cerebro_strerror(cerebro_errnum(handle));
-              
+
               _clean_err_exit(cerebro_errnum(handle));
               err_exit("%s: cerebro_event_parse: %s", func, msg);
             }
 
-          
+
           memset(vbuf, '\0', CEREBRO_STAT_BUFLEN);
           _metric_value_str(event_value_type,
                             event_value_len,
                             event_value,
                             vbuf,
                             CEREBRO_STAT_BUFLEN);
-          
+
           memset(tbuf, '\0', CEREBRO_STAT_BUFLEN);
           t = time(NULL);
           tm = Localtime(&t);
           strftime(tbuf, CEREBRO_STAT_BUFLEN, "%F %I:%M:%S%P", tm);
-          
+
           fprintf(stdout, "%s(%s): %s\n", nodename, tbuf, vbuf);
-          
+
           free(nodename);
           free(event_value);
-        }     
+        }
     }
 
   (void)cerebro_event_unregister(handle, fd);
@@ -849,7 +849,7 @@ _metric_data(void)
       _clean_err_exit(cerebro_errnum(handle));
       err_exit("%s: cerebro_get_metric_data: %s", func, msg);
     }
-  
+
   if (!(nitr = cerebro_nodelist_iterator_create(n)))
     {
       char *msg = cerebro_strerror(cerebro_nodelist_errnum(n));
@@ -871,7 +871,7 @@ _metric_data(void)
           err_exit("%s: cerebro_nodelist_iterator_nodename: %s", func, msg);
         }
 
-      if (cerebro_nodelist_iterator_metric_value(nitr, 
+      if (cerebro_nodelist_iterator_metric_value(nitr,
                                                  &(data->metric_value_received_time),
                                                  &(data->metric_value_type),
                                                  &(data->metric_value_len),
@@ -882,7 +882,7 @@ _metric_data(void)
         }
 
       List_append(l, data);
-      
+
       if (cerebro_nodelist_iterator_next(nitr) < 0)
         {
           char *msg = cerebro_strerror(cerebro_nodelist_iterator_errnum(nitr));
@@ -902,8 +902,8 @@ _metric_data(void)
   (void)cerebro_nodelist_destroy(n);
 }
 
-int 
-main(int argc, char *argv[]) 
+int
+main(int argc, char *argv[])
 {
   err_init(argv[0]);
   err_set_flags(ERROR_STDERR);
@@ -914,14 +914,14 @@ main(int argc, char *argv[])
   _init_cerebro_stat();
 
   _cmdline_parse(argc, argv);
-  
+
   /* Checks in _cmdline_parse ensure only one of four below will be called */
 
-  if (event_list_flag 
+  if (event_list_flag
       || (event_name && !strcmp(event_name, CEREBRO_EVENT_NAMES)))
     _event_list();
 
-  if (metric_list_flag 
+  if (metric_list_flag
       || (metric_name && !strcmp(metric_name, CEREBRO_METRIC_METRIC_NAMES)))
     _metric_list();
 

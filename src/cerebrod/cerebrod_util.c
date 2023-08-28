@@ -50,7 +50,7 @@ extern struct cerebrod_config conf;
 
 #if !WITH_CEREBROD_SPEAKER_ONLY
 
-/* 
+/*
  * _hash_removeall
  *
  * callback for hash_for_each that inserts entries into the new hash.
@@ -69,7 +69,7 @@ _hash_reinsert(void *data, const void *key, void *arg)
   return 1;
 }
 
-/* 
+/*
  * _hash_removeall
  *
  * callback for hash_remove_if that returns 1, signifying the removal
@@ -103,12 +103,12 @@ cerebrod_rehash(hash_t *old_hash,
 #endif /* CEREBRO_DEBUG */
 
   *hash_size += hash_size_increment;
-  
+
   new_hash = Hash_create(*hash_size,
 			 (hash_key_f)hash_key_string,
 			 (hash_cmp_f)strcmp,
 			 (hash_del_f)_Free);
-  
+
   if (Hash_for_each(*old_hash, _hash_reinsert, &new_hash) != hash_num)
     CEREBROD_EXIT(("invalid reinsert: hash_num=%d", hash_num));
 
@@ -123,18 +123,18 @@ cerebrod_rehash(hash_t *old_hash,
 #endif /* !WITH_CEREBROD_SPEAKER_ONLY */
 
 int
-cerebrod_reinit_socket(int old_fd, 
+cerebrod_reinit_socket(int old_fd,
                        int num,
-                       Cerebrod_socket_setup socket_setup, 
+                       Cerebrod_socket_setup socket_setup,
                        char *msg)
 {
   int fd = old_fd;
 
   assert(socket_setup && msg);
 
-  if (errno == EINVAL 
-      || errno == EBADF 
-      || errno == ENODEV 
+  if (errno == EINVAL
+      || errno == EBADF
+      || errno == ENODEV
       || errno == ENETDOWN
       || errno == ENETUNREACH
       || old_fd < 0)

@@ -24,6 +24,6 @@ AC_DEFUN([AC_UPDOWN],
      MANPAGE_UPDOWN=0
      ac_with_updown=no
   fi
- 
+
   AC_SUBST(MANPAGE_UPDOWN)
 ])

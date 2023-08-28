@@ -111,7 +111,7 @@ cerebro_metric_get_network(u_int64_t *bytesin,
 	  CEREBRO_ERR(("open: %s", strerror(errno)));
 	  goto cleanup;
 	}
-      
+
       memset(buf, '\0', NETWORK_BUFLEN);
       if ((len = read(fd, buf, NETWORK_BUFLEN)) < 0)
 	{
@@ -120,7 +120,7 @@ cerebro_metric_get_network(u_int64_t *bytesin,
 	}
 
       /* skip the first two lines of the file, which are headers, and
-       * skip the local loopback interface 
+       * skip the local loopback interface
        */
       parseptr = buf;
       if (!(parseptr = strstr(parseptr, "\n")))
@@ -150,7 +150,7 @@ cerebro_metric_get_network(u_int64_t *bytesin,
 	  u_int32_t tx_packets, tx_errs;
 	  u_int32_t temp;
 	  char *strptr;
-  
+
 	  /* skip the device name */
 	  if (!(strptr = strstr(parseptr, ":")))
 	    {
@@ -158,7 +158,7 @@ cerebro_metric_get_network(u_int64_t *bytesin,
 	      goto cleanup;
 	    }
 	  strptr++;
-	  
+
 	  rx_bytes = strtoull(strptr, &strptr, 10);
 	  if (!strptr)
 	    {
@@ -225,7 +225,7 @@ cerebro_metric_get_network(u_int64_t *bytesin,
 	      CEREBRO_ERR(("%s parse error", NETWORK_FILE));
 	      goto cleanup;
 	    }
-		
+
 	  total_bytesin += rx_bytes;
 	  total_packetsin += rx_packets;
 	  total_rxerrs += rx_errs;

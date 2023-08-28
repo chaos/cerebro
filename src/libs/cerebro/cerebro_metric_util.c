@@ -198,8 +198,8 @@ _metric_server_request_send(cerebro_t handle,
  * Returns 0 on success, -1 on error
  */
 static int
-_metric_server_response_check(cerebro_t handle, 
-                               const char *buf, 
+_metric_server_response_check(cerebro_t handle,
+                               const char *buf,
                                unsigned int buflen)
 {
   int n, len = 0;
@@ -233,7 +233,7 @@ _metric_server_response_check(cerebro_t handle,
       return -1;
     }
   len += n;
-  
+
   if (version != CEREBRO_METRIC_SERVER_PROTOCOL_VERSION)
     {
       handle->errnum = CEREBRO_ERR_VERSION_INCOMPATIBLE;
@@ -245,7 +245,7 @@ _metric_server_response_check(cerebro_t handle,
       handle->errnum = _metric_server_protocol_err_code_conversion(err_code);
       return -1;
     }
-  
+
   return 0;
 }
 
@@ -324,7 +324,7 @@ _metric_server_response_header_unmarshall(cerebro_t handle,
       return -1;
     }
   c += n;
-  
+
   mlenPtr = &(res->metric_value_len);
   if ((n = unmarshall_u_int32(mlenPtr, buf + c, buflen - c)) < 0)
     {
@@ -333,7 +333,7 @@ _metric_server_response_header_unmarshall(cerebro_t handle,
       return -1;
     }
   c += n;
-  
+
   if (c != CEREBRO_METRIC_SERVER_RESPONSE_HEADER_LEN)
     {
       handle->errnum = CEREBRO_ERR_PROTOCOL;
@@ -344,7 +344,7 @@ _metric_server_response_header_unmarshall(cerebro_t handle,
 }
 
 /*
- * _get_metric_data 
+ * _get_metric_data
  *
  * Get metric data and store it appropriately
  *
@@ -369,7 +369,7 @@ _get_metric_data(cerebro_t handle,
       handle->errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
-  
+
   if ((fd = low_timeout_connect(hostname,
                                 port,
                                 CEREBRO_METRIC_SERVER_PROTOCOL_CONNECT_TIMEOUT_LEN,
@@ -378,7 +378,7 @@ _get_metric_data(cerebro_t handle,
       handle->errnum = errnum;
       goto cleanup;
     }
-  
+
   if (_metric_server_request_send(handle,
                                   fd,
                                   metric_name,
@@ -419,19 +419,19 @@ _get_metric_data(cerebro_t handle,
           goto cleanup;
         }
 
-      if (_metric_server_response_header_unmarshall(handle, 
-                                                    &res, 
-                                                    buf, 
+      if (_metric_server_response_header_unmarshall(handle,
+                                                    &res,
+                                                    buf,
                                                     bytes_read) < 0)
         goto cleanup;
-     
+
       if (res.end == CEREBRO_METRIC_SERVER_PROTOCOL_IS_LAST_RESPONSE)
         break;
 
       if (receive_response(handle, list, &res, bytes_read, fd) < 0)
         goto cleanup;
     }
- 
+
   rv = 0;
  cleanup:
   /* ignore potential error, just return result */
@@ -439,7 +439,7 @@ _get_metric_data(cerebro_t handle,
   return rv;
 }
 
-int 
+int
 _cerebro_metric_get_data(cerebro_t handle,
                          void *list,
                          const char *metric_name,
@@ -503,7 +503,7 @@ _cerebro_metric_get_data(cerebro_t handle,
       char *hostname;
 
       if (handle->config_data.cerebro_metric_server_flag)
-        {         
+        {
           for (i = 0; i < handle->config_data.cerebro_metric_server_len; i++)
             {
               if (!strlen(handle->hostname))
@@ -538,13 +538,13 @@ _cerebro_metric_get_data(cerebro_t handle,
                 continue;
               break;
             }
-          
+
           if (i >= handle->config_data.cerebro_metric_server_len)
             {
               handle->errnum = CEREBRO_ERR_CONNECT;
               return -1;
             }
-          
+
           if (rv < 0)
             return -1;
         }
@@ -554,7 +554,7 @@ _cerebro_metric_get_data(cerebro_t handle,
             hostname = "localhost";
           else
             hostname = handle->hostname;
-          
+
           if (!handle->port)
             port = CEREBRO_METRIC_SERVER_PORT;
           else
@@ -583,7 +583,7 @@ _cerebro_metric_get_data(cerebro_t handle,
                            receive_response) < 0)
         return -1;
     }
-  
+
   return 0;
 }
 
