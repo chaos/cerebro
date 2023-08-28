@@ -497,14 +497,14 @@ cerebrod_event_modules_setup(void)
           continue;
         }
 
-      if (!(module_metric_names = event_module_metric_names(event_handle, i)) < 0)
+      if (!(module_metric_names = event_module_metric_names(event_handle, i)))
         {
           CEREBROD_DBG(("event_module_metric_names failed: %s", module_name));
           event_module_cleanup(event_handle, i);
           continue;
         }
 
-      if (!(module_event_names = event_module_event_names(event_handle, i)) < 0)
+      if (!(module_event_names = event_module_event_names(event_handle, i)))
         {
           CEREBROD_DBG(("event_module_event_names failed: %s", module_name));
           event_module_cleanup(event_handle, i);

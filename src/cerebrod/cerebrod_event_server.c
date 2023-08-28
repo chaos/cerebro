@@ -317,7 +317,7 @@ cerebrod_event_queue_monitor(void *arg)
       while ((ets = list_next(eitr)))
         {
           List_append(temp_event_queue, ets);
-          List_remove(eitr);
+          (void)List_remove(eitr);
         }
       List_iterator_destroy(eitr);
       Pthread_mutex_unlock(&event_queue_lock);
