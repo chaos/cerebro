@@ -188,14 +188,14 @@ wrap_list_iterator_destroy(WRAPPERS_ARGS, ListIterator i)
 void *
 wrap_list_remove(WRAPPERS_ARGS, ListIterator i)
 {
-  int rv;
+  void *rv;
 
   assert(file && function);
 
   if (!i)
     WRAPPERS_ERR_INVALID_PARAMETERS("list_remove");
 
-  if (!list_remove(i))
+  if (!(rv = list_remove(i)))
     WRAPPERS_ERR_ERRNO("list_remove");
 
   return rv;

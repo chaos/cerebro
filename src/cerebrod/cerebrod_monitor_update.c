@@ -224,7 +224,7 @@ cerebrod_monitor_modules_setup(void)
           continue;
         }
 
-      if (!(metric_names = monitor_module_metric_names(monitor_handle, i)) < 0)
+      if (!(metric_names = monitor_module_metric_names(monitor_handle, i)))
         {
           CEREBROD_DBG(("monitor_module_metric_names failed: %s", module_name));
           monitor_module_cleanup(monitor_handle, i);

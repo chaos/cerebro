@@ -588,7 +588,7 @@ cerebrod_listener(void *arg)
       char nodename_buf[CEREBRO_MAX_NODENAME_LEN+1];
       char nodename_key[CEREBRO_MAX_NODENAME_LEN+1];
       struct timeval tv;
-      int in_cluster_flag, i, count;
+      int in_cluster_flag, i;
       fd_set readfds;
       int recv_len = 0;
       int maxfd = 0;
@@ -602,7 +602,7 @@ cerebrod_listener(void *arg)
           FD_SET(listener_fds[i], &readfds);
         }
 
-      count = Select(maxfd + 1, &readfds, NULL, NULL, NULL);
+      Select(maxfd + 1, &readfds, NULL, NULL, NULL);
 
       for (i = 0; i < conf.listen_message_config_len; i++)
         {
