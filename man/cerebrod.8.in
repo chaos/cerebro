@@ -41,18 +41,18 @@ for an overview of the
 .B Cerebro
 system.
 
-The 
+The
 .B cerebrod
 daemon can be configured using the cerebro configuration file or having
 a cerebro configuration loaded.  The configuration changes can alter
-the features and behavior of the daemon as well as the 
+the features and behavior of the daemon as well as the
 .B Cerebro
 suite of tools and libraries.
 
 See the
 .BR cerebro.conf(5)
 and
-.BR cerebro_module(3) 
+.BR cerebro_module(3)
 manpages for additional information on configuration.
 
 Depending on the configuration of your cluster, the
@@ -62,7 +62,7 @@ daemon may need to be restarted to recognize a new configuration.
 For example, if additional nodes have been added into your cluster,
 .B cerebrod
 may need to be restarted to reload any cluster data files so these
-new nodes will be recognized.  
+new nodes will be recognized.
 
 .SH "OPTIONS"
 .TP

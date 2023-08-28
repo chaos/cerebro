@@ -30,7 +30,7 @@
 
 #define CEREBRO_CLUSTERLIST_INTERFACE_VERSION 1
 
-/* 
+/*
  * Cerebro_clusterlist_interface_version
  *
  * function prototype for clusterlist module function to return the
@@ -76,9 +76,9 @@ typedef int (*Cerebro_clusterlist_numnodes)(void);
  * Cerebro_clusterlist_get_all_nodes
  *
  * function prototype for clusterlist module function to get all
- * cluster nodes.  Caller is responsible for freeing the created 
+ * cluster nodes.  Caller is responsible for freeing the created
  * char ** array of nodes.  The returned array of strings will
- * be NULL terminated.   Required to be defined by each clusterlist 
+ * be NULL terminated.   Required to be defined by each clusterlist
  * module.
  *
  * - nodes - pointer to return char ** array of nodes
@@ -117,11 +117,11 @@ typedef int (*Cerebro_clusterlist_node_in_cluster)(const char *node);
  *
  * Returns nodename in buffer, 0 on success, -1 on error
  */
-typedef int (*Cerebro_clusterlist_get_nodename)(const char *node, 
-                                                char *buf, 
+typedef int (*Cerebro_clusterlist_get_nodename)(const char *node,
+                                                char *buf,
                                                 unsigned int buflen);
-	     
-/*  
+
+/*
  * struct cerebro_clusterlist_module_info
  *
  * contains clusterlist module information and operations.  Required

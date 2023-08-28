@@ -24,7 +24,7 @@
 .\"  with Cerebro.  If not, see <http://www.gnu.org/licenses/>.
 .\"#############################################################################
 .TH CEREBRO_MODULE 3 "May 2005" "LLNL" "CEREBRO_MODULE"
-.SH "NAME" 
+.SH "NAME"
 cerebro_module \- Introduction to cerebro modules
 .SH CLUSTERLIST MODULES
 
@@ -190,6 +190,6 @@ Event modules are searched for in the
 package library directory, @CEREBRO_MODULE_DIR@.
 
 .SH "SEE ALSO"
-libcerebro(3), 
+libcerebro(3),
 cerebro_module_devel(3),
 cerebro.conf(5)

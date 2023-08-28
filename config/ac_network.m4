@@ -24,6 +24,6 @@ AC_DEFUN([AC_NETWORK],
      MANPAGE_NETWORK=0
      ac_with_network=no
   fi
- 
+
   AC_SUBST(MANPAGE_NETWORK)
 ])

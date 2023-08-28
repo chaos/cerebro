@@ -35,7 +35,7 @@
  *
  * Client -> Server
  * - Metric request.
- * 
+ *
  * Server -> Client
  * - Stream of responses indicating metric_names or nodenames and
  *   metric values.  Responses may depend on the request flags.  Metric
@@ -50,7 +50,7 @@
  * - On errors, an error packet will contain the error code.
  *
  * Notes:
- * - Require a smaller timeout len for the server than the client, 
+ * - Require a smaller timeout len for the server than the client,
  *   so the server can respond to the client with a meaningful error
  *   message.
  */
@@ -82,7 +82,7 @@ struct cerebro_metric_server_request
   u_int32_t timeout_len;
   u_int32_t flags;
 };
-  
+
 #define CEREBRO_METRIC_SERVER_REQUEST_PACKET_LEN  (sizeof(int32_t) \
                                                    + CEREBRO_MAX_METRIC_NAME_LEN \
                                                    + sizeof(u_int32_t) \
@@ -105,7 +105,7 @@ struct cerebro_metric_server_response
   u_int32_t metric_value_len;
   void *metric_value;
 };
-  
+
 #define CEREBRO_METRIC_SERVER_RESPONSE_HEADER_LEN  (sizeof(int32_t) \
                                                     + sizeof(u_int32_t) \
                                                     + sizeof(u_int8_t) \
@@ -124,7 +124,7 @@ struct cerebro_metric_server_err_response
   int32_t version;
   u_int32_t err_code;
 };
-  
+
 #define CEREBRO_METRIC_SERVER_ERR_RESPONSE_LEN  (sizeof(int32_t) \
                                                  + sizeof(u_int32_t))
 

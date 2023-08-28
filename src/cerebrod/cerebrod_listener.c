@@ -65,7 +65,7 @@ extern pthread_mutex_t debug_output_mutex;
 
 extern clusterlist_module_t clusterlist_handle;
 
-/* 
+/*
  * listener_init
  * listener_init_cond
  * listener_init_lock
@@ -77,7 +77,7 @@ int listener_init = 0;
 pthread_cond_t listener_init_cond = PTHREAD_COND_INITIALIZER;
 pthread_mutex_t listener_init_lock = PTHREAD_MUTEX_INITIALIZER;
 
-/* 
+/*
  * listener_fds
  * listener_fds_lock
  *
@@ -86,7 +86,7 @@ pthread_mutex_t listener_init_lock = PTHREAD_MUTEX_INITIALIZER;
 int listener_fds[CEREBRO_CONFIG_LISTEN_MESSAGE_CONFIG_MAX];
 pthread_mutex_t listener_fds_lock = PTHREAD_MUTEX_INITIALIZER;
 
-/* 
+/*
  * struct forwarding_info
  *
  * forwarding information and a lock to protect concurrent access
@@ -107,7 +107,7 @@ struct forwarding_info forwarding_info[CEREBRO_CONFIG_FORWARD_MESSAGE_CONFIG_MAX
 clusterlist_module_t clusterlist_handle;
 int found_clusterlist_module = 0;
 
-/* 
+/*
  * _listener_setup_socket
  *
  * Create and setup the listener socket.  Do not use wrappers in this
@@ -116,7 +116,7 @@ int found_clusterlist_module = 0;
  *
  * In this socket setup function, 'num' is used as the message config
  * and file descriptor index.
- * 
+ *
  * Returns file descriptor on success, -1 on error
  */
 static int
@@ -168,7 +168,7 @@ _listener_setup_socket(int num)
   memset(&addr, '\0', sizeof(struct sockaddr_in));
   addr.sin_family = AF_INET;
   addr.sin_port = htons(conf.listen_message_config[num].port);
-  memcpy(&addr.sin_addr, 
+  memcpy(&addr.sin_addr,
          &conf.listen_message_config[num].ip_in_addr,
          sizeof(struct in_addr));
   if (bind(fd, (struct sockaddr *)&addr, sizeof(struct sockaddr_in)) < 0)
@@ -176,7 +176,7 @@ _listener_setup_socket(int num)
       CEREBROD_ERR(("bind: %s", strerror(errno)));
       goto cleanup;
     }
-  
+
   return fd;
 
  cleanup:
@@ -185,7 +185,7 @@ _listener_setup_socket(int num)
   return -1;
 }
 
-/* 
+/*
  * _forwarding_setup_socket
  *
  * Create and setup the forwarding socket.  Do not use wrappers in
@@ -194,7 +194,7 @@ _listener_setup_socket(int num)
  *
  * In this socket setup function, 'num' is used as the message config
  * and forwarding info index.
- * 
+ *
  * Returns file descriptor on success, -1 on error
  */
 static int
@@ -233,7 +233,7 @@ _forwarding_setup_socket(int num)
           goto cleanup;
         }
 
-      /* Turn off loopback for forwarding, since we already 
+      /* Turn off loopback for forwarding, since we already
        * have the data.
        */
       optval = 0;
@@ -282,11 +282,11 @@ _forwarding_setup_socket(int num)
   return -1;
 }
 
-/* 
+/*
  * _forwarding_setup
  *
  * 'index' is the index of the message config and forwarding info.
- * 
+ *
  * Returns 0 success, -1 on error
  */
 static int
@@ -317,7 +317,7 @@ _forwarding_setup(int index)
             {
               if (clusterlist_module_get_nodename(clusterlist_handle,
                                                   node,
-                                                  nodebuf, 
+                                                  nodebuf,
                                                   CEREBRO_MAX_NODENAME_LEN+1) < 0)
                 {
                   CEREBROD_DBG(("clusterlist_module_get_nodename: %s", nodebuf));
@@ -328,9 +328,9 @@ _forwarding_setup(int index)
             }
           else
             nodeptr = node;
-              
+
           Hostlist_push(forwarding_info[index].hosts, nodeptr);
-          
+
           free(node);
         }
     }
@@ -368,7 +368,7 @@ _cerebrod_listener_initialize(void)
 
   if (!(clusterlist_handle = clusterlist_module_load()))
     CEREBROD_EXIT(("clusterlist_module_load"));
-  
+
   if ((found_clusterlist_module = clusterlist_module_found(clusterlist_handle)) < 0)
     CEREBROD_EXIT(("clusterlist_module_found"));
 
@@ -382,7 +382,7 @@ _cerebrod_listener_initialize(void)
           fprintf(stderr, "**************************************\n");
           fprintf(stderr, "* Cerebro Clusterlist\n");
           fprintf(stderr, "* -----------------------\n");
-          fprintf(stderr, "* Using Clusterlist: %s\n", 
+          fprintf(stderr, "* Using Clusterlist: %s\n",
                   clusterlist_module_name(clusterlist_handle));
           fprintf(stderr, "**************************************\n");
         }
@@ -405,7 +405,7 @@ _cerebrod_listener_initialize(void)
   Pthread_mutex_unlock(&listener_init_lock);
 }
 
-/* 
+/*
  * _cerebrod_message_check_version
  *
  * Check that the version is correct prior to unmarshalling
@@ -422,7 +422,7 @@ _cerebrod_message_check_version(const char *buf, unsigned int buflen)
 
   if (version != CEREBROD_MESSAGE_PROTOCOL_VERSION)
     return -1;
-  
+
   return 0;
 }
 
@@ -444,11 +444,11 @@ _cerebrod_message_unmarshall(const char *buf, unsigned int buflen)
   int i, n, bufPtrlen, c = 0;
 
   assert(buf);
-  
+
   msg = Malloc(sizeof(struct cerebrod_message));
 
   memset(msg, '\0', sizeof(struct cerebrod_message));
-  
+
   if (!(n = Unmarshall_int32(&(msg->version), buf + c, buflen - c)))
     goto cleanup;
   c += n;
@@ -458,7 +458,7 @@ _cerebrod_message_unmarshall(const char *buf, unsigned int buflen)
   if (!(n = Unmarshall_buffer(bufPtr, bufPtrlen, buf + c, buflen - c)))
     goto cleanup;
   c += n;
-  
+
   if (!(n = Unmarshall_u_int32(&(msg->metrics_len), buf + c, buflen - c)))
     goto cleanup;
   c += n;
@@ -474,11 +474,11 @@ _cerebrod_message_unmarshall(const char *buf, unsigned int buflen)
       msg->metrics = NULL;
       return msg;
     }
-  
+
   size = sizeof(struct cerebrod_message_metric *)*(msg->metrics_len + 1);
   msg->metrics = Malloc(size);
   memset(msg->metrics, '\0', size);
-      
+
   for (i = 0; i < msg->metrics_len; i++)
     {
       char *mname;
@@ -486,22 +486,22 @@ _cerebrod_message_unmarshall(const char *buf, unsigned int buflen)
 
       mm = Malloc(sizeof(struct cerebrod_message_metric));
       memset(mm, '\0', sizeof(struct cerebrod_message_metric));
-      
+
       mname = mm->metric_name;
       mnamelen = sizeof(mm->metric_name);
-      
+
       if (!(n = Unmarshall_buffer(mname, mnamelen, buf + c, buflen - c)))
         goto cleanup;
       c += n;
-      
+
       if ((n = unmarshall_data_type_len(&(mm->metric_value_type),
                                         &(mm->metric_value_len),
-                                        buf + c, 
+                                        buf + c,
                                         buflen - c,
                                         NULL)) < 0)
         goto cleanup;
       c += n;
-      
+
       if (check_data_type_len(mm->metric_value_type, mm->metric_value_len) < 0)
         goto cleanup;
 
@@ -509,7 +509,7 @@ _cerebrod_message_unmarshall(const char *buf, unsigned int buflen)
       if (mm->metric_value_len)
         {
           mm->metric_value = Malloc(mm->metric_value_len);
-          if ((n = unmarshall_data_value(mm->metric_value_type, 
+          if ((n = unmarshall_data_value(mm->metric_value_type,
                                          mm->metric_value_len,
                                          mm->metric_value,
                                          mm->metric_value_len,
@@ -608,15 +608,15 @@ cerebrod_listener(void *arg)
         {
           if (FD_ISSET(listener_fds[i], &readfds))
             {
-              if ((recv_len = recvfrom(listener_fds[i], 
-                                       buf, 
-                                       CEREBRO_MAX_PACKET_LEN, 
-                                       0, 
-                                       NULL, 
+              if ((recv_len = recvfrom(listener_fds[i],
+                                       buf,
+                                       CEREBRO_MAX_PACKET_LEN,
+                                       0,
+                                       NULL,
                                        NULL)) < 0)
-                listener_fds[i] = cerebrod_reinit_socket(listener_fds[i], 
+                listener_fds[i] = cerebrod_reinit_socket(listener_fds[i],
                                                          i,
-                                                         _listener_setup_socket, 
+                                                         _listener_setup_socket,
                                                          "listener: recvfrom");
               break;
             }
@@ -646,7 +646,7 @@ cerebrod_listener(void *arg)
         }
 
       _cerebrod_message_dump(msg, "Received Message");
-      
+
       /* Guarantee ending '\0' character */
       memset(nodename_buf, '\0', CEREBRO_MAX_NODENAME_LEN+1);
       memcpy(nodename_buf, msg->nodename, CEREBRO_MAX_NODENAME_LEN);
@@ -673,25 +673,25 @@ cerebrod_listener(void *arg)
         }
       else
         /* must assume it is in the cluster */
-        /* Note, there is no need to handle 'forward_host_accept' under this case, 
+        /* Note, there is no need to handle 'forward_host_accept' under this case,
          * since we don't know if it is in the cluster or not anyways.
          */
         in_cluster_flag = 1;
-      
+
       if (!in_cluster_flag)
 	{
 	  CEREBROD_DBG(("received non-cluster packet: %s", nodename_buf));
           cerebrod_message_destroy(msg);
 	  continue;
 	}
-      
+
       memset(nodename_key, '\0', CEREBRO_MAX_NODENAME_LEN+1);
 
       if (found_clusterlist_module)
         {
           if (clusterlist_module_get_nodename(clusterlist_handle,
                                               nodename_buf,
-                                              nodename_key, 
+                                              nodename_key,
                                               CEREBRO_MAX_NODENAME_LEN+1) < 0)
             {
               CEREBROD_DBG(("clusterlist_module_get_nodename: %s", nodename_buf));
@@ -722,21 +722,21 @@ cerebrod_listener(void *arg)
               struct sockaddr_in msgaddr;
               unsigned int addrlen;
               int rv;
-              
+
               memset(&msgaddr, '\0', sizeof(struct sockaddr_in));
               msgaddr.sin_family = AF_INET;
               msgaddr.sin_port = htons(conf.forward_message_config[i].destination_port);
               memcpy(&msgaddr.sin_addr,
                      &conf.forward_message_config[i].ip_in_addr,
                      sizeof(struct in_addr));
-              
+
               addr = (struct sockaddr *)&msgaddr;
               addrlen = sizeof(struct sockaddr_in);
-              
+
               _cerebrod_message_dump(msg, "Forwarding Message");
 
               Pthread_mutex_lock(&forwarding_info[i].lock);
-              
+
               if ((rv = sendto(forwarding_info[i].fd,
                                buf,
                                recv_len,
@@ -752,7 +752,7 @@ cerebrod_listener(void *arg)
                   else
                     CEREBROD_ERR(("sendto: invalid bytes sent"));
                 }
-              
+
               Pthread_mutex_unlock(&forwarding_info[i].lock);
             }
         }

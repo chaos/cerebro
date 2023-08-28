@@ -57,13 +57,13 @@
 #define CEREBRO_ADMIN_RESEND      3
 #define CEREBRO_ADMIN_FLUSH       4
 
-/* 
- * External variables for getopt 
+/*
+ * External variables for getopt
  */
 extern char *optarg;
 extern int optind, opterr, optopt;
 
-/* 
+/*
  * Cerebro-Admin Data
  *
  * handle - cerebro handle
@@ -83,7 +83,7 @@ int64_t metric_value_int64;
 u_int64_t metric_value_u_int64;
 void *metric_value_ptr;
 
-/* 
+/*
  * _init_cerebro_admin
  *
  * initialize globals
@@ -97,7 +97,7 @@ _init_cerebro_admin(void)
     err_exit("%s: cerebro_handle_create()", func);
 }
 
-/* 
+/*
  * _cleanup_cerebro_stat
  *
  * cleanup globals
@@ -108,13 +108,13 @@ _cleanup_cerebro_stat(void)
   (void)cerebro_handle_destroy(handle);
 }
 
-/* 
+/*
  * _usage
  *
  * output usage and exit
  */
-static void 
-_usage(void) 
+static void
+_usage(void)
 {
   fprintf(stderr,
 	  "Usage: cerebro_admin [OPTIONS] -m <metric_name> [-r | -u | -p | -s]\n"
@@ -156,13 +156,13 @@ _usage(void)
   exit(1);
 }
 
-/*  
+/*
  * _version
  *
  * output version and exit
  */
-static void 
-_version(void) 
+static void
+_version(void)
 {
   fprintf(stderr, "%s %ss\n", PACKAGE, VERSION);
   exit(1);
@@ -194,20 +194,20 @@ _cerebro_set_flags(unsigned int new_flag)
     }
 }
 
-/* 
+/*
  * _cmdline_parse
  *
  * parse all cmdline input
  */
 static void
-_cmdline_parse(int argc, char **argv) 
+_cmdline_parse(int argc, char **argv)
 {
   char options[1024];
   char *ptr;
   int c;
 
 #if HAVE_GETOPT_LONG
-  struct option loptions[] = 
+  struct option loptions[] =
     {
       {"help",              0, NULL, 'h'},
       {"version",           0, NULL, 'v'},
@@ -243,7 +243,7 @@ _cmdline_parse(int argc, char **argv)
   while ((c = getopt(argc, argv, options)) != -1)
 #endif
     {
-    switch(c) 
+    switch(c)
       {
       case 'h':
         _usage();
@@ -361,7 +361,7 @@ _cmdline_parse(int argc, char **argv)
     }
 }
 
-/* 
+/*
  * _clean_err_exit
  *
  * Check for and output "nice" error messages for certain errnums.  If
@@ -386,8 +386,8 @@ _clean_err_exit(int errnum)
     err_exit("Invalid configuration input found");
 }
 
-int 
-main(int argc, char *argv[]) 
+int
+main(int argc, char *argv[])
 {
   const char *func = __FUNCTION__;
   int rv = 0;
@@ -401,13 +401,13 @@ main(int argc, char *argv[])
   _init_cerebro_admin();
 
   _cmdline_parse(argc, argv);
-  
+
   if (operation == CEREBRO_ADMIN_REGISTER)
     rv = cerebro_register_metric(handle, metric_name);
   else if (operation == CEREBRO_ADMIN_UNREGISTER)
     rv = cerebro_unregister_metric(handle, metric_name);
   else if (operation == CEREBRO_ADMIN_UPDATE)
-    rv = cerebro_update_metric_value(handle, 
+    rv = cerebro_update_metric_value(handle,
                                      metric_name,
                                      metric_value_type,
                                      metric_value_len,
@@ -416,15 +416,15 @@ main(int argc, char *argv[])
     rv = cerebro_resend_metric(handle, metric_name);
   else if (operation == CEREBRO_ADMIN_FLUSH)
     rv = cerebro_flush_metric(handle, metric_name);
-  
+
   if (rv < 0)
     {
       char *msg = cerebro_strerror(cerebro_errnum(handle));
-      
+
       _clean_err_exit(cerebro_errnum(handle));
       err_exit("%s: %s", func, msg);
     }
-  
+
   _cleanup_cerebro_stat();
   exit(0);
 }

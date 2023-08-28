@@ -79,7 +79,7 @@ loadavg5_metric_get_metric_value(unsigned int *metric_value_type,
 
   if (cerebro_metric_get_loadavgs(NULL, &loadavg5, NULL) < 0)
     goto cleanup;
-  
+
   if (!(loadavgptr = (float *)malloc(sizeof(float))))
     {
       CEREBRO_ERR(("malloc: %s", strerror(errno)));

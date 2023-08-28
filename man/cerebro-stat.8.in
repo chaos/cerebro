@@ -53,22 +53,22 @@ system.
 
 The user may specify the
 .I  "-m"
-or 
+or
 .I "-e"
 options to retrieve or monitor available metric data and event data.
 
 A number of other options specified below allow for alternate output
-formats for the 
+formats for the
 .I "-m"
 option.
 
-The 
+The
 .I "-l"
-and 
+and
 .I "-z"
 can be specified to list available metrics and events respectively.
 
-The default hostname and port used by 
+The default hostname and port used by
 .B cerebro-stat
 can be configured using the cerebro configuration file or having a
 cerebro configuration loaded.  The configuration changes can alter the
@@ -79,7 +79,7 @@ suite of tools and libraries.
 See the
 .BR cerebro.conf(5)
 and
-.BR cerebro_module(3) 
+.BR cerebro_module(3)
 manpages for additional information.
 
 .SH "OPTIONS"

@@ -27,7 +27,7 @@
 .SH "NAME"
 cerebro.conf \- cerebro configuration file
 .SH "DESCRIPTION"
-The 
+The
 .B cerebro
 configuration file configures the features and behavior of the
 .B libcerebro
@@ -42,7 +42,7 @@ for an overview of the
 .B Cerebro
 system and common configuration/setup information.
 
-The default configuration file loaded is @CEREBRO_CONFIG_FILE_DEFAULT@. 
+The default configuration file loaded is @CEREBRO_CONFIG_FILE_DEFAULT@.
 
 The configuration options that can be specified in the configuration
 file are listed below into appropriate sections.  Each configuration
@@ -58,7 +58,7 @@ backslash (".\").
 Specify an alternate default metric server host and port the
 libcerebro API should attempt to connect to.  Metric reading tools
 such as
-.B cerebro-stat 
+.B cerebro-stat
 connect to the metric server to read metric data.  This option can be
 listed multiple times to specify multiple hosts.  If the port is not
 specified, a default is assumed.
@@ -67,7 +67,7 @@ specified, a default is assumed.
 .I cerebro_event_server hostname [port]
 Specify an alternate default event server host and port the libcerebro
 API should attempt to connect to.  Event reading tools such as
-.B cerebro-stat 
+.B cerebro-stat
 connect to the event server to read event data.  This option can be
 listed multiple times to specify multiple hosts.  If the port is not
 specified, a default is assumed.
@@ -84,7 +84,7 @@ default.
 .I cerebrod_heartbeat_frequency ( sec | sec_min sec_max )
 Specify the frequency at which the the
 .B cerebrod
-daemon sends out heartbeat packets containing 
+daemon sends out heartbeat packets containing
 .B Cerebro
 information.  The frequency should be specified in seconds.  The
 frequency can be specified either as a static frequency or a range of
@@ -116,13 +116,13 @@ specified as a network interface (e.g.  eth0), an ip address
 (e.g. 192.168.1.1) or a subnet using CIDR notation
 (e.g. 192.168.1.1/16).  By default, when a network interface is not
 specified,
-.B cerebrod 
+.B cerebrod
 will search for and select an appropriate network interface. If the
-machine running 
-.B cerebrod 
+machine running
+.B cerebrod
 contains multiple network interfaces, it would be recommended that the
 appropriate network interface be configured.  The destination_port,
-source_port, and network_interface may be optionally specified.  
+source_port, and network_interface may be optionally specified.
 To use defaults for the ip address or network interface, '0.0.0.0' may
 be specified.  To use defaults for destination_port or source_port a
  '0' may be specified.
@@ -156,10 +156,10 @@ message receiving ip.  The network interface can be specified as a
 network interface (e.g.  eth0), an ip address (e.g. 192.168.1.1) or a
 subnet using CIDR notation (e.g. 192.168.1.1/16).  By default, when a
 network interface is not specified,
-.B cerebrod 
+.B cerebrod
 will search for and
-select an appropriate network interface. If the machine running 
-.B cerebrod 
+select an appropriate network interface. If the machine running
+.B cerebrod
 contains multiple network interfaces, it would be recommended that the
 appropriate network interface be configured.  The port and
 network_interface may be optionally specified.  To use defaults for
@@ -167,7 +167,7 @@ the ip address or network interface, '0.0.0.0' may be specified.  To
 use defaults for the port, a '0' may be specified.
 .TP
 .I cerebrod_listen_threads num
-Specify the number of listening threads the 
+Specify the number of listening threads the
 .B cerebrod
 listener server should execute.  The default executes 2 threads.
 .TP
@@ -177,10 +177,10 @@ Specify if the
 daemon should turn on the metric controller.  Generally speaking, this
 option should be turned on if the
 .I cerebrod_speak
-option is turned on.  If the 
+option is turned on.  If the
 .I cerebrod_speak
 option is turned off, the metric_controller will not be started.  The default
-turns this option on as long as the 
+turns this option on as long as the
 .I cerebrod_speak
 option is turned on.  This must be turned on for metric administration tools
 such as
@@ -195,14 +195,14 @@ Specify if the
 daemon should turn on the metric server.  Generally speaking, this
 option should be turned on if the
 .I cerebrod_listen
-option is turned on.  If the 
+option is turned on.  If the
 .I cerebrod_listen
 option is turned off, the metric_server will not be started.  The default
-turns this option on as long as the 
+turns this option on as long as the
 .I cerebrod_listen
 option is turned on.  This must be turned on for metric reading tools
 such as
-.B cerebro-stat 
+.B cerebro-stat
 to connect to the
 .B cerebrod
 daemon.
@@ -216,10 +216,10 @@ Specify if the
 daemon should turn on the event server.  Generally speaking, this
 option should be turned on if the
 .I cerebrod_listen
-option is turned on.  If the 
+option is turned on.  If the
 .I cerebrod_listen
 option is turned off, the event_server will not be started.  The default
-turns this option on as long as the 
+turns this option on as long as the
 .I cerebrod_listen
 option is turned on.
 .TP
@@ -250,10 +250,10 @@ specified as a network interface (e.g.  eth0), an ip address
 (e.g. 192.168.1.1) or a subnet using CIDR notation
 (e.g. 192.168.1.1/16).  By default, when a network interface is not
 specified,
-.B cerebrod 
+.B cerebrod
 will search for and select an appropriate network interface. If the
-machine running 
-.B cerebrod 
+machine running
+.B cerebrod
 contains multiple network interfaces, it would be recommended that the
 appropriate network interface be configured.  Multiple hosts can be
 specified to indicate metric data from specific hosts in your cluster
@@ -272,7 +272,7 @@ parameter is only used if the message destination ip address is a
 multicast ip address.  The default ttl is 1.
 .TP
 .I cerebrod_forward_host_accept host1 host2 host3 ...
-Specify hosts that are not in the cluster that 
+Specify hosts that are not in the cluster that
 .B cerebrod
 should accept because packets are being forwarded to it.  This option
 is particularly useful for a
@@ -282,17 +282,17 @@ Hosts must be specified in their shortened hostname form.  The hosts
 can be specified space separated, comma separated, or hostranged.
 .TP
 .I cerebrod_metric_module_exclude str1 str2 str3 ...
-Specify metric module names that 
+Specify metric module names that
 .B cerebrod
 should not load.
 .TP
 .I cerebrod_monitor_module_exclude str1 str2 str3 ...
-Specify monitor module names that 
+Specify monitor module names that
 .B cerebrod
 should not load.
 .TP
 .I cerebrod_event_module_exclude str1 str2 str3 ...
-Specify event module names that 
+Specify event module names that
 .B cerebrod
 should not load.
 .TP
@@ -332,8 +332,8 @@ gettimeofday().  This option is turned off by default.
 .if @MANPAGE_DEBUG@ \{
 .TP
 .I cerebrod_alternate_hostname str
-Specify an alternate hostname for the 
-.B cerebrod 
+Specify an alternate hostname for the
+.B cerebrod
 daemon to use.  Used for various testing and debugging purposes.
 \}
 .SH "FILES"

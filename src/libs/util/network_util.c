@@ -76,10 +76,10 @@ receive_data(int fd,
              unsigned int *errnum)
 {
   int bytes_read = 0;
-  
-  if (!buf 
-      || !buflen 
-      || !bytes_to_read 
+
+  if (!buf
+      || !buflen
+      || !bytes_to_read
       || buflen < bytes_to_read
       || !timeout_len)
     {
@@ -88,21 +88,21 @@ receive_data(int fd,
         *errnum = CEREBRO_ERR_INTERNAL;
       goto cleanup;
     }
-  
+
   memset(buf, '\0', buflen);
-  
+
   while (bytes_read < bytes_to_read)
     {
       fd_set rfds;
       struct timeval tv;
       int num;
-      
+
       tv.tv_sec = timeout_len;
       tv.tv_usec = 0;
-      
+
       FD_ZERO(&rfds);
       FD_SET(fd, &rfds);
-      
+
       if ((num = select(fd + 1, &rfds, NULL, NULL, &tv)) < 0)
         {
           CEREBRO_ERR(("select: %s", strerror(errno)));
@@ -145,18 +145,18 @@ receive_data(int fd,
                 *errnum = CEREBRO_ERR_INTERNAL;
               goto cleanup;
             }
-          
+
           /* Pipe closed */
           if (!n)
             {
               if (bytes_read)
                 goto out;
-              
+
               if (errnum)
                 *errnum = CEREBRO_ERR_PROTOCOL;
               goto cleanup;
             }
-          
+
           bytes_read += n;
         }
       else
@@ -167,15 +167,15 @@ receive_data(int fd,
           goto cleanup;
         }
     }
-  
+
  out:
   return bytes_read;
-  
+
  cleanup:
   return -1;
 }
 
-int 
+int
 low_timeout_connect(const char *hostname,
                     unsigned int port,
                     unsigned int connect_timeout,
@@ -189,7 +189,7 @@ low_timeout_connect(const char *hostname,
   char buf[GETHOSTBYNAME_AUX_BUFLEN];
 #endif /* HAVE_FUNC_GETHOSTBYNAME_R_6 */
   struct hostent *hptr;
-  
+
   if (!hostname || !port || !connect_timeout)
     {
       CEREBRO_DBG(("invalid parameters"));
@@ -197,14 +197,14 @@ low_timeout_connect(const char *hostname,
         *errnum = CEREBRO_ERR_INTERNAL;
       return -1;
     }
-  
+
 #ifdef HAVE_FUNC_GETHOSTBYNAME_R_6
   memset(&hent, '\0', sizeof(struct hostent));
-  if (gethostbyname_r(hostname, 
-                      &hent, 
-                      buf, 
-                      GETHOSTBYNAME_AUX_BUFLEN, 
-                      &hptr, 
+  if (gethostbyname_r(hostname,
+                      &hent,
+                      buf,
+                      GETHOSTBYNAME_AUX_BUFLEN,
+                      &hptr,
                       &h_errnop) != 0)
     {
       CEREBRO_ERR(("gethostbyname_r: %s", hstrerror(h_errnop)));
@@ -229,9 +229,9 @@ low_timeout_connect(const char *hostname,
       return -1;
     }
 #endif /* !HAVE_FUNC_GETHOSTBYNAME_R */
-  
+
   /* Alot of this code is from Unix Network Programming, by Stevens */
-  
+
   if ((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
       CEREBRO_ERR(("socket: %s", strerror(errno)));
@@ -244,7 +244,7 @@ low_timeout_connect(const char *hostname,
   addr.sin_family = AF_INET;
   addr.sin_port = htons(port);
   addr.sin_addr = *((struct in_addr *)hptr->h_addr);
-  
+
   if ((old_flags = fcntl(fd, F_GETFL, 0)) < 0)
     {
       CEREBRO_ERR(("fcntl: %s", strerror(errno)));
@@ -252,7 +252,7 @@ low_timeout_connect(const char *hostname,
         *errnum = CEREBRO_ERR_INTERNAL;
       goto cleanup;
     }
-  
+
   if (fcntl(fd, F_SETFL, old_flags | O_NONBLOCK) < 0)
     {
       CEREBRO_ERR(("fcntl: %s", strerror(errno)));
@@ -272,14 +272,14 @@ low_timeout_connect(const char *hostname,
     {
       fd_set rset, wset;
       struct timeval tval;
-      
+
       FD_ZERO(&rset);
       FD_SET(fd, &rset);
       FD_ZERO(&wset);
       FD_SET(fd, &wset);
       tval.tv_sec = connect_timeout;
       tval.tv_usec = 0;
-      
+
       if ((rv = select(fd+1, &rset, &wset, NULL, &tval)) < 0)
         {
           CEREBRO_ERR(("select: %s", strerror(errno)));
@@ -287,7 +287,7 @@ low_timeout_connect(const char *hostname,
             *errnum = CEREBRO_ERR_INTERNAL;
           goto cleanup;
         }
-      
+
       if (!rv)
         {
           if (errnum)
@@ -300,9 +300,9 @@ low_timeout_connect(const char *hostname,
             {
               unsigned int len;
               int error;
-              
+
               len = sizeof(int);
-              
+
               if (getsockopt(fd, SOL_SOCKET, SO_ERROR, &error, &len) < 0)
                 {
                   CEREBRO_ERR(("getsockopt: %s", strerror(errno)));
@@ -310,7 +310,7 @@ low_timeout_connect(const char *hostname,
                     *errnum = CEREBRO_ERR_INTERNAL;
                   goto cleanup;
                 }
-              
+
               if (error != 0)
                 {
                   errno = error;
@@ -333,7 +333,7 @@ low_timeout_connect(const char *hostname,
             }
         }
     }
-  
+
   /* reset flags */
   if (fcntl(fd, F_SETFL, old_flags) < 0)
     {

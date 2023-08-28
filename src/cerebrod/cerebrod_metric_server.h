@@ -31,7 +31,7 @@
 #include "cerebro/cerebro_metric_server_protocol.h"
 
 #include "list.h"
- 
+
 /*
  * struct cerebrod_metric_name_evaluation_data
  *

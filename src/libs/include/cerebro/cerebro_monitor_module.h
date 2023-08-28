@@ -30,7 +30,7 @@
 
 #define CEREBRO_MONITOR_INTERFACE_VERSION 1
 
-/* 
+/*
  * Cerebro_monitor_interface_version
  *
  * function prototype for monitor module function to return the
@@ -87,8 +87,8 @@ typedef int (*Cerebro_monitor_metric_update)(const char *nodename,
                                              void *metric_value);
 
 /*
- * struct cerebro_monitor_module_info 
- * 
+ * struct cerebro_monitor_module_info
+ *
  * contains monitor module information and operations.  Required to be
  * defined in each monitor module.
  */

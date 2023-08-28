@@ -31,7 +31,7 @@ cerebro \- cluster monitoring tools and libraries
 is a collection of monitoring tools and libraries.  It is made up of a
 daemon, loadable modules, a library, and several tools.
 
-The daemon, 
+The daemon,
 .B cerebrod(8),
 is the core of
 .B Cerebro.
@@ -52,7 +52,7 @@ sends and receives data via a multicast address on a set of defined
 ports.  However, it can be reconfigured to use non-multicast addresses
 and other alternate default ports.
 
-The metric data that 
+The metric data that
 .B cerebrod(8)
 gathers and sends is dependent on the what data is configured for
 monitoring.
@@ -76,7 +76,7 @@ offer the user the ability to collect/receive monitored data on
 
 Before
 .B cerebro
-can be used as a whole it must be configured.  
+can be used as a whole it must be configured.
 See
 .B cerebro.conf(5)
 for a complete list and description of configuration file options.  A
@@ -87,7 +87,7 @@ general overview of configuration and setup can be found below.
 Dynamically loadable modules can be developed for
 .B cerebrod
 for a variety of purposes, including configuration, data
-gathering/sending, data collection/receiving, or data logging.  
+gathering/sending, data collection/receiving, or data logging.
 
 Most
 users will likely want to use the
@@ -120,7 +120,7 @@ for programming against these events or they can be watched via
 
 For more information, see
 .B libcerebro(3)
-and 
+and
 .B cerebro_module(3).
 
 .SH "COMMON CONFIGURATION AND SETUP"
@@ -148,7 +148,7 @@ should be enabled if metric data will be fed into
 .B cerebrod
 via
 .B libcerebro
-and/or 
+and/or
 .B cerebro-admin.
 Typically, this means it should be enabled wherever
 .I cerebrod_speak
@@ -186,7 +186,7 @@ is enabled.
 
 Tools such as
 .B cerebro-admin
-and 
+and
 .B cerebro-stat
 must commonly access a listening
 .B cerebrod
@@ -198,7 +198,7 @@ and
 
 If the default ports chosen by any services of
 .B cerebro
-conflict with existing services, they can be reconfigured 
+conflict with existing services, they can be reconfigured
 and alternate default ports via a variety of options.  Please see
 .B cerebro.conf(5)
 for more details.
@@ -216,7 +216,7 @@ and see a list of nodes currently sending/receiving
 heartbeats.
 
 To see if metric data can be sent and collected, on a \fIspeaker\fR node, register a metric and feed some data to
-.B cerebrod 
+.B cerebrod
 via:
 
 .B # /usr/sbin/cerebro-admin -r -m foobar

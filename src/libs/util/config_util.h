@@ -30,7 +30,7 @@
 
 #include "cerebro/cerebro_config.h"
 
-/* 
+/*
  * load_config
  *
  * Wrapper that calls config_load_config_module,

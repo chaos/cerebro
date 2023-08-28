@@ -80,7 +80,7 @@ char *config_modules[] = {
 #define CONFIG_MODULE_MAX              1
 #define CONFIG_MODULE_MAGIC_NUMBER     0x33882211
 
-/* 
+/*
  * struct config_module
  *
  * config module handle
@@ -116,7 +116,7 @@ _config_module_cb(void *handle, void *dl_handle, void *module_info)
 
 #if WITH_STATIC_MODULES
   if (!handle || !module_info)
-#else /* !WITH_STATIC_MODULES */  
+#else /* !WITH_STATIC_MODULES */
   if (!handle || !dl_handle || !module_info)
 #endif /* !WITH_STATIC_MODULES */
     {
@@ -251,13 +251,13 @@ _handle_info_check(config_module_t handle)
 {
   if (_handle_check(handle) < 0)
     return -1;
-  
+
   if (!handle->module_info)
     {
       CEREBRO_DBG(("module not loaded"));
       return -1;
     }
-  
+
   return 0;
 }
 
@@ -266,7 +266,7 @@ config_module_unload(config_module_t handle)
 {
   if (_handle_check(handle) < 0)
     return -1;
-  
+
   if (handle->module_info)
     config_module_cleanup(handle);
 
@@ -282,7 +282,7 @@ config_module_unload(config_module_t handle)
   return 0;
 }
 
-int 
+int
 config_module_found(config_module_t handle)
 {
   if (_handle_check(handle) < 0)
@@ -305,7 +305,7 @@ config_module_interface_version(config_module_t handle)
 {
   if (_handle_info_check(handle) < 0)
     return -1;
-  
+
   return ((*(handle->module_info)->interface_version)());
 }
 
@@ -314,7 +314,7 @@ config_module_setup(config_module_t handle)
 {
   if (_handle_info_check(handle) < 0)
     return -1;
-  
+
   return ((*(handle->module_info)->setup)());
 }
 
@@ -323,7 +323,7 @@ config_module_cleanup(config_module_t handle)
 {
   if (_handle_info_check(handle) < 0)
     return -1;
-  
+
   return ((*(handle->module_info)->cleanup)());
 }
 
@@ -332,6 +332,6 @@ config_module_load_config(config_module_t handle, struct cerebro_config *conf)
 {
   if (_handle_info_check(handle) < 0)
     return -1;
-  
+
   return ((*(handle->module_info)->load_config)(conf));
 }

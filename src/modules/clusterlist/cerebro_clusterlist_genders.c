@@ -60,7 +60,7 @@ static genders_t gh = NULL;
  *
  * genders clusterlist module interface_version function
  */
-static int 
+static int
 genders_clusterlist_interface_version(void)
 {
   return CEREBRO_CLUSTERLIST_INTERFACE_VERSION;
@@ -71,7 +71,7 @@ genders_clusterlist_interface_version(void)
  *
  * genders clusterlist module setup function
  */
-static int 
+static int
 genders_clusterlist_setup(void)
 {
   if (gh)
@@ -102,7 +102,7 @@ genders_clusterlist_cleanup(void)
  *
  * genders clusterlist module numnodes function
  */
-static int 
+static int
 genders_clusterlist_numnodes(void)
 {
   if (!gh)
@@ -133,7 +133,7 @@ genders_clusterlist_get_all_nodes(char ***nodes)
       CEREBRO_DBG(("invalid parameters"));
       return -1;
     }
-  
+
   return cerebro_clusterlist_genders_get_all_nodes(gh, nodes);
 }
 
@@ -190,8 +190,8 @@ genders_clusterlist_node_in_cluster(const char *node)
  * genders clusterlist module get_nodename function
  */
 static int
-genders_clusterlist_get_nodename(const char *node, 
-                                 char *buf, 
+genders_clusterlist_get_nodename(const char *node,
+                                 char *buf,
                                  unsigned int buflen)
 {
   char nodebuf[CEREBRO_MAX_NODENAME_LEN+1];
@@ -208,7 +208,7 @@ genders_clusterlist_get_nodename(const char *node,
       CEREBRO_DBG(("invalid parameters"));
       return -1;
     }
-  
+
   /* Shorten hostname if necessary */
   if (strchr(node, '.'))
     {

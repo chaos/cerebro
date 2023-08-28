@@ -63,14 +63,14 @@
  */
 static u_int32_t metric_shutdown = 0;
 
-/* 
+/*
  * send_message_function
  *
  * Stores pointer to function to send a message
  */
 Cerebro_metric_send_message send_message_function = NULL;
 
-/* 
+/*
  * _metric_shutdown_handler
  *
  * Will handle the SIGTERM (and SIGINT if we're debugging) signals.
@@ -104,19 +104,19 @@ _metric_shutdown_handler(int signum)
 
   hb->version = CEREBROD_MESSAGE_PROTOCOL_VERSION;
   memcpy(hb->nodename, nodename, CEREBRO_MAX_NODENAME_LEN);
-  
+
   hb->metrics_len = 1;
   if (!(hb->metrics = (struct cerebrod_message_metric **)malloc(sizeof(struct cerebrod_message_metric *)*(hb->metrics_len + 1))))
     goto cleanup;
   memset(hb->metrics, '\0', sizeof(struct cerebrod_message_metric *)*(hb->metrics_len + 1));
-  
+
   if (!(hd = (struct cerebrod_message_metric *)malloc(sizeof(struct cerebrod_message_metric))))
     goto cleanup;
   memset(hd, '\0', sizeof(struct cerebrod_message_metric));
 
   /* need not overflow */
   strncpy(hd->metric_name, SHUTDOWN_METRIC_NAME, CEREBRO_MAX_METRIC_NAME_LEN);
-  
+
   hd->metric_value_type = CEREBRO_DATA_VALUE_TYPE_U_INT32;
   hd->metric_value_len = sizeof(u_int32_t);
   metric_shutdown = 1;
@@ -185,7 +185,7 @@ shutdown_metric_get_metric_period(int *period)
       CEREBRO_DBG(("invalid parameters"));
       return -1;
     }
-  
+
   /* Rather than making the period -1 (so the metric is never sent
    * except on during shutdown when the signal is caught), we set the
    * period to INT_MAX, so that the value of '0' is sent once at the

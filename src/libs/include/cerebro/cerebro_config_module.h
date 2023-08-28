@@ -32,7 +32,7 @@
 
 #define CEREBRO_CONFIG_INTERFACE_VERSION 1
 
-/* 
+/*
  * Cerebro_config_interface_version
  *
  * function prototype for config module function to return the
@@ -75,8 +75,8 @@ typedef int (*Cerebro_config_cleanup)(void);
 typedef int (*Cerebro_config_load_config)(struct cerebro_config *conf);
 
 /*
- * struct cerebro_config_module_info 
- * 
+ * struct cerebro_config_module_info
+ *
  * contains config module information and operations.  Required to be
  * defined in each config module.
  */

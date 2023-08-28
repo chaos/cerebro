@@ -16,8 +16,8 @@ AC_DEFUN([AC_CEREBRO_MODULE_DIR],
      CEREBRO_MODULE_DIR=${prefix}/$LIBDIRTYPE/cerebro
   fi
 
-  AC_DEFINE_UNQUOTED([CEREBRO_MODULE_DIR], 
-                     ["$CEREBRO_MODULE_DIR"], 
+  AC_DEFINE_UNQUOTED([CEREBRO_MODULE_DIR],
+                     ["$CEREBRO_MODULE_DIR"],
                      [Define default cerebro module dir])
   AC_SUBST(CEREBRO_MODULE_DIR)
 ])

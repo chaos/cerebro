@@ -28,7 +28,7 @@
 #ifndef _NETWORK_UTIL_H
 #define _NETWORK_UTIL_H
 
-/* 
+/*
  * receive_data
  *
  * Receive a certain amount of data

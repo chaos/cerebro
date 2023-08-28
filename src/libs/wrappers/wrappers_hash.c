@@ -35,7 +35,7 @@
 
 #include "wrappers.h"
 
-hash_t 
+hash_t
 wrap_hash_create(WRAPPERS_ARGS, int size, hash_key_f key_f, hash_cmp_f cmp_f, hash_del_f del_f)
 {
   hash_t rv;
@@ -51,7 +51,7 @@ wrap_hash_create(WRAPPERS_ARGS, int size, hash_key_f key_f, hash_cmp_f cmp_f, ha
   return rv;
 }
 
-int 
+int
 wrap_hash_count(WRAPPERS_ARGS, hash_t h)
 {
   int rv;
@@ -122,13 +122,13 @@ wrap_hash_remove(WRAPPERS_ARGS, hash_t h, const void *key)
   return rv;
 }
 
-int 
+int
 wrap_hash_remove_if(WRAPPERS_ARGS, hash_t h, hash_arg_f argf, void *arg)
 {
   int rv;
 
   assert(file && function);
-    
+
   if (!h || !argf)
     WRAPPERS_ERR_INVALID_PARAMETERS("hash_remove_if");
 
@@ -138,13 +138,13 @@ wrap_hash_remove_if(WRAPPERS_ARGS, hash_t h, hash_arg_f argf, void *arg)
   return rv;
 }
 
-int 
+int
 wrap_hash_delete_if(WRAPPERS_ARGS, hash_t h, hash_arg_f argf, void *arg)
 {
   int rv;
 
   assert(file && function);
-    
+
   if (!h || !argf)
     WRAPPERS_ERR_INVALID_PARAMETERS("hash_delete_if");
 
@@ -154,7 +154,7 @@ wrap_hash_delete_if(WRAPPERS_ARGS, hash_t h, hash_arg_f argf, void *arg)
   return rv;
 }
 
-int 
+int
 wrap_hash_for_each(WRAPPERS_ARGS, hash_t h, hash_arg_f argf, void *arg)
 {
   int rv;

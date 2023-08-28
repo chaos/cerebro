@@ -76,7 +76,7 @@ void *event_modules[] =
 #define EVENT_MODULE_DIR          EVENT_MODULE_BUILDDIR "/.libs"
 #define EVENT_MODULE_MAGIC_NUMBER 0x53812232
 
-/* 
+/*
  * struct event_module
  *
  * event module handle
@@ -98,7 +98,7 @@ struct event_module
  *
  * Return 1 is module is stored, 0 if not, -1 on fatal error
  */
-static int 
+static int
 #if WITH_STATIC_MODULES
 _event_module_cb(void *handle, void *module_info)
 #else  /* !WITH_STATIC_MODULES */
@@ -110,7 +110,7 @@ _event_module_cb(void *handle, void *dl_handle, void *module_info)
 #if !WITH_STATIC_MODULES
   lt_dlhandle event_dl_handle;
 #endif /* !WITH_STATIC_MODULES */
-                                                                                      
+
 #if WITH_STATIC_MODULES
   if (!handle || !module_info)
 #else /* !WITH_STATIC_MODULES */
@@ -155,7 +155,7 @@ _event_module_cb(void *handle, void *dl_handle, void *module_info)
     }
 
 #if !WITH_STATIC_MODULES
-  if (!vector_set(event_handle->dl_handles, 
+  if (!vector_set(event_handle->dl_handles,
                   event_dl_handle,
                   event_handle->modules_count))
     {
@@ -164,7 +164,7 @@ _event_module_cb(void *handle, void *dl_handle, void *module_info)
     }
 #endif /* !WITH_STATIC_MODULES */
   if (!vector_set(event_handle->module_infos,
-                  event_module_info, 
+                  event_module_info,
                   event_handle->modules_count))
     {
       CEREBRO_DBG(("vector_set: %s", strerror(errno)));
@@ -179,7 +179,7 @@ _event_module_cb(void *handle, void *dl_handle, void *module_info)
   return 1;
 }
 
-event_modules_t 
+event_modules_t
 event_modules_load(void)
 {
   struct event_module *handle = NULL;
@@ -187,7 +187,7 @@ event_modules_load(void)
 
   if (module_setup() < 0)
     return NULL;
-                                                                                    
+
   if (!(handle = (struct event_module *)malloc(sizeof(struct event_module))))
     {
       CEREBRO_ERR(("malloc: %s", strerror(errno)));
@@ -204,7 +204,7 @@ event_modules_load(void)
       goto cleanup;
     }
 #endif /* !WITH_STATIC_MODULES */
-  
+
   if (!(handle->module_infos = vector_create(NULL)))
     {
       CEREBRO_ERR(("vector_create: %s", strerror(errno)));
@@ -232,7 +232,7 @@ event_modules_load(void)
     goto out;
 
   /* Responsibility of caller to call count to see if no modules were
-   * loaded 
+   * loaded
    */
 
  out:
@@ -294,7 +294,7 @@ _handle_index_check(event_modules_t handle, unsigned int index)
   return 0;
 }
 
-int 
+int
 event_modules_unload(event_modules_t handle)
 {
   int i;
@@ -326,10 +326,10 @@ event_modules_unload(event_modules_t handle)
 
   module_cleanup();
   return 0;
-  
+
 }
 
-int 
+int
 event_modules_count(event_modules_t handle)
 {
   if (_handle_check(handle) < 0)
@@ -372,7 +372,7 @@ event_module_interface_version(event_modules_t handle, unsigned int index)
   return ((*module_info->interface_version)());
 }
 
-int 
+int
 event_module_setup(event_modules_t handle, unsigned int index)
 {
   struct cerebro_event_module_info *module_info;
@@ -389,7 +389,7 @@ event_module_setup(event_modules_t handle, unsigned int index)
   return ((*module_info->setup)());
 }
 
-int 
+int
 event_module_cleanup(event_modules_t handle, unsigned int index)
 {
   struct cerebro_event_module_info *module_info;
@@ -440,24 +440,24 @@ event_module_metric_names(event_modules_t handle, unsigned int index)
   return ((*module_info->metric_names)());
 }
 
-int 
+int
 event_module_timeout_length(event_modules_t handle, unsigned int index)
 {
   struct cerebro_event_module_info *module_info;
-  
+
   if (_handle_index_check(handle, index) < 0)
     return -1;
-  
+
   if (!(module_info = vector_get(handle->module_infos, index)))
     {
       CEREBRO_DBG(("vector_get: %s", strerror(errno)));
       return -1;
     }
-  
+
   return ((*module_info->timeout_length)());
 }
 
-int 
+int
 event_module_node_timeout(event_modules_t handle,
                           unsigned int index,
                           const char *nodename,
@@ -477,7 +477,7 @@ event_module_node_timeout(event_modules_t handle,
   return ((*module_info->node_timeout)(nodename, event));
 }
 
-int 
+int
 event_module_metric_update(event_modules_t handle,
                            unsigned int index,
                            const char *nodename,
@@ -506,7 +506,7 @@ event_module_metric_update(event_modules_t handle,
                                         event));
 }
 
-void 
+void
 event_module_destroy(event_modules_t handle,
                      unsigned int index,
                      struct cerebro_event *event)

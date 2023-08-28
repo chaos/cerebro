@@ -17,7 +17,7 @@
 AC_DEFUN([AC_IPV6],
 [
    # IEEE standard says it should be in sys/socket.h
-   AC_CHECK_DECL([AF_INET6], 
+   AC_CHECK_DECL([AF_INET6],
                  AC_DEFINE(HAVE_IPV6,1,[have IPv6]),,
-                 [#include <sys/socket.h>])  
+                 [#include <sys/socket.h>])
 ])

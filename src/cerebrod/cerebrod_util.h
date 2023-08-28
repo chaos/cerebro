@@ -38,7 +38,7 @@
 
 #include "hash.h"
 
-/* 
+/*
  * cerebrod_rehash
  *
  * rehash the contents of old_hash into a new hash.  Caller is
@@ -52,10 +52,10 @@
  *
  * Returns new_hash in 'old_hash', and new hash size in 'hash_size'.
  */
-void cerebrod_rehash(hash_t *old_hash, 
-                     int *hash_size, 
+void cerebrod_rehash(hash_t *old_hash,
+                     int *hash_size,
                      int hash_size_increment,
-                     int hash_num, 
+                     int hash_num,
                      pthread_mutex_t *hash_mutex);
 
 /*
@@ -65,7 +65,7 @@ void cerebrod_rehash(hash_t *old_hash,
  */
 typedef int (*Cerebrod_socket_setup)(int num);
 
-/* 
+/*
  * cerebrod_reinit_socket
  *
  * This function helps various looping network servers or clients
@@ -74,7 +74,7 @@ typedef int (*Cerebrod_socket_setup)(int num);
  * For networking errnos EINVAL, EBADF, ENODEV, we assume the network
  * device has been temporarily brought down then back up.  For
  * example, this can occur if the administrator runs
- * '/etc/init.d/network restart'.  
+ * '/etc/init.d/network restart'.
  *
  * If old_fd < 0, the network device just isn't back up yet from
  * the previous time we got an errno EINVAL, EBADF, or
@@ -82,11 +82,11 @@ typedef int (*Cerebrod_socket_setup)(int num);
  *
  * The num is passed to the socket_setup function.  For some socket
  * setup functions, they num will be a dummy value that is never used.
- * 
+ *
  * Returns new (or possibly old) fd on success, -1 on error
  */
 int
-cerebrod_reinit_socket(int old_fd, 
+cerebrod_reinit_socket(int old_fd,
                        int num,
                        Cerebrod_socket_setup socket_setup,
                        char *msg);

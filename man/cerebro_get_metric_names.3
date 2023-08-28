@@ -32,7 +32,7 @@ cerebro_get_metric_names \- retrieve available cerebro metric names
 .BI "cerebro_namelist_t cerebro_get_metric_names(cerebro_t handle);"
 .br
 .SH "DESCRIPTION"
-\fBcerebro_get_metric_names()\fR retrieves a list of metric names available for 
+\fBcerebro_get_metric_names()\fR retrieves a list of metric names available for
 retrieval with
 .B cerebro_get_metric_data(3).
 The metric names are returned in a cerebro namelist.  The cerebro
@@ -42,7 +42,7 @@ The default behavior of \fBcerebro_get_metric_names()\fR can be altered by
 setting alternate defaults using
 .B cerebro_set_hostname(3),
 or
-.B cerebro_set_port(3).  
+.B cerebro_set_port(3).
 It can also be altered using the the cerebro configuration file.
 
 .br
@@ -52,7 +52,7 @@ returned, and an error code is returned in \fIhandle\fR.  The error
 code can be retrieved via
 .BR cerebro_errnum(3)
 , and a description of the error code can be retrieved via
-.BR cerebro_strerror(3).  
+.BR cerebro_strerror(3).
 .br
 .SH "ERRORS"
 .TP
@@ -70,7 +70,7 @@ Invalid parameter passed in.
 Invalid hostname specified.
 .TP
 .B CEREBRO_ERR_CONNECT
-Error connecting to 
+Error connecting to
 .B cerebrod
 metric server.
 .TP

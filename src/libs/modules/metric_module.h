@@ -28,13 +28,13 @@
 #ifndef _METRIC_MODULE_H
 #define _METRIC_MODULE_H
 
-typedef struct metric_module *metric_modules_t; 
+typedef struct metric_module *metric_modules_t;
 
 /*
  * metric_modules_load
  *
  * Find and load the metric modules.
- * 
+ *
  * Returns metric module handle on success, NULL on error
  */
 metric_modules_t metric_modules_load(void);
@@ -95,7 +95,7 @@ char *metric_module_get_metric_name(metric_modules_t handle, unsigned int index)
  *
  * call metric module get_metric_period function
  */
-int metric_module_get_metric_period(metric_modules_t handle, 
+int metric_module_get_metric_period(metric_modules_t handle,
                                     unsigned int index,
                                     int *period);
 
@@ -104,7 +104,7 @@ int metric_module_get_metric_period(metric_modules_t handle,
  *
  * call metric module get_metric_flags function
  */
-int metric_module_get_metric_flags(metric_modules_t handle, 
+int metric_module_get_metric_flags(metric_modules_t handle,
                                    unsigned int index,
                                    u_int32_t *flags);
 

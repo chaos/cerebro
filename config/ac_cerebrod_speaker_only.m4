@@ -15,7 +15,7 @@ AC_DEFUN([AC_CEREBROD_SPEAKER_ONLY],
     ]
   )
   AC_MSG_RESULT([${ac_cerebrod_speaker_only_test=no}])
-  
+
   if test "$ac_cerebrod_speaker_only_test" = "yes"; then
      AC_DEFINE([WITH_CEREBROD_SPEAKER_ONLY], [1], [Define if you want to build cerebrod with the speaker only])
      ac_with_cerebrod_speaker_only=yes
@@ -37,7 +37,7 @@ AC_DEFUN([AC_CEREBROD_NO_THREADS],
     ]
   )
   AC_MSG_RESULT([${ac_cerebrod_no_threads_test=no}])
-  
+
   if test "$ac_with_cerebrod_speaker_only" = "yes" &&
      test "$ac_cerebrod_no_threads_test" = "yes"; then
      AC_DEFINE([WITH_CEREBROD_NO_THREADS], [1], [Define if you want to build cerebrod with no threads (requires --with-cerebrod-speaker-only)])

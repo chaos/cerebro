@@ -28,7 +28,7 @@
 #ifndef _CEREBRO_H
 #define _CEREBRO_H
 
-/* 
+/*
  * Cerebro Error Codes
  */
 #define CEREBRO_ERR_SUCCESS                   0
@@ -41,9 +41,9 @@
 #define CEREBRO_ERR_PARAMETERS                7
 #define CEREBRO_ERR_HOSTNAME                  8
 #define CEREBRO_ERR_CONNECT                   9
-#define CEREBRO_ERR_CONNECT_TIMEOUT          10 
+#define CEREBRO_ERR_CONNECT_TIMEOUT          10
 #define CEREBRO_ERR_PROTOCOL                 11
-#define CEREBRO_ERR_PROTOCOL_TIMEOUT         12 
+#define CEREBRO_ERR_PROTOCOL_TIMEOUT         12
 #define CEREBRO_ERR_VERSION_INCOMPATIBLE     13
 #define CEREBRO_ERR_OVERFLOW                 14
 #define CEREBRO_ERR_NODE_NOTFOUND            15
@@ -59,7 +59,7 @@
 #define CEREBRO_ERR_INTERNAL                 25
 #define CEREBRO_ERR_ERRNUMRANGE              26
 
-/* 
+/*
  * Cerebro Flags
  */
 
@@ -69,7 +69,7 @@
 #define CEREBRO_METRIC_CONTROL_FLAGS_SEND_NOW           0x00000008
 #define CEREBRO_METRIC_FLAGS_MASK                       0x0000000F
 
-/* 
+/*
  * Cerebro Data Value Types
  */
 #define CEREBRO_DATA_VALUE_TYPE_NONE             0
@@ -81,7 +81,7 @@
 #define CEREBRO_DATA_VALUE_TYPE_INT64            6
 #define CEREBRO_DATA_VALUE_TYPE_U_INT64          7
 
-/* 
+/*
  * Default metrics
  */
 #define CEREBRO_METRIC_METRIC_NAMES                "metric_names"
@@ -91,12 +91,12 @@
 #define CEREBRO_METRIC_UPDOWN_STATE_NODE_UP        1
 #define CEREBRO_METRIC_UPDOWN_STATE_NODE_DOWN      0
 
-/* 
+/*
  * Default events
  */
 #define CEREBRO_EVENT_NAMES                        "event_names"
 
-/* 
+/*
  * Server defaults
  */
 #define CEREBRO_METRIC_SERVER_PORT                 8852
@@ -190,31 +190,31 @@ int cerebro_nodelist_iterator_errnum(cerebro_nodelist_iterator_t nodelistItr);
  */
 char *cerebro_strerror(int errnum);
 
-/* 
- * Parameter Get/Set Routines 
+/*
+ * Parameter Get/Set Routines
  */
 
-/* 
+/*
  * cerebro_get_hostname
  *
  * Get a string pointer to the currently set hostname of the cerebrod
  * server.  The string returned may be the empty string, indicating no
  * hostname has been set.
- * 
+ *
  * Returns pointer on success, NULL on error
  */
 char *cerebro_get_hostname(cerebro_t handle);
 
-/* 
+/*
  * cerebro_set_hostname
  *
  * Set the hostname of the cerebrod server
- * 
+ *
  * Returns 0 on success, -1 on error
  */
 int cerebro_set_hostname(cerebro_t handle, const char *hostname);
 
-/* 
+/*
  * cerebro_get_port
  *
  * Get the currently set cerebrod server port.  The port may be 0,
@@ -224,7 +224,7 @@ int cerebro_set_hostname(cerebro_t handle, const char *hostname);
  */
 int cerebro_get_port(cerebro_t handle);
 
-/* 
+/*
  * cerebro_set_port
  *
  * Set the cerebrod server port to connect to
@@ -233,7 +233,7 @@ int cerebro_get_port(cerebro_t handle);
  */
 int cerebro_set_port(cerebro_t handle, unsigned int port);
 
-/* 
+/*
  * cerebro_get_timeout_len
  *
  * Get the currently set timeout_len.  The timeout_len may be 0,
@@ -243,7 +243,7 @@ int cerebro_set_port(cerebro_t handle, unsigned int port);
  */
 int cerebro_get_timeout_len(cerebro_t handle);
 
-/* 
+/*
  * cerebro_set_timeout_len
  *
  * Set the cerebrod server timeout_len for up vs. down calculation
@@ -252,7 +252,7 @@ int cerebro_get_timeout_len(cerebro_t handle);
  */
 int cerebro_set_timeout_len(cerebro_t handle, unsigned int timeout_len);
 
-/* 
+/*
  * cerebro_get_flags
  *
  * Get the currently set flags.  The flags may be 0, indicating no
@@ -262,7 +262,7 @@ int cerebro_set_timeout_len(cerebro_t handle, unsigned int timeout_len);
  */
 int cerebro_get_flags(cerebro_t handle);
 
-/* 
+/*
  * cerebro_set_flags
  *
  * Set the cerebrod server flags to use
@@ -271,11 +271,11 @@ int cerebro_get_flags(cerebro_t handle);
  */
 int cerebro_set_flags(cerebro_t handle, unsigned int flags);
 
-/* 
+/*
  * Event Retrieval API
  */
 
-/* 
+/*
  * cerebro_get_event_names
  *
  * Get a namelist of currently available events
@@ -284,7 +284,7 @@ int cerebro_set_flags(cerebro_t handle, unsigned int flags);
  */
 cerebro_namelist_t cerebro_get_event_names(cerebro_t handle);
 
-/* 
+/*
  * cerebro_event_register
  *
  * Setup a file descriptor for event polling.
@@ -293,7 +293,7 @@ cerebro_namelist_t cerebro_get_event_names(cerebro_t handle);
  */
 int cerebro_event_register(cerebro_t handle, const char *event_name);
 
-/* 
+/*
  * cerebro_event_unregister
  *
  * Tear down event file descriptor
@@ -302,7 +302,7 @@ int cerebro_event_register(cerebro_t handle, const char *event_name);
  */
 int cerebro_event_unregister(cerebro_t handle, int fd);
 
-/* 
+/*
  * cerebro_event_parse
  *
  * Parse event data when there is data to read on the file descriptor.
@@ -317,11 +317,11 @@ int cerebro_event_parse(cerebro_t handle,
                         unsigned int *event_value_len,
                         void **event_value);
 
-/* 
+/*
  * Metric Retrieval API
  */
 
-/* 
+/*
  * cerebro_get_metric_names
  *
  * Get a namelist of currently available metrics
@@ -330,7 +330,7 @@ int cerebro_event_parse(cerebro_t handle,
  */
 cerebro_namelist_t cerebro_get_metric_names(cerebro_t handle);
 
-/* 
+/*
  * cerebro_get_metric_data
  *
  * Get nodelist of nodes and values for a certain metric
@@ -340,11 +340,11 @@ cerebro_namelist_t cerebro_get_metric_names(cerebro_t handle);
 cerebro_nodelist_t cerebro_get_metric_data(cerebro_t handle,
 					   const char *metric_name);
 
-/* 
+/*
  * Metric Monitoring API
  */
 
-/* 
+/*
  * cerebro_register_metric
  *
  * Register a new metric with the local cerebro daemon
@@ -353,7 +353,7 @@ cerebro_nodelist_t cerebro_get_metric_data(cerebro_t handle,
  */
 int cerebro_register_metric(cerebro_t handle, const char *metric_name);
 
-/* 
+/*
  * cerebro_unregister_metric
  *
  * Unregister a metric with the local cerebro daemon
@@ -362,7 +362,7 @@ int cerebro_register_metric(cerebro_t handle, const char *metric_name);
  */
 int cerebro_unregister_metric(cerebro_t handle, const char *metric_name);
 
-/* 
+/*
  * cerebro_update_metric_value
  *
  * Update the value of a metric on the local cerebro daemon
@@ -375,7 +375,7 @@ int cerebro_update_metric_value(cerebro_t handle,
                                 unsigned int metric_value_len,
                                 void *metric_value);
 
-/* 
+/*
  * cerebro_resend_metric
  *
  * Resend a metric
@@ -384,7 +384,7 @@ int cerebro_update_metric_value(cerebro_t handle,
  */
 int cerebro_resend_metric(cerebro_t handle, const char *metric_name);
 
-/* 
+/*
  * cerebro_flush_metric
  *
  * Flush a metric
@@ -393,12 +393,12 @@ int cerebro_resend_metric(cerebro_t handle, const char *metric_name);
  */
 int cerebro_flush_metric(cerebro_t handle, const char *metric_name);
 
-/* 
+/*
  * Namelist API
  *
  */
 
-/* 
+/*
  * cerebro_namelist_length
  *
  * Determine the length of the namelist.
@@ -407,7 +407,7 @@ int cerebro_flush_metric(cerebro_t handle, const char *metric_name);
  */
 int cerebro_namelist_length(cerebro_namelist_t namelist);
 
-/* 
+/*
  * cerebro_namelist_destroy
  *
  * Destroy a namelist
@@ -416,7 +416,7 @@ int cerebro_namelist_length(cerebro_namelist_t namelist);
  */
 int cerebro_namelist_destroy(cerebro_namelist_t namelist);
 
-/* 
+/*
  * cerebro_namelist_iterator_create
  *
  * Create a namelist iterator
@@ -425,14 +425,14 @@ int cerebro_namelist_destroy(cerebro_namelist_t namelist);
  */
 cerebro_namelist_iterator_t cerebro_namelist_iterator_create(cerebro_namelist_t namelist);
 
-/* 
+/*
  * cerebro_namelist_iterator_name
  *
  * Retrieve a pointer to the current name
  *
  * Returns 0 on success, -1 on error
  */
-int cerebro_namelist_iterator_name(cerebro_namelist_iterator_t namelistItr, 
+int cerebro_namelist_iterator_name(cerebro_namelist_iterator_t namelistItr,
                                    char **name);
 
 /*
@@ -445,16 +445,16 @@ int cerebro_namelist_iterator_name(cerebro_namelist_iterator_t namelistItr,
  */
 int cerebro_namelist_iterator_next(cerebro_namelist_iterator_t namelistItr);
 
-/* 
+/*
  * cerebro_namelist_iterator_reset
  *
  * Reset the namelist iterator to the beginning.
- * 
+ *
  * Returns 0 on success, -1 on error
  */
 int cerebro_namelist_iterator_reset(cerebro_namelist_iterator_t namelistItr);
 
-/* 
+/*
  * cerebro_namelist_iterator_at_end
  *
  * Returns 1 if the end of the list has been reached, 0 if not, -1 on
@@ -462,19 +462,19 @@ int cerebro_namelist_iterator_reset(cerebro_namelist_iterator_t namelistItr);
  */
 int cerebro_namelist_iterator_at_end(cerebro_namelist_iterator_t namelistItr);
 
-/* 
+/*
  * cerebro_namelist_iterator_destroy
  *
  * Returns 0 on success, -1 on error
  */
 int cerebro_namelist_iterator_destroy(cerebro_namelist_iterator_t namelistItr);
 
-/* 
+/*
  * Nodelist API
  *
  */
 
-/* 
+/*
  * cerebro_nodelist_metric_name
  *
  * Determine the name of the data stored in the nodelist
@@ -483,7 +483,7 @@ int cerebro_namelist_iterator_destroy(cerebro_namelist_iterator_t namelistItr);
  */
 char *cerebro_nodelist_metric_name(cerebro_nodelist_t nodelist);
 
-/* 
+/*
  * cerebro_nodelist_length
  *
  * Determine the length of the nodelist.
@@ -492,7 +492,7 @@ char *cerebro_nodelist_metric_name(cerebro_nodelist_t nodelist);
  */
 int cerebro_nodelist_length(cerebro_nodelist_t nodelist);
 
-/* 
+/*
  * cerebro_nodelist_destroy
  *
  * Destroy a nodelist
@@ -501,7 +501,7 @@ int cerebro_nodelist_length(cerebro_nodelist_t nodelist);
  */
 int cerebro_nodelist_destroy(cerebro_nodelist_t nodelist);
 
-/* 
+/*
  * cerebro_nodelist_iterator_create
  *
  * Create a nodelist iterator
@@ -510,17 +510,17 @@ int cerebro_nodelist_destroy(cerebro_nodelist_t nodelist);
  */
 cerebro_nodelist_iterator_t cerebro_nodelist_iterator_create(cerebro_nodelist_t nodelist);
 
-/* 
+/*
  * cerebro_nodelist_iterator_nodename
  *
  * Retrieve a pointer to the current nodename
  *
  * Returns 0 on success, -1 on error
  */
-int cerebro_nodelist_iterator_nodename(cerebro_nodelist_iterator_t nodelistItr, 
+int cerebro_nodelist_iterator_nodename(cerebro_nodelist_iterator_t nodelistItr,
                                        char **nodename);
 
-/* 
+/*
  * cerebro_nodelist_iterator_metric_value
  *
  * If a value exists for the current point in the list, the metric
@@ -535,7 +535,7 @@ int cerebro_nodelist_iterator_metric_value(cerebro_nodelist_iterator_t nodelistI
                                            unsigned int *metric_value_len,
                                            void **metric_value);
 
-/* 
+/*
  * cerebro_nodelist_iterator_next
  *
  * Move the iterator pointer forward
@@ -545,16 +545,16 @@ int cerebro_nodelist_iterator_metric_value(cerebro_nodelist_iterator_t nodelistI
  */
 int cerebro_nodelist_iterator_next(cerebro_nodelist_iterator_t nodelistItr);
 
-/* 
+/*
  * cerebro_nodelist_iterator_reset
  *
  * Reset the nodelist iterator to the beginning.
- * 
+ *
  * Returns 0 on success, -1 on error
  */
 int cerebro_nodelist_iterator_reset(cerebro_nodelist_iterator_t nodelistItr);
 
-/* 
+/*
  * cerebro_nodelist_iterator_at_end
  *
  * Returns 1 if the end of the list has been reached, 0 if not, -1 on
@@ -562,7 +562,7 @@ int cerebro_nodelist_iterator_reset(cerebro_nodelist_iterator_t nodelistItr);
  */
 int cerebro_nodelist_iterator_at_end(cerebro_nodelist_iterator_t nodelistItr);
 
-/* 
+/*
  * cerebro_nodelist_iterator_destroy
  *
  * Returns 0 on success, -1 on error

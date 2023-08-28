@@ -55,7 +55,7 @@
 #define HOSTSFILE_CLUSTERLIST_MODULE_NAME "hostsfile"
 #define HOSTSFILE_PARSE_BUFLEN            4096
 
-/* 
+/*
  * hosts
  *
  * Store all of the hosts found in the hostsfile
@@ -67,15 +67,15 @@ static List hosts = NULL;
  *
  * hostsfile clusterlist module interface_version function
  */
-static int 
+static int
 hostsfile_clusterlist_interface_version(void)
 {
   return CEREBRO_CLUSTERLIST_INTERFACE_VERSION;
 }
 
-/* 
+/*
  * _readline
- * 
+ *
  * read a line from the hostsfile.  Buffer guaranteed to be null
  * terminated.
  *
@@ -101,7 +101,7 @@ _readline(int fd, char *buf, unsigned int buflen)
       CEREBRO_ERR(("fd_read_line: %s", strerror(errno)));
       return -1;
     }
-  
+
   /* buflen - 1 b/c fd_read_line guarantees null termination */
   if (len >= (buflen-1))
     {
@@ -112,7 +112,7 @@ _readline(int fd, char *buf, unsigned int buflen)
   return len;
 }
 
-/* 
+/*
  * _remove_comments
  *
  * remove comments from the buffer
@@ -160,7 +160,7 @@ _remove_comments(char *buf, int buflen)
   return lenleft;
 }
 
-/* 
+/*
  * _remove_trailing_whitespace
  *
  * remove trailing whitespace from the buffer
@@ -175,7 +175,7 @@ static int
 _remove_trailing_whitespace(char *buf, int buflen)
 {
   char *temp;
-  
+
   if (!buf)
     {
       CEREBRO_DBG(("invalid parameters"));
@@ -183,7 +183,7 @@ _remove_trailing_whitespace(char *buf, int buflen)
     }
 
   temp = buf + buflen;
-  for (--temp; temp >= buf; temp--) 
+  for (--temp; temp >= buf; temp--)
     {
       if (isspace(*temp))
         *temp = '\0';
@@ -195,7 +195,7 @@ _remove_trailing_whitespace(char *buf, int buflen)
   return buflen;
 }
 
-/* 
+/*
  * _move_past_whitespace
  *
  * move past whitespace at the beginning of the buffer
@@ -220,13 +220,13 @@ _move_past_whitespace(char *buf)
   return buf;
 }
 
-/* 
+/*
  * hostsfile_clusterlist_setup
  *
  * hostsfile clusterlist module setup function.  Open hostsfile, read
  * each line of the hostsfile, and save hosts into hosts list.
  */
-static int 
+static int
 hostsfile_clusterlist_setup(void)
 {
   int len, fd = -1;
@@ -247,11 +247,11 @@ hostsfile_clusterlist_setup(void)
 
   if ((fd = open(CEREBRO_CLUSTERLIST_HOSTSFILE_DEFAULT, O_RDONLY)) < 0)
     {
-      CEREBRO_ERR(("hostsfile '%s' cannot be opened: %s", 
+      CEREBRO_ERR(("hostsfile '%s' cannot be opened: %s",
                    CEREBRO_CLUSTERLIST_HOSTSFILE_DEFAULT, strerror(errno)));
       goto cleanup;
     }
- 
+
   while ((len = _readline(fd, buf, HOSTSFILE_PARSE_BUFLEN)) > 0)
     {
       char *hostPtr;
@@ -286,7 +286,7 @@ hostsfile_clusterlist_setup(void)
           cerebro_err_output("hostsfile node '%s' exceeds max length", hostPtr);
           goto cleanup;
         }
-      
+
       /* Shorten hostname if necessary */
       if ((p = strchr(hostPtr, '.')))
         *p = '\0';
@@ -303,7 +303,7 @@ hostsfile_clusterlist_setup(void)
           goto cleanup;
         }
     }
-  
+
   if (len < 0)
     goto cleanup;
 
@@ -342,7 +342,7 @@ hostsfile_clusterlist_cleanup(void)
  *
  * hostsfile clusterlist module numnodes function
  */
-static int 
+static int
 hostsfile_clusterlist_numnodes(void)
 {
   if (!hosts)
@@ -374,7 +374,7 @@ hostsfile_clusterlist_get_all_nodes(char ***nodes)
     }
 
   if (!nodes)
-    {     
+    {
       CEREBRO_DBG(("invalid parameters"));
       return -1;
     }
@@ -432,7 +432,7 @@ hostsfile_clusterlist_get_all_nodes(char ***nodes)
 /*
  * list_strcmp
  *
- * strcmp for list data structure 
+ * strcmp for list data structure
  */
 static int
 list_strcmp(void *x, void *key)
@@ -467,7 +467,7 @@ hostsfile_clusterlist_node_in_cluster(const char *node)
     }
 
   if (!node)
-    {     
+    {
       CEREBRO_DBG(("invalid parameters"));
       return -1;
     }
@@ -497,8 +497,8 @@ hostsfile_clusterlist_node_in_cluster(const char *node)
  * hostsfile clusterlist module get_nodename function
  */
 static int
-hostsfile_clusterlist_get_nodename(const char *node, 
-                                   char *buf, 
+hostsfile_clusterlist_get_nodename(const char *node,
+                                   char *buf,
                                    unsigned int buflen)
 {
   char nodebuf[CEREBRO_MAX_NODENAME_LEN+1];

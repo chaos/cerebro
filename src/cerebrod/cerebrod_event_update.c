@@ -84,7 +84,7 @@ event_modules_t event_handle = NULL;
  */
 hash_t event_index = NULL;
 
-/* 
+/*
  * event_module_timeout_index
  *
  * Map of timeouts to modules that need to be called
@@ -98,7 +98,7 @@ hash_t event_module_timeout_index = NULL;
  */
 List event_names = NULL;
 
-/* 
+/*
  * event_module_timeouts
  *
  * List of module timeout lengths
@@ -106,7 +106,7 @@ List event_names = NULL;
 List event_module_timeouts = NULL;
 unsigned int event_module_timeout_min = INT_MAX;
 
-/* 
+/*
  * event_node_timeout_data
  * event_node_timeout_data_index
  *
@@ -118,7 +118,7 @@ hash_t event_node_timeout_data_index = NULL;
 int event_node_timeout_data_index_numnodes;
 int event_node_timeout_data_index_size;
 
-/*  
+/*
  * event_node_timeout_data_lock
  *
  * lock to protect pthread access to both the event_node_timeout_data
@@ -172,7 +172,7 @@ _cerebrod_event_module_info_destroy(void *data)
   Free(event_module);
 }
 
-/* 
+/*
  * _cerebrod_event_module_timeout_data_destroy
  *
  * Destroy a monitor_module struct.
@@ -181,15 +181,15 @@ static void
 _cerebrod_event_module_timeout_data_destroy(void *data)
 {
   struct cerebrod_event_module_timeout_data *mtd;
-  
+
   assert(data);
-  
+
   mtd = (struct cerebrod_event_module_timeout_data *)data;
   Free(mtd->timeout_str);
   Free(mtd);
 }
 
-/* 
+/*
  * _event_node_timeout_data_add
  *
  * Create entries for the event_node_timeout_data list and index
@@ -220,7 +220,7 @@ _event_node_timeout_data_add(const char *nodename, u_int32_t time_now)
   return 0;
 }
 
-/* 
+/*
  * _event_node_timeout_data_callback
  *
  * Callback from Hash_for_each on listener_data to create entries for
@@ -237,7 +237,7 @@ _event_node_timeout_data_callback(void *data, const void *key, void *arg)
   nd = (struct cerebrod_node_data *)data;
 
   /* Note: Lock not really necessary b/c this function is called
-   * during initialization, but it'll make the debug stuff happy 
+   * during initialization, but it'll make the debug stuff happy
    * when you call _event_node_timeout_data_add().
    */
 #if CEREBRO_DEBUG
@@ -250,7 +250,7 @@ _event_node_timeout_data_callback(void *data, const void *key, void *arg)
   return 1;
 }
 
-/* 
+/*
  * _event_module_timeout_data_find_callback
  *
  * Callback for list_find to find matching timeout
@@ -266,7 +266,7 @@ _event_module_timeout_data_find_callback(void *x, void *key)
 
   timeout = *((int *)key);
   mtd = (struct cerebrod_event_module_timeout_data *)x;
-  
+
   if (mtd->timeout == timeout)
     return 1;
   return 0;
@@ -297,7 +297,7 @@ _event_module_timeout_data_compare(void *x, void *y)
 /*
  * _setup_event_node_timeout_data
  *
- * Setup event timeout calculation data structures. 
+ * Setup event timeout calculation data structures.
  *
  * Return 0 on success, -1 on error
  */
@@ -311,12 +311,12 @@ _setup_event_node_timeout_data(void)
   assert(listener_data);
 
   event_node_timeout_data = List_create(NULL);
-  event_node_timeout_data_index = Hash_create(EVENT_NODE_TIMEOUT_SIZE_DEFAULT, 
+  event_node_timeout_data_index = Hash_create(EVENT_NODE_TIMEOUT_SIZE_DEFAULT,
                                               (hash_key_f)hash_key_string,
-                                              (hash_cmp_f)strcmp, 
+                                              (hash_cmp_f)strcmp,
                                               (hash_del_f)NULL);
   event_node_timeout_data_index_size = EVENT_NODE_TIMEOUT_SIZE_DEFAULT;
-  
+
   Gettimeofday(&tv, NULL);
 
   num = Hash_for_each(listener_data,
@@ -510,7 +510,7 @@ cerebrod_event_modules_setup(void)
           event_module_cleanup(event_handle, i);
           continue;
         }
-      
+
       if ((timeout = event_module_timeout_length(event_handle, i)) < 0)
         {
           CEREBROD_DBG(("event_module_timeout_length failed: %s", module_name));
@@ -525,7 +525,7 @@ cerebrod_event_modules_setup(void)
       Pthread_mutex_init(&(event_module->event_lock), NULL);
 
       /* The monitoring module may support multiple metrics */
-          
+
       metricPtr = strtok_r(event_module->metric_names, ",", &metricbuf);
       while (metricPtr)
         {
@@ -541,7 +541,7 @@ cerebrod_event_modules_setup(void)
             }
           else
             List_append(el->event_list, event_module);
-          
+
           metricPtr = strtok_r(NULL, ",", &metricbuf);
         }
 
@@ -572,8 +572,8 @@ cerebrod_event_modules_setup(void)
           struct cerebrod_event_module_timeout_data *mtd;
           List modules_list;
 
-          if (!(mtd = List_find_first(event_module_timeouts, 
-                                      _event_module_timeout_data_find_callback, 
+          if (!(mtd = List_find_first(event_module_timeouts,
+                                      _event_module_timeout_data_find_callback,
                                       &timeout)))
             {
               char strbuf[64];
@@ -584,12 +584,12 @@ cerebrod_event_modules_setup(void)
               mtd->timeout_str = Strdup(strbuf);
 
               List_append(event_module_timeouts, mtd);
-              
+
               if (timeout < event_module_timeout_min)
                 event_module_timeout_min = timeout;
             }
 
-          if (!(modules_list = Hash_find(event_module_timeout_index, 
+          if (!(modules_list = Hash_find(event_module_timeout_index,
                                          mtd->timeout_str)))
             {
               modules_list = List_create((ListDelF)NULL);
@@ -602,7 +602,7 @@ cerebrod_event_modules_setup(void)
             List_append(modules_list, event_module);
         }
     }
-  
+
   List_sort(event_module_timeouts, _event_module_timeout_data_compare);
 
   if (!event_index_count)
@@ -611,7 +611,7 @@ cerebrod_event_modules_setup(void)
   if (_setup_event_node_timeout_data() < 0)
     goto cleanup;
 
-  /* 
+  /*
    * Since the cerebrod listener is started before any of the event
    * threads (node_timeout, queue_monitor, server), this must be
    * created in here (which is called by the listener) to avoid a
@@ -621,7 +621,7 @@ cerebrod_event_modules_setup(void)
   event_queue = List_create((ListDelF)cerebrod_event_to_send_destroy);
 
   return 1;
-  
+
  cleanup:
   if (event_handle)
     {
@@ -641,7 +641,7 @@ cerebrod_event_modules_setup(void)
   return 0;
 }
 
-void 
+void
 cerebrod_event_add_node_timeout_data(struct cerebrod_node_data *nd,
                                      u_int32_t received_time)
 {
@@ -678,7 +678,7 @@ cerebrod_event_add_node_timeout_data(struct cerebrod_node_data *nd,
   Pthread_mutex_unlock(&event_node_timeout_data_lock);
 }
 
-void 
+void
 cerebrod_event_update_node_received_time(struct cerebrod_node_data *nd,
                                          u_int32_t received_time)
 {
@@ -720,7 +720,7 @@ cerebrod_event_modules_update(const char *nodename,
 #if CEREBRO_DEBUG
   int rv;
 #endif /* CEREBRO_DEBUG */
-  
+
   assert(nodename && nd && metric_name && mm);
 
   if (!event_index)

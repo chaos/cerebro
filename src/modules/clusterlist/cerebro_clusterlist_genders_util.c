@@ -42,11 +42,11 @@
 
 #include "debug.h"
 
-int 
+int
 cerebro_clusterlist_genders_setup(genders_t *gh, char *filename)
 {
   if (!gh)
-    { 
+    {
       CEREBRO_DBG(("invalid parameters"));
       return -1;
     }
@@ -104,7 +104,7 @@ cerebro_clusterlist_genders_cleanup(genders_t *gh)
   return 0;
 }
 
-int 
+int
 cerebro_clusterlist_genders_numnodes(genders_t gh)
 {
   int num;
@@ -129,7 +129,7 @@ cerebro_clusterlist_genders_get_all_nodes(genders_t gh, char ***nodes)
 {
   char **nodelist = NULL;
   int nodelistlen, num;
-  
+
   if (!gh || !nodes)
     {
       CEREBRO_DBG(("invalid parameters"));
@@ -141,7 +141,7 @@ cerebro_clusterlist_genders_get_all_nodes(genders_t gh, char ***nodes)
       CEREBRO_ERR(("genders_nodelist_create: %s", genders_errormsg(gh)));
       goto cleanup;
     }
-  
+
   if ((num = genders_getnodes(gh, nodelist, nodelistlen, NULL, NULL)) < 0)
     {
       CEREBRO_ERR(("genders_getnodes: %s", genders_errormsg(gh)));

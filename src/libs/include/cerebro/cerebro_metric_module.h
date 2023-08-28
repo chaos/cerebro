@@ -35,7 +35,7 @@
 
 #define CEREBRO_METRIC_MODULE_FLAGS_SEND_ON_PERIOD 0x1
 
-/* 
+/*
  * Cerebro_metric_interface_version
  *
  * function prototype for metric module function to return the
@@ -66,7 +66,7 @@ typedef int (*Cerebro_metric_setup)(void);
  */
 typedef int (*Cerebro_metric_cleanup)(void);
 
-/* 
+/*
  * Cerebro_metric_get_metric_name
  *
  * Returns the name of the metric metriced by this module Required to
@@ -76,7 +76,7 @@ typedef int (*Cerebro_metric_cleanup)(void);
  */
 typedef char *(*Cerebro_metric_get_metric_name)(void);
 
-/* 
+/*
  * Cerebro_metric_get_metric_period
  *
  * Retrieve the period in seconds that the metric value should be read
@@ -94,12 +94,12 @@ typedef char *(*Cerebro_metric_get_metric_name)(void);
  */
 typedef int (*Cerebro_metric_get_metric_period)(int *period);
 
-/* 
+/*
  * Cerebro_metric_get_metric_flags
  *
  * function prototype for metric module function to indicate the flags
  * it supports.  Required to be defined by each metric module.
- * 
+ *
  * Returns 0 on success, -1 on error
  */
 typedef int (*Cerebro_metric_get_metric_flags)(u_int32_t *flags);
@@ -126,14 +126,14 @@ typedef int (*Cerebro_metric_get_metric_value)(unsigned int *metric_value_type,
  */
 typedef int (*Cerebro_metric_destroy_metric_value)(void *metric_value);
 
-/* 
+/*
  * Cerebro_metric_thread_pointer
  *
  * function prototype for a thread which will be passed to
  * pthread_create
  *
  * This thread can perform any metric monitoring duties it pleases and
- * call the send message function (see Cerebro_metric_send_message below) 
+ * call the send message function (see Cerebro_metric_send_message below)
  * to send data when its data has been updated.
  *
  * Typically the thread is used to watch or monitor for some event and
@@ -154,7 +154,7 @@ typedef void *(*Cerebro_metric_thread_pointer)(void *arg);
  */
 typedef Cerebro_metric_thread_pointer (*Cerebro_metric_get_metric_thread)(void);
 
-/* Cerebro_metric_send_message 
+/* Cerebro_metric_send_message
  *
  * function prototype to inform the cerebrod daemon to send
  * a message.
@@ -163,7 +163,7 @@ typedef Cerebro_metric_thread_pointer (*Cerebro_metric_get_metric_thread)(void);
  */
 typedef int (*Cerebro_metric_send_message)(struct cerebrod_message *hb);
 
-/* 
+/*
  * Cerebro_metric_send_message_function_pointer
  *
  * function prototype to give a Cerebro_metric_send_message function
@@ -174,8 +174,8 @@ typedef int (*Cerebro_metric_send_message)(struct cerebrod_message *hb);
 typedef int (*Cerebro_metric_send_message_function_pointer)(Cerebro_metric_send_message function_pointer);
 
 /*
- * struct cerebro_metric_module_info 
- * 
+ * struct cerebro_metric_module_info
+ *
  * contains metric module information and operations.  Required to be
  * defined in each metric module.
  */
@@ -191,7 +191,7 @@ struct cerebro_metric_module_info
   Cerebro_metric_get_metric_value get_metric_value;
   Cerebro_metric_destroy_metric_value destroy_metric_value;
   Cerebro_metric_get_metric_thread get_metric_thread;
-  Cerebro_metric_send_message_function_pointer send_message_function_pointer; 
+  Cerebro_metric_send_message_function_pointer send_message_function_pointer;
 };
 
 #endif /* _CEREBRO_METRIC_MODULE_H */

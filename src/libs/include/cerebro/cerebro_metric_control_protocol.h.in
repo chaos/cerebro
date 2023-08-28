@@ -35,7 +35,7 @@
  *
  * Client -> Server
  * - Metric request.
- * 
+ *
  * Server -> Client
  * - Metric response.
  *
@@ -43,7 +43,7 @@
 
 #define CEREBRO_METRIC_CONTROL_PROTOCOL_VERSION               2
 
-/* 
+/*
  * Even though the controller protocol is through a local unix domain
  * socket, we'll still need timeouts to ensure the user isn't being an
  * idiot and not sending data.
@@ -83,7 +83,7 @@ struct cerebro_metric_control_request
 {
   int32_t version;
   int32_t command;
-  u_int32_t flags;      
+  u_int32_t flags;
   char metric_name[CEREBRO_MAX_METRIC_NAME_LEN];
   u_int32_t metric_value_type;
   u_int32_t metric_value_len;
@@ -107,7 +107,7 @@ struct cerebro_metric_control_response
   int32_t version;
   u_int32_t err_code;
 };
-  
+
 #define CEREBRO_METRIC_CONTROL_RESPONSE_LEN  (sizeof(int32_t) \
                                              + sizeof(u_int32_t))
 

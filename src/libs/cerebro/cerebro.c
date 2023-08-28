@@ -81,7 +81,7 @@ cerebro_handle_create(void)
 
   if (!(handle = (cerebro_t)malloc(sizeof(struct cerebro))))
     goto cleanup;
-                 
+
   memset(handle, '\0', sizeof(struct cerebro));
   handle->magic = CEREBRO_MAGIC_NUMBER;
   handle->errnum = CEREBRO_ERR_SUCCESS;
@@ -91,7 +91,7 @@ cerebro_handle_create(void)
   handle->flags = 0;
   handle->loaded_state = 0;
   memset(&(handle->config_data), '\0', sizeof(struct cerebro_config));
-  
+
   if (!(handle->namelists = list_create((ListDelF)cerebro_namelist_destroy)))
     goto cleanup;
 
@@ -142,7 +142,7 @@ cerebro_handle_destroy(cerebro_t handle)
   handle->nodelists = NULL;
   list_destroy(handle->event_fds);
   handle->event_fds = NULL;
-  
+
   handle->errnum = CEREBRO_ERR_SUCCESS;
   handle->magic = ~CEREBRO_MAGIC_NUMBER;
   free(handle);
@@ -160,7 +160,7 @@ cerebro_errnum(cerebro_t handle)
     return handle->errnum;
 }
 
-int 
+int
 cerebro_namelist_errnum(cerebro_namelist_t namelist)
 {
   if (!namelist)
@@ -171,7 +171,7 @@ cerebro_namelist_errnum(cerebro_namelist_t namelist)
     return namelist->errnum;
 }
 
-int 
+int
 cerebro_namelist_iterator_errnum(cerebro_namelist_iterator_t namelistItr)
 {
   if (!namelistItr)
@@ -182,7 +182,7 @@ cerebro_namelist_iterator_errnum(cerebro_namelist_iterator_t namelistItr)
     return namelistItr->errnum;
 }
 
-int 
+int
 cerebro_nodelist_errnum(cerebro_nodelist_t nodelist)
 {
   if (!nodelist)
@@ -193,7 +193,7 @@ cerebro_nodelist_errnum(cerebro_nodelist_t nodelist)
     return nodelist->errnum;
 }
 
-int 
+int
 cerebro_nodelist_iterator_errnum(cerebro_nodelist_iterator_t nodelistItr)
 {
   if (!nodelistItr)
@@ -222,7 +222,7 @@ cerebro_get_hostname(cerebro_t handle)
   return handle->hostname;
 }
 
-int 
+int
 cerebro_set_hostname(cerebro_t handle, const char *hostname)
 {
   if (_cerebro_handle_check(handle) < 0)
@@ -242,7 +242,7 @@ cerebro_set_hostname(cerebro_t handle, const char *hostname)
   return 0;
 }
 
-int 
+int
 cerebro_get_port(cerebro_t handle)
 {
   if (_cerebro_handle_check(handle) < 0)
@@ -251,7 +251,7 @@ cerebro_get_port(cerebro_t handle)
   return handle->port;
 }
 
-int 
+int
 cerebro_set_port(cerebro_t handle, unsigned int port)
 {
   if (_cerebro_handle_check(handle) < 0)
@@ -261,7 +261,7 @@ cerebro_set_port(cerebro_t handle, unsigned int port)
   return 0;
 }
 
-int 
+int
 cerebro_get_timeout_len(cerebro_t handle)
 {
   if (_cerebro_handle_check(handle) < 0)
@@ -270,7 +270,7 @@ cerebro_get_timeout_len(cerebro_t handle)
   return handle->timeout_len;
 }
 
-int 
+int
 cerebro_set_timeout_len(cerebro_t handle, unsigned int timeout_len)
 {
   if (_cerebro_handle_check(handle) < 0)
@@ -280,7 +280,7 @@ cerebro_set_timeout_len(cerebro_t handle, unsigned int timeout_len)
   return 0;
 }
 
-int 
+int
 cerebro_get_flags(cerebro_t handle)
 {
   if (_cerebro_handle_check(handle) < 0)
@@ -289,7 +289,7 @@ cerebro_get_flags(cerebro_t handle)
   return handle->flags;
 }
 
-int 
+int
 cerebro_set_flags(cerebro_t handle, unsigned int flags)
 {
   if (_cerebro_handle_check(handle) < 0)

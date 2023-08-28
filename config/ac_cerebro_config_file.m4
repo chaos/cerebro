@@ -8,19 +8,19 @@ AC_DEFUN([AC_CEREBRO_CONFIG_FILE],
 
   AC_MSG_CHECKING([for cerebro config file default path])
   AC_ARG_WITH([cerebro-config-file],
-    AS_HELP_STRING([--with-cerebro-config-file=PATH], 
+    AS_HELP_STRING([--with-cerebro-config-file=PATH],
                    [Specify default cerebro config file path]),
     [ case "$withval" in
         no)  ;;
         yes) ;;
-        *)   CEREBRO_CONFIG_FILE_DEFAULT=$withval 
+        *)   CEREBRO_CONFIG_FILE_DEFAULT=$withval
       esac
     ]
   )
   AC_MSG_RESULT($CEREBRO_CONFIG_FILE_DEFAULT)
 
-  AC_DEFINE_UNQUOTED([CEREBRO_CONFIG_FILE_DEFAULT], 
-                     ["$CEREBRO_CONFIG_FILE_DEFAULT"], 
+  AC_DEFINE_UNQUOTED([CEREBRO_CONFIG_FILE_DEFAULT],
+                     ["$CEREBRO_CONFIG_FILE_DEFAULT"],
                      [Define default cerebro config_file.])
   AC_SUBST(CEREBRO_CONFIG_FILE_DEFAULT)
 ])

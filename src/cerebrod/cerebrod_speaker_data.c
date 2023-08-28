@@ -98,7 +98,7 @@ int metric_list_size = 0;
 pthread_mutex_t metric_list_lock = PTHREAD_MUTEX_INITIALIZER;
 #endif /* !WITH_CEREBROD_NO_THREADS */
 
-/* 
+/*
  * _setup_metric_modules
  *
  * Setup metric modules. Under almost any circumstance, don't return a
@@ -132,13 +132,13 @@ _setup_metric_modules(void)
       CEREBROD_DBG(("metric_modules_load"));
       goto cleanup;
     }
-  
+
   if ((metric_handle_count = metric_modules_count(metric_handle)) < 0)
     {
       CEREBROD_DBG(("metric_module_count failed"));
       goto cleanup;
     }
-  
+
   if (!metric_handle_count)
     {
       if (conf.debug && conf.speak_debug)
@@ -165,7 +165,7 @@ _setup_metric_modules(void)
       char *module_name, *metric_name;
       int metric_period;
       u_int32_t metric_flags;
-      
+
       module_name = metric_module_name(metric_handle, i);
 
       if (conf.metric_module_exclude_len)
@@ -181,7 +181,7 @@ _setup_metric_modules(void)
                   break;
                 }
             }
-          
+
           if (found_exclude)
             {
               if (conf.debug && conf.speak_debug)
@@ -200,7 +200,7 @@ _setup_metric_modules(void)
               continue;
             }
         }
-      
+
       if (conf.debug && conf.speak_debug)
         {
 #if !WITH_CEREBROD_NO_THREADS
@@ -255,7 +255,7 @@ _setup_metric_modules(void)
           metric_module_cleanup(metric_handle, i);
           continue;
         }
- 
+
       metric_info = Malloc(sizeof(struct cerebrod_speaker_metric_info));
       /* No need to Strdup() the name in this case */
       metric_info->metric_name = metric_name;
@@ -265,14 +265,14 @@ _setup_metric_modules(void)
       metric_info->metric_flags = metric_flags;
       metric_info->index = i;
 
-      /* 
+      /*
        * If metric period is < 0, it presumably never will be sent
        * (metric is likely handled by a metric_thread), so set
        * next_call_time to UINT_MAX.
        *
        * If this is a metric that will be piggy-backed on heartbeats,
        * then initialize next_call_time to 0, so the data is sent on
-       * the first heartbeat 
+       * the first heartbeat
        *
        * If this is a metric that will not be piggy-backed on
        * heartbeats, set the next_call_time to UINT_MAX.  Let the
@@ -283,16 +283,16 @@ _setup_metric_modules(void)
         metric_info->next_call_time = UINT_MAX;
       else
         metric_info->next_call_time = 0;
-      
+
       List_append(metric_list, metric_info);
       metric_list_size++;
 
 #if !WITH_CEREBROD_NO_THREADS
       if ((threadPtr = metric_module_get_metric_thread(metric_handle, i)))
-        {          
+        {
           pthread_t thread;
           pthread_attr_t attr;
-          
+
           Pthread_attr_init(&attr);
           Pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
           Pthread_attr_setstacksize(&attr, CEREBROD_THREAD_STACKSIZE);
@@ -301,7 +301,7 @@ _setup_metric_modules(void)
         }
 #endif /* !WITH_CEREBROD_NO_THREADS */
     }
-  
+
   if (!metric_list_size)
     goto cleanup;
 
@@ -320,7 +320,7 @@ _setup_metric_modules(void)
   return 0;
 }
 
-/* 
+/*
  * _destroy_speaker_metric_info
  *
  * Deallocate speaker_metric_info structure
@@ -329,7 +329,7 @@ static void
 _destroy_speaker_metric_info(void *x)
 {
   struct cerebrod_speaker_metric_info *metric_info;
-  
+
   assert(x);
 
   metric_info = (struct cerebrod_speaker_metric_info *)x;
@@ -340,7 +340,7 @@ _destroy_speaker_metric_info(void *x)
       if (metric_info->metric_value)
         Free(metric_info->metric_value);
     }
-  
+
   Free(metric_info);
 }
 
@@ -354,7 +354,7 @@ cerebrod_speaker_data_initialize(void)
     goto out;
 
 #if !WITH_CEREBROD_NO_THREADS
-  /* 
+  /*
    * Must lock in this initialization routine, b/c the update thread
    * in a metric module may call the update state function.
    */
@@ -398,11 +398,11 @@ _next_call_time_cmp(void *x, void *y)
     return 0;
   else if (a->next_call_time < b->next_call_time)
     return -1;
-  else 
+  else
     return 1;
 }
 
-void 
+void
 cerebrod_speaker_data_metric_list_sort(void)
 {
 #if CEREBRO_DEBUG
@@ -425,7 +425,7 @@ cerebrod_speaker_data_metric_list_sort(void)
   List_sort(metric_list, _next_call_time_cmp);
 }
 
-/* 
+/*
  * _get_module_metric_value
  *
  * Get the metric value data from a module
@@ -453,7 +453,7 @@ _get_module_metric_value(unsigned int index)
 
   /* need not overflow */
   strncpy(mm->metric_name, metric_name, CEREBRO_MAX_METRIC_NAME_LEN);
-  
+
   if (metric_module_get_metric_value(metric_handle,
                                      index,
                                      &mtype,
@@ -464,13 +464,13 @@ _get_module_metric_value(unsigned int index)
       goto cleanup;
     }
 
-  if (mtype == CEREBRO_DATA_VALUE_TYPE_STRING 
+  if (mtype == CEREBRO_DATA_VALUE_TYPE_STRING
       && mlen > CEREBRO_MAX_DATA_STRING_LEN)
     {
       CEREBROD_DBG(("truncate metric string: %d", mlen));
       mlen = CEREBRO_MAX_DATA_STRING_LEN;
     }
- 
+
   if (mtype == CEREBRO_DATA_VALUE_TYPE_STRING && !mlen)
     {
       CEREBROD_DBG(("adjusting metric type to none"));
@@ -490,11 +490,11 @@ _get_module_metric_value(unsigned int index)
   else
     mm->metric_value = NULL;
   metric_module_destroy_metric_value(metric_handle, index, mvalue);
-  
+
   return mm;
 
  cleanup:
-  
+
   if (mvalue)
     metric_module_destroy_metric_value(metric_handle, index, mvalue);
 
@@ -504,11 +504,11 @@ _get_module_metric_value(unsigned int index)
         Free(mm->metric_value);
       Free(mm);
     }
- 
+
   return NULL;
 }
 
-/* 
+/*
  * _get_userspace_metric_value
  *
  * Get the metric value data supplied by a userspace program
@@ -539,8 +539,8 @@ _get_userspace_metric_value(struct cerebrod_speaker_metric_info *metric_info)
   memset(mm, '\0', sizeof(struct cerebrod_message_metric));
 
   /* need not overflow */
-  strncpy(mm->metric_name, 
-          metric_info->metric_name, 
+  strncpy(mm->metric_name,
+          metric_info->metric_name,
           CEREBRO_MAX_METRIC_NAME_LEN);
 
   mm->metric_value_type = metric_info->metric_value_type;
@@ -548,8 +548,8 @@ _get_userspace_metric_value(struct cerebrod_speaker_metric_info *metric_info)
   if (mm->metric_value_len)
     {
       mm->metric_value = Malloc(metric_info->metric_value_len);
-      memcpy(mm->metric_value, 
-             metric_info->metric_value, 
+      memcpy(mm->metric_value,
+             metric_info->metric_value,
              metric_info->metric_value_len);
     }
   else
@@ -567,7 +567,7 @@ _get_userspace_metric_value(struct cerebrod_speaker_metric_info *metric_info)
   return NULL;
 }
 
-void 
+void
 cerebrod_speaker_data_get_heartbeat_metric_data(struct cerebrod_message *msg,
                                                 unsigned int *message_len,
                                                 int *more_data_to_send)
@@ -600,10 +600,10 @@ cerebrod_speaker_data_get_heartbeat_metric_data(struct cerebrod_message *msg,
   memset(msg->metrics, '\0', sizeof(struct cerebrod_message_metric *)*(metric_list_size + 1));
 
   Gettimeofday(&tv, NULL);
-  
+
   itr = List_iterator_create(metric_list);
   while ((metric_info = list_next(itr)))
-    {      
+    {
       struct cerebrod_message_metric *mm = NULL;
 
       if (tv.tv_sec <= metric_info->next_call_time)
@@ -625,7 +625,7 @@ cerebrod_speaker_data_get_heartbeat_metric_data(struct cerebrod_message *msg,
             {
               *more_data_to_send = 1;
               goto sort_out;
-            } 
+            }
           else
             {
               *message_len += CEREBROD_MESSAGE_METRIC_HEADER_LEN;
@@ -640,7 +640,7 @@ cerebrod_speaker_data_get_heartbeat_metric_data(struct cerebrod_message *msg,
           if (metric_info->metric_period < 0)
             metric_info->next_call_time = UINT_MAX;
 
-          /* 
+          /*
            * Metric period stays at 0 for metrics that need to be
            * propagated every time
            */
@@ -650,7 +650,7 @@ cerebrod_speaker_data_get_heartbeat_metric_data(struct cerebrod_message *msg,
 
       if (metric_info->metric_origin & CEREBROD_METRIC_SPEAKER_ORIGIN_USERSPACE)
         metric_info->next_call_time = UINT_MAX;
-    } 
+    }
  sort_out:
   List_iterator_destroy(itr);
   cerebrod_speaker_data_metric_list_sort();
@@ -661,7 +661,7 @@ cerebrod_speaker_data_get_heartbeat_metric_data(struct cerebrod_message *msg,
   return;
 }
 
-void 
+void
 cerebrod_speaker_data_get_module_metric_data(struct cerebrod_message *msg,
                                              unsigned int *message_len,
                                              unsigned int index,
@@ -670,7 +670,7 @@ cerebrod_speaker_data_get_module_metric_data(struct cerebrod_message *msg,
   struct cerebrod_message_metric *mm = NULL;
 
   assert(msg && message_len && more_data_to_send);
-  
+
   assert(metric_handle && metric_list && metric_list_size);
 
   if (!speaker_data_init)
@@ -696,7 +696,7 @@ cerebrod_speaker_data_get_module_metric_data(struct cerebrod_message *msg,
       msg->metrics[msg->metrics_len] = mm;
       msg->metrics_len++;
     }
-  
+
 #if !WITH_CEREBROD_NO_THREADS
   Pthread_mutex_unlock(&metric_list_lock);
 #endif /* !WITH_CEREBROD_NO_THREADS */

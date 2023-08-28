@@ -37,7 +37,7 @@ typedef struct config_module *config_module_t;
  *
  * Find and load the config module.  If none is found, will assume a
  * default config module.
- * 
+ *
  * Returns config module handle on success, NULL on error
  */
 config_module_t config_module_load(void);
@@ -91,7 +91,7 @@ int config_module_cleanup(config_module_t handle);
  *
  * call config module get all nodes function
  */
-int config_module_load_config(config_module_t handle, 
+int config_module_load_config(config_module_t handle,
 			      struct cerebro_config *conf);
 
 

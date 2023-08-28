@@ -66,7 +66,7 @@ extern pthread_mutex_t debug_output_mutex;
 
 extern pthread_mutex_t listener_data_init_lock;
 
-/* 
+/*
  * monitor_handle
  *
  * monitoring module handles
@@ -81,7 +81,7 @@ monitor_modules_t monitor_handle = NULL;
  */
 hash_t monitor_index = NULL;
 
-/* 
+/*
  * _cerebrod_monitor_module_info_destroy
  *
  * Destroy a monitor_module_info struct.
@@ -90,9 +90,9 @@ static void
 _cerebrod_monitor_module_info_destroy(void *data)
 {
   struct cerebrod_monitor_module_info *monitor_module;
-  
+
   assert(data);
-  
+
   monitor_module = (struct cerebrod_monitor_module_info *)data;
   Free(monitor_module->metric_names);
   Free(monitor_module);
@@ -115,7 +115,7 @@ _cerebrod_monitor_module_list_destroy(void *data)
   Free(ml);
 }
 
-/* 
+/*
  * Under almost any circumstance, don't return a -1 error, cerebro can
  * go on without loading monitor modules. The listener_data_init_lock
  * should already be set.
@@ -160,16 +160,16 @@ cerebrod_monitor_modules_setup(void)
         }
       goto cleanup;
     }
-  
+
   /* Each monitor module may wish to monitor multiple metrics.  We'll
    * assume there will never be more than 2 metrics per monitor module, and
    * that will be enough to avoid all hash collisions.
    */
   monitor_index_len = monitor_module_count * 2;
 
-  monitor_index = Hash_create(monitor_index_len, 
-                              (hash_key_f)hash_key_string, 
-                              (hash_cmp_f)strcmp, 
+  monitor_index = Hash_create(monitor_index_len,
+                              (hash_key_f)hash_key_string,
+                              (hash_cmp_f)strcmp,
                               (hash_del_f)_cerebrod_monitor_module_list_destroy);
 
   for (i = 0; i < monitor_module_count; i++)
@@ -237,7 +237,7 @@ cerebrod_monitor_modules_setup(void)
       Pthread_mutex_init(&(monitor_module->monitor_lock), NULL);
 
       /* The monitoring module may support multiple metrics */
-          
+
       metricPtr = strtok_r(monitor_module->metric_names, ",", &metricbuf);
       while (metricPtr)
         {
@@ -253,7 +253,7 @@ cerebrod_monitor_modules_setup(void)
             }
           else
             List_append(ml->monitor_list, monitor_module);
-          
+
           metricPtr = strtok_r(NULL, ",", &metricbuf);
         }
     }
@@ -277,7 +277,7 @@ cerebrod_monitor_modules_setup(void)
   return 0;
 }
 
-/* 
+/*
  * cerebrod_monitor_modules_update
  *
  * Send metric data to the appropriate monitor modules, if necessary.
@@ -294,7 +294,7 @@ cerebrod_monitor_modules_update(const char *nodename,
 #if CEREBRO_DEBUG
   int rv;
 #endif /* CEREBRO_DEBUG */
-  
+
   assert(nodename && nd && metric_name && mm);
 
   if (!monitor_index)

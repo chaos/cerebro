@@ -65,7 +65,7 @@ struct cerebrod_monitor_module_list
   pthread_mutex_t monitor_list_lock;
 };
 
-/* 
+/*
  * cerebrod_monitor_modules_setup
  *
  * Setup monitor modules.
@@ -74,7 +74,7 @@ struct cerebrod_monitor_module_list
  */
 int cerebrod_monitor_modules_setup(void);
 
-/* 
+/*
  * cerebrod_monitor_update
  *
  * Accepts recently gathered metric data to be passed to monitor modules.

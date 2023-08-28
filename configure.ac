@@ -20,11 +20,11 @@ AC_CONFIG_HEADERS([config/config.h])
 AM_MAINTAINER_MODE
 
 # Update this information before a public release only!
- 
+
 # library versioning
 #
 # If the library source code has changed at all since the last update,
-# then increment c:r: c:r+1:).                                                                                     
+# then increment c:r: c:r+1:).
 #
 # If any interfaces have been added, removed, or changed since the
 # last update, increment current, and set revision to 0.
@@ -32,9 +32,9 @@ AM_MAINTAINER_MODE
 # If any interfaces have been added since the last public release,
 # then increment age.
 #
-# If any interfaces have been removed or changed since the last public                                                
+# If any interfaces have been removed or changed since the last public
 # release, then set age to 0.
-#                                               
+#
 LIBCEREBRO_CURRENT=1
 LIBCEREBRO_REVISION=1
 LIBCEREBRO_AGE=0
@@ -166,9 +166,9 @@ AM_CONDITIONAL(WITH_UPDOWN, [test "$ac_with_updown" = "yes"])
 # Determine which static module libraries do not need to be linked
 # against under a static module build
 #
-AM_CONDITIONAL(WITH_CLUSTERLIST_STATIC_MODULES, 
+AM_CONDITIONAL(WITH_CLUSTERLIST_STATIC_MODULES,
                [(test "$ac_with_static_modules" = "yes") &&
-                (test "$ac_with_genders" = "yes" || 
+                (test "$ac_with_genders" = "yes" ||
                  test "$ac_with_hostsfile" = "yes")])
 
 # Placeholder, please don't dailywtf me :-)
@@ -182,10 +182,10 @@ AM_CONDITIONAL(WITH_EVENT_STATIC_MODULES,
 
 AM_CONDITIONAL(WITH_METRIC_STATIC_MODULES,
                [(test "$ac_with_static_modules" = "yes") &&
-                (test "$ac_with_boottime" = "yes" || 
-                 test "$ac_with_loadavg" = "yes" || 
-                 test "$ac_with_memory" = "yes" || 
-                 test "$ac_with_network" = "yes" || 
+                (test "$ac_with_boottime" = "yes" ||
+                 test "$ac_with_loadavg" = "yes" ||
+                 test "$ac_with_memory" = "yes" ||
+                 test "$ac_with_network" = "yes" ||
                  test "$ac_with_slurm_state" = "yes")])
 
 # Placeholder, please don't dailywtf me :-)

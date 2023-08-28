@@ -32,7 +32,7 @@
 
 #include "cerebro/cerebro_metric_server_protocol.h"
 
-/* 
+/*
  * Cerebro_metric_receive_response
  *
  * Function to call after the metric request has been sent
@@ -43,7 +43,7 @@ typedef int (*Cerebro_metric_receive_response)(cerebro_t handle,
                                                unsigned int bytes_read,
                                                int fd);
 
-/* 
+/*
  * _cerebro_metric_get_data
  *
  * Connect to the cerebrod metric and receive responses

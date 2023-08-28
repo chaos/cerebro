@@ -32,9 +32,9 @@ cerebro_get_metric_data \- retrieve cerebro metric data
 .BI "cerebro_nodelist_t cerebro_get_metric_data(cerebro_t handle, const char *metric_name);"
 .br
 .SH "DESCRIPTION"
-\fBcerebro_get_metric_data()\fR retrieves metric data for the metric 
+\fBcerebro_get_metric_data()\fR retrieves metric data for the metric
 \fImetric_name\fR from
-the 
+the
 .B cerebrod
 metric server and returns it in a cerebro nodelist.  The cerebro
 nodelist can then be operated on by the cerebro nodelist routines.
@@ -52,8 +52,8 @@ The default metrics available through the
 .B cerebrod
 metric server are:
 
-CEREBRO_METRIC_CLUSTER_NODES - Retrieve all nodes known to 
-.B cerebrod.  
+CEREBRO_METRIC_CLUSTER_NODES - Retrieve all nodes known to
+.B cerebrod.
 No metric value is returned for this metric.
 
 CEREBRO_METRIC_UPDOWN_STATE - Retrieve the up vs. down state of all
@@ -69,7 +69,7 @@ returned, and an error code is returned in \fIhandle\fR.  The error
 code can be retrieved via
 .BR cerebro_errnum(3)
 , and a description of the error code can be retrieved via
-.BR cerebro_strerror(3).  
+.BR cerebro_strerror(3).
 .br
 .SH "ERRORS"
 .TP
@@ -87,7 +87,7 @@ Invalid parameter passed in.
 Invalid hostname specified.
 .TP
 .B CEREBRO_ERR_CONNECT
-Error connecting to 
+Error connecting to
 .B cerebrod
 metric server.
 .TP

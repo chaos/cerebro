@@ -43,7 +43,7 @@
 #define ERROR_STDERR 0x0002
 #define ERROR_SYSLOG 0x0004
 
-/*  
+/*
  * err_init
  *
  * Initialize error lib with program name.  This is usually the first
@@ -59,35 +59,35 @@ void err_init(char *prog);
  */
 void err_init_exit_value(int val);
 
-/* 
+/*
  * err_get_flags
  *
  * Returns the currently set flags
  */
 int err_get_flags(void);
 
-/* 
+/*
  * err_set_flags
  *
  * Sets the error lib flags to 'flags'.
  */
 void err_set_flags(int flags);
 
-/* 
+/*
  * err_debug
  *
  * Output a debug message
  */
 void err_debug(const char *fmt, ...);
 
-/*  
+/*
  * err_output
  *
  * Output an error message
  */
 void err_output(const char *fmt, ...);
 
-/* 
+/*
  * err_exit
  *
  * Output an error message and exit

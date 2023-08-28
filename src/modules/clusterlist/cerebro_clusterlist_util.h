@@ -28,7 +28,7 @@
 #ifndef _CEREBRO_CLUSTERLIST_UTIL_H
 #define _CEREBRO_CLUSTERLIST_UTIL_H
 
-/* 
+/*
  * cerebro_copy_nodename
  *
  * Copy a node string into a buffer, checking for length appropriately

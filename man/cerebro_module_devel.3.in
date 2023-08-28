@@ -296,12 +296,12 @@ The 'cerebrod_heartbeat_frequency_min' and
 maximum heartbeat frequency for
 .BR cerebrod(8).
 
-The 'cerebrod_speak' field is a boolean that turns on the 
+The 'cerebrod_speak' field is a boolean that turns on the
 .BR cerebrod(8)
 speaker to send out message packets.
 
 The 'cerebrod_speak_message_config' field should store an array of
-destinations 
+destinations
 .BR cerebrod(8)
 messages should be to.
 
@@ -318,7 +318,7 @@ threads that should be created in
 .BR cerebrod(8).
 
 The 'cerebrod_listen_message_config' field should store an array of
-message destinations 
+message destinations
 .BR cerebrod(8)
 should be listening on.
 
@@ -331,7 +331,7 @@ The 'cerebrod_metric_server' field is a boolean that turns on the
 metric server to receive metric data requests.
 
 The 'cerebrod_metric_server_port' field stores the metric server
-port for 
+port for
 .BR cerebrod(8).
 
 The 'cerebrod_event_server' field is a boolean that turns on the
@@ -339,7 +339,7 @@ The 'cerebrod_event_server' field is a boolean that turns on the
 event server to receive event data requests.
 
 The 'cerebrod_event_server_port' field stores the event server
-port for 
+port for
 .BR cerebrod(8).
 
 The 'cerebrod_forward_message_config' field should store an array of
@@ -358,7 +358,7 @@ should accept.
 .if @MANPAGE_DEBUG@ \{
 
 The 'cerebrod_speak_debug' field is a boolean that turns on speaker
-debugging for 
+debugging for
 .BR cerebrod.
 
 The 'cerebrod_listen_debug' field is a boolean that turns on listener
@@ -378,7 +378,7 @@ event server debugging for
 .BR cerebrod.
 
 The 'cerebrod_alternate_hostname' field is a string that specifies
-an alternate hostname 
+an alternate hostname
 .BR cerebrod
 should assume for testing purposes.
 \}
@@ -506,7 +506,7 @@ The 'get_metric_thread' function returns a pointer of type:
 
 typedef void *(*Cerebro_metric_thread_pointer)(void *arg);
 
-which will be executed as a detached thread.  
+which will be executed as a detached thread.
 
 This thread can perform any metric monitoring duties it pleases.
 Typically the thread is used to watch or monitor for some event and
@@ -516,7 +516,7 @@ function below.
 If no detached thread is required to be executed by this module, NULL
 should be returned.
 
-If the 
+If the
 .B cerebrod
 daemon was built without threads, the 'get_metric_thread' function will
 never be called.
@@ -596,7 +596,7 @@ The field 'metric_update' should point to a function of the following type:
 typedef int (*Cerebro_monitor_metric_update)(const char *nodename, unsigned int metric_value_type, unsigned int metric_value_len, void *metric_value);
 
 The 'metric_update' function is called whenever the metric is received from a node.
-The nodename the metric was received from, metric value type, metric value length, and metric value are passed in as arguments.  
+The nodename the metric was received from, metric value type, metric value length, and metric value are passed in as arguments.
 Returns the 0 on success, -1 on error.
 
 All of the above functions must be defined in the module and listed in

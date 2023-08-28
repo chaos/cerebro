@@ -53,7 +53,7 @@
 #endif /* !WITH_STATIC_MODULES */
 #include "module_util.h"
 
-/*  
+/*
  * module_setup_count
  *
  * indicates the number of times module setup function has been called
@@ -61,14 +61,14 @@
 int module_setup_count = 0;
 
 #if WITH_STATIC_MODULES
-int 
+int
 find_and_load_modules(void **modules_list,
                       Module_callback module_cb,
                       void *handle,
                       unsigned int modules_max)
 {
   int found = 0;
- 
+
   /* modules_list need not be passed in */
   if (!module_cb
       || !handle
@@ -86,13 +86,13 @@ find_and_load_modules(void **modules_list,
       while ((module_info = modules_list[i]))
         {
           int flag;
-          
+
           if ((flag = module_cb(handle, module_info)) < 0)
             return -1;
 
           if (flag)
             found++;
-          
+
           if (found >= modules_max)
             goto out;
 
@@ -104,9 +104,9 @@ find_and_load_modules(void **modules_list,
   return (found) ? 1 : 0;
 }
 #else /* !WITH_STATIC_MODULES */
-/* 
+/*
  * _load_module
- * 
+ *
  * Load module indicated by parameters and call module callback
  *
  * Returns 1 if module loaded and stored, 0 if not, -1 on error
@@ -141,16 +141,16 @@ _load_module(char *search_dir,
       CEREBRO_ERR(("lt_dlopen: %s, %s", filebuf, lt_dlerror()));
       goto cleanup;
     }
-              
+
   /* clear lt_dlerror */
   lt_dlerror();
-  
+
   if (!(module_info = lt_dlsym(dl_handle, module_info_sym)))
     {
       lt_dlclose(dl_handle);
       return 0;
     }
-  
+
   if ((flag = module_cb(handle, dl_handle, module_info)) < 0)
     goto cleanup;
 
@@ -259,7 +259,7 @@ _find_known_module(char *search_dir,
  *
  * Returns 1 when a module(s) are found, 0 if not, -1 on fatal error
  */
-static int 
+static int
 _find_unknown_modules(char *search_dir,
                       char *signature,
                       Module_callback module_cb,
@@ -312,10 +312,10 @@ _find_unknown_modules(char *search_dir,
                                    module_info_sym,
                                    handle)) < 0)
             goto cleanup;
-          
+
           if (flag)
             found++;
-          
+
           if (found >= modules_max)
             goto out;
         }
@@ -330,7 +330,7 @@ _find_unknown_modules(char *search_dir,
   return -1;
 }
 
-int 
+int
 find_and_load_modules(char *module_dir,
                       char **modules_list,
                       char *signature,
@@ -362,18 +362,18 @@ find_and_load_modules(char *module_dir,
                                    module_info_sym,
                                    handle)) < 0)
         return -1;
-      
+
       if (rv)
         return 1;
 #endif /* CEREBRO_DEBUG */
-      
+
       if ((rv = _find_known_module(CEREBRO_MODULE_DIR,
                                    modules_list,
                                    module_cb,
                                    module_info_sym,
                                    handle)) < 0)
         return -1;
-      
+
       if (rv)
         return 1;
     }
@@ -386,7 +386,7 @@ find_and_load_modules(char *module_dir,
                                   handle,
                                   modules_max)) < 0)
     return -1;
-  
+
   if (rv)
     return 1;
 #endif /* CEREBRO_DEBUG */
@@ -406,7 +406,7 @@ find_and_load_modules(char *module_dir,
 }
 #endif /* !WITH_STATIC_MODULES */
 
-int 
+int
 module_setup(void)
 {
   if (module_setup_count)
@@ -425,7 +425,7 @@ module_setup(void)
   return 0;
 }
 
-int 
+int
 module_cleanup(void)
 {
   if (module_setup_count)

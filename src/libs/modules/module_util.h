@@ -68,14 +68,14 @@ int find_and_load_modules(char *module_dir,
                           unsigned int modules_max);
 #endif /* !WITH_STATIC_MODULES */
 
-/* 
+/*
  * module_setup
  *
  * Setup library for module loading
  */
 int module_setup(void);
 
-/* 
+/*
  * module_cleanup
  *
  * Cleanup library from module loading

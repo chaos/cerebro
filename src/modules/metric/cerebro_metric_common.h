@@ -33,7 +33,7 @@
 /*
  * common_metric_interface_version
  *
- * common metric module interface version function 
+ * common metric module interface version function
  */
 int common_metric_interface_version(void);
 
@@ -51,25 +51,25 @@ int common_metric_setup_do_nothing(void);
  */
 int common_metric_cleanup_do_nothing(void);
 
-/* 
+/*
  * common_metric_get_metric_period_0
- * 
+ *
  * common metric module get_metric_period function returning a period
  * of 0
  */
 int common_metric_get_metric_period_0(int *period);
 
-/* 
+/*
  * common_metric_get_metric_period_60
- * 
+ *
  * common metric module get_metric_period function returning a period
  * of 60
  */
 int common_metric_get_metric_period_60(int *period);
 
-/* 
+/*
  * common_metric_get_metric_period_300
- * 
+ *
  * common metric module get_metric_period function returning a period
  * of 300
  */

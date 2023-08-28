@@ -76,7 +76,7 @@ bytesin_metric_get_metric_value(unsigned int *metric_value_type,
       CEREBRO_DBG(("invalid parameters"));
       return -1;
     }
-  
+
   if (cerebro_metric_get_network(&bytesinval,
                                  NULL,
                                  NULL,
@@ -84,13 +84,13 @@ bytesin_metric_get_metric_value(unsigned int *metric_value_type,
                                  NULL,
                                  NULL) < 0)
     goto cleanup;
-  
+
   if (!(bytesinptr = (u_int64_t *)malloc(sizeof(u_int64_t))))
     {
       CEREBRO_ERR(("malloc: %s", strerror(errno)));
       goto cleanup;
     }
-  
+
   *bytesinptr = bytesinval;
 
   *metric_value_type = CEREBRO_DATA_VALUE_TYPE_U_INT64;

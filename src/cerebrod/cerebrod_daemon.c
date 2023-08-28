@@ -45,24 +45,24 @@ cerebrod_daemon_init(void)
   /* Based on code in Unix network programming by R. Stevens */
   pid_t pid;
   int i;
- 
+
   pid = Fork();
   if (pid != 0)			/* Terminate Parent */
     exit(0);
- 
+
   setsid();
- 
+
   Signal(SIGHUP, SIG_IGN);
-   
+
   pid = Fork();
   if (pid != 0)			/* Terminate 1st Child */
     exit(0);
 
   Chdir("/");
- 
+
   Umask(0);
-   
+
   /* Don't use Close() wrapper, we don't want to exit on error */
   for (i = 0; i < 64; i++)
-    close(i);			
+    close(i);
 }

@@ -70,7 +70,7 @@ extern pthread_mutex_t debug_output_mutex;
  */
 static char cerebrod_nodename[CEREBRO_MAX_NODENAME_LEN+1];
 
-/* 
+/*
  * next_send_times
  *
  * Stores information on the next time to send information
@@ -96,7 +96,7 @@ int speaker_fds[CEREBRO_CONFIG_SPEAK_MESSAGE_CONFIG_MAX];
 unsigned int speaker_fds_len = 0;
 pthread_mutex_t speaker_fds_lock = PTHREAD_MUTEX_INITIALIZER;
 
-/* 
+/*
  * _speaker_setup_socket
  *
  * Create and setup a speaker socket.  Do not use wrappers in this
@@ -105,7 +105,7 @@ pthread_mutex_t speaker_fds_lock = PTHREAD_MUTEX_INITIALIZER;
  *
  * In this socket setup function, 'num' is used as the message config
  * and file descriptor index.
- * 
+ *
  * Returns file descriptor on success, -1 on error
  */
 static int
@@ -127,14 +127,14 @@ _speaker_setup_socket(int num)
       struct ip_mreqn imr;
 
       memset(&imr, '\0', sizeof(struct ip_mreqn));
-      memcpy(&imr.imr_multiaddr, 
+      memcpy(&imr.imr_multiaddr,
 	     &conf.speak_message_config[num].ip_in_addr,
 	     sizeof(struct in_addr));
-      memcpy(&imr.imr_address, 
+      memcpy(&imr.imr_address,
 	     &conf.speak_message_config[num].network_interface_in_addr,
 	     sizeof(struct in_addr));
       imr.imr_ifindex = conf.speak_message_config[num].network_interface_index;
-      
+
       optlen = sizeof(struct ip_mreqn);
       if (setsockopt(fd, SOL_IP, IP_MULTICAST_IF, &imr, optlen) < 0)
 	{
@@ -174,7 +174,7 @@ _speaker_setup_socket(int num)
   memcpy(&addr.sin_addr,
 	 &conf.speak_message_config[num].network_interface_in_addr,
 	 sizeof(struct in_addr));
-  if (bind(fd, (struct sockaddr *)&addr, sizeof(struct sockaddr_in)) < 0) 
+  if (bind(fd, (struct sockaddr *)&addr, sizeof(struct sockaddr_in)) < 0)
     {
       CEREBROD_ERR(("bind: %s", strerror(errno)));
       goto cleanup;
@@ -267,10 +267,10 @@ _speaker_initialize(void)
   cerebrod_speaker_data_initialize();
 
   next_send_times = List_create((ListDelF)_Free);
-  /*  
+  /*
    * We will always atleast send a heartbeat, so initialize
    * the next_send_times list with this information.
-   * 
+   *
    * Initialize the next_send_time to send a heartbeat immediately.
    */
   nst = (struct cerebrod_next_send_time *)Malloc(sizeof(struct cerebrod_next_send_time));
@@ -339,12 +339,12 @@ _cerebrod_message_create(struct cerebrod_next_send_time *nst,
   *message_len += CEREBROD_MESSAGE_HEADER_LEN;
 
   if (nst->next_send_type & CEREBROD_SPEAKER_NEXT_SEND_TYPE_HEARTBEAT)
-    cerebrod_speaker_data_get_heartbeat_metric_data(msg, 
-                                                    message_len, 
+    cerebrod_speaker_data_get_heartbeat_metric_data(msg,
+                                                    message_len,
                                                     more_data_to_send);
   else if (nst->next_send_type & CEREBROD_SPEAKER_NEXT_SEND_TYPE_MODULE)
-    cerebrod_speaker_data_get_module_metric_data(msg, 
-                                                 message_len, 
+    cerebrod_speaker_data_get_module_metric_data(msg,
+                                                 message_len,
                                                  nst->index,
                                                  more_data_to_send);
 
@@ -359,22 +359,22 @@ _cerebrod_message_create(struct cerebrod_next_send_time *nst,
  * Returns length written to buffer on success, -1 on error
  */
 int
-_message_marshall(struct cerebrod_message *msg, 
-                  char *buf, 
+_message_marshall(struct cerebrod_message *msg,
+                  char *buf,
                   unsigned int buflen)
 {
   char *bufPtr;
   int i, bufPtrlen, c = 0;
- 
+
   assert(msg && buf && buflen >= CEREBROD_MESSAGE_HEADER_LEN);
-  
+
   bufPtr = msg->nodename;
   bufPtrlen = sizeof(msg->nodename);
   memset(buf, '\0', buflen);
   c += Marshall_int32(msg->version, buf + c, buflen - c);
   c += Marshall_buffer(bufPtr, bufPtrlen, buf + c, buflen - c);
   c += Marshall_u_int32(msg->metrics_len, buf + c, buflen - c);
-  
+
   if (!msg->metrics_len)
     return c;
 
@@ -405,7 +405,7 @@ _message_marshall(struct cerebrod_message *msg,
           mtype = CEREBRO_DATA_VALUE_TYPE_NONE;
         }
 
-      if ((n = marshall_data(mtype, 
+      if ((n = marshall_data(mtype,
                              mlen,
                              mvalue,
                              buf + c,
@@ -414,14 +414,14 @@ _message_marshall(struct cerebrod_message *msg,
         goto cleanup;
       c += n;
     }
-  
+
   return c;
 
  cleanup:
   return -1;
 }
 
-/* 
+/*
  * _cerebrod_message_dump
  *
  * Dump contents of message packet
@@ -438,7 +438,7 @@ _cerebrod_message_dump(struct cerebrod_message *msg)
   Pthread_mutex_lock(&debug_output_mutex);
 #endif /* !WITH_CEREBROD_NO_THREADS */
   fprintf(stderr, "**************************************\n");
-  fprintf(stderr, "* Sending Message\n");     
+  fprintf(stderr, "* Sending Message\n");
   fprintf(stderr, "* -----------------------\n");
   cerebrod_message_dump(msg);
   fprintf(stderr, "**************************************\n");
@@ -456,42 +456,42 @@ _cerebrod_message_send(struct cerebrod_message* msg, unsigned int msglen)
 
   assert(msg);
   assert(msglen);               /* atleast the header must be there */
-  
+
   buf = Malloc(msglen + 1);
-                  
+
   if ((buflen = _message_marshall(msg, buf, msglen)) < 0)
     {
       Free(buf);
       return;
     }
-  
+
   Pthread_mutex_lock(&speaker_fds_lock);
   for (i = 0; i < speaker_fds_len; i++)
     {
       struct sockaddr *addr;
       struct sockaddr_in msgaddr;
       unsigned int addrlen;
-      
+
       memset(&msgaddr, '\0', sizeof(struct sockaddr_in));
       msgaddr.sin_family = AF_INET;
       msgaddr.sin_port = htons(conf.speak_message_config[i].destination_port);
-      memcpy(&msgaddr.sin_addr, 
-             &conf.speak_message_config[i].ip_in_addr, 
+      memcpy(&msgaddr.sin_addr,
+             &conf.speak_message_config[i].ip_in_addr,
              sizeof(struct in_addr));
-      
+
       addr = (struct sockaddr *)&msgaddr;
       addrlen = sizeof(struct sockaddr_in);
       if ((rv = sendto(speaker_fds[i],
-                       buf, 
+                       buf,
                        buflen,
                        0,
-                       addr, 
+                       addr,
                        addrlen)) != msglen)
         {
           if (rv < 0)
-            speaker_fds[i] = cerebrod_reinit_socket(speaker_fds[i], 
+            speaker_fds[i] = cerebrod_reinit_socket(speaker_fds[i],
                                                     i,
-                                                    _speaker_setup_socket, 
+                                                    _speaker_setup_socket,
                                                     "speaker: sendto");
           else
             CEREBROD_ERR(("sendto: invalid bytes sent"));
@@ -676,7 +676,7 @@ cerebrod_send_message(struct cerebrod_message *msg)
     }
 
   _cerebrod_message_dump(msg);
-      
+
   _cerebrod_message_send(msg, msglen);
 
  cleanup:

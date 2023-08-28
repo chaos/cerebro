@@ -51,7 +51,7 @@ wrap_malloc(WRAPPERS_ARGS, size_t size)
   if (!(size > 0 || size <= INT_MAX))
     WRAPPERS_ERR_INVALID_PARAMETERS("malloc");
 
-  if (!(ptr = malloc(2*sizeof(int) + size + MALLOC_PAD_LEN))) 
+  if (!(ptr = malloc(2*sizeof(int) + size + MALLOC_PAD_LEN)))
     WRAPPERS_ERR_ERRNO("malloc");
 
   *((int *)(ptr)) = MALLOC_MAGIC;
@@ -83,7 +83,7 @@ wrap_free(WRAPPERS_ARGS, void *ptr)
   free(p);
 }
 
-void 
+void
 _Free(void *ptr)
 {
   wrap_free(__FILE__, __FUNCTION__, __LINE__, ptr);
@@ -119,13 +119,13 @@ wrap_strncpy(WRAPPERS_ARGS, char *dest, const char *src, size_t n)
   return rv;
 }
 
-int 
+int
 wrap_open(WRAPPERS_ARGS, const char *pathname, int flags, int mode)
 {
   int fd;
 
   assert(file && function);
-  
+
   if (!pathname)
     WRAPPERS_ERR_INVALID_PARAMETERS("open");
 
@@ -135,13 +135,13 @@ wrap_open(WRAPPERS_ARGS, const char *pathname, int flags, int mode)
   return fd;
 }
 
-int 
+int
 wrap_close(WRAPPERS_ARGS, int fd)
 {
   int rv;
-                                 
+
   assert(file && function);
-                                                   
+
   if ((rv = close(fd)) < 0)
     WRAPPERS_ERR_ERRNO("close");
 
@@ -152,7 +152,7 @@ ssize_t
 wrap_read(WRAPPERS_ARGS, int fd, void *buf, size_t count)
 {
   ssize_t rv;
-  
+
   assert(file && function);
 
   if (!buf || !(count > 0 || count <= INT_MAX))
@@ -164,7 +164,7 @@ wrap_read(WRAPPERS_ARGS, int fd, void *buf, size_t count)
 
   if (rv < 0)
     WRAPPERS_ERR_ERRNO("read");
-  
+
   return rv;
 }
 
@@ -204,7 +204,7 @@ wrap_chdir(WRAPPERS_ARGS, const char *path)
   return rv;
 }
 
-int 
+int
 wrap_stat(WRAPPERS_ARGS, const char *path, struct stat *buf)
 {
   int rv;
@@ -233,7 +233,7 @@ DIR *
 wrap_opendir(WRAPPERS_ARGS, const char *name)
 {
   DIR *rv;
-  
+
   assert(file && function);
 
   if (!name)
@@ -274,11 +274,11 @@ wrap_socket(WRAPPERS_ARGS, int domain, int type, int protocol)
   return fd;
 }
 
-int 
+int
 wrap_bind(WRAPPERS_ARGS, int sockfd, struct sockaddr *my_addr, socklen_t addrlen)
 {
   int rv;
-  
+
   assert(file && function);
 
   if (!my_addr || !(addrlen > 0 || addrlen <= INT_MAX))
@@ -290,7 +290,7 @@ wrap_bind(WRAPPERS_ARGS, int sockfd, struct sockaddr *my_addr, socklen_t addrlen
   return rv;
 }
 
-int 
+int
 wrap_connect(WRAPPERS_ARGS, int sockfd, struct sockaddr *serv_addr, socklen_t addrlen)
 {
   int rv;
@@ -306,7 +306,7 @@ wrap_connect(WRAPPERS_ARGS, int sockfd, struct sockaddr *serv_addr, socklen_t ad
   return rv;
 }
 
-int 
+int
 wrap_listen(WRAPPERS_ARGS, int s, int backlog)
 {
   int rv;
@@ -322,7 +322,7 @@ wrap_listen(WRAPPERS_ARGS, int s, int backlog)
   return rv;
 }
 
-int 
+int
 wrap_accept(WRAPPERS_ARGS, int s, struct sockaddr *addr, socklen_t *addrlen)
 {
   int rv;
@@ -338,13 +338,13 @@ wrap_accept(WRAPPERS_ARGS, int s, struct sockaddr *addr, socklen_t *addrlen)
   return rv;
 }
 
-int 
+int
 wrap_select(WRAPPERS_ARGS, int n, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout)
 {
   int rv;
   struct timeval timeout_orig;
   struct timeval start, end, delta;
-  
+
   assert(file && function);
 
   /* readfds, writefds, exceptfds, and timeout could each be null, but
@@ -353,7 +353,7 @@ wrap_select(WRAPPERS_ARGS, int n, fd_set *readfds, fd_set *writefds, fd_set *exc
   if (!readfds && !writefds && !exceptfds && !timeout)
     WRAPPERS_ERR_INVALID_PARAMETERS("select");
 
-  if (timeout) 
+  if (timeout)
     {
       timeout_orig = *timeout;
       Gettimeofday(&start, NULL);
@@ -365,37 +365,37 @@ wrap_select(WRAPPERS_ARGS, int n, fd_set *readfds, fd_set *writefds, fd_set *exc
       timeout_orig.tv_usec = 0;
     }
 
-  do 
+  do
     {
       rv = select(n, readfds, writefds, exceptfds, timeout);
       if (rv < 0 && errno != EINTR)
         WRAPPERS_ERR_ERRNO("select");
-      if (rv < 0 && timeout) 
+      if (rv < 0 && timeout)
 	{
 	  Gettimeofday(&end, NULL);
 	  /* delta = end-start */
-	  timersub(&end, &start, &delta);     
+	  timersub(&end, &start, &delta);
 	  /* timeout = timeout_orig-delta */
-	  timersub(&timeout_orig, &delta, timeout);     
+	  timersub(&timeout_orig, &delta, timeout);
 	}
-    } 
+    }
   while (rv < 0);
 
   return rv;
 }
 
-int 
+int
 wrap_poll(WRAPPERS_ARGS, struct pollfd *ufds, unsigned int nfds, int timeout)
 {
   int rv;
   struct timeval timeout_orig, timeout_current;
   struct timeval start, end, delta;
-                                                                         
-  if (!ufds)  
+
+  if (!ufds)
     WRAPPERS_ERR_INVALID_PARAMETERS("poll");
 
   /* Poll uses timeout in milliseconds */
-  if (timeout >= 0) 
+  if (timeout >= 0)
     {
       timeout_orig.tv_sec = (long)timeout/1000;
       timeout_orig.tv_usec = (timeout % 1000) * 1000;
@@ -415,13 +415,13 @@ wrap_poll(WRAPPERS_ARGS, struct pollfd *ufds, unsigned int nfds, int timeout)
     if (rv < 0 && timeout >= 0) {
       Gettimeofday(&end, NULL);
       /* delta = end-start */
-      timersub(&end, &start, &delta);     
+      timersub(&end, &start, &delta);
       /* timeout_current = timeout_orig-delta */
       timersub(&timeout_orig, &delta, &timeout_current);
       timeout = (timeout_current.tv_sec * 1000) + (timeout_current.tv_usec/1000);
     }
   } while (rv < 0);
-                                                                         
+
   return rv;
 }
 
@@ -485,15 +485,15 @@ wrap_inet_ntop(WRAPPERS_ARGS, int af, const void *src, char *dst, socklen_t cnt)
 
   if ((rv = inet_ntop(af, src, dst, cnt)) < 0)
     WRAPPERS_ERR_ERRNO("inet_ntop");
-  
+
   return rv;
 }
 
-int 
+int
 wrap_inet_pton(WRAPPERS_ARGS, int af, const char *src, void *dst)
 {
   int rv;
-  
+
   assert(file && function);
 
   if (!src || !dst)
@@ -509,15 +509,15 @@ struct tm *
 wrap_localtime(WRAPPERS_ARGS, const time_t *timep)
 {
   struct tm *tmptr;
-  
+
   assert(file && function);
-  
+
   if (!timep)
     WRAPPERS_ERR_INVALID_PARAMETERS("localtime");
-  
+
   if (!(tmptr = localtime(timep)))
     WRAPPERS_ERR_ERRNO("localtime");
-  
+
   return tmptr;
 }
 
@@ -525,15 +525,15 @@ struct tm *
 wrap_localtime_r(WRAPPERS_ARGS, const time_t *timep, struct tm *result)
 {
   struct tm *tmptr;
-  
+
   assert(file && function);
-  
+
   if (!timep || !result)
     WRAPPERS_ERR_INVALID_PARAMETERS("localtime_r");
-  
+
   if (!(tmptr = localtime_r(timep, result)))
     WRAPPERS_ERR_ERRNO("localtime_r");
-  
+
   return tmptr;
 }
 
@@ -588,7 +588,7 @@ wrap_gettimeofday_workaround(WRAPPERS_ARGS, struct timeval *tv, struct timezone 
 	  WRAPPERS_ERR_ERRNO("gettimeofday");
 	if ((ret2 = gettimeofday(&tv2, tz)))
 	  WRAPPERS_ERR_ERRNO("gettimeofday");
-	
+
 	if (abs(tv1.tv_sec - tv2.tv_sec) < GETTIMEOFDAY_RANGE)
 	  {
 	    tv->tv_sec = tv2.tv_sec;
@@ -608,7 +608,7 @@ wrap_gettimeofday_workaround(WRAPPERS_ARGS, struct timeval *tv, struct timezone 
   return rv;
 }
 
-pid_t 
+pid_t
 wrap_fork(WRAPPERS_ARGS)
 {
   pid_t pid;
@@ -637,7 +637,7 @@ wrap_signal(WRAPPERS_ARGS, int signum, Sighandler_t handler)
   return rv;
 }
 
-int 
+int
 wrap_gethostname(WRAPPERS_ARGS, char *name, size_t len)
 {
   int rv;

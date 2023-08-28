@@ -37,7 +37,7 @@
 #if CEREBRO_DEBUG
 
 #define CEREBROD_DBG(msg) CEREBRO_DBG(msg)
-   
+
 #else /* !CEREBRO_DEBUG */
 
 #define CEREBROD_DBG(msg) \
