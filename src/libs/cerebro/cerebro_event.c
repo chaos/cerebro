@@ -130,7 +130,10 @@ _event_server_request_send(cerebro_t handle,
     }
 
   req.version = CEREBRO_EVENT_SERVER_PROTOCOL_VERSION;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-truncation"
   strncpy(req.event_name, event_name, CEREBRO_MAX_EVENT_NAME_LEN);
+#pragma GCC diagnostic pop
   req.flags = flags;
 
   if ((req_len = _event_server_request_marshall(handle,

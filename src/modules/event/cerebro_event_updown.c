@@ -229,8 +229,11 @@ _create_event(const char *nodename, int state)
 
   event->version = CEREBRO_EVENT_PROTOCOL_VERSION;
   event->err_code = CEREBRO_EVENT_SERVER_PROTOCOL_ERR_SUCCESS;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-truncation"
   strncpy(event->nodename, nodename, CEREBRO_MAX_NODENAME_LEN);
   strncpy(event->event_name, UPDOWN_EVENT_NAME, CEREBRO_MAX_EVENT_NAME_LEN);
+#pragma GCC diagnostic pop
   event->event_value_type = CEREBRO_DATA_VALUE_TYPE_INT32;
   event->event_value_len = sizeof(int32_t);
   if (!(event->event_value = malloc(sizeof(int32_t))))

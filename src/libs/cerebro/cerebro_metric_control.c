@@ -270,7 +270,10 @@ _metric_control_request_send(cerebro_t handle,
   req.version = CEREBRO_METRIC_CONTROL_PROTOCOL_VERSION;
   req.command = command;
   req.flags = flags;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-truncation"
   strncpy(req.metric_name, metric_name, CEREBRO_MAX_METRIC_NAME_LEN);
+#pragma GCC diagnostic pop
   req.metric_value_type = metric_value_type;
   req.metric_value_len = metric_value_len;
   req.metric_value = metric_value;

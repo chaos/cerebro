@@ -148,7 +148,6 @@ cerebro_metric_get_network(u_int64_t *bytesin,
 	  u_int64_t tx_bytes;
 	  u_int32_t rx_packets, rx_errs;
 	  u_int32_t tx_packets, tx_errs;
-	  u_int32_t temp;
 	  char *strptr;
 
 	  /* skip the device name */
@@ -177,31 +176,31 @@ cerebro_metric_get_network(u_int64_t *bytesin,
 	      CEREBRO_ERR(("%s parse error", NETWORK_FILE));
 	      goto cleanup;
 	    }
- 	  temp = strtoul(strptr, &strptr, 10); /* drop */
+	  (void)strtoul(strptr, &strptr, 10); /* drop */
 	  if (!strptr)
 	    {
 	      CEREBRO_ERR(("%s parse error", NETWORK_FILE));
 	      goto cleanup;
 	    }
- 	  temp = strtoul(strptr, &strptr, 10); /* fifo */
+	  (void)strtoul(strptr, &strptr, 10); /* fifo */
 	  if (!strptr)
 	    {
 	      CEREBRO_ERR(("%s parse error", NETWORK_FILE));
 	      goto cleanup;
 	    }
- 	  temp = strtoul(strptr, &strptr, 10); /* frame */
+	  (void)strtoul(strptr, &strptr, 10); /* frame */
 	  if (!strptr)
 	    {
 	      CEREBRO_ERR(("%s parse error", NETWORK_FILE));
 	      goto cleanup;
 	    }
- 	  temp = strtoul(strptr, &strptr, 10); /* compressed */
+	  (void)strtoul(strptr, &strptr, 10); /* compressed */
 	  if (!strptr)
 	    {
 	      CEREBRO_ERR(("%s parse error", NETWORK_FILE));
 	      goto cleanup;
 	    }
- 	  temp = strtoul(strptr, &strptr, 10); /* multicast */
+	  (void)strtoul(strptr, &strptr, 10); /* multicast */
 	  if (!strptr)
 	    {
 	      CEREBRO_ERR(("%s parse error", NETWORK_FILE));

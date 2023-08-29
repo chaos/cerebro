@@ -451,8 +451,11 @@ _get_module_metric_value(unsigned int index)
       goto cleanup;
     }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-truncation"
   /* need not overflow */
   strncpy(mm->metric_name, metric_name, CEREBRO_MAX_METRIC_NAME_LEN);
+#pragma GCC diagnostic pop
 
   if (metric_module_get_metric_value(metric_handle,
                                      index,
@@ -538,10 +541,13 @@ _get_userspace_metric_value(struct cerebrod_speaker_metric_info *metric_info)
   mm = Malloc(sizeof(struct cerebrod_message_metric));
   memset(mm, '\0', sizeof(struct cerebrod_message_metric));
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-truncation"
   /* need not overflow */
   strncpy(mm->metric_name,
           metric_info->metric_name,
           CEREBRO_MAX_METRIC_NAME_LEN);
+#pragma GCC diagnostic pop
 
   mm->metric_value_type = metric_info->metric_value_type;
   mm->metric_value_len = metric_info->metric_value_len;

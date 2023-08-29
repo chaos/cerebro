@@ -609,8 +609,11 @@ _send_message_now(int fd,
     }
   memset(mm, '\0', sizeof(struct cerebrod_message_metric));
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-truncation"
   /* need not overflow */
   strncpy(mm->metric_name, metric_name, CEREBRO_MAX_METRIC_NAME_LEN);
+#pragma GCC diagnostic pop
 
   mm->metric_value_type = metric_value_type;
   mm->metric_value_len = metric_value_len;

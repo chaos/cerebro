@@ -65,8 +65,10 @@ void
 wrap_free(WRAPPERS_ARGS, void *ptr)
 {
   void *p = ptr - 2*sizeof(int);
+#ifndef NDEBUG
   int i, size;
   char *c;
+#endif
 
   assert(file && function);
 
@@ -76,10 +78,12 @@ wrap_free(WRAPPERS_ARGS, void *ptr)
   if (!(*((int *)p) == MALLOC_MAGIC))
     WRAPPERS_ERR_MSG("free", "memory corruption");
 
+#ifndef NDEBUG
   size = *((int *)(p + sizeof(int)));
   c = (char *)(p + 2*sizeof(int) + size);
   for (i = 0; i < MALLOC_PAD_LEN; i++)
     assert(c[i] == (char)MALLOC_PAD_DATA);
+#endif
   free(p);
 }
 
