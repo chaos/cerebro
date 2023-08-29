@@ -9,7 +9,7 @@
  *
  *  This file is part of Cerebro, a collection of cluster monitoring
  *  tools and libraries.  For details, see
- *  <http://www.llnl.gov/linux/cerebro/>.
+ *  <https://github.com/chaos/cerebro>.
  *
  *  Cerebro is free software; you can redistribute it and/or modify it under
  *  the terms of the GNU General Public License as published by the Free
