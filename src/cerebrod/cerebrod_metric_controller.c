@@ -966,7 +966,7 @@ _speaker_metric_names_dump(void)
  *
  * Thread to service a connection from a client to retrieve metric
  * data.  Use wrapper functions minimally, b/c we want to return
- * errors to the user instead of exitting with errors.
+ * errors to the user instead of exiting with errors.
  *
  * Passed int * pointer to client TCP socket file descriptor
  *
