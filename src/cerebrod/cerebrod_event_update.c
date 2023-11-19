@@ -439,9 +439,9 @@ cerebrod_event_modules_setup(void)
 
   event_module_timeouts = List_create((ListDelF)_cerebrod_event_module_timeout_data_destroy);
   event_module_timeout_index = Hash_create(event_module_count,
-					   (hash_key_f)hash_key_string,
-					   (hash_cmp_f)strcmp,
-					   (hash_del_f)list_destroy);
+                                           (hash_key_f)hash_key_string,
+                                           (hash_cmp_f)strcmp,
+                                           (hash_del_f)list_destroy);
 
   for (i = 0; i < event_module_count; i++)
     {
@@ -754,9 +754,9 @@ cerebrod_event_modules_update(const char *nodename,
       Pthread_mutex_unlock(&(el->event_list_lock));
 
       while ((event_module = list_next(itr)))
-	{
-	  Pthread_mutex_lock(&event_module->event_lock);
-	  if ((rv = event_module_metric_update(event_handle,
+        {
+          Pthread_mutex_lock(&event_module->event_lock);
+          if ((rv = event_module_metric_update(event_handle,
                                                event_module->index,
                                                nodename,
                                                metric_name,
@@ -773,8 +773,8 @@ cerebrod_event_modules_update(const char *nodename,
             cerebrod_queue_event(event, event_module->index);
 
         loop_next:
-	  Pthread_mutex_unlock(&event_module->event_lock);
-	}
+          Pthread_mutex_unlock(&event_module->event_lock);
+        }
 
       Pthread_mutex_lock(&(el->event_list_lock));
       List_iterator_destroy(itr);

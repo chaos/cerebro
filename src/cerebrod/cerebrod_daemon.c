@@ -47,7 +47,7 @@ cerebrod_daemon_init(void)
   int i;
 
   pid = Fork();
-  if (pid != 0)			/* Terminate Parent */
+  if (pid != 0)                 /* Terminate Parent */
     exit(0);
 
   setsid();
@@ -55,7 +55,7 @@ cerebrod_daemon_init(void)
   Signal(SIGHUP, SIG_IGN);
 
   pid = Fork();
-  if (pid != 0)			/* Terminate 1st Child */
+  if (pid != 0)                 /* Terminate 1st Child */
     exit(0);
 
   Chdir("/");

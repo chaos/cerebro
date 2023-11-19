@@ -617,7 +617,7 @@ cerebrod_speaker_data_get_heartbeat_metric_data(struct cerebrod_message *msg,
 
       if (metric_info->metric_origin & CEREBROD_METRIC_SPEAKER_ORIGIN_MODULE
           && !(metric_info->metric_flags & CEREBRO_METRIC_MODULE_FLAGS_SEND_ON_PERIOD))
-	mm = _get_module_metric_value(metric_info->index);
+        mm = _get_module_metric_value(metric_info->index);
 
       if (metric_info->metric_origin & CEREBROD_METRIC_SPEAKER_ORIGIN_USERSPACE)
         mm = _get_userspace_metric_value(metric_info);

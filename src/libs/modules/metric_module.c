@@ -514,10 +514,10 @@ metric_module_get_metric_flags(metric_modules_t handle,
 
 int
 metric_module_get_metric_value(metric_modules_t handle,
-			       unsigned int index,
-			       unsigned int *metric_value_type,
-			       unsigned int *metric_value_len,
-			       void **metric_value)
+                               unsigned int index,
+                               unsigned int *metric_value_type,
+                               unsigned int *metric_value_len,
+                               void **metric_value)
 {
   struct cerebro_metric_module_info *module_info;
 
@@ -537,8 +537,8 @@ metric_module_get_metric_value(metric_modules_t handle,
 
 int
 metric_module_destroy_metric_value(metric_modules_t handle,
-				   unsigned int index,
-				   void *metric_value)
+                                   unsigned int index,
+                                   void *metric_value)
 {
   struct cerebro_metric_module_info *module_info;
 

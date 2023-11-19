@@ -138,16 +138,16 @@ static void
 _usage(void)
 {
   fprintf(stderr,
-	  "Usage: cerebro-stat [OPTIONS] -m <metric_name>\n"
-	  "or     cerebro-stat [OPTIONS] -l\n"
+          "Usage: cerebro-stat [OPTIONS] -m <metric_name>\n"
+          "or     cerebro-stat [OPTIONS] -l\n"
           "or     cerebro-stat [OPTIONS] -e <event_name>\n"
           "or     cerebro-stat [OPTIONS] -z\n"
           "\n"
           "OPTIONS:\n"
-	  "  -h         Print help and exit\n"
-	  "  -v         Print version and exit\n"
-	  "  -o STRING  Cerebro server hostname\n"
-	  "  -p INT     Cerebro server port\n"
+          "  -h         Print help and exit\n"
+          "  -v         Print version and exit\n"
+          "  -o STRING  Cerebro server hostname\n"
+          "  -p INT     Cerebro server port\n"
           "  -m STRING  Output metric data for the specified metric\n"
           "  -l         List all available metrics that can be queried\n"
           "  -U         Only output metrics from up nodes\n"

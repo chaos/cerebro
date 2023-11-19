@@ -128,35 +128,35 @@ _speaker_setup_socket(int num)
 
       memset(&imr, '\0', sizeof(struct ip_mreqn));
       memcpy(&imr.imr_multiaddr,
-	     &conf.speak_message_config[num].ip_in_addr,
-	     sizeof(struct in_addr));
+             &conf.speak_message_config[num].ip_in_addr,
+             sizeof(struct in_addr));
       memcpy(&imr.imr_address,
-	     &conf.speak_message_config[num].network_interface_in_addr,
-	     sizeof(struct in_addr));
+             &conf.speak_message_config[num].network_interface_in_addr,
+             sizeof(struct in_addr));
       imr.imr_ifindex = conf.speak_message_config[num].network_interface_index;
 
       optlen = sizeof(struct ip_mreqn);
       if (setsockopt(fd, SOL_IP, IP_MULTICAST_IF, &imr, optlen) < 0)
-	{
-	  CEREBROD_ERR(("setsockopt: %s", strerror(errno)));
+        {
+          CEREBROD_ERR(("setsockopt: %s", strerror(errno)));
           goto cleanup;
-	}
+        }
 
       optval = 1;
       optlen = sizeof(optval);
       if (setsockopt(fd, SOL_IP, IP_MULTICAST_LOOP, &optval, optlen) < 0)
-	{
-	  CEREBROD_ERR(("setsockopt: %s", strerror(errno)));
+        {
+          CEREBROD_ERR(("setsockopt: %s", strerror(errno)));
           goto cleanup;
-	}
+        }
 
       optval = conf.speak_message_ttl;
       optlen = sizeof(optval);
       if (setsockopt(fd, SOL_IP, IP_MULTICAST_TTL, &optval, optlen) < 0)
-	{
-	  CEREBROD_ERR(("setsockopt: %s", strerror(errno)));
+        {
+          CEREBROD_ERR(("setsockopt: %s", strerror(errno)));
           goto cleanup;
-	}
+        }
     }
 
   /* For quick start/restart */
@@ -172,8 +172,8 @@ _speaker_setup_socket(int num)
   addr.sin_family = AF_INET;
   addr.sin_port = htons(conf.speak_message_config[num].source_port);
   memcpy(&addr.sin_addr,
-	 &conf.speak_message_config[num].network_interface_in_addr,
-	 sizeof(struct in_addr));
+         &conf.speak_message_config[num].network_interface_in_addr,
+         sizeof(struct in_addr));
   if (bind(fd, (struct sockaddr *)&addr, sizeof(struct sockaddr_in)) < 0)
     {
       CEREBROD_ERR(("bind: %s", strerror(errno)));
@@ -515,9 +515,9 @@ cerebrod_speaker(void *arg)
       time_t now;
 
       if (conf.gettimeofday_workaround)
-	Gettimeofday_workaround(&tv, NULL);
+        Gettimeofday_workaround(&tv, NULL);
       else
-	Gettimeofday(&tv, NULL);
+        Gettimeofday(&tv, NULL);
       now = tv.tv_sec;
 
       /* Note: After initial setup, we are the only thread that uses this
@@ -578,43 +578,43 @@ cerebrod_speaker(void *arg)
                   else
                     t = conf.heartbeat_frequency_min;
 
-		  if (conf.gettimeofday_workaround)
-		    {
-		      /* On a number of Intel systems, it has been
-		       * observed that gettimeofday can occasionally
-		       * return erroneous values.  For example, values 40
-		       * years into the future.  Then it goes back to
-		       * returning valid values.
-		       *
-		       * Even the present workaround in Gettimeofday() was
-		       * not found to be sufficient, so this additional
-		       * workaround has been put in place.
-		       *
-		       * The following code should work around this
-		       * situation.
-		       */
-		      if (conf.heartbeat_frequency_ranged
-			  && nst->next_send_time
-			  && (((now + t) - nst->next_send_time) > (2 * conf.heartbeat_frequency_max)))
-			{
-			  if (((now + t) - nst->next_send_time) < (10 * conf.heartbeat_frequency_max))
-			    {
-			      /* If the tv_sec is only moderately off, assume it's due to drift and it's ok */
-			      nst->next_send_time = now + t;
-			    }
-			  else
-			    {
-			      CEREBROD_ERR (("Forcing maximum heartbeat frequency due to out of range time. "
+                  if (conf.gettimeofday_workaround)
+                    {
+                      /* On a number of Intel systems, it has been
+                       * observed that gettimeofday can occasionally
+                       * return erroneous values.  For example, values 40
+                       * years into the future.  Then it goes back to
+                       * returning valid values.
+                       *
+                       * Even the present workaround in Gettimeofday() was
+                       * not found to be sufficient, so this additional
+                       * workaround has been put in place.
+                       *
+                       * The following code should work around this
+                       * situation.
+                       */
+                      if (conf.heartbeat_frequency_ranged
+                          && nst->next_send_time
+                          && (((now + t) - nst->next_send_time) > (2 * conf.heartbeat_frequency_max)))
+                        {
+                          if (((now + t) - nst->next_send_time) < (10 * conf.heartbeat_frequency_max))
+                            {
+                              /* If the tv_sec is only moderately off, assume it's due to drift and it's ok */
+                              nst->next_send_time = now + t;
+                            }
+                          else
+                            {
+                              CEREBROD_ERR (("Forcing maximum heartbeat frequency due to out of range time. "
                                              "tv_sec:%lu, t:%d, next_send_time:%u",
                                              now, t, (unsigned)nst->next_send_time));
-			      nst->next_send_time = now + conf.heartbeat_frequency_max;
-			    }
-			}
-		      else
-			nst->next_send_time = now + t;
-		    }
-		  else
-		    nst->next_send_time = now + t;
+                              nst->next_send_time = now + conf.heartbeat_frequency_max;
+                            }
+                        }
+                      else
+                        nst->next_send_time = now + t;
+                    }
+                  else
+                    nst->next_send_time = now + t;
                 }
               if (nst->next_send_type & CEREBROD_SPEAKER_NEXT_SEND_TYPE_MODULE)
                 nst->next_send_time = now + nst->metric_period;
@@ -628,21 +628,21 @@ cerebrod_speaker(void *arg)
 
       nst = List_peek(next_send_times);
       if (conf.gettimeofday_workaround)
-	{
-	  if ((nst->next_send_type & CEREBROD_SPEAKER_NEXT_SEND_TYPE_HEARTBEAT)
-	      && (((nst->next_send_time - now) < 0)
-		  || (conf.heartbeat_frequency_ranged
-		      && ((nst->next_send_time - now) > conf.heartbeat_frequency_max))))
-	    sleep_time = conf.heartbeat_frequency_max;
-	  else
-	    sleep_time = nst->next_send_time - now;
-	}
+        {
+          if ((nst->next_send_type & CEREBROD_SPEAKER_NEXT_SEND_TYPE_HEARTBEAT)
+              && (((nst->next_send_time - now) < 0)
+                  || (conf.heartbeat_frequency_ranged
+                      && ((nst->next_send_time - now) > conf.heartbeat_frequency_max))))
+            sleep_time = conf.heartbeat_frequency_max;
+          else
+            sleep_time = nst->next_send_time - now;
+        }
       else
-	sleep_time = nst->next_send_time - now;
+        sleep_time = nst->next_send_time - now;
       sleep(sleep_time);
     }
 
-  return NULL;			/* NOT REACHED */
+  return NULL;                  /* NOT REACHED */
 }
 
 int
@@ -660,11 +660,11 @@ cerebrod_send_message(struct cerebrod_message *msg)
   for (i = 0; i < msg->metrics_len; i++)
     {
       if (!msg->metrics[i])
-	{
-	  CEREBROD_DBG(("null metrics pointer"));
-	  errno = EINVAL;
-	  goto cleanup;
-	}
+        {
+          CEREBROD_DBG(("null metrics pointer"));
+          errno = EINVAL;
+          goto cleanup;
+        }
       msglen += CEREBROD_MESSAGE_METRIC_HEADER_LEN;
       msglen += msg->metrics[i]->metric_value_len;
     }

@@ -381,7 +381,7 @@ cerebrod_event_queue_monitor(void *arg)
 
   List_destroy(temp_event_queue);
 
-  return NULL;			/* NOT REACHED */
+  return NULL;                  /* NOT REACHED */
 }
 
 /*
@@ -1222,7 +1222,7 @@ cerebrod_event_server(void *arg)
       Free(pfds);
     }
 
-  return NULL;			/* NOT REACHED */
+  return NULL;                  /* NOT REACHED */
 }
 
 #endif /* !WITH_CEREBROD_SPEAKER_ONLY */

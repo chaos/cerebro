@@ -260,5 +260,5 @@ main(int argc, char **argv)
   for (;;)
     sleep(INT_MAX);
 
-  return 0;			/* NOT REACHED */
+  return 0;                     /* NOT REACHED */
 }

@@ -120,8 +120,8 @@ _load_config_module(struct cerebro_config *conf, unsigned int *errnum)
  */
 static int
 _cb_cerebrod_heartbeat_freq(conffile_t cf, struct conffile_data *data,
-			    char *optionname, int option_type, void *option_ptr,
-			    int option_data, void *app_ptr, int app_data)
+                            char *optionname, int option_type, void *option_ptr,
+                            int option_data, void *app_ptr, int app_data)
 {
   struct cerebro_config *conf;
 
@@ -642,8 +642,8 @@ _cb_cerebrod_forward_host_accept(conffile_t cf, struct conffile_data *data,
  */
 static int
 _cb_cerebrod_module_exclude(conffile_t cf, struct conffile_data *data,
-			    char *optionname, int option_type, void *option_ptr,
-			    int option_data, void *app_ptr, int app_data)
+                            char *optionname, int option_type, void *option_ptr,
+                            int option_data, void *app_ptr, int app_data)
 {
   struct cerebro_config *conf;
 
@@ -667,43 +667,43 @@ _cb_cerebrod_module_exclude(conffile_t cf, struct conffile_data *data,
               return -1;
             }
 
-	  /* achu: passing char[][] as pointer is badness, play it safe */
-	  if (!strcasecmp(optionname,  "cerebrod_metric_module_exclude"))
-	    {
-	      if (conf->cerebrod_metric_module_exclude_len >= CEREBRO_CONFIG_METRIC_MODULE_EXCLUDE_MAX)
-		{
-		  conffile_seterrnum(cf, CONFFILE_ERR_PARSE_ARG_TOOMANY);
-		  return -1;
-		}
+          /* achu: passing char[][] as pointer is badness, play it safe */
+          if (!strcasecmp(optionname,  "cerebrod_metric_module_exclude"))
+            {
+              if (conf->cerebrod_metric_module_exclude_len >= CEREBRO_CONFIG_METRIC_MODULE_EXCLUDE_MAX)
+                {
+                  conffile_seterrnum(cf, CONFFILE_ERR_PARSE_ARG_TOOMANY);
+                  return -1;
+                }
 
-	      strcpy(conf->cerebrod_metric_module_exclude[conf->cerebrod_metric_module_exclude_len],
-		     data->stringlist[i]);
-	      conf->cerebrod_metric_module_exclude_len++;
-	    }
-	  else if (!strcasecmp(optionname,  "cerebrod_monitor_module_exclude"))
-	    {
-	      if (conf->cerebrod_monitor_module_exclude_len >= CEREBRO_CONFIG_MONITOR_MODULE_EXCLUDE_MAX)
-		{
-		  conffile_seterrnum(cf, CONFFILE_ERR_PARSE_ARG_TOOMANY);
-		  return -1;
-		}
+              strcpy(conf->cerebrod_metric_module_exclude[conf->cerebrod_metric_module_exclude_len],
+                     data->stringlist[i]);
+              conf->cerebrod_metric_module_exclude_len++;
+            }
+          else if (!strcasecmp(optionname,  "cerebrod_monitor_module_exclude"))
+            {
+              if (conf->cerebrod_monitor_module_exclude_len >= CEREBRO_CONFIG_MONITOR_MODULE_EXCLUDE_MAX)
+                {
+                  conffile_seterrnum(cf, CONFFILE_ERR_PARSE_ARG_TOOMANY);
+                  return -1;
+                }
 
-	      strcpy(conf->cerebrod_monitor_module_exclude[conf->cerebrod_monitor_module_exclude_len],
-		     data->stringlist[i]);
-	      conf->cerebrod_monitor_module_exclude_len++;
-	    }
-	  else if (!strcasecmp(optionname,  "cerebrod_event_module_exclude"))
-	    {
-	      if (conf->cerebrod_event_module_exclude_len >= CEREBRO_CONFIG_EVENT_MODULE_EXCLUDE_MAX)
-		{
-		  conffile_seterrnum(cf, CONFFILE_ERR_PARSE_ARG_TOOMANY);
-		  return -1;
-		}
+              strcpy(conf->cerebrod_monitor_module_exclude[conf->cerebrod_monitor_module_exclude_len],
+                     data->stringlist[i]);
+              conf->cerebrod_monitor_module_exclude_len++;
+            }
+          else if (!strcasecmp(optionname,  "cerebrod_event_module_exclude"))
+            {
+              if (conf->cerebrod_event_module_exclude_len >= CEREBRO_CONFIG_EVENT_MODULE_EXCLUDE_MAX)
+                {
+                  conffile_seterrnum(cf, CONFFILE_ERR_PARSE_ARG_TOOMANY);
+                  return -1;
+                }
 
-	      strcpy(conf->cerebrod_event_module_exclude[conf->cerebrod_event_module_exclude_len],
-		     data->stringlist[i]);
-	      conf->cerebrod_event_module_exclude_len++;
-	    }
+              strcpy(conf->cerebrod_event_module_exclude[conf->cerebrod_event_module_exclude_len],
+                     data->stringlist[i]);
+              conf->cerebrod_event_module_exclude_len++;
+            }
         }
     }
   return 0;
@@ -788,305 +788,305 @@ _load_config_file(struct cerebro_config *conf, unsigned int *errnum)
         0
       },
       {
-	"cerebro_timeout_len",
-	CONFFILE_OPTION_INT,
-	-1,
-	conffile_int,
-	1,
-	0,
-	&(conf->cerebro_timeout_len_flag),
-	&(conf->cerebro_timeout_len),
-	0
+        "cerebro_timeout_len",
+        CONFFILE_OPTION_INT,
+        -1,
+        conffile_int,
+        1,
+        0,
+        &(conf->cerebro_timeout_len_flag),
+        &(conf->cerebro_timeout_len),
+        0
       },
       {
-	"cerebro_flags",
-	CONFFILE_OPTION_INT,
-	-1,
-	conffile_int,
-	1,
-	0,
-	&(conf->cerebro_flags_flag),
-	&(conf->cerebro_flags),
-	0
+        "cerebro_flags",
+        CONFFILE_OPTION_INT,
+        -1,
+        conffile_int,
+        1,
+        0,
+        &(conf->cerebro_flags_flag),
+        &(conf->cerebro_flags),
+        0
       },
       /*
        * Cerebrod configuration
        */
       {
-	"cerebrod_heartbeat_frequency",
-	CONFFILE_OPTION_LIST_INT,
-	-1,
-	_cb_cerebrod_heartbeat_freq,
-	1,
-	0,
-	&(conf->cerebrod_heartbeat_frequency_flag),
-	conf,
-	0
+        "cerebrod_heartbeat_frequency",
+        CONFFILE_OPTION_LIST_INT,
+        -1,
+        _cb_cerebrod_heartbeat_freq,
+        1,
+        0,
+        &(conf->cerebrod_heartbeat_frequency_flag),
+        conf,
+        0
       },
       {
-	"cerebrod_speak",
-	CONFFILE_OPTION_BOOL,
-	-1,
-	conffile_bool,
-	1,
-	0,
-	&(conf->cerebrod_speak_flag),
-	&conf->cerebrod_speak,
-	0
+        "cerebrod_speak",
+        CONFFILE_OPTION_BOOL,
+        -1,
+        conffile_bool,
+        1,
+        0,
+        &(conf->cerebrod_speak_flag),
+        &conf->cerebrod_speak,
+        0
       },
       {
-	"cerebrod_speak_message_config",
-	CONFFILE_OPTION_LIST_STRING,
-	-1,
-	_cb_cerebrod_speak_message_config,
-	CEREBRO_CONFIG_SPEAK_MESSAGE_CONFIG_MAX,
-	0,
-	&(conf->cerebrod_speak_message_config_flag),
-	conf,
-	0
+        "cerebrod_speak_message_config",
+        CONFFILE_OPTION_LIST_STRING,
+        -1,
+        _cb_cerebrod_speak_message_config,
+        CEREBRO_CONFIG_SPEAK_MESSAGE_CONFIG_MAX,
+        0,
+        &(conf->cerebrod_speak_message_config_flag),
+        conf,
+        0
       },
       {
-	"cerebrod_speak_message_ttl",
-	CONFFILE_OPTION_INT,
-	-1,
-	conffile_int,
-	1,
-	0,
-	&(conf->cerebrod_speak_message_ttl_flag),
-	&(conf->cerebrod_speak_message_ttl),
-	0
+        "cerebrod_speak_message_ttl",
+        CONFFILE_OPTION_INT,
+        -1,
+        conffile_int,
+        1,
+        0,
+        &(conf->cerebrod_speak_message_ttl_flag),
+        &(conf->cerebrod_speak_message_ttl),
+        0
       },
       {
-	"cerebrod_listen",
-	CONFFILE_OPTION_BOOL,
-	-1,
-	conffile_bool,
-	1,
-	0,
-	&(conf->cerebrod_listen_flag),
-	&conf->cerebrod_listen,
-	0
+        "cerebrod_listen",
+        CONFFILE_OPTION_BOOL,
+        -1,
+        conffile_bool,
+        1,
+        0,
+        &(conf->cerebrod_listen_flag),
+        &conf->cerebrod_listen,
+        0
       },
       {
-	"cerebrod_listen_threads",
-	CONFFILE_OPTION_INT,
-	-1,
-	conffile_int,
-	1,
-	0,
-	&(conf->cerebrod_listen_threads_flag),
-	&(conf->cerebrod_listen_threads),
-	0
+        "cerebrod_listen_threads",
+        CONFFILE_OPTION_INT,
+        -1,
+        conffile_int,
+        1,
+        0,
+        &(conf->cerebrod_listen_threads_flag),
+        &(conf->cerebrod_listen_threads),
+        0
       },
       {
-	"cerebrod_listen_message_config",
-	CONFFILE_OPTION_LIST_STRING,
-	-1,
-	_cb_cerebrod_listen_message_config,
-	CEREBRO_CONFIG_LISTEN_MESSAGE_CONFIG_MAX,
-	0,
-	&(conf->cerebrod_listen_message_config_flag),
-	conf,
-	0
+        "cerebrod_listen_message_config",
+        CONFFILE_OPTION_LIST_STRING,
+        -1,
+        _cb_cerebrod_listen_message_config,
+        CEREBRO_CONFIG_LISTEN_MESSAGE_CONFIG_MAX,
+        0,
+        &(conf->cerebrod_listen_message_config_flag),
+        conf,
+        0
       },
       {
-	"cerebrod_metric_controller",
-	CONFFILE_OPTION_BOOL,
-	-1,
-	conffile_bool,
-	1,
-	0,
-	&(conf->cerebrod_metric_controller_flag),
-	&conf->cerebrod_metric_controller,
-	0
+        "cerebrod_metric_controller",
+        CONFFILE_OPTION_BOOL,
+        -1,
+        conffile_bool,
+        1,
+        0,
+        &(conf->cerebrod_metric_controller_flag),
+        &conf->cerebrod_metric_controller,
+        0
       },
       {
-	"cerebrod_metric_server",
-	CONFFILE_OPTION_BOOL,
-	-1,
-	conffile_bool,
-	1,
-	0,
-	&(conf->cerebrod_metric_server_flag),
-	&conf->cerebrod_metric_server,
-	0
+        "cerebrod_metric_server",
+        CONFFILE_OPTION_BOOL,
+        -1,
+        conffile_bool,
+        1,
+        0,
+        &(conf->cerebrod_metric_server_flag),
+        &conf->cerebrod_metric_server,
+        0
       },
       {
-	"cerebrod_metric_server_port",
-	CONFFILE_OPTION_INT,
-	-1,
-	conffile_int,
-	1,
-	0,
-	&(conf->cerebrod_metric_server_port_flag),
-	&(conf->cerebrod_metric_server_port),
-	0
+        "cerebrod_metric_server_port",
+        CONFFILE_OPTION_INT,
+        -1,
+        conffile_int,
+        1,
+        0,
+        &(conf->cerebrod_metric_server_port_flag),
+        &(conf->cerebrod_metric_server_port),
+        0
       },
       {
-	"cerebrod_event_server",
-	CONFFILE_OPTION_BOOL,
-	-1,
-	conffile_bool,
-	1,
-	0,
-	&(conf->cerebrod_event_server_flag),
-	&conf->cerebrod_event_server,
-	0
+        "cerebrod_event_server",
+        CONFFILE_OPTION_BOOL,
+        -1,
+        conffile_bool,
+        1,
+        0,
+        &(conf->cerebrod_event_server_flag),
+        &conf->cerebrod_event_server,
+        0
       },
       {
-	"cerebrod_event_server_port",
-	CONFFILE_OPTION_INT,
-	-1,
-	conffile_int,
-	1,
-	0,
-	&(conf->cerebrod_event_server_port_flag),
-	&(conf->cerebrod_event_server_port),
-	0
+        "cerebrod_event_server_port",
+        CONFFILE_OPTION_INT,
+        -1,
+        conffile_int,
+        1,
+        0,
+        &(conf->cerebrod_event_server_port_flag),
+        &(conf->cerebrod_event_server_port),
+        0
       },
       {
-	"cerebrod_forward_message_config",
-	CONFFILE_OPTION_LIST_STRING,
-	-1,
-	_cb_cerebrod_forward_message_config,
-	CEREBRO_CONFIG_FORWARD_MESSAGE_CONFIG_MAX,
-	0,
-	&(conf->cerebrod_forward_message_config_flag),
-	conf,
-	0
+        "cerebrod_forward_message_config",
+        CONFFILE_OPTION_LIST_STRING,
+        -1,
+        _cb_cerebrod_forward_message_config,
+        CEREBRO_CONFIG_FORWARD_MESSAGE_CONFIG_MAX,
+        0,
+        &(conf->cerebrod_forward_message_config_flag),
+        conf,
+        0
       },
       {
-	"cerebrod_forward_message_ttl",
-	CONFFILE_OPTION_INT,
-	-1,
-	conffile_int,
-	1,
-	0,
-	&(conf->cerebrod_forward_message_ttl_flag),
-	&(conf->cerebrod_forward_message_ttl),
-	0
+        "cerebrod_forward_message_ttl",
+        CONFFILE_OPTION_INT,
+        -1,
+        conffile_int,
+        1,
+        0,
+        &(conf->cerebrod_forward_message_ttl_flag),
+        &(conf->cerebrod_forward_message_ttl),
+        0
       },
       {
-	"cerebrod_forward_host_accept",
-	CONFFILE_OPTION_LIST_STRING,
-	-1,
-	_cb_cerebrod_forward_host_accept,
-	CEREBRO_CONFIG_FORWARD_HOST_ACCEPT_MAX,
-	0,
-	&(conf->cerebrod_forward_host_accept_flag),
-	conf,
-	0
+        "cerebrod_forward_host_accept",
+        CONFFILE_OPTION_LIST_STRING,
+        -1,
+        _cb_cerebrod_forward_host_accept,
+        CEREBRO_CONFIG_FORWARD_HOST_ACCEPT_MAX,
+        0,
+        &(conf->cerebrod_forward_host_accept_flag),
+        conf,
+        0
       },
       {
-	"cerebrod_metric_module_exclude",
-	CONFFILE_OPTION_LIST_STRING,
-	-1,
-	_cb_cerebrod_module_exclude,
-	CEREBRO_CONFIG_METRIC_MODULE_EXCLUDE_MAX,
-	0,
-	&(conf->cerebrod_metric_module_exclude_flag),
-	conf,
-	0
+        "cerebrod_metric_module_exclude",
+        CONFFILE_OPTION_LIST_STRING,
+        -1,
+        _cb_cerebrod_module_exclude,
+        CEREBRO_CONFIG_METRIC_MODULE_EXCLUDE_MAX,
+        0,
+        &(conf->cerebrod_metric_module_exclude_flag),
+        conf,
+        0
       },
       {
-	"cerebrod_monitor_module_exclude",
-	CONFFILE_OPTION_LIST_STRING,
-	-1,
-	_cb_cerebrod_module_exclude,
-	CEREBRO_CONFIG_MONITOR_MODULE_EXCLUDE_MAX,
-	0,
-	&(conf->cerebrod_monitor_module_exclude_flag),
-	conf,
-	0
+        "cerebrod_monitor_module_exclude",
+        CONFFILE_OPTION_LIST_STRING,
+        -1,
+        _cb_cerebrod_module_exclude,
+        CEREBRO_CONFIG_MONITOR_MODULE_EXCLUDE_MAX,
+        0,
+        &(conf->cerebrod_monitor_module_exclude_flag),
+        conf,
+        0
       },
       {
-	"cerebrod_event_module_exclude",
-	CONFFILE_OPTION_LIST_STRING,
-	-1,
-	_cb_cerebrod_module_exclude,
-	CEREBRO_CONFIG_EVENT_MODULE_EXCLUDE_MAX,
-	0,
-	&(conf->cerebrod_event_module_exclude_flag),
-	conf,
-	0
+        "cerebrod_event_module_exclude",
+        CONFFILE_OPTION_LIST_STRING,
+        -1,
+        _cb_cerebrod_module_exclude,
+        CEREBRO_CONFIG_EVENT_MODULE_EXCLUDE_MAX,
+        0,
+        &(conf->cerebrod_event_module_exclude_flag),
+        conf,
+        0
       },
       {
-	"cerebrod_speak_debug",
-	CONFFILE_OPTION_BOOL,
-	-1,
-	conffile_bool,
-	1,
-	0,
-	&(conf->cerebrod_speak_debug_flag),
-	&conf->cerebrod_speak_debug,
-	0
+        "cerebrod_speak_debug",
+        CONFFILE_OPTION_BOOL,
+        -1,
+        conffile_bool,
+        1,
+        0,
+        &(conf->cerebrod_speak_debug_flag),
+        &conf->cerebrod_speak_debug,
+        0
       },
       {
-	"cerebrod_listen_debug",
-	CONFFILE_OPTION_BOOL,
-	-1,
-	conffile_bool,
-	1,
-	0,
-	&(conf->cerebrod_listen_debug_flag),
-	&conf->cerebrod_listen_debug,
-	0
+        "cerebrod_listen_debug",
+        CONFFILE_OPTION_BOOL,
+        -1,
+        conffile_bool,
+        1,
+        0,
+        &(conf->cerebrod_listen_debug_flag),
+        &conf->cerebrod_listen_debug,
+        0
       },
       {
-	"cerebrod_metric_controller_debug",
-	CONFFILE_OPTION_BOOL,
-	-1,
-	conffile_bool,
-	1,
-	0,
-	&(conf->cerebrod_metric_controller_debug_flag),
-	&conf->cerebrod_metric_controller_debug,
-	0
+        "cerebrod_metric_controller_debug",
+        CONFFILE_OPTION_BOOL,
+        -1,
+        conffile_bool,
+        1,
+        0,
+        &(conf->cerebrod_metric_controller_debug_flag),
+        &conf->cerebrod_metric_controller_debug,
+        0
       },
       {
-	"cerebrod_metric_server_debug",
-	CONFFILE_OPTION_BOOL,
-	-1,
-	conffile_bool,
-	1,
-	0,
-	&(conf->cerebrod_metric_server_debug_flag),
-	&conf->cerebrod_metric_server_debug,
-	0
+        "cerebrod_metric_server_debug",
+        CONFFILE_OPTION_BOOL,
+        -1,
+        conffile_bool,
+        1,
+        0,
+        &(conf->cerebrod_metric_server_debug_flag),
+        &conf->cerebrod_metric_server_debug,
+        0
       },
       {
-	"cerebrod_event_server_debug",
-	CONFFILE_OPTION_BOOL,
-	-1,
-	conffile_bool,
-	1,
-	0,
-	&(conf->cerebrod_event_server_debug_flag),
-	&conf->cerebrod_event_server_debug,
-	0
+        "cerebrod_event_server_debug",
+        CONFFILE_OPTION_BOOL,
+        -1,
+        conffile_bool,
+        1,
+        0,
+        &(conf->cerebrod_event_server_debug_flag),
+        &conf->cerebrod_event_server_debug,
+        0
       },
       {
-	"cerebrod_gettimeofday_workaround",
-	CONFFILE_OPTION_BOOL,
-	-1,
-	conffile_bool,
-	1,
-	0,
-	&(conf->cerebrod_gettimeofday_workaround_flag),
-	&conf->cerebrod_gettimeofday_workaround,
-	0
+        "cerebrod_gettimeofday_workaround",
+        CONFFILE_OPTION_BOOL,
+        -1,
+        conffile_bool,
+        1,
+        0,
+        &(conf->cerebrod_gettimeofday_workaround_flag),
+        &conf->cerebrod_gettimeofday_workaround,
+        0
       },
 #if CEREBRO_DEBUG
       {
-	"cerebrod_alternate_hostname",
-	CONFFILE_OPTION_STRING,
-	-1,
-	_cb_cerebrod_alternate_hostname,
-	1,
-	0,
-	&(conf->cerebrod_alternate_hostname_flag),
+        "cerebrod_alternate_hostname",
+        CONFFILE_OPTION_STRING,
+        -1,
+        _cb_cerebrod_alternate_hostname,
+        1,
+        0,
+        &(conf->cerebrod_alternate_hostname_flag),
         conf,
-	0
+        0
       },
 #endif /* CEREBRO_DEBUG */
     };
@@ -1114,13 +1114,13 @@ _load_config_file(struct cerebro_config *conf, unsigned int *errnum)
 
       /* Its not an error if the default configuration file doesn't exist */
       if (!strcmp(config_file, CEREBRO_CONFIG_FILE_DEFAULT)
-	  && conffile_errnum(cf) == CONFFILE_ERR_EXIST)
-	goto out;
+          && conffile_errnum(cf) == CONFFILE_ERR_EXIST)
+        goto out;
 
       if (conffile_errmsg(cf, buf, CONFFILE_MAX_ERRMSGLEN) < 0)
-	CEREBRO_DBG(("conffile_parse: %d", conffile_errnum(cf)));
+        CEREBRO_DBG(("conffile_parse: %d", conffile_errnum(cf)));
       else
-	CEREBRO_DBG(("conffile_parse: %s", buf));
+        CEREBRO_DBG(("conffile_parse: %s", buf));
 
       if (errnum)
         *errnum = CEREBRO_ERR_CONFIG_FILE;

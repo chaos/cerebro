@@ -338,7 +338,7 @@ cerebro_namelist_t cerebro_get_metric_names(cerebro_t handle);
  * Returns nodelist on success, -1 on error
  */
 cerebro_nodelist_t cerebro_get_metric_data(cerebro_t handle,
-					   const char *metric_name);
+                                           const char *metric_name);
 
 /*
  * Metric Monitoring API
@@ -370,7 +370,7 @@ int cerebro_unregister_metric(cerebro_t handle, const char *metric_name);
  * Returns 0 on success, -1 on error
  */
 int cerebro_update_metric_value(cerebro_t handle,
-				const char *metric_name,
+                                const char *metric_name,
                                 unsigned int metric_value_type,
                                 unsigned int metric_value_len,
                                 void *metric_value);

@@ -92,7 +92,7 @@ int config_module_cleanup(config_module_t handle);
  * call config module get all nodes function
  */
 int config_module_load_config(config_module_t handle,
-			      struct cerebro_config *conf);
+                              struct cerebro_config *conf);
 
 
 #endif /* _CONFIG_MODULE_H */

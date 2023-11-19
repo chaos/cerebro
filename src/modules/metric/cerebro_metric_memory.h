@@ -29,8 +29,8 @@
 #define _CEREBRO_METRIC_MEMORY
 
 int cerebro_metric_get_memory(u_int32_t *memtotal,
-			      u_int32_t *memfree,
-			      u_int32_t *swaptotal,
-			      u_int32_t *swapfree);
+                              u_int32_t *memfree,
+                              u_int32_t *swaptotal,
+                              u_int32_t *swapfree);
 
 #endif /* _CEREBRO_METRIC_MEMORY */

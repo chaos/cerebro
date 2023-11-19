@@ -29,8 +29,8 @@
 #define _CEREBRO_METRIC_LOADAVG
 
 int cerebro_metric_get_loadavgs(float *loadavg1,
-				float *loadavg5,
-				float *loadavg15);
+                                float *loadavg5,
+                                float *loadavg15);
 
 #endif /* _CEREBRO_METRIC_LOADAVG */
 

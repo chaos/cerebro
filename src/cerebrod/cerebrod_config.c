@@ -154,7 +154,7 @@ _usage(void)
           "-v    --version       Output Version\n"
           "-c    --config_file   Specify alternate config file\n"
           "-d    --debug         Turn on debugging and run daemon\n"
-	  "                      in foreground\n");
+          "                      in foreground\n");
   exit(0);
 }
 
@@ -500,23 +500,23 @@ _cerebrod_config_error_check_network_interface(char *network_interface)
   if (network_interface && strchr(network_interface, '.'))
     {
       if (strchr(network_interface, '/'))
-	{
-	  char *ipaddr_cpy = Strdup(network_interface);
-	  char *tok;
+        {
+          char *ipaddr_cpy = Strdup(network_interface);
+          char *tok;
 
-	  tok = strtok(ipaddr_cpy, "/");
-	  if (!Inet_pton(AF_INET, tok, &addr_temp))
-	    cerebro_err_exit("network interface IP address '%s' invalid",
+          tok = strtok(ipaddr_cpy, "/");
+          if (!Inet_pton(AF_INET, tok, &addr_temp))
+            cerebro_err_exit("network interface IP address '%s' invalid",
                              network_interface);
 
-	  Free(ipaddr_cpy);
-	}
+          Free(ipaddr_cpy);
+        }
       else
-	{
-	  if (!Inet_pton(AF_INET, network_interface, &addr_temp))
-	    cerebro_err_exit("network interface IP address '%s' invalid",
+        {
+          if (!Inet_pton(AF_INET, network_interface, &addr_temp))
+            cerebro_err_exit("network interface IP address '%s' invalid",
                              network_interface);
-	}
+        }
     }
 }
 
@@ -1032,26 +1032,26 @@ _cerebrod_configuration_data_error_check(void)
 
       /* Check all interfaces */
       for(ptr = buf; ptr < buf + ifc.ifc_len;)
-	{
-	  struct sockaddr_in *sinptr;
-	  int len;
+        {
+          struct sockaddr_in *sinptr;
+          int len;
 
-	  ifr = (struct ifreq *)ptr;
+          ifr = (struct ifreq *)ptr;
 
-	  len = _get_ifr_len(ifr);
+          len = _get_ifr_len(ifr);
 
-	  ptr += sizeof(ifr->ifr_name) + len;
+          ptr += sizeof(ifr->ifr_name) + len;
 
-	  sinptr = (struct sockaddr_in *)&ifr->ifr_addr;
+          sinptr = (struct sockaddr_in *)&ifr->ifr_addr;
 
           if (!memcmp((void *)&addr_temp,
                       (void *)&sinptr->sin_addr,
                       sizeof(struct in_addr)))
             {
-	      found_interface++;
-	      break;
+              found_interface++;
+              break;
             }
-	}
+        }
 
       Free(buf);
       Close(fd);
@@ -1082,7 +1082,7 @@ _cerebrod_configuration_data_error_check(void)
         }
 
       if (conf.metric_server_port == conf.event_server_port)
-	cerebro_err_exit("metric server port '%d' cannot be identical "
+        cerebro_err_exit("metric server port '%d' cannot be identical "
                          "to event server port", conf.metric_server_port);
     }
 

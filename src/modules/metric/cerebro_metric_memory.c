@@ -82,9 +82,9 @@ static unsigned long int last_read = 0;
  */
 static int
 _read_memory(int fd,
-	     char *buf,
-	     char *keyword,
-	     u_int32_t *memvalptr)
+             char *buf,
+             char *keyword,
+             u_int32_t *memvalptr)
 {
   char *parseptr;
   unsigned long int memval;
@@ -137,9 +137,9 @@ _read_memory(int fd,
  */
 int
 cerebro_metric_get_memory(u_int32_t *memtotal,
-			  u_int32_t *memfree,
-			  u_int32_t *swaptotal,
-			  u_int32_t *swapfree)
+                          u_int32_t *memfree,
+                          u_int32_t *swaptotal,
+                          u_int32_t *swapfree)
 {
   int len, fd = -1;
   char buf[MEMORY_BUFLEN];
@@ -155,29 +155,29 @@ cerebro_metric_get_memory(u_int32_t *memtotal,
   if ((now.tv_sec - last_read) > MEMORY_CACHETIMEOUT)
     {
       if ((fd = open(MEMORY_FILE, O_RDONLY, 0)) < 0)
-	{
-	  CEREBRO_ERR(("open: %s", strerror(errno)));
-	  goto cleanup;
-	}
+        {
+          CEREBRO_ERR(("open: %s", strerror(errno)));
+          goto cleanup;
+        }
 
       memset(buf, '\0', MEMORY_BUFLEN);
       if ((len = read(fd, buf, MEMORY_BUFLEN)) < 0)
-	{
-	  CEREBRO_ERR(("read: %s", strerror(errno)));
-	  goto cleanup;
-	}
+        {
+          CEREBRO_ERR(("read: %s", strerror(errno)));
+          goto cleanup;
+        }
 
       if (_read_memory(fd, buf, MEMTOTAL_KEYWORD, &cache_memtotal) < 0)
-	goto cleanup;
+        goto cleanup;
 
       if (_read_memory(fd, buf, MEMFREE_KEYWORD, &cache_memfree) < 0)
-	goto cleanup;
+        goto cleanup;
 
       if (_read_memory(fd, buf, SWAPTOTAL_KEYWORD, &cache_swaptotal) < 0)
-	goto cleanup;
+        goto cleanup;
 
       if (_read_memory(fd, buf, SWAPFREE_KEYWORD, &cache_swapfree) < 0)
-	goto cleanup;
+        goto cleanup;
 
       last_read = now.tv_sec;
     }

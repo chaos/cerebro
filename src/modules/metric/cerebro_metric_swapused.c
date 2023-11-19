@@ -78,9 +78,9 @@ swapused_metric_get_metric_value(unsigned int *metric_value_type,
     }
 
   if (cerebro_metric_get_memory(NULL,
-				NULL,
-				&swaptotalval,
-				&swapfreeval) < 0)
+                                NULL,
+                                &swaptotalval,
+                                &swapfreeval) < 0)
     goto cleanup;
 
   if (!(swapusedptr = (u_int32_t *)malloc(sizeof(u_int32_t))))

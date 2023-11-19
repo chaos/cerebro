@@ -112,8 +112,8 @@ int clusterlist_module_node_in_cluster(clusterlist_module_t handle,
  * call clusterlist module get nodename function
  */
 int clusterlist_module_get_nodename(clusterlist_module_t handle,
-				    const char *node,
-				    char *buf,
-				    unsigned int buflen);
+                                    const char *node,
+                                    char *buf,
+                                    unsigned int buflen);
 
 #endif /* _CLUSTERLIST_MODULE_H */

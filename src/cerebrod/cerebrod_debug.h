@@ -43,7 +43,7 @@
 #define CEREBROD_DBG(msg) \
     do { \
       if (conf.debug) \
-	cerebro_err_debug msg; \
+        cerebro_err_debug msg; \
     } while(0)
 
 #endif /* !CEREBRO_DEBUG */

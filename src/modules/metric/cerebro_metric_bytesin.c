@@ -64,8 +64,8 @@ bytesin_metric_get_metric_name(void)
  */
 static int
 bytesin_metric_get_metric_value(unsigned int *metric_value_type,
-				unsigned int *metric_value_len,
-				void **metric_value)
+                                unsigned int *metric_value_len,
+                                void **metric_value)
 {
   u_int64_t bytesinval;
   u_int64_t *bytesinptr = NULL;
