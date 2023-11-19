@@ -64,8 +64,8 @@ packetsout_metric_get_metric_name(void)
  */
 static int
 packetsout_metric_get_metric_value(unsigned int *metric_value_type,
-				   unsigned int *metric_value_len,
-				   void **metric_value)
+                                   unsigned int *metric_value_len,
+                                   void **metric_value)
 {
   u_int32_t packetsoutval;
   u_int32_t *packetsoutptr = NULL;

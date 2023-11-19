@@ -83,10 +83,10 @@ _hash_removeall(void *data, const void *key, void *arg)
 
 void
 cerebrod_rehash(hash_t *old_hash,
-		int *hash_size,
-		int hash_size_increment,
-		int hash_num,
-		pthread_mutex_t *hash_mutex)
+                int *hash_size,
+                int hash_size_increment,
+                int hash_num,
+                pthread_mutex_t *hash_mutex)
 {
   hash_t new_hash;
 
@@ -105,9 +105,9 @@ cerebrod_rehash(hash_t *old_hash,
   *hash_size += hash_size_increment;
 
   new_hash = Hash_create(*hash_size,
-			 (hash_key_f)hash_key_string,
-			 (hash_cmp_f)strcmp,
-			 (hash_del_f)_Free);
+                         (hash_key_f)hash_key_string,
+                         (hash_cmp_f)strcmp,
+                         (hash_del_f)_Free);
 
   if (Hash_for_each(*old_hash, _hash_reinsert, &new_hash) != hash_num)
     CEREBROD_EXIT(("invalid reinsert: hash_num=%d", hash_num));

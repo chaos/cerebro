@@ -77,8 +77,8 @@ static unsigned long int last_read = 0;
  */
 int
 cerebro_metric_get_loadavgs(float *loadavg1,
-			    float *loadavg5,
-			    float *loadavg15)
+                            float *loadavg5,
+                            float *loadavg15)
 {
   int len, fd = -1;
   char buf[LOADAVG_BUFLEN];
@@ -94,27 +94,27 @@ cerebro_metric_get_loadavgs(float *loadavg1,
   if ((now.tv_sec - last_read) > LOADVAG_CACHETIMEOUT)
     {
       if ((fd = open(LOADAVG_FILE, O_RDONLY, 0)) < 0)
-	{
-	  CEREBRO_ERR(("open: %s", strerror(errno)));
-	  goto cleanup;
-	}
+        {
+          CEREBRO_ERR(("open: %s", strerror(errno)));
+          goto cleanup;
+        }
 
       memset(buf, '\0', LOADAVG_BUFLEN);
       if ((len = read(fd, buf, LOADAVG_BUFLEN)) < 0)
-	{
-	  CEREBRO_ERR(("read: %s", strerror(errno)));
-	  goto cleanup;
-	}
+        {
+          CEREBRO_ERR(("read: %s", strerror(errno)));
+          goto cleanup;
+        }
 
       if (sscanf(buf,
-		 "%f %f %f",
-		 &cache_loadavg1,
-		 &cache_loadavg5,
-		 &cache_loadavg15) != 3)
-	{
-	  CEREBRO_DBG(("loadavg file parse error"));
-	  goto cleanup;
-	}
+                 "%f %f %f",
+                 &cache_loadavg1,
+                 &cache_loadavg5,
+                 &cache_loadavg15) != 3)
+        {
+          CEREBRO_DBG(("loadavg file parse error"));
+          goto cleanup;
+        }
 
       last_read = now.tv_sec;
     }

@@ -574,11 +574,11 @@ _metric_data_update(struct cerebrod_node_data *nd,
     {
       /* Re-hash if our hash is getting too small */
       if ((nd->metric_data_count + 1) > (nd->metric_data_size*2))
-	cerebrod_rehash(&nd->metric_data,
-			&nd->metric_data_size,
-			LISTENER_DATA_METRIC_DATA_INCREMENT,
-			nd->metric_data_count,
-			&nd->node_data_lock);
+        cerebrod_rehash(&nd->metric_data,
+                        &nd->metric_data_size,
+                        LISTENER_DATA_METRIC_DATA_INCREMENT,
+                        nd->metric_data_count,
+                        &nd->node_data_lock);
 
       md = metric_data_create(metric_name);
       Hash_insert(nd->metric_data, md->metric_name, md);
@@ -630,11 +630,11 @@ cerebrod_listener_data_update(char *nodename,
     {
       /* Re-hash if our hash is getting too small */
       if ((listener_data_numnodes + 1) > (listener_data_size*2))
-	cerebrod_rehash(&listener_data,
-			&listener_data_size,
-			LISTENER_DATA_SIZE_INCREMENT,
-			listener_data_numnodes,
-			&listener_data_lock);
+        cerebrod_rehash(&listener_data,
+                        &listener_data_size,
+                        LISTENER_DATA_SIZE_INCREMENT,
+                        listener_data_numnodes,
+                        &listener_data_lock);
 
       nd = _cerebrod_node_data_create_and_init(nodename);
       Hash_insert(listener_data, nd->nodename, nd);

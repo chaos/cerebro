@@ -140,7 +140,7 @@ _cerebro_nodelist_create(cerebro_t handle, const char *metric_name)
 
 int
 _cerebro_nodelist_append(cerebro_nodelist_t nodelist,
-			 const char *nodename,
+                         const char *nodename,
                          u_int32_t metric_value_received_time,
                          u_int32_t metric_value_type,
                          u_int32_t metric_value_len,

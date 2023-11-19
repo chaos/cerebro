@@ -325,7 +325,7 @@ int wrap_list_delete(WRAPPERS_ARGS, ListIterator i);
 #define Hash_remove(h, key) \
         wrap_hash_remove(WRAPPERS_DEBUG_ARGS, h, key)
 #define Hash_remove_if(h, argf, arg) \
-	wrap_hash_remove_if(WRAPPERS_DEBUG_ARGS,h, argf, arg)
+        wrap_hash_remove_if(WRAPPERS_DEBUG_ARGS,h, argf, arg)
 #define Hash_delete_if(h, argf, arg) \
         wrap_hash_delete_if(WRAPPERS_DEBUG_ARGS, h, argf, arg)
 #define Hash_for_each(h, argf, arg) \

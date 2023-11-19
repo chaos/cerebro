@@ -268,7 +268,7 @@ cerebrod_event_node_timeout_monitor(void *arg)
 
     }
 
-  return NULL;			/* NOT REACHED */
+  return NULL;                  /* NOT REACHED */
 }
 
 #endif /* !WITH_CEREBROD_SPEAKER_ONLY */

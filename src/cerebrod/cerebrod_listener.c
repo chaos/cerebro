@@ -150,10 +150,10 @@ _listener_setup_socket(int num)
 
       optlen = sizeof(struct ip_mreqn);
       if (setsockopt(fd, SOL_IP, IP_ADD_MEMBERSHIP, &imr, optlen) < 0)
-	{
-	  CEREBROD_ERR(("setsockopt: %s", strerror(errno)));
+        {
+          CEREBROD_ERR(("setsockopt: %s", strerror(errno)));
           goto cleanup;
-	}
+        }
     }
 
   /* For quick start/restart */
@@ -625,23 +625,23 @@ cerebrod_listener(void *arg)
 
       /* No packet read */
       if (recv_len <= 0)
-	continue;
+        continue;
 
       if (recv_len >= CEREBRO_MAX_PACKET_LEN)
         {
-	  CEREBROD_DBG(("received truncated packet"));
+          CEREBROD_DBG(("received truncated packet"));
           continue;
         }
 
       if (_cerebrod_message_check_version(buf, recv_len) < 0)
         {
-	  CEREBROD_DBG(("received invalid version packet"));
+          CEREBROD_DBG(("received invalid version packet"));
           continue;
         }
 
       if (!(msg = _cerebrod_message_unmarshall(buf, recv_len)))
         {
-	  CEREBROD_DBG(("received unmarshallable packet"));
+          CEREBROD_DBG(("received unmarshallable packet"));
           continue;
         }
 
@@ -679,11 +679,11 @@ cerebrod_listener(void *arg)
         in_cluster_flag = 1;
 
       if (!in_cluster_flag)
-	{
-	  CEREBROD_DBG(("received non-cluster packet: %s", nodename_buf));
+        {
+          CEREBROD_DBG(("received non-cluster packet: %s", nodename_buf));
           cerebrod_message_destroy(msg);
-	  continue;
-	}
+          continue;
+        }
 
       memset(nodename_key, '\0', CEREBRO_MAX_NODENAME_LEN+1);
 
@@ -760,7 +760,7 @@ cerebrod_listener(void *arg)
       cerebrod_message_destroy(msg);
     }
 
-  return NULL;			/* NOT REACHED */
+  return NULL;                  /* NOT REACHED */
 }
 
 #endif /* !WITH_CEREBROD_SPEAKER_ONLY */

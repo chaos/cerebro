@@ -64,10 +64,10 @@ cerebro_clusterlist_genders_setup(genders_t *gh, char *filename)
   if (genders_load_data(*gh, filename) < 0)
     {
       if (genders_errnum(*gh) == GENDERS_ERR_OPEN)
-	{
-	  CEREBRO_ERR(("genders database '%s' cannot be opened", filename));
-	  goto cleanup;
-	}
+        {
+          CEREBRO_ERR(("genders database '%s' cannot be opened", filename));
+          goto cleanup;
+        }
       else
         {
           CEREBRO_ERR(("genders_load_data: %s", genders_errormsg(*gh)));

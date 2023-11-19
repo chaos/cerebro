@@ -114,10 +114,10 @@ int metric_module_get_metric_flags(metric_modules_t handle,
  * call metric module get_metric_value function
  */
 int metric_module_get_metric_value(metric_modules_t handle,
-				   unsigned int index,
-				   unsigned int *metric_value_type,
-				   unsigned int *metric_value_len,
-				   void **metric_value);
+                                   unsigned int index,
+                                   unsigned int *metric_value_type,
+                                   unsigned int *metric_value_len,
+                                   void **metric_value);
 
 /*
  * metric_module_destroy_metric_value
@@ -125,8 +125,8 @@ int metric_module_get_metric_value(metric_modules_t handle,
  * call metric module destroy_metric_value function
  */
 int metric_module_destroy_metric_value(metric_modules_t handle,
-				       unsigned int index,
-				       void *metric_value);
+                                       unsigned int index,
+                                       void *metric_value);
 
 /*
  * metric_module_get_metric_thread

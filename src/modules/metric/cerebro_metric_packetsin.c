@@ -64,8 +64,8 @@ packetsin_metric_get_metric_name(void)
  */
 static int
 packetsin_metric_get_metric_value(unsigned int *metric_value_type,
-				  unsigned int *metric_value_len,
-				  void **metric_value)
+                                  unsigned int *metric_value_len,
+                                  void **metric_value)
 {
   u_int32_t packetsinval;
   u_int32_t *packetsinptr = NULL;

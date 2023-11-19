@@ -382,9 +382,9 @@ clusterlist_module_node_in_cluster(clusterlist_module_t handle, const char *node
 
 int
 clusterlist_module_get_nodename(clusterlist_module_t handle,
-				const char *node,
-				char *buf,
-				unsigned int buflen)
+                                const char *node,
+                                char *buf,
+                                unsigned int buflen)
 {
   if (_handle_info_check(handle) < 0)
     return -1;

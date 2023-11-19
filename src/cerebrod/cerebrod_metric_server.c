@@ -326,7 +326,7 @@ _metric_server_respond_with_error(int fd, int32_t version, u_int32_t err_code)
 
   assert(fd >= 0
          && err_code >= CEREBRO_METRIC_SERVER_PROTOCOL_ERR_VERSION_INVALID
-	 && err_code <= CEREBRO_METRIC_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
+         && err_code <= CEREBRO_METRIC_SERVER_PROTOCOL_ERR_INTERNAL_ERROR);
 
   memset(&res, '\0', CEREBRO_METRIC_SERVER_ERR_RESPONSE_LEN);
   res.version = version;
@@ -1034,7 +1034,7 @@ cerebrod_metric_server(void *arg)
       Pthread_attr_destroy(&attr);
     }
 
-  return NULL;			/* NOT REACHED */
+  return NULL;                  /* NOT REACHED */
 }
 
 #endif /* !WITH_CEREBROD_SPEAKER_ONLY */

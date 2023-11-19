@@ -78,9 +78,9 @@ memused_metric_get_metric_value(unsigned int *metric_value_type,
     }
 
   if (cerebro_metric_get_memory(&memtotalval,
-				&memfreeval,
-				NULL,
-				NULL) < 0)
+                                &memfreeval,
+                                NULL,
+                                NULL) < 0)
     goto cleanup;
 
   if (!(memusedptr = (u_int32_t *)malloc(sizeof(u_int32_t))))

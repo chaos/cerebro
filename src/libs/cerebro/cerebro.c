@@ -126,7 +126,7 @@ cerebro_handle_destroy(cerebro_t handle)
   if (handle->loaded_state & CEREBRO_CONFIG_LOADED)
     {
       if (_cerebro_unload_config(handle) < 0)
-	return -1;
+        return -1;
 
       if (handle->loaded_state & CEREBRO_CONFIG_LOADED)
         {

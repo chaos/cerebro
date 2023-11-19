@@ -375,13 +375,13 @@ wrap_select(WRAPPERS_ARGS, int n, fd_set *readfds, fd_set *writefds, fd_set *exc
       if (rv < 0 && errno != EINTR)
         WRAPPERS_ERR_ERRNO("select");
       if (rv < 0 && timeout)
-	{
-	  Gettimeofday(&end, NULL);
-	  /* delta = end-start */
-	  timersub(&end, &start, &delta);
-	  /* timeout = timeout_orig-delta */
-	  timersub(&timeout_orig, &delta, timeout);
-	}
+        {
+          Gettimeofday(&end, NULL);
+          /* delta = end-start */
+          timersub(&end, &start, &delta);
+          /* timeout = timeout_orig-delta */
+          timersub(&timeout_orig, &delta, timeout);
+        }
     }
   while (rv < 0);
 
@@ -588,24 +588,24 @@ wrap_gettimeofday_workaround(WRAPPERS_ARGS, struct timeval *tv, struct timezone 
 
     while (1)
       {
-	if ((ret1 = gettimeofday(&tv1, tz)))
-	  WRAPPERS_ERR_ERRNO("gettimeofday");
-	if ((ret2 = gettimeofday(&tv2, tz)))
-	  WRAPPERS_ERR_ERRNO("gettimeofday");
+        if ((ret1 = gettimeofday(&tv1, tz)))
+          WRAPPERS_ERR_ERRNO("gettimeofday");
+        if ((ret2 = gettimeofday(&tv2, tz)))
+          WRAPPERS_ERR_ERRNO("gettimeofday");
 
-	if (abs(tv1.tv_sec - tv2.tv_sec) < GETTIMEOFDAY_RANGE)
-	  {
-	    tv->tv_sec = tv2.tv_sec;
-	    tv->tv_usec = tv2.tv_usec;
-	    rv = ret2;
-	    break;
-	  }
-	else
-	  cerebro_err_output("gettimeofday bad time read "
-			     "(abs(%lu - %lu) >= %u) - retrying",
-			     tv1.tv_sec,
-			     tv2.tv_sec,
-			     GETTIMEOFDAY_RANGE);
+        if (abs(tv1.tv_sec - tv2.tv_sec) < GETTIMEOFDAY_RANGE)
+          {
+            tv->tv_sec = tv2.tv_sec;
+            tv->tv_usec = tv2.tv_usec;
+            rv = ret2;
+            break;
+          }
+        else
+          cerebro_err_output("gettimeofday bad time read "
+                             "(abs(%lu - %lu) >= %u) - retrying",
+                             tv1.tv_sec,
+                             tv2.tv_sec,
+                             GETTIMEOFDAY_RANGE);
       }
   }
 

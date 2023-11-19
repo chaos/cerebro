@@ -415,12 +415,12 @@ monitor_module_metric_names(monitor_modules_t handle, unsigned int index)
 
 int
 monitor_module_metric_update(monitor_modules_t handle,
-			     unsigned int index,
-			     const char *nodename,
+                             unsigned int index,
+                             const char *nodename,
                              const char *metric_name,
-			     unsigned int metric_value_type,
-			     unsigned int metric_value_len,
-			     void *metric_value)
+                             unsigned int metric_value_type,
+                             unsigned int metric_value_len,
+                             void *metric_value)
 {
   struct cerebro_monitor_module_info *module_info;
 

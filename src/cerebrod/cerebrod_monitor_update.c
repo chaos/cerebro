@@ -316,17 +316,17 @@ cerebrod_monitor_modules_update(const char *nodename,
       Pthread_mutex_unlock(&(ml->monitor_list_lock));
 
       while ((monitor_module = list_next(itr)))
-	{
-	  Pthread_mutex_lock(&monitor_module->monitor_lock);
-	  monitor_module_metric_update(monitor_handle,
-				       monitor_module->index,
-				       nodename,
-				       metric_name,
-				       mm->metric_value_type,
-				       mm->metric_value_len,
-				       mm->metric_value);
-	  Pthread_mutex_unlock(&monitor_module->monitor_lock);
-	}
+        {
+          Pthread_mutex_lock(&monitor_module->monitor_lock);
+          monitor_module_metric_update(monitor_handle,
+                                       monitor_module->index,
+                                       nodename,
+                                       metric_name,
+                                       mm->metric_value_type,
+                                       mm->metric_value_len,
+                                       mm->metric_value);
+          Pthread_mutex_unlock(&monitor_module->monitor_lock);
+        }
 
       Pthread_mutex_lock(&(ml->monitor_list_lock));
       List_iterator_destroy(itr);

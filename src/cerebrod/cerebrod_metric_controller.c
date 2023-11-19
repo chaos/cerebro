@@ -1133,7 +1133,7 @@ cerebrod_metric_controller(void *arg)
       Pthread_attr_destroy(&attr);
     }
 
-  return NULL;			/* NOT REACHED */
+  return NULL;                  /* NOT REACHED */
 }
 
 #endif /* !WITH_CEREBROD_SPEAKER_ONLY */
