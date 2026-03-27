@@ -91,6 +91,7 @@ _cerebrod_set_config_default(void)
   memset(&conf, '\0', sizeof(struct cerebrod_config));
 
   conf.debug = CEREBROD_DEBUG_DEFAULT;
+  conf.foreground = CEREBROD_FOREGROUND_DEFAULT;
   conf.config_file = CEREBRO_CONFIG_FILE_DEFAULT;
 
   conf.heartbeat_frequency_min = CEREBROD_HEARTBEAT_FREQUENCY_MIN_DEFAULT;
@@ -153,8 +154,8 @@ _usage(void)
           "-h    --help          Output Help\n"
           "-v    --version       Output Version\n"
           "-c    --config_file   Specify alternate config file\n"
-          "-d    --debug         Turn on debugging and run daemon\n"
-          "                      in foreground\n");
+          "-f    --foreground    run in foreground\n"
+          "-d    --debug         Turn on debugging and run daemon, implies --foreground\n");
   exit(0);
 }
 
@@ -188,13 +189,14 @@ _cerebrod_cmdline_arguments_parse(int argc, char **argv)
       {"version",             0, NULL, 'v'},
       {"config-file",         1, NULL, 'c'},
       {"debug",               0, NULL, 'd'},
+      {"foreground",          0, NULL, 'f'},
     };
 #endif /* HAVE_GETOPT_LONG */
 
   assert(argv);
 
   memset(options, '\0', sizeof(options));
-  strcat(options, "hvc:d");
+  strcat(options, "hvc:df");
 
   /* turn off output messages */
   opterr = 0;
@@ -216,7 +218,11 @@ _cerebrod_cmdline_arguments_parse(int argc, char **argv)
         case 'c':       /* --config-file */
           conf.config_file = Strdup(optarg);
           break;
+        case 'f':       /* --foreground */
+          conf.foreground++;
+          break;
         case 'd':       /* --debug */
+          conf.foreground++;
           conf.debug++;
           break;
         case '?':
@@ -1155,6 +1161,7 @@ _cerebrod_config_dump(void)
   fprintf(stderr, "* Command Line Options\n");
   fprintf(stderr, "* -------------------------------\n");
   fprintf(stderr, "* debug: %d\n", conf.debug);
+  fprintf(stderr, "* foreground: %d\n", conf.foreground);
   fprintf(stderr, "* config_file: \"%s\"\n", conf.config_file);
   fprintf(stderr, "* -------------------------------\n");
   fprintf(stderr, "* Configuration File Options\n");

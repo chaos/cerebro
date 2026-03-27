@@ -3,8 +3,8 @@ Description=Cerebrod daemon
 After=syslog.target network.target   
                                       
 [Service]                            
-Type=forking                         
-ExecStart=/usr/sbin/cerebrod         
+Type=simple
+ExecStart=/usr/sbin/cerebrod -f
 ExecReload=/bin/kill -HUP $MAINPID   
 KillMode=process                     
 User=root

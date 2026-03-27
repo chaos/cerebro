@@ -112,11 +112,12 @@ main(int argc, char **argv)
 
   cerebrod_config_setup(argc, argv);
 
+
+  if (!conf.foreground)
+    cerebrod_daemon_init();
+
   if (!conf.debug)
-    {
-      cerebrod_daemon_init();
-      cerebro_err_set_flags(CEREBRO_ERROR_SYSLOG);
-    }
+    cerebro_err_set_flags(CEREBRO_ERROR_SYSLOG);
   else
     cerebro_err_set_flags(CEREBRO_ERROR_STDERR);
 
