@@ -394,7 +394,7 @@ _cerebrod_load_config(void)
                     *ptr = '\0';
 
                   if (!hostlist_push(conf.forward_message_config[i].hosts, hostptr))
-                    cerebro_err_exit("host '%s' improperly formatted");
+                    cerebro_err_exit("host '%s' improperly formatted", hostptr);
                   Free(hostptr);
                 }
               Hostlist_sort(conf.forward_message_config[i].hosts);
@@ -424,7 +424,7 @@ _cerebrod_load_config(void)
             *ptr = '\0';
 
           if (!hostlist_push(conf.forward_host_accept, hostptr))
-            cerebro_err_exit("host '%s' improperly formatted");
+            cerebro_err_exit("host '%s' improperly formatted", hostptr);
           Free(hostptr);
         }
       Hostlist_sort(conf.forward_host_accept);
