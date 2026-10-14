@@ -54,6 +54,8 @@ cerebrod_message_destroy(struct cerebrod_message *msg)
 
   for (i = 0; i < msg->metrics_len; i++)
     {
+      if (!msg->metrics[i])
+        continue;
       Free(msg->metrics[i]->metric_value);
       Free(msg->metrics[i]);
     }
