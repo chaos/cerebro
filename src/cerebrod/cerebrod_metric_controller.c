@@ -739,7 +739,7 @@ _update_metric(int fd,
   return 0;
 
  cleanup:
-  Free(req->metric_value);
+  /* req->metric_value is freed by the caller on both success and error */
   return -1;
 }
 
