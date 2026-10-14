@@ -487,7 +487,7 @@ wrap_inet_ntop(WRAPPERS_ARGS, int af, const void *src, char *dst, socklen_t cnt)
   if (!src || !dst)
     WRAPPERS_ERR_INVALID_PARAMETERS("inet_ntop");
 
-  if ((rv = inet_ntop(af, src, dst, cnt)) < 0)
+  if (!(rv = inet_ntop(af, src, dst, cnt)))
     WRAPPERS_ERR_ERRNO("inet_ntop");
 
   return rv;
