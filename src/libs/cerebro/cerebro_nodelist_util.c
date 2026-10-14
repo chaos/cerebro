@@ -90,6 +90,13 @@ _cerebro_nodelist_create(cerebro_t handle, const char *metric_name)
 {
   cerebro_nodelist_t nodelist = NULL;
 
+  if (!metric_name || strlen(metric_name) > CEREBRO_MAX_METRIC_NAME_LEN)
+    {
+      CEREBRO_DBG(("invalid parameters"));
+      handle->errnum = CEREBRO_ERR_INTERNAL;
+      goto cleanup;
+    }
+
   if (!(nodelist = (cerebro_nodelist_t)malloc(sizeof(struct cerebro_nodelist))))
     {
       handle->errnum = CEREBRO_ERR_OUTMEM;
@@ -98,7 +105,7 @@ _cerebro_nodelist_create(cerebro_t handle, const char *metric_name)
 
   memset(nodelist, '\0', sizeof(struct cerebro_nodelist));
   nodelist->magic = CEREBRO_NODELIST_MAGIC_NUMBER;
-  strcpy(nodelist->metric_name, metric_name);
+  strncpy(nodelist->metric_name, metric_name, CEREBRO_MAX_METRIC_NAME_LEN);
 
   if (!(nodelist->nodes = list_create((ListDelF)_cerebro_nodelist_data_destroy)))
     {

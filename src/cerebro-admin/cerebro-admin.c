@@ -164,7 +164,7 @@ _usage(void)
 static void
 _version(void)
 {
-  fprintf(stderr, "%s %ss\n", PACKAGE, VERSION);
+  fprintf(stderr, "%s %s\n", PACKAGE, VERSION);
   exit(1);
 }
 
